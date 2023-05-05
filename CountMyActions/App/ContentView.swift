@@ -10,5 +10,7 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         CameraWithPosesAndOverlaysView()
+
+        //TODO:牌堆界面切换
     }
 }
