@@ -1,34 +1,49 @@
-/*
-See LICENSE folder for this sample’s licensing information.
-
-Abstract:
-The app's camera with poses and the overlay view.
-*/
-
-import SwiftUI
-
 struct CameraWithPosesAndOverlaysView: View {
 
     @StateObject var viewModel = ViewModel()
+    @State var showCardView = false
 
     var body: some View {
-        OverlayView(count: viewModel.uiCount) {
-            viewModel.onCameraButtonTapped()
+        ZStack {
+            if showCardView {
+                CardView(cards: viewModel.cards)
+            }
+            OverlayView(count: viewModel.uiCount) {
+                viewModel.onCameraButtonTapped()
+            }
         }
         .background {
-            if let (image, poses) = viewModel.liveCameraImageAndPoses {
-                CameraView(
-                    cameraImage: image
-                )
-                .overlay {
-                    PosesView(poses: poses)
+            if viewModel.isShowCardArray {
+                // 如果当前有 CardView，则删除
+                if showCardView {
+                    showCardView = false
                 }
-                .ignoresSafeArea()
+                // 创建一个新的 CardView
+                showCardView = true
+            } else {
+                // 如果当前有 CardView，则删除
+                if showCardView {
+                    showCardView = false
+                }
             }
         }
         .onAppear {
             viewModel.initialize()
         }
+
+        VStack(alignment: .leading, spacing: 20) {
+            HStack {
+                Button(action: {
+                    viewModel.onCardArrayButtonTapped()
+                }, label: {
+                    Text("cardArray Button")
+                })
+            }
+            Spacer()
+        }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color.white)
     }
 }
 

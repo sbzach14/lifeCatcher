@@ -45,6 +45,8 @@ class ViewModel: ObservableObject {
     // cardArray
     public let cardArray = Array(0...51)
 
+    public var isShowCardArray: Bool = false
+
     // MARK: - View Controller Events
 
     /// Configures the main view after it loads.
@@ -66,6 +68,16 @@ class ViewModel: ObservableObject {
         startVideoProcessingPipeline()
     }
 
+    func onCardArrayButtonTapped()
+    {
+        if isShowCardArray == true{
+            isShowCardArray = false
+        }
+        else{
+            isShowCardArray = true
+        }
+    }
+
     // MARK: - Helper methods
 
     /// Change the camera toggle positions.
@@ -78,7 +90,7 @@ class ViewModel: ObservableObject {
         }
         configuration.frameRate = 120
 
-        
+
     }
     
     /// Start the video-processing pipeline by displaying the poses in the camera frames and
