@@ -9,8 +9,9 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
+        
+        //TODO: auth
+        
         CameraWithPosesAndOverlaysView()
-
-        //TODO:牌堆界面切换
     }
 }
