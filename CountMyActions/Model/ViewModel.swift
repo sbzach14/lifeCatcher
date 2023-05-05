@@ -89,8 +89,6 @@ class ViewModel: ObservableObject {
             configuration.position = .front
         }
         configuration.frameRate = 120
-
-
     }
     
     /// Start the video-processing pipeline by displaying the poses in the camera frames and
