@@ -5,6 +5,10 @@ Abstract:
 The app's main view model.
 */
 
+#if DEBUG
+import AVKit
+#endif
+
 import SwiftUI
 import CreateMLComponents
 import AsyncAlgorithms
@@ -38,6 +42,9 @@ class ViewModel: ObservableObject {
     /// The counter to count action repetitions from a pose stream.
     private let actionCounter = ActionCounter()
 
+    // cardArray
+    public let cardArray = Array(0...51)
+
     // MARK: - View Controller Events
 
     /// Configures the main view after it loads.
@@ -63,11 +70,55 @@ class ViewModel: ObservableObject {
 
     /// Change the camera toggle positions.
     func toggleCameraSelection() {
+        #if DEBUG
+        // Use a sample video file as input in debug mode
+        let bundleURL = Bundle.main.url(forResource: "sample-video", withExtension: "mp4")!
+        let asset = AVURLAsset(url: bundleURL)
+        configuration.avAsset = asset
+        #else
         if configuration.position == .front {
             configuration.position = .back
-        } else {
+             else {
             configuration.position = .front
         }
+        #endif
+
+        let frameDuration = CMTime(value: 1, timescale: 120)
+        
+        for captureDevice in AVCaptureDevice.devices(for: .video) {
+            if captureDevice.position == .front || captureDevice.position == .back {
+                do {
+                    try captureDevice.lockForConfiguration()
+                    
+                    // Set activeVideoMinFrameDuration and activeVideoMaxFrameDuration
+                    captureDevice.activeVideoMinFrameDuration = frameDuration
+                    captureDevice.activeVideoMaxFrameDuration = frameDuration
+                    
+                    // Set videoMinFrameDuration and videoMaxFrameDuration for each AVCaptureConnection
+                    for captureInput in captureSession.inputs {
+                        if let captureInput = captureInput as? AVCaptureDeviceInput,
+                        captureInput.device == captureDevice {
+                            for captureConnection in captureInput.connections {
+                                if captureConnection.isVideoOrientationSupported {
+                                    captureConnection.videoOrientation = .portrait
+                                }
+                                
+                                if captureConnection.isVideoMinFrameDurationSupported &&
+                                    captureConnection.isVideoMaxFrameDurationSupported {
+                                    captureConnection.videoMinFrameDuration = frameDuration
+                                    captureConnection.videoMaxFrameDuration = frameDuration
+                                }
+                            }
+                        }
+                    }
+                    
+                    captureDevice.unlockForConfiguration()
+                } catch {
+                    print("Failed to lock configuration for device: \(captureDevice), error: \(error.localizedDescription)")
+                }
+            }
+        }
+
     }
     
     /// Start the video-processing pipeline by displaying the poses in the camera frames and
@@ -79,8 +130,6 @@ class ViewModel: ObservableObject {
         }
 
         displayCameraTask = Task {
-            //TODO:设置并调用慢动作前置120fps摄像头
-
             // Display poses on top of each camera frame.
             try await self.displayPoseInCamera()
         }
