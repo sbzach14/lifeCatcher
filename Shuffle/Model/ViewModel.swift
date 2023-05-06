@@ -16,6 +16,8 @@ class ViewModel: ObservableObject {
     
     // cardArray
     @Published var cardArray : Array<Int> = []
+    //TODO: int->image dic
+    //TODO: rule judge
     
     private var displayCameraTask: Task<Void, Error>?
     
