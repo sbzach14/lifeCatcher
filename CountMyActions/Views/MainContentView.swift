@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct CameraWithPosesAndOverlaysView: View {
+struct MainContentView: View {
 
     @StateObject var viewModel = ViewModel()
 

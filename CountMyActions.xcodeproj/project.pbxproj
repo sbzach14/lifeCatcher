@@ -10,18 +10,19 @@
 		18CA148B284ABF8C00F90372 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 18CA148A284ABF8C00F90372 /* AsyncAlgorithms */; };
 		18CA14D2284AC42C00F90372 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C3284AC42C00F90372 /* ViewModel.swift */; };
 		18CA14D3284AC42C00F90372 /* OverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C5284AC42C00F90372 /* OverlayView.swift */; };
-		18CA14D4284AC42C00F90372 /* CameraWithPosesAndOverlaysView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C6284AC42C00F90372 /* CameraWithPosesAndOverlaysView.swift */; };
+		18CA14D4284AC42C00F90372 /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C6284AC42C00F90372 /* MainContentView.swift */; };
 		18CA14D6284AC42C00F90372 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C8284AC42C00F90372 /* CameraView.swift */; };
 		18CA14DB284AC42C00F90372 /* MyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14D0284AC42C00F90372 /* MyApp.swift */; };
 		18CA14DC284AC42C00F90372 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14D1284AC42C00F90372 /* ContentView.swift */; };
 		50053F84284ACAED00C86BF4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50053F81284ACAED00C86BF4 /* Assets.xcassets */; };
+		A887167F2A0623E500B7F2CD /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887167E2A0623E500B7F2CD /* AuthManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		18CA1477284ABEC600F90372 /* CountMyActions.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CountMyActions.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		18CA14C3284AC42C00F90372 /* ViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
 		18CA14C5284AC42C00F90372 /* OverlayView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OverlayView.swift; sourceTree = "<group>"; };
-		18CA14C6284AC42C00F90372 /* CameraWithPosesAndOverlaysView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraWithPosesAndOverlaysView.swift; sourceTree = "<group>"; };
+		18CA14C6284AC42C00F90372 /* MainContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainContentView.swift; sourceTree = "<group>"; };
 		18CA14C8284AC42C00F90372 /* CameraView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		18CA14D0284AC42C00F90372 /* MyApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyApp.swift; sourceTree = "<group>"; };
 		18CA14D1284AC42C00F90372 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -30,6 +31,8 @@
 		50053F82284ACAED00C86BF4 /* CountMyActions.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = CountMyActions.entitlements; sourceTree = "<group>"; };
 		5269731033A41881895B5A41 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A6748516A40E187B4F8ACFA3 /* SampleCode.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
+		A887167E2A0623E500B7F2CD /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
+		A88716812A06413600B7F2CD /* DOC.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DOC.md; sourceTree = "<group>"; };
 		F11ED84932036610B96BC234 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -48,6 +51,7 @@
 		18CA146E284ABEC600F90372 = {
 			isa = PBXGroup;
 			children = (
+				A88716812A06413600B7F2CD /* DOC.md */,
 				5269731033A41881895B5A41 /* README.md */,
 				18CA1479284ABEC600F90372 /* CountMyActions */,
 				18CA1478284ABEC600F90372 /* Products */,
@@ -67,6 +71,7 @@
 		18CA1479284ABEC600F90372 /* CountMyActions */ = {
 			isa = PBXGroup;
 			children = (
+				A887167D2A0623A300B7F2CD /* Utils */,
 				18CA14CF284AC42C00F90372 /* App */,
 				18CA14C2284AC42C00F90372 /* Model */,
 				18CA14C4284AC42C00F90372 /* Views */,
@@ -86,7 +91,7 @@
 			isa = PBXGroup;
 			children = (
 				18CA14C5284AC42C00F90372 /* OverlayView.swift */,
-				18CA14C6284AC42C00F90372 /* CameraWithPosesAndOverlaysView.swift */,
+				18CA14C6284AC42C00F90372 /* MainContentView.swift */,
 				18CA14C8284AC42C00F90372 /* CameraView.swift */,
 			);
 			path = Views;
@@ -120,6 +125,14 @@
 			path = LICENSE;
 			sourceTree = "<group>";
 		};
+		A887167D2A0623A300B7F2CD /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				A887167E2A0623E500B7F2CD /* AuthManager.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -130,6 +143,7 @@
 				18CA1473284ABEC600F90372 /* Sources */,
 				18CA1474284ABEC600F90372 /* Frameworks */,
 				18CA1475284ABEC600F90372 /* Resources */,
+				A88716802A063EEF00B7F2CD /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -191,13 +205,35 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		A88716802A063EEF00B7F2CD /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 8;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd \"${TARGET_BUILD_DIR}/${PRODUCT_NAME}.app\"\nupx -9 \"${TARGET_NAME}\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		18CA1473284ABEC600F90372 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				18CA14DC284AC42C00F90372 /* ContentView.swift in Sources */,
-				18CA14D4284AC42C00F90372 /* CameraWithPosesAndOverlaysView.swift in Sources */,
+				A887167F2A0623E500B7F2CD /* AuthManager.swift in Sources */,
+				18CA14D4284AC42C00F90372 /* MainContentView.swift in Sources */,
 				18CA14DB284AC42C00F90372 /* MyApp.swift in Sources */,
 				18CA14D2284AC42C00F90372 /* ViewModel.swift in Sources */,
 				18CA14D3284AC42C00F90372 /* OverlayView.swift in Sources */,
