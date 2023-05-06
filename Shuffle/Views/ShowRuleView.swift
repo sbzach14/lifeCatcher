@@ -10,8 +10,9 @@ import SwiftUI
 
 struct ShowRuleView: View {
     var body: some View {
-            //TODO: showRule button
-            //TODO: selectRule
+        //TODO: showRuleSelect button
+        //TODO: ruleSelect
+        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
     }
 }
 
