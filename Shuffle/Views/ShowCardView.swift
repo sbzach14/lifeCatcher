@@ -8,7 +8,7 @@ The app's overlay view.
 import SwiftUI
 
 /// - Tag: OverlayView
-struct OverlayView: View {
+struct ShowCardView: View {
     let cards: Array<Int>
     @State var showCardView = false
 
@@ -73,6 +73,6 @@ extension View {
 
 struct OverlayView_Previews: PreviewProvider {
     static var previews: some View {
-        OverlayView(cards: Array(0...51))
+        ShowCardView(cards: Array(0...51))
     }
 }

@@ -6,7 +6,8 @@ struct MainContentView: View {
 
     var body: some View {
         ZStack {
-            OverlayView(cards: viewModel.cardArray)
+            ShowCardView(cards: viewModel.cardArray)
+            ShowRuleView()
         }
         .background{
             if let image = viewModel.cameraImage{
