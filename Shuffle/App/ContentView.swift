@@ -28,7 +28,7 @@ struct ContentView: View {
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
                 Button(action: {
-                    if self.userInput == self.uniqueID {
+                    if AuthManager.authKey(input: self.userInput) == true {
                         self.isAuthorized = true
                     } else {
                         self.userInput = ""

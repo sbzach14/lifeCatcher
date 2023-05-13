@@ -7,7 +7,7 @@ struct MainContentView: View {
     var body: some View {
         ZStack {
             ShowCardView(cards: viewModel.cardArray)
-            ShowRuleView()
+            ShowRuleView().environmentObject(viewModel)
         }
         .background{
             if let image = viewModel.cameraImage{
@@ -20,4 +20,12 @@ struct MainContentView: View {
         }
     }
 }
+
+
+struct MainContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        MainContentView()
+    }
+}
+
 

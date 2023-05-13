@@ -8,16 +8,23 @@ The app's main view model.
 import SwiftUI
 import CreateMLComponents
 import AsyncAlgorithms
+import AVFoundation
 
 /// - Tag: ViewModel
 class ViewModel: ObservableObject {
     
+    
+    
     @Published var cameraImage : CGImage?
     
     // cardArray
-    @Published var cardArray : Array<Int> = []
-    //TODO: int->image dic
-    //TODO: rule judge
+    @Published var cardArray :  [Int] = Array(0...51)
+    @Published var winnerPlayer: [Int] = [0]
+
+    public var state : Int = 0
+    public var playerNum : Int = 2
+    public var ruleIndex : Int = 0
+    
     
     private var displayCameraTask: Task<Void, Error>?
     
@@ -32,7 +39,7 @@ class ViewModel: ObservableObject {
     func initialize() {
         toggleCameraSelection()
         
-        cardArray = Array(0...51)
+        
 
         // Restart the video processing.
         startVideoProcessingPipeline()
@@ -79,11 +86,31 @@ class ViewModel: ObservableObject {
                 .createCGImage(frame.feature, from: frame.feature.extent){
                 await display(image: cgImage)
             }
-
-            //TODO: 这里视频帧流逐张图传入模型之中，替换模型
-            // cardArray = try await model.applied(to: frame.feature)
             
-            //TODO: compute rule result
+            var nowState = 0
+            
+            //TODO: 这里视频帧流逐张图传入模型之中，替换模型
+            // cardArray, nowState = try await model.applied(to: frame.feature)
+            
+            switch nowState{
+            case 0:
+                //idle
+                if state == 1 || state == 2{
+                    computeWinnerPlayer()
+                    speakText(input: winnerPlayer)
+                }
+            case 1:
+                //cut
+                print("cut")
+            case 2:
+                //shuffle
+                print("shuffle")
+            default:
+                //error
+                print("error")
+            }
+            
+            self.state = nowState
 
             // Frame rate debug information.
             print(String(format: "Frame rate %2.2f fps", 1 / (CFAbsoluteTimeGetCurrent() - lastTime)))
@@ -98,5 +125,25 @@ class ViewModel: ObservableObject {
     /// - Tag: display
     @MainActor func display(image: CGImage) {
         self.cameraImage = image
+    }
+    
+    func computeWinnerPlayer() {
+        winnerPlayer = GameManager.selectGame(gameIndex: ruleIndex, inputCards: cardArray, playerNum: playerNum)
+        speakText(input: winnerPlayer)
+    }
+    
+
+    func speakText(input: [Int]) {
+        let speechSynthesizer = AVSpeechSynthesizer()
+
+        if input.isEmpty {
+            let speechUtterance = AVSpeechUtterance(string: "无")
+            speechSynthesizer.speak(speechUtterance)
+        } else {
+            let speechStrings = input.map { String($0) }
+            let joinedSpeech = speechStrings.joined(separator: "和")
+            let speechUtterance = AVSpeechUtterance(string: joinedSpeech)
+            speechSynthesizer.speak(speechUtterance)
+        }
     }
 }

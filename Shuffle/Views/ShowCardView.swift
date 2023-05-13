@@ -9,7 +9,7 @@ import SwiftUI
 
 /// - Tag: OverlayView
 struct ShowCardView: View {
-    let cards: Array<Int>
+    var cards: Array<Int>
     @State var showCardView = false
 
     var body: some View {
@@ -36,7 +36,7 @@ struct ShowCardView: View {
                 }
                 
                 Spacer()
-            }.bubbleBackground()
+            }
             
             Spacer()
             
@@ -71,7 +71,7 @@ extension View {
     }
 }
 
-struct OverlayView_Previews: PreviewProvider {
+struct ShowCardView_Previews: PreviewProvider {
     static var previews: some View {
         ShowCardView(cards: Array(0...51))
     }

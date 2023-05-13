@@ -17,6 +17,10 @@
 		50053F84284ACAED00C86BF4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50053F81284ACAED00C86BF4 /* Assets.xcassets */; };
 		A887167F2A0623E500B7F2CD /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887167E2A0623E500B7F2CD /* AuthManager.swift */; };
 		A88716832A0651F900B7F2CD /* ShowRuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88716822A0651F900B7F2CD /* ShowRuleView.swift */; };
+		A88716852A0F701500B7F2CD /* GameManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88716842A0F701500B7F2CD /* GameManager.swift */; };
+		A88716882A0F71D500B7F2CD /* TexasPoker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88716872A0F71D500B7F2CD /* TexasPoker.swift */; };
+		A887168A2A0F805400B7F2CD /* TexasPokerEval.py in Resources */ = {isa = PBXBuildFile; fileRef = A88716892A0F805400B7F2CD /* TexasPokerEval.py */; };
+		A88F20982A0FB58C005E4A27 /* PythonKit in Frameworks */ = {isa = PBXBuildFile; productRef = A88F20972A0FB58C005E4A27 /* PythonKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +39,10 @@
 		A887167E2A0623E500B7F2CD /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		A88716812A06413600B7F2CD /* DOC.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DOC.md; sourceTree = "<group>"; };
 		A88716822A0651F900B7F2CD /* ShowRuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRuleView.swift; sourceTree = "<group>"; };
+		A88716842A0F701500B7F2CD /* GameManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameManager.swift; sourceTree = "<group>"; };
+		A88716872A0F71D500B7F2CD /* TexasPoker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TexasPoker.swift; sourceTree = "<group>"; };
+		A88716892A0F805400B7F2CD /* TexasPokerEval.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = TexasPokerEval.py; sourceTree = "<group>"; };
+		A88F20952A0FAF3E005E4A27 /* PythonKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = PythonKit; path = ../PythonKit; sourceTree = "<group>"; };
 		F11ED84932036610B96BC234 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -44,6 +52,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				18CA148B284ABF8C00F90372 /* AsyncAlgorithms in Frameworks */,
+				A88F20982A0FB58C005E4A27 /* PythonKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -53,12 +62,14 @@
 		18CA146E284ABEC600F90372 = {
 			isa = PBXGroup;
 			children = (
+				A88F20922A0F9BA0005E4A27 /* Packages */,
 				A88716812A06413600B7F2CD /* DOC.md */,
 				5269731033A41881895B5A41 /* README.md */,
 				18CA1479284ABEC600F90372 /* Shuffle */,
 				18CA1478284ABEC600F90372 /* Products */,
 				6F1A40C356DDD7B853F4B7B0 /* Configuration */,
 				8FCAE36708347D80E3093CD0 /* LICENSE */,
+				A88F20962A0FB582005E4A27 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -73,6 +84,7 @@
 		18CA1479284ABEC600F90372 /* Shuffle */ = {
 			isa = PBXGroup;
 			children = (
+				A88716862A0F712A00B7F2CD /* GameRules */,
 				A887167D2A0623A300B7F2CD /* Utils */,
 				18CA14CF284AC42C00F90372 /* App */,
 				18CA14C2284AC42C00F90372 /* Model */,
@@ -132,8 +144,33 @@
 			isa = PBXGroup;
 			children = (
 				A887167E2A0623E500B7F2CD /* AuthManager.swift */,
+				A88716842A0F701500B7F2CD /* GameManager.swift */,
 			);
 			path = Utils;
+			sourceTree = "<group>";
+		};
+		A88716862A0F712A00B7F2CD /* GameRules */ = {
+			isa = PBXGroup;
+			children = (
+				A88716872A0F71D500B7F2CD /* TexasPoker.swift */,
+				A88716892A0F805400B7F2CD /* TexasPokerEval.py */,
+			);
+			path = GameRules;
+			sourceTree = "<group>";
+		};
+		A88F20922A0F9BA0005E4A27 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				A88F20952A0FAF3E005E4A27 /* PythonKit */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		A88F20962A0FB582005E4A27 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -155,6 +192,7 @@
 			name = Shuffle;
 			packageProductDependencies = (
 				18CA148A284ABF8C00F90372 /* AsyncAlgorithms */,
+				A88F20972A0FB58C005E4A27 /* PythonKit */,
 			);
 			productName = CountMyActions;
 			productReference = 18CA1477284ABEC600F90372 /* Shuffle.app */;
@@ -202,6 +240,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A887168A2A0F805400B7F2CD /* TexasPokerEval.py in Resources */,
 				50053F84284ACAED00C86BF4 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -235,9 +274,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				18CA14DC284AC42C00F90372 /* ContentView.swift in Sources */,
+				A88716852A0F701500B7F2CD /* GameManager.swift in Sources */,
 				A88716832A0651F900B7F2CD /* ShowRuleView.swift in Sources */,
 				A887167F2A0623E500B7F2CD /* AuthManager.swift in Sources */,
 				18CA14D4284AC42C00F90372 /* MainContentView.swift in Sources */,
+				A88716882A0F71D500B7F2CD /* TexasPoker.swift in Sources */,
 				18CA14DB284AC42C00F90372 /* MyApp.swift in Sources */,
 				18CA14D2284AC42C00F90372 /* ViewModel.swift in Sources */,
 				18CA14D3284AC42C00F90372 /* ShowCardView.swift in Sources */,
@@ -469,6 +510,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 18CA1489284ABF8C00F90372 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
 			productName = AsyncAlgorithms;
+		};
+		A88F20972A0FB58C005E4A27 /* PythonKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PythonKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
