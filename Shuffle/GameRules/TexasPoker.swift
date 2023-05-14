@@ -8,6 +8,7 @@
 
 import Foundation
 import PythonKit
+import Python
 
 class TexasPoker {
     static func findWinningPlayer(inputCards: [Int], playerNum: Int) -> [Int]? {
@@ -62,20 +63,46 @@ class TexasPoker {
             cards.removeFirst()
         }
         
-        // 导入 Python 模块
-        let texasPokerEval = Python.import("TexasPokerEval")
+        let winner = texasPokerEval(holeCards:players, communityCards: communityCards)
+        return winner
+    }
+    
+    
+    static func texasPokerEval(holeCards: [[Int]], communityCards: [Int]) -> [Int] {
+        var maxHandRank = -1
+        var winningPlayers: [Int] = []
         
-        // 将 Swift 数组转换为 Python 列表
-        let playersInput = inputCards.map { PythonObject($0) }
-        let communityCardsInput = communityCards.map { PythonObject($0) }
+        // 将数字转换为形如 "As", "Ks" 的字符串表示形式
+        var holeCardsStr: [[String]] = []
+        for cards in holeCards {
+            var cardsStr: [String] = []
+            for card in cards {
+                cardsStr.append(intToStr(card: card))
+            }
+            holeCardsStr.append(cardsStr)
+        }
         
-        // 调用 Python 函数并获取结果
-        let winningPlayers = texasPokerEval.TexasPokerEval(hole_cards: playersInput, community_cards: communityCardsInput)
+        var communityCardsStr: [String] = []
+        for card in communityCards {
+            communityCardsStr.append(intToStr(card: card))
+        }
         
-        // 将 Python 列表转换为 Swift 数组
-        let swiftWinningPlayers = winningPlayers.map { Int($0)! }
+        let texasPokerEval = Python.import("pypokerengine")
+        //TODO: fix cal rank
         
-        return swiftWinningPlayers
+
+        return winningPlayers
     }
 
+    
+    static func intToStr(card: Int) -> String {
+        let suits: [String] = ["s", "h", "c", "d"]
+        let ranks: [String] = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+        let suit = suits[card / 13]
+        let rank = ranks[card % 13]
+        return rank + suit
+    }
 }
+
+
+

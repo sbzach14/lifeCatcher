@@ -7,6 +7,11 @@
         使用upx对可执行文件进行二进制加密
 
 
+python调用参考：
+1.https://zhuanlan.zhihu.com/p/627147941
+2.pythonKit
+3.pyPokerEngine
+
 
 
 TODO:

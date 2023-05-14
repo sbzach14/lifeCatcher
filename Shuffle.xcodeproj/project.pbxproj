@@ -19,8 +19,10 @@
 		A88716832A0651F900B7F2CD /* ShowRuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88716822A0651F900B7F2CD /* ShowRuleView.swift */; };
 		A88716852A0F701500B7F2CD /* GameManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88716842A0F701500B7F2CD /* GameManager.swift */; };
 		A88716882A0F71D500B7F2CD /* TexasPoker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88716872A0F71D500B7F2CD /* TexasPoker.swift */; };
-		A887168A2A0F805400B7F2CD /* TexasPokerEval.py in Resources */ = {isa = PBXBuildFile; fileRef = A88716892A0F805400B7F2CD /* TexasPokerEval.py */; };
-		A88F20982A0FB58C005E4A27 /* PythonKit in Frameworks */ = {isa = PBXBuildFile; productRef = A88F20972A0FB58C005E4A27 /* PythonKit */; };
+		A88F209B2A10E99F005E4A27 /* PythonKit in Frameworks */ = {isa = PBXBuildFile; productRef = A88F209A2A10E99F005E4A27 /* PythonKit */; };
+		A88F209D2A10EB39005E4A27 /* python-stdlib in Resources */ = {isa = PBXBuildFile; fileRef = A88F209C2A10EB39005E4A27 /* python-stdlib */; };
+		A88F209F2A10EB4D005E4A27 /* Python.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A88F209E2A10EB4D005E4A27 /* Python.xcframework */; };
+		A88F20A12A10EBC6005E4A27 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A88F20A02A10EBC6005E4A27 /* SystemConfiguration.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,8 +43,9 @@
 		A88716822A0651F900B7F2CD /* ShowRuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRuleView.swift; sourceTree = "<group>"; };
 		A88716842A0F701500B7F2CD /* GameManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameManager.swift; sourceTree = "<group>"; };
 		A88716872A0F71D500B7F2CD /* TexasPoker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TexasPoker.swift; sourceTree = "<group>"; };
-		A88716892A0F805400B7F2CD /* TexasPokerEval.py */ = {isa = PBXFileReference; lastKnownFileType = text.script.python; path = TexasPokerEval.py; sourceTree = "<group>"; };
-		A88F20952A0FAF3E005E4A27 /* PythonKit */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = PythonKit; path = ../PythonKit; sourceTree = "<group>"; };
+		A88F209C2A10EB39005E4A27 /* python-stdlib */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "python-stdlib"; sourceTree = "<group>"; };
+		A88F209E2A10EB4D005E4A27 /* Python.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = Python.xcframework; sourceTree = "<group>"; };
+		A88F20A02A10EBC6005E4A27 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		F11ED84932036610B96BC234 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -52,7 +55,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				18CA148B284ABF8C00F90372 /* AsyncAlgorithms in Frameworks */,
-				A88F20982A0FB58C005E4A27 /* PythonKit in Frameworks */,
+				A88F209F2A10EB4D005E4A27 /* Python.xcframework in Frameworks */,
+				A88F20A12A10EBC6005E4A27 /* SystemConfiguration.framework in Frameworks */,
+				A88F209B2A10E99F005E4A27 /* PythonKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +70,8 @@
 				A88F20922A0F9BA0005E4A27 /* Packages */,
 				A88716812A06413600B7F2CD /* DOC.md */,
 				5269731033A41881895B5A41 /* README.md */,
+				A88F209E2A10EB4D005E4A27 /* Python.xcframework */,
+				A88F209C2A10EB39005E4A27 /* python-stdlib */,
 				18CA1479284ABEC600F90372 /* Shuffle */,
 				18CA1478284ABEC600F90372 /* Products */,
 				6F1A40C356DDD7B853F4B7B0 /* Configuration */,
@@ -153,7 +160,6 @@
 			isa = PBXGroup;
 			children = (
 				A88716872A0F71D500B7F2CD /* TexasPoker.swift */,
-				A88716892A0F805400B7F2CD /* TexasPokerEval.py */,
 			);
 			path = GameRules;
 			sourceTree = "<group>";
@@ -161,7 +167,6 @@
 		A88F20922A0F9BA0005E4A27 /* Packages */ = {
 			isa = PBXGroup;
 			children = (
-				A88F20952A0FAF3E005E4A27 /* PythonKit */,
 			);
 			name = Packages;
 			sourceTree = "<group>";
@@ -169,6 +174,7 @@
 		A88F20962A0FB582005E4A27 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A88F20A02A10EBC6005E4A27 /* SystemConfiguration.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -183,6 +189,7 @@
 				18CA1473284ABEC600F90372 /* Sources */,
 				18CA1474284ABEC600F90372 /* Frameworks */,
 				18CA1475284ABEC600F90372 /* Resources */,
+				A88F20A42A10FB0C005E4A27 /* ShellScript */,
 				A88716802A063EEF00B7F2CD /* Run Script */,
 			);
 			buildRules = (
@@ -192,7 +199,7 @@
 			name = Shuffle;
 			packageProductDependencies = (
 				18CA148A284ABF8C00F90372 /* AsyncAlgorithms */,
-				A88F20972A0FB58C005E4A27 /* PythonKit */,
+				A88F209A2A10E99F005E4A27 /* PythonKit */,
 			);
 			productName = CountMyActions;
 			productReference = 18CA1477284ABEC600F90372 /* Shuffle.app */;
@@ -225,6 +232,7 @@
 			mainGroup = 18CA146E284ABEC600F90372;
 			packageReferences = (
 				18CA1489284ABF8C00F90372 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
+				A88F20992A10E99F005E4A27 /* XCRemoteSwiftPackageReference "PythonKit" */,
 			);
 			productRefGroup = 18CA1478284ABEC600F90372 /* Products */;
 			projectDirPath = "";
@@ -240,8 +248,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A887168A2A0F805400B7F2CD /* TexasPokerEval.py in Resources */,
 				50053F84284ACAED00C86BF4 /* Assets.xcassets in Resources */,
+				A88F209D2A10EB39005E4A27 /* python-stdlib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -264,7 +272,25 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ncd \"${TARGET_BUILD_DIR}/${PRODUCT_NAME}.app\"\nupx -9 \"${TARGET_NAME}\"\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\ncd \"${TARGET_BUILD_DIR}/${PRODUCT_NAME}.app\"\nupx -9 \"${TARGET_NAME}\"\n";
+		};
+		A88F20A42A10FB0C005E4A27 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\n#!/bin/bash\nset -e\n\necho \"Signing as $EXPANDED_CODE_SIGN_IDENTITY_NAME ($EXPANDED_CODE_SIGN_IDENTITY)\"\n\nfind \"$CODESIGNING_FOLDER_PATH/python-stdlib/lib-dynload\" -name \"*.so\" -exec /usr/bin/codesign --force --sign \"$EXPANDED_CODE_SIGN_IDENTITY\" -o runtime --timestamp=none --preserve-metadata=identifier,entitlements,flags --generate-entitlement-der {} \\;\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -503,6 +529,14 @@
 				version = 0.0.1;
 			};
 		};
+		A88F20992A10E99F005E4A27 /* XCRemoteSwiftPackageReference "PythonKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pvieito/PythonKit.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -511,8 +545,9 @@
 			package = 18CA1489284ABF8C00F90372 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
 			productName = AsyncAlgorithms;
 		};
-		A88F20972A0FB58C005E4A27 /* PythonKit */ = {
+		A88F209A2A10E99F005E4A27 /* PythonKit */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = A88F20992A10E99F005E4A27 /* XCRemoteSwiftPackageReference "PythonKit" */;
 			productName = PythonKit;
 		};
 /* End XCSwiftPackageProductDependency section */

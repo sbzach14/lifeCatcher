@@ -10,6 +10,9 @@ import CreateMLComponents
 import AsyncAlgorithms
 import AVFoundation
 
+import Python
+import PythonKit
+
 /// - Tag: ViewModel
 class ViewModel: ObservableObject {
     
@@ -30,7 +33,6 @@ class ViewModel: ObservableObject {
     
     /// The camera configuration to define the basic camera position, pixel format, and resolution to use.
     private var configuration = VideoReader.CameraConfiguration()
-    
 
     // MARK: - View Controller Events
 
@@ -39,10 +41,21 @@ class ViewModel: ObservableObject {
     func initialize() {
         toggleCameraSelection()
         
-        
-
         // Restart the video processing.
         startVideoProcessingPipeline()
+        
+
+                
+                // Python 初始化
+                guard let stdLibPath = Bundle.main.path(forResource: "python-stdlib", ofType: nil) else { return }
+                guard let libDynloadPath = Bundle.main.path(forResource: "python-stdlib/lib-dynload", ofType: nil) else { return }
+
+                setenv("PYTHONHOME", stdLibPath, 1)
+                setenv("PYTHONPATH", "\(stdLibPath):\(libDynloadPath)", 1)
+
+                Py_Initialize()
+
+                
     }
 
 

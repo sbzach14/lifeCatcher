@@ -32,8 +32,8 @@ struct ShowRuleView: View {
                     Picker("Player Num", selection: $selectedPlayerNum) {
                         let ruleIndex = viewModel.ruleIndex
                         if let selectedRule = GameManager.gameRules[ruleIndex] {
-                            ForEach(selectedRule.minPlayerNum...selectedRule.maxPlayerNum, id: \.self) { num in
-                                Text(String(num)).tag(num)
+                            ForEach(0...selectedRule.maxPlayerNum - selectedRule.minPlayerNum, id: \.self) { index in
+                                Text(String(index + selectedRule.minPlayerNum)).tag(index)
                             }
                         }
                     }
@@ -62,7 +62,7 @@ struct ShowRuleView: View {
         let ruleIndex = viewModel.ruleIndex
         if let selectedRule = GameManager.gameRules[ruleIndex] {
             viewModel.playerNum = selectedRule.minPlayerNum + playerNum
-            viewModel.winnerPlayer = []
+            viewModel.computeWinnerPlayer()
         }
     }
 
@@ -71,7 +71,13 @@ struct ShowRuleView: View {
             viewModel.ruleIndex = ruleIndex
             viewModel.playerNum = selectedRule.minPlayerNum
             refreshPlayerNum.toggle() // Toggle the refreshPlayerNum to trigger update
-            viewModel.winnerPlayer = []
+            viewModel.computeWinnerPlayer()
         }
+    }
+}
+
+struct ShowRuleView_Previews: PreviewProvider {
+    static var previews: some View {
+        ShowRuleView().environmentObject(ViewModel())
     }
 }
