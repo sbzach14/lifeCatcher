@@ -23,6 +23,7 @@
 		A88F209D2A10EB39005E4A27 /* python-stdlib in Resources */ = {isa = PBXBuildFile; fileRef = A88F209C2A10EB39005E4A27 /* python-stdlib */; };
 		A88F209F2A10EB4D005E4A27 /* Python.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A88F209E2A10EB4D005E4A27 /* Python.xcframework */; };
 		A88F20A12A10EBC6005E4A27 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A88F20A02A10EBC6005E4A27 /* SystemConfiguration.framework */; };
+		A88F20A82A120DEF005E4A27 /* Resources.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A88F20A72A120DEF005E4A27 /* Resources.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +47,7 @@
 		A88F209C2A10EB39005E4A27 /* python-stdlib */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "python-stdlib"; sourceTree = "<group>"; };
 		A88F209E2A10EB4D005E4A27 /* Python.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = Python.xcframework; sourceTree = "<group>"; };
 		A88F20A02A10EBC6005E4A27 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		A88F20A72A120DEF005E4A27 /* Resources.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Resources.xcassets; sourceTree = "<group>"; };
 		F11ED84932036610B96BC234 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -67,6 +69,7 @@
 		18CA146E284ABEC600F90372 = {
 			isa = PBXGroup;
 			children = (
+				A88F20A72A120DEF005E4A27 /* Resources.xcassets */,
 				A88F20922A0F9BA0005E4A27 /* Packages */,
 				A88716812A06413600B7F2CD /* DOC.md */,
 				5269731033A41881895B5A41 /* README.md */,
@@ -248,6 +251,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A88F20A82A120DEF005E4A27 /* Resources.xcassets in Resources */,
 				50053F84284ACAED00C86BF4 /* Assets.xcassets in Resources */,
 				A88F209D2A10EB39005E4A27 /* python-stdlib in Resources */,
 			);
