@@ -22,17 +22,22 @@ struct ShowCardView: View {
                     //TODO: show rule result
                     
                     ScrollView {
-                                LazyVGrid(columns: [GridItem(.adaptive(minimum: 50))]) {
-                                    ForEach(cards, id: \.self) { card in
-                                        Text(String(card))
-                                            .padding(5)
-                                            .background(Color.gray)
-                                            .cornerRadius(10)
-                                    }
-                                }
-                                .padding()
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 50))]) {
+                            ForEach(cards.indices, id: \.self) { index in
+                                let imageName = "\(cards[index])"
+                                Image(imageName)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .padding(5)
+                                    .background(Color.gray)
+                                    .cornerRadius(10)
                             }
-                            .bubbleBackground()
+                        }
+                        .padding()
+                    }
+                    .bubbleBackground()
+
+
                 }
                 
                 Spacer()
