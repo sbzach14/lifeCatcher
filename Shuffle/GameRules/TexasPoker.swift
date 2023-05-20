@@ -65,6 +65,7 @@ class TexasPoker {
         
         let winner = texasPokerEval(holeCards:players, communityCards: communityCards)
         return winner
+        return winner
     }
     
     
