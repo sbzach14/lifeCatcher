@@ -1,16 +1,16 @@
 import itertools
-from utils import sort_cards_from_low_to_high
+from utils import sort_cards_from_high_to_low
 
 class HandEvaluator:
     # 
 
-    NULLBULL = 0
-    ONEBULL = 1
-    BULLBULL = 2
-    SILVERBULL = 3
-    GOLDBULL = 4
-    BOMB = 6
-    FIVELITTLE = 5
+    NULLBULL = 1
+    ONEBULL = 2
+    BULLBULL = 3
+    SILVERBULL = 4
+    GOLDBULL = 5
+    BOMB = 7
+    FIVELITTLE = 6
 
     # result[flag, rank1,rank2...rank5]
     # rank-> 01 0010 club2
@@ -19,10 +19,17 @@ class HandEvaluator:
     # return flag 
     @classmethod
     def evaluate(self, cards):
-        
 
-        return eval
+        funcList = [self.Is_Bomb, self.Is_FiveLittle, self.Is_goldbull, self.Is_silverbull, self.Is_bull]
 
+        for func in funcList:
+            flag, rank = func(cards)
+            if flag == 0:
+                continue
+            else:
+                eval = 1<<(8 + flag - 1) | rank 
+                print(eval)
+                return eval
 
 
     @classmethod
@@ -32,45 +39,60 @@ class HandEvaluator:
 
         # find out all bull
         for combination in itertools.combinations(cards, 3):
-            sum_of_cards = sum(item[1] for item in combination)
-            if sum_of_cards % 10 == 0:
+            sum_of_combinations = 0
+            for item in combination:
+                if item.rank > 10:
+                    sum_of_combinations += 10
+                else:
+                    sum_of_combinations += item.rank
+            if sum_of_combinations % 10 == 0:
                 bulls.append(combination)
-        # no bull
+        # if no bull
         if len(bulls) == 0:
-            return self.NULLBULL, self.rank_for_suit_number(cards)
+            print("没牛")
+            return self.NULLBULL, self.rank_for_max_card(cards)
         
         for bull in bulls:
             other_cards = [card for card in cards if card not in bull]
-            cards_rank = sum(item[1] for item in other_cards) % 10
-            # bull,bull
+            cards_rank = 0
+            for item in other_cards:
+                if(item.rank > 10):
+                    cards_rank += 10
+                else:
+                    cards_rank += item.rank
+            cards_rank = cards_rank % 10
+            # if bull,bull
             if cards_rank == 0:
-                return self.BULLBULL, self.rank_for_suit_number(cards)
+                print("牛牛")
+                return self.BULLBULL, self.rank_for_max_card(cards)
             if cards_rank > bull_rank:
                 bull_rank = cards_rank
+        print("牛" + str(bull_rank))
 
-        return self.ONEBULL, bull_rank
+        return self.ONEBULL, bull_rank << 4 | self.rank_for_max_card(cards)
         
     @classmethod
     def Is_silverbull(self,cards):
         count = 0
-        for _, num in cards:
-            if num < 10:
+        for card in cards:
+            if card.rank < 10:
                 return 0, 0
-            if num == 10:
+            if card.rank == 10:
                 count += 1
             if count > 1:
                 return 0, 0
-        rank = self.rank_for_suit_number(cards)
+        rank = self.rank_for_max_card(cards)
+        print("银牛")
         return self.SILVERBULL, rank
     @classmethod
     def Is_goldbull(self,cards):
         count = 0
         for card in cards:
-            _, num = card
-            if num > 10:
+            if card.rank > 10:
                 count += 1
         if count == 5:
-            rank = self.rank_for_suit_number(cards)
+            rank = self.rank_for_max_card(cards)
+            print("金牛")
             return self.GOLDBULL, rank
         
         return 0, 0
@@ -79,35 +101,28 @@ class HandEvaluator:
     def Is_Bomb(self, cards):
         counts = {}
         for card in cards:
-            _, num = card
-            counts[num] = counts.get(num, 0) + 1
-            if counts[num] == 4:
 
-                return self.BOMB, num
+            counts[card.rank] = counts.get(card.rank, 0) + 1
+            if counts[card.rank] == 4:
+                print("炸弹！")
+                return self.BOMB, card.rank
         return 0, 0
     
-    def is_FiveLittle(self, cards):
-        if(sum(card[1] for card in cards) > 10): return False
+    @classmethod
+    def Is_FiveLittle(self, cards):
+        if(sum(card.rank for card in cards) > 10): return 0, 0
         for card in cards:
-            if(card[1] > 5):
+            if(card.rank > 5):
                 return 0, 0
             
-        rank = self.rank_for_suit_number(cards)
-        
+        rank = self.rank_for_max_card(cards)
+        print("五小!")
         return self.FIVELITTLE, rank
     
-    def rank_for_suit_number(cards):
-        sorted_cards = sort_cards_from_low_to_high(cards)
-        rank = 0
-        for index in range(sorted_cards):
-            card = sorted_cards[index]
-            suit = card[0]
-            number = card[1]
-            current_card_rank = suit<<2 | number
-            rank = rank | current_card_rank << (index << 2)
-        
+    def rank_for_max_card(cards):
+        sorted_cards = sort_cards_from_high_to_low(cards)
+        rank = sorted_cards[0].score
         return rank
-
     
 
 
