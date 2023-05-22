@@ -1,4 +1,4 @@
-from ThreeCardPoker.HandEvaluator import HandEvaluator
+from FiveCardStud.HandEvaluator import HandEvaluator
 from utils import Init_deck
 
 class Player:
@@ -15,7 +15,7 @@ class Player:
         
 
 
-class ThreeCardPokerGame:
+class FiveCardStudGame:
 
     @classmethod
     def calResult(self, cardArray, playerNum):
@@ -32,7 +32,7 @@ class ThreeCardPokerGame:
             allPlayCards.append(Player())
         
         #发牌
-        for card_cnt in range(3):
+        for card_cnt in range(5):
             for i in range(playerNum):
                 allPlayCards[i].Insert_card(deck.pop(0))
 

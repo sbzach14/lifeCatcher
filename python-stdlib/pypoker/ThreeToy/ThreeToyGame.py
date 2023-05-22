@@ -1,4 +1,4 @@
-from ThreeCardPoker.HandEvaluator import HandEvaluator
+from ThreeToy.HandEvaluator import HandEvaluator
 from utils import Init_deck
 
 class Player:
@@ -15,7 +15,7 @@ class Player:
         
 
 
-class ThreeCardPokerGame:
+class ThreeToyGame:
 
     @classmethod
     def calResult(self, cardArray, playerNum):
