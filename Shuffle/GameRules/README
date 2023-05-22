@@ -1,0 +1,5 @@
+findWinningPlayer() is tested
+
+Go to ./TexasPokerTest and compile by
+swiftc  main.swift TexasPoker.swift -o test
+And execute multiple times
