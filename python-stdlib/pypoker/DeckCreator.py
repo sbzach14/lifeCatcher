@@ -1,6 +1,3 @@
-
-
-
 def pack_card(card_index):
     return (card_index // 13, card_index % 13 + 1)
 
