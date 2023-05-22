@@ -1,5 +1,5 @@
-from ThreeCardPoker.HandEvaluator import HandEvaluator
 from utils import Init_deck
+from TwoEightGang.HandEvaluator import HandEvaluator
 
 class Player:
     # Card format[(int suitNumber(0-3), int number(1-13))
@@ -14,13 +14,13 @@ class Player:
         self.evaluate_flag = HandEvaluator.eval_hand(self.player_card)
         
 
-
-class ThreeCardPokerGame:
+class TwoEightGangGame:
 
     @classmethod
     def calResult(self, cardArray, playerNum):
         deck = Init_deck(cardArray)
         winners = self.calWinners(deck, playerNum)
+                
         return winners
 
     @classmethod
@@ -32,9 +32,10 @@ class ThreeCardPokerGame:
             allPlayCards.append(Player())
         
         #发牌
-        for card_cnt in range(3):
-            for i in range(playerNum):
-                allPlayCards[i].Insert_card(deck.pop(0))
+        for i in range(playerNum):
+            allPlayCards[i].Insert_card(deck.pop(0))
+        for i in range(playerNum):
+            allPlayCards[i].Insert_card(deck.pop(0))
 
         for i in range(playerNum):
             allPlayCards[i].evaluate_hand_cards()
@@ -49,4 +50,3 @@ class ThreeCardPokerGame:
                 winners.append(i)
 
         return winners
-        

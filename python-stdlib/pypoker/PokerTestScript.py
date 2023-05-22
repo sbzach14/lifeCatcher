@@ -1,13 +1,16 @@
 from utils import random_card_array, show_card_array
 from TinyNine.TinyNineGame import TinyNineGame
 from ThreeCardPoker.ThreeCardPokerGame import ThreeCardPokerGame
+from FiveCardStud.FiveCardStudGame import FiveCardStudGame
+from ThreeToy.ThreeToyGame import ThreeToyGame
 from PokerBull.PorkerBullGame import PokerBullGame
+
+
+
 
 if __name__ == "__main__":
     #testCardArray = random_card_array(52)
-    testCardArray = [34,3,10,25,35,19,5,41,11,32,46,18,33,0,45,17,12,31,21,38,22,27,43,28]
+    testCardArray = [12, 42, 18, 19, 16, 22, 26, 29, 14, 4]
     show_card_array(testCardArray)
     print("")
-    # print(ThreeCardPokerGame.calResult(testCardArray, 5))
-    print("")
-    print(PokerBullGame.calResult(testCardArray,4))
+    print(ThreeToyGame.calResult(testCardArray, 3))

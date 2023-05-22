@@ -41,7 +41,6 @@ class TexasPoker{
             cards.removeFirst()
         }
         
-
         let winners = texasPokerEval(holeCards:players, communityCards: communityCards)
         return winners
     }

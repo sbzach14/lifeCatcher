@@ -1,5 +1,3 @@
-from functools import reduce
-from itertools import groupby
 from Card import Card
 
 class HandEvaluator:
@@ -83,14 +81,14 @@ class HandEvaluator:
   @classmethod
   def __search_straightflash(self, cards):
     rank = -1
-    cnt = 0
+    cnt = 1
     straight_head_index = -1
     for i in range(max(2, len(cards) - 1)):
         if cards[i].suit == cards[i+1].suit and cards[i].rank - cards[i+1].rank == 1:
             cnt += 1
             if straight_head_index == -1:
                straight_head_index = i
-    if cnt == 2: 
+    if cnt == 3: 
         rank = straight_head_index.rank << 2 | straight_head_index.suit
     return rank
   
@@ -132,14 +130,14 @@ class HandEvaluator:
   @classmethod
   def __search_straight(self, cards):
     rank = -1
-    cnt = 0
+    cnt = 1
     straight_head_index = -1
     for i in range(max(2, len(cards) - 1)):
         if cards[i].rank - cards[i+1].rank == 1:
             cnt += 1
             if straight_head_index == -1:
                straight_head_index = i
-    if cnt == 2: 
+    if cnt == 3: 
         rank = cards[straight_head_index].rank << 2 | cards[straight_head_index].suit
     return rank
   
