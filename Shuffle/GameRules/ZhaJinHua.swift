@@ -1,18 +1,46 @@
+//
+//  TexasPoker.swift
+//  Shuffle
+//
+//  Created by Zhangyi Chen on 5/13/23.
+//  Copyright © 2023 Apple. All rights reserved.
+//
+
 import Foundation
+import PythonKit
+import Python
 
-class TexasPoker{
 
-    static func findWinningPlayer(inputCards: [Int], playerNum: Int) -> [Int]? { 
-        guard inputCards.count == 52 && playerNum > 0 && playerNum <= 22 else { return nil }
+
+class TexasPoker {
+
+    
+    
+    
+    static func findWinningPlayer(inputCards: [Int], playerNum: Int) -> [Int]? {
+        guard inputCards.count == 52 && playerNum > 0 && playerNum <= inputCards.count else {
+            return nil
+        }
         
         var cards = inputCards
         
         // 按规则分配底牌给每个玩家
         var players = [[Int]]()
-        // 按顺序给每个玩家发一张牌，再发第二张牌 .... i,j被弄反了,我直接改了, 而且这时候要把牌扔掉.....
-        for k in 0..<playerNum { players.append( [ cards[k],cards[k+playerNum]] ) }
-        for _ in 0..<2*playerNum { cards.removeFirst() }
-
+        let holeCardsPerPlayer = 2
+        
+        for _ in 0..<playerNum {
+            players.append([])
+        }
+        
+        // 按顺序给每个玩家发一张牌，再发第二张牌
+        for i in 0..<holeCardsPerPlayer {
+            for j in 0..<playerNum {
+                let index = i * playerNum + j
+                let card = cards[index]
+                players[j].append(card)
+            }
+        }
+        
         // 公共牌
         var communityCards = [Int]()
         
@@ -41,45 +69,52 @@ class TexasPoker{
             cards.removeFirst()
         }
         
-        let winners = texasPokerEval(holeCards:players, communityCards: communityCards)
-        return winners
+        let winner = texasPokerEval(holeCards:players, communityCards: communityCards)
+        return winner
     }
     
     
     
     
     static func texasPokerEval(holeCards: [[Int]], communityCards: [Int]) -> [Int] {
-        
+        var maxHandRank = -1
+        var winningPlayers: [Int] = []
         
         // 将数字转换为形如 "As", "Ks" 的字符串表示形式
-        let holeCardsStr: [[String]] = holeCards.map(_: { $0.map(_:  {intToStr(card : $0)} ) })
-        let communityCardsStr: [String] = communityCards.map(_: {intToStr(card : $0)} )
-
+        var holeCardsStr: [[String]] = []
+        for cards in holeCards {
+            var cardsStr: [String] = []
+            for card in cards {
+                cardsStr.append(intToStr(card: card))
+            }
+            holeCardsStr.append(cardsStr)
+        }
         
-    
+        var communityCardsStr: [String] = []
+        for card in communityCards {
+            communityCardsStr.append(intToStr(card: card))
+        }
+        
+        //let texasPokerEval = Python.import("pypokerengine")
         //TODO: fix cal rank
-        // texasPokerEval.hand_score() take in an array of 7 Cards(String) and output a list of winners
+        // texasPokerEval.hand_score() take in a list of 7 Cards(String) and output a score
         
         var maxScore : Int = -1
-        var winners: [Int] = []
-
-
-        
-        var kthHand : [String] = []
-        var kthScore : Int = 0
-        for k in 0..<holeCards.count {
-            kthHand   = holeCardsStr[k] + communityCardsStr
-            kthScore = handScore(hand : kthHand)
-
-            if  kthScore == maxScore {
-                winners.append(k)
-            } else if kthScore > maxScore {
+        for k in 0...holeCards.count-1 {
+            var kthHand : [String] = holeCardsStr[k] + communityCardsStr
+            var kthScore : Int = handScore(hand : kthHand)
+            
+            if  kthScore > maxScore {
                 maxScore = kthScore
-                winners.removeAll()
-                winners.append(k)
-            }         
+                winningPlayers = [k]
+            }
+            if kthScore == maxScore {
+                winningPlayers.append(k)
+            }
+            
         }
-        return winners
+        
+        return winningPlayers
     }
     
     
@@ -87,9 +122,7 @@ class TexasPoker{
     
     
     static func handScore(hand : [String]) -> Int{
-        // will use integer to represent strength of a hand
         // returns [4bitType of hands] [4bitRank * 5]
-
         var handSorted = hand.sorted(by:compareCards)
         handSorted.reverse()
         
@@ -118,7 +151,7 @@ class TexasPoker{
             isStraight = isStraight && cardToInt(card:handSorted[i+2]) == cardToInt(card:handSorted[i+3])+1
             isStraight = isStraight && cardToInt(card:handSorted[i+3]) == cardToInt(card:handSorted[i+4])+1
             if isStraight{
-                let c : Character = Array(handSorted[i])[1]
+                var c : Character = Array(handSorted[i])[1]
                 isFlush = c==Array(handSorted[i+1])[1]
                 isFlush = isFlush && c==Array(handSorted[i+2])[1]
                 isFlush = isFlush && c==Array(handSorted[i+3])[1]
@@ -156,14 +189,14 @@ class TexasPoker{
             if rank==cardToInt(card:handSorted[i+1]) && rank==cardToInt(card:handSorted[i+2]){
                 if i>=2 {
                     for j in 0...i-2{
-                        let m : Int = cardToInt(card: handSorted[j])
+                        var m : Int = cardToInt(card: handSorted[j])
                         if m==cardToInt(card: handSorted[j+1]){
                             remain = m
                             return (fullhouse<<20)|(rank<<16)|(remain<<12)
                         }}}
                 if i<=2{
                     for j in i+3...6{
-                        let m : Int = cardToInt(card: handSorted[j])
+                        var m : Int = cardToInt(card: handSorted[j])
                         if m==cardToInt(card: handSorted[j+1]){
                             remain = m
                             return (fullhouse<<20)|(rank<<16)|(remain<<12)
@@ -177,7 +210,7 @@ class TexasPoker{
     static func checkFlush(handSorted : [String]) -> Int {
         var suitDict : [Character:Int] = ["s":0,"h":0, "c":0, "d":0]
         for card in handSorted{
-            let suit : Character = Array(card)[1]
+            var suit : Character = Array(card)[0]
             let count = suitDict[suit]!
             suitDict[suit] = count+1
         }
@@ -228,10 +261,8 @@ class TexasPoker{
                     rank2=cardToInt(card:handSorted[0])
                     rank3=cardToInt(card:handSorted[1])
                 }
-
-            return (threecards<<20) | (rank1<<16) | (rank2<<12) | (rank3<<8)
             }
-           
+            return (threecards<<20) | (rank1<<16) | (rank2<<12) | (rank3<<8)
         }
         return -1
     }
@@ -248,19 +279,18 @@ class TexasPoker{
             if rank1 == cardToInt(card:handSorted[i+1]){
                 for j in i+2...5{
                     rank2 = cardToInt(card:handSorted[j])
-                    if rank2 == cardToInt(card:handSorted[j+1]) {
+                    if rank2 == cardToInt(card:handSorted[j+1]){
                         if i==0 && j==2{
-                            rank3 = cardToInt(card:handSorted[4])
+                            rank3 = cardToInt(card:handSorted[4]
                         }else if i==0 && j>=3{
-                            rank3 = cardToInt(card:handSorted[3])
+                            rank3 = cardToInt(card:handSorted[3]
                         }
                         else{
-                            rank3 = cardToInt(card:handSorted[0])
+                            rank3 = cardToInt(card:handSorted[0]
                         }
                         return (twopairs<<20) | (rank1<<16) | (rank2<<12) | (rank3<<8)
                     }
                 }
-            }
         }
         return -1
     }
@@ -270,9 +300,9 @@ class TexasPoker{
     //Check onepair
     static func checkOnepair(handSorted : [String]) -> Int{
         var rank1 : Int = 0
-        let rank2 : Int = 0
-        let rank3 : Int = 0
-        let rank4 : Int = 0
+        var rank2 : Int = 0
+        var rank3 : Int = 0
+        var rank4 : Int = 0
         for i in 0...5{
             rank1 = cardToInt(card:handSorted[i])
             if rank1 == cardToInt(card:handSorted[i+1]){
@@ -285,39 +315,41 @@ class TexasPoker{
     
     //Check highcard
     static func checkHighcard(handSorted : [String]) -> Int{
-        let rank1 : Int = cardToInt(card:handSorted[0])
-        let rank2 : Int = cardToInt(card:handSorted[1])
-        let rank3 : Int = cardToInt(card:handSorted[2])
-        let rank4 : Int = cardToInt(card:handSorted[3])
-        let rank5 : Int = cardToInt(card:handSorted[4])
+        var rank1 : Int = cardToInt(card:handSorted[0])
+        var rank2 : Int = cardToInt(card:handSorted[1])
+        var rank3 : Int = cardToInt(card:handSorted[2])
+        var rank4 : Int = cardToInt(card:handSorted[3])
+        var rank5 : Int = cardToInt(card:handSorted[4])
         return (highcard<<20) | (rank1<<16) | (rank2<<12) | (rank3<<8) | (rank4<<4) | (rank5<<0)
     }
     
     
     
     
-    // made a mistake, A2345 should be the minimal straight
-    static var highcard=0  //      <~800000
-    static var onepair=1  //      <~2000000
-    static var twopairs=2  //     <~3000000
-    static var threecards=3  //   <~4000000
-    static var straight=4  //     <~5000000
-    static var flush=5  //        <~6000000
-    static var fullhouse=6  //    <~7100000
-    static var fourcards=7  //    <~8200000
-    static var straightflush=8  // ~9200000
-    static var pokerToIntDict:[Character:Int]=["2":2,"3":3,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9,"T":10,"J":11,"Q":12,"K":13,"A":14]
+    
+    static var highcard=0
+    static var onepair=1
+    static var twopairs=2
+    static var threecards=3
+    static var straight=4
+    static var flush=5
+    static var fullhouse=6
+    static var fourcards=7
+    static var straightflush=8
+    static var pokerToIntDict:[Character:Int]=["2":0,"3":1,"4":2,"5":3,"6":4,"7":5,"8":6,"9":7,"T":8,"J":9,"Q":10,"K":11,"A":12]
     static func cardToInt(card:String) -> Int { return pokerToIntDict[Array(card)[0]]! }
     static func compareCards(card0:String,card1:String) -> Bool { return cardToInt(card:card0)<cardToInt(card:card1) }
     
     static func intToStr(card: Int) -> String {
-        // intput from 0...51
         let suits: [String] = ["s", "h", "c", "d"]
         let ranks: [String] = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K"]
         let suit = suits[card / 13]
         let rank = ranks[card % 13]
         return rank + suit
     }
+    
+    
+    
     
     
 }
