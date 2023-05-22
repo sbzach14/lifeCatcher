@@ -1,4 +1,5 @@
-from HandEvaluator import HandEvaluator
+from PokerBull.HandEvaluator import HandEvaluator
+from utils import Init_deck
 
 class Player:
 
@@ -7,7 +8,6 @@ class Player:
         self.player_card = []
         self.evaluate_flag = 0
 
-    @classmethod
     def Insert_card(self, card):
         self.player_card.append(card)
 
@@ -18,30 +18,24 @@ class Player:
 
 class PokerBullGame:
 
+
     @classmethod
-    def __init__(self, initial_cards, player_num) -> None:
-        round = 1
-        self.cards = []
-        self.players = []
-        self.player_num = player_num
-        self.cards = initial_cards
-        self.players = [Player() for i in range(player_num)]
+    def calResult(self, cardArray, playerNum):
+        deck = Init_deck(cardArray)
+        winners = self.calWinners(deck, playerNum)
 
-        for i in range(self.cards):
-            card_index = self.cards[i]
-
-            card = self.pack_card(card_index)
-            self.players[i % player_num].Insert_card(card)
-            if round > 5:
-                return
-            round += 1
+        return winners
     
     @classmethod
-    def pack_card(self, card_index):
-        return (card_index // 13, card_index % 13 + 1)
-    
-    @classmethod
-    def return_winner(self):
+    def calWinners(self, deck, playerNum):
+        winners = []
+        
+
+
+
+        
+
+
         for player in self.players:
             player.evaluate_hand_cards()
         
