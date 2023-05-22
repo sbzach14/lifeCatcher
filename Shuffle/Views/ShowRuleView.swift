@@ -52,7 +52,6 @@ struct ShowRuleView: View {
                 }
                 .padding()
 
-
                 Spacer()
             }
         }

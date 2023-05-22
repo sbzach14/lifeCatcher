@@ -142,6 +142,7 @@ class ViewModel: ObservableObject {
     
     func computeWinnerPlayer() {
         winnerPlayer = GameManager.selectGame(gameIndex: ruleIndex, inputCards: cardArray, playerNum: playerNum)
+        
         speakText(input: winnerPlayer)
     }
     
@@ -158,5 +159,9 @@ class ViewModel: ObservableObject {
             let speechUtterance = AVSpeechUtterance(string: joinedSpeech)
             speechSynthesizer.speak(speechUtterance)
         }
+    }
+    //TODO return all cards
+    func speakText(input:[String:Int]){
+        
     }
 }
