@@ -1,4 +1,4 @@
-from PokerBull.HandEvaluator import HandEvaluator
+from NinePointFive.HandEvaluator import HandEvaluator
 from utils import Init_deck
 
 class Player:
@@ -14,11 +14,8 @@ class Player:
 
     def evaluate_hand_cards(self):
         self.evaluate_flag = HandEvaluator.evaluate(self.player_card)
-        
 
-
-class PokerBullGame:
-
+class NinePointFiveGame:
 
     @classmethod
     def calResult(self, cardArray, playerNum):
@@ -31,11 +28,10 @@ class PokerBullGame:
     def calWinners(self, deck, playerNum):
         allPlayers = [Player(i) for i in range(playerNum)]
 
-        for i in range(playerNum * 5):
+        for i in range(playerNum * 2):
             allPlayers[i % playerNum].Insert_card(deck[i])       
 
         for player in allPlayers:
             player.evaluate_hand_cards()
         
         return [sorted(allPlayers, key=lambda x:x.evaluate_flag, reverse=True)[0].playerID]
-        
