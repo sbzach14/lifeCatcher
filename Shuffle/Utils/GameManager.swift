@@ -22,11 +22,18 @@ class GameManager {
         
         switch gameIndex {
         case 0:
+            print(gameIndex)
             if let result = TexasPoker.findWinningPlayer(inputCards: inputCards, playerNum: playerNum) {
                 winner = result
             }
         case 1:
             print(gameIndex)
+            if let result = PokerBull.findWinner(inputCards: inputCards, playerNum: playerNum){
+                winner = result
+            }
+        case 2:
+            print(gameIndex)
+            
         default:
             print(gameIndex)
         }

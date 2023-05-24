@@ -24,7 +24,6 @@
 		A88F209F2A10EB4D005E4A27 /* Python.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A88F209E2A10EB4D005E4A27 /* Python.xcframework */; };
 		A88F20A12A10EBC6005E4A27 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A88F20A02A10EBC6005E4A27 /* SystemConfiguration.framework */; };
 		A88F20A82A120DEF005E4A27 /* Resources.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A88F20A72A120DEF005E4A27 /* Resources.xcassets */; };
-		A88F20AA2A122BEB005E4A27 /* ShowResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88F20A92A122BEB005E4A27 /* ShowResultView.swift */; };
 		A88F20AC2A1246A0005E4A27 /* RunFast.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88F20AB2A1246A0005E4A27 /* RunFast.swift */; };
 		A88F20AE2A13A470005E4A27 /* PokerBull.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88F20AD2A13A470005E4A27 /* PokerBull.swift */; };
 /* End PBXBuildFile section */
@@ -51,7 +50,6 @@
 		A88F209E2A10EB4D005E4A27 /* Python.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = Python.xcframework; sourceTree = "<group>"; };
 		A88F20A02A10EBC6005E4A27 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		A88F20A72A120DEF005E4A27 /* Resources.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Resources.xcassets; sourceTree = "<group>"; };
-		A88F20A92A122BEB005E4A27 /* ShowResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowResultView.swift; sourceTree = "<group>"; };
 		A88F20AB2A1246A0005E4A27 /* RunFast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunFast.swift; sourceTree = "<group>"; };
 		A88F20AD2A13A470005E4A27 /* PokerBull.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokerBull.swift; sourceTree = "<group>"; };
 		F11ED84932036610B96BC234 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
@@ -124,7 +122,6 @@
 				18CA14C6284AC42C00F90372 /* MainContentView.swift */,
 				18CA14C8284AC42C00F90372 /* CameraView.swift */,
 				A88716822A0651F900B7F2CD /* ShowRuleView.swift */,
-				A88F20A92A122BEB005E4A27 /* ShowResultView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -319,7 +316,6 @@
 				A887167F2A0623E500B7F2CD /* AuthManager.swift in Sources */,
 				18CA14D4284AC42C00F90372 /* MainContentView.swift in Sources */,
 				A88716882A0F71D500B7F2CD /* TexasPoker.swift in Sources */,
-				A88F20AA2A122BEB005E4A27 /* ShowResultView.swift in Sources */,
 				18CA14DB284AC42C00F90372 /* MyApp.swift in Sources */,
 				18CA14D2284AC42C00F90372 /* ViewModel.swift in Sources */,
 				A88F20AE2A13A470005E4A27 /* PokerBull.swift in Sources */,
