@@ -4,13 +4,13 @@ from ThreeCardPoker.ThreeCardPokerGame import ThreeCardPokerGame
 from FiveCardStud.FiveCardStudGame import FiveCardStudGame
 from ThreeToy.ThreeToyGame import ThreeToyGame
 from PokerBull.PorkerBullGame import PokerBullGame
-
+from Baccarat.BaccaratGame import BaccaratGame
 
 
 
 if __name__ == "__main__":
     #testCardArray = random_card_array(52)
-    testCardArray = [12, 42, 18, 19, 16, 22, 26, 29, 14, 4]
+    testCardArray = [34,28,8,46,42,29]
     show_card_array(testCardArray)
     print("")
-    print(ThreeToyGame.calResult(testCardArray, 3))
+    print(BaccaratGame.calResult(testCardArray, 2))
