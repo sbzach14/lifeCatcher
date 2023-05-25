@@ -47,6 +47,7 @@ class ViewModel: ObservableObject {
 
                 
                 // Python 初始化
+                print("pythonInitialize")
                 guard let stdLibPath = Bundle.main.path(forResource: "python-stdlib", ofType: nil) else { return }
                 guard let libDynloadPath = Bundle.main.path(forResource: "python-stdlib/lib-dynload", ofType: nil) else { return }
 

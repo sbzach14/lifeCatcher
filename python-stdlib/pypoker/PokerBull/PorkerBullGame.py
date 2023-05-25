@@ -1,6 +1,7 @@
 from PokerBull.HandEvaluator import HandEvaluator
 from utils import Init_deck
 
+
 class Player:
 
     # Card format[(int suitNumber(0-3), int number(1-13))
@@ -14,11 +15,8 @@ class Player:
 
     def evaluate_hand_cards(self):
         self.evaluate_flag = HandEvaluator.evaluate(self.player_card)
-        
-
 
 class PokerBullGame:
-
 
     @classmethod
     def calResult(self, cardArray, playerNum):
