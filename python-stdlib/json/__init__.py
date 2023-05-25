@@ -105,6 +105,7 @@ __author__ = 'Bob Ippolito <bob@redivi.com>'
 
 from .decoder import JSONDecoder, JSONDecodeError
 from .encoder import JSONEncoder
+from .TestClass import TestClass
 import codecs
 
 _default_encoder = JSONEncoder(
