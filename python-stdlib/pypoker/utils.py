@@ -4,7 +4,13 @@ from Card import Card
 def Init_deck(initial_cards):
     deck_List = []
     for card_index in initial_cards:
-        deck_List.append(Card(3 - card_index // 13, card_index % 13 + 1))
+        if(card_index < 52):
+            deck_List.append(Card(3 - card_index // 13, card_index % 13 + 1))
+        else:
+            if card_index == 53:
+                deck_List.append(Card(0, 14))
+            elif card_index == 54:
+                deck_List.append(Card(0, 15))
     
     return deck_List
 
@@ -29,9 +35,9 @@ def show_card_array(cardArray):
 
 
 def sort_cards_from_high_to_low(cards, isAMax = False):
-    return sorted(cards, key=lambda x: (x[1], x[0]), reverse=True)
+    return sorted(cards, key=lambda x: x.score, reverse=True)
 
 def sort_cards_from_low_to_high(cards, isAMax = False):
-    return sorted(cards, key=lambda x: (x[1], x[0]))
+    return sorted(cards, key=lambda x: x.score)
         
 
