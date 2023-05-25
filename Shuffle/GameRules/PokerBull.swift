@@ -27,19 +27,18 @@ class PokerBull{
         print(jsonObj["name"])
 
         print("Start the function")
-        let pokerBull =  Python.import("pypoker.PokerBull")
+        
         print("import successfully")
         let pythonList = Python.list(inputCards)
         let pythonInt = PythonObject(playerNum)
         print("var conversion")
-        print(pokerBull)
         
         let pyobj =  Int(json.TestClass.TestFunc(playerNum))!
         
         print(pyobj)
         print("////////////////////")
         
-        let pythonObject =  pokerBull.PorkerBullGame.calResult(pythonList, pythonInt)
+        let pythonObject =  json.PokerBullGame.calResult(pythonList, pythonInt)
         print("Return Winner")
         // 使用 map() 函数将 PythonList 转换为 Int 数组
         let intArray = pythonObject.object.map { Int($0)! }
