@@ -34,7 +34,7 @@ class PokerBull{
         print("var conversion")
         print(pokerBull)
         
-        let pyobj =  Int(json.testCall(playerNum))!
+        let pyobj =  Int(json.TestClass.TestFunc(playerNum))!
         
         print(pyobj)
         print("////////////////////")
