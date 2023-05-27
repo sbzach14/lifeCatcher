@@ -1,4 +1,4 @@
-from utils import Init_deck
+from .utils import Init_deck
 
 
 class BaccaratGame:

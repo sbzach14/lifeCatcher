@@ -1,5 +1,4 @@
-from utils import Init_deck
-from TwoEightGang.HandEvaluator import HandEvaluator
+from .utils import Init_deck
 
 class Player:
     # Card format[(int suitNumber(0-3), int number(1-13))
@@ -14,14 +13,28 @@ class Player:
         self.evaluate_flag = HandEvaluator.eval_hand(self.player_card)
         
 
-class TwoEightGangGame:
+class TinyNineGame:
 
     @classmethod
-    def calResult(self, cardArray, playerNum):
+    def calResult(self, cardArray, playerNum, targetPlayerIndex, dealerPlayerIndex):
         deck = Init_deck(cardArray)
-        winners = self.calWinners(deck, playerNum)
+        target_cut = -1
+        for i in range(len(deck)):
+            deck_bot = deck[0:i]
+            deck_top = deck[i:-1]
+            new_deck = deck_top + deck_bot
+            winners = self.calWinners(new_deck, playerNum)
+            
+            if targetPlayerIndex == dealerPlayerIndex:
+                if targetPlayerIndex in winners:
+                    target_cut = i
+                    break
+            else:
+                if targetPlayerIndex in winners and len(winners) == 1:
+                    target_cut = i
+                    break
                 
-        return winners
+        return target_cut
 
     @classmethod
     def calWinners(self, deck, playerNum):
@@ -50,3 +63,16 @@ class TwoEightGangGame:
                 winners.append(i)
 
         return winners
+
+class HandEvaluator:
+
+  @classmethod
+  def eval_hand(self, cards):
+    score = 0
+    num1 = cards[0].rank
+    num2 = cards[1].rank
+    if num1 == num2:
+        score = num1 + 100
+    else:
+        score = (num1 + num2) % 10
+    return score
