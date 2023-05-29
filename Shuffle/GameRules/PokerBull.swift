@@ -12,22 +12,11 @@ import PythonKit
 
 class PokerBull{
     static func FindWinner(inputCards:[Int], playerNum: Int) -> [Int]? {
-        let jsonString = """
-        {
-            "name": "John",
-            "age": 30,
-            "city": "New York"
-        }
-        """
         
         let sys = Python.import("sys")
         sys.path.append("/Users/naldochen/shuffle/python-stdlib/")
         let json = Python.import("json")
-        let jsonObj = json.loads(jsonString)
-        print(jsonObj["name"])
 
-        print("Start the function")
-        
         print("import successfully")
         let pythonList = Python.list(inputCards)
         let pythonInt = PythonObject(playerNum)

@@ -1,7 +1,6 @@
 
-from .utils import Init_deck,sort_cards_from_high_to_low
+from .utils import Init_deck, sort_cards_from_high_to_low
 import itertools
-
 
 class Player:
 
