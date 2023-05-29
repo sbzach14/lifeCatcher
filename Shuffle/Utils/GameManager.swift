@@ -10,20 +10,20 @@ import Foundation
 
 class GameManager {
     static var gameRules: [Int: Rule] = {
-        let rule1 = Rule(ruleIndex: 0, ruleName: "TexasPoker", minPlayerNum: 3, maxPlayerNum: 8)
+        let rule1 = TexasPokerRule(ruleIndex: 0, ruleName: "TexasPoker", minPlayerNum: 3, maxPlayerNum: 8)
         let rule2 = Rule(ruleIndex: 1, ruleName: "PokerBullRule", minPlayerNum: 2, maxPlayerNum: 6)
         
         return [rule1.ruleIndex: rule1, rule2.ruleIndex: rule2]
     }()
     
     
-    static func selectGame(gameIndex: Int, inputCards: [Int], playerNum: Int) -> [Int] {
+    static func selectGame(gameIndex: Int, inputCards: [Int], playerNum: Int, args : [Int]) -> [Int] {
         var winner: [Int] = []
         
         switch gameIndex {
         case 0:
             print("Texas")
-            if let result = TexasPoker.findWinningPlayer(inputCards: inputCards, playerNum: playerNum) {
+            if let result = TexasPoker.FindWinner(inputCards: inputCards, playerNum: playerNum, args: args) {
                 winner = result
             }
         case 1:

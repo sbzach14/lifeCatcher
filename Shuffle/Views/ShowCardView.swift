@@ -48,7 +48,7 @@ struct ShowCardView: View {
                     .font(.title)
                     .foregroundColor(.primary)
                 
-                Text(winners.map(String.init).joined(separator: " "))
+                Text(winners.map { String($0 + 1) }.joined(separator: " "))
                                     .font(.title)
                                     .foregroundColor(.primary)
                 

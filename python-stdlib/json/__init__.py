@@ -107,6 +107,7 @@ from .decoder import JSONDecoder, JSONDecodeError
 from .encoder import JSONEncoder
 from .TestClass import TestClass
 from .PokerBullGame import PokerBullGame
+from .TexasPoker import TexasPokerGame
 # from .Baccarat.BaccaratGame import BaccaratGame
 # from .FiveCardStud.FiveCardStudGame import FiveCardStudGame
 # from .NinePointFive.NinePointFiveGame import NinePointFiveGame

@@ -10,6 +10,7 @@ import SwiftUI
 struct RuleSettingView: View {
     var selectedRuleIndex: Int
     @State private var selectedPlayerNum: Int = 0
+    @State private var mode: Int = 0
     @State private var navigateToMainContent = false
     
     var body: some View {
@@ -33,6 +34,19 @@ struct RuleSettingView: View {
             
             Spacer()
             
+            Text("Mode")
+            Picker("Mode", selection: $mode) {
+                if let selectedRule = GameManager.gameRules[selectedRuleIndex] as? TexasPokerRule {
+                    ForEach(0...selectedRule.mode.count - 1, id: \.self) { index in
+                        Text(String(index)).tag(index)
+                    }
+                }
+            }
+            .pickerStyle(MenuPickerStyle())
+            
+            
+            Spacer()
+            
             Button(action: {
                 navigateToMainContent = true
             }) {
@@ -46,7 +60,7 @@ struct RuleSettingView: View {
             .padding()
             .background(
                 NavigationLink(
-                    destination: MainContentView(ruleIndex: selectedRuleIndex, playerNum: selectedPlayerNum + GameManager.gameRules[selectedRuleIndex]!.minPlayerNum),
+                    destination: MainContentView(ruleIndex: selectedRuleIndex, playerNum: selectedPlayerNum + GameManager.gameRules[selectedRuleIndex]!.minPlayerNum, args : [mode]),
                     isActive: $navigateToMainContent,
                     label: EmptyView.init
                 )
