@@ -1,4 +1,3 @@
-from FiveCardStud.HandEvaluator import HandEvaluator
 from .utils import Init_deck
 from .Card import Card
 

@@ -1,4 +1,3 @@
-from NinePointFive.HandEvaluator import HandEvaluator
 from .utils import Init_deck
 
 class Player:
