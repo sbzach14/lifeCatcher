@@ -7,6 +7,8 @@ class TexasPoker{
         
         var cards = inputCards
         
+        //var cards : [Int] = [47, 10, 33, 38, 22, 25, 35, 7, 32, 31, 41, 50, 28, 6, 3, 9, 20, 4, 16]
+        
         // 按规则分配底牌给每个玩家
         var players = [[Int]]()
         // 按顺序给每个玩家发一张牌，再发第二张牌 .... i,j被弄反了,我直接改了, 而且这时候要把牌扔掉.....
@@ -71,7 +73,7 @@ class TexasPoker{
         for k in 0..<holeCards.count {
             kthHand   = holeCardsStr[k] + communityCardsStr
             kthScore = handScore(hand : kthHand)
-
+            print(kthScore)
             if  kthScore == maxScore {
                 winners.append(k)
             } else if kthScore > maxScore {

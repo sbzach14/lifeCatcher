@@ -15,7 +15,7 @@ struct ContentView: View {
     var body: some View {
         VStack {
             if isAuthorized {
-                MainContentView()
+                SelectRuleView()
             } else {
                 Text("Please enter your unique Key:")
                     .font(.headline)

@@ -41,7 +41,7 @@ class PokerBull{
         let pythonObject =  json.PokerBullGame.calResult(pythonList, pythonInt)
         print("Return Winner")
         // 使用 map() 函数将 PythonList 转换为 Int 数组
-        let intArray = pythonObject.object.map { Int($0)! }
+        let intArray = Array<Int>(pythonObject)!
         print("Convert winner from python to swift")
         
         return intArray

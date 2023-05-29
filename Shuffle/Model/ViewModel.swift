@@ -38,23 +38,25 @@ class ViewModel: ObservableObject {
 
     /// Configures the main view after it loads.
     /// Starts the video-processing pipeline.
-    func initialize() {
+    func initialize(playerNum : Int, ruleIndex: Int ) {
         toggleCameraSelection()
         
         // Restart the video processing.
         startVideoProcessingPipeline()
         
+        self.ruleIndex = ruleIndex
+        self.playerNum = playerNum
 
                 
-                // Python 初始化
-                print("pythonInitialize")
-                guard let stdLibPath = Bundle.main.path(forResource: "python-stdlib", ofType: nil) else { return }
-                guard let libDynloadPath = Bundle.main.path(forResource: "python-stdlib/lib-dynload", ofType: nil) else { return }
+        // Python 初始化
+        print("pythonInitialize")
+        guard let stdLibPath = Bundle.main.path(forResource: "python-stdlib", ofType: nil) else { return }
+        guard let libDynloadPath = Bundle.main.path(forResource: "python-stdlib/lib-dynload", ofType: nil) else { return }
 
-                setenv("PYTHONHOME", stdLibPath, 1)
-                setenv("PYTHONPATH", "\(stdLibPath):\(libDynloadPath)", 1)
+        setenv("PYTHONHOME", stdLibPath, 1)
+        setenv("PYTHONPATH", "\(stdLibPath):\(libDynloadPath)", 1)
 
-                Py_Initialize()
+        Py_Initialize()
 
                 
     }

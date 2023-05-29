@@ -17,7 +17,7 @@ struct MyApp: App {
 //                .onAppear {
 //                    requestPermissions()
 //                }
-            MainContentView()
+            SelectRuleView()
         }
     }
 

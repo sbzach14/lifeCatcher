@@ -7,60 +7,54 @@ The app's overlay view.
 
 import SwiftUI
 
-/// - Tag: OverlayView
 struct ShowCardView: View {
     var cards: Array<Int>
+    var winners: Array<Int>
     @State var showCardView = false
-
+    
     var body: some View {
-        VStack {
-            HStack {
-                Spacer()
-                
-                if showCardView {
-                    
-                    //TODO: show rule result
-                    
-                    ScrollView {
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 50))]) {
-                            ForEach(cards.indices, id: \.self) { index in
-                                let imageName = "\(cards[index])"
-                                Image(imageName)
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .padding(5)
-                                    .background(Color.gray)
-                                    .cornerRadius(10)
-                            }
+        VStack(alignment: .leading) {
+            if showCardView {
+                ScrollView {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 45))]) {
+                        ForEach(cards.indices, id: \.self) { index in
+                            let imageName = "\(cards[index])"
+                            Image(imageName)
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .padding(5)
+                                .background(Color.gray)
+                                .cornerRadius(10)
                         }
-                        .padding()
                     }
-                    .bubbleBackground()
-
-
                 }
-                
-                Spacer()
+                .bubbleBackground()
+                .padding(.horizontal)
             }
             
             Spacer()
             
             HStack {
-                Button{
-                    if showCardView {
-                        showCardView = false
-                    }
-                    else {
-                        showCardView = true
-                    }
+                Button {
+                    showCardView.toggle()
                 } label: {
-                    Label("Flip", systemImage: "")
+                    Label("ShowCard", systemImage: "magnifyingglass")
                         .foregroundColor(.primary)
                         .labelStyle(.iconOnly)
                         .bubbleBackground()
                 }
+                
+                Text("Winner :")
+                    .font(.title)
+                    .foregroundColor(.primary)
+                
+                Text(winners.map(String.init).joined(separator: " "))
+                                    .font(.title)
+                                    .foregroundColor(.primary)
+                
                 Spacer()
             }
+            .padding(.horizontal)
         }
     }
 }
@@ -78,6 +72,6 @@ extension View {
 
 struct ShowCardView_Previews: PreviewProvider {
     static var previews: some View {
-        ShowCardView(cards: Array(0...51))
+        ShowCardView(cards: Array(0...51), winners: Array(0...2))
     }
 }

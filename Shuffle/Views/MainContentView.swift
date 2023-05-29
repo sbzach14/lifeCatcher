@@ -1,13 +1,13 @@
 import SwiftUI
 
 struct MainContentView: View {
-
+    var ruleIndex : Int
+    var playerNum : Int
     @StateObject var viewModel = ViewModel()
 
     var body: some View {
         ZStack {
-            ShowCardView(cards: viewModel.cardArray)
-            ShowRuleView().environmentObject(viewModel)
+            ShowCardView(cards: viewModel.cardArray, winners: viewModel.winnerPlayer)
         }
         .background{
             if let image = viewModel.cameraImage{
@@ -16,7 +16,7 @@ struct MainContentView: View {
             }
         }
         .onAppear {
-            viewModel.initialize()
+            viewModel.initialize(playerNum: playerNum, ruleIndex: ruleIndex)
         }
     }
 }
@@ -25,7 +25,7 @@ struct MainContentView: View {
 
 struct MainContentView_Previews: PreviewProvider {
     static var previews: some View {
-        MainContentView()
+        MainContentView(ruleIndex: 0, playerNum: 0)
     }
 }
 
