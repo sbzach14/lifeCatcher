@@ -17,18 +17,18 @@ class GameManager {
     }()
     
     
-    static func selectGame(gameIndex: Int, inputCards: [Int], playerNum: Int, args : [Int]) -> [Int] {
+    static func selectGame(gameIndex: Int, inputCards: [Int], playerNum: Int, args : [Int], rankRules : [Int]) -> [Int] {
         var winner: [Int] = []
         
         switch gameIndex {
         case 0:
             print("Texas")
-            if let result = TexasPoker.FindWinner(inputCards: inputCards, playerNum: playerNum, args: args) {
+            if let result = TexasPoker.FindWinner(inputCards: inputCards, playerNum: playerNum, args: args, rankRules: rankRules) {
                 winner = result
             }
         case 1:
             print("Bull")
-            if let result = PokerBull.FindWinner(inputCards: inputCards, playerNum: playerNum){
+            if let result = PokerBull.FindWinner(inputCards: inputCards, playerNum: playerNum, args: args, rankRules: rankRules){
                 winner = result
             }
         case 2:

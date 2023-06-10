@@ -1,55 +1,76 @@
 from functools import reduce
+import itertools
 from itertools import groupby
 from .utils import Init_deck
 from .Card import Card
 
 class Player:
-    # Card format[(int suitNumber(0-3), int number(1-13))
-    def __init__(self, mode = 0) -> None:
+    # Card format[(int suitNumber(0-3), int number(103))
+    def __init__(self) -> None:
         self.player_card = []
         self.evaluate_flag = 0
-        self.mode = mode
 
     def Insert_card(self, card):
         self.player_card.append(card)
 
-    def evaluate_hand_cards(self, community):
-        self.evaluate_flag = HandEvaluator.eval_hand(self.player_card + community, self.mode)
-        
-
 
 class TexasPokerGame:
 
+    #args
+    #0 isCompareSuit 0/1
+    #1 isAceStraight 0/1
+    #2 minRank 2-9
+    #3 handNum 1-5
+    #4 communityNum 0/3/5
+    #5 handUseType 0无限制/1必须/2至少
+    #6 handUseNum 1-5
+
     @classmethod
-    def calResult(self, cardArray, playerNum, args):
+    def calResult(self, cardArray, playerNum, args, rankRules):
         deck = Init_deck(cardArray)
-        mode = args[0]
-        winners = self.calWinners(deck, playerNum, mode)
+        winners = self.calWinners(deck, playerNum, args, rankRules)
         return winners
 
     @classmethod
-    def calWinners(self, deck, playerNum, mode):
-        maxRank = -1
+    def calWinners(self, deck, playerNum, args, rankRules):
+
+        isCompareSuit = args[0] == 1
+        isAceStraight = args[1] == 1
+        minRank = args[2]
+        handNum = args[3]
+        communityNum = args[4]
+        handUseType = args[5]
+        handUseNum = args[6]
+
+        maxRank = 0
         winners = []
         allPlayCards = []
         community = []
         for i in range(playerNum):
-            allPlayCards.append(Player(mode))
+            allPlayCards.append(Player())
         
         #发牌
-        for card_cnt in range(2):
+        for _ in range(handNum):
             for i in range(playerNum):
                 allPlayCards[i].Insert_card(deck.pop(0))
 
-        deck.pop(0)
-        for i in range(3):
-            community.append(deck.pop(0))
-        for i in range(2):
+        if communityNum == 3:
             deck.pop(0)
-            community.append(deck.pop(0))
+            for i in range(3):
+                community.append(deck.pop(0))
+        elif communityNum == 5:
+            deck.pop(0)
+            for i in range(3):
+                community.append(deck.pop(0))
+            for i in range(2):
+                deck.pop(0)
+                community.append(deck.pop(0))
+
 
         for i in range(playerNum):
-            allPlayCards[i].evaluate_hand_cards(community)
+            allPlayCards[i].evaluate_flag = HandEvaluator.eval_hand(allPlayCards[i].player_card, community, 
+                                                                    isCompareSuit, isAceStraight, minRank, 
+                                                                    handUseType, handUseNum, rankRules)
 
         for i in range(playerNum):
             rank = allPlayCards[i].evaluate_flag
@@ -72,122 +93,143 @@ class TexasPokerGame:
 
 class HandEvaluator:
 
-  HIGHCARD      = 0
-  ONEPAIR       = 1 << 20
-  TWOPAIR       = 1 << 21
-  THREECARD     = 1 << 22
-  STRAIGHT      = 1 << 23
-  FLASH         = 1 << 24
-  FULLHOUSE     = 1 << 25
-  FOURCARD      = 1 << 26
-  STRAIGHTFLASH = 1 << 27
+  @classmethod
+  def eval_hand(self, cards, community, 
+                isCompareSuit, isAceStraight, minRank, 
+                handUseType, handUseNum, rankRules):
+    cards_length, all_sorted_cards = self.__sort_cards(cards, community, handUseType, handUseNum, isAceStraight, minRank)
 
-
-  #mode 0normal 1short
+    max_score = 0
+    for sorted_cards in all_sorted_cards:
+        score = self.__calc_hand_info_flg(sorted_cards, isCompareSuit, rankRules, cards_length)
+        if score > max_score:
+            max_score = score
+    return max_score
 
   @classmethod
-  def eval_hand(self, cards, mode):
-    sortedCards = self.__sort_cards(cards, mode)
-    score = self.__calc_hand_info_flg(sortedCards, mode)
-    return score
+  def __sort_cards(self, cards, community, handUseType, handUseNum, isAceStraight, minRank):
+    for card in cards:
+        if card.rank == 1:
+            card.rank = 14
 
-  @classmethod
-  def __sort_cards(self, cards, mode):
+    all_cards = []
+    cards_length = 0
+    if handUseType == 0:
+        all_cards.append(cards + community)
+        cards_length = len(cards) + len(community)
+    elif handUseType == 1:
+        cards_length = 5
+        communityNum = 5 - handNum
+        handCombinations = list(itertools.combinations(cards, handNum))
+        communityCombinations = list(itertools.combinations(community, communityNum))
+        for handCombination in handCombinations:
+            if communityNum != 0:
+                for communityCombination in communityCombinations:
+                    all_cards.append(list(handCombination + communityCombination))
+            else:
+                all_cards.append(list(handCombination))
+    elif handUseType == 2:
+        cards_length = 5
+        for handNum in range(1, handUseNum + 1):
+            communityNum = 5 - handNum
+            handCombinations = list(itertools.combinations(cards, handNum))
+            communityCombinations = list(itertools.combinations(community, communityNum))
+            for handCombination in handCombinations:
+                if communityNum != 0:
+                    for communityCombination in communityCombinations:
+                        all_cards.append(list(handCombination + communityCombination))
+                else:
+                    all_cards.append(list(handCombination))
     
-    if mode == 0:
-        ace_cards = []
-        for card in cards:
-            if card.rank == 1:
-                ace_cards.append(Card(card.suit, 14))
-        card = ace_cards + card
-    elif mode == 1:
-        for card in cards:
-            if card.rank == 1:
-                card.rank = 14
-        
-    sorted_cards = sorted(cards, key=lambda card: card.rank, reverse=True)
+    for cards in all_cards: 
+        if isAceStraight:
+            ace_cards = []
+            for card in cards:
+                if card.rank == 14:
+                    ace_cards.append(Card(card.suit, minRank - 1))
+            cards += ace_cards
+        cards.sort(key=lambda card: Card.cal_score(card), reverse=True)
 
-    return sorted_cards
+    return cards_length, all_cards
        
 
   # Return Format
-  # [Bit flg of hand][rank1(4bit)][rank2(4bit)]
-  # ex.)
-  #       HighCard hole card 9,5,4,3,2          =>           1001 0101 0100 0011 0010
-  #       OnePair of rank3, 9,8,7               =>         1 0000 0011 1001 1000 0111
-  #       TwoPair of rank3,2  9                 =>        10 0000 0000 0011 0010 1001
-  #       ThreeCard of rank9 3,2                =>       100 0000 0000 1001 0011 0010
-  #       Straight of rank spade10              =>      1000 0000 0000 0000 0000 1010
-  #       Flash of rank spade10,9,8,7,5         =>     10000 1010 1001 1000 0111 0101
-  #       Fullhouse of rank 8,9                 =>    100000 0000 0000 0000 1000 1001
-  #       FourCard of rank8 9                   =>   1000000 0000 0000 0000 1000 1001
-  #       straight flash of rank 7              =>  10000000 0000 0000 0000 0000 0111
+  # 
+  # 0       HighCard hole card 9,5,4,3,2          =>  1001 0101 0100 0011 0010 00
+  # 1       OnePair of rank3, 9,8,7               =>  0000 0011 1001 1000 0111 00
+  # 2       TwoPair of rank3,2  9                 =>  0000 0000 0011 0010 1001 00
+  # 3       ThreeFlush of rank9,8,6 3,2           =>  1001 1000 0110 0011 0010 00
+  # 4       ThreeStraight of rank9 3,2            =>  0000 0000 1001 0011 0010 00
+  # 5       ThreeStraightFlush of rank9 3,2       =>  0000 0000 1001 0011 0010 00
+  # 6       ThreeCard of rank9 3,2                =>  0000 0000 1001 0011 0010 00
+  # 7       Straight of rank spade10              =>  0000 0000 0000 0000 1010 00
+  # 8       Flash of rank spade10,9,8,7,5         =>  1010 1001 1000 0111 0101 00
+  # 9       Fullhouse of rank 8,9                 =>  0000 0000 0000 1000 1001 00
+  # 10      FourCard of rank8 9                   =>  0000 0000 0000 1000 1001 00
+  # 11      straight flash of rank 7              =>  0000 0000 0000 0000 0111 00
 
-  
-  @classmethod
-  def __calc_hand_info_flg(self, cards, mode):
-    if self.__is_straightflash(cards): return self.STRAIGHTFLASH | self.__eval_straightflash(cards)
-    if self.__is_fourcard(cards): return self.FOURCARD | self.__eval_fourcard(cards)
-    
-    if mode == 0:
-        if self.__is_fullhouse(cards): return self.FULLHOUSE | self.__eval_fullhouse(cards)
-        if self.__is_flash(cards): return self.FLASH | self.__eval_flash(cards)
-    elif mode == 1:
-        if self.__is_flash(cards): return self.FLASH | self.__eval_flash(cards)
-        if self.__is_fullhouse(cards): return self.FULLHOUSE | self.__eval_fullhouse(cards)
-       
-    if self.__is_straight(cards): return self.STRAIGHT | self.__eval_straight(cards)
-    if self.__is_threecard(cards): return self.THREECARD | self.__eval_threecard(cards)
-    if self.__is_twopair(cards): return self.TWOPAIR | (self.__eval_twopair(cards))
-    if self.__is_onepair(cards): return self.ONEPAIR | (self.__eval_onepair(cards))
-    return self.__eval_holecard(cards)
-  
-
-  
-  @classmethod
-  def __is_straightflash(self, cards):
-    return self.__search_straightflash(cards) != -1
 
   @classmethod
-  def __eval_straightflash(self, cards):
-    return self.__search_straightflash(cards)
+  def __calc_hand_info_flg(self, cards, isCompareSuit, rankRules, cards_length):
+
+    rule_dict = {
+        0  : self.__eval_holecard,
+        1  : self.__eval_onepair,
+        2  : self.__eval_twopair,
+        3  : self.__eval_threeflush,
+        4  : self.__eval_threestraight,
+        5  : self.__eval_threestraightflush,
+        6  : self.__eval_threecard,
+        7  : self.__eval_straight,
+        8  : self.__eval_flush,
+        9  : self.__eval_fullhouse,
+        10 : self.__eval_fourcard,
+        11 : self.__eval_straightflush,
+    }
+
+    rank_result = 0
+    for index, ruleIndex in enumerate(rankRules):
+        rank_flag = len(rankRules) - index + 22
+        rank_result = rule_dict[ruleIndex](cards, cards_length)
+        if isCompareSuit:
+            rank_result = rank_result >> 2
+        if rank_result != 0:
+            rank_result = rank_result | rank_flag
+            break
+
+    return rank_result
 
   @classmethod
-  def __search_straightflash(self, cards):
-    rank = -1
-    for suit in range(4):
+  def __eval_straightflush(self, cards, cards_length):
+    rank = 0
+    for suit in [3,2,1,0]:
         rank_list = []
         cnt = 1
-        straight_head_rank = -1
+        straight_head_rank = 0
         for i in range(len(cards)):
             if cards[i].suit == suit:
                 rank_list.append(cards[i].rank)
         for i in range(len(rank_list) - 1):
             if rank_list[i] - rank_list[i+1] == 1:
                 cnt += 1
-                if straight_head_rank == -1:
+                if straight_head_rank == 0:
                     straight_head_rank = i
-                if cnt >= 5: 
+                if cnt == 5: 
                     rank = straight_head_rank 
+                    break
             else:
                 cnt = 1
-                straight_head_rank = -1
+                straight_head_rank = 0
+        if rank != 0:
+            rank = rank << 2 | suit
+            break
     return rank
 
 
-
   @classmethod
-  def __is_fourcard(self, cards):
-    return self.__search_fourcard(cards) != -1
-
-  @classmethod
-  def __eval_fourcard(self, cards):
-    return self.__search_fourcard(cards)
-
-  @classmethod
-  def __search_fourcard(self, cards):
-    rank = -1
-    for i in range(4):
+  def __eval_fourcard(self, cards, cards_length):
+    rank = 0
+    for i in range(cards_length - 3):
         is_fourcard = True
         for j in range(1, 4):
             if cards[i + j].rank != cards[i].rank:
@@ -199,191 +241,248 @@ class HandEvaluator:
                 rank = rank | cards[4].rank
             else:
                 rank = rank | cards[0].rank
+            rank = rank << 2
             break
+    
     return rank
   
 
-
   @classmethod
-  def __is_fullhouse(self, cards):
-    return self.__search_fullhouse(cards) != -1
-
-  @classmethod
-  def __eval_fullhouse(self, cards):
-    return self.__search_fullhouse(cards)
-
-  @classmethod
-  def __search_fullhouse(self, cards):
-    rank = -1
-    threecard_rank = -1
-    pair_rank = -1
-    for i in range(5):
+  def __eval_fullhouse(self, cards, cards_length):
+    rank = 0
+    threecard_rank = 0
+    pair_rank = 0
+    for i in range(cards_length - 2):
         if cards[i].rank == cards[i+1].rank == cards[i+2].rank:
             threecard_rank = cards[i].rank
             break
-    
-    if threecard_rank != -1:
-        for i in range(6):
+    if threecard_rank != 0:
+        for i in range(cards_length - 1):
             if cards[i].rank == cards[i+1].rank and cards[i].rank != threecard_rank:
                 pair_rank = cards[i].rank
                 break
     
-    if threecard_rank != -1 and pair_rank != -1:
+    if threecard_rank != 0 and pair_rank != 0:
         rank = threecard_rank << 4 | pair_rank
-
+        rank = rank << 2
     return rank
 
 
   @classmethod
-  def __is_flash(self, cards):
-    return self.__search_flash(cards) != -1
-
-  @classmethod
-  def __eval_flash(self, cards):
-    return self.__search_flash(cards)
-
-  @classmethod
-  def __search_flash(self, cards):
-    rank = -1
-    for suit in range(4):
+  def __eval_flush(self, cards, cards_length):
+    rank = 0
+    for suit in [3,2,1,0]:
         cnt = 0
-        for i in range(7):
-            if cards[i].suit == suit:
+        for i in range(cards_length):
+            if cards[i].suit == suit and cnt < 5:
                 cnt += 1
-                if rank == -1:
-                    rank = 0
-                if cnt <= 5:
-                    rank = rank << 4 | cards[i].rank
-        if cnt >= 5:
+                rank = rank << 4 | cards[i].rank
+        if cnt == 5:
+            rank = rank << 2 | suit
             break
         else:
-            rank = -1    
+            rank = 0   
     return rank
   
-  
-  @classmethod
-  def __is_straight(self, cards):
-    return self.__search_straight(cards) != -1
 
   @classmethod
-  def __eval_straight(self, cards):
-    return self.__search_straight(cards)
-
-  @classmethod
-  def __search_straight(self, cards):
-    rank = -1
+  def __eval_straight(self, cards, cards_length):
+    rank = 0
     cnt = 1
-    straight_head_rank = -1
+    straight_head_rank = 0
     for i in range(len(cards) - 1):
         if cards[i].rank - cards[i+1].rank == 1:
             cnt += 1
-            if straight_head_rank == -1:
+            if straight_head_rank == 0:
                 straight_head_rank = cards[i].rank
-            if cnt >= 5: 
-                rank = straight_head_rank 
+            if cnt == 5: 
+                rank = straight_head_rank
+                break
         elif cards[i].rank != cards[i+1].rank:
             cnt = 1
-            straight_head_rank = -1
+            straight_head_rank = 0
+    if rank != 0:
+        for card in cards:
+            if card.rank == rank:
+                rank = rank << 2 | card.suit
+                break
     return rank
  
-  
 
   @classmethod
-  def __is_threecard(self, cards):
-    return self.__search_threecard(cards) != -1
-
-  @classmethod
-  def __eval_threecard(self, cards):
-    return self.__search_threecard(cards)
-
-  @classmethod
-  def __search_threecard(self, cards):
-    rank = -1
-    threecard_rank = -1
-    highcard_rank1 = -1
-    highcard_rank2 = -1
-    for i in range(5):
+  def __eval_threecard(self, cards, cards_length):
+    rank = 0
+    threecard_rank = 0
+    highcard_rank1 = 0
+    highcard_rank2 = 0
+    threecard_suit = 0
+    for i in range(cards_length - 2):
         if cards[i].rank == cards[i+1].rank == cards[i+2].rank:
             threecard_rank = cards[i].rank
+            threecard_suit = cards[i].suit
             break
-    if threecard_rank != -1:
-        for i in range(7):
+    if threecard_rank != 0:
+        for i in range(cards_length):
             if cards[i].rank != threecard_rank:
                 highcard_rank1 = cards[i].rank
                 break
-        for i in range(7):
+        for i in range(cards_length):
             if cards[i].rank != threecard_rank and cards[i].rank != highcard_rank1:
                 highcard_rank2 = cards[i].rank
                 break
         rank = threecard_rank << 8 | highcard_rank1 << 4 | highcard_rank2
+        rank = rank << 2 | threecard_suit
+    return rank
+  
+  
+
+  @classmethod
+  def __eval_threestraightflush(self, cards, cards_length):
+    rank = 0
+    for suit in [3,2,1,0]:
+        card_list = []
+        cnt = 1
+        straight_head_rank = 0
+        for i in range(len(cards)):
+            if cards[i].suit == suit:
+                card_list.append(cards[i])
+        for i in range(len(card_list) - 1):
+            if card_list[i].rank - card_list[i+1].rank == 1:
+                cnt += 1
+                if straight_head_rank == 0:
+                    straight_head_rank = i
+                if cnt == 3: 
+                    rank = straight_head_rank 
+                    card_list = card_list[i - 1, i + 2]
+                    break
+            else:
+                cnt = 1
+                straight_head_rank = 0
+        if rank != 0:
+            high_card_cnt = 0
+            for card in cards:
+                if card not in card_list:
+                    rank = rank << 4 | card.rank
+                    high_card_cnt += 1
+                if high_card_cnt == 2:
+                    break
+            rank = rank << 2 | suit
+            break
+    return rank
+  
+
+  @classmethod
+  def __eval_threestraight(self, cards, cards_length):
+    rank = 0
+    cnt = 1
+    straight_head_rank = 0
+    card_list = [cards[0]]
+    for i in range(len(cards) - 1):
+        if cards[i].rank - cards[i+1].rank == 1:
+            cnt += 1
+            card_list.append(cards[i + 1])
+            if straight_head_rank == 0:
+                straight_head_rank = cards[i].rank
+            if cnt == 3: 
+                rank = straight_head_rank 
+                break
+        elif cards[i].rank != cards[i+1].rank:
+            cnt = 1
+            card_list = [cards[i]]
+            straight_head_rank = 0
+    if rank != 0:
+        high_card_cnt = 0
+        for card in cards:
+            if card not in card_list:
+                rank = rank << 4 | card.rank
+                high_card_cnt += 1
+            if high_card_cnt == 2:
+                break
+        for card in cards:
+            if card.rank == rank:
+                rank = rank << 2 | card.suit
+                break
+    return rank
+  
+
+  @classmethod
+  def __eval_threeflush(self, cards, cards_length):
+    rank = 0
+    card_list = []
+    for suit in [3,2,1,0]:
+        cnt = 0
+        for i in range(cards_length):
+            if cards[i].suit == suit and cnt < 3:
+                cnt += 1
+                card_list.append(cards[i])
+                rank = rank << 4 | cards[i].rank
+        if cnt == 3:
+            high_card_cnt = 0
+            for card in cards:
+                if card not in card_list:
+                    rank = rank << 4 | card.rank
+                    high_card_cnt += 1
+                if high_card_cnt == 2:
+                    break
+            rank = rank << 2 | suit
+            break
+        else:
+            rank = 0   
+            card_list = []
     return rank
     
-  
-
 
   @classmethod
-  def __is_twopair(self, cards):
-    return self.__eval_twopair(cards) != -1
-  
-  @classmethod
-  def __eval_twopair(self, cards):
-    return self.__search_twopair(cards)
-
-  @classmethod
-  def __search_twopair(self, cards):
-    rank = -1
-    first_pair_rank = -1
-    second_pair_rank = -1
-    highcard_rank = -1
-    for i in range(6):
+  def __eval_twopair(self, cards, cards_length):
+    rank = 0
+    first_pair_rank = 0
+    second_pair_rank = 0
+    highcard_rank = 0
+    first_pair_suit = 0
+    for i in range(cards_length - 1):
         if cards[i].rank == cards[i+1].rank:
-            if first_pair_rank == -1:
+            if first_pair_rank == 0:
                 first_pair_rank = cards[i].rank
+                first_pair_suit = cards[i].suit
             else:
                 second_pair_rank = cards[i].rank
                 break
-    if first_pair_rank != -1 and second_pair_rank != -1: 
-        for i in range(7):
+    if first_pair_rank != 0 and second_pair_rank != 0: 
+        for i in range(cards_length):
             if cards[i].rank != first_pair_rank and cards[i].rank != second_pair_rank:
                 highcard_rank = cards[i].rank
                 break
         rank = first_pair_rank << 8 | second_pair_rank << 4 | highcard_rank
+        rank = rank << 2 | first_pair_suit
     return rank
   
 
   @classmethod
-  def __is_onepair(self, cards):
-    return self.__eval_onepair(cards) != -1
-  
-  @classmethod
-  def __eval_onepair(self, cards):
-    return self.__search_onepair(cards)
-
-  @classmethod
-  def __search_onepair(self, cards):
-    rank = -1
-    pair_rank = -1
+  def __eval_onepair(self, cards, cards_length):
+    rank = 0
+    pair_rank = 0
+    pair_suit = 0
     rank_list = []
-    for i in range(6):
+    for i in range(cards_length - 1):
         if cards[i].rank == cards[i+1].rank:
             pair_rank = cards[i].rank
+            pair_suit = cards[i].suit
             rank_list.append(pair_rank)
             break
-    if pair_rank != -1:
-        for num in range(3):
-            for i in range(7):
-                if cards[i].rank not in rank_list:
+    if pair_rank != 0:
+        for _ in range(3):
+            for i in range(cards_length):
+                if cards[i].rank != pair_rank:
                     rank_list.append(cards[i].rank)
                     break
-        rank = 0
         for rank_ in rank_list:
             rank = rank << 4 | rank_
+        rank = rank << 2 | pair_suit
     return rank
   
 
-
   @classmethod
-  def __eval_holecard(self, cards):
+  def __eval_holecard(self, cards, cards_length):
     rank = 0
     for i in range(5):
         rank = rank << 4 | cards[i].rank
