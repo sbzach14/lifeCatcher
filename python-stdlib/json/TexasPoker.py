@@ -166,7 +166,7 @@ class HandEvaluator:
   # 8       Flash of rank spade10,9,8,7,5         =>  1010 1001 1000 0111 0101 00
   # 9       Fullhouse of rank 8,9                 =>  0000 0000 0000 1000 1001 00
   # 10      FourCard of rank8 9                   =>  0000 0000 0000 1000 1001 00
-  # 11      straight flash of rank 7              =>  0000 0000 0000 0000 0111 00
+  # 11      StraightFlash of rank 7              =>  0000 0000 0000 0000 0111 00
 
 
   @classmethod
