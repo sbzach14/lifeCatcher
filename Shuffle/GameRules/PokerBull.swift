@@ -11,19 +11,18 @@ import Python
 import PythonKit
 
 class PokerBull{
-    static func FindWinner(inputCards:[Int], playerNum: Int) -> [Int]? {
+    static func FindWinner(inputCards:[Int], args:[Int], rankRules:[Int]) -> [Int]? {
         
 
         let json = Python.import("json")
+        
+        
+
 
         let pythonList = Python.list(inputCards)
-        let pythonInt = PythonObject(playerNum)
         
-        let pyobj =  Int(json.TestClass.TestFunc(playerNum))!
-        
-        print(pyobj)
-        
-        let pythonObject =  json.PokerBullGame.calResult(pythonList, pythonInt)
+                
+        let pythonObject =  json.PokerBullGame.calResult(pythonList)
         // 使用 map() 函数将 PythonList 转换为 Int 数组
         let intArray = Array<Int>(pythonObject)!
         

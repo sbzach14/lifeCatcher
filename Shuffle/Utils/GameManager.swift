@@ -10,25 +10,25 @@ import Foundation
 
 class GameManager {
     static var gameRules: [Int: Rule] = {
-        let rule1 = TexasPokerRule(ruleIndex: 0, ruleName: "TexasPoker", minPlayerNum: 3, maxPlayerNum: 8)
-        let rule2 = Rule(ruleIndex: 1, ruleName: "PokerBullRule", minPlayerNum: 2, maxPlayerNum: 6)
+        let rule1 = TexasPokerRule(ruleIndex: 0, ruleName: "TexasPoker")
+        let rule2 = Rule(ruleIndex: 1, ruleName: "PokerBullRule")
         
         return [rule1.ruleIndex: rule1, rule2.ruleIndex: rule2]
     }()
     
     
-    static func selectGame(gameIndex: Int, inputCards: [Int], playerNum: Int, args : [Int]) -> [Int] {
+    static func selectGame(gameIndex: Int, inputCards: [Int], args : [Int], rankRules : [Int]) -> [Int] {
         var winner: [Int] = []
         
         switch gameIndex {
         case 0:
             print("Texas")
-            if let result = TexasPoker.FindWinner(inputCards: inputCards, playerNum: playerNum, args: args) {
+            if let result = TexasPoker.FindWinner(inputCards: inputCards, args: args, rankRules: rankRules) {
                 winner = result
             }
         case 1:
             print("Bull")
-            if let result = PokerBull.FindWinner(inputCards: inputCards, playerNum: playerNum){
+            if let result = PokerBull.FindWinner(inputCards: inputCards, args: args, rankRules: rankRules){
                 winner = result
             }
         case 2:
@@ -46,15 +46,16 @@ class GameManager {
 class Rule {
     let ruleIndex: Int
     let ruleName: String
-    let minPlayerNum: Int
-    let maxPlayerNum: Int
 
-    init(ruleIndex: Int, ruleName: String, minPlayerNum: Int, maxPlayerNum: Int) {
+    init(ruleIndex: Int, ruleName: String) {
         self.ruleIndex = ruleIndex
         self.ruleName = ruleName
-        self.minPlayerNum = minPlayerNum
-        self.maxPlayerNum = maxPlayerNum
     }
+}
+
+struct RankRulesSate {
+    var index: Int
+    var isChecked: Bool
 }
 
 

@@ -132,6 +132,7 @@ class PokerBullGame:
         deck = Init_deck(cardArray)
         winners = self.calWinners(deck, playerNum)
 
+
         return winners
     
     @classmethod

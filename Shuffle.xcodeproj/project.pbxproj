@@ -28,6 +28,7 @@
 		A88F20B02A1DEE63005E4A27 /* TinyNine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88F20AF2A1DEE63005E4A27 /* TinyNine.swift */; };
 		A8D0D9342A223D210061A90E /* RuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D0D9332A223D210061A90E /* RuleSettingView.swift */; };
 		A8D0D9362A24A4C20061A90E /* TexasPoker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D0D9352A24A4C20061A90E /* TexasPoker.swift */; };
+		A8D0D9382A35D9970061A90E /* RankRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D0D9372A35D9970061A90E /* RankRulesView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -57,6 +58,7 @@
 		A88F20B12A1E3D4C005E4A27 /* Shuffle.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Shuffle.entitlements; sourceTree = "<group>"; };
 		A8D0D9332A223D210061A90E /* RuleSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleSettingView.swift; sourceTree = "<group>"; };
 		A8D0D9352A24A4C20061A90E /* TexasPoker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TexasPoker.swift; sourceTree = "<group>"; };
+		A8D0D9372A35D9970061A90E /* RankRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankRulesView.swift; sourceTree = "<group>"; };
 		F11ED84932036610B96BC234 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -129,6 +131,7 @@
 				18CA14C8284AC42C00F90372 /* CameraView.swift */,
 				A83DC6792A22352C00EC8210 /* SelectRuleView.swift */,
 				A8D0D9332A223D210061A90E /* RuleSettingView.swift */,
+				A8D0D9372A35D9970061A90E /* RankRulesView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -331,6 +334,7 @@
 				A8D0D9362A24A4C20061A90E /* TexasPoker.swift in Sources */,
 				18CA14D3284AC42C00F90372 /* ShowCardView.swift in Sources */,
 				18CA14D6284AC42C00F90372 /* CameraView.swift in Sources */,
+				A8D0D9382A35D9970061A90E /* RankRulesView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

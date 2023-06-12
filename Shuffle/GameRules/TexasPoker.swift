@@ -11,25 +11,88 @@ import Python
 import PythonKit
 
 class TexasPokerRule : Rule{
-    let mode : [Int] = [0,1]
+    let setting: [Int: String] = [
+        0: "标准",
+        1: "短牌",
+        2: "自定义"
+    ]
+    let playerNum : [Int] = [2,3,4,5,6,7,8]
+    let isCompareSuit : [Int: String] = [
+        0: "否",
+        1: "是"
+    ]
+    let isAceStraight: [Int: String] = [
+        0: "否",
+        1: "是"
+    ]
+    let minRank: [Int] = [2,3,4,5,6,7,8,9]
+    let handNum: [Int] = [1,2,3,4,5]
+    let communityNum: [Int] = [0,3,5]
+    let handUseType: [Int: String] = [
+        0: "无限制",
+        1: "必须用n张",
+        2: "最少用n张"
+    ]
+    let handUseNum: [Int] = [1,2,3,4,5]
+    let rankRules: [Int: String] = [
+        11: "StraightFlash",
+        10: "FourCard",
+        9: "Fullhouse",
+        8: "Flash",
+        7: "Straight",
+        6: "ThreeCard",
+        5: "ThreeStraightFlush",
+        4: "ThreeStraight",
+        3: "ThreeFlush",
+        2: "TwoPair",
+        1: "OnePair",
+        0: "HighCard"
+    ]
+    
+    
+
 }
 
 class TexasPoker{
-    static func FindWinner(inputCards:[Int], playerNum: Int, args: [Int]) -> [Int]? {
+    
+    
+    static func FindWinner(inputCards:[Int], args: [Int], rankRules: [Int]) -> [Int]? {
         
-
         let json = Python.import("json")
 
-        let pythonList = Python.list(inputCards)
-        let pythonInt = PythonObject(playerNum)
-        
-        let pyobj =  Int(json.TestClass.TestFunc(playerNum))!
+        //let pythonList = Python.list(inputCards)
+        //let pythonInt = PythonObject(playerNum)
                 
-        let pythonObject =  json.TexasPokerGame.calResult(pythonList, pythonInt, args)
+        let pythonObject =  json.TexasPokerGame.calResult(inputCards, args, rankRules)
         // 使用 map() 函数将 PythonList 转换为 Int 数组
         let intArray = Array<Int>(pythonObject)!
         
         return intArray
     }
     
+    static func legalCheck(playerNum: Int, minRank: Int, handUseType: Int, handUseNum: Int, handNum: Int, communityNum: Int) -> String
+    {
+        var errMessage : String = ""
+        if(handUseType == 0 && handNum + communityNum < 5)
+        {
+            errMessage = "可用牌不足5张，请重新设置！"
+        }
+        else if(handUseType != 0 && handNum < handUseNum)
+        {
+            errMessage = "手牌数小于设置需求，请重新设置！"
+        }
+        else if(handUseType == 1 && handUseNum + communityNum < 5)
+        {
+            errMessage = "可用牌不足5张，请重新设置！"
+        }
+        else if(handUseType == 2 && handNum + communityNum < 5)
+        {
+            errMessage = "可用牌不足5张，请重新设置！"
+        }
+        else if(playerNum * handNum + communityNum > 52 - (minRank - 2) * 4)
+        {
+            errMessage = "需要牌数量超出牌堆总数，请重新设置！"
+        }
+        return errMessage
+    }
 }

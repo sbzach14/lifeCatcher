@@ -25,9 +25,9 @@ class ViewModel: ObservableObject {
     @Published var winnerPlayer: [Int] = []
 
     public var state : Int = 0
-    public var playerNum : Int = 2
     public var ruleIndex : Int = 0
     public var args : [Int] = []
+    public var rankRules : [Int] = []
     
     
     private var displayCameraTask: Task<Void, Error>?
@@ -39,15 +39,15 @@ class ViewModel: ObservableObject {
 
     /// Configures the main view after it loads.
     /// Starts the video-processing pipeline.
-    func initialize(playerNum : Int, ruleIndex: Int, args : [Int] ) {
+    func initialize(ruleIndex: Int, args : [Int], rankRules : [Int] ) {
         toggleCameraSelection()
         
         // Restart the video processing.
         startVideoProcessingPipeline()
         
         self.ruleIndex = ruleIndex
-        self.playerNum = playerNum
         self.args = args
+        self.rankRules = rankRules
                 
         // Python 初始化
         print("pythonInitialize")
@@ -143,7 +143,7 @@ class ViewModel: ObservableObject {
     }
     
     func computeWinnerPlayer() {
-        winnerPlayer = GameManager.selectGame(gameIndex: ruleIndex, inputCards: cardArray, playerNum: playerNum, args: args)
+        winnerPlayer = GameManager.selectGame(gameIndex: ruleIndex, inputCards: cardArray, args: args, rankRules: rankRules)
         
         speakText(input: winnerPlayer)
     }
