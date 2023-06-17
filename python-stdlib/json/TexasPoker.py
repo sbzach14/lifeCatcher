@@ -27,14 +27,15 @@ class TexasPokerGame:
     #7 handUseNum 1-5
 
     @classmethod
-    def calResult(self, cardArray, args, rankRules):
-        deck = Init_deck(cardArray)
+    def calResult(self, cardArray, args, rankRules, suitRules):
+        deck = Init_deck(cardArray, suitRules)
         winners = self.calWinners(deck, args, rankRules)
         return winners
 
     @classmethod
     def calWinners(self, deck, args, rankRules):
-
+        
+        playerNum = args[0]
         isCompareSuit = args[1] == 1
         isAceStraight = args[2] == 1
         minRank = args[3]
@@ -47,12 +48,12 @@ class TexasPokerGame:
         winners = []
         allPlayCards = []
         community = []
-        for i in range(args[0]):
+        for i in range(playerNum):
             allPlayCards.append(Player())
         
         #发牌
         for _ in range(handNum):
-            for i in range(args[0]):
+            for i in range(playerNum):
                 allPlayCards[i].Insert_card(deck.pop(0))
 
         if communityNum == 3:
@@ -68,12 +69,12 @@ class TexasPokerGame:
                 community.append(deck.pop(0))
 
 
-        for i in range(args[0]):
+        for i in range(playerNum):
             allPlayCards[i].evaluate_flag = HandEvaluator.eval_hand(allPlayCards[i].player_card, community, 
                                                                     isCompareSuit, isAceStraight, minRank, 
                                                                     handUseType, handUseNum, rankRules)
 
-        for i in range(args[0]):
+        for i in range(playerNum):
             rank = allPlayCards[i].evaluate_flag
             if rank > maxRank:
                 maxRank = rank
@@ -84,7 +85,7 @@ class TexasPokerGame:
 
         #sort list
         # winners = []
-        # for i in range(args[0]):
+        # for i in range(playerNum):
         #     winners.append(i)
         # winners = sorted(winners, key=lambda x:allPlayCards[x].evaluate_flag, reverse=True)
             

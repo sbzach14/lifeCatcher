@@ -62,6 +62,8 @@ private func destinationView(for index: Int) -> some View {
     switch index {
     case 0:
         return AnyView(TexasPokerRuleSettingView())
+    case 2:
+        return AnyView(ThreeCardPokerGameRuleSettingView())
     default:
         return AnyView(EmptyView())
     }

@@ -122,9 +122,6 @@ class ThreeCardPokerGame{
     static func FindWinner(inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> [Int]? {
         
         let json = Python.import("json")
-
-        //let pythonList = Python.list(inputCards)
-        //let pythonInt = PythonObject(playerNum)
                 
         let pythonObject =  json.ThreeCardPokerGame.calResult(inputCards, args, rankRules, suitRules)
         // 使用 map() 函数将 PythonList 转换为 Int 数组

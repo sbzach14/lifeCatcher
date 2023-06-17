@@ -1,11 +1,11 @@
 import random
 from .Card import Card
 
-def Init_deck(initial_cards):
+def Init_deck(initial_cards, suitRules):
     deck_List = []
     for card_index in initial_cards:
         if(card_index < 52):
-            deck_List.append(Card(3 - card_index // 13, card_index % 13 + 1))
+            deck_List.append(Card(suitRules[card_index // 13], card_index % 13 + 1))
         else:
             if card_index == 53:
                 deck_List.append(Card(0, 14))
