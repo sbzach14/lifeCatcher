@@ -15,6 +15,8 @@
 		18CA14DB284AC42C00F90372 /* MyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14D0284AC42C00F90372 /* MyApp.swift */; };
 		18CA14DC284AC42C00F90372 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14D1284AC42C00F90372 /* ContentView.swift */; };
 		50053F84284ACAED00C86BF4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50053F81284ACAED00C86BF4 /* Assets.xcassets */; };
+		A812F92F2A3DCBA500AA392F /* ThreeCardPokerGameRuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A812F92E2A3DCBA500AA392F /* ThreeCardPokerGameRuleSettingView.swift */; };
+		A812F9312A3DCD0800AA392F /* ThreeCardPokerGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A812F9302A3DCD0800AA392F /* ThreeCardPokerGame.swift */; };
 		A83DC67A2A22352C00EC8210 /* SelectRuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83DC6792A22352C00EC8210 /* SelectRuleView.swift */; };
 		A887167F2A0623E500B7F2CD /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887167E2A0623E500B7F2CD /* AuthManager.swift */; };
 		A88716852A0F701500B7F2CD /* GameManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88716842A0F701500B7F2CD /* GameManager.swift */; };
@@ -26,9 +28,10 @@
 		A88F20A82A120DEF005E4A27 /* Resources.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A88F20A72A120DEF005E4A27 /* Resources.xcassets */; };
 		A88F20AE2A13A470005E4A27 /* PokerBull.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88F20AD2A13A470005E4A27 /* PokerBull.swift */; };
 		A88F20B02A1DEE63005E4A27 /* TinyNine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88F20AF2A1DEE63005E4A27 /* TinyNine.swift */; };
-		A8D0D9342A223D210061A90E /* RuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D0D9332A223D210061A90E /* RuleSettingView.swift */; };
+		A8D0D9342A223D210061A90E /* TexasPokerRuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D0D9332A223D210061A90E /* TexasPokerRuleSettingView.swift */; };
 		A8D0D9362A24A4C20061A90E /* TexasPoker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D0D9352A24A4C20061A90E /* TexasPoker.swift */; };
 		A8D0D9382A35D9970061A90E /* RankRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D0D9372A35D9970061A90E /* RankRulesView.swift */; };
+		A8FBC7BB2A3DF1B000EDDFD7 /* SuitRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8FBC7BA2A3DF1B000EDDFD7 /* SuitRulesView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,6 +47,8 @@
 		50053F82284ACAED00C86BF4 /* CountMyActions.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = CountMyActions.entitlements; sourceTree = "<group>"; };
 		5269731033A41881895B5A41 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A6748516A40E187B4F8ACFA3 /* SampleCode.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
+		A812F92E2A3DCBA500AA392F /* ThreeCardPokerGameRuleSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeCardPokerGameRuleSettingView.swift; sourceTree = "<group>"; };
+		A812F9302A3DCD0800AA392F /* ThreeCardPokerGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeCardPokerGame.swift; sourceTree = "<group>"; };
 		A83DC6792A22352C00EC8210 /* SelectRuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectRuleView.swift; sourceTree = "<group>"; };
 		A887167E2A0623E500B7F2CD /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		A88716812A06413600B7F2CD /* DOC.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DOC.md; sourceTree = "<group>"; };
@@ -56,9 +61,10 @@
 		A88F20AD2A13A470005E4A27 /* PokerBull.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokerBull.swift; sourceTree = "<group>"; };
 		A88F20AF2A1DEE63005E4A27 /* TinyNine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TinyNine.swift; sourceTree = "<group>"; };
 		A88F20B12A1E3D4C005E4A27 /* Shuffle.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Shuffle.entitlements; sourceTree = "<group>"; };
-		A8D0D9332A223D210061A90E /* RuleSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleSettingView.swift; sourceTree = "<group>"; };
+		A8D0D9332A223D210061A90E /* TexasPokerRuleSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TexasPokerRuleSettingView.swift; sourceTree = "<group>"; };
 		A8D0D9352A24A4C20061A90E /* TexasPoker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TexasPoker.swift; sourceTree = "<group>"; };
 		A8D0D9372A35D9970061A90E /* RankRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankRulesView.swift; sourceTree = "<group>"; };
+		A8FBC7BA2A3DF1B000EDDFD7 /* SuitRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuitRulesView.swift; sourceTree = "<group>"; };
 		F11ED84932036610B96BC234 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -126,12 +132,13 @@
 		18CA14C4284AC42C00F90372 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				A812F92D2A3DCB6200AA392F /* RuleSettingViews */,
 				18CA14C5284AC42C00F90372 /* ShowCardView.swift */,
 				18CA14C6284AC42C00F90372 /* MainContentView.swift */,
 				18CA14C8284AC42C00F90372 /* CameraView.swift */,
 				A83DC6792A22352C00EC8210 /* SelectRuleView.swift */,
-				A8D0D9332A223D210061A90E /* RuleSettingView.swift */,
 				A8D0D9372A35D9970061A90E /* RankRulesView.swift */,
+				A8FBC7BA2A3DF1B000EDDFD7 /* SuitRulesView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -164,6 +171,15 @@
 			path = LICENSE;
 			sourceTree = "<group>";
 		};
+		A812F92D2A3DCB6200AA392F /* RuleSettingViews */ = {
+			isa = PBXGroup;
+			children = (
+				A8D0D9332A223D210061A90E /* TexasPokerRuleSettingView.swift */,
+				A812F92E2A3DCBA500AA392F /* ThreeCardPokerGameRuleSettingView.swift */,
+			);
+			path = RuleSettingViews;
+			sourceTree = "<group>";
+		};
 		A887167D2A0623A300B7F2CD /* Utils */ = {
 			isa = PBXGroup;
 			children = (
@@ -180,6 +196,7 @@
 				A88F20AD2A13A470005E4A27 /* PokerBull.swift */,
 				A8D0D9352A24A4C20061A90E /* TexasPoker.swift */,
 				A88F20AF2A1DEE63005E4A27 /* TinyNine.swift */,
+				A812F9302A3DCD0800AA392F /* ThreeCardPokerGame.swift */,
 			);
 			path = GameRules;
 			sourceTree = "<group>";
@@ -321,13 +338,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				18CA14DC284AC42C00F90372 /* ContentView.swift in Sources */,
-				A8D0D9342A223D210061A90E /* RuleSettingView.swift in Sources */,
+				A8D0D9342A223D210061A90E /* TexasPokerRuleSettingView.swift in Sources */,
+				A812F92F2A3DCBA500AA392F /* ThreeCardPokerGameRuleSettingView.swift in Sources */,
 				A83DC67A2A22352C00EC8210 /* SelectRuleView.swift in Sources */,
 				A88716852A0F701500B7F2CD /* GameManager.swift in Sources */,
 				A887167F2A0623E500B7F2CD /* AuthManager.swift in Sources */,
 				18CA14D4284AC42C00F90372 /* MainContentView.swift in Sources */,
 				A88F20B02A1DEE63005E4A27 /* TinyNine.swift in Sources */,
 				A88716882A0F71D500B7F2CD /* TexasPoker_Deprecated.swift in Sources */,
+				A812F9312A3DCD0800AA392F /* ThreeCardPokerGame.swift in Sources */,
 				18CA14DB284AC42C00F90372 /* MyApp.swift in Sources */,
 				18CA14D2284AC42C00F90372 /* ViewModel.swift in Sources */,
 				A88F20AE2A13A470005E4A27 /* PokerBull.swift in Sources */,
@@ -335,6 +354,7 @@
 				18CA14D3284AC42C00F90372 /* ShowCardView.swift in Sources */,
 				18CA14D6284AC42C00F90372 /* CameraView.swift in Sources */,
 				A8D0D9382A35D9970061A90E /* RankRulesView.swift in Sources */,
+				A8FBC7BB2A3DF1B000EDDFD7 /* SuitRulesView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

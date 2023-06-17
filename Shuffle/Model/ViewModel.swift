@@ -28,6 +28,7 @@ class ViewModel: ObservableObject {
     public var ruleIndex : Int = 0
     public var args : [Int] = []
     public var rankRules : [Int] = []
+    public var suitRules : [Int] = [3,2,1,0]
     
     
     private var displayCameraTask: Task<Void, Error>?
@@ -39,7 +40,7 @@ class ViewModel: ObservableObject {
 
     /// Configures the main view after it loads.
     /// Starts the video-processing pipeline.
-    func initialize(ruleIndex: Int, args : [Int], rankRules : [Int] ) {
+    func initialize(ruleIndex: Int, args : [Int], rankRules : [Int], suitRules : [Int] ) {
         toggleCameraSelection()
         
         // Restart the video processing.
@@ -48,7 +49,8 @@ class ViewModel: ObservableObject {
         self.ruleIndex = ruleIndex
         self.args = args
         self.rankRules = rankRules
-                
+        self.suitRules = suitRules
+
         // Python 初始化
         print("pythonInitialize")
         guard let stdLibPath = Bundle.main.path(forResource: "python-stdlib", ofType: nil) else { return }
@@ -143,7 +145,7 @@ class ViewModel: ObservableObject {
     }
     
     func computeWinnerPlayer() {
-        winnerPlayer = GameManager.selectGame(gameIndex: ruleIndex, inputCards: cardArray, args: args, rankRules: rankRules)
+        winnerPlayer = GameManager.selectGame(gameIndex: ruleIndex, inputCards: cardArray, args: args, rankRules: rankRules, suitRules: suitRules)
         
         speakText(input: winnerPlayer)
     }

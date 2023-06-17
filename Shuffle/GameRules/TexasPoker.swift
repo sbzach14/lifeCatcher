@@ -35,18 +35,18 @@ class TexasPokerRule : Rule{
     ]
     let handUseNum: [Int] = [1,2,3,4,5]
     let rankRules: [Int: String] = [
-        11: "StraightFlash",
-        10: "FourCard",
-        9: "Fullhouse",
-        8: "Flash",
-        7: "Straight",
-        6: "ThreeCard",
-        5: "ThreeStraightFlush",
-        4: "ThreeStraight",
-        3: "ThreeFlush",
-        2: "TwoPair",
-        1: "OnePair",
-        0: "HighCard"
+        11: "同花顺",
+        10: "四条",
+        9: "葫芦",
+        8: "同花",
+        7: "顺子",
+        6: "三条",
+        5: "三同花顺",
+        4: "三顺子",
+        3: "三同花",
+        2: "两对",
+        1: "一对",
+        0: "高牌"
     ]
     
     
@@ -56,14 +56,14 @@ class TexasPokerRule : Rule{
 class TexasPoker{
     
     
-    static func FindWinner(inputCards:[Int], args: [Int], rankRules: [Int]) -> [Int]? {
+    static func FindWinner(inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> [Int]? {
         
         let json = Python.import("json")
 
         //let pythonList = Python.list(inputCards)
         //let pythonInt = PythonObject(playerNum)
                 
-        let pythonObject =  json.TexasPokerGame.calResult(inputCards, args, rankRules)
+        let pythonObject =  json.TexasPokerGame.calResult(inputCards, args, rankRules, suitRules)
         // 使用 map() 函数将 PythonList 转换为 Int 数组
         let intArray = Array<Int>(pythonObject)!
         

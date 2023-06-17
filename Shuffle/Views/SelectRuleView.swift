@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SelectRuleView: View {
     @State private var searchText = ""
+    @State private var selectedRuleIndex: Int? = nil
     
     var body: some View {
         NavigationView {
@@ -12,7 +13,9 @@ struct SelectRuleView: View {
                     VStack(spacing: 0) {
                         let ruleCnt = GameManager.gameRules.count
                         ForEach(0..<ruleCnt, id: \.self) { index in
-                            NavigationLink(destination: RuleSettingView(selectedRuleIndex : index)) {
+                            NavigationLink(
+                                destination: destinationView(for: index)
+                                ) {
                                 VStack(alignment: .leading) {
                                     if let rule = GameManager.gameRules[index] {
                                         Text(rule.ruleName)
@@ -52,6 +55,15 @@ struct SearchBar: View {
             }
         }
         .padding()
+    }
+}
+
+private func destinationView(for index: Int) -> some View {
+    switch index {
+    case 0:
+        return AnyView(TexasPokerRuleSettingView())
+    default:
+        return AnyView(EmptyView())
     }
 }
 
