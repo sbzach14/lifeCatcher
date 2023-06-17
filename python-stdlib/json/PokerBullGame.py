@@ -745,7 +745,7 @@ class HandEvaluator:
         pair = []
         highcard = []
         for key, value in counts:
-            if value == 1:
+            if value == 2:
                 pair.append(key)
             else:
                 highcard.append(key)
@@ -852,7 +852,6 @@ class HandEvaluator:
     @classmethod
     def Is_Bull_Plus_JQ(self, cards):
         allbulls = []
-        bull_rank = 0
         rank = 0
 
         # find out all bull
@@ -882,6 +881,160 @@ class HandEvaluator:
                             rank = 0                        
                         return True, rank
         return False, 0
+    
+    @classmethod
+    def Is_Bull_Plus_TenJ(self, cards):
+        allbulls = []
+        rank = 0
+
+        # find out all bull
+        for index in self.bull_rules:
+            func = self.IS_BULL_DIC[index]
+            bulls = func(cards)
+            if len(bulls) != 0:
+                allbulls.append(bulls)
+        
+        if len(allbulls) == 0:
+            return False, 0
+        
+        for bulls in allbulls:
+            for bull in bulls:
+                if len(bull) == 5:
+                    continue
+                if len(bull) == 3:
+                    other_cards = [card for card in cards if card not in bull]
+                    sorted(other_cards, key=lambda x:x.true_rank, reverse= True)
+                    rank = 0
+                    if other_cards[0].true_rank == 11 and other_cards[1].true_rank == 10:
+                        if self.same_bull_point_comparision == 0:
+                            rank = self.rank_for_max_card(cards)
+                        if self.same_bull_point_comparision == 1:
+                            rank = self.rank_for_max_card(other_cards)
+                        if self.same_bull_point_comparision(cards):
+                            rank = 0                        
+                        return True, rank
+        return False, 0
+    @classmethod
+    def Is_Bull_Plus_ATen(self, cards):
+        allbulls = []
+        rank = 0
+
+        # find out all bull
+        for index in self.bull_rules:
+            func = self.IS_BULL_DIC[index]
+            bulls = func(cards)
+            if len(bulls) != 0:
+                allbulls.append(bulls)
+        
+        if len(allbulls) == 0:
+            return False, 0
+        
+        for bulls in allbulls:
+            for bull in bulls:
+                if len(bull) == 5:
+                    continue
+                if len(bull) == 3:
+                    other_cards = [card for card in cards if card not in bull]
+                    sorted(other_cards, key=lambda x:x.true_rank, reverse= True)
+                    rank = 0
+                    if other_cards[0].true_rank == 10 and other_cards[1].true_rank == 1:
+                        if self.same_bull_point_comparision == 0:
+                            rank = self.rank_for_max_card(cards)
+                        if self.same_bull_point_comparision == 1:
+                            rank = self.rank_for_max_card(other_cards)
+                        if self.same_bull_point_comparision(cards):
+                            rank = 0                        
+                        return True, rank
+        return False, 0
+    @classmethod
+    def Is_235_Plus_Pair(self, cards):
+        counts = {}
+        for card in cards:
+            counts[cards.true_rank] = counts.get(card.true_rank, 0) + 1
+        pair = []
+        highcard = []
+        for key, value in counts:
+            if value == 2:
+                pair.append(key)
+            else:
+                highcard.append(key)        
+        if len(pair) == 1:
+            sorted(pair, reverse= True)
+            sorted(highcard, reverse=True)
+            if highcard[0].true_rank ==5 and highcard[1].true_rank == 3 and highcard[2].true_rank == 2:
+                return True, pair[0] << 4 | highcard[0].score
+        return False, 0
+    
+    def Is_Bull_Plus_Pair_Nine(self, cards):
+        allbulls = []
+        rank = 0
+
+        # find out all bull
+        for index in self.bull_rules:
+            func = self.IS_BULL_DIC[index]
+            bulls = func(cards)
+            if len(bulls) != 0:
+                allbulls.append(bulls)
+        
+        if len(allbulls) == 0:
+            return False, 0
+        
+        for bulls in allbulls:
+            for bull in bulls:
+                if len(bull) == 5:
+                    continue
+                if len(bull) == 3:
+                    other_cards = [card for card in cards if card not in bull]
+                    rank = 0
+                    if other_cards[0].true_rank == other_cards[1].true_rank == 10:
+                        if self.same_bull_point_comparision == 0:
+                            rank = self.rank_for_max_card(cards)
+                        if self.same_bull_point_comparision == 1:
+                            rank = self.rank_for_max_card(other_cards)
+                        if self.same_bull_point_comparision(cards):
+                            rank = 0                        
+                        return True, rank
+        return False, 0
+    
+    @classmethod
+    def Is_Five_Cards_Sum_Forty(self, cards):
+        if sum(card.rank2_value for card in cards) == 40:
+            return True, self.rank_for_max_card(cards)
+        return False, 0
+    
+    @classmethod
+    def Is_IronBull(self,cards):
+
+        threeCard = self.Threecard(cards)
+
+        if len(threeCard) == 0:
+            return False, 0
+        if sum(card.rank2_value for card in cards if card not in threeCard) % 10 == 0:
+            return True, threeCard[0].rank2_value
+        return False, 0
+    @classmethod
+    def Is_SameColor(self, cards):
+        black = 0
+        red = 0
+        for card in cards:
+            if card.suit == 1 or card.suit == 3:
+                black += 1
+            if card.suit == 2 or card.suit == 0:
+                red += 1
+        if black == 5 or red == 5:
+            return True, self.rank_for_max_card()
+        return False, 0
+    @classmethod
+    def Is_StraightBull(self, cards):
+        if len(self.Three_card_straight(cards)) != 0:
+            return True, self.rank_for_max_card(cards)
+        return False, 0
+    @classmethod
+    def Is_235Bull(self, cards):
+        pass
+
+    
+
 
 
 
