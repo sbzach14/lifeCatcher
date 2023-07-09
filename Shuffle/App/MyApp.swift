@@ -17,14 +17,19 @@ struct MyApp: App {
 //                .onAppear {
 //                    requestPermissions()
 //                }
-            SelectRuleView()
+            SelectRuleView().onAppear {
+                requestPermissions()
+            }
         }
     }
 
     private func requestPermissions() {
         AVCaptureDevice.requestAccess(for: .video) { granted in
             if !granted {
-                // 摄像头权限被拒绝，执行相应操作
+                print("camera access fail")
+            }
+            else{
+                print("camera access success")
             }
         }
     }

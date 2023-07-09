@@ -96,6 +96,7 @@ class ThreeCardPokerGameRule : Rule{
         1: "是"
     ]
     let rankRules: [Int: String] = [
+        14: "对王",
         13: "炸弹",
         12: "三条",
         11: "同花235",
