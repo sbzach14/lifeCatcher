@@ -78,6 +78,26 @@ struct RankRulesView: View {
 
 struct RankRulesView_Previews: PreviewProvider {
     static var previews: some View {
-        RankRulesView(rankRules: .constant([RankRulesSate(index: 0, isChecked: false), RankRulesSate(index: 1, isChecked: true)]), selectedRuleIndex: 0)
+        RankRulesView(rankRules: .constant([
+            RankRulesSate(index: 0, isChecked: false),
+            RankRulesSate(index: 1, isChecked: true),
+            RankRulesSate(index: 1, isChecked: true),
+            RankRulesSate(index: 1, isChecked: true),
+            RankRulesSate(index: 1, isChecked: true),
+            RankRulesSate(index: 1, isChecked: true),
+            RankRulesSate(index: 1, isChecked: true),
+            RankRulesSate(index: 1, isChecked: true),
+            RankRulesSate(index: 1, isChecked: true),
+            RankRulesSate(index: 1, isChecked: true),
+            RankRulesSate(index: 1, isChecked: true),
+            RankRulesSate(index: 1, isChecked: true),
+            RankRulesSate(index: 1, isChecked: true),
+            RankRulesSate(index: 1, isChecked: true),
+            RankRulesSate(index: 1, isChecked: true),
+            RankRulesSate(index: 1, isChecked: true),
+            RankRulesSate(index: 1, isChecked: true),
+            RankRulesSate(index: 1, isChecked: true),
+            RankRulesSate(index: 1, isChecked: true),
+            RankRulesSate(index: 1, isChecked: true)]), selectedRuleIndex: 0)
     }
 }

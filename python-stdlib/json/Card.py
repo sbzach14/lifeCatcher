@@ -5,4 +5,7 @@ class Card:
 
     @classmethod
     def cal_score(self, card):
-        return card.rank << 2 | card.suit
+        if type(card.suit) == int:
+            return card.rank *10 + card.suit
+        else:
+            return card.rank *10 + max(card.suit.max)
