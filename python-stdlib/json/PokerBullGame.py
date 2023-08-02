@@ -10,8 +10,8 @@ import itertools
 # 0, normal dealing, 5 cards each
 # 1, one card each for the first round and begin from the largest card
 # 2, normal dealing, 3 cards each
-# 3, normal dealing, 4 cards each
-# 4, normal dealing, 10 cards each
+# 3, normal dealing, 4 cards each*
+# 4, normal dealing, 10 cards each*
 
 # numberchangearray
 # if card number change -> int Array:
@@ -53,7 +53,7 @@ import itertools
 # 13, Twopair
 # 14, BullNine
 # 15, Onepair
-# 16, Flash
+# 16, Flush
 # 17, all cards < 5
 # 18, DiamandBull(JQKJOKER)
 # 19, Bull+9pair max
@@ -150,7 +150,9 @@ class PokerBullGame:
             else:
                 self.suit = card.suit
             
-            # rank1_value是用来组牛时候的点数，rank2_value是用来比大小时候的点数
+            # rank1_value是用来组牛和计算点数时候的点数
+            # rank2_value是用来比大小时候的点数
+            # true_value是用来组成牌型的点数
             # 10 -10 10是0，1
             if card.rank == 10:
                 if self.tenValue == 0:
@@ -251,6 +253,7 @@ class PokerBullGame:
                 self.rank2_value = card.rank
                 self.suit = card.suit       
             self.score = self.cal_self_score()
+        
         @classmethod
         def cal_score(self, poker_bull_card):
             return poker_bull_card.rank2_value << 2 | poker_bull_card.suit
@@ -312,15 +315,6 @@ class PokerBullGame:
         return [sorted(allPlayers, key=lambda x:x.evaluate_flag, reverse=True)[0].playerID]
 
 class HandEvaluator:
-    # 
-
-    NULLBULL = 1
-    ONEBULL = 2
-    BULLBULL = 3
-    SILVERBULL = 4
-    GOLDBULL = 5
-    BOMB = 7
-    FIVELITTLE = 6
 
     # 0, 0 同牛同点比最大牌，无牛比最大牌, 
     # 1 同牛同点比牛架后的两张, 无牛比最大 
@@ -347,9 +341,9 @@ class HandEvaluator:
     # cards, bull cards 数组
     # bull_rules，判断什么是牛的规则数组
     # same_bull_point_comparision, 同牛情况下如何比较的规则
-    # 五小牛比较的规则
-    # 五小牛是否和顺子一样大
-    # 牌型大小的排序数组
+    # five_little_comparision, 五小牛比较的规则
+    # five_little_equal_to_straight, 五小牛是否和顺子一样大
+    # rankRules, 牌型大小的排序数组
     # 
     # 所有的比较都是默认比较highcard
 
@@ -358,10 +352,65 @@ class HandEvaluator:
     @classmethod
     def evaluate(self, cards,bull_rules, same_bull_point_comparision, five_little_comparision,five_little_equal_to_straight, rankRules):
 
-        RANK_RULE_Dic = {
+        self.FIVE_CARDS_RANK_RULE_Dic = {
         0 : self.Is_cards_sum_largerOrequal_forty,
         1 : self.Is_Fourcard, 
         2 : self.Is_five_cards_sum_lessOrEqual_ten,
+        3 : self.Is_five_cards_sum_equalsTo_twenty_and_haveBulls,
+        4 : self.Is_five_cards_sum_equalsTo_thirty_and_haveBulls,
+        5 : self.Threecard_and_otherTen,
+        6 : self.sum_equal_twentyORthirty,
+        7 : self.Is_Fullhouse,
+        8 : self.Is_stratght,
+        9 : self.Is_BullBull,
+        10 : self.Is_bull,
+        11 : self.Is_goldbull,
+        12 : self.Is_silverbull,
+        13 : self.Is_TwoPair,
+        14 : self.Is_BullNine,
+        15 : self.Is_One_Pair,
+        16 : self.Is_Flush,
+        17 : self.Is_All_Cards_Less_Than_Five,
+        18 : self.Is_Diamand_Bull,
+        19 : self.Is_Bull_Plus_Pair_Nine,
+        20 : self.Is_Bull_Plus_JQ,
+        21 : self.Is_Bull_Plus_TenJ,
+        22 : self.Is_Bull_Plus_ATen,
+        23 : self.Is_235_Plus_Pair,
+        24 : self.Is_Bull_Plus_Pair_Ten,
+        25 : self.Is_Five_Cards_Sum_Forty,
+        26 : self.Is_IronBull,
+        27 : self.Is_SameColor,
+        28 : self.Is_StraightBull,
+        29 : self.Is_235Bull,
+        30 : self.Is_StraightFlush,
+        31 : self.Is_FiveOne,
+        32 : self.Is_Five_Cards_Equal_Ten,
+        33 : self.Is_Five_Cards_Equal_Twenty,
+        34 : self.Is_Five_Cards_Equal_Thirty,
+        35 : self.Is_Five_Cards_Equal_Forty,
+        36 : self.Is_Five_Cards_Equal_Five,
+        37 : self.Is_SpadeA_With_JQK,
+        38 : self.Is_Bull_Apair,
+        39 : self.Is_Bull_With_SpadeA,
+        40 : self.Is_GoldBull_with_SpadeA,
+        41 : self.Is_FiveLittle
+        }
+        self.THREE_CARDS_RANK_RULE_DIC = {
+        1: self.Is_ThreeCard_THR,
+        2: self.Is_JQK_THR,
+        3: self.Is_QJTEN_THR,
+        4: self.Is_sum_equalToTen_THR,
+        5: self.Is_StraightFlush_THR,
+        6: self.Is_Straight_THR
+        }
+
+        self.TEN_CARDS_RANK_RULE_DIC = {
+
+        }
+
+        self.FOUR_CARDS_RANK_RULE_DIC = {
+
         }
 
         self.IS_BULL_DIC = {
@@ -374,29 +423,37 @@ class HandEvaluator:
         6: self.Five_cards_sum_less_than_ten,
         7: self.Five_cards_sum_less_than_nine,
         8: self.Any_three_card_sum_Nten_overTwenty
-
         }
-
-
-
 
         self.bull_rules = bull_rules
         self.same_bull_point_comparision = same_bull_point_comparision
         self.five_little_comparision = five_little_comparision
         self.five_little_equal_to_straight = five_little_equal_to_straight
+        self.rank_rules = rankRules
+        funcs = []
+        rule_dic= {}
+        if len(cards) == 3:
+            rule_dic = self.THREE_CARDS_RANK_RULE_DIC
+        if len(cards) == 5:
+            rule_dic = self.FIVE_CARDS_RANK_RULE_Dic
 
-        funcList = [self.Is_Fourcard, self.Is_FiveLittle, self.Is_goldbull, self.Is_silverbull, self.Is_bull]
-        i = len(funcList) + 1
-        for func in funcList:
+        for rank_Index in self.rank_rules:
+            funcs.append(rule_dic[rank_Index])
+
+        i = len(funcs) + 1
+        for func in funcs:
             i = i - 1
             flag, rank = func(cards)
-            if flag:
+            if flag != True:
                 continue
             else:
                 eval = 1<<(8 + i) | rank 
                 print(eval)
                 return eval
-            
+        
+
+
+
 ###################################################
     # 判断是否有牛
     # 不同判断牛的函数
@@ -478,8 +535,53 @@ class HandEvaluator:
 
 # 所有的牌型判断
 ###########################################################
+#所有的3张牌的牌型判断
+# ################################
+    
+    @classmethod
+    def Is_ThreeCard_THR(self, cards):
+        counts = {}
+        for card in cards:
+            counts[card.true_rank] = counts.get(card.true_rank, 0) + 1
+        
+        if len(counts) == 1:
+            return True, counts[cards[0].true_rank]
+        else:
+            return False, 0
+    @classmethod
+    def Is_JQK_THR(self, cards):
+        sorted(cards, key= lambda x:x.true_rank)
+        first_rank = 11
+        for card in cards:
+            if card.true_rank != first_rank:
+                return False, 0
+            first_rank += 1
+        return True, cards[-1].score
+    @classmethod
+    def Is_QJTEN_THR(self, cards):
+        sorted(cards, key = lambda x:x.true_rank)
+        first_rank = 10
+        for card in cards:
+            if card.true_rank != first_rank:
+                return False, 0
+            first_rank += 1
+        return True, cards[-1].score
+    @classmethod
+    def Is_sum_equalToTen_THR(self,cards):
+        if sum(card.rank2_value for card in cards) == 10:
+            return True, self.rank_for_max_card(cards)
+        return False, 0
+    @classmethod
+    def Is_StraightFlush_THR(self, cards):
+        return self.Is_StraightFlush(cards)
+    
+    @classmethod
+    def Is_Straight_THR(self, cards):
+        return self.Is_stratght(cards)
 
 
+# 所有的5张牌牌型判断
+# ########################################
     # 0, five cards sum >= 40
     @classmethod
     def Is_cards_sum_largerOrequal_forty(self, cards):
@@ -563,7 +665,7 @@ class HandEvaluator:
                 continue
             else:
                 return False, 0
-        return True, cards[0].cal_self_score()
+        return True, cards[0].score()
     
     @classmethod
     def Is_BullBull(self, cards):
@@ -757,7 +859,7 @@ class HandEvaluator:
         return False, 0
 
     @classmethod
-    def Is_Flash(self, cards):
+    def Is_Flush(self, cards):
         suit = cards[0].suit
         for card in cards:
             if card.suit != suit:
@@ -807,39 +909,6 @@ class HandEvaluator:
                     other_cards = [card for card in cards if card not in bull]
                     rank = 0
                     if other_cards[0].true_rank == other_cards[1].true_rank == 9:
-                        if self.same_bull_point_comparision == 0:
-                            rank = self.rank_for_max_card(cards)
-                        if self.same_bull_point_comparision == 1:
-                            rank = self.rank_for_max_card(other_cards)
-                        if self.same_bull_point_comparision(cards):
-                            rank = 0                        
-                        return True, rank
-        return False, 0
-    @classmethod
-    def Is_Bull_Plus_JQ(self, cards):
-        allbulls = []
-        bull_rank = 0
-        rank = 0
-
-        # find out all bull
-        for index in self.bull_rules:
-            func = self.IS_BULL_DIC[index]
-            bulls = func(cards)
-            if len(bulls) != 0:
-                allbulls.append(bulls)
-        
-        if len(allbulls) == 0:
-            return False, 0
-        
-        for bulls in allbulls:
-            for bull in bulls:
-                if len(bull) == 5:
-                    continue
-                if len(bull) == 3:
-                    other_cards = [card for card in cards if card not in bull]
-                    sorted(other_cards, key=lambda x:x.true_rank, reverse= True)
-                    rank = 0
-                    if other_cards[0].true_rank == 12 and other_cards[1].true_rank == 11:
                         if self.same_bull_point_comparision == 0:
                             rank = self.rank_for_max_card(cards)
                         if self.same_bull_point_comparision == 1:
@@ -965,7 +1034,7 @@ class HandEvaluator:
                 return True, pair[0] << 4 | highcard[0].score
         return False, 0
     
-    def Is_Bull_Plus_Pair_Nine(self, cards):
+    def Is_Bull_Plus_Pair_Ten(self, cards):
         allbulls = []
         rank = 0
 
@@ -1031,13 +1100,160 @@ class HandEvaluator:
         return False, 0
     @classmethod
     def Is_235Bull(self, cards):
-        pass
 
+        sorted_card = self.Sort_Bull_Cards_From_Low_to_High(cards)
+        a = 0
+        b = 0
+        c = 0
+        cloned_List = list(sorted_card)
+
+
+        for card in sorted_card:
+            if card.rank2_value == 2 and a != 1:
+                a = 1
+                cloned_List.remove(card)
+            if card.rank2_value == 3 and b != 1:
+                b = 1
+                cloned_List.remove(card)
+            if card.rank2_value == 5 and c != 0:
+                c = 1
+                cloned_List.remove(card)
+        if len(cloned_List) == 2:
+            if self.same_bull_point_comparision == 0:
+                rank = self.rank_for_max_card(cards)
+            if self.same_bull_point_comparision == 1:
+                rank = self.rank_for_max_card(cloned_List)
+            if self.same_bull_point_comparision(cards):
+                rank = 0                        
+            return True, rank
+
+        return False, 0
+    @classmethod
+    def Is_StraightFlush(self, cards):
+        is_flush, _ = self.Is_Flush(cards)
+        is_straight, _ = self.Is_stratght(cards)
+
+        if is_flush and is_straight:
+            return True, self.rank_for_max_card(cards)
+        return False, 0
+    @classmethod
+    def Is_FiveOne(self, cards):
+        for card in cards:
+            if card.rank2_value != 1:
+                return False, 0
+        return True, self.rank_for_max_card(cards)
+    @classmethod
+    def Is_Five_Cards_Equal_Ten(self, cards):
+        if sum(card.rank1_value for card in cards) == 10:
+            return True, self.rank_for_max_card(cards)
+        return False, 0
+    @classmethod
+    def Is_Five_Cards_Equal_Twenty(self, cards):
+        if sum(card.rank1_value for card in cards) == 20:
+            return True, self.rank_for_max_card(cards)
+        return False, 0
+
+    @classmethod
+    def Is_Five_Cards_Equal_Thirty(self, cards):
+        if sum(card.rank1_value for card in cards) == 30:
+            return True, self.rank_for_max_card(cards)
+        return False, 0
+
+    @classmethod
+    def Is_Five_Cards_Equal_Forty(self, cards):
+        if sum(card.rank1_value for card in cards) == 40:
+            return True, self.rank_for_max_card(cards)
+        return False, 0
+
+    @classmethod
+    def Is_Five_Cards_Equal_Five(self, cards):
+        if sum(card.rank1_value for card in cards) == 5:
+            return True, self.rank_for_max_card(cards)
+        return False, 0        
+    @classmethod
+    def Is_SpadeA_With_JQK(self, cards):
+        sorted_cards =  sorted(cards, key= lambda x:x.true_rank, reverse=True)
+        if sorted_cards[-1].true_value == 1 and sorted_cards[-1].suit == 3:
+            del sorted_cards[-1]
+            for card in sorted_cards:
+                if card.true_value < 11 or card.true_value > 13:
+                    return False, 0
+        return True, self.rank_for_max_card(cards)
+
+    @classmethod
+    def Is_Bull_Apair(self, cards):
+        allbulls = []
+        rank = 0
+
+        # find out all bull
+        for index in self.bull_rules:
+            func = self.IS_BULL_DIC[index]
+            bulls = func(cards)
+            if len(bulls) != 0:
+                allbulls.append(bulls)
+        
+        if len(allbulls) == 0:
+            return False, 0
+        
+        for bulls in allbulls:
+            for bull in bulls:
+                if len(bull) == 5:
+                    continue
+                if len(bull) == 3:
+                    other_cards = [card for card in cards if card not in bull]
+                    rank = 0
+                    if other_cards[0].true_rank == other_cards[1].true_rank == 1:
+                        if self.same_bull_point_comparision == 0:
+                            rank = self.rank_for_max_card(cards)
+                        if self.same_bull_point_comparision == 1:
+                            rank = self.rank_for_max_card(other_cards)
+                        if self.same_bull_point_comparision(cards):
+                            rank = 0                        
+                        return True, rank
+        return False, 0
     
+    @classmethod
+    def Is_Bull_With_SpadeA(self, cards):
+        allbulls = []
+        rank = 0
 
-
-
-
+        # find out all bull
+        for index in self.bull_rules:
+            func = self.IS_BULL_DIC[index]
+            bulls = func(cards)
+            if len(bulls) != 0:
+                allbulls.append(bulls)
+        
+        if len(allbulls) == 0:
+            return False, 0
+        
+        for bulls in allbulls:
+            for bull in bulls:
+                if len(bull) == 5:
+                    continue
+                if len(bull) == 3:
+                    other_cards = [card for card in cards if card not in bull]
+                    rank = 0
+                    if (other_cards[0].true_rank ==1 and other_cards[0].suit == 3) or (other_cards[1].true_rank == 1 and other_cards[1].suit == 3):
+                        if self.same_bull_point_comparision == 0:
+                            rank = self.rank_for_max_card(cards)
+                        if self.same_bull_point_comparision == 1:
+                            rank = self.rank_for_max_card(other_cards)
+                        if self.same_bull_point_comparision(cards):
+                            rank = 0                        
+                        return True, rank
+        return False, 0
+    
+    @classmethod
+    def Is_GoldBull_with_SpadeA(self, cards):
+        sorted_cards = sorted(cards, key=lambda x:x.true_rank)
+        if sorted_cards[-1].true_rank == 1 and sorted_cards[-1].suit == 3:
+            del sorted_cards[-1]
+            for card in sorted_cards:
+                if card.true_rank < 11 or card.true_rank > 15:
+                    return False, 0
+            return True, self.rank_for_max_card(cards)
+        return False, 0
     
     @classmethod
     def Is_FiveLittle(self, cards):
@@ -1047,7 +1263,11 @@ class HandEvaluator:
                 return 0, 0
             
         rank = self.rank_for_max_card(cards)
-        return self.FIVELITTLE, rank
+        return True, rank
+    @classmethod
+    def Is_HightCard(self, cards):
+        if self.NOBULLRANKTOPTWO == True:
+            return True
     
     def rank_for_max_card(self,cards):
         sorted_cards = self.Sort_Bull_Cards_From_High_to_Low(cards)
@@ -1056,4 +1276,8 @@ class HandEvaluator:
     @classmethod
     def Sort_Bull_Cards_From_High_to_Low(self, cards):
         return sorted(cards, key = lambda x:x.score, reverse=True)
+    
+    @classmethod
+    def Sort_Bull_Cards_From_Low_to_High(self, cards):
+        return sorted(cards, key = lambda x:x.score)
 
