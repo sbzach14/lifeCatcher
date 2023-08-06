@@ -21,7 +21,7 @@ class GameManager {
         let rule2 = Rule(ruleIndex: 1, ruleName: "PokerBullRule")
         let rule3 = ThreeCardPokerGameRule(ruleIndex: 2, ruleName: "ThreeCardPokerGame")
         
-        return [rule1.ruleIndex: rule1, rule2.ruleIndex: rule2, rule3.ruleIndex: rule3]
+        return [rule1.ruleIndex: rule1]
     }()
     
     

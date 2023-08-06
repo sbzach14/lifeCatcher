@@ -1,0 +1,158 @@
+//
+//  Utils.swift
+//  Shuffle
+//
+//  Created by Zhangyi Chen on 8/6/23.
+//  Copyright © 2023 Apple. All rights reserved.
+//
+
+import Foundation
+import CoreML
+
+public func initFile(){
+    
+    
+        
+    //创建config json文件
+    createConfigJSON()
+    
+    //创建cls json文件
+    createRecordHistoryJSON()
+        
+        
+}
+
+// Helper method to read config.json and return the data as a dictionary
+public func readConfigJSON() -> [String: Bool]? {
+    do {
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let fileURL = documentsURL.appendingPathComponent("config.json")
+
+        let jsonData = try Data(contentsOf: fileURL)
+        let jsonObject = try JSONSerialization.jsonObject(with: jsonData, options: [])
+
+        if let configData = jsonObject as? [String: Bool] {
+            return configData
+        }
+    } catch {
+        print("Error reading config.json: \(error)")
+    }
+    return nil
+}
+
+public func readRecordHistoryJSON() -> [String: [String]]? {
+    do {
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let fileURL = documentsURL.appendingPathComponent("recordHistory").appendingPathComponent("recordHistory.json")
+
+        let jsonData = try Data(contentsOf: fileURL)
+        let jsonObject = try JSONSerialization.jsonObject(with: jsonData, options: [])
+
+        if let recordHistroyData = jsonObject as? [String: [String]] {
+            return recordHistroyData
+        }
+    } catch {
+        print("Error reading recordHistory.json: \(error)")
+    }
+    return nil
+}
+
+
+
+
+func createRecordHistoryJSON() {
+    // 获取resnet MLModel文件的URL
+    guard let modelURL = Bundle.main.url(forResource: "Resnet50FP16", withExtension: "mlmodelc") else {
+        print("找不到MLModel文件")
+        return
+    }
+    
+    do {
+        // Parse the MLModel file to get the model description
+        let model = try MLModel(contentsOf: modelURL)
+        
+        let modelDescription = model.modelDescription
+        // Create an empty record dictionary
+        var recordDict: [String: [String]] = [:]
+
+        // Get all class labels and initialize corresponding empty string lists
+        if let classLabels = modelDescription.classLabels as? [String] {
+            for key in classLabels {
+                var resultString = key
+                if let firstCommaIndex = key.firstIndex(of: ","){
+                    let substring = key[..<firstCommaIndex]
+                    resultString = String(substring)
+                }
+                recordDict[resultString] = []
+            }
+            
+        }
+        
+        // Get the Documents directory path in the app's sandbox
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        
+
+        // Convert the dictionary to JSON Data
+        let jsonData = try JSONSerialization.data(withJSONObject: recordDict, options: .prettyPrinted)
+
+        // Create the recordHistory.json file URL
+        let fileURL = documentsURL.appendingPathComponent("recordHistory.json")
+        
+        // Check if config.json already exists
+        if !FileManager.default.fileExists(atPath: fileURL.path) {
+            // Write the JSON Data to the recordHistory.json file
+            try jsonData.write(to: fileURL)
+            print("recordHistory.json file created successfully")
+        } else {
+            print("recordHistory.json file already exists, skipping write operation.")
+        }
+        
+        print("recordHistory.json file and directories created successfully")
+        
+        
+        // Create the recordHistory directory URL
+        let recordHistoryURL = documentsURL.appendingPathComponent("recordHistory")
+
+        
+        // Create the recordHistory directory if it doesn't exist
+        try FileManager.default.createDirectory(at: recordHistoryURL, withIntermediateDirectories: true, attributes: nil)
+
+    } catch {
+        print("Error creating the recordHistory.json file: \(error)")
+    }
+}
+
+
+func createConfigJSON() {
+    // Create the config dictionary with default values
+    let configDict: [String: Bool] = [
+        "isBlack": false,
+        "isMute": false,
+        "isActive": false,
+        "isBackCamera": false
+    ]
+
+    do {
+        // Convert the dictionary to JSON Data
+        let jsonData = try JSONSerialization.data(withJSONObject: configDict, options: .prettyPrinted)
+
+        // Get the Documents directory path in the app's sandbox
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+
+        // Create the config.json file URL
+        let fileURL = documentsURL.appendingPathComponent("config.json")
+
+        // Check if config.json already exists
+        if !FileManager.default.fileExists(atPath: fileURL.path) {
+            // Write the JSON Data to the config.json file
+            try jsonData.write(to: fileURL)
+            print("config.json file created successfully")
+        } else {
+            print("config.json file already exists, skipping write operation.")
+        }
+
+
+    } catch {
+        print("Error creating the config.json file: \(error)")
+    }
+}

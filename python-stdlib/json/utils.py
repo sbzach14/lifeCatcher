@@ -1,5 +1,5 @@
 import random
-from .Card import Card
+from Card import Card
 
 def Init_deck(initial_cards, suitRules):
     deck_List = []

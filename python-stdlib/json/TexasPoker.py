@@ -113,6 +113,10 @@ class HandEvaluator:
     for card in cards:
         if card.rank == 1:
             card.rank = 14
+    
+    for card in community:
+        if card.rank == 1:
+            card.rank = 14
 
     all_cards = []
     cards_length = 0
@@ -191,9 +195,9 @@ class HandEvaluator:
 
     rank_result = 0
     for index, ruleIndex in enumerate(rankRules):
-        rank_flag = len(rankRules) - index + 22
+        rank_flag = 1 << (len(rankRules) - index + 23)
         rank_result = rule_dict[ruleIndex](cards, cards_length)
-        if isCompareSuit:
+        if not isCompareSuit:
             rank_result = rank_result >> 2
         if rank_result != 0:
             rank_result = rank_result | rank_flag
@@ -474,7 +478,7 @@ class HandEvaluator:
     if pair_rank != 0:
         for _ in range(3):
             for i in range(cards_length):
-                if cards[i].rank != pair_rank:
+                if cards[i].rank not in rank_list:
                     rank_list.append(cards[i].rank)
                     break
         for rank_ in rank_list:
@@ -488,5 +492,6 @@ class HandEvaluator:
     rank = 0
     for i in range(5):
         rank = rank << 4 | cards[i].rank
+    rank = rank << 2 | cards[0].suit
     return rank
 

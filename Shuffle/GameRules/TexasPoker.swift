@@ -93,4 +93,16 @@ class TexasPoker{
         }
         return errMessage
     }
+    
+    static func getAllCardIndex(minRank: Int) -> [Int]{
+        var result : [Int] = []
+        for i in 0...3{
+            for rank in 0...12{
+                if rank == 0 || rank >= minRank - 1{
+                    result.append(rank + i * 13)
+                }
+            }
+        }
+        return result
+    }
 }

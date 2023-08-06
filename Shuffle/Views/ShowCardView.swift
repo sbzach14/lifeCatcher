@@ -8,17 +8,15 @@ The app's overlay view.
 import SwiftUI
 
 struct ShowCardView: View {
-    var cards: Array<Int>
-    var winners: Array<Int>
-    @State var showCardView = false
+    @EnvironmentObject var viewModel : ViewModel
     
     var body: some View {
         VStack(alignment: .leading) {
-            if showCardView {
+            if viewModel.isShowCard {
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 45))]) {
-                        ForEach(cards.indices, id: \.self) { index in
-                            let imageName = "\(cards[index])"
+                        ForEach(viewModel.cardArray.indices, id: \.self) { index in
+                            let imageName = "\(viewModel.cardArray[index])"
                             Image(imageName)
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
@@ -36,7 +34,7 @@ struct ShowCardView: View {
             
             HStack {
                 Button {
-                    showCardView.toggle()
+                    viewModel.showCardToggle()
                 } label: {
                     Label("ShowCard", systemImage: "magnifyingglass")
                         .foregroundColor(.primary)
@@ -48,7 +46,7 @@ struct ShowCardView: View {
                     .font(.title)
                     .foregroundColor(.primary)
                 
-                Text(winners.map { String($0 + 1) }.joined(separator: " "))
+                Text(viewModel.winnerPlayer.map { String($0 + 1) }.joined(separator: " "))
                                     .font(.title)
                                     .foregroundColor(.primary)
                 
@@ -72,6 +70,6 @@ extension View {
 
 struct ShowCardView_Previews: PreviewProvider {
     static var previews: some View {
-        ShowCardView(cards: Array(0...51), winners: Array(0...2))
+        ShowCardView().environmentObject(ViewModel())
     }
 }

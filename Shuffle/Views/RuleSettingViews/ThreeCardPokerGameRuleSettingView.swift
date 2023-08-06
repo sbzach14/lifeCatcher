@@ -446,7 +446,7 @@ struct ThreeCardPokerGameRuleSettingView: View {
                         blackJokerRank,
                         isMixedSuit,
                         isReverseHighCard
-                    ], rankRules : GameManager.getCheckedIndexes(rankRules: rankRules), suitRules: suitRules),
+                    ], rankRules : GameManager.getCheckedIndexes(rankRules: rankRules), suitRules: suitRules, allCardIndex: TexasPoker.getAllCardIndex(minRank: selectedRule.minRank[minRank])),
                     isActive: $navigateToMainContent,
                     label: EmptyView.init
                 )

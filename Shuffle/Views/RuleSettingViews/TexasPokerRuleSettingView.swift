@@ -46,10 +46,6 @@ struct TexasPokerRuleSettingView: View {
         {
             let selectedRule = GameManager.gameRules[0] as! TexasPokerRule
             
-            Text("Rule Setting")
-                .font(.title)
-                .padding()
-            
             Spacer()
             
             ScrollView{
@@ -312,14 +308,16 @@ struct TexasPokerRuleSettingView: View {
                         selectedRule.communityNum[communityNum],
                         handUseType,
                         selectedRule.handUseNum[handUseNum]
-                    ], rankRules : GameManager.getCheckedIndexes(rankRules: rankRules), suitRules: suitRules),
+                    ], rankRules : GameManager.getCheckedIndexes(rankRules: rankRules), suitRules: suitRules, allCardIndex: TexasPoker.getAllCardIndex(minRank: selectedRule.minRank[minRank])),
                     isActive: $navigateToMainContent,
                     label: EmptyView.init
                 )
                 .hidden()
             )
-        }
+        }.navigationTitle("Rule Setting")
     }
+    
+    
     
     private func showAlertWithMessage() {
         showAlert = true

@@ -240,9 +240,9 @@ class HandEvaluator:
                 rankRules.remove(7)
         
         for index, ruleIndex in enumerate(rankRules):
-            rank_flag = len(rankRules) - index + 18
+            rank_flag = 1 << (len(rankRules) - index + 18)
             rank_result = rule_dict[ruleIndex](sorted_cards)
-            if self.isCompareSuit:
+            if not self.isCompareSuit:
                 rank_result = rank_result >> 6
             if rank_result != 0:
                 rank_result = rank_result | rank_flag
