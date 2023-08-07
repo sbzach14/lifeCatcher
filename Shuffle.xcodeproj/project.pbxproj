@@ -22,12 +22,13 @@
 		A88716852A0F701500B7F2CD /* GameManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88716842A0F701500B7F2CD /* GameManager.swift */; };
 		A887B64E2A7FDF56009F488F /* RecordHistoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B64D2A7FDF56009F488F /* RecordHistoryViewModel.swift */; };
 		A887B6502A7FE1AF009F488F /* ShowRecordHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B64F2A7FE1AF009F488F /* ShowRecordHistoryView.swift */; };
+		A887B6522A8104BC009F488F /* TimeUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B6512A8104BC009F488F /* TimeUtils.swift */; };
 		A88EFDC42A7D217200897243 /* VisionObjectRecognitionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFDC12A7D217100897243 /* VisionObjectRecognitionViewModel.swift */; };
 		A88EFDC82A7D249C00897243 /* VisionObjectRecognitionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFDC72A7D249C00897243 /* VisionObjectRecognitionView.swift */; };
 		A88EFE032A7E8ACD00897243 /* Resnet50FP16.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A88EFE022A7E8ACC00897243 /* Resnet50FP16.mlmodel */; };
 		A88EFE072A7FA95A00897243 /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFE062A7FA95A00897243 /* SettingView.swift */; };
 		A88EFE092A7FAD1100897243 /* SettingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFE082A7FAD1100897243 /* SettingViewModel.swift */; };
-		A88EFE0B2A7FC05900897243 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFE0A2A7FC05900897243 /* Utils.swift */; };
+		A88EFE0B2A7FC05900897243 /* JsonUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFE0A2A7FC05900897243 /* JsonUtils.swift */; };
 		A88EFE0D2A7FDC9500897243 /* RecordHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFE0C2A7FDC9500897243 /* RecordHistoryView.swift */; };
 		A88F209B2A10E99F005E4A27 /* PythonKit in Frameworks */ = {isa = PBXBuildFile; productRef = A88F209A2A10E99F005E4A27 /* PythonKit */; };
 		A88F209D2A10EB39005E4A27 /* python-stdlib in Resources */ = {isa = PBXBuildFile; fileRef = A88F209C2A10EB39005E4A27 /* python-stdlib */; };
@@ -68,12 +69,13 @@
 		A88716842A0F701500B7F2CD /* GameManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameManager.swift; sourceTree = "<group>"; };
 		A887B64D2A7FDF56009F488F /* RecordHistoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordHistoryViewModel.swift; sourceTree = "<group>"; };
 		A887B64F2A7FE1AF009F488F /* ShowRecordHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRecordHistoryView.swift; sourceTree = "<group>"; };
+		A887B6512A8104BC009F488F /* TimeUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeUtils.swift; sourceTree = "<group>"; };
 		A88EFDC12A7D217100897243 /* VisionObjectRecognitionViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisionObjectRecognitionViewModel.swift; sourceTree = "<group>"; };
 		A88EFDC72A7D249C00897243 /* VisionObjectRecognitionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionObjectRecognitionView.swift; sourceTree = "<group>"; };
 		A88EFE022A7E8ACC00897243 /* Resnet50FP16.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = Resnet50FP16.mlmodel; sourceTree = "<group>"; };
 		A88EFE062A7FA95A00897243 /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
 		A88EFE082A7FAD1100897243 /* SettingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewModel.swift; sourceTree = "<group>"; };
-		A88EFE0A2A7FC05900897243 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		A88EFE0A2A7FC05900897243 /* JsonUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonUtils.swift; sourceTree = "<group>"; };
 		A88EFE0C2A7FDC9500897243 /* RecordHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordHistoryView.swift; sourceTree = "<group>"; };
 		A88F209C2A10EB39005E4A27 /* python-stdlib */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "python-stdlib"; sourceTree = "<group>"; };
 		A88F209E2A10EB4D005E4A27 /* Python.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = Python.xcframework; sourceTree = "<group>"; };
@@ -221,7 +223,8 @@
 				A887167E2A0623E500B7F2CD /* AuthManager.swift */,
 				A88716842A0F701500B7F2CD /* GameManager.swift */,
 				A8FBC7C12A3F0A5C00EDDFD7 /* CVBufferGenerate.swift */,
-				A88EFE0A2A7FC05900897243 /* Utils.swift */,
+				A88EFE0A2A7FC05900897243 /* JsonUtils.swift */,
+				A887B6512A8104BC009F488F /* TimeUtils.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -392,8 +395,9 @@
 				A887167F2A0623E500B7F2CD /* AuthManager.swift in Sources */,
 				18CA14D4284AC42C00F90372 /* MainContentView.swift in Sources */,
 				A88F20B02A1DEE63005E4A27 /* TinyNine.swift in Sources */,
-				A88EFE0B2A7FC05900897243 /* Utils.swift in Sources */,
+				A88EFE0B2A7FC05900897243 /* JsonUtils.swift in Sources */,
 				A88EFDC82A7D249C00897243 /* VisionObjectRecognitionView.swift in Sources */,
+				A887B6522A8104BC009F488F /* TimeUtils.swift in Sources */,
 				A892C6002A765A0A003FA2B3 /* MainMenuView.swift in Sources */,
 				A893F4832A6FB8F4001AB6A9 /* CardDetect.mlmodel in Sources */,
 				A8922FC02A6553FB00A7033E /* PokerBullSettingView.swift in Sources */,

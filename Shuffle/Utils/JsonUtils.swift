@@ -1,28 +1,97 @@
-//
-//  Utils.swift
-//  Shuffle
-//
-//  Created by Zhangyi Chen on 8/6/23.
-//  Copyright © 2023 Apple. All rights reserved.
-//
+
 
 import Foundation
 import CoreML
 
-public func initFile(){
-    
-    
-        
-    //创建config json文件
-    createConfigJSON()
-    
-    //创建cls json文件
-    createRecordHistoryJSON()
-        
-        
-}
+
 
 // Helper method to read config.json and return the data as a dictionary
+
+func createParaJSON() {
+    // Create the config dictionary with default values
+    let paraDict: [String: String] = [
+        "activeTime": ""
+    ]
+
+    do {
+        // Convert the dictionary to JSON Data
+        let jsonData = try JSONSerialization.data(withJSONObject: paraDict, options: .prettyPrinted)
+
+        // Get the Documents directory path in the app's sandbox
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+
+        // Create the config.json file URL
+        let fileURL = documentsURL.appendingPathComponent("para.json")
+
+        // Check if config.json already exists
+        if !FileManager.default.fileExists(atPath: fileURL.path) {
+            // Write the JSON Data to the config.json file
+            try jsonData.write(to: fileURL)
+            print("para.json file created successfully")
+        } else {
+            print("para.json file already exists, skipping write operation.")
+        }
+
+
+    } catch {
+        print("Error creating the para.json file: \(error)")
+    }
+}
+
+
+public func readParaJSON() -> [String: String]? {
+    do {
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let fileURL = documentsURL.appendingPathComponent("para.json")
+
+        let jsonData = try Data(contentsOf: fileURL)
+        let jsonObject = try JSONSerialization.jsonObject(with: jsonData, options: [])
+
+        if let paraData = jsonObject as? [String: String] {
+            return paraData
+        }
+    } catch {
+        print("Error reading para.json: \(error)")
+    }
+    return nil
+}
+
+
+func createConfigJSON() {
+    // Create the config dictionary with default values
+    let configDict: [String: Bool] = [
+        "isBlack": false,
+        "isMute": false,
+        "isActive": false,
+        "isBackCamera": false
+    ]
+
+    do {
+        // Convert the dictionary to JSON Data
+        let jsonData = try JSONSerialization.data(withJSONObject: configDict, options: .prettyPrinted)
+
+        // Get the Documents directory path in the app's sandbox
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+
+        // Create the config.json file URL
+        let fileURL = documentsURL.appendingPathComponent("config.json")
+
+        // Check if config.json already exists
+        if !FileManager.default.fileExists(atPath: fileURL.path) {
+            // Write the JSON Data to the config.json file
+            try jsonData.write(to: fileURL)
+            print("config.json file created successfully")
+        } else {
+            print("config.json file already exists, skipping write operation.")
+        }
+
+
+    } catch {
+        print("Error creating the config.json file: \(error)")
+    }
+}
+
+
 public func readConfigJSON() -> [String: Bool]? {
     do {
         let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
@@ -39,24 +108,6 @@ public func readConfigJSON() -> [String: Bool]? {
     }
     return nil
 }
-
-public func readRecordHistoryJSON() -> [String: [String]]? {
-    do {
-        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let fileURL = documentsURL.appendingPathComponent("recordHistory").appendingPathComponent("recordHistory.json")
-
-        let jsonData = try Data(contentsOf: fileURL)
-        let jsonObject = try JSONSerialization.jsonObject(with: jsonData, options: [])
-
-        if let recordHistroyData = jsonObject as? [String: [String]] {
-            return recordHistroyData
-        }
-    } catch {
-        print("Error reading recordHistory.json: \(error)")
-    }
-    return nil
-}
-
 
 
 
@@ -122,37 +173,19 @@ func createRecordHistoryJSON() {
     }
 }
 
-
-func createConfigJSON() {
-    // Create the config dictionary with default values
-    let configDict: [String: Bool] = [
-        "isBlack": false,
-        "isMute": false,
-        "isActive": false,
-        "isBackCamera": false
-    ]
-
+public func readRecordHistoryJSON() -> [String: [String]]? {
     do {
-        // Convert the dictionary to JSON Data
-        let jsonData = try JSONSerialization.data(withJSONObject: configDict, options: .prettyPrinted)
-
-        // Get the Documents directory path in the app's sandbox
         let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let fileURL = documentsURL.appendingPathComponent("recordHistory").appendingPathComponent("recordHistory.json")
 
-        // Create the config.json file URL
-        let fileURL = documentsURL.appendingPathComponent("config.json")
+        let jsonData = try Data(contentsOf: fileURL)
+        let jsonObject = try JSONSerialization.jsonObject(with: jsonData, options: [])
 
-        // Check if config.json already exists
-        if !FileManager.default.fileExists(atPath: fileURL.path) {
-            // Write the JSON Data to the config.json file
-            try jsonData.write(to: fileURL)
-            print("config.json file created successfully")
-        } else {
-            print("config.json file already exists, skipping write operation.")
+        if let recordHistroyData = jsonObject as? [String: [String]] {
+            return recordHistroyData
         }
-
-
     } catch {
-        print("Error creating the config.json file: \(error)")
+        print("Error reading recordHistory.json: \(error)")
     }
+    return nil
 }

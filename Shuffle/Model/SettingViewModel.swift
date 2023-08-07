@@ -52,8 +52,62 @@ class SettingViewModel: ObservableObject {
     }
     
     public func onReturnKeyPressed(){
-        if searchText == "WHOSYOURDADDY"{
+        if searchText == "TEMP"{
             self.isActive.toggle()
+            let dateString = "TEMP"
+            
+            do {
+                let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+                let fileURL = documentsURL.appendingPathComponent("para.json")
+
+                let paraData: [String: String] = [
+                    "activeTime": dateString
+                ]
+
+                let jsonData = try JSONSerialization.data(withJSONObject: paraData, options: .prettyPrinted)
+                try jsonData.write(to: fileURL)
+
+                print("para.json file updated successfully")
+            } catch {
+                print("Error updating para.json: \(error)")
+            }
+        }
+        else if searchText == "WHOSYOURDADDY"{
+            fetchInternetCurrentDate { internetDate in
+                if let internetDate = internetDate {
+                    
+                    self.isActive.toggle()
+                    
+                    let activeTimeString = readParaJSON()!["activeTime"]
+                    if activeTimeString == ""{
+                        let dateFormatter = DateFormatter()
+                        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+
+                        let dateString = dateFormatter.string(from: internetDate)
+                        
+                        do {
+                            let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+                            let fileURL = documentsURL.appendingPathComponent("para.json")
+
+                            let paraData: [String: String] = [
+                                "activeTime": dateString
+                            ]
+
+                            let jsonData = try JSONSerialization.data(withJSONObject: paraData, options: .prettyPrinted)
+                            try jsonData.write(to: fileURL)
+
+                            print("para.json file updated successfully")
+                        } catch {
+                            print("Error updating para.json: \(error)")
+                        }
+
+                    }
+                } else {
+                    print("无法获取互联网当前日期")
+                    exit(0)
+                }
+            }
+        
         }
         searchText = ""
     }

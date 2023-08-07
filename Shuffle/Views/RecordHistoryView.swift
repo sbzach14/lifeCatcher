@@ -25,17 +25,20 @@ struct RecordHistoryView: View {
             ScrollView {
                 VStack(spacing: 0) {
                     ForEach(viewModel.recordHistoryData.keys.sorted(), id: \.self) { key in
-                        NavigationLink(
-                            destination: ShowRecordHistoryView(cls: key)
-                        ) {
-                            HStack {
-                                Text(key)
-                                Spacer()
-                                if let value = viewModel.recordHistoryData[key]?.count {
-                                    Text("\(value)")
+                        if let value = viewModel.recordHistoryData[key]?.count {
+                            if value > 0{
+                                NavigationLink(
+                                    destination: ShowRecordHistoryView(cls: key)
+                                ) {
+                                    HStack {
+                                        Text(key)
+                                        Spacer()
+                                        Text("\(value)")
+                                        
+                                    }
+                                    .padding()
                                 }
                             }
-                            .padding()
                         }
                     }
                 }

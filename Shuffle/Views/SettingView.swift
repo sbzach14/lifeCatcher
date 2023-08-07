@@ -86,7 +86,7 @@ struct SettingView: View {
                                     .padding()
                             }
                             .alert(isPresented: $showInfoAlert) {
-                                Alert(title: Text("Info"), message: Text("Version 1.0"), dismissButton: .cancel())
+                                Alert(title: Text("Info"), message: Text("Version: 1.0\n ID:" + AuthManager.getUniqueID()!), dismissButton: .cancel())
                             }
                             Divider()
                      }
