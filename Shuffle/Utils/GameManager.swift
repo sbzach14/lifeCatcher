@@ -63,10 +63,12 @@ class GameManager {
 class Rule {
     let ruleIndex: Int
     let ruleName: String
+    var rankRules: [Int: String]
 
     init(ruleIndex: Int, ruleName: String) {
         self.ruleIndex = ruleIndex
         self.ruleName = ruleName
+        self.rankRules = [:]
     }
 }
 

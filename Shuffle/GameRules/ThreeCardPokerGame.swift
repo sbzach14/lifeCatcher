@@ -84,22 +84,26 @@ class ThreeCardPokerGameRule : Rule{
         1: "A",
         0: "0"
     ]
-    let rankRules: [Int: String] = [
-        13: "对王",
-        12: "三条",
-        11: "同花235",
-        10: "235",
-        9: "同花AKJ",
-        8: "AKJ",
-        7: "三公",
-        6: "同花顺",
-        5: "同花对子",
-        4: "同花",
-        3: "顺子",
-        2: "真对子",
-        1: "对子",
-        0: "散牌"
-    ]
+    
+    override init(ruleIndex: Int, ruleName: String) {
+        super.init(ruleIndex: ruleIndex, ruleName: ruleName)
+        self.rankRules = [
+            13: "对王",
+            12: "三条",
+            11: "同花235",
+            10: "235",
+            9: "同花AKJ",
+            8: "AKJ",
+            7: "三公",
+            6: "同花顺",
+            5: "同花对子",
+            4: "同花",
+            3: "顺子",
+            2: "真对子",
+            1: "对子",
+            0: "散牌"
+        ]
+    }
 }
 
 class ThreeCardPokerGame{

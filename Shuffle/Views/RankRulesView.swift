@@ -6,7 +6,7 @@ struct RankRulesView: View {
     let selectedRuleIndex: Int
     
     var body: some View {
-        let selectedRule = GameManager.gameRules[selectedRuleIndex] as! TexasPokerRule
+        let selectedRule = GameManager.gameRules[selectedRuleIndex]!
         
         ScrollView {
             Divider()

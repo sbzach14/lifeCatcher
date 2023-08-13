@@ -27,20 +27,25 @@ class TexasPokerRule : Rule{
         2: "最少用n张"
     ]
     let handUseNum: [Int] = [1,2,3,4,5]
-    let rankRules: [Int: String] = [
-        11: "同花顺",
-        10: "四条",
-        9: "葫芦",
-        8: "同花",
-        7: "顺子",
-        6: "三条",
-        5: "三同花顺",
-        4: "三顺子",
-        3: "三同花",
-        2: "两对",
-        1: "一对",
-        0: "高牌"
-    ]
+    
+    override init(ruleIndex: Int, ruleName: String) {
+        super.init(ruleIndex: ruleIndex, ruleName: ruleName)
+        self.rankRules = [
+            11: "同花顺",
+            10: "四条",
+            9: "葫芦",
+            8: "同花",
+            7: "顺子",
+            6: "三条",
+            5: "三同花顺",
+            4: "三顺子",
+            3: "三同花",
+            2: "两对",
+            1: "一对",
+            0: "高牌"
+        ]
+    }
+
     
     
 

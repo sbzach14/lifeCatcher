@@ -96,8 +96,17 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     var isBackCamera: Bool = false
     var isContrastAug: Bool = false
 
-    override init() {
-        super.init()
+
+    func initialize(ruleIndex: Int, args : [Int], rankRules : [Int], suitRules : [Int], allCardIndex : [Int], minCardNum : Int) {
+        
+        
+        self.ruleIndex = ruleIndex
+        self.args = args
+        self.rankRules = rankRules
+        self.suitRules = suitRules
+        self.allCardIndex = allCardIndex
+        self.minCardNum = minCardNum
+        self.initCardArray()
         
         // Python 初始化
         print("pythonInitialize")
@@ -127,16 +136,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
         
         setupAVCapture()
-    }
-
-    func initialize(ruleIndex: Int, args : [Int], rankRules : [Int], suitRules : [Int], allCardIndex : [Int], minCardNum : Int) {
-        self.ruleIndex = ruleIndex
-        self.args = args
-        self.rankRules = rankRules
-        self.suitRules = suitRules
-        self.allCardIndex = allCardIndex
-        self.minCardNum = minCardNum
-        self.initCardArray()
 
     }
     
