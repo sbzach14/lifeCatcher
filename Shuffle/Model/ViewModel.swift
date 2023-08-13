@@ -18,6 +18,7 @@ import Vision
 import Foundation
 import CoreML
 import Photos
+import Accelerate
 
 /// - Tag: ViewModel
 class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBufferDelegate {
@@ -29,7 +30,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var cardArray :  [Int] = []
     @Published var winnerPlayer: [Int] = []
 
-    let model = try! CardDetect()
+    let model = try! cardDetection()
     
     // 创建一个后台队列
     let videoProcessingQueue = DispatchQueue(label: "com.example.videoProcessing", qos: .userInitiated)
@@ -47,6 +48,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     public var rankRules : [Int] = []
     public var suitRules : [Int] = [3,2,1,0]
     public var allCardIndex : [Int] = Array(0...51)
+    public var minCardNum : Int = 0
     
     var lastCards : [[Int]] = []
 
@@ -71,25 +73,28 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     var captureDevice: AVCaptureDevice!
     var captureDeviceInput: AVCaptureDeviceInput!
     let session = AVCaptureSession()
+    private var requests = [VNRequest]()
     
     private var stateCounter : Int = 0
     private var stateCard : [Int] = [-1, -1]
+    private var frameCounter : Int = 0
     
     private var speechSynthesizer = AVSpeechSynthesizer()
     
     private var confidenceDic : [Int:Float] = [:]
     let cardLabelDic : [Int:String] = [
-        0: "As", 1: "2s", 2: "3s", 3: "4s", 4: "5s", 5: "6s", 6: "7s", 7: "8s", 8: "9s", 9: "10s",
-        10: "Js", 11: "Qs", 12: "Ks", 13: "Ah", 14: "2h", 15: "3h", 16: "4h", 17: "5h", 18: "6h",
-        19: "7h", 20: "8h", 21: "9h", 22: "10h", 23: "Jh", 24: "Qh", 25: "Kh", 26: "Ac", 27: "2c",
-        28: "3c", 29: "4c", 30: "5c", 31: "6c", 32: "7c", 33: "8c", 34: "9c", 35: "10c", 36: "Jc",
-        37: "Qc", 38: "Kc", 39: "Ad", 40: "2d", 41: "3d", 42: "4d", 43: "5d", 44: "6d", 45: "7d",
-        46: "8d", 47: "9d", 48: "10d", 49: "Jd", 50: "Qd", 51: "Kd", 52: "none", 53: "black_J", 54: "red_j"
+        0: "♠️A ", 1: "♠️2 ", 2: "♠️3 ", 3: "♠️4 ", 4: "♠️5 ", 5: "♠️6 ", 6: "♠️7 ", 7: "♠️8 ", 8: "♠️9 ", 9: "♠️10 ",
+        10: "♠️J ", 11: "♠️Q ", 12: "♠️K ", 13: "♥️A ", 14: "♥️2 ", 15: "♥️3 ", 16: "♥️4 ", 17: "♥️5 ", 18: "♥️6 ",
+        19: "♥️7 ", 20: "♥️8 ", 21: "♥️9 ", 22: "♥️10 ", 23: "♥️J ", 24: "♥️Q ", 25: "♥️K ", 26: "♣️A ", 27: "♣️2 ",
+        28: "♣️3 ", 29: "♣️4 ", 30: "♣️5 ", 31: "♣️6 ", 32: "♣️7 ", 33: "♣️8 ", 34: "♣️9 ", 35: "♣️10 ", 36: "♣️J ",
+        37: "♣️Q ", 38: "♣️K ", 39: "♦️A ", 40: "♦️2 ", 41: "♦️3 ", 42: "♦️4 ", 43: "♦️5 ", 44: "♦️6", 45: "♦️7",
+        46: "♦️8 ", 47: "♦️9 ", 48: "♦️10 ", 49: "♦️J ", 50: "♦️Q ", 51: "♦️K ", 52: "none", 53: "小王", 54: "大王"
     ]
     
     var isBlack: Bool = false
     var isMute: Bool = false
     var isBackCamera: Bool = false
+    var isContrastAug: Bool = false
 
     override init() {
         super.init()
@@ -112,21 +117,27 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             self.isBlack = configData["isBlack"]!
             self.isMute = configData["isMute"]!
             self.isBackCamera = configData["isBackCamera"]!
+            self.isContrastAug = configData["isContrastAug"]!
         } else {
             // If config.json is not found or invalid, set default values
             self.isBlack = false
             self.isMute = false
             self.isBackCamera = false
+            self.isContrastAug = false
         }
+        
+        setupAVCapture()
     }
 
-    func initialize(ruleIndex: Int, args : [Int], rankRules : [Int], suitRules : [Int], allCardIndex : [Int]) {
+    func initialize(ruleIndex: Int, args : [Int], rankRules : [Int], suitRules : [Int], allCardIndex : [Int], minCardNum : Int) {
         self.ruleIndex = ruleIndex
         self.args = args
         self.rankRules = rankRules
         self.suitRules = suitRules
         self.allCardIndex = allCardIndex
+        self.minCardNum = minCardNum
         self.initCardArray()
+
     }
     
     private func initCardArray(){
@@ -140,6 +151,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         lastCards = [[-1], [-1]]
         winnerPlayer = []
         stateCounter = 0
+        stateCard = [-1, -1]
+        frameCounter = 0
         tempCardArray = []
         detectResultList = []
         centerX = 0.5
@@ -154,11 +167,9 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
     }
     
-    
-    func startCamera() {
-        
+    func setupAVCapture(){
         if self.isBackCamera{
-            self.captureDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
+            self.captureDevice = AVCaptureDevice.default(.builtInUltraWideCamera, for: .video, position: .back)
         }
         else{
             self.captureDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front)
@@ -169,6 +180,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             self.captureDeviceInput = try AVCaptureDeviceInput(device: self.captureDevice)
             
             session.beginConfiguration()
+            session.sessionPreset = .iFrame1280x720
             session.addInput(captureDeviceInput!)
             
             let output = AVCaptureVideoDataOutput()
@@ -192,22 +204,32 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 self.captureDevice.activeFormat = format
                 self.captureDevice.activeVideoMinFrameDuration = CMTime(value: 1, timescale: Int32(format.videoSupportedFrameRateRanges.first!.maxFrameRate))
                 self.captureDevice.activeVideoMaxFrameDuration = CMTime(value: 1, timescale: Int32(format.videoSupportedFrameRateRanges.first!.maxFrameRate))
+                
+                // 设置更短的曝光时间（更快的快门速度）
+                let desiredExposureDuration: CMTime = CMTimeMake(value: 1, timescale: 200) // 1/1000 秒
+
+                captureDevice.exposureMode = .continuousAutoExposure
+
                 self.captureDevice.unlockForConfiguration()
             } catch {
                 print("设置帧率时发生错误: \(error)")
             }
             
             session.commitConfiguration()
-            session.startRunning()
             
             // 获取当前帧率
             let videoFrameRate = format.videoSupportedFrameRateRanges.first!.maxFrameRate
             print("设定帧率: \(videoFrameRate)")
 
-            changeCameraFrameRate(to: 30)
+            changeCameraFrameRate(to: 60)
         } catch {
             print("配置前置摄像头时发生错误: \(error)")
         }
+    }
+    
+    func startCamera() {
+        
+        session.startRunning()
     }
     
     func stopCamera() {
@@ -234,6 +256,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             
     }
     
+
+    
     // AVCaptureVideoDataOutputSampleBufferDelegate 方法
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         
@@ -253,30 +277,108 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             
         }
         
+        let myIndex = self.taskIndex
+        self.taskIndex += 1
+        self.taskIndex %= 10000
         
         // 处理视频帧数据
-        if let ciImage = imageFromSampleBuffer(sampleBuffer) {
-            
-            let rotationTransform = CGAffineTransform(rotationAngle: -.pi / 2)  // 顺时针旋转90度
-            let rotatedImage = ciImage.transformed(by: rotationTransform)
-            
-            let xOffset = ciImage.extent.size.height
-            let translationTransform = CGAffineTransform(translationX: xOffset, y: CGFloat(0))
-            let translatedImage = rotatedImage.transformed(by: translationTransform)
-            let cgImage = context.createCGImage(translatedImage, from: translatedImage.extent)
-            self.cameraImage = cgImage
-            
-            
-            let myIndex = self.taskIndex
-            self.taskIndex += 1
-            self.taskIndex %= 10000
-            
-            if !self.isShowCard{
-                backgroundQueue.async {
-                    self.processImageOrigin(ciImage, taskIndex: myIndex)
+        let ciImage = imageFromSampleBuffer(sampleBuffer)!
+        
+        backgroundQueue.async {
+            if self.isContrastAug{
+                do{
+                    let cgImage = self.context.createCGImage(ciImage, from: ciImage.extent)!
+                    let cgImageFormat = vImage_CGImageFormat(
+                        bitsPerComponent: UInt32(cgImage.bitsPerComponent),
+                        bitsPerPixel: UInt32(cgImage.bitsPerPixel),
+                        colorSpace: Unmanaged.passUnretained(cgImage.colorSpace!),
+                        bitmapInfo: cgImage.bitmapInfo,
+                        version: 0,
+                        decode: nil,
+                        renderingIntent: cgImage.renderingIntent)
+                    
+                    // 创建 vImage_Buffer
+                    var vImageBuffer = try vImage_Buffer(cgImage: cgImage)
+                    
+                    
+                    // 创建目标 vImage_Buffer
+                    var destinationBuffer = try! vImage_Buffer(width: 960,
+                                                               height: 544,
+                                                               bitsPerPixel: 32) // 32 bits for ARGB
+                    
+                    // 进行图像缩放
+                    vImageScale_ARGB8888(&vImageBuffer, &destinationBuffer, nil, vImage_Flags(0))
+                    
+                    
+                    // 进行直方图均衡
+//                    vImageEqualization_ARGB8888(&destinationBuffer,
+//                                                &destinationBuffer,
+//                                                vImage_Flags(kvImageNoFlags))
+                    
+                    
+                    // 进行高斯滤波
+//                    let convolutionKernel: [Int16] = [1, 2, 1,
+//                                                      2, 4, 2,
+//                                                      1, 2, 1]
+//                    vImageConvolve_ARGB8888(&destinationBuffer, &destinationBuffer, nil, 0, 0, convolutionKernel, 3, 3, 16, [0], vImage_Flags(kvImageEdgeExtend))
+                    
+                    if !self.isBlack{
+                        // 进行顺时针旋转90度
+                        var rotatedBuffer = try! vImage_Buffer(width: Int(destinationBuffer.height),
+                                                               height: Int(destinationBuffer.width),
+                                                               bitsPerPixel: 32) // 32 bits for ARGB
+                        vImageRotate90_ARGB8888(&destinationBuffer, &rotatedBuffer, UInt8(kRotate90DegreesClockwise), [0], vImage_Flags(kvImageNoFlags))
+                        
+                        let outputCGImage = try rotatedBuffer.createCGImage(format: cgImageFormat)
+                        DispatchQueue.main.async {
+                            self.cameraImage = outputCGImage
+                        }
+                        
+                        rotatedBuffer.free()
+                    }
+                    
+                    let modelCGImage = try destinationBuffer.createCGImage(format: cgImageFormat)
+                    let modelCIImage = CIImage(cgImage: modelCGImage)
+                    
+                    vImageBuffer.free()
+                    destinationBuffer.free()
+                    
+                    if !self.isShowCard{
+                        self.detectionQueue.async {
+                            let cvPixelBuffer = createCVPixelBuffer(ciImage: modelCIImage, targetSize: CGSize(width: 960, height: 544))!
+                            self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex)
+                        }
+                    }
+                }
+                
+                catch{
+                    print("Error: \(error)")
+                }
+                
+            }
+            else{
+                if !self.isBlack{
+                    let rotationTransform = CGAffineTransform(rotationAngle: -.pi / 2)  // 顺时针旋转90度
+                    let rotatedImage = ciImage.transformed(by: rotationTransform)
+                    
+                    let xOffset = ciImage.extent.size.height
+                    let translationTransform = CGAffineTransform(translationX: xOffset, y: CGFloat(0))
+                    let translatedImage = rotatedImage.transformed(by: translationTransform)
+                    let cgImage = self.context.createCGImage(translatedImage, from: translatedImage.extent)
+                    DispatchQueue.main.async {
+                        self.cameraImage = cgImage
+                    }
+                }
+                
+                if !self.isShowCard{
+                    self.detectionQueue.async {
+                        let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: 960, height: 544))!
+                        self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex)
+                    }
                 }
             }
         }
+            
         // 释放视频帧资源
         CMSampleBufferInvalidate(sampleBuffer)
     }
@@ -285,6 +387,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
             return nil
         }
+        
         
         let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
         return ciImage
@@ -342,79 +445,110 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         return nil
     }
     
-    private func processImageOrigin(_ originCIImage: CIImage, taskIndex: Int){
-        if let pixelBuffer = createCVPixelBuffer(ciImage: originCIImage, targetSize: CGSize(width: 960, height: 544)){
+    private func processImageOrigin(_ pixelBuffer: CVPixelBuffer, taskIndex: Int){
+        
+        if state != "idle" && self.isContrastAug{
+            frameCounter += 1
             
-            let result = try! model.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: 0.25)
-            let cardResult = getCard(from: result.confidence, from: result.coordinates)
+            if frameCounter == 600{
+                DispatchQueue.main.async{
+                    self.changeCameraFrameRate(to: 60)
+                }
+                return
+            }
             
+            else if frameCounter > 600 && frameCounter < 800{
+                return
+            }
             
-            if cardResult[0].cardIndex[0] == self.stateCard[0] && cardResult[1].cardIndex[0] == self.stateCard[1]{
-                stateCounter = min(stateCounter + 1, 120)
+            else if frameCounter == 800{
+                
+                DispatchQueue.main.async{
+                    self.state = "idle"
+                    self.initCardArray()
+                }
+                
+                return
+            }
+            
+        }
+        
+        let result = try! model.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: 0.15)
+        let cardResult = getCard(from: result.confidence, from: result.coordinates)
+        
+        if cardResult[0].cardIndex[0] == self.stateCard[0] && cardResult[1].cardIndex[0] == self.stateCard[1]{
+            stateCounter = min(stateCounter + 1, 600)
+        }
+        else{
+            stateCounter = 0
+        }
+        
+        
+        
+        self.stateCard[0] = cardResult[0].cardIndex[0]
+        self.stateCard[1] = cardResult[1].cardIndex[0]
+        
+        
+        if state == "idle"{
+            if self.stateCard[0] != -1 && self.stateCard[1] != -1 && self.stateCard[0] != self.stateCard[1]
+                && stateCounter > 5{
+                state = "shuffle"
+                print("动作：开始洗牌")
+                speakText(input: "开始洗牌")
+                
+                DispatchQueue.main.async{
+                    self.changeCameraFrameRate(to: 120)
+                    self.initCardArray()
+                }
+            }
+            else if ((self.stateCard[0] == -1 && self.stateCard[1] != -1)
+                     || (self.stateCard[0] != -1 && self.stateCard[1] == -1)
+                     || (self.stateCard[0] != -1 && self.stateCard[0] == self.stateCard[1]))
+                        && self.cardArray.count > 0 && stateCounter > 5{
+                state = "cut"
+                print("动作：开始切牌")
+                speakText(input: "开始切牌")
+                DispatchQueue.main.async{
+                    self.frameCounter = 0
+                    self.changeCameraFrameRate(to: 120)
+                    self.cutCardArray(cardResult: cardResult, taskIndex: taskIndex)
+                }
+            }
+        }
+        else if state == "cut"{
+            if self.stateCard[0] != -1 && self.stateCard[1] != -1 && self.stateCard[0] != self.stateCard[1] && stateCounter > 10{
+                state = "shuffle"
+                print("动作：开始洗牌")
+                speakText(input: "开始洗牌")
+                DispatchQueue.main.async{
+                    self.changeCameraFrameRate(to: 120)
+                    self.initCardArray()
+                }
+            }
+            else if self.stateCard[0] == -1 && self.stateCard[1] == -1 && stateCounter > 50{
+                state = "idle"
+                print("动作：切牌完成")
+                speakText(input: "切牌完成")
+                DispatchQueue.main.async{
+                    self.changeCameraFrameRate(to: 60)
+                    self.computeWinnerPlayer()
+                }
+            }
+        }
+        else if state == "shuffle"{
+            if self.stateCard[0] == -1 && self.stateCard[1] == -1 && stateCounter > 50{
+                state = "idle"
+                print("动作：洗牌完成")
+                speakText(input: "洗牌完成")
+                DispatchQueue.main.async{
+                    self.changeCameraFrameRate(to: 60)
+                    self.handleShuffleResult()
+                    self.centerX = 0
+                    self.computeWinnerPlayer()
+                }
             }
             else{
-                stateCounter = 0
-            }
-            
-            self.stateCard[0] = cardResult[0].cardIndex[0]
-            self.stateCard[1] = cardResult[1].cardIndex[0]
-            
-            
-            if state == "idle"{
-                if self.stateCard[0] != -1 && self.stateCard[1] != -1 && self.stateCard[0] != self.stateCard[1] && stateCounter > 10{
-                    state = "shuffle"
-                    print("动作：开始洗牌")
-                    speakText(input: "开始洗牌")
-                    DispatchQueue.main.async{
-                        self.changeCameraFrameRate(to: 120)
-                        self.initCardArray()
-                    }
-                }
-                else if (self.stateCard[0] != -1 || self.stateCard[1] != -1) && self.cardArray.count > 0 && stateCounter > 10{
-                    state = "cut"
-                    print("动作：开始切牌")
-                    speakText(input: "开始切牌")
-                    DispatchQueue.main.async{
-                        self.changeCameraFrameRate(to: 120)
-                        self.cutCardArray(cardResult: cardResult, taskIndex: taskIndex)
-                    }
-                }
-            }
-            else if state == "cut"{
-                if self.stateCard[0] != -1 && self.stateCard[1] != -1 && self.stateCard[0] != self.stateCard[1] && stateCounter > 10{
-                    state = "shuffle"
-                    print("动作：开始洗牌")
-                    speakText(input: "开始洗牌")
-                    DispatchQueue.main.async{
-                        self.changeCameraFrameRate(to: 120)
-                        self.initCardArray()
-                    }
-                }
-                else if self.stateCard[0] == -1 && self.stateCard[1] == -1 && stateCounter > 50{
-                    state = "idle"
-                    print("动作：切牌完成")
-                    speakText(input: "切牌完成")
-                    DispatchQueue.main.async{
-                        self.changeCameraFrameRate(to: 30)
-                        self.computeWinnerPlayer()
-                    }
-                }
-            }
-            else if state == "shuffle"{
-                if self.stateCard[0] == -1 && self.stateCard[1] == -1 && stateCounter > 50{
-                    state = "idle"
-                    print("动作：洗牌完成")
-                    speakText(input: "洗牌完成")
-                    DispatchQueue.main.async{
-                        self.changeCameraFrameRate(to: 30)
-                        self.handleShuffleResult()
-                        self.centerX = 0
-                        self.computeWinnerPlayer()
-                    }
-                }
-                else{
-                    self.appendCardToCardArray(cardResult: cardResult, taskIndex: taskIndex, originCIImage: originCIImage)
-                }
+                self.appendCardToCardArray(cardResult: cardResult, taskIndex: taskIndex)
             }
         }
     }
@@ -511,7 +645,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     
     
     //每一次单图分类任务或者是上下detect任务完成，在主线程中调用此函数，每一次调用，主线程都会循环将已经分类好的任务和图片进行一次判断和处理，然后将结果加入到cardarray中
-    func appendCardToCardArray(cardResult : [DetectionResult], taskIndex : Int, originCIImage: CIImage){
+    func appendCardToCardArray(cardResult : [DetectionResult], taskIndex : Int){
         var nextCards : [[Int]] = []
         var lastCards : [[Int]] = self.lastCards
         
@@ -773,14 +907,21 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     
     
     func computeWinnerPlayer() {
-        winnerPlayer = GameManager.selectGame(gameIndex: ruleIndex, inputCards: cardArray, args: args, rankRules: rankRules, suitRules: suitRules)
         
-        speakText(input: winnerPlayer)
+        if cardArray.count >= minCardNum{
+            winnerPlayer = GameManager.selectGame(gameIndex: ruleIndex, inputCards: cardArray, args: args, rankRules: rankRules, suitRules: suitRules)
+            
+            speakText(input: winnerPlayer)
+        }
+        else{
+            speakText(input: "检测错误")
+        }
     }
     
 
     func speakText(input: [Int]) {
         if !self.isMute{
+            speechSynthesizer.stopSpeaking(at: .immediate)
             if input.isEmpty {
                 let speechUtterance = AVSpeechUtterance(string: "无")
                 speechSynthesizer.speak(speechUtterance)
@@ -796,6 +937,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     
     func speakText(input: String){
         if !self.isMute{
+            speechSynthesizer.stopSpeaking(at: .immediate)
             let speechUtterance = AVSpeechUtterance(string: input)
             speechSynthesizer.speak(speechUtterance)
         }

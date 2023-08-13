@@ -308,7 +308,7 @@ struct TexasPokerRuleSettingView: View {
                         selectedRule.communityNum[communityNum],
                         handUseType,
                         selectedRule.handUseNum[handUseNum]
-                    ], rankRules : GameManager.getCheckedIndexes(rankRules: rankRules), suitRules: suitRules, allCardIndex: TexasPoker.getAllCardIndex(minRank: selectedRule.minRank[minRank])),
+                    ], rankRules : GameManager.getCheckedIndexes(rankRules: rankRules), suitRules: suitRules, allCardIndex: TexasPoker.getAllCardIndex(minRank: selectedRule.minRank[minRank]), minCardNum : TexasPoker.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: selectedRule.handNum[handNum], communityNum: selectedRule.communityNum[communityNum])),
                     isActive: $navigateToMainContent,
                     label: EmptyView.init
                 )

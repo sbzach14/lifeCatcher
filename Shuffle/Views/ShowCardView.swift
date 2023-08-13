@@ -16,13 +16,15 @@ struct ShowCardView: View {
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 45))]) {
                         ForEach(viewModel.cardArray.indices, id: \.self) { index in
-                            let imageName = "\(viewModel.cardArray[index])"
-                            Image(imageName)
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .padding(5)
-                                .background(Color.gray)
-                                .cornerRadius(10)
+                            ZStack {
+                                Rectangle()
+                                    .foregroundColor(Color.white)
+                                    .aspectRatio(contentMode: .fit)
+                                    .cornerRadius(10)
+                                    .shadow(radius: 2)
+                                Text(viewModel.cardLabelDic[viewModel.cardArray[index]]!)
+                                    .font(.system(size: 14))
+                            }.padding(5)
                         }
                     }
                 }

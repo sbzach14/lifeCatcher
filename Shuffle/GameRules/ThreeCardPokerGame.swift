@@ -1,10 +1,3 @@
-//
-//  TexasPoker.swift
-//  Shuffle
-//
-//  Created by Zhangyi Chen on 5/29/23.
-//  Copyright © 2023 Apple. All rights reserved.
-//
 
 import Foundation
 import Python
@@ -91,13 +84,8 @@ class ThreeCardPokerGameRule : Rule{
         1: "A",
         0: "0"
     ]
-    let isMixedSuit: [Int: String] = [
-        0: "否",
-        1: "是"
-    ]
     let rankRules: [Int: String] = [
-        14: "对王",
-        13: "炸弹",
+        13: "对王",
         12: "三条",
         11: "同花235",
         10: "235",
@@ -112,9 +100,6 @@ class ThreeCardPokerGameRule : Rule{
         1: "对子",
         0: "散牌"
     ]
-    
-    
-
 }
 
 class ThreeCardPokerGame{
@@ -131,8 +116,7 @@ class ThreeCardPokerGame{
         return intArray
     }
     
-    static func legalCheck(playerNum: Int, minRank: Int, handNum: Int, isHeadCard: Int, isRedJoker: Int, isBlackJoker: Int) -> String
-    {
+    static func legalCheck(playerNum: Int, minRank: Int, handNum: Int, isHeadCard: Int, isRedJoker: Int, isBlackJoker: Int) -> String{
         var errMessage : String = ""
         if(playerNum * handNum > 52 - (minRank - 2) * 4 - isHeadCard * 12 + isRedJoker + isBlackJoker)
         {
@@ -141,5 +125,31 @@ class ThreeCardPokerGame{
         return errMessage
     }
     
-
+    static func getAllCardIndex(minRank: Int, isAce: Int, isHeadCard: Int, isRedJoker: Int, isBlackJoker: Int) -> [Int]{
+        var result : [Int] = []
+        for i in 0...3{
+            for rank in 0...12{
+                if rank == 0 && isAce != 0{
+                    result.append(rank + i * 13)
+                }
+                else if (rank >= 10 || rank <= 12) && isHeadCard == 1{
+                    result.append(rank + i * 13)
+                }
+                else if rank >= minRank - 1{
+                    result.append(rank + i * 13)
+                }
+            }
+        }
+        if isBlackJoker == 1{
+            result.append(53)
+        }
+        if isRedJoker == 1{
+            result.append(54)
+        }
+        return result
+    }
+    
+    static func getMinCardNum(playerNum: Int, handNum: Int) -> Int{
+        return playerNum * handNum
+    }
 }

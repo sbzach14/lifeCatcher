@@ -1,10 +1,4 @@
-//
-//  RuleSettingView.swift
-//  Shuffle
-//
-//  Created by Zhangyi Chen on 5/27/23.
-//  Copyright © 2023 Apple. All rights reserved.
-//
+
 import SwiftUI
 
 struct ThreeCardPokerGameRuleSettingView: View {
@@ -26,7 +20,6 @@ struct ThreeCardPokerGameRuleSettingView: View {
     @State private var isBlackJoker: Int = 0
     @State private var blackJokerSuit: Int = 0
     @State private var blackJokerRank: Int = 0
-    @State private var isMixedSuit: Int = 0
     @State private var isReverseHighCard: Int = 0
     
     @State private var suitRules: [Int] = [3,2,1,0]
@@ -55,12 +48,6 @@ struct ThreeCardPokerGameRuleSettingView: View {
         VStack
         {
             let selectedRule = GameManager.gameRules[2] as! ThreeCardPokerGameRule
-            
-            Text("Rule Setting")
-                .font(.title)
-                .padding()
-            
-            Spacer()
             
             ScrollView {
                 VStack {
@@ -125,21 +112,6 @@ struct ThreeCardPokerGameRuleSettingView: View {
                                 Picker("isCompareSuit", selection: $isCompareSuit) {
                                     ForEach(0...selectedRule.isCompareSuit.count - 1, id: \.self) { index in
                                         Text(String(selectedRule.isCompareSuit[index]!)).tag(index)
-                                    }
-                                }
-                                .pickerStyle(MenuPickerStyle())
-                                .frame(maxWidth: .infinity, alignment: .trailing)
-                                .padding(.trailing, 60) // 右侧间距
-                            }
-                            
-                            HStack
-                            {
-                                Text("三张杂色成牌")
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .padding(.leading, 60) // 左侧间距
-                                Picker("isMixedSuit", selection: $isMixedSuit) {
-                                    ForEach(0...selectedRule.isMixedSuit.count - 1, id: \.self) { index in
-                                        Text(String(selectedRule.isMixedSuit[index]!)).tag(index)
                                     }
                                 }
                                 .pickerStyle(MenuPickerStyle())
@@ -390,7 +362,7 @@ struct ThreeCardPokerGameRuleSettingView: View {
                         }
                     }
                 }
-            }.frame(width: 400, height: 600)
+            }
     
             Spacer()
 
@@ -444,15 +416,14 @@ struct ThreeCardPokerGameRuleSettingView: View {
                         isBlackJoker,
                         blackJokerSuit,
                         blackJokerRank,
-                        isMixedSuit,
                         isReverseHighCard
-                    ], rankRules : GameManager.getCheckedIndexes(rankRules: rankRules), suitRules: suitRules, allCardIndex: TexasPoker.getAllCardIndex(minRank: selectedRule.minRank[minRank])),
+                    ], rankRules : GameManager.getCheckedIndexes(rankRules: rankRules), suitRules: suitRules, allCardIndex: ThreeCardPokerGame.getAllCardIndex(minRank: selectedRule.minRank[minRank], isAce: isAce, isHeadCard: isHeadCard, isRedJoker: isRedJoker, isBlackJoker: isBlackJoker), minCardNum : ThreeCardPokerGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: selectedRule.handNum[handNum])),
                     isActive: $navigateToMainContent,
                     label: EmptyView.init
                 )
                 .hidden()
             )
-        }
+        }.navigationTitle("Rule Setting")
     }
     
     private func showAlertWithMessage() {
@@ -477,7 +448,6 @@ struct ThreeCardPokerGameRuleSettingView: View {
             isBlackJoker = 0
             blackJokerSuit = 0
             blackJokerRank = 0
-            isMixedSuit = 0
             isReverseHighCard = 0
             
             suitRules = [3,2,1,0]

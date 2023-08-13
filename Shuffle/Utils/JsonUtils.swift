@@ -63,7 +63,8 @@ func createConfigJSON() {
         "isBlack": false,
         "isMute": false,
         "isActive": false,
-        "isBackCamera": false
+        "isBackCamera": false,
+        "isContrastAug": false
     ]
 
     do {
@@ -176,7 +177,7 @@ func createRecordHistoryJSON() {
 public func readRecordHistoryJSON() -> [String: [String]]? {
     do {
         let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let fileURL = documentsURL.appendingPathComponent("recordHistory").appendingPathComponent("recordHistory.json")
+        let fileURL = documentsURL.appendingPathComponent("recordHistory.json")
 
         let jsonData = try Data(contentsOf: fileURL)
         let jsonObject = try JSONSerialization.jsonObject(with: jsonData, options: [])

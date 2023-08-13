@@ -1,10 +1,14 @@
 import Foundation
+import SwiftUI
 
 class SettingViewModel: ObservableObject {
     @Published var isBlack: Bool = false
     @Published var isMute: Bool = false
     @Published var isBackCamera: Bool = false
+    @Published var isContrastAug: Bool = false
     @Published var isActive: Bool = false
+    @Published var activeDate: String = ""
+    
     
     @Published var searchText : String = ""
 
@@ -14,14 +18,18 @@ class SettingViewModel: ObservableObject {
             self.isBlack = configData["isBlack"]!
             self.isMute = configData["isMute"]!
             self.isBackCamera = configData["isBackCamera"]!
+            self.isContrastAug = configData["isContrastAug"]!
             self.isActive = configData["isActive"]!
         } else {
             // If config.json is not found or invalid, set default values
             self.isBlack = false
             self.isMute = false
             self.isBackCamera = false
+            self.isContrastAug = false
             self.isActive = false
         }
+        
+        self.activeDate = readParaJSON()!["activeTime"]!
     }
 
     // Method to save changes to config.json whenever any property changes
@@ -39,6 +47,7 @@ class SettingViewModel: ObservableObject {
                 "isBlack": self.isBlack,
                 "isMute": self.isMute,
                 "isBackCamera" : self.isBackCamera,
+                "isContrastAug" : self.isContrastAug,
                 "isActive": self.isActive
             ]
 
@@ -68,6 +77,13 @@ class SettingViewModel: ObservableObject {
                 try jsonData.write(to: fileURL)
 
                 print("para.json file updated successfully")
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 5 * 60) {
+                    UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        exit(0)
+                    }
+                }
             } catch {
                 print("Error updating para.json: \(error)")
             }

@@ -1,11 +1,3 @@
-//
-//  UniqueIDGenerator.swift
-//  CountMyActions
-//
-//  Created by Zhangyi Chen on 5/6/23.
-//  Copyright © 2023 Apple. All rights reserved.
-//
-
 import UIKit
 import Security
 import Foundation

@@ -1,10 +1,3 @@
-//
-//  TexasPoker.swift
-//  Shuffle
-//
-//  Created by Zhangyi Chen on 5/29/23.
-//  Copyright © 2023 Apple. All rights reserved.
-//
 
 import Foundation
 import Python
@@ -60,7 +53,6 @@ class TexasPoker{
         
         let json = Python.import("json")
 
-                
         let pythonObject =  json.TexasPokerGame.calResult(inputCards, args, rankRules, suitRules)
         // 使用 map() 函数将 PythonList 转换为 Int 数组
         let intArray = Array<Int>(pythonObject)!
@@ -104,5 +96,9 @@ class TexasPoker{
             }
         }
         return result
+    }
+    
+    static func getMinCardNum(playerNum: Int, handNum: Int, communityNum: Int) -> Int{
+        return playerNum * handNum + communityNum
     }
 }

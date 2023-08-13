@@ -6,18 +6,9 @@ struct MainContentView: View {
     var rankRules: [Int]
     var suitRules: [Int]
     var allCardIndex: [Int]
-    @StateObject var viewModel: ViewModel
+    var minCardNum : Int
+    @ObservedObject var viewModel = ViewModel()
     
-    // 初始化器中初始化 viewModel
-    init(ruleIndex: Int, args: [Int], rankRules: [Int], suitRules: [Int], allCardIndex: [Int]) {
-        self.ruleIndex = ruleIndex
-        self.args = args
-        self.rankRules = rankRules
-        self.suitRules = suitRules
-        self.allCardIndex = allCardIndex
-        _viewModel = StateObject(wrappedValue: ViewModel())
-        viewModel.initialize(ruleIndex: ruleIndex, args: args, rankRules: rankRules, suitRules: suitRules, allCardIndex: allCardIndex)
-    }
     
     var body: some View {
         ZStack {
@@ -31,8 +22,10 @@ struct MainContentView: View {
                     UIScreen.main.brightness = 0.0
                 }
                 .onDisappear {
+                    
                     UIScreen.main.brightness = 1.0
                 }
+                .navigationBarBackButtonHidden(true)
             } else {
                 ZStack {
                     ShowCardView().environmentObject(viewModel)
@@ -46,6 +39,7 @@ struct MainContentView: View {
             }
         }
         .onAppear {
+            viewModel.initialize(ruleIndex: ruleIndex, args: args, rankRules: rankRules, suitRules: suitRules, allCardIndex: allCardIndex, minCardNum: minCardNum)
             viewModel.startCamera()
         }
         .onDisappear {
@@ -56,10 +50,10 @@ struct MainContentView: View {
 
 
 
-struct MainContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        MainContentView(ruleIndex: 0, args: [0, 0, 1, 0, 1, 2, 0, 0], rankRules: [1,2,3], suitRules: [3,2,1,0], allCardIndex: Array(0...51))
-    }
-}
+//struct MainContentView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        MainContentView(ruleIndex: 0, args: [0, 0, 1, 0, 1, 2, 0, 0], rankRules: [1,2,3], suitRules: [3,2,1,0], allCardIndex: Array(0...51))
+//    }
+//}
 
 

@@ -1,6 +1,9 @@
 import UIKit
 import AVFoundation
 import Vision
+import CoreImage
+import CoreImage.CIFilterBuiltins
+import Accelerate
 
 class VisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBufferDelegate  {
     
@@ -13,7 +16,29 @@ class VisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVid
     @Published var detectedObjects: [DetectedObject] = []
     @Published var cameraImage : CGImage?
     
+    var isBlack: Bool = false
+    var isMute: Bool = false
+    var isBackCamera: Bool = false
+    var isContrastAug: Bool = false
+    
+    private var speechSynthesizer = AVSpeechSynthesizer()
+    
     func initialize(){
+        
+        // Load data from config.json
+        if let configData = readConfigJSON() {
+            self.isBlack = configData["isBlack"]!
+            self.isMute = configData["isMute"]!
+            self.isBackCamera = configData["isBackCamera"]!
+            self.isContrastAug = configData["isContrastAug"]!
+        } else {
+            // If config.json is not found or invalid, set default values
+            self.isBlack = false
+            self.isMute = false
+            self.isBackCamera = false
+            self.isContrastAug = false
+        }
+        
         setupAVCapture()
         setupVision()
         startCaptureSession()
@@ -25,12 +50,8 @@ class VisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVid
         var deviceInput: AVCaptureDeviceInput!
         var videoDevice: AVCaptureDevice
         
-        var isBackCamera : Bool = false
-        if let configData = readConfigJSON() {
-            isBackCamera = configData["isBackCamera"]!
-        }
         
-        if isBackCamera{
+        if self.isBackCamera{
             videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)!
         }
         else{
@@ -150,12 +171,22 @@ class VisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVid
         } catch {
             print(error)
         }
+        
+        
 
         // 处理视频帧数据
         if let ciImage = imageFromSampleBuffer(sampleBuffer) {
             
+            let outputImage: CIImage
+            if self.isContrastAug{
+                outputImage = performHistogramEqualization(ciImage: ciImage)!
+            }
+            else{
+                outputImage = ciImage
+            }
+            
             let rotationTransform = CGAffineTransform(rotationAngle: -.pi / 2)  // 顺时针旋转90度
-            let rotatedImage = ciImage.transformed(by: rotationTransform)
+            let rotatedImage = outputImage.transformed(by: rotationTransform)
             
             let xOffset = ciImage.extent.size.height
             let translationTransform = CGAffineTransform(translationX: xOffset, y: CGFloat(0))
@@ -163,7 +194,6 @@ class VisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVid
             let cgImage = context.createCGImage(translatedImage, from: translatedImage.extent)
             
             
-            // Assign the resized and rotated image to the cameraImage property
             DispatchQueue.main.async {
                 self.cameraImage = cgImage
             }
@@ -186,7 +216,7 @@ class VisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVid
             return
         }
 
-        let timestamp = Int(Date().timeIntervalSince1970) // Get the current timestamp
+        let timestamp = Int(CACurrentMediaTime()*1000) // Get the current timestamp
         let imageName = "\(timestamp).jpeg" // Use the timestamp as the image name
 
         let uiImage = UIImage(cgImage: cameraImage)
@@ -207,6 +237,8 @@ class VisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVid
                 var recordDict = loadRecordHistory()
                 recordDict[self.detectedObjects[0].cls]?.append(imageName)
                 saveRecordHistory(recordDict: recordDict)
+                
+                speakText(input: "保存成功")
 
             } catch {
                 print("Failed to save file \(imageName): \(error)")
@@ -237,6 +269,14 @@ class VisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVid
             print("Error saving recordHistory.json: \(error)")
         }
     }
+    
+    func speakText(input: String){
+        if !self.isMute{
+            let speechUtterance = AVSpeechUtterance(string: input)
+            speechSynthesizer.speak(speechUtterance)
+        }
+    }
+        
 }
 
 struct DetectedObject {

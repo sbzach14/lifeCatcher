@@ -10,8 +10,6 @@ import SwiftUI
 
 struct SettingView: View {
     @StateObject var viewModel = SettingViewModel()
-    @State private var showPrivacyAlert = false
-    @State private var showInfoAlert = false
     
     var body: some View {
             VStack{
@@ -62,33 +60,28 @@ struct SettingView: View {
                                     .padding()
                             }
                             Divider()
-
-                            Button(action: {
-                                // Show privacy alert
-                                self.showPrivacyAlert.toggle()
-                            }) {
-                                Text("Privacy")
+                        
+                            HStack {
+                                Text("isAug")
                                     .foregroundColor(.primary)
                                     .padding()
-                            }
-                            .alert(isPresented: $showPrivacyAlert) {
-                                Alert(title: Text("Privacy"), message: Text("Your privacy information goes here."), dismissButton: .cancel())
-                            }
 
+                                Spacer()
+
+                                Toggle("", isOn: $viewModel.isContrastAug)
+                                    .padding()
+                            }
                             Divider()
 
-                            Button(action: {
-                                // Show info alert
-                                self.showInfoAlert.toggle()
-                            }) {
+                            NavigationLink(
+                                destination: InfoView(activeDate: viewModel.activeDate)
+                            ) {
                                 Text("Info")
-                                    .foregroundColor(.primary)
-                                    .padding()
-                            }
-                            .alert(isPresented: $showInfoAlert) {
-                                Alert(title: Text("Info"), message: Text("Version: 1.0\n ID:" + AuthManager.getUniqueID()!), dismissButton: .cancel())
+                                .padding()
                             }
                             Divider()
+                        
+                            
                      }
                 }
             }

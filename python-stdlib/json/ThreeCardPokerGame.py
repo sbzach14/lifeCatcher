@@ -35,8 +35,7 @@ class ThreeCardPokerGame:
     #10 isBlackJoker 0/1
     #11 blackJokerSuit 0/1
     #12 blackJokerRank 0/1
-    #13 isMixedSuit 0/1
-    #14 isReverseHighCard 0/1
+    #13 isReverseHighCard 0/1
 
     @classmethod
     def calResult(self, cardArray, args, rankRules, suitRules):
@@ -60,8 +59,7 @@ class ThreeCardPokerGame:
         isBlackJoker = args[10]
         blackJokerSuit = args[11]
         blackJokerRank = args[12]
-        isMixedSuit = args[13]
-        isReverseHighCard = args[14]
+        isReverseHighCard = args[13]
 
         maxRank = 0
         winners = []
@@ -81,7 +79,7 @@ class ThreeCardPokerGame:
                                                                     isCompareSuit, minRank, isAce, isAceStraight, isHeadCard, 
                                                                     isRedJoker, redJokerSuit, redJokerRank, 
                                                                     isBlackJoker, blackJokerSuit, blackJokerRank,
-                                                                    isMixedSuit, isReverseHighCard, rankRules, suitRules)
+                                                                    isReverseHighCard, rankRules, suitRules)
 
         for i in range(playerNum):
             rank = allPlayCards[i].evaluate_flag
@@ -110,7 +108,7 @@ class HandEvaluator:
                     isCompareSuit, minRank, isAce, isAceStraight, isHeadCard, 
                     isRedJoker, redJokerSuit, redJokerRank, 
                     isBlackJoker, blackJokerSuit, blackJokerRank,
-                    isMixedSuit, isReverseHighCard, rankRules, suitRules):
+                    isReverseHighCard, rankRules, suitRules):
         
         self.isCompareSuit = isCompareSuit
         self.minRank = minRank
@@ -123,7 +121,6 @@ class HandEvaluator:
         self.isBlackJoker = isBlackJoker
         self.blackJokerSuit = blackJokerSuit
         self.blackJokerRank = blackJokerRank
-        self.isMixedSuit = isMixedSuit
         self.isReverseHighCard = isReverseHighCard
 
         if isHeadCard == 1:
@@ -217,8 +214,7 @@ class HandEvaluator:
             10 : self.__eval_235,
             11 : self.__eval_235flush,
             12 : self.__eval_threecard,
-            13 : self.__eval_fourcard,
-            14 : self.__eval_doubleJoker
+            13 : self.__eval_doubleJoker
         }
 
         rank_result = 0
@@ -811,6 +807,7 @@ class HandEvaluator:
     def __eval_holecard(self, cards):
         jokerlist = []
         normallist = []
+        rank = 0
         if self.isReverseHighCard:
             minRank = self.minRank
             if self.isAce == 1:
