@@ -168,7 +168,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     
     func setupAVCapture(){
         if self.isBackCamera{
-            self.captureDevice = AVCaptureDevice.default(.builtInUltraWideCamera, for: .video, position: .back)
+            self.captureDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
         }
         else{
             self.captureDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front)
@@ -370,9 +370,13 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 }
                 
                 if !self.isShowCard{
+                    
+                    
                     self.detectionQueue.async {
                         let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: 960, height: 544))!
                         self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex)
+                        
+                        
                     }
                 }
             }
@@ -472,6 +476,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             
         }
         
+        
+        
         let result = try! model.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: 0.15)
         let cardResult = getCard(from: result.confidence, from: result.coordinates)
         
@@ -481,8 +487,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         else{
             stateCounter = 0
         }
-        
-        
         
         self.stateCard[0] = cardResult[0].cardIndex[0]
         self.stateCard[1] = cardResult[1].cardIndex[0]
@@ -550,6 +554,14 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 self.appendCardToCardArray(cardResult: cardResult, taskIndex: taskIndex)
             }
         }
+        
+//        if self.state == "shuffle"{
+//            let modelCIImage = CIImage(cvPixelBuffer: pixelBuffer)
+//            let cgImage = CIContext().createCGImage(modelCIImage, from: modelCIImage.extent)
+//            let savedUIImage = UIImage(cgImage: cgImage!)
+//            UIImageWriteToSavedPhotosAlbum(savedUIImage, self, #selector(self.imageSaved(_:didFinishSavingWithError:contextInfo:)), nil)
+//            print("检测结果：[\(cardLabelDic[cardResult[0].cardIndex[0]] ?? "none"),\(cardLabelDic[cardResult[1].cardIndex[0]] ?? "none")]")
+//        }
     }
     
     
@@ -647,6 +659,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     func appendCardToCardArray(cardResult : [DetectionResult], taskIndex : Int){
         var nextCards : [[Int]] = []
         var lastCards : [[Int]] = self.lastCards
+        
         
         
         for detectionResultIndex in 0..<cardResult.count{
