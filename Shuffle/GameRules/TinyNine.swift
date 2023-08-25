@@ -7,14 +7,16 @@
 //
 
 import Foundation
-import Python
-import PythonKit
-
+//import Python
+//import PythonKit
+//小九
 class TinyNine{
     static func FindWinner(inputCards:[Int], playerNum: Int)->[Int]? {
-        let tinyNineGame = Python.import("pypoker/TinyNine")
-        let pythonObject = tinyNineGame.TinyNineGame.calResult(inputCards, playerNum)
-        let intArray = pythonObject.object.map{Int($0)!}
+//        let tinyNineGame = Python.import("pypoker/TinyNine")
+//        let pythonObject = tinyNineGame.TinyNineGame.calResult(inputCards, playerNum)
+//        let intArray = pythonObject.object.map{Int($0)!}
+        var intArray: [Int] = []
+
         return intArray
     }
 }

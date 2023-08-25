@@ -32,7 +32,6 @@
 		A88EFE092A7FAD1100897243 /* SettingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFE082A7FAD1100897243 /* SettingViewModel.swift */; };
 		A88EFE0B2A7FC05900897243 /* JsonUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFE0A2A7FC05900897243 /* JsonUtils.swift */; };
 		A88EFE0D2A7FDC9500897243 /* RecordHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFE0C2A7FDC9500897243 /* RecordHistoryView.swift */; };
-		A88F209B2A10E99F005E4A27 /* PythonKit in Frameworks */ = {isa = PBXBuildFile; productRef = A88F209A2A10E99F005E4A27 /* PythonKit */; };
 		A88F209D2A10EB39005E4A27 /* python-stdlib in Resources */ = {isa = PBXBuildFile; fileRef = A88F209C2A10EB39005E4A27 /* python-stdlib */; };
 		A88F209F2A10EB4D005E4A27 /* Python.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A88F209E2A10EB4D005E4A27 /* Python.xcframework */; };
 		A88F20A12A10EBC6005E4A27 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A88F20A02A10EBC6005E4A27 /* SystemConfiguration.framework */; };
@@ -47,6 +46,10 @@
 		A8D0D9382A35D9970061A90E /* RankRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D0D9372A35D9970061A90E /* RankRulesView.swift */; };
 		A8FBC7BB2A3DF1B000EDDFD7 /* SuitRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8FBC7BA2A3DF1B000EDDFD7 /* SuitRulesView.swift */; };
 		A8FBC7C22A3F0A5C00EDDFD7 /* CVUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8FBC7C12A3F0A5C00EDDFD7 /* CVUtils.swift */; };
+		B03B7B2A2A963B7B006A0647 /* TexasPokerGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B292A963B7B006A0647 /* TexasPokerGame.swift */; };
+		B03B7B2D2A963C05006A0647 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B2C2A963C05006A0647 /* Card.swift */; };
+		B03B7B2F2A963C1B006A0647 /* utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B2E2A963C1B006A0647 /* utils.swift */; };
+		B03B7B312A97681D006A0647 /* PokerBullGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B302A97681D006A0647 /* PokerBullGame.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -95,6 +98,10 @@
 		A8D0D9372A35D9970061A90E /* RankRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankRulesView.swift; sourceTree = "<group>"; };
 		A8FBC7BA2A3DF1B000EDDFD7 /* SuitRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuitRulesView.swift; sourceTree = "<group>"; };
 		A8FBC7C12A3F0A5C00EDDFD7 /* CVUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CVUtils.swift; sourceTree = "<group>"; };
+		B03B7B292A963B7B006A0647 /* TexasPokerGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TexasPokerGame.swift; sourceTree = "<group>"; };
+		B03B7B2C2A963C05006A0647 /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
+		B03B7B2E2A963C1B006A0647 /* utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = utils.swift; sourceTree = "<group>"; };
+		B03B7B302A97681D006A0647 /* PokerBullGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokerBullGame.swift; sourceTree = "<group>"; };
 		F11ED84932036610B96BC234 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -105,7 +112,6 @@
 			files = (
 				A88F209F2A10EB4D005E4A27 /* Python.xcframework in Frameworks */,
 				A88F20A12A10EBC6005E4A27 /* SystemConfiguration.framework in Frameworks */,
-				A88F209B2A10E99F005E4A27 /* PythonKit in Frameworks */,
 				A887B6562A81370F009F488F /* AsyncAlgorithms in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -235,10 +241,13 @@
 		A88716862A0F712A00B7F2CD /* GameRules */ = {
 			isa = PBXGroup;
 			children = (
+				B03B7B2B2A963BB9006A0647 /* CardUtils */,
 				A88F20AD2A13A470005E4A27 /* PokerBull.swift */,
 				A8D0D9352A24A4C20061A90E /* TexasPoker.swift */,
 				A88F20AF2A1DEE63005E4A27 /* TinyNine.swift */,
 				A812F9302A3DCD0800AA392F /* ThreeCardPokerGame.swift */,
+				B03B7B292A963B7B006A0647 /* TexasPokerGame.swift */,
+				B03B7B302A97681D006A0647 /* PokerBullGame.swift */,
 			);
 			path = GameRules;
 			sourceTree = "<group>";
@@ -269,6 +278,15 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
+		B03B7B2B2A963BB9006A0647 /* CardUtils */ = {
+			isa = PBXGroup;
+			children = (
+				B03B7B2C2A963C05006A0647 /* Card.swift */,
+				B03B7B2E2A963C1B006A0647 /* utils.swift */,
+			);
+			path = CardUtils;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -288,7 +306,6 @@
 			);
 			name = Shuffle;
 			packageProductDependencies = (
-				A88F209A2A10E99F005E4A27 /* PythonKit */,
 				A887B6552A81370F009F488F /* AsyncAlgorithms */,
 			);
 			productName = CountMyActions;
@@ -322,7 +339,6 @@
 			mainGroup = 18CA146E284ABEC600F90372;
 			packageReferences = (
 				18CA1489284ABF8C00F90372 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
-				A88F20992A10E99F005E4A27 /* XCRemoteSwiftPackageReference "PythonKit" */,
 			);
 			productRefGroup = 18CA1478284ABEC600F90372 /* Products */;
 			projectDirPath = "";
@@ -392,7 +408,10 @@
 				18CA14DC284AC42C00F90372 /* ContentView.swift in Sources */,
 				A887B6582A8511A4009F488F /* InfoView.swift in Sources */,
 				A8D0D9342A223D210061A90E /* TexasPokerRuleSettingView.swift in Sources */,
+				B03B7B2A2A963B7B006A0647 /* TexasPokerGame.swift in Sources */,
+				B03B7B2F2A963C1B006A0647 /* utils.swift in Sources */,
 				A812F92F2A3DCBA500AA392F /* ThreeCardPokerGameRuleSettingView.swift in Sources */,
+				B03B7B312A97681D006A0647 /* PokerBullGame.swift in Sources */,
 				A83DC67A2A22352C00EC8210 /* SelectRuleView.swift in Sources */,
 				A88716852A0F701500B7F2CD /* GameManager.swift in Sources */,
 				A887167F2A0623E500B7F2CD /* AuthManager.swift in Sources */,
@@ -407,6 +426,7 @@
 				A812F9312A3DCD0800AA392F /* ThreeCardPokerGame.swift in Sources */,
 				18CA14DB284AC42C00F90372 /* MyApp.swift in Sources */,
 				A88EFE092A7FAD1100897243 /* SettingViewModel.swift in Sources */,
+				B03B7B2D2A963C05006A0647 /* Card.swift in Sources */,
 				A887B64E2A7FDF56009F488F /* RecordHistoryViewModel.swift in Sources */,
 				18CA14D2284AC42C00F90372 /* ViewModel.swift in Sources */,
 				A88F20AE2A13A470005E4A27 /* PokerBull.swift in Sources */,
@@ -658,14 +678,6 @@
 				version = 0.0.1;
 			};
 		};
-		A88F20992A10E99F005E4A27 /* XCRemoteSwiftPackageReference "PythonKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/pvieito/PythonKit.git";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -673,11 +685,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 18CA1489284ABF8C00F90372 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
 			productName = AsyncAlgorithms;
-		};
-		A88F209A2A10E99F005E4A27 /* PythonKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A88F20992A10E99F005E4A27 /* XCRemoteSwiftPackageReference "PythonKit" */;
-			productName = PythonKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -7,8 +7,8 @@
 //
 
 import Foundation
-import Python
-import PythonKit
+//import Python
+//import PythonKit
 
 class PokerBullRule : Rule{
     let setting: [Int: String] = [
@@ -152,17 +152,17 @@ class PokerBullRule : Rule{
     ]
     
 }
-
+//牛牛
 class PokerBull{
     static func FindWinner(inputCards:[Int], args:[Int], rankRules:[Int], suitRules: [Int]) -> [Int]? {
         
 
-        let json = Python.import("json")
-                
-        let pythonObject =  json.PokerBullGame.calResult(inputCards, args, rankRules, suitRules)
-        // 使用 map() 函数将 PythonList 转换为 Int 数组
-        let intArray = Array<Int>(pythonObject)!
-        
+//        let json = Python.import("json")
+//
+//        let pythonObject =  json.PokerBullGame.calResult(inputCards, args, rankRules, suitRules)
+//        // 使用 map() 函数将 PythonList 转换为 Int 数组
+//        let intArray = Array<Int>(pythonObject)!
+        let intArray: [Int] = []
         return intArray
     }
     
