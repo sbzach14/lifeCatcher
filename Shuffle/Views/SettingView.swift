@@ -61,17 +61,17 @@ struct SettingView: View {
                             }
                             Divider()
                         
-                            HStack {
-                                Text("isAug")
-                                    .foregroundColor(.primary)
-                                    .padding()
-
-                                Spacer()
-
-                                Toggle("", isOn: $viewModel.isContrastAug)
-                                    .padding()
-                            }
-                            Divider()
+//                            HStack {
+//                                Text("isAug")
+//                                    .foregroundColor(.primary)
+//                                    .padding()
+//
+//                                Spacer()
+//
+//                                Toggle("", isOn: $viewModel.isContrastAug)
+//                                    .padding()
+//                            }
+//                            Divider()
 
                             NavigationLink(
                                 destination: InfoView(activeDate: viewModel.activeDate)

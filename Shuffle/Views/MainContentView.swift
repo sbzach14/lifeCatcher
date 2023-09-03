@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct MainContentView: View {
+    var shuffleMode: Int
+    var calModeArgs: [Int]
     var ruleIndex: Int
     var args: [Int]
     var rankRules: [Int]
@@ -39,7 +41,7 @@ struct MainContentView: View {
             }
         }
         .onAppear {
-            viewModel.initialize(ruleIndex: ruleIndex, args: args, rankRules: rankRules, suitRules: suitRules, allCardIndex: allCardIndex, minCardNum: minCardNum)
+            viewModel.initialize(shuffleMode: shuffleMode, calModeArgs: calModeArgs, ruleIndex: ruleIndex, args: args, rankRules: rankRules, suitRules: suitRules, allCardIndex: allCardIndex, minCardNum: minCardNum)
             viewModel.startCamera()
         }
         .onDisappear {

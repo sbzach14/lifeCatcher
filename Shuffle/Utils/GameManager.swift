@@ -19,31 +19,87 @@ class GameManager {
     }()
     
     
-    static func selectGame(gameIndex: Int, inputCards: [Int], args : [Int], rankRules : [Int], suitRules: [Int]) -> [Int] {
-        var winner: [Int] = []
+    static func selectGame(gameIndex: Int, inputCards: [Int], args : [Int], rankRules : [Int], suitRules: [Int], calModeArgs: [Int], minCardNum: Int) -> Int {
+        var reportResult = 0
+        
+        //calModeArgs [calMode, target, targetPos]
+        //calmode 0不打色 1去色 2留色
+        //target 0max 1min
+        //targetPos 1
+        let calMode = calModeArgs[0]
+        let target = calModeArgs[1]
+        let targetPos = calModeArgs[2]
+        
+        // 定义一个字典，将游戏索引映射到游戏函数
+        let gameFunctions: [Int: ([Int], [Int], [Int], [Int]) -> [Int]?] = [
+            0: TexasPoker.FindWinner,
+            1: PokerBull.FindWinner,
+            2: ThreeCardPokerGame.FindWinner
+        ]
 
-        switch gameIndex {
-        case 0:
-            print("Texas")
-            if let result = TexasPoker.FindWinner(inputCards: inputCards, args: args, rankRules: rankRules, suitRules: suitRules) {
-                winner = result
-            }
-        case 1:
-            print("Bull")
-            if let result = PokerBull.FindWinner(inputCards: inputCards, args: args, rankRules: rankRules, suitRules: suitRules){
-                winner = result
-            }
-        case 2:
-            print("ThreePokerGame")
-            if let result = ThreeCardPokerGame.FindWinner(inputCards: inputCards, args: args, rankRules: rankRules, suitRules: suitRules){
-                winner = result
-            }
+        // 检查 gameIndex 是否存在于字典中
+        if let gameFunction = gameFunctions[gameIndex] {
+            print("Selected Game: \(gameFunction)")
             
-        default:
-            print(gameIndex)
+            switch calMode{
+                
+            case 0://不打色
+                if let result = gameFunction(inputCards, args, rankRules, suitRules) {
+                    if target == 0{
+                        reportResult = result[0]
+                    }
+                    else if target == 1{
+                        reportResult = result[result.count - 1]
+                    }
+                }
+            
+            case 1://去色
+                for cardIndex in 0..<inputCards.count - minCardNum{
+                    let cardRank = inputCards[cardIndex] % 13 + 1
+                    let newInputCards = Array(inputCards[(cardIndex+1)...])//去掉上面的牌
+                    var resultTargetPos = 0
+                    if let result = gameFunction(newInputCards, args, rankRules, suitRules) {
+                        if target == 0{
+                            resultTargetPos = result[0]
+                        }
+                        else if target == 1{
+                            resultTargetPos = result[result.count - 1]
+                        }
+                    }
+                    let resultPos = cardRank + resultTargetPos//起始发牌位置+目标输赢发牌位置
+                    if resultPos == targetPos{
+                        reportResult = cardIndex + 1
+                        break
+                    }
+                }
+                
+            case 2://留色
+                for cardIndex in 0..<inputCards.count{
+                    let cardRank = inputCards[cardIndex] % 13 + 1
+                    var resultTargetPos = 0
+                    if let result = gameFunction(inputCards, args, rankRules, suitRules) {
+                        if target == 0{
+                            resultTargetPos = result[0]
+                        }
+                        else if target == 1{
+                            resultTargetPos = result[result.count - 1]
+                        }
+                    }
+                    let resultPos = cardRank + resultTargetPos//起始发牌位置+目标输赢发牌位置
+                    if resultPos == targetPos{
+                        reportResult = cardIndex + 1
+                        break
+                    }
+                }
+                
+            default:
+                print("calModeArgs 0 error")
+            }
+        } else {
+            print("Invalid gameIndex: \(gameIndex)")
         }
         
-        return winner
+        return reportResult
     }
     
     static func getCheckedIndexes(rankRules: [RankRulesSate]) -> [Int] {
