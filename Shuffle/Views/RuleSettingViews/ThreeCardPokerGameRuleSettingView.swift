@@ -5,6 +5,12 @@ struct ThreeCardPokerGameRuleSettingView: View {
     @State private var showAlert = false
     @State private var alertMessage = ""
     
+    @State private var shuffleMode: Int = 0
+    @State private var calMode: Int = 0
+    
+    @State private var targetPos: Int = 1
+    @State private var target: Int = 0//0max 1min
+    
     @State private var setting : Int = 0
     
     @State private var playerNum: Int = 0
@@ -51,7 +57,104 @@ struct ThreeCardPokerGameRuleSettingView: View {
             
             ScrollView {
                 VStack {
+                    
+                    HStack
+                    {
+                        Text("洗牌模式")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.leading, 60) // 左侧间距
+                        Picker("shuffleMode", selection: $shuffleMode) {
+                            Text("洗牌").tag(0)
+                            Text("拨到顶").tag(1)
+                            Text("拨中间").tag(2)
+                    
+                        }
+                        .pickerStyle(MenuPickerStyle())
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .padding(.trailing, 60) // 右侧间距
+                    }
+                    
+                    HStack
+                    {
+                        Text("打色模式")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.leading, 60) // 左侧间距
+                        Picker("calMode", selection: $calMode) {
+                            Text("切牌").tag(0)
+                            Text("去色").tag(1)
+                            Text("留色").tag(2)
+                    
+                        }
+                        .pickerStyle(MenuPickerStyle())
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .padding(.trailing, 60) // 右侧间距
+                    }
+                    
+                    
+                    if calMode == 0{
+                        HStack
+                        {
+                            Text("报牌模式")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.leading, 60) // 左侧间距
+                            Picker("target", selection: $target) {
+                                Text("报最大位置").tag(0)
+                                Text("报最小位置").tag(1)
+                            }
+                            .pickerStyle(MenuPickerStyle())
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .padding(.trailing, 60) // 右侧间距
+                        }
+                    }
+                    
+                    else{
+                        HStack
+                        {
+                            Text("报牌模式")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.leading, 60) // 左侧间距
+                            Picker("target", selection: $target) {
+                                Text("报切几张目标位置最大").tag(0)
+                                Text("报切几张目标位置最小").tag(1)
+                            }
+                            .pickerStyle(MenuPickerStyle())
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .padding(.trailing, 60) // 右侧间距
+                        }
+                        
+                        HStack
+                        {
+                            Text("目标位置")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.leading, 60) // 左侧间距
+                            Picker("targetPos", selection: $targetPos) {
+                                ForEach(1...selectedRule.playerNum[playerNum], id: \.self) { index in
+                                    Text(String(index)).tag(index)
+                                }
+                            }
+                            .pickerStyle(MenuPickerStyle())
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .padding(.trailing, 60) // 右侧间距
+                        }
+                    }
 
+                    
+
+                    HStack
+                    {
+                        Text("玩家数量")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.leading, 60) // 左侧间距
+                        Picker("playerNum", selection: $playerNum) {
+                            ForEach(0...selectedRule.playerNum.count - 1, id: \.self) { index in
+                                Text(String(selectedRule.playerNum[index])).tag(index)
+                            }
+                        }
+                        .pickerStyle(MenuPickerStyle())
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .padding(.trailing, 60) // 右侧间距
+                    }
+                    
                     HStack
                     {
                         Text("设置模版")
@@ -69,21 +172,6 @@ struct ThreeCardPokerGameRuleSettingView: View {
                         .onChange(of: setting) { _ in
                             handleSettingChange()
                         }
-                    }
-
-                    HStack
-                    {
-                        Text("玩家数量")
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.leading, 60) // 左侧间距
-                        Picker("playerNum", selection: $playerNum) {
-                            ForEach(0...selectedRule.playerNum.count - 1, id: \.self) { index in
-                                Text(String(selectedRule.playerNum[index])).tag(index)
-                            }
-                        }
-                        .pickerStyle(MenuPickerStyle())
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                        .padding(.trailing, 60) // 右侧间距
                     }
                       
                     if(setting == 1)
@@ -402,7 +490,10 @@ struct ThreeCardPokerGameRuleSettingView: View {
             }
             .background(
                 NavigationLink(
-                    destination: MainContentView(ruleIndex: selectedRule.ruleIndex, args : [
+                    destination: MainContentView(
+                        shuffleMode: shuffleMode,
+                        calModeArgs: [calMode, target, targetPos],
+                        ruleIndex: selectedRule.ruleIndex, args : [
                         selectedRule.playerNum[playerNum],
                         selectedRule.handNum[handNum],
                         isCompareSuit,
