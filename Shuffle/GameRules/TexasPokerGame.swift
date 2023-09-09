@@ -8,8 +8,7 @@
 
 import Foundation
 
-
-class Player {
+class TexasPlayer {
     var playerCard = [Card]()
     var evaluateFlag = 0
     
@@ -46,11 +45,11 @@ class TexasPokerGame {
         
         var maxRank = 0
         var winners = [Int]()
-        var allPlayCards = [Player]()
+        var allPlayCards = [TexasPlayer]()
         var community = [Card]()
         
         for _ in 0..<playerNum {
-            allPlayCards.append(Player())
+            allPlayCards.append(TexasPlayer())
         }
         
         // 发牌

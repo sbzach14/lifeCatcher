@@ -23,7 +23,7 @@ struct ShowCardView: View {
                                     .cornerRadius(10)
                                     .shadow(radius: 2)
                                 Text(viewModel.cardLabelDic[viewModel.cardArray[index]]!)
-                                    .font(.system(size: 10))
+                                    .font(.system(size: 14)).foregroundColor(Color.black)
                             }.padding(5)
                         }
                     }

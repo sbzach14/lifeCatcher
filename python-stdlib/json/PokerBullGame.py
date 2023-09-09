@@ -333,11 +333,6 @@ class HandEvaluator:
     # 9，Joker是最小的0
     JOKERISSMALLESTZERO = False
 
-
-
-    
-
-
     # cards, bull cards 数组
     # bull_rules，判断什么是牛的规则数组
     # same_bull_point_comparision, 同牛情况下如何比较的规则

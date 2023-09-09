@@ -51,7 +51,19 @@
 		B03B7B2D2A963C05006A0647 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B2C2A963C05006A0647 /* Card.swift */; };
 		B03B7B2F2A963C1B006A0647 /* utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B2E2A963C1B006A0647 /* utils.swift */; };
 		B03B7B312A97681D006A0647 /* PokerBullGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B302A97681D006A0647 /* PokerBullGame.swift */; };
+		B03B7B532A98AD32006A0647 /* ShuffleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B522A98AD32006A0647 /* ShuffleTests.swift */; };
+		B03B7B5C2A99D294006A0647 /* cardDetection_826.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B5B2A99D294006A0647 /* cardDetection_826.mlmodel */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		B03B7B542A98AD32006A0647 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 18CA146F284ABEC600F90372 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 18CA1476284ABEC600F90372;
+			remoteInfo = Shuffle;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		18CA1477284ABEC600F90372 /* Shuffle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Shuffle.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -104,6 +116,9 @@
 		B03B7B2C2A963C05006A0647 /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
 		B03B7B2E2A963C1B006A0647 /* utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = utils.swift; sourceTree = "<group>"; };
 		B03B7B302A97681D006A0647 /* PokerBullGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokerBullGame.swift; sourceTree = "<group>"; };
+		B03B7B502A98AD32006A0647 /* ShuffleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShuffleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B03B7B522A98AD32006A0647 /* ShuffleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShuffleTests.swift; sourceTree = "<group>"; };
+		B03B7B5B2A99D294006A0647 /* cardDetection_826.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; name = cardDetection_826.mlmodel; path = ../../../../../Downloads/cardDetection_826.mlmodel; sourceTree = "<group>"; };
 		F11ED84932036610B96BC234 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -115,6 +130,13 @@
 				A88F209F2A10EB4D005E4A27 /* Python.xcframework in Frameworks */,
 				A88F20A12A10EBC6005E4A27 /* SystemConfiguration.framework in Frameworks */,
 				A887B6562A81370F009F488F /* AsyncAlgorithms in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B03B7B4D2A98AD32006A0647 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -130,6 +152,7 @@
 				A88F209E2A10EB4D005E4A27 /* Python.xcframework */,
 				A88F209C2A10EB39005E4A27 /* python-stdlib */,
 				18CA1479284ABEC600F90372 /* Shuffle */,
+				B03B7B512A98AD32006A0647 /* ShuffleTests */,
 				18CA1478284ABEC600F90372 /* Products */,
 				6F1A40C356DDD7B853F4B7B0 /* Configuration */,
 				8FCAE36708347D80E3093CD0 /* LICENSE */,
@@ -141,6 +164,7 @@
 			isa = PBXGroup;
 			children = (
 				18CA1477284ABEC600F90372 /* Shuffle.app */,
+				B03B7B502A98AD32006A0647 /* ShuffleTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -274,6 +298,7 @@
 			children = (
 				A893F4822A6FB8F4001AB6A9 /* CardDetect.mlmodel */,
 				A887B6592A88C8A7009F488F /* cardDetection.mlmodel */,
+				B03B7B5B2A99D294006A0647 /* cardDetection_826.mlmodel */,
 				A8F9A3702A949B7800DC35AC /* cardDetection_new.mlmodel */,
 				A88EFE022A7E8ACC00897243 /* Resnet50FP16.mlmodel */,
 				A892C6102A7D145C003FA2B3 /* YOLOv3TinyFP16.mlmodel */,
@@ -288,6 +313,14 @@
 				B03B7B2E2A963C1B006A0647 /* utils.swift */,
 			);
 			path = CardUtils;
+			sourceTree = "<group>";
+		};
+		B03B7B512A98AD32006A0647 /* ShuffleTests */ = {
+			isa = PBXGroup;
+			children = (
+				B03B7B522A98AD32006A0647 /* ShuffleTests.swift */,
+			);
+			path = ShuffleTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -315,6 +348,24 @@
 			productReference = 18CA1477284ABEC600F90372 /* Shuffle.app */;
 			productType = "com.apple.product-type.application";
 		};
+		B03B7B4F2A98AD32006A0647 /* ShuffleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B03B7B562A98AD32006A0647 /* Build configuration list for PBXNativeTarget "ShuffleTests" */;
+			buildPhases = (
+				B03B7B4C2A98AD32006A0647 /* Sources */,
+				B03B7B4D2A98AD32006A0647 /* Frameworks */,
+				B03B7B4E2A98AD32006A0647 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B03B7B552A98AD32006A0647 /* PBXTargetDependency */,
+			);
+			name = ShuffleTests;
+			productName = ShuffleTests;
+			productReference = B03B7B502A98AD32006A0647 /* ShuffleTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -322,12 +373,17 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1400;
+				DefaultBuildSystemTypeForWorkspace = Latest;
+				LastSwiftUpdateCheck = 1430;
 				LastUpgradeCheck = 1400;
 				ORGANIZATIONNAME = Apple;
 				TargetAttributes = {
 					18CA1476284ABEC600F90372 = {
 						CreatedOnToolsVersion = 14.0;
+					};
+					B03B7B4F2A98AD32006A0647 = {
+						CreatedOnToolsVersion = 14.3.1;
+						TestTargetID = 18CA1476284ABEC600F90372;
 					};
 				};
 			};
@@ -348,6 +404,7 @@
 			projectRoot = "";
 			targets = (
 				18CA1476284ABEC600F90372 /* Shuffle */,
+				B03B7B4F2A98AD32006A0647 /* ShuffleTests */,
 			);
 		};
 /* End PBXProject section */
@@ -359,6 +416,13 @@
 			files = (
 				50053F84284ACAED00C86BF4 /* Assets.xcassets in Resources */,
 				A88F209D2A10EB39005E4A27 /* python-stdlib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B03B7B4E2A98AD32006A0647 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -433,6 +497,7 @@
 				B03B7B2D2A963C05006A0647 /* Card.swift in Sources */,
 				A887B64E2A7FDF56009F488F /* RecordHistoryViewModel.swift in Sources */,
 				18CA14D2284AC42C00F90372 /* ViewModel.swift in Sources */,
+				B03B7B5C2A99D294006A0647 /* cardDetection_826.mlmodel in Sources */,
 				A88F20AE2A13A470005E4A27 /* PokerBull.swift in Sources */,
 				A8D0D9362A24A4C20061A90E /* TexasPoker.swift in Sources */,
 				A8FBC7C22A3F0A5C00EDDFD7 /* CVUtils.swift in Sources */,
@@ -450,7 +515,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B03B7B4C2A98AD32006A0647 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B03B7B532A98AD32006A0647 /* ShuffleTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B03B7B552A98AD32006A0647 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 18CA1476284ABEC600F90372 /* Shuffle */;
+			targetProxy = B03B7B542A98AD32006A0647 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		18CA1483284ABEC700F90372 /* Debug */ = {
@@ -650,6 +731,48 @@
 			};
 			name = Release;
 		};
+		B03B7B572A98AD32006A0647 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FYQ8UYQL3M;
+				ENABLE_TESTABILITY = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.apple.ShuffleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Shuffle.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Shuffle";
+			};
+			name = Debug;
+		};
+		B03B7B582A98AD32006A0647 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FYQ8UYQL3M;
+				ENABLE_TESTABILITY = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.apple.ShuffleTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Shuffle.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Shuffle";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -667,6 +790,15 @@
 			buildConfigurations = (
 				18CA1486284ABEC700F90372 /* Debug */,
 				18CA1487284ABEC700F90372 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B03B7B562A98AD32006A0647 /* Build configuration list for PBXNativeTarget "ShuffleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B03B7B572A98AD32006A0647 /* Debug */,
+				B03B7B582A98AD32006A0647 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
