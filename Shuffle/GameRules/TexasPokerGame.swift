@@ -2,14 +2,6 @@
 
 import Foundation
 
-class TexasPlayer {
-    var playerCard = [Card]()
-    var evaluateFlag = 0
-    
-    func insertCard(card: Card) {
-        playerCard.append(card)
-    }
-}
 
 class TexasPokerGame {
 //    #args
@@ -39,11 +31,11 @@ class TexasPokerGame {
         
         var maxRank = 0
         var winners = [Int]()
-        var allPlayCards = [TexasPlayer]()
+        var allPlayCards = [Player]()
         var community = [Card]()
         
         for _ in 0..<playerNum {
-            allPlayCards.append(TexasPlayer())
+            allPlayCards.append(Player())
         }
         
         // 发牌
@@ -574,31 +566,4 @@ class TexasHandEvaluator {
     
 }
 
-// Helper extension for combinations
-extension Array {
-    func combinations(ofCount count: Int) -> [[Element]] {
-        if count == 0 {
-            return [[]]
-        }
-        guard !isEmpty else {
-            return []
-        }
-        if count >= self.count {
-            return [self]
-        }
-        if count == 1 {
-            return self.map { [$0] }
-        }
-        var result: [[Element]] = []
-        for (index, element) in self.enumerated() {
-            var reduced = self
-            reduced.removeFirst(index + 1)
-            let subcombinations = reduced.combinations(ofCount: count - 1)
-            for subcombination in subcombinations {
-                result.append([element] + subcombination)
-            }
-        }
-        return result
-    }
-}
 

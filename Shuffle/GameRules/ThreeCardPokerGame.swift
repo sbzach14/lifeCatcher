@@ -106,14 +106,7 @@ class ThreeCardPokerGameRule : Rule{
     }
 }
 
-class ThreeCardPokerGamePlayer {
-    var playerCard = [Card]()
-    var evaluateFlag = 0
-    
-    func insertCard(card: Card) {
-        playerCard.append(card)
-    }
-}
+
 
 
 //炸金花
@@ -183,10 +176,10 @@ class ThreeCardPokerGame{
         
         var maxRank = 0
         var winners: [Int] = []
-        var allPlayCards: [ThreeCardPokerGamePlayer] = []
+        var allPlayCards: [Player] = []
         
         for _ in 0..<playerNum {
-            allPlayCards.append(ThreeCardPokerGamePlayer())
+            allPlayCards.append(Player())
         }
         
         
