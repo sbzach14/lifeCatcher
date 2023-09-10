@@ -50,7 +50,13 @@ struct PokerBullSettingView: View {
         RankRulesSate(index: 0, isChecked: true)
     ]
 
-    @State private var rankRules = [RankRulesSate]()
+    @State private var rankRules: [RankRulesSate] = [
+        RankRulesSate(index: 41, isChecked: true),
+        RankRulesSate(index: 39, isChecked: true),
+        RankRulesSate(index: 38, isChecked: true),
+        RankRulesSate(index: 2, isChecked: true),
+        RankRulesSate(index: 1, isChecked: true),
+        RankRulesSate(index: 0, isChecked: true)]
 
     @State private var navigateToSuitRules = false
     @State private var navigateToRankRules = false
@@ -73,7 +79,7 @@ struct PokerBullSettingView: View {
                             Text("洗牌").tag(0)
                             Text("拨到顶").tag(1)
                             Text("拨中间").tag(2)
-                    
+
                         }
                         .pickerStyle(MenuPickerStyle())
                         .frame(maxWidth: .infinity, alignment: .trailing)
@@ -89,7 +95,7 @@ struct PokerBullSettingView: View {
                             Text("不打色").tag(0)
                             Text("去色").tag(1)
                             Text("留色").tag(2)
-                    
+
                         }
                         .pickerStyle(MenuPickerStyle())
                         .frame(maxWidth: .infinity, alignment: .trailing)
@@ -111,7 +117,7 @@ struct PokerBullSettingView: View {
                             .padding(.trailing, 60) // 右侧间距
                         }
                     }
-                    
+
                     else{
                         HStack
                         {
@@ -126,7 +132,7 @@ struct PokerBullSettingView: View {
                             .frame(maxWidth: .infinity, alignment: .trailing)
                             .padding(.trailing, 60) // 右侧间距
                         }
-                        
+
                         HStack
                         {
                             Text("目标位置")
@@ -540,7 +546,6 @@ struct PokerBullSettingView: View {
         if(setting == 2){
             
         }
-        
     }
 }
 

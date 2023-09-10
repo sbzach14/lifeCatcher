@@ -159,7 +159,10 @@ class PokerBullRule : Rule{
         40:"带♠️a的五花牛（有大小王）",
         41:"五小牛，五张牌的每一张牌都小于等于5并且总和小于10",
     ]
-    
+    override init(ruleIndex: Int, ruleName: String) {
+        super.init(ruleIndex: ruleIndex, ruleName: ruleName)
+        self.rankRules = PokerBullRule.fiveCardsRankRules
+    }
 }
 
 class PokerBull{
@@ -1572,18 +1575,10 @@ class BullHandEvaluator {
     }
     
     static func isIronBull(cards: [PokerBullGame.PokerBullCard]) -> (Bool, Int) {
-//        let threeCard = self.threeCard(cards: cards)
-//        if threeCard.isEmpty {
-//            return (false, 0)
-//        }
-//        var sum = 0
-//        for card in cards{
-//            if threeCard[0].contains(where: )
-//        }
-//
-//        if cards.filter({ !threeCard[0].contains(where: $0) }).map({ $0.rank2Value }).reduce(0, +) % 10 == 0 {
-//            return (true, threeCard[0][0].rank2Value)
-//        }
+        let threeCard = self.threeCard(cards: cards)
+        if threeCard.isEmpty {
+            return (false, 0)
+        }
         return (false, 0)
     }
     

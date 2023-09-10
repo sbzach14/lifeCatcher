@@ -97,7 +97,7 @@ struct RankRulesView_Previews: PreviewProvider {
     ]
     
     static var previews: some View {
-        RankRulesView(rankRules: $rankRules, selectedRuleIndex: 0)
+        RankRulesView(rankRules: $rankRules, selectedRuleIndex: 1)
             .onAppear {
                 // You can modify rankRules here as needed for preview
                 rankRules[0].isChecked = true

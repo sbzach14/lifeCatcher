@@ -12,7 +12,7 @@ class GameManager {
     ]
     static var gameRules: [Int: Rule] = {
         let rule1 = TexasPokerRule(ruleIndex: 0, ruleName: "TexasPoker")
-        let rule2 = Rule(ruleIndex: 1, ruleName: "PokerBullRule")
+        let rule2 = PokerBullRule(ruleIndex: 1, ruleName: "PokerBullRule")
         let rule3 = ThreeCardPokerGameRule(ruleIndex: 2, ruleName: "ThreeCardPokerGame")
         
         return [rule1.ruleIndex: rule1, rule2.ruleIndex: rule2, rule3.ruleIndex: rule3]
