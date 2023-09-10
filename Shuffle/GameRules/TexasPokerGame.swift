@@ -1,10 +1,4 @@
-//
-//  TexasPokerGame.swift
-//  Shuffle
-//
-//  Created by Ariel on 2023/8/23.
-//  Copyright © 2023 Apple. All rights reserved.
-//
+
 
 import Foundation
 
@@ -76,7 +70,7 @@ class TexasPokerGame {
         }
         
         for i in 0..<playerNum {
-            allPlayCards[i].evaluateFlag = HandEvaluator.evalHand(cards: allPlayCards[i].playerCard, community: community, isCompareSuit: isCompareSuit, isAceStraight: isAceStraight, minRank: minRank, handUseType: handUseType, handUseNum: handUseNum, rankRules: rankRules)
+            allPlayCards[i].evaluateFlag = TexasHandEvaluator.evalHand(cards: allPlayCards[i].playerCard, community: community, isCompareSuit: isCompareSuit, isAceStraight: isAceStraight, minRank: minRank, handUseType: handUseType, handUseNum: handUseNum, rankRules: rankRules)
         }
         
         for i in 0..<playerNum {
@@ -94,7 +88,7 @@ class TexasPokerGame {
     }
 }
 
-class HandEvaluator {
+class TexasHandEvaluator {
     
     static func evalHand(cards: [Card], community: [Card], isCompareSuit: Bool, isAceStraight: Bool, minRank: Int, handUseType: Int, handUseNum: Int, rankRules: [Int]) -> Int {
         let (cardsLength, allSortedCards) = sortCards(cards: cards, community: community, handUseType: handUseType, handUseNum: handUseNum, isAceStraight: isAceStraight, minRank: minRank)
@@ -220,7 +214,7 @@ class HandEvaluator {
             var straightHeadRank = 0
             
             for i in 0..<cards.count {
-                if cards[i].suit as! Int == suit {
+                if cards[i].suit[0] == suit {
                     rankList.append(cards[i].rank)
                 }
             }
@@ -254,7 +248,6 @@ class HandEvaluator {
         return rank
     }
     
-    // Rest of the HandEvaluator methods...
     
     static func evalFourCard(cards: [Card], cardsLength: Int) -> Int {
             var rank = 0
@@ -311,7 +304,7 @@ class HandEvaluator {
             for suit in [3, 2, 1, 0] {
                 var cnt = 0
                 for i in 0..<cardsLength {
-                    if cards[i].suit as! Int == suit && cnt < 5 {
+                    if cards[i].suit[0] == suit && cnt < 5 {
                         cnt += 1
                         rank = rank << 4 | cards[i].rank
                     }
@@ -348,7 +341,7 @@ class HandEvaluator {
             if rank != 0 {
                 for card in cards {
                     if card.rank == rank {
-                        rank = rank << 2 | (card.suit as! Int)
+                        rank = rank << 2 | card.suit[0]
                         break
                     }
                 }
@@ -365,7 +358,7 @@ class HandEvaluator {
             for i in 0..<(cardsLength - 2) {
                 if cards[i].rank == cards[i+1].rank && cards[i].rank == cards[i+2].rank {
                     threeCardRank = cards[i].rank
-                    threeCardSuit = cards[i].suit as! Int
+                    threeCardSuit = cards[i].suit[0]
                     break
                 }
             }
@@ -395,7 +388,7 @@ class HandEvaluator {
                 var cnt = 1
                 var straightHeadRank = 0
                 for card in cards {
-                    if card.suit as! Int == suit {
+                    if card.suit[0] == suit {
                         cardList.append(card)
                     }
                 }
@@ -468,7 +461,7 @@ class HandEvaluator {
                 }
                 for card in cards {
                     if card.rank == rank {
-                        rank = rank << 2 | (card.suit as! Int)
+                        rank = rank << 2 | card.suit[0]
                         break
                     }
                 }
@@ -482,7 +475,7 @@ class HandEvaluator {
             for suit in [3, 2, 1, 0] {
                 var cnt = 0
                 for i in 0..<cardsLength {
-                    if cards[i].suit as! Int == suit && cnt < 3 {
+                    if cards[i].suit[0] == suit && cnt < 3 {
                         cnt += 1
                         cardList.append(cards[i])
                         rank = rank << 4 | cards[i].rank
@@ -519,7 +512,7 @@ class HandEvaluator {
                 if cards[i].rank == cards[i+1].rank {
                     if firstPairRank == 0 {
                         firstPairRank = cards[i].rank
-                        firstPairSuit = cards[i].suit as! Int
+                        firstPairSuit = cards[i].suit[0]
                     } else {
                         secondPairRank = cards[i].rank
                         break
@@ -547,7 +540,7 @@ class HandEvaluator {
             for i in 0..<(cardsLength - 1) {
                 if cards[i].rank == cards[i + 1].rank {
                     pairRank = cards[i].rank
-                    pairSuit = cards[i].suit as! Int
+                    pairSuit = cards[i].suit[0]
                     rankList.append(pairRank)
                     break
                 }
@@ -574,7 +567,7 @@ class HandEvaluator {
             for i in 0..<5 {
                 rank = rank << 4 | cards[i].rank
             }
-            rank = rank << 2 | (cards[0].suit as! Int)
+            rank = rank << 2 | cards[0].suit[0]
             return rank
         }
     
