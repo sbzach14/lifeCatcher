@@ -720,6 +720,7 @@ class BullHandEvaluator {
                 return (true, ~cards.reduce(into: 0) { $0 + $1.rank2Value })
             }
         }
+        return (false, 0)
     }
     
     static func isFiveCardsSumEqualsToTwentyAndHaveBulls(cards: [PokerBullGame.PokerBullCard]) -> (Bool, Int) {
@@ -1373,18 +1374,18 @@ class BullHandEvaluator {
     }
     
     static func isIronBull(cards: [PokerBullGame.PokerBullCard]) -> (Bool, Int) {
-        let threeCard = self.threeCard(cards: cards)
-        if threeCard.isEmpty {
-            return (false, 0)
-        }
-        var sum = 0
-        for card in cards{
-            if threeCard[0].contains(where: )
-        }
-        
-        if cards.filter({ !threeCard[0].contains(where: $0) }).map({ $0.rank2Value }).reduce(0, +) % 10 == 0 {
-            return (true, threeCard[0][0].rank2Value)
-        }
+//        let threeCard = self.threeCard(cards: cards)
+//        if threeCard.isEmpty {
+//            return (false, 0)
+//        }
+//        var sum = 0
+//        for card in cards{
+//            if threeCard[0].contains(where: )
+//        }
+//
+//        if cards.filter({ !threeCard[0].contains(where: $0) }).map({ $0.rank2Value }).reduce(0, +) % 10 == 0 {
+//            return (true, threeCard[0][0].rank2Value)
+//        }
         return (false, 0)
     }
     
