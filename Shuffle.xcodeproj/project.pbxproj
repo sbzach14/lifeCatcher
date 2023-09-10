@@ -50,7 +50,6 @@
 		B03B7B2D2A963C05006A0647 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B2C2A963C05006A0647 /* Card.swift */; };
 		B03B7B2F2A963C1B006A0647 /* utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B2E2A963C1B006A0647 /* utils.swift */; };
 		B03B7B532A98AD32006A0647 /* ShuffleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B522A98AD32006A0647 /* ShuffleTests.swift */; };
-		B03B7B5C2A99D294006A0647 /* cardDetection_826.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B5B2A99D294006A0647 /* cardDetection_826.mlmodel */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -114,7 +113,6 @@
 		B03B7B2E2A963C1B006A0647 /* utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = utils.swift; sourceTree = "<group>"; };
 		B03B7B502A98AD32006A0647 /* ShuffleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShuffleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B03B7B522A98AD32006A0647 /* ShuffleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShuffleTests.swift; sourceTree = "<group>"; };
-		B03B7B5B2A99D294006A0647 /* cardDetection_826.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; name = cardDetection_826.mlmodel; path = ../../../../../Downloads/cardDetection_826.mlmodel; sourceTree = "<group>"; };
 		F11ED84932036610B96BC234 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -292,7 +290,6 @@
 			children = (
 				A893F4822A6FB8F4001AB6A9 /* CardDetect.mlmodel */,
 				A887B6592A88C8A7009F488F /* cardDetection.mlmodel */,
-				B03B7B5B2A99D294006A0647 /* cardDetection_826.mlmodel */,
 				A8F9A3702A949B7800DC35AC /* cardDetection_new.mlmodel */,
 				A88EFE022A7E8ACC00897243 /* Resnet50FP16.mlmodel */,
 				A892C6102A7D145C003FA2B3 /* YOLOv3TinyFP16.mlmodel */,
@@ -489,7 +486,6 @@
 				B03B7B2D2A963C05006A0647 /* Card.swift in Sources */,
 				A887B64E2A7FDF56009F488F /* RecordHistoryViewModel.swift in Sources */,
 				18CA14D2284AC42C00F90372 /* ViewModel.swift in Sources */,
-				B03B7B5C2A99D294006A0647 /* cardDetection_826.mlmodel in Sources */,
 				A88F20AE2A13A470005E4A27 /* PokerBull.swift in Sources */,
 				A8D0D9362A24A4C20061A90E /* TexasPoker.swift in Sources */,
 				A8FBC7C22A3F0A5C00EDDFD7 /* CVUtils.swift in Sources */,

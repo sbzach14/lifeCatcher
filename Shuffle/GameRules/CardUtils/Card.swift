@@ -8,21 +8,15 @@
 
 import Foundation
 class Card {
-    var suit: Any
+    var suit: [Int]
     var rank: Int
     
-    init(suit: Any, rank: Int) {
+    init(suit: [Int], rank: Int) {
         self.suit = suit
         self.rank = rank
     }
     
     static func calScore(card: Card) -> Int {
-        if let suit = card.suit as? Int {
-            return card.rank * 10 + suit
-        } else if let suits = card.suit as? [Int] {
-            return card.rank * 10 + suits.max()!
-        } else {
-            return 0 // Handle the case when suit is neither Int nor [Int]
-        }
+        return card.rank * 10 + card.suit.max()!
     }
 }

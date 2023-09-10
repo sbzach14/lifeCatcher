@@ -12,12 +12,6 @@ class Player:
     def Insert_card(self, card):
         self.player_card.append(card)
 
-    def evaluate_hand_cards(self):
-        self.evaluate_flag = HandEvaluator.eval_hand(self.player_card)
-        
-#todo 
-#     mixedsuit
-#     zhandan
 
 class ThreeCardPokerGame:
 
