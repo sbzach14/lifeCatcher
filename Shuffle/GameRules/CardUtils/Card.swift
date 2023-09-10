@@ -20,3 +20,13 @@ class Card {
         return card.rank * 10 + card.suit.max()!
     }
 }
+
+
+class Player {
+    var playerCard = [Card]()
+    var evaluateFlag = 0
+    
+    func insertCard(card: Card) {
+        playerCard.append(card)
+    }
+}

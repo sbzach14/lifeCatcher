@@ -11,11 +11,15 @@ class GameManager {
         3: "♠️黑桃"
     ]
     static var gameRules: [Int: Rule] = {
-        let rule1 = TexasPokerRule(ruleIndex: 0, ruleName: "TexasPoker")
-        let rule2 = PokerBullRule(ruleIndex: 1, ruleName: "PokerBullRule")
-        let rule3 = ThreeCardPokerGameRule(ruleIndex: 2, ruleName: "ThreeCardPokerGame")
+        let rule0 = TexasPokerRule(ruleIndex: 0, ruleName: "德州")
+        let rule1 = PokerBullRule(ruleIndex: 1, ruleName: "牛牛")
+        let rule2 = ThreeCardPokerGameRule(ruleIndex: 2, ruleName: "炸金花")
+        let rule3 = TinyNineGameRule(ruleIndex: 3, ruleName: "小九")
+        let rule4 = ThreeMenGameRule(ruleIndex: 4, ruleName: "三公")
+        let rule5 = TwoEightGangGameRule(ruleIndex: 5, ruleName: "二八杠")
+        let rule6 = NinePointFiveGameRule(ruleIndex: 6, ruleName: "九点半")        
         
-        return [rule1.ruleIndex: rule1, rule2.ruleIndex: rule2, rule3.ruleIndex: rule3]
+        return [rule0.ruleIndex: rule0, rule1.ruleIndex: rule1, rule2.ruleIndex: rule2, rule3.ruleIndex: rule3, rule4.ruleIndex: rule4, rule5.ruleIndex: rule5, rule6.ruleIndex: rule6]
     }()
     
     
