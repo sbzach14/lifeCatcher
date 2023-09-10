@@ -25,10 +25,12 @@ class GameManager {
         //calModeArgs [calMode, target, targetPos]
         //calmode 0不打色 1去色 2留色
         //target 0max 1min
-        //targetPos 1
+        //targetPos 这里变为0开始
         let calMode = calModeArgs[0]
         let target = calModeArgs[1]
-        let targetPos = calModeArgs[2]
+        let targetPos = calModeArgs[2] - 1
+        
+        let playerNum = args[0]
         
         // 定义一个字典，将游戏索引映射到游戏函数
         let gameFunctions: [Int: ([Int], [Int], [Int], [Int]) -> [Int]?] = [
@@ -55,7 +57,7 @@ class GameManager {
             
             case 1://去色
                 for cardIndex in 0..<inputCards.count - minCardNum{
-                    let cardRank = inputCards[cardIndex] % 13 + 1
+                    let cardRank = inputCards[cardIndex] % 13
                     let newInputCards = Array(inputCards[(cardIndex+1)...])//去掉上面的牌
                     var resultTargetPos = 0
                     if let result = gameFunction(newInputCards, args, rankRules, suitRules) {
@@ -66,8 +68,8 @@ class GameManager {
                             resultTargetPos = result[result.count - 1]
                         }
                     }
-                    let resultPos = cardRank + resultTargetPos//起始发牌位置+目标输赢发牌位置
-                    if resultPos == targetPos{
+                    let resultPos = (cardRank + resultTargetPos) % playerNum//起始发牌位置+目标输赢发牌位置
+                    if resultPos == targetPos{//targetPos 0 - playerNum-1
                         reportResult = cardIndex + 1
                         break
                     }
@@ -75,7 +77,7 @@ class GameManager {
                 
             case 2://留色
                 for cardIndex in 0..<inputCards.count{
-                    let cardRank = inputCards[cardIndex] % 13 + 1
+                    let cardRank = inputCards[cardIndex] % 13
                     var resultTargetPos = 0
                     if let result = gameFunction(inputCards, args, rankRules, suitRules) {
                         if target == 0{
@@ -85,7 +87,7 @@ class GameManager {
                             resultTargetPos = result[result.count - 1]
                         }
                     }
-                    let resultPos = cardRank + resultTargetPos//起始发牌位置+目标输赢发牌位置
+                    let resultPos = (cardRank + resultTargetPos) % playerNum//起始发牌位置+目标输赢发牌位置
                     if resultPos == targetPos{
                         reportResult = cardIndex + 1
                         break
