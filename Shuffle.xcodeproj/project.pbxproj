@@ -284,14 +284,9 @@
 				A8D0D9352A24A4C20061A90E /* TexasPoker.swift */,
 				A88F20AF2A1DEE63005E4A27 /* TinyNineGame.swift */,
 				A812F9302A3DCD0800AA392F /* ThreeCardPokerGame.swift */,
-<<<<<<< HEAD
-=======
-				B03B7B292A963B7B006A0647 /* TexasPokerGame.swift */,
-				B03B7B302A97681D006A0647 /* PokerBullGame.swift */,
 				A8E0E2E42AADEF560091FC1D /* ThreeMenGame.swift */,
 				A8E0E2E62AADF6E20091FC1D /* TwoEightGangGame.swift */,
 				A8E0E2E82AADF9240091FC1D /* NinePointFiveGame.swift */,
->>>>>>> a1518f16ecad7ed34269469dddc9b99c590c6cbf
 			);
 			path = GameRules;
 			sourceTree = "<group>";

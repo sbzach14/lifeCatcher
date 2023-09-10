@@ -40,7 +40,11 @@ class GameManager {
         let gameFunctions: [Int: ([Int], [Int], [Int], [Int]) -> [Int]?] = [
             0: TexasPoker.FindWinner,
             1: PokerBull.FindWinner,
-            2: ThreeCardPokerGame.FindWinner
+            2: ThreeCardPokerGame.FindWinner,
+            3: TinyNineGame.FindWinner,
+            4: ThreeMenGame.FindWinner,
+            5: TwoEightGangGame.FindWinner,
+            6: NinePointFiveGame.FindWinner
         ]
 
         // 检查 gameIndex 是否存在于字典中

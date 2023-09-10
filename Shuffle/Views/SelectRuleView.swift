@@ -35,7 +35,7 @@ private func destinationView(for index: Int) -> some View {
     case 0:
         return AnyView(TexasPokerRuleSettingView())
     case 1:
-        return AnyView(EmptyView())
+        return AnyView(PokerBullSettingView())
     case 2:
         return AnyView(ThreeCardPokerGameRuleSettingView())
     case 3:
