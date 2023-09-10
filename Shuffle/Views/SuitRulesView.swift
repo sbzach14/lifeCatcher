@@ -3,57 +3,66 @@ import SwiftUI
 
 struct SuitRulesView: View {
     @Binding var suitRules: [Int]
-    
-    
+
+    @State private var draggedIndex: Int?
+    @State private var dragOffset: CGSize = .zero
+
     var body: some View {
         
-        ScrollView {
+        VStack{
             Divider()
-            VStack {
-                ForEach(suitRules.indices, id: \.self) { index in
-                    HStack {
-                        Text(GameManager.suitNames[suitRules[index]]!)
-                                .padding(.leading)
-                        
-                        Spacer()
-                        
-                        Button(action: {
-                            moveItemUp(index)
-                        }) {
-                            Image(systemName: "arrow.up")
-                                .font(.title)
-                                .padding(.trailing)
-                        }
-                        .frame(width: 20, height: 20)
-                        
-                        Button(action: {
-                            moveItemDown(index)
-                        }) {
-                            Image(systemName: "arrow.down")
-                                .font(.title)
-                                .padding(.trailing)
-                        }
-                        .frame(width: 20, height: 20)
-                    }
-                    .frame(width: 300, height: 30)
-                    
-                    Divider()
+            ForEach(suitRules.indices, id: \.self) { index in
+                HStack {
+                    Text(GameManager.suitNames[suitRules[index]]!)
+                            .padding(.leading)
                 }
+                .frame(width: 300, height: 30)
+                .background(draggedIndex == index ? Color.gray.opacity(0.6) : Color.clear)
+                .cornerRadius(10)
+                .offset(draggedIndex == index ? dragOffset : .zero)
+                .gesture(
+                    DragGesture()
+                        .onChanged { value in
+                            withAnimation {
+                                draggedIndex = index
+                                dragOffset = value.translation
+                            }
+                        }
+                        .onEnded { value in
+                            withAnimation {
+                                if let currentIndex = draggedIndex {
+                                    let newIndex = calculateNewIndex(value)
+                                    suitRules.move(fromOffsets: IndexSet(integer: currentIndex), toOffset: newIndex)
+                                }
+                                draggedIndex = nil
+                                dragOffset = .zero
+                            }
+                        }
+                )
+
+                Divider()
             }
+            Spacer()
         }
-        .frame(width: 300, height: 600)
-        .cornerRadius(10)
-        .border(Color.black, width: 2)
+        
     }
 
-    private func moveItemUp(_ index: Int) {
-        guard index > 0 else { return }
-        suitRules.swapAt(index, index - 1)
-    }
-    
-    private func moveItemDown(_ index: Int) {
-        guard index < suitRules.count - 1 else { return }
-        suitRules.swapAt(index, index + 1)
+    private func calculateNewIndex(_ value: DragGesture.Value) -> Int {
+        guard let draggedIndex = draggedIndex else { return 0 }
+        
+        // 初始化新的索引位置
+        var newIndex = draggedIndex
+        var offset = Int(dragOffset.height)
+        if offset > 0{
+            newIndex = newIndex + offset / 45 + 1
+            newIndex = min(newIndex, suitRules.count)
+        }
+        else{
+            newIndex = newIndex - (-offset) / 45
+            newIndex = max(newIndex, 0)
+        }
+        
+        return newIndex
     }
 }
 
