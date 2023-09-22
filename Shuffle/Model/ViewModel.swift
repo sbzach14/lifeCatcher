@@ -807,33 +807,33 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     var isDelete : Bool = true
                     
                     
-                    for cardCandicate in tempCardArray[existIndex]{
-                        
-                        var sameCardNumberList : [Int] = []
-                        
-                        if cardCandicate<52{
-                            let cardNumber = cardCandicate%13
-                            for suit in 0...3{
-                                let cardIndex = suit * 13 + cardNumber
-                                if cardIndex != cardCandicate  && self.allCardIndex.contains(cardIndex){
-                                    sameCardNumberList.append(cardIndex)
-                                }
-                            }
-                        }
-                        
-                        for newCardIndex in sameCardNumberList{
-                            if !tempCardArray.contains(where: {$0[0] == newCardIndex}) && !cardResult.contains(where: {$0.cardIndex[0] == newCardIndex}) && !lastCards.contains(where: {$0[0] == newCardIndex}){
-                                tempCardArray[existIndex].insert(newCardIndex, at: 0)
-                                isDelete = false
-                                print("result 删除已有的\(cardLabelDic[detectionResult.cardIndex[0]])替换为\(cardLabelDic[newCardIndex])index\(taskIndex)")
-                                break
-                            }
-                        }
-                        
-                        if !isDelete{
-                            break
-                        }
-                    }
+//                    for cardCandicate in tempCardArray[existIndex]{
+//                        
+//                        var sameCardNumberList : [Int] = []
+//                        
+//                        if cardCandicate<52{
+//                            let cardNumber = cardCandicate%13
+//                            for suit in 0...3{
+//                                let cardIndex = suit * 13 + cardNumber
+//                                if cardIndex != cardCandicate  && self.allCardIndex.contains(cardIndex){
+//                                    sameCardNumberList.append(cardIndex)
+//                                }
+//                            }
+//                        }
+//                        
+//                        for newCardIndex in sameCardNumberList{
+//                            if !tempCardArray.contains(where: {$0[0] == newCardIndex}) && !cardResult.contains(where: {$0.cardIndex[0] == newCardIndex}) && !lastCards.contains(where: {$0[0] == newCardIndex}){
+//                                tempCardArray[existIndex].insert(newCardIndex, at: 0)
+//                                isDelete = false
+//                                print("result 删除已有的\(cardLabelDic[detectionResult.cardIndex[0]])替换为\(cardLabelDic[newCardIndex])index\(taskIndex)")
+//                                break
+//                            }
+//                        }
+//                        
+//                        if !isDelete{
+//                            break
+//                        }
+//                    }
                     
                     
                     if isDelete{
@@ -849,34 +849,34 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     
                     var isDelete : Bool = true
                     
-                    for cardCandicate in detectionResult.cardIndex{
-                        
-                        var sameCardNumberList : [Int] = []
-                        
-                        if cardCandicate<52{
-                            let cardNumber = cardCandicate%13
-                            for suit in 0...3{
-                                let cardIndex = suit * 13 + cardNumber
-                                if cardIndex != cardCandicate && self.allCardIndex.contains(cardIndex){
-                                    sameCardNumberList.append(cardIndex)
-                                }
-                            }
-                        }
-                        
-                        for newCardIndex in sameCardNumberList{
-                            if !tempCardArray.contains(where: {$0[0] == newCardIndex}) && !cardResult.contains(where: {$0.cardIndex[0] == newCardIndex}) && !lastCards.contains(where: {$0[0] == newCardIndex}){
-                                detectionResult.cardIndex.insert(newCardIndex, at: 0)
-                                detectionResult.confidence = 0
-                                isDelete = false
-                                print("result 删除现在的\(cardLabelDic[tempCardArray[existIndex][0]])替换为\(cardLabelDic[newCardIndex])index\(taskIndex)")
-                                break
-                            }
-                        }
-                        
-                        if !isDelete{
-                            break
-                        }
-                    }
+//                    for cardCandicate in detectionResult.cardIndex{
+//
+//                        var sameCardNumberList : [Int] = []
+//
+//                        if cardCandicate<52{
+//                            let cardNumber = cardCandicate%13
+//                            for suit in 0...3{
+//                                let cardIndex = suit * 13 + cardNumber
+//                                if cardIndex != cardCandicate && self.allCardIndex.contains(cardIndex){
+//                                    sameCardNumberList.append(cardIndex)
+//                                }
+//                            }
+//                        }
+//
+//                        for newCardIndex in sameCardNumberList{
+//                            if !tempCardArray.contains(where: {$0[0] == newCardIndex}) && !cardResult.contains(where: {$0.cardIndex[0] == newCardIndex}) && !lastCards.contains(where: {$0[0] == newCardIndex}){
+//                                detectionResult.cardIndex.insert(newCardIndex, at: 0)
+//                                detectionResult.confidence = 0
+//                                isDelete = false
+//                                print("result 删除现在的\(cardLabelDic[tempCardArray[existIndex][0]])替换为\(cardLabelDic[newCardIndex])index\(taskIndex)")
+//                                break
+//                            }
+//                        }
+//
+//                        if !isDelete{
+//                            break
+//                        }
+//                    }
                     
                     if isDelete{
                         nextCards.append([-1])
