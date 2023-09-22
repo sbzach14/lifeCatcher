@@ -30,7 +30,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var cardArray :  [Int] = []
     @Published var winnerPlayer: [Int] = []
 
-    let model = try! cardDetection()
+    let model = try! cardDetection_913()
 
     
     // 创建一个后台队列
@@ -563,7 +563,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 speakText(input: "洗牌完成")
                 DispatchQueue.main.async{
                     self.changeCameraFrameRate(to: 60)
-                    //self.handleShuffleResult()
+//                    self.handleShuffleResult()
                     self.handleDetecResultList()
                     self.centerX = 0
                     
@@ -575,7 +575,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 }
             }
             else{
-                //self.appendCardToCardArray(cardResult: cardResult, taskIndex: taskIndex)
+//                self.appendCardToCardArray(cardResult: cardResult, taskIndex: taskIndex)
                 self.detectResultList.append(cardResult)
             }
         }

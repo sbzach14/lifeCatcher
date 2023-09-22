@@ -12,7 +12,7 @@ import Foundation
 
 class PokerBullRule : Rule{
     let setting: [Int: String] = [
-        0: "标准五张牛牛",
+        0: "标准五张牛牛(测试中请勿使用)",
         1: "标准四张牛牛",
         2: "标准三张牛牛",
         3: "自定义"
@@ -29,6 +29,9 @@ class PokerBullRule : Rule{
         54//1-k, 大小王
     ]
     let handNum :[Int] = [3,4,5]
+    let wayToDeal:[Int:String] = [
+        0:"一人发一张牌",
+        ]
     let isCompareSuit : [Int: String] = [
         0: "否",
         1: "是"
@@ -158,6 +161,7 @@ class PokerBullRule : Rule{
         39:"带♠️a的牛",
         40:"带♠️a的五花牛（有大小王）",
         41:"五小牛，五张牌的每一张牌都小于等于5并且总和小于10",
+        42:"高牌"
     ]
     override init(ruleIndex: Int, ruleName: String) {
         super.init(ruleIndex: ruleIndex, ruleName: ruleName)
@@ -343,6 +347,7 @@ class PokerBullGame {
     class PokerBullCard {
         var tenValue, JValue, QValue, KValue, BJokerValue, RJokerValue, ThreeValue, SixValue, SpadeA: Int
         var suit, rank1Value, rank2Value, trueRank: Int
+        
         var score: Int
         
         init(card: Card, numberChangeArray: [Int], isNoSuit: Int, jokerMinZero: Int) {
@@ -364,7 +369,7 @@ class PokerBullGame {
             if isNoSuit == 1 {
                 self.suit = 0
             } else {
-                self.suit = card.suit as! Int
+                self.suit = card.suit[0]
             }
             
 //            # rank1_value是用来组牛和计算点数时候的点数
@@ -388,6 +393,7 @@ class PokerBullGame {
                             self.rank1Value = 0
                             self.rank2Value = card.rank
                         } else if self.JValue == 1 {
+
                             self.rank1Value = 1
                             self.rank2Value = 1
                         } else if self.JValue == 2 {
@@ -399,6 +405,7 @@ class PokerBullGame {
                             self.rank1Value = 0
                             self.rank2Value = card.rank
                         } else if self.QValue == 1{
+
                             self.rank1Value = 1
                             self.rank2Value = 1
                         } else if self.QValue == 2{
@@ -413,6 +420,7 @@ class PokerBullGame {
                             self.rank1Value = 0
                             self.rank2Value = 13
                         } else if self.KValue == 1 {
+
                             self.rank1Value = 1
                             self.rank2Value = 1
                         } else if self.KValue == 2 {
@@ -466,7 +474,7 @@ class PokerBullGame {
                             self.rank1Value = -6
                             self.rank2Value = -6
                         }
-                    } else if card.rank == 1, card.suit as! Int == 3 {
+                    } else if card.rank == 1, card.suit[0] == 3 {
                         if self.SpadeA == 0 {
                             self.rank1Value = 1
                             self.rank2Value = 1
@@ -477,7 +485,7 @@ class PokerBullGame {
                     } else {
                         self.rank1Value = card.rank
                         self.rank2Value = card.rank
-                        self.suit = card.suit as! Int
+                        self.suit = card.suit[0]
                     }
             
                     self.score = self.rank2Value << 2 | self.suit
@@ -506,17 +514,17 @@ class PokerBullGame {
     static func calWinners(deck: [Card], args: [Int], rankRules: [Int]) -> [Int] {
         // 解析 args
         let playerNum = args[0]
-        let wayToDealCards = args[1]
-        let numberChangeArray = Array(args[2...11])
-        let bullRule = Array(args[11...20])
-        let sameBullPointComparision = args[20]
-        let fiveLittleComparision = args[21]
-        
+        let cardsNum = args[1]
+        let handNum = args[2]
+        let wayToDealCards = args[3]
+        let noSuit = args[4]
+        let fiveLittleComparision = args[5]
+        let sameBullPointComparision = args[6]
+        let jokerMinZero = args[7]
+        let numberChangeArray = Array(args[8...15])
+        let bullRule = Array(args[15...24])
 
-        let fiveLittleEqualToStraight = args[22] == 1
-        let noSuit = args[23]
-        let jokerMinZero = args[24]
-
+        let fiveLittleEqualToStraight = args[25] == 1
         // 组建bull deck
         let bullDeck: [PokerBullCard] = deck.map { PokerBullCard.init(card: $0, numberChangeArray: numberChangeArray, isNoSuit: noSuit, jokerMinZero: jokerMinZero) }
         var allPlayers: [BullPlayer] = (0..<playerNum).map { BullPlayer(playerIndex: $0) }
@@ -573,11 +581,11 @@ class BullHandEvaluator {
 //    # 0, 0 同牛同点比最大牌，无牛比最大牌,
 //    # 1 同牛同点比牛架后的两张, 无牛比最大
 //    # 2 同牛同点一样大，无牛一样大
-    static let BULLSECONDRANK = -1
+    static let BULLSECONDRANK = 0
 //    # 0, 五小一样大
 //    # 1, 五小谁小谁大
 //    # 2, 五小谁大谁大
-    static let FIVELITTLESECONDRANK = -1
+    static let FIVELITTLESECONDRANK = 0
 //    # 6, 顺子五小一样大
 
     static let STRAITEQUALFIVELITTLE = false
@@ -589,7 +597,7 @@ class BullHandEvaluator {
 //    # 9，Joker是最小的0
     static let JOKERISSMALLESTZERO = false
     // ... (other class properties)
-    static var bullRules: [Int] = []
+    static var bullRules: [Int] = [0]
     static var sameBullPointComparison: Int = 0
     static var fiveLittleComparison: Int = 0
     static var fiveLittleEqualToStraight: Bool = false
@@ -655,7 +663,8 @@ class BullHandEvaluator {
         38: isBullAPair,
         39: isBullWithSpadeA,
         40: isGoldBullWithSpadeA,
-        41: isFiveLittle
+        41: isFiveLittle,
+        42: isHighCard
             ]
     
     static var TEN_CARDS_RANK_RULE_DIC: [Int: ([PokerBullGame.PokerBullCard]) -> (Bool, Int)] = [:]
@@ -664,19 +673,13 @@ class BullHandEvaluator {
 
     
     static func evaluate(cards: [PokerBullGame.PokerBullCard], bullRules: [Int], inputSameBullPointComparision: Int, inputFiveLittleComparision: Int, inputFiveLittleEqualToStraight: Bool, rankRules: [Int]) -> Int {
-        
-        
-        
-        
-        
-        
             
         
         self.bullRules = bullRules
         self.sameBullPointComparison = inputSameBullPointComparision
         self.fiveLittleComparison = inputFiveLittleComparision
         self.fiveLittleEqualToStraight = inputFiveLittleEqualToStraight
-        var rank_rules: [Int] = rankRules
+        let rank_rules: [Int] = rankRules
         
 
         var funcs: [(_ cards: [PokerBullGame.PokerBullCard]) -> (Bool, Int)] = []
@@ -712,11 +715,13 @@ class BullHandEvaluator {
 //            # 不同判断牛的函数
 //            # TODO 组牛时候的多个值的变化
 //        ###################################################
+        // Tested
         static func anyThreeCardSumNten(cards: [PokerBullGame.PokerBullCard]) -> [[PokerBullGame.PokerBullCard]] {
             var bulls: [[PokerBullGame.PokerBullCard]] = []
-            
             for combination in cards.combinations(ofCount: 3) {
-                let sumOfCombination = combination.reduce(into: 0) { $0 + $1.rank1Value }
+                
+                let sumOfCombination = sumAllBullCard(combination: combination, rank: 1)
+                print("cal bull ",sumOfCombination)
                 if sumOfCombination % 10 == 0 {
                     bulls.append(Array(combination))
                 }
@@ -724,7 +729,7 @@ class BullHandEvaluator {
             
             return bulls
         }
-
+        //Tested
         static func threeCard(cards: [PokerBullGame.PokerBullCard]) -> [[PokerBullGame.PokerBullCard]] {
             var counts: [Int: [PokerBullGame.PokerBullCard]] = [:]
             var bulls: [[PokerBullGame.PokerBullCard]] = []
@@ -737,31 +742,32 @@ class BullHandEvaluator {
             }
             return bulls
         }
-
+        //Tested
         static func totalEqualToN10(cards: [PokerBullGame.PokerBullCard]) -> [[PokerBullGame.PokerBullCard]] {
-            let sum = cards.reduce(into: 0) { $0 + $1.rank1Value }
-            
+            let sum = sumAllBullCard(combination: cards, rank: 1)
+            print("sum", sum)
             if sum % 10 == 0 {
                 return [cards]
             }
-            
             return []
         }
+        //tested
         static func threeCardStraight(cards: [PokerBullGame.PokerBullCard]) -> [[PokerBullGame.PokerBullCard]] {
             var bulls: [[PokerBullGame.PokerBullCard]] = []
             
             for combination in cards.combinations(ofCount: 3) {
                 let sortedCombination = combination.sorted(by: { (card1, card2) -> Bool in
-                    return card1.rank2Value < card2.rank2Value
+                    return card1.trueRank < card2.trueRank
                 })
-                if sortedCombination[0].rank2Value + 2 == sortedCombination[1].rank2Value + 1 &&
-                   sortedCombination[1].rank2Value + 1 == sortedCombination[2].rank2Value {
+                if sortedCombination[0].trueRank + 2 == sortedCombination[1].trueRank + 1 &&
+                   sortedCombination[1].trueRank + 1 == sortedCombination[2].trueRank {
                     bulls.append(sortedCombination)
                 }
             }
             
             return bulls
         }
+        //Tested
         static func onlyJKQAJoker(cards: [PokerBullGame.PokerBullCard]) -> [[PokerBullGame.PokerBullCard]] {
             var bulls: [[PokerBullGame.PokerBullCard]] = []
             var combination: [PokerBullGame.PokerBullCard] = []
@@ -778,12 +784,13 @@ class BullHandEvaluator {
             
             return bulls
         }
-
+        //tested
         static func threeRankOneCard(cards: [PokerBullGame.PokerBullCard]) -> [[PokerBullGame.PokerBullCard]] {
             var bulls: [[PokerBullGame.PokerBullCard]] = []
             
             for combination in cards.combinations(ofCount: 3) {
-                let sumOfCombination = combination.reduce(into: 0) { $0 + ($1.rank2Value == 1 ? 1 : 0) }
+                let sumOfCombination = sumAllBullCard(combination: combination, rank: 1)
+                print(sumOfCombination)
                 if sumOfCombination == 3 {
                     bulls.append(Array(combination))
                 }
@@ -791,32 +798,32 @@ class BullHandEvaluator {
             
             return bulls
         }
-
+        //Tested
         static func fiveCardsSumLessThanTen(cards: [PokerBullGame.PokerBullCard]) -> [[PokerBullGame.PokerBullCard]] {
             var bulls: [[PokerBullGame.PokerBullCard]] = []
             
-            if cards.reduce(into: 0, { $0 + $1.rank2Value }) <= 10 {
+            if sumAllBullCard(combination: cards,rank: 2) <= 10 {
                 bulls.append(cards)
             }
             
             return bulls
         }
-
+        // Tested
         static func fiveCardsSumLessThanNine(cards: [PokerBullGame.PokerBullCard]) -> [[PokerBullGame.PokerBullCard]] {
             var bulls: [[PokerBullGame.PokerBullCard]] = []
             
-            if cards.reduce(into: 0, { $0 + $1.rank2Value }) < 10 {
+            if sumAllBullCard(combination: cards,rank: 2) < 10 {
                 bulls.append(cards)
             }
             
             return bulls
         }
-
+        //Tested
         static func anyThreeCardSumNtenOverTwenty(cards: [PokerBullGame.PokerBullCard]) -> [[PokerBullGame.PokerBullCard]] {
             var bulls: [[PokerBullGame.PokerBullCard]] = []
             
             for combination in cards.combinations(ofCount: 3) {
-                let sumOfCombination = combination.reduce(0) { $0 + $1.rank1Value }
+                let sumOfCombination = sumAllBullCard(combination: combination, rank: 1)
                 if sumOfCombination % 10 == 0 && sumOfCombination > 20 {
                     bulls.append(Array(combination))
                 }
@@ -828,6 +835,7 @@ class BullHandEvaluator {
 //        ###########################################################
 //        #所有的3张牌的牌型判断
 //        # ################################
+    //Tested
     static func isThreeCardTHR(cards: [PokerBullGame.PokerBullCard]) -> (Bool, Int) {
         var counts: [Int: Int] = [:]
         for card in cards {
@@ -835,12 +843,12 @@ class BullHandEvaluator {
         }
         
         if counts.count == 1 {
-            return (true, counts[cards[0].trueRank]!)
+            return (true, cards[0].rank2Value)
         } else {
             return (false, 0)
         }
     }
-
+    //Tested
     static func isJQKTHR(cards: [PokerBullGame.PokerBullCard]) -> (Bool, Int) {
         var mutableCards = cards
         mutableCards.sort(by: { $0.trueRank < $1.trueRank })
@@ -851,9 +859,9 @@ class BullHandEvaluator {
             }
             firstRank += 1
         }
-        return (true, cards.last!.score)
+        return (true, mutableCards.last!.score)
     }
-
+    //Tested
     static func isQJTENTHR(cards: [PokerBullGame.PokerBullCard]) -> (Bool, Int) {
         var mutableCards = cards // 创建可变副本
         mutableCards.sort(by: { $0.trueRank < $1.trueRank })
@@ -867,18 +875,19 @@ class BullHandEvaluator {
         return (true, mutableCards.last!.score)
     }
 
-
+    //Tested
     static func isSumEqualToTenTHR(cards: [PokerBullGame.PokerBullCard]) -> (Bool, Int) {
-        if cards.reduce(into: 0, { $0 + $1.rank2Value }) == 10 {
+        if sumAllBullCard(combination: cards, rank: 1) == 10 {
             return (true, self.rankForMaxCard(cards: cards))
         }
         return (false, 0)
     }
-
+    
+    //Tested
     static func isStraightFlushTHR(cards: [PokerBullGame.PokerBullCard]) -> (Bool, Int) {
         return isStraightFlush(cards: cards)
     }
-
+    //Tested
     static func isStraightTHR(cards: [PokerBullGame.PokerBullCard]) -> (Bool, Int) {
         return isStratght(cards: cards)
     }
@@ -886,16 +895,17 @@ class BullHandEvaluator {
     //五张牌牌型判断
     //######################################
     
-    
+    //Tested
     static func isCardsSumLargerOrEqualForty(cards: [PokerBullGame.PokerBullCard]) -> (Bool, Int) {
-        if cards.reduce(into: 0) { $0 + $1.rank2Value } < 40 {
+        print(sumAllBullCard(combination: cards, rank: 2))
+        if sumAllBullCard(combination: cards, rank: 2) < 40 {
                 return (false, 0)
             } else {
                 let rank = rankForMaxCard(cards: cards)
                 return (true, rank)
             }
         }
-        
+    //Tested
     static func isFourcard(cards: [PokerBullGame.PokerBullCard]) -> (Bool, Int) {
         var counts: [Int: Int] = [:]
         
@@ -908,24 +918,25 @@ class BullHandEvaluator {
         
         return (false, 0)
     }
-    
+    //Tested
     static func isFiveCardsSumLessOrEqualTen(cards: [PokerBullGame.PokerBullCard]) -> (Bool, Int) {
-        if cards.reduce(into: 0) { $0 + $1.rank2Value } > 10 {
+        if sumAllBullCard(combination: cards, rank: 2) > 10 {
             return (false, 0)
         } else {
             if self.FIVELITTLESECONDRANK == 0 {
                 return (true, 0)
             } else if self.FIVELITTLESECONDRANK == 1 {
-                return (true, cards.reduce(0) { $0 + $1.rank2Value })
+                return (true, sumAllBullCard(combination: cards, rank: 2))
             } else if self.FIVELITTLESECONDRANK == 2 {
-                return (true, ~cards.reduce(into: 0) { $0 + $1.rank2Value })
+                return (true, ~sumAllBullCard(combination: cards, rank: 2))
             }
         }
         return (false, 0)
     }
-    
+    //Tested
     static func isFiveCardsSumEqualsToTwentyAndHaveBulls(cards: [PokerBullGame.PokerBullCard]) -> (Bool, Int) {
-        if cards.reduce(into: 0) { $0 + $1.rank2Value } == 20 && isBull(cards: cards).0 {
+        print(isBull(cards: cards).0)
+        if sumAllBullCard(combination: cards, rank: 2) == 20 && isBull(cards: cards).0 {
             let rank = rankForMaxCard(cards: cards)
             return (true, rank)
         } else {
@@ -1075,6 +1086,7 @@ class BullHandEvaluator {
         
         for index in self.bullRules {
             let bullFunc = self.IS_BULL_DIC[index]!
+            
             let bulls = bullFunc(cards)
             if !bulls.isEmpty {
                 allbulls.append(bulls)
@@ -1088,18 +1100,18 @@ class BullHandEvaluator {
         for bulls in allbulls {
             for bull in bulls {
                 if bull.count == 5 {
-                    bullRank = bull.reduce(0) { $0 + $1.rank2Value } % 10
+                    bullRank = sumAllBullCard(combination: bull, rank: 1) % 10
                 }
                 if bull.count == 3 {
                     var otherCards: [PokerBullGame.PokerBullCard] = []
                     for card in cards {
-                        if !bull.contains(where: {$0 as! AnyHashable == card as! AnyHashable}) {
+                        if hasCard(combination: bull, searchCard: card) == false {
                             otherCards.append(card)
                         }
                     }
                     var cardsRank = 0
                     for item in otherCards {
-                        cardsRank += item.rank2Value
+                        cardsRank += item.rank1Value
                     }
                     cardsRank = cardsRank % 10
                     if cardsRank > bullRank {
@@ -1830,15 +1842,13 @@ class BullHandEvaluator {
         return (true, rank)
     }
     
-    static func isHighCard(cards: [PokerBullGame.PokerBullCard]) -> Bool {
-        if self.NOBULLRANKTOPTWO == true {
-            return true
-        }
-        return false
+    static func isHighCard(cards: [PokerBullGame.PokerBullCard]) -> (Bool, Int) {
+        
+        return (true, rankForMaxCard(cards: cards))
     }
 
     // ... (other rank rule functions)
-
+    //
     static func rankForMaxCard(cards: [PokerBullGame.PokerBullCard]) -> Int {
             let sortedCards = sortBullCardsFromHighToLow(cards: cards)
             let rank = sortedCards[0].score
@@ -1852,4 +1862,31 @@ class BullHandEvaluator {
         static func sortBullCardsFromLowToHigh(cards: [PokerBullGame.PokerBullCard]) -> [PokerBullGame.PokerBullCard] {
             return cards.sorted { $0.score < $1.score }
         }
+    static func sumAllBullCard(combination:[PokerBullGame.PokerBullCard], rank: Int) -> Int{
+        var sum:Int = 0
+        for card in combination{
+            if rank == 1{
+                sum += card.rank1Value
+
+            } else if rank == 2{
+                sum += card.rank2Value
+
+            } else if rank == 3{
+                sum += card.trueRank
+            }
+        }
+        return sum
+    }
+    
+    static func hasCard(combination: [PokerBullGame.PokerBullCard], searchCard: PokerBullGame.PokerBullCard)-> Bool{
+        for card in combination{
+            if card.trueRank == searchCard.trueRank && card.suit == searchCard.suit{
+                return true
+            }
+        }
+        
+        return false
+    }
+    
+    
 }

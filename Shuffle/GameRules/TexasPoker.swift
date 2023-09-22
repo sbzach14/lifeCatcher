@@ -2,6 +2,16 @@
 import Foundation
 
 class TexasPokerRule : Rule{
+    //Test to be deleted
+    static let testCardLabelDic : [Int:String] = [
+        0: "♠️A ", 1: "♠️2 ", 2: "♠️3 ", 3: "♠️4 ", 4: "♠️5 ", 5: "♠️6 ", 6: "♠️7 ", 7: "♠️8 ", 8: "♠️9 ", 9: "♠️10 ",
+        10: "♠️J ", 11: "♠️Q ", 12: "♠️K ", 13: "♥️A ", 14: "♥️2 ", 15: "♥️3 ", 16: "♥️4 ", 17: "♥️5 ", 18: "♥️6 ",
+        19: "♥️7 ", 20: "♥️8 ", 21: "♥️9 ", 22: "♥️10 ", 23: "♥️J ", 24: "♥️Q ", 25: "♥️K ", 26: "♣️A ", 27: "♣️2 ",
+        28: "♣️3 ", 29: "♣️4 ", 30: "♣️5 ", 31: "♣️6 ", 32: "♣️7 ", 33: "♣️8 ", 34: "♣️9 ", 35: "♣️10 ", 36: "♣️J ",
+        37: "♣️Q ", 38: "♣️K ", 39: "♦️A ", 40: "♦️2 ", 41: "♦️3 ", 42: "♦️4 ", 43: "♦️5 ", 44: "♦️6", 45: "♦️7",
+        46: "♦️8 ", 47: "♦️9 ", 48: "♦️10 ", 49: "♦️J ", 50: "♦️Q ", 51: "♦️K ", 52: "none", 53: "小王", 54: "大王"
+    ]
+    //Test to be deleted
     let setting: [Int: String] = [
         0: "标准",
         1: "短牌",
@@ -43,10 +53,6 @@ class TexasPokerRule : Rule{
             0: "高牌"
         ]
     }
-
-    
-    
-
 }
 
 //德州扑克
@@ -194,7 +200,9 @@ class TexasPokerGame {
             }
         }
         
+        
         for i in 0..<playerNum {
+            
             allPlayCards[i].evaluateFlag = HandEvaluator.evalHand(cards: allPlayCards[i].playerCard, community: community, isCompareSuit: isCompareSuit, isAceStraight: isAceStraight, minRank: minRank, handUseType: handUseType, handUseNum: handUseNum, rankRules: rankRules)
         }
         
@@ -216,7 +224,27 @@ class TexasPokerGame {
 class HandEvaluator {
     
     static func evalHand(cards: [Card], community: [Card], isCompareSuit: Bool, isAceStraight: Bool, minRank: Int, handUseType: Int, handUseNum: Int, rankRules: [Int]) -> Int {
+        let suitRules :[Int] = [3,2,1,0]
+
+        var handCardsString:String = ""
+        for handCard in cards{
+            handCardsString += TexasPokerRule.testCardLabelDic[handCard.rank
+                                                               - 1 + suitRules[handCard.suit[0]]*13]!
+        }
+        print("手牌：", handCardsString, "A顺子：", isAceStraight)
+        var communityCardsString: String = ""
+        for communityCard in community{
+            communityCardsString += TexasPokerRule.testCardLabelDic[communityCard.rank - 1 + suitRules[communityCard.suit[0]] * 13]!
+        }
+        print("公共牌：", communityCardsString)
+        
         let (cardsLength, allSortedCards) = sortCards(cards: cards, community: community, handUseType: handUseType, handUseNum: handUseNum, isAceStraight: isAceStraight, minRank: minRank)
+        var sortedString:String = ""
+        for sortedcard in allSortedCards[0]{
+            sortedString += TexasPokerRule.testCardLabelDic[sortedcard.rank - 1 + suitRules[sortedcard.suit[0]] * 13]!
+        }
+        
+        print("排序后的牌 ", sortedString," length: ", cardsLength)
         
         var maxScore = 0
         for sortedCards in allSortedCards {
@@ -231,27 +259,34 @@ class HandEvaluator {
     static func sortCards(cards: [Card], community: [Card], handUseType: Int, handUseNum: Int, isAceStraight: Bool, minRank: Int) -> (Int, [[Card]]) {
         var allCards = [[Card]]()
         var cardsLength = 0
+        var cardCopy:[Card] = []
+        var communityCopy:[Card] = []
         
         for card in cards {
-            if card.rank == 1 {
-                card.rank = 14
+            var copy:Card = Card(suit: card.suit, rank: card.rank)
+            if copy.rank == 1 {
+                copy.rank = 14
             }
+            cardCopy.append(copy)
         }
         
         for card in community {
-            if card.rank == 1 {
-                card.rank = 14
+            var copy:Card = Card(suit: card.suit, rank: card.rank)
+
+            if copy.rank == 1 {
+                copy.rank = 14
             }
+            communityCopy.append(copy)
         }
         
         if handUseType == 0 {
-            allCards.append(cards + community)
-            cardsLength = cards.count + community.count
+            allCards.append(cardCopy + communityCopy)
+            cardsLength = cardCopy.count + communityCopy.count
         } else if handUseType == 1 {
             cardsLength = 5
             let communityNum = 5 - handUseNum
-            let handCombinations = cards.combinations(ofCount: handUseNum)
-            let communityCombinations = community.combinations(ofCount: communityNum)
+            let handCombinations = cardCopy.combinations(ofCount: handUseNum)
+            let communityCombinations = communityCopy.combinations(ofCount: communityNum)
             
             for handCombination in handCombinations {
                 if communityNum != 0 {
@@ -266,8 +301,8 @@ class HandEvaluator {
             cardsLength = 5
             for handNum in 1...handUseNum {
                 let communityNum = 5 - handNum
-                let handCombinations = cards.combinations(ofCount: handNum)
-                let communityCombinations = community.combinations(ofCount: communityNum)
+                let handCombinations = cardCopy.combinations(ofCount: handNum)
+                let communityCombinations = communityCopy.combinations(ofCount: communityNum)
                 
                 for handCombination in handCombinations {
                     if communityNum != 0 {
@@ -280,6 +315,7 @@ class HandEvaluator {
                 }
             }
         }
+        var returnAllCards = [[Card]]()
         
         for var cardsList in allCards {
             if isAceStraight {
@@ -294,9 +330,10 @@ class HandEvaluator {
             cardsList.sort(by: { card1, card2 in
                 return Card.calScore(card: card1) > Card.calScore(card: card2)
             })
+            returnAllCards.append(cardsList)
         }
         
-        return (cardsLength, allCards)
+        return (cardsLength, returnAllCards)
     }
     
     static func calcHandInfoFlg(sortedCards: [Card], isCompareSuit: Bool, rankRules: [Int], cardsLength: Int) -> Int {
@@ -324,6 +361,7 @@ class HandEvaluator {
             }
             if rankResult != 0 {
                 rankResult |= rankFlag
+                print("判断结果 ", ruleIndex)
                 break
             }
         }
@@ -339,7 +377,7 @@ class HandEvaluator {
             var straightHeadRank = 0
             
             for i in 0..<cards.count {
-                if cards[i].suit as! Int == suit {
+                if cards[i].suit[0]  == suit {
                     rankList.append(cards[i].rank)
                 }
             }
@@ -372,9 +410,7 @@ class HandEvaluator {
         
         return rank
     }
-    
-    // Rest of the HandEvaluator methods...
-    
+        
     static func evalFourCard(cards: [Card], cardsLength: Int) -> Int {
             var rank = 0
             for i in 0...(cardsLength - 4) {
@@ -430,7 +466,7 @@ class HandEvaluator {
             for suit in [3, 2, 1, 0] {
                 var cnt = 0
                 for i in 0..<cardsLength {
-                    if cards[i].suit as! Int == suit && cnt < 5 {
+                    if cards[i].suit[0] == suit && cnt < 5 {
                         cnt += 1
                         rank = rank << 4 | cards[i].rank
                     }
@@ -467,7 +503,7 @@ class HandEvaluator {
             if rank != 0 {
                 for card in cards {
                     if card.rank == rank {
-                        rank = rank << 2 | (card.suit as! Int)
+                        rank = rank << 2 | (card.suit[0])
                         break
                     }
                 }
@@ -484,7 +520,7 @@ class HandEvaluator {
             for i in 0..<(cardsLength - 2) {
                 if cards[i].rank == cards[i+1].rank && cards[i].rank == cards[i+2].rank {
                     threeCardRank = cards[i].rank
-                    threeCardSuit = cards[i].suit as! Int
+                    threeCardSuit = cards[i].suit[0]
                     break
                 }
             }
@@ -514,7 +550,7 @@ class HandEvaluator {
                 var cnt = 1
                 var straightHeadRank = 0
                 for card in cards {
-                    if card.suit as! Int == suit {
+                    if card.suit[0] == suit {
                         cardList.append(card)
                     }
                 }
@@ -587,7 +623,7 @@ class HandEvaluator {
                 }
                 for card in cards {
                     if card.rank == rank {
-                        rank = rank << 2 | (card.suit as! Int)
+                        rank = rank << 2 | (card.suit[0])
                         break
                     }
                 }
@@ -601,7 +637,7 @@ class HandEvaluator {
             for suit in [3, 2, 1, 0] {
                 var cnt = 0
                 for i in 0..<cardsLength {
-                    if cards[i].suit as! Int == suit && cnt < 3 {
+                    if cards[i].suit[0] == suit && cnt < 3 {
                         cnt += 1
                         cardList.append(cards[i])
                         rank = rank << 4 | cards[i].rank
@@ -638,7 +674,7 @@ class HandEvaluator {
                 if cards[i].rank == cards[i+1].rank {
                     if firstPairRank == 0 {
                         firstPairRank = cards[i].rank
-                        firstPairSuit = cards[i].suit as! Int
+                        firstPairSuit = cards[i].suit[0]
                     } else {
                         secondPairRank = cards[i].rank
                         break
@@ -666,7 +702,7 @@ class HandEvaluator {
             for i in 0..<(cardsLength - 1) {
                 if cards[i].rank == cards[i + 1].rank {
                     pairRank = cards[i].rank
-                    pairSuit = cards[i].suit as! Int
+                    pairSuit = cards[i].suit[0]
                     rankList.append(pairRank)
                     break
                 }
@@ -693,7 +729,7 @@ class HandEvaluator {
             for i in 0..<5 {
                 rank = rank << 4 | cards[i].rank
             }
-            rank = rank << 2 | (cards[0].suit as! Int)
+            rank = rank << 2 | (cards[0].suit[0])
             return rank
         }
 }

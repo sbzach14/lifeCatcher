@@ -78,7 +78,7 @@ class GameManager {
                     }
                     let resultPos = (cardRank + resultTargetPos) % playerNum//起始发牌位置+目标输赢发牌位置
                     if resultPos == targetPos{//targetPos 0 - playerNum-1
-                        reportResult = cardIndex + 1
+                        reportResult = cardIndex
                         break
                     }
                 }
@@ -97,7 +97,7 @@ class GameManager {
                     }
                     let resultPos = (cardRank + resultTargetPos) % playerNum//起始发牌位置+目标输赢发牌位置
                     if resultPos == targetPos{
-                        reportResult = cardIndex + 1
+                        reportResult = cardIndex
                         break
                     }
                 }

@@ -22,6 +22,7 @@ struct PokerBullSettingView: View {
     @State private var setting : Int = 0
     @State private var playerNum: Int = 0
     @State private var handNum: Int = 2
+    @State private var wayToDeal: Int = 0
     @State private var cardsNum: Int = 5
     @State private var isCompareSuit: Int = 1
     @State private var fiveLittleRank: Int = 0
@@ -57,6 +58,7 @@ struct PokerBullSettingView: View {
         RankRulesSate(index: 2, isChecked: true),
         RankRulesSate(index: 1, isChecked: true),
         RankRulesSate(index: 0, isChecked: true)]
+    @State private var args: [Int] = []
 
     @State private var navigateToSuitRules = false
     @State private var navigateToRankRules = false
@@ -208,8 +210,23 @@ struct PokerBullSettingView: View {
                             .frame(maxWidth: .infinity, alignment: .trailing)
                             .padding(.trailing, 60) // 右侧间距
                         }
+                        
                         HStack{
-                            Text("五小大小比较")
+                            Text("发牌方式")
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.leading, 60) // 左侧间距
+                            Picker("wayToDeal", selection: $wayToDeal) {
+                                ForEach(0...selectedRule.wayToDeal.count - 1, id: \.self) { index in
+                                    Text(String(selectedRule.wayToDeal[index]!)).tag(index)
+                                }
+                            }
+                            .pickerStyle(MenuPickerStyle())
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .padding(.trailing, 60) // 右侧间距
+                        }
+                        
+                        HStack{
+                            Text("是否比较花色")
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.leading, 60) // 左侧间距
                             Picker("isCompareSuit", selection: $isCompareSuit) {
@@ -234,7 +251,7 @@ struct PokerBullSettingView: View {
                             .frame(maxWidth: .infinity, alignment: .trailing)
                             .padding(.trailing, 60) // 右侧间距
                         }
-                        
+                        Group{
                         if(cardsNum == 6 || cardsNum == 1 || cardsNum == 4){
                             HStack{
                                 Text("大王的点数")
@@ -352,7 +369,6 @@ struct PokerBullSettingView: View {
                             }
                         }//包含J,Q,K
                         // 3, 6, SpadeAValue
-                        Group{
                             HStack{
                                 Text("♠️A的点数")
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -448,8 +464,6 @@ struct PokerBullSettingView: View {
                             )
                         }
                     }//setting = 3,自定义
-                    
-                    
                 }//VStack
             }//ScrollView
             
@@ -465,8 +479,26 @@ struct PokerBullSettingView: View {
                     showAlertWithMessage()
                 }
                 else {
+                    //organize the args
+                    args = [
+                        selectedRule.playerNum[playerNum], selectedRule.cardsNum[cardsNum],
+                        selectedRule.handNum[handNum],
+                        wayToDeal,
+                        isCompareSuit,
+                        fiveLittleRank,
+                        secondRankRule,
+                        jokerIsMinZero,
+                        tenValueRange,
+                        JValueRange,
+                        QValueRange,
+                        KValueRange,
+                        threeValueRange,
+                        sixValueRange,
+                        spadeAValueRange] + bullrulelist + [0]
                     navigateToMainContent = true
                 }
+                
+                
                 
             }) {
                 Text("Start")
@@ -484,21 +516,7 @@ struct PokerBullSettingView: View {
                     )
                 }.background(
                     NavigationLink(
-                        destination: MainContentView(shuffleMode: shuffleMode,calModeArgs:[calMode, target, targetPos], ruleIndex: selectedRule.ruleIndex, args : [
-                            selectedRule.playerNum[playerNum], selectedRule.cardsNum[cardsNum],
-                            selectedRule.handNum[handNum],
-                            isCompareSuit,
-                            fiveLittleRank,
-                            secondRankRule,
-                            jokerIsMinZero,
-                            tenValueRange,
-                            JValueRange,
-                            QValueRange,
-                            KValueRange,
-                            threeValueRange,
-                            sixValueRange,
-                            spadeAValueRange,
-                        ], rankRules : GameManager.getCheckedIndexes(rankRules: rankRules), suitRules: suitRules, allCardIndex: PokerBull.GetAllCardIndex(), minCardNum: PokerBull.GetMinCardNum(playerNum: playerNum, handNum: handNum)),
+                        destination: MainContentView(shuffleMode: shuffleMode,calModeArgs:[calMode, target, targetPos], ruleIndex: selectedRule.ruleIndex, args : args, rankRules : GameManager.getCheckedIndexes(rankRules: rankRules), suitRules: suitRules, allCardIndex: PokerBull.GetAllCardIndex(), minCardNum: PokerBull.GetMinCardNum(playerNum: playerNum, handNum: handNum)),
                         isActive: $navigateToMainContent,
                         label: EmptyView.init
                     )
@@ -519,23 +537,27 @@ struct PokerBullSettingView: View {
         if(setting == 0)
         {
             isCompareSuit = 1
-            
             suitRules = [3,2,1,0]
+            wayToDeal = 0
+            fiveLittleRank = 0
+            secondRankRule = 0
+            jokerIsMinZero = 0
+            tenValueRange = 0
+            JValueRange = 0
+            QValueRange = 0
+            KValueRange = 0
+            threeValueRange = 0
+            sixValueRange = 0
+            spadeAValueRange = 0
+            bullrulelist = [0]
             rankRules = [
-                RankRulesSate(index: 13, isChecked: false),
-                RankRulesSate(index: 12, isChecked: true),
-                RankRulesSate(index: 11, isChecked: false),
-                RankRulesSate(index: 10, isChecked: false),
-                RankRulesSate(index: 9, isChecked: false),
-                RankRulesSate(index: 8, isChecked: false),
-                RankRulesSate(index: 7, isChecked: false),
-                RankRulesSate(index: 6, isChecked: true),
-                RankRulesSate(index: 5, isChecked: false),
-                RankRulesSate(index: 4, isChecked: true),
-                RankRulesSate(index: 3, isChecked: true),
-                RankRulesSate(index: 2, isChecked: false),
+                RankRulesSate(index: 41, isChecked: true),
                 RankRulesSate(index: 1, isChecked: true),
-                RankRulesSate(index: 0, isChecked: true)
+                RankRulesSate(index: 11, isChecked: true),
+                RankRulesSate(index: 12, isChecked: true),
+                RankRulesSate(index: 9, isChecked: true),
+                RankRulesSate(index: 10, isChecked: true),
+                RankRulesSate(index: 42, isChecked: true),
             ]
         }
         //标准四张牛牛
