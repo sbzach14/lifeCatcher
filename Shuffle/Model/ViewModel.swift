@@ -492,7 +492,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         
         
         
-        let result = try! model.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: 0.15)
+        let result = try! model.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: 0.25)
         let cardResult = getCard(from: result.confidence, from: result.coordinates)
         
         if cardResult[0].cardIndex[0] == self.stateCard[0] && cardResult[1].cardIndex[0] == self.stateCard[1]{
@@ -585,7 +585,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             let cgImage = CIContext().createCGImage(modelCIImage, from: modelCIImage.extent)
             let savedUIImage = UIImage(cgImage: cgImage!)
             UIImageWriteToSavedPhotosAlbum(savedUIImage, self, #selector(self.imageSaved(_:didFinishSavingWithError:contextInfo:)), nil)
-            print("检测结果：[\(cardLabelDic[cardResult[0].cardIndex[0]] ?? "none"),\(cardLabelDic[cardResult[1].cardIndex[0]] ?? "none")]")
+            print("检测结果：[\(cardLabelDic[cardResult[0].cardIndex[0]] ?? "none"),Confidence: \(cardResult[0].confidence),ConfidencePercent: \(cardResult[0].confidencePercent),\(cardLabelDic[cardResult[1].cardIndex[0]] ?? "none"), Confidence: \(cardResult[1].confidence), ConfidencePercent: \(cardResult[1].confidencePercent)]")
         }
     }
     
@@ -698,35 +698,69 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 
                 //同时插入
                 if (nodeType0 == 2 || nodeType0 == 4) && (nodeType1 == 2 || nodeType1 == 4){
-                    let nowRank0 = [4,2].firstIndex(of: nodeType0)!
-                    let nowRank1 = [4,2].firstIndex(of: nodeType1)!
-                    let nextRank0 = [1,4,0].firstIndex(of: nextNodeType0)!
-                    let nextRank1 = [1,4,0].firstIndex(of: nextNodeType1)!
+                    //取连续四帧
+                    let firstNode1 = self.detectResultList[detectResultListIndex - 1][0]
+                    let firstNode2 = self.detectResultList[detectResultListIndex - 1][1]
                     
-                    if nextRank0 < nextRank1{
+                    let detectResultNode1 = self.detectResultList[detectResultListIndex][0]
+                    let detectResultNode2 = self.detectResultList[detectResultListIndex][1]
+                    let thirdNode1 = self.detectResultList[detectResultListIndex + 1][0]
+                    let thirdNode2 = self.detectResultList[detectResultListIndex + 1][1]
+                    let forthNode1 = self.detectResultList[detectResultListIndex + 2][0]
+                    let forthNode2 = self.detectResultList[detectResultListIndex + 2][1]
+                    
+                    if detectResultNode1.confidence <= 0.65 && (firstNode1.confidence -  detectResultNode1.confidence >= 0.05) && detectResultNode1.nodeType == 4{
                         self.cardArray.insert(nowNum0, at: 0)
                         self.cardArray.insert(nowNum1, at: 0)
-                    }
-                    else if nextRank0 > nextRank1{
+                        
+                    } else if detectResultNode2.confidence <= 0.65 && (firstNode2.confidence - detectResultNode2.confidence >= 0.05) && detectResultNode2.nodeType == 4{
+                        self.cardArray.insert(nowNum1, at: 0)
+                        self.cardArray.insert(nowNum0, at: 0)
+                    } else if thirdNode1.confidence <= 0.65 && (forthNode1.confidence - thirdNode1.confidence >= 0.05) && thirdNode1.nodeType == 1{
+                        self.cardArray.insert(nowNum1, at: 0)
+                        self.cardArray.insert(nowNum0, at: 0)
+                    } else if thirdNode2.confidence <= 0.65 && (forthNode2.confidence - thirdNode2.confidence >= 0.05) && thirdNode2.nodeType == 1{
+                        self.cardArray.insert(nowNum0, at: 0)
+                        self.cardArray.insert(nowNum1, at: 0)
+                    } else if Double.random(in: 0..<1) < 0.5{
+                        self.cardArray.insert(nowNum0, at: 0)
+                        self.cardArray.insert(nowNum1, at: 0)
+                    } else{
                         self.cardArray.insert(nowNum1, at: 0)
                         self.cardArray.insert(nowNum0, at: 0)
                     }
-                    else if nowRank0 < nowRank0{
-                        self.cardArray.insert(nowNum0, at: 0)
-                        self.cardArray.insert(nowNum1, at: 0)
-                    }
-                    else if nowRank0 > nowRank1{
-                        self.cardArray.insert(nowNum1, at: 0)
-                        self.cardArray.insert(nowNum0, at: 0)
-                    }
-                    else if Double.random(in: 0..<1) < 0.5{
-                        self.cardArray.insert(nowNum0, at: 0)
-                        self.cardArray.insert(nowNum1, at: 0)
-                    }
-                    else{
-                        self.cardArray.insert(nowNum1, at: 0)
-                        self.cardArray.insert(nowNum0, at: 0)
-                    }
+                    
+//                    let nowRank0 = [4,2].firstIndex(of: nodeType0)!
+//                    let nowRank1 = [4,2].firstIndex(of: nodeType1)!
+//                    let nextRank0 = [1,4,0].firstIndex(of: nextNodeType0)!
+//                    let nextRank1 = [1,4,0].firstIndex(of: nextNodeType1)!
+//
+//                    if nextRank0 < nextRank1{
+//                        self.cardArray.insert(nowNum0, at: 0)
+//                        self.cardArray.insert(nowNum1, at: 0)
+//                    }
+//                    else if nextRank0 > nextRank1{
+//                        self.cardArray.insert(nowNum1, at: 0)
+//                        self.cardArray.insert(nowNum0, at: 0)
+//                    }
+//                    else if nowRank0 < nowRank0{
+//                        self.cardArray.insert(nowNum0, at: 0)
+//                        self.cardArray.insert(nowNum1, at: 0)
+//                    }
+//                    else if nowRank0 > nowRank1{
+//                        self.cardArray.insert(nowNum1, at: 0)
+//                        self.cardArray.insert(nowNum0, at: 0)
+//                    }
+//                    else if Double.random(in: 0..<1) < 0.5{
+//                        self.cardArray.insert(nowNum0, at: 0)
+//                        self.cardArray.insert(nowNum1, at: 0)
+//                    }
+//                    else{
+//                        self.cardArray.insert(nowNum1, at: 0)
+//                        self.cardArray.insert(nowNum0, at: 0)
+//                    }
+                    
+                    
                 }
                 //单个插入
                 else{
