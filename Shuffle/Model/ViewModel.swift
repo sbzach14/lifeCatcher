@@ -30,7 +30,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var cardArray :  [Int] = []
     @Published var winnerPlayer: [Int] = []
 
-    let model = try! cardDetection_913()
+    let model = try! cardDetection_quantilized()
 
     
     // 创建一个后台队列
@@ -99,6 +99,9 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     var isMute: Bool = false
     var isBackCamera: Bool = false
     var isContrastAug: Bool = false
+    var cameraFrameRate: Int = 0
+    
+    var testCVPixelBuffer : CVPixelBuffer?
 
 
     func initialize(shuffleMode : Int, calModeArgs : [Int], ruleIndex: Int, args : [Int], rankRules : [Int], suitRules : [Int], allCardIndex : [Int], minCardNum : Int) {
@@ -193,6 +196,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             output.setSampleBufferDelegate(self, queue: DispatchQueue.main)
             session.addOutput(output)
             
+            session.sessionPreset = .iFrame960x540
             
             // 设置帧率为120帧
             guard let format = self.captureDevice.formats.first(where: { format in
@@ -211,7 +215,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 self.captureDevice.activeVideoMaxFrameDuration = CMTime(value: 1, timescale: Int32(format.videoSupportedFrameRateRanges.first!.maxFrameRate))
                 
                 // 设置更短的曝光时间（更快的快门速度）
-                let desiredExposureDuration: CMTime = CMTimeMake(value: 1, timescale: 200) // 1/1000 秒
+                //let desiredExposureDuration: CMTime = CMTimeMake(value: 1, timescale: 200) // 1/1000 秒
 
                 captureDevice.exposureMode = .continuousAutoExposure
 
@@ -226,7 +230,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             let videoFrameRate = format.videoSupportedFrameRateRanges.first!.maxFrameRate
             print("设定帧率: \(videoFrameRate)")
 
-            changeCameraFrameRate(to: 60)
+            changeCameraFrameRate(to: 120)
         } catch {
             print("配置前置摄像头时发生错误: \(error)")
         }
@@ -235,13 +239,20 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     func startCamera() {
         
         session.startRunning()
+        print("开启相机")
     }
     
     func stopCamera() {
+        if let inputs = session.inputs as? [AVCaptureDeviceInput] {
+            for input in inputs {
+                session.removeInput(input)
+            }
+        }
         session.stopRunning()
+        print("关闭相机")
     }
     
-    func changeCameraFrameRate(to frameRate: Float) {
+    func changeCameraFrameRate(to frameRate: Int) {
         guard let device = captureDevice else {
             print("相机设备未初始化")
             return
@@ -253,6 +264,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             device.activeVideoMinFrameDuration = CMTime(value: 1, timescale: Int32(frameRate))
             device.activeVideoMaxFrameDuration = CMTime(value: 1, timescale: Int32(frameRate))
             device.unlockForConfiguration()
+            cameraFrameRate = frameRate
             print("设置帧率为: \(frameRate)")
         }catch {
             print("设置帧率时发生错误: \(error)")
@@ -290,7 +302,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         let ciImage = imageFromSampleBuffer(sampleBuffer)!
         
         backgroundQueue.async {
-            if self.isContrastAug{
+            if !self.isBlack && (self.cameraFrameRate < 60 || self.taskIndex % 4 == 0){
                 do{
                     let cgImage = self.context.createCGImage(ciImage, from: ciImage.extent)!
                     let cgImageFormat = vImage_CGImageFormat(
@@ -327,39 +339,30 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 //                                                      1, 2, 1]
 //                    vImageConvolve_ARGB8888(&destinationBuffer, &destinationBuffer, nil, 0, 0, convolutionKernel, 3, 3, 16, [0], vImage_Flags(kvImageEdgeExtend))
                     
-                    if !self.isBlack{
-                        var outputCGImage : CGImage
-                        if ciImage.extent.size.width > ciImage.extent.size.height{
-                            // 进行顺时针旋转90度
-                            var rotatedBuffer = try! vImage_Buffer(width: Int(vImageBuffer.height),
-                                                                   height: Int(vImageBuffer.width),
-                                                                   bitsPerPixel: 32) // 32 bits for ARGB
-                            vImageRotate90_ARGB8888(&vImageBuffer, &rotatedBuffer, UInt8(kRotate90DegreesClockwise), [0], vImage_Flags(kvImageNoFlags))
-                            
-                            outputCGImage = try rotatedBuffer.createCGImage(format: cgImageFormat)
-                            rotatedBuffer.free()
-                        }
-                        else{
-                            outputCGImage = try vImageBuffer.createCGImage(format: cgImageFormat)
-                        }
+                    
+                    var outputCGImage : CGImage
+                    if ciImage.extent.size.width > ciImage.extent.size.height{
+                        // 进行顺时针旋转90度
+                        var rotatedBuffer = try! vImage_Buffer(width: Int(vImageBuffer.height),
+                                                               height: Int(vImageBuffer.width),
+                                                               bitsPerPixel: 32) // 32 bits for ARGB
+                        vImageRotate90_ARGB8888(&vImageBuffer, &rotatedBuffer, UInt8(kRotate90DegreesClockwise), [0], vImage_Flags(kvImageNoFlags))
                         
-                        DispatchQueue.main.async {
-                            self.cameraImage = outputCGImage
-                        }
+                        outputCGImage = try rotatedBuffer.createCGImage(format: cgImageFormat)
+                        rotatedBuffer.free()
+                    }
+                    else{
+                        outputCGImage = try vImageBuffer.createCGImage(format: cgImageFormat)
                     }
                     
-                    let modelCGImage = try vImageBuffer.createCGImage(format: cgImageFormat)
-                    let modelCIImage = CIImage(cgImage: modelCGImage)
+                    DispatchQueue.main.async {
+                        self.cameraImage = outputCGImage
+                    }
+                    
                     
                     vImageBuffer.free()
                     //destinationBuffer.free()
                     
-                    if !self.isShowCard{
-                        self.detectionQueue.async {
-                            let cvPixelBuffer = createCVPixelBuffer(ciImage: modelCIImage, targetSize: CGSize(width: 960, height: 544))!
-                            self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex)
-                        }
-                    }
                 }
                 
                 catch{
@@ -367,31 +370,35 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 }
                 
             }
-            else{
-                if !self.isBlack{
-                    var translatedImage = ciImage
-                    if ciImage.extent.size.width > ciImage.extent.size.height{
-                        let rotationTransform = CGAffineTransform(rotationAngle: -.pi / 2)  // 顺时针旋转90度
-                        let rotatedImage = ciImage.transformed(by: rotationTransform)
-                        
-                        let xOffset = ciImage.extent.size.height
-                        let translationTransform = CGAffineTransform(translationX: xOffset, y: CGFloat(0))
-                        translatedImage = rotatedImage.transformed(by: translationTransform)
-                    }
-                    let cgImage = self.context.createCGImage(translatedImage, from: translatedImage.extent)
-                    DispatchQueue.main.async {
-                        self.cameraImage = cgImage
-                    }
-                }
+            
+//            if !self.isBlack{
+//                    var translatedImage = ciImage
+//                    if ciImage.extent.size.width > ciImage.extent.size.height{
+//                        let rotationTransform = CGAffineTransform(rotationAngle: -.pi / 2)  // 顺时针旋转90度
+//                        let rotatedImage = ciImage.transformed(by: rotationTransform)
+//
+//                        let xOffset = ciImage.extent.size.height
+//                        let translationTransform = CGAffineTransform(translationX: xOffset, y: CGFloat(0))
+//                        translatedImage = rotatedImage.transformed(by: translationTransform)
+//                    }
+//                    let cgImage = self.context.createCGImage(translatedImage, from: translatedImage.extent)
+//                    DispatchQueue.main.async {
+//                        self.cameraImage = cgImage
+//                    }
+//            }
                 
-                if !self.isShowCard{
+            if !self.isShowCard{
+                
+                self.detectionQueue.async {
+                    let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: 960, height: 544))!
+                    self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex)
+//                        if self.testCVPixelBuffer == nil{
+//                            self.testCVPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: 960, height: 544))!
+//                        }
+//                        self.processImageOrigin(self.testCVPixelBuffer!, taskIndex: myIndex)
                     
-                    self.detectionQueue.async {
-                        let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: 960, height: 544))!
-                        self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex)
-                        
-                        
-                    }
+                    
+                    
                 }
             }
         }
@@ -637,7 +644,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 for detectResultListIndex in 0..<self.detectResultList.count{
                     for numIndex in 0..<self.detectResultList[detectResultListIndex].count{
                         let nowNum = self.detectResultList[detectResultListIndex][numIndex].cardIndex[0]
-                        let confidence = self.detectResultList[detectResultListIndex][numIndex].confidencePercent
+                        let confidence = self.detectResultList[detectResultListIndex][numIndex].confidence
                         if nowNum == key && confidence > self.confidenceDic[nowNum]! {
                             self.confidenceDic[nowNum] = confidence
                             nodeIndex = [detectResultListIndex, numIndex]
