@@ -580,13 +580,13 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
         
-//        if self.state == "shuffle"{
-//            let modelCIImage = CIImage(cvPixelBuffer: pixelBuffer)
-//            let cgImage = CIContext().createCGImage(modelCIImage, from: modelCIImage.extent)
-//            let savedUIImage = UIImage(cgImage: cgImage!)
-//            UIImageWriteToSavedPhotosAlbum(savedUIImage, self, #selector(self.imageSaved(_:didFinishSavingWithError:contextInfo:)), nil)
-//            print("检测结果：[\(cardLabelDic[cardResult[0].cardIndex[0]] ?? "none"),\(cardLabelDic[cardResult[1].cardIndex[0]] ?? "none")]")
-//        }
+        if self.state == "shuffle"{
+            let modelCIImage = CIImage(cvPixelBuffer: pixelBuffer)
+            let cgImage = CIContext().createCGImage(modelCIImage, from: modelCIImage.extent)
+            let savedUIImage = UIImage(cgImage: cgImage!)
+            UIImageWriteToSavedPhotosAlbum(savedUIImage, self, #selector(self.imageSaved(_:didFinishSavingWithError:contextInfo:)), nil)
+            print("检测结果：[\(cardLabelDic[cardResult[0].cardIndex[0]] ?? "none"),\(cardLabelDic[cardResult[1].cardIndex[0]] ?? "none")]")
+        }
     }
     
     
