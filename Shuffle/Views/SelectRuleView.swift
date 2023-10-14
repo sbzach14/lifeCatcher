@@ -3,6 +3,17 @@ import SwiftUI
 struct SelectRuleView: View {
     @State private var searchText = ""
     @State private var selectedRuleIndex: Int? = nil
+    private var GameImageDic:[Int:String] = [
+        0:"德州",
+        1:"牛牛",
+        2:"炸金花",
+        3:"小九",
+        4:"三公",
+        5:"二八杠",
+        6:"九点半",
+    ]
+        
+    
     
     var body: some View {
         VStack {
@@ -15,18 +26,26 @@ struct SelectRuleView: View {
                         NavigationLink(
                             destination: destinationView(for: index)
                         ) {
-                            VStack(alignment: .leading) {
+                            VStack(alignment: .center,spacing: 30) {
                                 if let rule = GameManager.gameRules[index] {
-                                    Text(rule.ruleName)
+                                    Text("                                 ")
+                                        .foregroundColor(.none)
                                 }
                                 Divider()
-                            }
+                                    .colorInvert()
+                            }.background(Image(GameImageDic[index]!).resizable().scaledToFill())
                             .padding()
                         }
                     }
                 }
             }
-        }.navigationBarTitle("Select Rules")
+        }
+        .background(
+            Image("bg")
+                .resizable()
+                .scaledToFill()
+        )
+        .navigationBarTitle("玩法选择")
     }
 }
 

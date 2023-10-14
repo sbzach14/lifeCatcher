@@ -32,18 +32,28 @@ struct RecordHistoryView: View {
                                 ) {
                                     HStack {
                                         Text(key)
+                                            .foregroundColor(.white)
                                         Spacer()
                                         Text("\(value)")
+                                            .foregroundColor(.white)
                                         
                                     }
                                     .padding()
+                                    Divider()
+                                        .colorInvert()
                                 }
                             }
                         }
                     }
                 }
             }
-        }.navigationBarTitle("Record History")
+        }
+        .background(
+            Image("bg")
+                .resizable()
+                .scaledToFill()
+        )
+        .navigationBarTitle("记录历史")
         .onAppear {
             // Show the navigation bar when this view appears
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {

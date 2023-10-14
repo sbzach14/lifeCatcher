@@ -28,38 +28,44 @@ struct SettingView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0)  {
                             HStack {
-                                Text("isBlack")
-                                    .foregroundColor(.primary)
+                                Text("黑屏")
+                                    .foregroundColor(.white)
                                     .padding()
                                 Spacer()
                                 Toggle("", isOn: $viewModel.isBlack)
+                                    .toggleStyle(CustomToggleStyle())
                                     .padding()
                             }
                             Divider()
+                                .foregroundColor(.white)
 
                             HStack {
-                                Text("isMute")
-                                    .foregroundColor(.primary)
+                                Text("静音")
+                                    .foregroundColor(.white)
                                     .padding()
 
                                 Spacer()
 
                                 Toggle("", isOn: $viewModel.isMute)
+                                    .toggleStyle(CustomToggleStyle())
                                     .padding()
                             }
                             Divider()
+                                .foregroundColor(.white)
 
                             HStack {
-                                Text("isBackCamera")
-                                    .foregroundColor(.primary)
+                                Text("后置相机")
+                                    .foregroundColor(.white)
                                     .padding()
 
                                 Spacer()
 
                                 Toggle("", isOn: $viewModel.isBackCamera)
+                                    .toggleStyle(CustomToggleStyle())
                                     .padding()
                             }
                             Divider()
+                                .foregroundColor(.white)
                         
 //                            HStack {
 //                                Text("isAug")
@@ -76,10 +82,12 @@ struct SettingView: View {
                             NavigationLink(
                                 destination: InfoView(activeDate: viewModel.activeDate)
                             ) {
-                                Text("Info")
-                                .padding()
+                                Text("信息")
+                                    .foregroundColor(.white)
+                                    .padding()
                             }
                             Divider()
+                            .colorInvert()
                         
                             
                      }
@@ -88,7 +96,12 @@ struct SettingView: View {
             .onDisappear{
                 viewModel.saveChanges()
             }
-            .navigationBarTitle("Setting")
+            .background(
+                Image("bg")
+                    .resizable()
+                    .scaledToFill()
+            )
+            .navigationBarTitle("设置")
     }
 }
 

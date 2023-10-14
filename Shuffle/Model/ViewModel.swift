@@ -31,6 +31,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var winnerPlayer: [Int] = []
 
     let model = try! cardDetection_s_1014()
+
     
 
 
@@ -483,7 +484,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 }
                 return
             }
-            
             else if frameCounter > 600 && frameCounter < 800{
                 return
             }

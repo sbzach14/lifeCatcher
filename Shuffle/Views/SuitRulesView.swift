@@ -12,11 +12,30 @@ struct SuitRulesView: View {
         VStack{
             Divider()
             ForEach(suitRules.indices, id: \.self) { index in
-                HStack {
+                HStack() {
+                    if index == 0{
+                        Image("icon_list_onlydown").resizable()
+                            .frame(width: 30, height: 55)
+                            .alignmentGuide(.top) { d in d[.top] }
+                            .foregroundColor(.white)
+                            .offset(y:10)
+                    } else if index == (suitRules.count - 1){
+                        Image("icon_list_onlyup").resizable()
+                            .frame(width: 30, height: 55)
+                            .alignmentGuide(.top) { d in d[.top] }
+                            .foregroundColor(.white)                         .offset(y:-10)
+
+                    } else {
+                        Image("icon_list").resizable()
+                            .frame(width: 30, height: 80)
+                            .alignmentGuide(.top) { d in d[.top] }
+                            .foregroundColor(.white)
+                    }
+                    Spacer()
                     Text(GameManager.suitNames[suitRules[index]]!)
-                            .padding(.leading)
+                        .padding(.leading).foregroundColor(.white)
                 }
-                .frame(width: 300, height: 30)
+                .frame(width: 300, height: 80)
                 .background(draggedIndex == index ? Color.gray.opacity(0.6) : Color.clear)
                 .cornerRadius(10)
                 .offset(draggedIndex == index ? dragOffset : .zero)
@@ -40,10 +59,16 @@ struct SuitRulesView: View {
                         }
                 )
 
-                Divider()
+                Divider().colorInvert()
             }
             Spacer()
         }
+        .navigationTitle("花色设置")
+        .background(
+            Image("bg")
+                .resizable()
+                .scaledToFill()
+        )
         
     }
 
