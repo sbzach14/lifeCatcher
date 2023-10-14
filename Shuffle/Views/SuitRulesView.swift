@@ -31,13 +31,15 @@ struct SuitRulesView: View {
                             .alignmentGuide(.top) { d in d[.top] }
                             .foregroundColor(.white)
                     }
-                    Spacer()
+                    
                     Text(GameManager.suitNames[suitRules[index]]!)
-                        .padding(.leading).foregroundColor(.white)
+                        .padding(.leading, 20)
+                        .foregroundColor(.white)
+                    
+                    Spacer()
                 }
-                .frame(width: 300, height: 80)
+                .frame(height: 50)
                 .background(draggedIndex == index ? Color.gray.opacity(0.6) : Color.clear)
-                .cornerRadius(10)
                 .offset(draggedIndex == index ? dragOffset : .zero)
                 .gesture(
                     DragGesture()
@@ -59,7 +61,6 @@ struct SuitRulesView: View {
                         }
                 )
 
-                Divider().colorInvert()
             }
             Spacer()
         }

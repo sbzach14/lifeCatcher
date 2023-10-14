@@ -73,9 +73,9 @@ struct TexasPokerRuleSettingView: View {
                     
                         }
                         .pickerStyle(MenuPickerStyle())
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                        .padding(.trailing, 60)
-                        .accentColor(.white) // 右侧间距
+                        .frame(width: 160, height: 30, alignment: .trailing)
+                        .padding(.trailing, 30) // 右侧间距
+                        .accentColor(.white)
                     }
                     
                     HStack
@@ -93,8 +93,8 @@ struct TexasPokerRuleSettingView: View {
                     
                         }
                         .pickerStyle(MenuPickerStyle())
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                        .padding(.trailing, 60) // 右侧间距
+                        .frame(width: 160, height: 30, alignment: .trailing)
+                        .padding(.trailing, 30) // 右侧间距
                         .accentColor(.white)
                     }
                     
@@ -112,8 +112,8 @@ struct TexasPokerRuleSettingView: View {
                                 Text("报最小家位置").tag(1)
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60) // 右侧间距
+                            .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30) // 右侧间距
                             .accentColor(.white)
                         }
                     }
@@ -132,8 +132,8 @@ struct TexasPokerRuleSettingView: View {
                                 Text("报切几张目标位置最小").tag(1)
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60) // 右侧间距
+                            .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30) // 右侧间距
                             .accentColor(.white)
                         }
                         
@@ -148,8 +148,8 @@ struct TexasPokerRuleSettingView: View {
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60) // 右侧间距
+                            .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30) // 右侧间距
                         }
                     }
                     
@@ -168,8 +168,8 @@ struct TexasPokerRuleSettingView: View {
                             }
                         }
                         .pickerStyle(MenuPickerStyle())
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                        .padding(.trailing, 60) // 右侧间距
+                        .frame(width: 160, height: 30, alignment: .trailing)
+                        .padding(.trailing, 30) // 右侧间距
                         .accentColor(.white)
                     }
                     
@@ -188,8 +188,8 @@ struct TexasPokerRuleSettingView: View {
                             }
                         }
                         .pickerStyle(MenuPickerStyle())
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                        .padding(.trailing, 60) // 右侧间距
+                        .frame(width: 160, height: 30, alignment: .trailing)
+                        .padding(.trailing, 30) // 右侧间距
                         .accentColor(.white)
                         .onChange(of: setting) { _ in
                             handleSettingChange()
@@ -211,8 +211,8 @@ struct TexasPokerRuleSettingView: View {
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60) // 右侧间距
+                            .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30) // 右侧间距
                         }
                         
                         HStack
@@ -226,8 +226,8 @@ struct TexasPokerRuleSettingView: View {
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60) // 右侧间距
+                            .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30) // 右侧间距
                         }
                         
                         HStack {
@@ -240,8 +240,8 @@ struct TexasPokerRuleSettingView: View {
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60) // 右侧间距
+                            .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30) // 右侧间距
                         }
                         
                         HStack
@@ -255,8 +255,8 @@ struct TexasPokerRuleSettingView: View {
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60) // 右侧间距
+                            .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30) // 右侧间距
                         }
                         
                         HStack
@@ -270,12 +270,9 @@ struct TexasPokerRuleSettingView: View {
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60) // 右侧间距
+                            .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30) // 右侧间距
                         }
-                        
-                        
-                        
                         
                         
                         HStack
@@ -289,8 +286,8 @@ struct TexasPokerRuleSettingView: View {
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60) // 右侧间距
+                            .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30) // 右侧间距
                         }
                         
                         if(handUseType != 0)
@@ -306,8 +303,8 @@ struct TexasPokerRuleSettingView: View {
                                     }
                                 }
                                 .pickerStyle(MenuPickerStyle())
-                                .frame(maxWidth: .infinity, alignment: .trailing)
-                                .padding(.trailing, 60) // 右侧间距
+                                .frame(width: 160, height: 30, alignment: .trailing)
+                                .padding(.trailing, 30) // 右侧间距
                             }
                         }
                         
@@ -328,7 +325,7 @@ struct TexasPokerRuleSettingView: View {
                                     .cornerRadius(10)
                                     .frame(width: 40, height: 40) // 设置正方形大小
                             }
-                            .padding(.trailing, 60)
+                            .padding(.trailing, 30)
                             .background(
                                 NavigationLink(
                                     destination: RankRulesView(rankRules: $rankRules, selectedRuleIndex: selectedRule.ruleIndex),
@@ -358,7 +355,7 @@ struct TexasPokerRuleSettingView: View {
                                         .cornerRadius(10)
                                         .frame(width: 40, height: 40) // 设置正方形大小
                                 }
-                                .padding(.trailing, 60)
+                                .padding(.trailing, 30)
                                 .background(
                                     NavigationLink(
                                         destination: SuitRulesView(suitRules: $suitRules),
