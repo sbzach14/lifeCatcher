@@ -60,9 +60,12 @@ struct ThreeCardPokerGameRuleSettingView: View {
                     
                     HStack
                     {
+                        Image("icon_rulesetting_item")
+                            .resizable()
+                            .frame(width: 40, height: 40).padding(.leading, 20)
                         Text("洗牌模式")
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.leading, 60) // 左侧间距
+                            .foregroundColor(.white) // 左侧间距
                         Picker("shuffleMode", selection: $shuffleMode) {
                             Text("洗牌").tag(0)
                             Text("拨到顶").tag(1)
@@ -71,14 +74,17 @@ struct ThreeCardPokerGameRuleSettingView: View {
                         }
                         .pickerStyle(MenuPickerStyle())
                         .frame(maxWidth: .infinity, alignment: .trailing)
-                        .padding(.trailing, 60) // 右侧间距
+                        .padding(.trailing, 60).accentColor(.white) // 右侧间距
                     }
                     
                     HStack
                     {
+                        Image("icon_rulesetting_item")
+                            .resizable()
+                            .frame(width: 40, height: 40).padding(.leading, 20)
                         Text("打色模式")
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.leading, 60) // 左侧间距
+                            .foregroundColor(.white) // 左侧间距
                         Picker("calMode", selection: $calMode) {
                             Text("切牌").tag(0)
                             Text("去色").tag(1)
@@ -87,46 +93,57 @@ struct ThreeCardPokerGameRuleSettingView: View {
                         }
                         .pickerStyle(MenuPickerStyle())
                         .frame(maxWidth: .infinity, alignment: .trailing)
-                        .padding(.trailing, 60) // 右侧间距
+                        .padding(.trailing, 60).accentColor(.white) // 右侧间距
                     }
                     
                     
                     if calMode == 0{
                         HStack
                         {
+                            Image("icon_rulesetting_item")
+                                .resizable()
+                                .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("报牌模式")
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.leading, 60) // 左侧间距
+                                .foregroundColor(.white) // 左侧间距
                             Picker("target", selection: $target) {
                                 Text("报最大位置").tag(0)
                                 Text("报最小位置").tag(1)
                             }
                             .pickerStyle(MenuPickerStyle())
                             .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60) // 右侧间距
+                            .padding(.trailing, 60).accentColor(.white) // 右侧间距
                         }
                     }
                     
                     else{
                         HStack
                         {
+                            Image("icon_rulesetting_item")
+                                .resizable()
+                                .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("报牌模式")
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.leading, 60) // 左侧间距
+                                .foregroundColor(.white) // 左侧间距
                             Picker("target", selection: $target) {
                                 Text("报切几张目标位置最大").tag(0)
                                 Text("报切几张目标位置最小").tag(1)
                             }
                             .pickerStyle(MenuPickerStyle())
                             .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60) // 右侧间距
+                            .padding(.trailing, 60).accentColor(.white
+                            ) // 右侧间距
                         }
                         
                         HStack
                         {
+                            Image("icon_rulesetting_item")
+                                .resizable()
+                                .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("目标位置")
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.leading, 60) // 左侧间距
+                                .foregroundColor(.white
+                                ) // 左侧间距
                             Picker("targetPos", selection: $targetPos) {
                                 ForEach(1...selectedRule.playerNum[playerNum], id: \.self) { index in
                                     Text(String(index)).tag(index)
@@ -134,7 +151,8 @@ struct ThreeCardPokerGameRuleSettingView: View {
                             }
                             .pickerStyle(MenuPickerStyle())
                             .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60) // 右侧间距
+                            .padding(.trailing, 60).accentColor(.white
+                            ) // 右侧间距
                         }
                     }
 
@@ -142,9 +160,12 @@ struct ThreeCardPokerGameRuleSettingView: View {
 
                     HStack
                     {
+                        Image("icon_rulesetting_item")
+                            .resizable()
+                            .frame(width: 40, height: 40).padding(.leading, 20)
                         Text("玩家数量")
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.leading, 60) // 左侧间距
+                            .foregroundColor(.white) // 左侧间距
                         Picker("playerNum", selection: $playerNum) {
                             ForEach(0...selectedRule.playerNum.count - 1, id: \.self) { index in
                                 Text(String(selectedRule.playerNum[index])).tag(index)
@@ -152,14 +173,18 @@ struct ThreeCardPokerGameRuleSettingView: View {
                         }
                         .pickerStyle(MenuPickerStyle())
                         .frame(maxWidth: .infinity, alignment: .trailing)
-                        .padding(.trailing, 60) // 右侧间距
+                        .padding(.trailing, 60).accentColor(.white
+                        ) // 右侧间距
                     }
                     
                     HStack
                     {
+                        Image("icon_rulesetting_item")
+                            .resizable()
+                            .frame(width: 40, height: 40).padding(.leading, 20)
                         Text("设置模版")
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.leading, 60) // 左侧间距
+                            .foregroundColor(.white) // 左侧间距
                         Picker("setting", selection: $setting) {
                             ForEach(0...selectedRule.setting.count - 1, id: \.self) {
                                 index in
@@ -168,7 +193,7 @@ struct ThreeCardPokerGameRuleSettingView: View {
                         }
                         .pickerStyle(MenuPickerStyle())
                         .frame(maxWidth: .infinity, alignment: .trailing)
-                        .padding(.trailing, 60) // 右侧间距
+                        .padding(.trailing, 60).accentColor(.white) // 右侧间距
                         .onChange(of: setting) { _ in
                             handleSettingChange()
                         }
@@ -179,10 +204,12 @@ struct ThreeCardPokerGameRuleSettingView: View {
                         if(true)
                         {
                             HStack
-                            {
+                            {Image("icon_rulesetting_item")
+                                    .resizable()
+                                    .frame(width: 40, height: 40).padding(.leading, 20)
                                 Text("手牌数量")
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                    .padding(.leading, 60) // 左侧间距
+                                    .foregroundColor(.white) // 左侧间距
                                 Picker("handNum", selection: $handNum) {
                                     ForEach(0...selectedRule.handNum.count - 1, id: \.self) { index in
                                         Text(String(selectedRule.handNum[index])).tag(index)
@@ -190,7 +217,7 @@ struct ThreeCardPokerGameRuleSettingView: View {
                                 }
                                 .pickerStyle(MenuPickerStyle())
                                 .frame(maxWidth: .infinity, alignment: .trailing)
-                                .padding(.trailing, 60) // 右侧间距
+                                .padding(.trailing, 60).accentColor(.white) // 右侧间距
                             }
                             
                             HStack {
@@ -514,7 +541,7 @@ struct ThreeCardPokerGameRuleSettingView: View {
                 )
                 .hidden()
             )
-        }.navigationTitle("Rule Setting")
+        }.navigationTitle("Rule Setting").background(Image("bg").resizable().scaledToFill())
     }
     
     private func showAlertWithMessage() {
