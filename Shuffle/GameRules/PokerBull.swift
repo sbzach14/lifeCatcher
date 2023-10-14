@@ -531,17 +531,17 @@ class PokerBullGame {
         
         // 发牌
         if wayToDealCards == 0 {
-            for i in 0..<(playerNum * 5) {
+            for i in 0..<(playerNum * handNum) {
                 allPlayers[i % playerNum].insertCard(card: bullDeck[i])
             }
         }
         if wayToDealCards == 1 {
-            for i in 0..<5 {
+            for i in 0..<handNum {
                 allPlayers[i % playerNum].insertCard(card: bullDeck[i])
             }
             allPlayers.sort { $0.playerCard[0].rank2Value > $1.playerCard[0].rank2Value }
-            for i in 0..<((playerNum - 1) * 5) {
-                allPlayers[i % playerNum].insertCard(card: bullDeck[i + 5])
+            for i in 0..<((playerNum - 1) * handNum) {
+                allPlayers[i % playerNum].insertCard(card: bullDeck[i + handNum])
             }
         }
         if wayToDealCards == 2 {

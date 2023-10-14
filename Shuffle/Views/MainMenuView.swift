@@ -1,10 +1,4 @@
-//
-//  SwiftUIView.swift
-//  Shuffle
-//
-//  Created by Zhangyi Chen on 7/30/23.
-//  Copyright © 2023 Apple. All rights reserved.
-//
+
 
 import SwiftUI
 
@@ -21,8 +15,10 @@ struct MainMenuView: View {
                             destination: VisionObjectRecognitionView()
                         ) {
                             VStack(alignment: .leading) {
-                                Text("Recording")
+                                Text("开始记录")
+                                    .foregroundColor(.white)
                                 Divider()
+                                    .colorInvert()
                             }
                             .padding()
                         }
@@ -30,8 +26,10 @@ struct MainMenuView: View {
                             destination: RecordHistoryView()
                         ) {
                             VStack(alignment: .leading) {
-                                Text("History")
+                                Text("记录历史")
+                                    .foregroundColor(.white)
                                 Divider()
+                                    .colorInvert()
                             }
                             .padding()
                         }
@@ -39,14 +37,23 @@ struct MainMenuView: View {
                             destination: SettingView()
                         ) {
                             VStack(alignment: .leading) {
-                                Text("Setting")
+                                Text("设置")
+                                    .foregroundColor(.white)
                                 Divider()
+                                    .colorInvert()
                             }
                             .padding()
                         }
                     }
                 }
-            }.navigationBarTitle("Main Menu")
+            }
+            .navigationBarTitle("记录此刻")
+            .background(
+                Image("bg")
+                    .resizable()
+                    .scaledToFill()
+            )
+            
         }
     }
 }
@@ -64,13 +71,14 @@ struct SearchBar: View {
     @Binding var searchText: String
     
     var body: some View {
-        HStack {
-            Image(systemName: "magnifyingglass")
-                .foregroundColor(.gray)
-            
-            TextField("Search", text: $searchText)
+        ZStack {
+            TextField("       Search", text: $searchText)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .disableAutocorrection(true)
+            
+            Image(systemName: "magnifyingglass")
+                .foregroundColor(.gray)
+                .offset(x: -180)
             
             if !searchText.isEmpty {
                 Button(action: {

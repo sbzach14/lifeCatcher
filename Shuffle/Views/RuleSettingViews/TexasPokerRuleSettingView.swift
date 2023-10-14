@@ -60,9 +60,12 @@ struct TexasPokerRuleSettingView: View {
                 VStack {
                     HStack
                     {
+                        Image("icon_shufflemode")
+                            .resizable()
+                            .frame(width: 40, height: 40).padding(.leading, 20)
                         Text("洗牌模式")
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.leading, 60) // 左侧间距
+                            .foregroundColor(.white) // 左侧间距
                         Picker("shuffleMode", selection: $shuffleMode) {
                             Text("洗牌").tag(0)
                             Text("拨到顶").tag(1)
@@ -71,14 +74,18 @@ struct TexasPokerRuleSettingView: View {
                         }
                         .pickerStyle(MenuPickerStyle())
                         .frame(maxWidth: .infinity, alignment: .trailing)
-                        .padding(.trailing, 60) // 右侧间距
+                        .padding(.trailing, 60)
+                        .accentColor(.white) // 右侧间距
                     }
                     
                     HStack
                     {
+                        Image("icon_cutmode")
+                            .resizable()
+                            .frame(width: 40, height: 40).padding(.leading, 20)
                         Text("打色模式")
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.leading, 60) // 左侧间距
+                            .foregroundColor(.white) // 左侧间距
                         Picker("calMode", selection: $calMode) {
                             Text("不打色").tag(0)
                             Text("去色").tag(1)
@@ -88,14 +95,18 @@ struct TexasPokerRuleSettingView: View {
                         .pickerStyle(MenuPickerStyle())
                         .frame(maxWidth: .infinity, alignment: .trailing)
                         .padding(.trailing, 60) // 右侧间距
+                        .accentColor(.white)
                     }
                     
                     if calMode == 0{
                         HStack
                         {
+                            Image("icon_voice")
+                                .resizable()
+                                .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("报牌模式")
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.leading, 60) // 左侧间距
+                                .foregroundColor(.white)// 左侧间距
                             Picker("target", selection: $target) {
                                 Text("报最大家位置").tag(0)
                                 Text("报最小家位置").tag(1)
@@ -103,15 +114,19 @@ struct TexasPokerRuleSettingView: View {
                             .pickerStyle(MenuPickerStyle())
                             .frame(maxWidth: .infinity, alignment: .trailing)
                             .padding(.trailing, 60) // 右侧间距
+                            .accentColor(.white)
                         }
                     }
                     
                     else{
                         HStack
                         {
+                            Image("icon_voice")
+                                .resizable()
+                                .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("报牌模式")
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.leading, 60) // 左侧间距
+                                .foregroundColor(.white) // 左侧间距
                             Picker("target", selection: $target) {
                                 Text("报切几张目标位置最大").tag(0)
                                 Text("报切几张目标位置最小").tag(1)
@@ -119,6 +134,7 @@ struct TexasPokerRuleSettingView: View {
                             .pickerStyle(MenuPickerStyle())
                             .frame(maxWidth: .infinity, alignment: .trailing)
                             .padding(.trailing, 60) // 右侧间距
+                            .accentColor(.white)
                         }
                         
                         HStack
@@ -139,24 +155,32 @@ struct TexasPokerRuleSettingView: View {
                     
                     HStack
                     {
+                        Image("icon_user")
+                            .resizable()
+                            .frame(width: 40, height: 40).padding(.leading, 20)
                         Text("玩家数量")
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.leading, 60) // 左侧间距
+                            .foregroundColor(.white)
                         Picker("playerNum", selection: $playerNum) {
                             ForEach(0...selectedRule.playerNum.count - 1, id: \.self) { index in
                                 Text(String(selectedRule.playerNum[index])).tag(index)
+                                
                             }
                         }
                         .pickerStyle(MenuPickerStyle())
                         .frame(maxWidth: .infinity, alignment: .trailing)
                         .padding(.trailing, 60) // 右侧间距
+                        .accentColor(.white)
                     }
                     
                     HStack
                     {
+                        Image("icon_setting")
+                            .resizable()
+                            .frame(width: 40, height: 40).padding(.leading, 20)
                         Text("设置模版")
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.leading, 60) // 左侧间距
+                            .foregroundColor(.white)
                         Picker("setting", selection: $setting) {
                             ForEach(0...selectedRule.setting.count - 1, id: \.self) {
                                 index in
@@ -166,6 +190,7 @@ struct TexasPokerRuleSettingView: View {
                         .pickerStyle(MenuPickerStyle())
                         .frame(maxWidth: .infinity, alignment: .trailing)
                         .padding(.trailing, 60) // 右侧间距
+                        .accentColor(.white)
                         .onChange(of: setting) { _ in
                             handleSettingChange()
                         }
@@ -405,6 +430,7 @@ struct TexasPokerRuleSettingView: View {
                 .hidden()
             )
         }.navigationTitle("Rule Setting")
+            .background(Image("bg").resizable().scaledToFill())
     }
     
     

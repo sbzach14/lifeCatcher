@@ -4,6 +4,20 @@ import AVFoundation
 @main
 struct MyApp: App {
     
+    init(){
+        // 创建导航栏外观样式
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.titlePositionAdjustment = .zero // 将标题文本居中
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.white] // 标题文本颜色
+        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white] // 大标题文本颜色
+        appearance.backgroundImage = UIImage(named: "top_bg") // 自定义背景图片
+        
+        // 应用全局导航栏样式
+        UINavigationBar.appearance().standardAppearance = appearance
+        UINavigationBar.appearance().scrollEdgeAppearance = appearance
+    }
+    
     var body: some Scene {
         WindowGroup {
             MainMenuView().onAppear {

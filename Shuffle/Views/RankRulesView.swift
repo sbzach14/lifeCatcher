@@ -14,10 +14,29 @@ struct RankRulesView: View {
         VStack{
             Divider()
             ForEach(rankRules.indices, id: \.self) { index in
-                HStack {
+                HStack{
+                    if index == 0{
+                        Image("icon_list_onlydown").resizable()
+                            .frame(width: 30, height: 55)
+                            .alignmentGuide(.top) { d in d[.top] }
+                            .foregroundColor(.white)
+                            .offset(y:15)
+                    } else if index == (rankRules.count - 1){
+                        Image("icon_list_onlyup").resizable()
+                            .frame(width: 30, height: 55)
+                            .alignmentGuide(.top) { d in d[.top] }
+                            .foregroundColor(.white)                         .offset(y:-15)
+
+                    } else {
+                        Image("icon_list").resizable()
+                            .frame(width: 30, height: 80)
+                            .alignmentGuide(.top) { d in d[.top] }
+                            .foregroundColor(.white)
+                    }
+                    Spacer()
                     if let firstWord = selectedRule.rankRules[rankRules[index].index] {
                         Text(firstWord)
-                            .padding(.leading)
+                            .foregroundColor(.white)
                     }
 
                     Spacer()
@@ -28,8 +47,13 @@ struct RankRulesView: View {
                         .frame(width: 60, height: 40)
                         
                 }
-                .frame(width: 300, height: 40)
+                .frame(width: 400, height: 50)
                 .background(draggedIndex == index ? Color.gray.opacity(0.6) : Color.clear)
+                .background(
+                    Image("list_bg") // 背景图片
+                        .resizable()
+                        .scaledToFill()
+                )
                 .cornerRadius(10)
                 .offset(draggedIndex == index ? dragOffset : .zero)
                 .gesture(
@@ -52,10 +76,17 @@ struct RankRulesView: View {
                         }
                 )
 
-                Divider()
+                Divider().colorInvert()
             }
             Spacer()
+            
         }
+        .navigationTitle("规则设置")
+        .background(
+            Image("bg")
+                .resizable()
+                .scaledToFill()
+        )
         
     }
 
@@ -64,7 +95,7 @@ struct RankRulesView: View {
         
         // 初始化新的索引位置
         var newIndex = draggedIndex
-        var offset = Int(dragOffset.height)
+        let offset = Int(dragOffset.height)
         if offset > 0{
             newIndex = newIndex + offset / 45 + 1
             newIndex = min(newIndex, rankRules.count)
@@ -93,7 +124,9 @@ struct RankRulesView: View {
 struct RankRulesView_Previews: PreviewProvider {
     @State static var rankRules: [RankRulesSate] = [
         RankRulesSate(index: 0, isChecked: false),
-        RankRulesSate(index: 1, isChecked: true)
+        RankRulesSate(index: 1, isChecked: true),
+        RankRulesSate(index: 2, isChecked: true),
+        RankRulesSate(index: 3, isChecked: true)
         // Add more RankRulesState items as needed
     ]
     
@@ -102,7 +135,9 @@ struct RankRulesView_Previews: PreviewProvider {
             .onAppear {
                 // You can modify rankRules here as needed for preview
                 rankRules[0].isChecked = true
-                rankRules[1].isChecked = false
+                rankRules[1].isChecked = true
+                rankRules[2].isChecked = true
+                rankRules[3].isChecked = false
             }
     }
 }

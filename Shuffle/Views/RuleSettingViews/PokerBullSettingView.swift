@@ -536,6 +536,8 @@ struct PokerBullSettingView: View {
         //标准五张牛牛
         if(setting == 0)
         {
+            cardsNum = 5
+            handNum = 2
             isCompareSuit = 1
             suitRules = [3,2,1,0]
             wayToDeal = 0
@@ -549,7 +551,7 @@ struct PokerBullSettingView: View {
             threeValueRange = 0
             sixValueRange = 0
             spadeAValueRange = 0
-            bullrulelist = [0]
+            bullrulelist = [1,0,0,0,0,0,0,0,0]
             rankRules = [
                 RankRulesSate(index: 41, isChecked: true),
                 RankRulesSate(index: 1, isChecked: true),

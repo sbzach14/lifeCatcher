@@ -48,6 +48,11 @@ struct ShowRecordHistoryView: View {
             }
             .padding(16)
         }
+        .background(
+            Image("bg")
+                .resizable()
+                .scaledToFill()
+        )
         .navigationTitle(cls)
     }
 
