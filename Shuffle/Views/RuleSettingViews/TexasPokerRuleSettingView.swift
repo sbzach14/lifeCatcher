@@ -73,10 +73,16 @@ struct TexasPokerRuleSettingView: View {
                     
                         }
                         .pickerStyle(MenuPickerStyle())
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                        .padding(.trailing, 60)
-                        .accentColor(.white) // 右侧间距
+                        .frame(width: 160, height: 30, alignment: .trailing)
+                        .padding(.trailing, 30) // 右侧间距
+                        .accentColor(.white)
                     }
+                    .background(
+                        Image("list_bg") // 背景图片
+                            .resizable()
+                            .scaledToFill()
+                    )
+                    .frame(height: 50)
                     
                     HStack
                     {
@@ -93,10 +99,16 @@ struct TexasPokerRuleSettingView: View {
                     
                         }
                         .pickerStyle(MenuPickerStyle())
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                        .padding(.trailing, 60) // 右侧间距
+                        .frame(width: 160, height: 30, alignment: .trailing)
+                        .padding(.trailing, 30) // 右侧间距
                         .accentColor(.white)
                     }
+                    .background(
+                        Image("list_bg") // 背景图片
+                            .resizable()
+                            .scaledToFill()
+                    )
+                    .frame(height: 50)
                     
                     if calMode == 0{
                         HStack
@@ -112,10 +124,16 @@ struct TexasPokerRuleSettingView: View {
                                 Text("报最小家位置").tag(1)
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60) // 右侧间距
+                            .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30) // 右侧间距
                             .accentColor(.white)
                         }
+                        .background(
+                            Image("list_bg") // 背景图片
+                                .resizable()
+                                .scaledToFill()
+                        )
+                        .frame(height: 50)
                     }
                     
                     else{
@@ -132,10 +150,16 @@ struct TexasPokerRuleSettingView: View {
                                 Text("报切几张目标位置最小").tag(1)
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60) // 右侧间距
+                            .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30) // 右侧间距
                             .accentColor(.white)
                         }
+                        .background(
+                            Image("list_bg") // 背景图片
+                                .resizable()
+                                .scaledToFill()
+                        )
+                        .frame(height: 50)
                         
                         HStack
                         {
@@ -151,9 +175,15 @@ struct TexasPokerRuleSettingView: View {
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60).accentColor(.white) // 右侧间距
+                            .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30) // 右侧间距
                         }
+                        .background(
+                            Image("list_bg") // 背景图片
+                                .resizable()
+                                .scaledToFill()
+                        )
+                        .frame(height: 50)
                     }
                     
                     HStack
@@ -172,10 +202,16 @@ struct TexasPokerRuleSettingView: View {
                             }
                         }
                         .pickerStyle(MenuPickerStyle())
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                        .padding(.trailing, 60) // 右侧间距
+                        .frame(width: 160, height: 30, alignment: .trailing)
+                        .padding(.trailing, 30) // 右侧间距
                         .accentColor(.white)
                     }
+                    .background(
+                        Image("list_bg") // 背景图片
+                            .resizable()
+                            .scaledToFill()
+                    )
+                    .frame(height: 50)
                     
                     HStack
                     {
@@ -192,13 +228,19 @@ struct TexasPokerRuleSettingView: View {
                             }
                         }
                         .pickerStyle(MenuPickerStyle())
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                        .padding(.trailing, 60) // 右侧间距
+                        .frame(width: 160, height: 30, alignment: .trailing)
+                        .padding(.trailing, 30) // 右侧间距
                         .accentColor(.white)
                         .onChange(of: setting) { _ in
                             handleSettingChange()
                         }
                     }
+                    .background(
+                        Image("list_bg") // 背景图片
+                            .resizable()
+                            .scaledToFill()
+                    )
+                    .frame(height: 50)
                     
                     
                     
@@ -206,8 +248,7 @@ struct TexasPokerRuleSettingView: View {
                     {
                         HStack
                         {
-                            Image("icon_rulesetting_item")
-                                .resizable()
+                            Image("icon_list")
                                 .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("手牌数量")
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -218,14 +259,20 @@ struct TexasPokerRuleSettingView: View {
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60).accentColor(.white) // 右侧间距
+                            .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30) // 右侧间距
+                            .accentColor(.white)
                         }
+                        .background(
+                            Image("list_bg") // 背景图片
+                                .resizable()
+                                .scaledToFill()
+                        )
+                        .frame(height: 50)
                         
                         HStack
                         {
-                            Image("icon_rulesetting_item")
-                                .resizable()
+                            Image("icon_list")
                                 .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("公共牌数量")
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -236,13 +283,19 @@ struct TexasPokerRuleSettingView: View {
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60).accentColor(.white) // 右侧间距
+                            .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30) // 右侧间距
+                            .accentColor(.white)
                         }
+                        .background(
+                            Image("list_bg") // 背景图片
+                                .resizable()
+                                .scaledToFill()
+                        )
+                        .frame(height: 50)
                         
                         HStack {
-                            Image("icon_rulesetting_item")
-                                .resizable()
+                            Image("icon_list")
                                 .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("是否比较花色")
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -253,14 +306,20 @@ struct TexasPokerRuleSettingView: View {
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60).accentColor(.white) // 右侧间距
+                            .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30) // 右侧间距
+                            .accentColor(.white) // 右侧间距
                         }
+                        .background(
+                            Image("list_bg") // 背景图片
+                                .resizable()
+                                .scaledToFill()
+                        )
+                        .frame(height: 50)
                         
                         HStack
                         {
-                            Image("icon_rulesetting_item")
-                                .resizable()
+                            Image("icon_list")
                                 .frame(width: 40, height: 40).padding(.leading, 20)
                             
                             Text("是否计A顺子")
@@ -272,14 +331,20 @@ struct TexasPokerRuleSettingView: View {
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60).accentColor(.white) // 右侧间距
+                            .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30) // 右侧间距
+                            .accentColor(.white)
                         }
+                        .background(
+                            Image("list_bg") // 背景图片
+                                .resizable()
+                                .scaledToFill()
+                        )
+                        .frame(height: 50)
                         
                         HStack
                         {
-                            Image("icon_rulesetting_item")
-                                .resizable()
+                            Image("icon_list")
                                 .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("牌堆最小牌")
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -290,18 +355,21 @@ struct TexasPokerRuleSettingView: View {
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60).accentColor(.white) // 右侧间距
+                            .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30) // 右侧间距
+                            .accentColor(.white)
                         }
-                        
-                        
-                        
+                        .background(
+                            Image("list_bg") // 背景图片
+                                .resizable()
+                                .scaledToFill()
+                        )
+                        .frame(height: 50)
                         
                         
                         HStack
                         {
-                            Image("icon_rulesetting_item")
-                                .resizable()
+                            Image("icon_list")
                                 .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("手牌限制")
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -312,16 +380,22 @@ struct TexasPokerRuleSettingView: View {
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60).accentColor(.white) // 右侧间距
+                            .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30) // 右侧间距
+                            .accentColor(.white)
                         }
+                        .background(
+                            Image("list_bg") // 背景图片
+                                .resizable()
+                                .scaledToFill()
+                        )
+                        .frame(height: 50)
                         
                         if(handUseType != 0)
                         {
                             HStack
                             {
-                                Image("icon_rulesetting_item")
-                                    .resizable()
+                                Image("icon_list")
                                     .frame(width: 40, height: 40).padding(.leading, 20)
                                 Text("n")
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -332,9 +406,16 @@ struct TexasPokerRuleSettingView: View {
                                     }
                                 }
                                 .pickerStyle(MenuPickerStyle())
-                                .frame(maxWidth: .infinity, alignment: .trailing)
-                                .padding(.trailing, 60).accentColor(.white) // 右侧间距
+                                .frame(width: 160, height: 30, alignment: .trailing)
+                                .padding(.trailing, 30) // 右侧间距
+                                .accentColor(.white) // 右侧间距
                             }
+                            .background(
+                                Image("list_bg") // 背景图片
+                                    .resizable()
+                                    .scaledToFill()
+                            )
+                            .frame(height: 50)
                         }
                         
                         HStack
@@ -358,7 +439,7 @@ struct TexasPokerRuleSettingView: View {
                                     .cornerRadius(10)
                                     .frame(width: 40, height: 40) // 设置正方形大小
                             }
-                            .padding(.trailing, 60)
+                            .padding(.trailing, 30)
                             .background(
                                 NavigationLink(
                                     destination: RankRulesView(rankRules: $rankRules, selectedRuleIndex: selectedRule.ruleIndex),
@@ -368,6 +449,12 @@ struct TexasPokerRuleSettingView: View {
                                 .hidden()
                             )
                         }
+                        .background(
+                            Image("list_bg") // 背景图片
+                                .resizable()
+                                .scaledToFill()
+                        )
+                        .frame(height: 50)
                         
                         if(isCompareSuit == 1)
                         {
@@ -392,7 +479,7 @@ struct TexasPokerRuleSettingView: View {
                                         .cornerRadius(10)
                                         .frame(width: 40, height: 40) // 设置正方形大小
                                 }
-                                .padding(.trailing, 60)
+                                .padding(.trailing, 30)
                                 .background(
                                     NavigationLink(
                                         destination: SuitRulesView(suitRules: $suitRules),
@@ -402,6 +489,12 @@ struct TexasPokerRuleSettingView: View {
                                     .hidden()
                                 )
                             }
+                            .background(
+                                Image("list_bg") // 背景图片
+                                    .resizable()
+                                    .scaledToFill()
+                            )
+                            .frame(height: 50)
                         }
                     }
                 }
@@ -428,12 +521,7 @@ struct TexasPokerRuleSettingView: View {
                 }
                 
             }) {
-                Text("Start")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue)
-                    .cornerRadius(10)
+                Image("icon_start").resizable().frame(width: 150, height: 60)
             }
             .padding()
             .alert(isPresented: $showAlert) {

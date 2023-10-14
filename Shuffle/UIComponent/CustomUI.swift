@@ -1,4 +1,5 @@
 import SwiftUI
+import CreateMLComponents
 
 struct CustomToggleStyle: ToggleStyle{
     let onImage: Image = Image("icon_slider_bg_on")

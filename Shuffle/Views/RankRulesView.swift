@@ -33,28 +33,29 @@ struct RankRulesView: View {
                             .alignmentGuide(.top) { d in d[.top] }
                             .foregroundColor(.white)
                     }
-                    Spacer()
+                    
                     if let firstWord = selectedRule.rankRules[rankRules[index].index] {
                         Text(firstWord)
                             .foregroundColor(.white)
+                            .padding(.leading, 20)
+                            
                     }
 
                     Spacer()
 
                     Toggle("", isOn: bindingForIndex(index))
                         .toggleStyle(CustomToggleStyle())
-                        .padding(.trailing)
+                        .padding(.trailing,50)
                         .frame(width: 60, height: 40)
                         
                 }
-                .frame(width: 400, height: 50)
+                .frame(height: 50)
                 .background(draggedIndex == index ? Color.gray.opacity(0.6) : Color.clear)
                 .background(
                     Image("list_bg") // 背景图片
                         .resizable()
                         .scaledToFill()
                 )
-                .cornerRadius(10)
                 .offset(draggedIndex == index ? dragOffset : .zero)
                 .gesture(
                     DragGesture()
@@ -75,8 +76,6 @@ struct RankRulesView: View {
                             }
                         }
                 )
-
-                Divider().colorInvert()
             }
             Spacer()
             
