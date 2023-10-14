@@ -100,6 +100,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     var isBlack: Bool = false
     var isMute: Bool = false
     var isBackCamera: Bool = false
+    var setFrameRate: Float64 = 120.0
     var isContrastAug: Bool = false
     var cameraFrameRate: Int = 0
     
@@ -180,9 +181,11 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     func setupAVCapture(){
         if self.isBackCamera{
             self.captureDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
+            self.setFrameRate = 240.0
         }
         else{
             self.captureDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front)
+            self.setFrameRate = 120.0
         }
         
 
@@ -200,13 +203,16 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             
             
             // 设置帧率为120帧
+            print("设定识别帧率: \(self.setFrameRate)")
+
+            
             guard let format = self.captureDevice.formats.first(where: { format in
                 let ranges = format.videoSupportedFrameRateRanges
                 return ranges.contains { range in
-                    return range.maxFrameRate >= 120
+                    return range.maxFrameRate >= self.setFrameRate
                 }
             }) else {
-                print("不支持120帧的前置摄像头格式")
+                print("不支持\(setFrameRate)帧的摄像头格式")
                 return
             }
             do {
@@ -230,7 +236,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             // 获取当前帧率
             let videoFrameRate = format.videoSupportedFrameRateRanges.first!.maxFrameRate
             print("设定帧率: \(videoFrameRate)")
-
             changeCameraFrameRate(to: 60)
         } catch {
             print("配置前置摄像头时发生错误: \(error)")
@@ -306,7 +311,11 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
         
         backgroundQueue.async {
-            if !self.isBlack && (self.cameraFrameRate < 60 || self.taskIndex % 4 == 0){
+            var indexGap = 4
+            if self.isBackCamera{
+                indexGap = 8
+            }
+            if !self.isBlack && (self.cameraFrameRate < 60 || self.taskIndex % indexGap == 0){
                 do{
                     let cgImage = self.context.createCGImage(ciImage, from: ciImage.extent)!
                     let cgImageFormat = vImage_CGImageFormat(
@@ -512,11 +521,10 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 && stateCounter > 5
                 && shuffleMode == 0{
                 state = "shuffle"
-                print("动作：开始洗牌")
+                print("动作：开始洗牌 ", self.setFrameRate)
                 speakText(input: "开始洗牌")
-                
                 DispatchQueue.main.async{
-                    self.changeCameraFrameRate(to: 120)
+                    self.changeCameraFrameRate(to: Int(self.setFrameRate))
                     self.initCardArray()
                 }
             }
@@ -528,7 +536,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 speakText(input: "开始拨牌")
                 
                 DispatchQueue.main.async{
-                    self.changeCameraFrameRate(to: 120)
+                    self.changeCameraFrameRate(to: Int(self.setFrameRate))
                     self.initCardArray()
                 }
                 
@@ -541,7 +549,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 speakText(input: "开始切牌")
                 DispatchQueue.main.async{
                     self.frameCounter = 0
-                    self.changeCameraFrameRate(to: 120)
+                    self.changeCameraFrameRate(to: Int(self.setFrameRate))
                     self.cutCardArray(cardResult: cardResult, taskIndex: taskIndex)
                 }
             }
@@ -560,7 +568,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         else if state == "shuffle"{
             if self.stateCard[0] == -1 && self.stateCard[1] == -1 && stateCounter > 10{
                 state = "idle"
-                print("动作：洗牌完成")
+                print("动作：洗牌完成 ", self.setFrameRate)
                 speakText(input: "洗牌完成")
                 DispatchQueue.main.async{
                     self.changeCameraFrameRate(to: 60)
