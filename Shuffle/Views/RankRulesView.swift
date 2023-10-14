@@ -23,11 +23,12 @@ struct RankRulesView: View {
                     Spacer()
 
                     Toggle("", isOn: bindingForIndex(index))
-                        .toggleStyle(SwitchToggleStyle(tint: .green))
+                        .toggleStyle(CustomToggleStyle())
                         .padding(.trailing)
-                        .frame(width: 80, height: 20)
+                        .frame(width: 60, height: 40)
+                        
                 }
-                .frame(width: 300, height: 30)
+                .frame(width: 300, height: 40)
                 .background(draggedIndex == index ? Color.gray.opacity(0.6) : Color.clear)
                 .cornerRadius(10)
                 .offset(draggedIndex == index ? dragOffset : .zero)
@@ -92,7 +93,7 @@ struct RankRulesView: View {
 struct RankRulesView_Previews: PreviewProvider {
     @State static var rankRules: [RankRulesSate] = [
         RankRulesSate(index: 0, isChecked: false),
-        RankRulesSate(index: 1, isChecked: true),
+        RankRulesSate(index: 1, isChecked: true)
         // Add more RankRulesState items as needed
     ]
     
