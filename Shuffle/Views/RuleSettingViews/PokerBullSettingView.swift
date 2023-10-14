@@ -73,7 +73,9 @@ struct PokerBullSettingView: View {
             ScrollView{
                 VStack{
                     HStack
-                    {
+                    {Image("icon_rulesetting_item")
+                            .resizable()
+                            .frame(width: 40, height: 40).padding(.leading, 20)
                         Text("洗牌模式")
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.leading, 60) // 左侧间距
@@ -89,7 +91,9 @@ struct PokerBullSettingView: View {
                     }
                     
                     HStack
-                    {
+                    {Image("icon_rulesetting_item")
+                            .resizable()
+                            .frame(width: 40, height: 40).padding(.leading, 20)
                         Text("打色模式")
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.leading, 60) // 左侧间距
@@ -106,7 +110,9 @@ struct PokerBullSettingView: View {
                     
                     if calMode == 0{
                         HStack
-                        {
+                        {Image("icon_rulesetting_item")
+                                .resizable()
+                                .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("报牌模式")
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.leading, 60) // 左侧间距
@@ -122,7 +128,9 @@ struct PokerBullSettingView: View {
 
                     else{
                         HStack
-                        {
+                        {Image("icon_rulesetting_item")
+                                .resizable()
+                                .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("报牌模式")
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.leading, 60) // 左侧间距
@@ -136,7 +144,9 @@ struct PokerBullSettingView: View {
                         }
 
                         HStack
-                        {
+                        {Image("icon_rulesetting_item")
+                                .resizable()
+                                .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("目标位置")
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.leading, 60) // 左侧间距
@@ -150,7 +160,9 @@ struct PokerBullSettingView: View {
                             .padding(.trailing, 60) // 右侧间距
                         }
                     }
-                    HStack{
+                    HStack{Image("icon_rulesetting_item")
+                            .resizable()
+                            .frame(width: 40, height: 40).padding(.leading, 20)
                         Text("设置规则")
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.leading, 60) // 左侧间距
@@ -169,7 +181,9 @@ struct PokerBullSettingView: View {
                     }
                     
                     HStack
-                    {
+                    {Image("icon_rulesetting_item")
+                            .resizable()
+                            .frame(width: 40, height: 40).padding(.leading, 20)
                         Text("玩家数量")
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.leading, 60) // 左侧间距
@@ -183,7 +197,9 @@ struct PokerBullSettingView: View {
                         .padding(.trailing, 60) // 右侧间距
                     }
                     if(setting == 3){
-                        HStack{
+                        HStack{Image("icon_rulesetting_item")
+                                .resizable()
+                                .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("牌库数量")
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.leading, 60) // 左侧间距
@@ -197,7 +213,9 @@ struct PokerBullSettingView: View {
                             .padding(.trailing, 60)
                         }
                         
-                        HStack{
+                        HStack{Image("icon_rulesetting_item")
+                                .resizable()
+                                .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("手牌数量")
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.leading, 60) // 左侧间距
@@ -211,7 +229,9 @@ struct PokerBullSettingView: View {
                             .padding(.trailing, 60) // 右侧间距
                         }
                         
-                        HStack{
+                        HStack{Image("icon_rulesetting_item")
+                                .resizable()
+                                .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("发牌方式")
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.leading, 60) // 左侧间距
@@ -225,7 +245,9 @@ struct PokerBullSettingView: View {
                             .padding(.trailing, 60) // 右侧间距
                         }
                         
-                        HStack{
+                        HStack{Image("icon_rulesetting_item")
+                                .resizable()
+                                .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("是否比较花色")
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.leading, 60) // 左侧间距
@@ -238,7 +260,9 @@ struct PokerBullSettingView: View {
                             .frame(maxWidth: .infinity, alignment: .trailing)
                             .padding(.trailing, 60) // 右侧间距
                         }
-                        HStack{
+                        HStack{Image("icon_rulesetting_item")
+                                .resizable()
+                                .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("同牛同点比较规则")
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.leading, 60) // 左侧间距
@@ -253,7 +277,9 @@ struct PokerBullSettingView: View {
                         }
                         Group{
                         if(cardsNum == 6 || cardsNum == 1 || cardsNum == 4){
-                            HStack{
+                            HStack{Image("icon_rulesetting_item")
+                                    .resizable()
+                                    .frame(width: 40, height: 40).padding(.leading, 20)
                                 Text("大王的点数")
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .padding(.leading, 60) // 左侧间距
@@ -266,7 +292,9 @@ struct PokerBullSettingView: View {
                                 .frame(maxWidth: .infinity, alignment: .trailing)
                                 .padding(.trailing, 60) // 右侧间距
                             }
-                            HStack{
+                            HStack{Image("icon_rulesetting_item")
+                                    .resizable()
+                                    .frame(width: 40, height: 40).padding(.leading, 20)
                                 Text("小王的点数")
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .padding(.leading, 60) // 左侧间距
@@ -281,7 +309,9 @@ struct PokerBullSettingView: View {
                             }
                             if(blackJokerValueRange == 0 && redJokerValueRange == 0){
                                 
-                                HStack{
+                                HStack{Image("icon_rulesetting_item")
+                                        .resizable()
+                                        .frame(width: 40, height: 40).padding(.leading, 20)
                                     Text("王是否是最小的0")
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                         .padding(.leading, 60) // 左侧间距
@@ -297,7 +327,9 @@ struct PokerBullSettingView: View {
                             }
                         }//card == 6 54张牌, 32张牌，42张牌, 含有大小王
                         if(cardsNum != 2){
-                            HStack{
+                            HStack{Image("icon_rulesetting_item")
+                                    .resizable()
+                                    .frame(width: 40, height: 40).padding(.leading, 20)
                                 Text("10的点数")
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .padding(.leading, 60) // 左侧间距
@@ -313,7 +345,9 @@ struct PokerBullSettingView: View {
                         }//card != 2, 有10
                         
                         if (cardsNum == 0 || cardsNum == 1 || cardsNum == 5 || cardsNum == 6){
-                            HStack{
+                            HStack{Image("icon_rulesetting_item")
+                                    .resizable()
+                                    .frame(width: 40, height: 40).padding(.leading, 20)
                                 Text("J的点数")
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .padding(.leading, 60) // 左侧间距
@@ -327,7 +361,9 @@ struct PokerBullSettingView: View {
                                 .padding(.trailing, 60) // 右侧间距
                             }
                             
-                            HStack{
+                            HStack{Image("icon_rulesetting_item")
+                                    .resizable()
+                                    .frame(width: 40, height: 40).padding(.leading, 20)
                                 Text("Q的点数")
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .padding(.leading, 60) // 左侧间距
@@ -341,7 +377,9 @@ struct PokerBullSettingView: View {
                                 .padding(.trailing, 60) // 右侧间距
                             }
                             
-                            HStack{
+                            HStack{Image("icon_rulesetting_item")
+                                    .resizable()
+                                    .frame(width: 40, height: 40).padding(.leading, 20)
                                 Text("K的点数")
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .padding(.leading, 60) // 左侧间距
@@ -354,7 +392,9 @@ struct PokerBullSettingView: View {
                                 .frame(maxWidth: .infinity, alignment: .trailing)
                                 .padding(.trailing, 60) // 右侧间距
                             }
-                            HStack{
+                            HStack{Image("icon_rulesetting_item")
+                                    .resizable()
+                                    .frame(width: 40, height: 40).padding(.leading, 20)
                                 Text("Q的点数")
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .padding(.leading, 60) // 左侧间距
@@ -369,7 +409,9 @@ struct PokerBullSettingView: View {
                             }
                         }//包含J,Q,K
                         // 3, 6, SpadeAValue
-                            HStack{
+                            HStack{Image("icon_rulesetting_item")
+                                    .resizable()
+                                    .frame(width: 40, height: 40).padding(.leading, 20)
                                 Text("♠️A的点数")
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .padding(.leading, 60) // 左侧间距
@@ -382,7 +424,9 @@ struct PokerBullSettingView: View {
                                 .frame(maxWidth: .infinity, alignment: .trailing)
                                 .padding(.trailing, 60) // 右侧间距
                             }
-                            HStack{
+                            HStack{Image("icon_rulesetting_item")
+                                    .resizable()
+                                    .frame(width: 40, height: 40).padding(.leading, 20)
                                 Text("3的点数")
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .padding(.leading, 60) // 左侧间距
@@ -396,7 +440,9 @@ struct PokerBullSettingView: View {
                                 .padding(.trailing, 60) // 右侧间距
                             }
                             
-                            HStack{
+                            HStack{Image("icon_rulesetting_item")
+                                    .resizable()
+                                    .frame(width: 40, height: 40).padding(.leading, 20)
                                 Text("6的点数")
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .padding(.leading, 60) // 左侧间距
@@ -412,7 +458,9 @@ struct PokerBullSettingView: View {
                         }
 
                         if (handNum == 2){
-                            HStack{
+                            HStack{Image("icon_rulesetting_item")
+                                    .resizable()
+                                    .frame(width: 40, height: 40).padding(.leading, 20)
                                 Text("可以组成牛的牌型:").font(.headline).padding(.leading,60).padding(.top).frame(maxWidth: .infinity, alignment: .leading)
                             }
                             ForEach(0..<selectedRule.BullRules.count-1, id: \.self) { index in
@@ -438,6 +486,9 @@ struct PokerBullSettingView: View {
                         }
                         
                         HStack{
+                            Image("icon_rulesetting_item")
+                                    .resizable()
+                                    .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("自定义牌型顺序")
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.leading, 60) // 左侧间距
