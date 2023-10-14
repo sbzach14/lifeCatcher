@@ -56,6 +56,7 @@
 		B03B7B2D2A963C05006A0647 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B2C2A963C05006A0647 /* Card.swift */; };
 		B03B7B2F2A963C1B006A0647 /* utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B2E2A963C1B006A0647 /* utils.swift */; };
 		B03B7B532A98AD32006A0647 /* ShuffleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B522A98AD32006A0647 /* ShuffleTests.swift */; };
+		B087B8E32ADAD7BB009B9B40 /* cardDetection_s_1014.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = B087B8E22ADAD7BB009B9B40 /* cardDetection_s_1014.mlmodel */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -127,6 +128,7 @@
 		B03B7B2E2A963C1B006A0647 /* utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = utils.swift; sourceTree = "<group>"; };
 		B03B7B502A98AD32006A0647 /* ShuffleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShuffleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B03B7B522A98AD32006A0647 /* ShuffleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShuffleTests.swift; sourceTree = "<group>"; };
+		B087B8E22ADAD7BB009B9B40 /* cardDetection_s_1014.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection_s_1014.mlmodel; sourceTree = "<group>"; };
 		F11ED84932036610B96BC234 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -310,6 +312,7 @@
 		A8FBC7BE2A3F057700EDDFD7 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				B087B8E22ADAD7BB009B9B40 /* cardDetection_s_1014.mlmodel */,
 				A88EFE022A7E8ACC00897243 /* Resnet50FP16.mlmodel */,
 				B01A281C2ABF164300A74AA4 /* cardDetection_quantilized.mlmodel */,
 				B01A281A2ABF15C900A74AA4 /* cardDetection.mlmodel */,
@@ -521,6 +524,7 @@
 				A88F20AE2A13A470005E4A27 /* PokerBull.swift in Sources */,
 				A8D0D9362A24A4C20061A90E /* TexasPoker.swift in Sources */,
 				A8FBC7C22A3F0A5C00EDDFD7 /* CVUtils.swift in Sources */,
+				B087B8E32ADAD7BB009B9B40 /* cardDetection_s_1014.mlmodel in Sources */,
 				18CA14D3284AC42C00F90372 /* ShowCardView.swift in Sources */,
 				A8E0E2F12AAE00B90091FC1D /* NinePointFiveGameRuleSettingView.swift in Sources */,
 				A88EFE0D2A7FDC9500897243 /* RecordHistoryView.swift in Sources */,

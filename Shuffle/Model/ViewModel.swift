@@ -30,7 +30,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var cardArray :  [Int] = []
     @Published var winnerPlayer: [Int] = []
 
-    let model = try! cardDetection_s_1009()
+    let model = try! cardDetection_s_1014()
     
 
 
@@ -236,7 +236,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             // 获取当前帧率
             let videoFrameRate = format.videoSupportedFrameRateRanges.first!.maxFrameRate
             print("设定帧率: \(videoFrameRate)")
-            changeCameraFrameRate(to: 60)
+            changeCameraFrameRate(to: 240)
         } catch {
             print("配置前置摄像头时发生错误: \(error)")
         }
