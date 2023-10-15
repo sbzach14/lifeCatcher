@@ -73,9 +73,15 @@ struct ThreeCardPokerGameRuleSettingView: View {
                     
                         }
                         .pickerStyle(MenuPickerStyle())
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                        .padding(.trailing, 60).accentColor(.white) // 右侧间距
-                    }
+                        .frame(width: 160, height: 30, alignment: .trailing)
+                        .padding(.trailing, 30) // 右侧间距
+                        .accentColor(.white)
+                    }.background(
+                        Image("list_bg") // 背景图片
+                            .resizable()
+                            .scaledToFill()
+                    )
+                    .frame(height: 50)
                     
                     HStack
                     {
@@ -92,9 +98,15 @@ struct ThreeCardPokerGameRuleSettingView: View {
                     
                         }
                         .pickerStyle(MenuPickerStyle())
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                        .padding(.trailing, 60).accentColor(.white) // 右侧间距
-                    }
+                        .frame(width: 160, height: 30, alignment: .trailing)
+                        .padding(.trailing, 30) // 右侧间距
+                        .accentColor(.white)
+                    }.background(
+                        Image("list_bg") // 背景图片
+                            .resizable()
+                            .scaledToFill()
+                    )
+                    .frame(height: 50)
                     
                     
                     if calMode == 0{
@@ -111,9 +123,14 @@ struct ThreeCardPokerGameRuleSettingView: View {
                                 Text("报最小位置").tag(1)
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60).accentColor(.white) // 右侧间距
-                        }
+                        .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30).accentColor(.white) // 右侧间距
+                        }.background(
+                            Image("list_bg") // 背景图片
+                                .resizable()
+                                .scaledToFill()
+                        )
+                        .frame(height: 50)
                     }
                     
                     else{
@@ -130,10 +147,15 @@ struct ThreeCardPokerGameRuleSettingView: View {
                                 Text("报切几张目标位置最小").tag(1)
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60).accentColor(.white
+                        .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30).accentColor(.white
                             ) // 右侧间距
-                        }
+                        }.background(
+                            Image("list_bg") // 背景图片
+                                .resizable()
+                                .scaledToFill()
+                        )
+                        .frame(height: 50)
                         
                         HStack
                         {
@@ -150,10 +172,15 @@ struct ThreeCardPokerGameRuleSettingView: View {
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60).accentColor(.white
+                        .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30).accentColor(.white
                             ) // 右侧间距
-                        }
+                        }.background(
+                            Image("list_bg") // 背景图片
+                                .resizable()
+                                .scaledToFill()
+                        )
+                        .frame(height: 50)
                     }
 
                     
@@ -173,9 +200,14 @@ struct ThreeCardPokerGameRuleSettingView: View {
                         }
                         .pickerStyle(MenuPickerStyle())
                         .frame(maxWidth: .infinity, alignment: .trailing)
-                        .padding(.trailing, 60).accentColor(.white
+                        .padding(.trailing, 30).accentColor(.white
                         ) // 右侧间距
-                    }
+                    }.background(
+                        Image("list_bg") // 背景图片
+                            .resizable()
+                            .scaledToFill()
+                    )
+                    .frame(height: 50)
                     
                     HStack
                     {
@@ -192,20 +224,26 @@ struct ThreeCardPokerGameRuleSettingView: View {
                             }
                         }
                         .pickerStyle(MenuPickerStyle())
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                        .padding(.trailing, 60).accentColor(.white) // 右侧间距
+                        .frame(width: 160, height: 30, alignment: .trailing)
+                        .padding(.trailing, 30) // 右侧间距
+                        .accentColor(.white)
                         .onChange(of: setting) { _ in
                             handleSettingChange()
                         }
-                    }
+                    }.background(
+                        Image("list_bg") // 背景图片
+                            .resizable()
+                            .scaledToFill()
+                    )
+                    .frame(height: 50)
                       
                     if(setting == 1)
                     {
                         if(true)
                         {
                             HStack
-                            {Image("icon_rulesetting_item")
-                                    .resizable()
+                            {Image("icon_list")
+                                  
                                     .frame(width: 40, height: 40).padding(.leading, 20)
                                 Text("手牌数量")
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -217,12 +255,16 @@ struct ThreeCardPokerGameRuleSettingView: View {
                                 }
                                 .pickerStyle(MenuPickerStyle())
                                 .frame(maxWidth: .infinity, alignment: .trailing)
-                                .padding(.trailing, 60).accentColor(.white) // 右侧间距
-                            }
+                                .padding(.trailing, 30).accentColor(.white) // 右侧间距
+                            }.background(
+                                Image("list_bg") // 背景图片
+                                    .resizable()
+                                    .scaledToFill()
+                            )
+                            .frame(height: 50)
                             
                             HStack {
-                                Image("icon_rulesetting_item")
-                                        .resizable()
+                                Image("icon_list")
                                         .frame(width: 40, height: 40).padding(.leading, 20)
                                 Text("是否比较花色")
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -234,14 +276,19 @@ struct ThreeCardPokerGameRuleSettingView: View {
                                 }
                                 .pickerStyle(MenuPickerStyle())
                                 .frame(maxWidth: .infinity, alignment: .trailing)
-                                .padding(.trailing, 60).accentColor(.white) // 右侧间距
-                            }
+                                .padding(.trailing, 30).accentColor(.white) // 右侧间距
+                            }.background(
+                                Image("list_bg") // 背景图片
+                                    .resizable()
+                                    .scaledToFill()
+                            )
+                            .frame(height: 50)
                             
                             
                             HStack
                             {
-                                Image("icon_rulesetting_item")
-                                    .resizable()
+                                Image("icon_list")
+                                  
                                     .frame(width: 40, height: 40).padding(.leading, 20)
                                 Text("散牌倒序")
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -253,12 +300,17 @@ struct ThreeCardPokerGameRuleSettingView: View {
                                 }
                                 .pickerStyle(MenuPickerStyle())
                                 .frame(maxWidth: .infinity, alignment: .trailing)
-                                .padding(.trailing, 60).accentColor(.white) // 右侧间距
-                            }
+                                .padding(.trailing, 30).accentColor(.white) // 右侧间距
+                            }.background(
+                                Image("list_bg") // 背景图片
+                                    .resizable()
+                                    .scaledToFill()
+                            )
+                            .frame(height: 50)
                             
                             HStack
-                            {Image("icon_rulesetting_item")
-                                    .resizable()
+                            {Image("icon_list")
+                                  
                                     .frame(width: 40, height: 40).padding(.leading, 20)
                                 Text("牌堆最小数字牌")
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -270,14 +322,19 @@ struct ThreeCardPokerGameRuleSettingView: View {
                                 }
                                 .pickerStyle(MenuPickerStyle())
                                 .frame(maxWidth: .infinity, alignment: .trailing)
-                                .padding(.trailing, 60).accentColor(.white) // 右侧间距
-                            }
+                                .padding(.trailing, 30).accentColor(.white) // 右侧间距
+                            }.background(
+                                Image("list_bg") // 背景图片
+                                    .resizable()
+                                    .scaledToFill()
+                            )
+                            .frame(height: 50)
                         }
 
 
                         HStack
-                        {Image("icon_rulesetting_item")
-                                .resizable()
+                        {Image("icon_list")
+              
                                 .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("是否有A")
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -288,16 +345,21 @@ struct ThreeCardPokerGameRuleSettingView: View {
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60).accentColor(.white) // 右侧间距
-                        }
+                        .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30).accentColor(.white) // 右侧间距
+                        }.background(
+                            Image("list_bg") // 背景图片
+                                .resizable()
+                                .scaledToFill()
+                        )
+                        .frame(height: 50)
 
                         if(isAce == 2)
                         {
 
                             HStack
-                            {Image("icon_rulesetting_item")
-                                    .resizable()
+                            {Image("icon_list")
+                                  
                                     .frame(width: 40, height: 40).padding(.leading, 20)
                                 Text("是否计A顺子")
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -309,13 +371,18 @@ struct ThreeCardPokerGameRuleSettingView: View {
                                 }
                                 .pickerStyle(MenuPickerStyle())
                                 .frame(maxWidth: .infinity, alignment: .trailing)
-                                .padding(.trailing, 60).accentColor(.white) // 右侧间距
-                            }
+                                .padding(.trailing, 30).accentColor(.white) // 右侧间距
+                            }.background(
+                                Image("list_bg") // 背景图片
+                                    .resizable()
+                                    .scaledToFill()
+                            )
+                            .frame(height: 50)
                         }
 
                         HStack
-                        {Image("icon_rulesetting_item")
-                                .resizable()
+                        {Image("icon_list")
+              
                                 .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("是否有JQK")
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -326,14 +393,19 @@ struct ThreeCardPokerGameRuleSettingView: View {
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60).accentColor(.white) // 右侧间距
-                        }
+                        .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30).accentColor(.white) // 右侧间距
+                        }.background(
+                            Image("list_bg") // 背景图片
+                                .resizable()
+                                .scaledToFill()
+                        )
+                        .frame(height: 50)
 
 
                         HStack
-                        {Image("icon_rulesetting_item")
-                                .resizable()
+                        {Image("icon_list")
+              
                                 .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("是否有大王")
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -344,16 +416,21 @@ struct ThreeCardPokerGameRuleSettingView: View {
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60).accentColor(.white) // 右侧间距
-                        }
+                        .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30).accentColor(.white) // 右侧间距
+                        }.background(
+                            Image("list_bg") // 背景图片
+                                .resizable()
+                                .scaledToFill()
+                        )
+                        .frame(height: 50)
 
                         if(isRedJoker == 1)
                         {
 
                             HStack
-                            {Image("icon_rulesetting_item")
-                                    .resizable()
+                            {Image("icon_list")
+                                  
                                     .frame(width: 40, height: 40).padding(.leading, 20)
                                 Text("大王可替花色")
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -365,12 +442,17 @@ struct ThreeCardPokerGameRuleSettingView: View {
                                 }
                                 .pickerStyle(MenuPickerStyle())
                                 .frame(maxWidth: .infinity, alignment: .trailing)
-                                .padding(.trailing, 60).accentColor(.white) // 右侧间距
-                            }
+                                .padding(.trailing, 30).accentColor(.white) // 右侧间距
+                            }.background(
+                                Image("list_bg") // 背景图片
+                                    .resizable()
+                                    .scaledToFill()
+                            )
+                            .frame(height: 50)
 
                             HStack
-                            {Image("icon_rulesetting_item")
-                                    .resizable()
+                            {Image("icon_list")
+                                  
                                     .frame(width: 40, height: 40).padding(.leading, 20)
                                 Text("大王可替点数")
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -382,14 +464,19 @@ struct ThreeCardPokerGameRuleSettingView: View {
                                 }
                                 .pickerStyle(MenuPickerStyle())
                                 .frame(maxWidth: .infinity, alignment: .trailing)
-                                .padding(.trailing, 60).accentColor(.white) // 右侧间距
-                            }
+                                .padding(.trailing, 30).accentColor(.white) // 右侧间距
+                            }.background(
+                                Image("list_bg") // 背景图片
+                                    .resizable()
+                                    .scaledToFill()
+                            )
+                            .frame(height: 50)
                         }
 
 
                         HStack
-                        {Image("icon_rulesetting_item")
-                                .resizable()
+                        {Image("icon_list")
+
                                 .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("是否有小王")
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -400,15 +487,20 @@ struct ThreeCardPokerGameRuleSettingView: View {
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 60).accentColor(.white) // 右侧间距
-                        }
+                        .frame(width: 160, height: 30, alignment: .trailing)
+                            .padding(.trailing, 30).accentColor(.white) // 右侧间距
+                        }.background(
+                            Image("list_bg") // 背景图片
+                                .resizable()
+                                .scaledToFill()
+                        )
+                        .frame(height: 50)
 
                         if(isBlackJoker == 1)
                         {
                             HStack
-                            {Image("icon_rulesetting_item")
-                                    .resizable()
+                            {Image("icon_list")
+                                  
                                     .frame(width: 40, height: 40).padding(.leading, 20)
                                 Text("小王可替花色")
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -420,12 +512,16 @@ struct ThreeCardPokerGameRuleSettingView: View {
                                 }
                                 .pickerStyle(MenuPickerStyle())
                                 .frame(maxWidth: .infinity, alignment: .trailing)
-                                .padding(.trailing, 60).accentColor(.white) // 右侧间距
-                            }
+                                .padding(.trailing, 30).accentColor(.white) // 右侧间距
+                            }.background(
+                                Image("list_bg") // 背景图片
+                                    .resizable()
+                                    .scaledToFill()
+                            )
+                            .frame(height: 50)
 
                             HStack
-                            {Image("icon_rulesetting_item")
-                                    .resizable()
+                            {Image("icon_list")
                                     .frame(width: 40, height: 40).padding(.leading, 20)
                                 Text("小王可替点数")
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -437,8 +533,13 @@ struct ThreeCardPokerGameRuleSettingView: View {
                                 }
                                 .pickerStyle(MenuPickerStyle())
                                 .frame(maxWidth: .infinity, alignment: .trailing)
-                                .padding(.trailing, 60).accentColor(.white) // 右侧间距
-                            }
+                                .padding(.trailing, 30).accentColor(.white) // 右侧间距
+                            }.background(
+                                Image("list_bg") // 背景图片
+                                    .resizable()
+                                    .scaledToFill()
+                            )
+                            .frame(height: 50)
                             
                         }
                         
@@ -462,7 +563,7 @@ struct ThreeCardPokerGameRuleSettingView: View {
                                     .cornerRadius(10)
                                     .frame(width: 40, height: 40) // 设置正方形大小
                             }
-                            .padding(.trailing, 60)
+                            .padding(.trailing, 30)
                             .background(
                                 NavigationLink(
                                     destination: RankRulesView(rankRules: $rankRules, selectedRuleIndex: selectedRule.ruleIndex),
@@ -471,7 +572,12 @@ struct ThreeCardPokerGameRuleSettingView: View {
                                 )
                                 .hidden()
                             )
-                        }
+                        }.background(
+                            Image("list_bg") // 背景图片
+                                .resizable()
+                                .scaledToFill()
+                        )
+                        .frame(height: 50)
 
                         if(isCompareSuit == 1)
                         {
@@ -494,7 +600,7 @@ struct ThreeCardPokerGameRuleSettingView: View {
                                         .cornerRadius(10)
                                         .frame(width: 40, height: 40) // 设置正方形大小
                                 }
-                                .padding(.trailing, 60)
+                                .padding(.trailing, 30)
                                 .background(
                                     NavigationLink(
                                         destination: SuitRulesView(suitRules: $suitRules),
@@ -503,7 +609,12 @@ struct ThreeCardPokerGameRuleSettingView: View {
                                     )
                                     .hidden()
                                 )
-                            }
+                            }.background(
+                                Image("list_bg") // 背景图片
+                                    .resizable()
+                                    .scaledToFill()
+                            )
+                            .frame(height: 50)
                         }
                     }
                 }
@@ -530,12 +641,7 @@ struct ThreeCardPokerGameRuleSettingView: View {
                 }
 
             }) {
-                Text("Start")
-                    .font(.headline)
-                    .foregroundColor(.white)
-                    .padding()
-                    .background(Color.blue)
-                    .cornerRadius(10)
+                Image("icon_start").resizable().frame(width: 150, height: 60)
             }
             .padding()
             .alert(isPresented: $showAlert) {
