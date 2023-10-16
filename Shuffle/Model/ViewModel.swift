@@ -237,7 +237,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             // 获取当前帧率
             let videoFrameRate = format.videoSupportedFrameRateRanges.first!.maxFrameRate
             print("设定帧率: \(videoFrameRate)")
-            changeCameraFrameRate(to: 240)
+            changeCameraFrameRate(to: 60)
         } catch {
             print("配置前置摄像头时发生错误: \(error)")
         }
@@ -316,7 +316,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             if self.isBackCamera{
                 indexGap = 8
             }
-            if !self.isBlack && (self.cameraFrameRate < 60 || self.taskIndex % indexGap == 0){
+            if !self.isBlack && (self.cameraFrameRate <= 60 || self.taskIndex % indexGap == 0){
                 do{
                     let cgImage = self.context.createCGImage(ciImage, from: ciImage.extent)!
                     let cgImageFormat = vImage_CGImageFormat(

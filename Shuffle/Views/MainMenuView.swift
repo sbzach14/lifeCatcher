@@ -71,14 +71,15 @@ struct SearchBar: View {
     @Binding var searchText: String
     
     var body: some View {
-        ZStack {
-            TextField("       Search", text: $searchText)
+        ZStack(alignment: .leading) {
+            TextField("         Search", text: $searchText)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .disableAutocorrection(true)
+                .accentColor(.white)
             
             Image(systemName: "magnifyingglass")
                 .foregroundColor(.gray)
-                .offset(x: -180)
+                .padding(.leading, 10)
             
             if !searchText.isEmpty {
                 Button(action: {
