@@ -677,7 +677,7 @@ struct ThreeCardPokerGameRuleSettingView: View {
                 )
                 .hidden()
             )
-        }.navigationTitle("Rule Setting").background(Image("bg").resizable().scaledToFill())
+        }.navigationTitle("规则设置").background(Image("bg").resizable().scaledToFill())
     }
     
     private func showAlertWithMessage() {

@@ -38,6 +38,8 @@ struct RankRulesView: View {
                         Text(firstWord)
                             .foregroundColor(.white)
                             .padding(.leading, 20)
+                            .frame(maxWidth: 200, alignment: .leading)
+                        
                             
                     }
 
@@ -80,7 +82,7 @@ struct RankRulesView: View {
             Spacer()
             
         }
-        .navigationTitle("规则设置")
+        .navigationTitle("牌型顺序")
         .background(
             Image("bg")
                 .resizable()

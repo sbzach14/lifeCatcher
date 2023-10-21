@@ -53,7 +53,7 @@ struct RecordHistoryView: View {
                 .resizable()
                 .scaledToFill()
         )
-        .navigationBarTitle("记录历史")
+        .navigationBarTitle("历史记录")
         .onAppear {
             // Show the navigation bar when this view appears
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
