@@ -64,7 +64,7 @@ struct SuitRulesView: View {
             }
             Spacer()
         }
-        .navigationTitle("花色设置")
+        .navigationTitle("花色顺序")
         .background(
             Image("bg")
                 .resizable()

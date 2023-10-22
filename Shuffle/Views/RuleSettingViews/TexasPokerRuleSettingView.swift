@@ -551,7 +551,7 @@ struct TexasPokerRuleSettingView: View {
                 )
                 .hidden()
             )
-        }.navigationTitle("Rule Setting")
+        }.navigationTitle("规则设置")
             .background(Image("bg").resizable().scaledToFill())
     }
     

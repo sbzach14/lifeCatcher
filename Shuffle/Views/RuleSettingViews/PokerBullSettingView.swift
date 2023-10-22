@@ -190,6 +190,30 @@ struct PokerBullSettingView: View {
                         )
                         .frame(height: 50)
                     }
+                    
+                    HStack
+                    {Image("icon_user")
+                            .resizable()
+                            .frame(width: 40, height: 40).padding(.leading, 20)
+                        Text("玩家数量")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .foregroundColor(.white) // 左侧间距
+                        Picker("playerNum", selection: $playerNum) {
+                            ForEach(0...selectedRule.playerNum.count - 1, id: \.self) { index in
+                                Text(String(selectedRule.playerNum[index])).tag(index)
+                            }
+                        }
+                        .pickerStyle(MenuPickerStyle())
+                        .frame(width: 160, height: 30, alignment: .trailing)
+                        .padding(.trailing, 30) // 右侧间距
+                        .accentColor(.white) // 右侧间距
+                    }.background(
+                        Image("list_bg") // 背景图片
+                            .resizable()
+                            .scaledToFill()
+                    )
+                    .frame(height: 50)
+                    
                     HStack{Image("icon_setting")
                             .resizable()
                             .frame(width: 40, height: 40).padding(.leading, 20)
@@ -216,28 +240,7 @@ struct PokerBullSettingView: View {
                     )
                     .frame(height: 50)
                     
-                    HStack
-                    {Image("icon_user")
-                            .resizable()
-                            .frame(width: 40, height: 40).padding(.leading, 20)
-                        Text("玩家数量")
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .foregroundColor(.white) // 左侧间距
-                        Picker("playerNum", selection: $playerNum) {
-                            ForEach(0...selectedRule.playerNum.count - 1, id: \.self) { index in
-                                Text(String(selectedRule.playerNum[index])).tag(index)
-                            }
-                        }
-                        .pickerStyle(MenuPickerStyle())
-                        .frame(width: 160, height: 30, alignment: .trailing)
-                        .padding(.trailing, 30) // 右侧间距
-                        .accentColor(.white) // 右侧间距
-                    }.background(
-                        Image("list_bg") // 背景图片
-                            .resizable()
-                            .scaledToFill()
-                    )
-                    .frame(height: 50)
+                    
                     if(setting == 3){
                         HStack{Image("icon_list")
                                         .frame(width: 40, height: 40).padding(.leading, 20)
@@ -589,27 +592,23 @@ struct PokerBullSettingView: View {
                                     .scaledToFill()
                             )
                             .frame(height: 50)
+                            
                             ForEach(0..<selectedRule.BullRules.count-1, id: \.self) { index in
                                 HStack {
                                     Image("icon_list")
                                             .frame(width: 40, height: 40).padding(.leading, 20)
-                                    Toggle(isOn: Binding(
-                                        get: { selectedIndices.contains(index) },
-                                        set: { isSelected in
-                                            if isSelected {
-                                                selectedIndices.insert(index)
-                                                bullrulelist.append(index)
-                                            } else {
-                                                selectedIndices.remove(index)
-                                                if let indexToRemove = bullrulelist.firstIndex(of: index) {
-                                                    bullrulelist.remove(at: indexToRemove)
-                                                }
-                                            }
-                                        }
-                                    )) {
-                                        Text(selectedRule.BullRules[index]!).frame(maxWidth: .infinity, alignment: .leading)
-                                            .foregroundColor(.white)
-                                    }
+                                    
+                                    Text(selectedRule.BullRules[index]!)
+                                        .foregroundColor(.white)
+                                        .frame(maxWidth: 200, alignment: .leading)
+                                    
+                                    Spacer()
+
+                                    Toggle("", isOn: bindingForIndex(index))
+                                        .toggleStyle(CustomToggleStyle())
+                                        .padding(.trailing,50)
+                                        .frame(width: 60, height: 40)
+                                    
                                 }.background(
                                     Image("list_bg") // 背景图片
                                         .resizable()
@@ -637,7 +636,7 @@ struct PokerBullSettingView: View {
                                     .cornerRadius(10)
                                     .frame(width: 40, height: 40) // 设置正方形大小
                             }
-                            .padding(.trailing, 60)
+                            .padding(.trailing, 30)
                             .background(
                                 NavigationLink(
                                     destination: RankRulesView(rankRules: $rankRules, selectedRuleIndex: selectedRule.ruleIndex),
@@ -706,7 +705,8 @@ struct PokerBullSettingView: View {
                     )
                     .hidden()
                 )
-        }.background(Image("bg").resizable().scaledToFill())
+        }.navigationTitle("规则设置")
+            .background(Image("bg").resizable().scaledToFill())
     }
 
     private func showAlertWithMessage() {
@@ -755,6 +755,24 @@ struct PokerBullSettingView: View {
             
         }
     }
+    
+    private func bindingForIndex(_ index: Int) -> Binding<Bool> {
+        return Binding<Bool>(
+            get: { selectedIndices.contains(index) },
+            set: { isSelected in
+                if isSelected {
+                    selectedIndices.insert(index)
+                    bullrulelist.append(index)
+                } else {
+                    selectedIndices.remove(index)
+                    if let indexToRemove = bullrulelist.firstIndex(of: index) {
+                        bullrulelist.remove(at: indexToRemove)
+                    }
+                }
+            }
+        )
+    }
+    
 }
 
 
