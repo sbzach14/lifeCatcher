@@ -89,23 +89,43 @@ class BaoziGameHandEvaluator{
     
     func evalHand(cards: [Card])->Int{
         var score = 0
-        var num1 = cards[0].rank
-        var num2 = cards[1].rank
+        var num1 = BaoziCard(cardRank:cards[0].rank)
+        var num2 = BaoziCard(cardRank:cards[1].rank)
         
-        if num1 == 1{
-            num1 = 14
-        }
-        if num2 == 1{
-            num2 = 14
-        }
-        
-        if num1 == num2 {
-            score = num1 << 8
+        if num1.rank == num2.rank {
+            score = num1.rank << 8
         }
         else {
-            score = ((num1 + num2) % 10) << 4 | max(num1, num2)
+            score = ((num1.point + num2.point) % 10) << 4 | max(num1.rank, num2.rank)
         }
         
         return score
+    }
+}
+
+class BaoziCard{
+    var rank:Int
+    var point:Int
+    
+    init(cardRank: Int){
+        if cardRank == 1{
+            rank = 14
+        }
+        else{
+            rank = cardRank
+        }
+        
+        if cardRank == 11{
+            point = 1
+        }
+        else if cardRank == 12{
+            point = 2
+        }
+        else if cardRank == 13{
+            point = 3
+        }
+        else{
+            point = cardRank
+        }
     }
 }

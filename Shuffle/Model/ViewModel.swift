@@ -225,7 +225,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 // 设置更短的曝光时间（更快的快门速度）
                 //let desiredExposureDuration: CMTime = CMTimeMake(value: 1, timescale: 200) // 1/1000 秒
 
-                //captureDevice.exposureMode = .continuousAutoExposure
+                captureDevice.exposureMode = .continuousAutoExposure
 
                 self.captureDevice.unlockForConfiguration()
             } catch {
@@ -732,9 +732,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 let nextNodeType1 = self.detectResultList[detectResultListIndex + 1][1].nodeType
                 
                 
-                //当前点决定当前点插入的置信度 4<2
-                //下一个点决定当前点先插入的置信度 1<4<0 (不可能是23）
-                //小的先插入
                 print("iNdex ",detectResultListIndex," 牌 count = 2", cardLabelDic[nowNum0], " ", nodeType0," ", cardLabelDic[nowNum1], " ", nodeType1)
                 //Note:
                 // 加入考虑情况，最后一组拍的时候如果是一边模糊一边none
@@ -753,128 +750,87 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     let forthNode2 = self.detectResultList[detectResultListIndex + 2][1]
                     
                     
+                    var isLeftclear:Float = 0
+                    var isRightclear:Float = 0
+                    var isNextLeftclear:Float = 0
+                    var isNextRightclear:Float = 0
+                    var blurThreshold:Float = 0.1
                     
-                    var isLeftclear:Bool = true
-                    var isRightclear:Bool = true
-                    var isNextLeftclear:Bool = true
-                    var isNextRightclear:Bool = true
                     
-                    if detectResultNode1.confidence <= 0.7 && (firstNode1.confidence -  detectResultNode1.confidence >= 0.05){
-                        if detectResultNode1.nodeType == 2 || detectResultNode1.nodeType == 0{
-                            print("同时落下：[\(cardLabelDic[detectResultNode1.cardIndex[0]] ?? "none"),Confidence: \(detectResultNode1.confidence),ConfidencePercent: \(detectResultNode1.confidencePercent),\(cardLabelDic[detectResultNode2.cardIndex[0]] ?? "none"), Confidence: \(detectResultNode2.confidence), ConfidencePercent: \(detectResultNode2.confidencePercent)], \(detectResultNode1.nodeType), \(detectResultNode2.nodeType)")
-                            print("左边糊了")
-                            isLeftclear = false
-                        }
-                        
+                    if detectResultNode1.nodeType == 2{
+                        isLeftclear = firstNode1.confidence -  detectResultNode1.confidence
                     }
-                    if detectResultNode2.confidence <= 0.7 && (firstNode2.confidence - detectResultNode2.confidence >= 0.05){
-                        if detectResultNode2.nodeType == 2 || detectResultNode2.nodeType == 0{
-                            print("同时落下：[\(cardLabelDic[detectResultNode1.cardIndex[0]] ?? "none"),Confidence: \(detectResultNode1.confidence),ConfidencePercent: \(detectResultNode1.confidencePercent),\(cardLabelDic[detectResultNode2.cardIndex[0]] ?? "none"), Confidence: \(detectResultNode2.confidence), ConfidencePercent: \(detectResultNode2.confidencePercent)], \(detectResultNode1.nodeType), \(detectResultNode2.nodeType)")
-                            print("右边糊了")
-                            isRightclear = false
-
-                        }
+                    if detectResultNode2.nodeType == 2{
+                        isRightclear = firstNode2.confidence -  detectResultNode2.confidence
                     }
                     
-                    if thirdNode1.confidence <= 0.7 && (forthNode1.confidence - thirdNode1.confidence >= 0.05){
-                        if thirdNode1.nodeType == 1 || thirdNode1.nodeType == 0{
-                            print("同时落下：[\(cardLabelDic[detectResultNode1.cardIndex[0]] ?? "none"),Confidence: \(detectResultNode1.confidence),ConfidencePercent: \(detectResultNode1.confidencePercent),\(cardLabelDic[detectResultNode2.cardIndex[0]] ?? "none"), Confidence: \(detectResultNode2.confidence), ConfidencePercent: \(detectResultNode2.confidencePercent)], \(detectResultNode1.nodeType), \(detectResultNode2.nodeType)")
-                            print("下一张左边糊了")
-                            isNextLeftclear = false
-                        }
+                    if thirdNode1.nodeType == 0{
+                        isNextLeftclear = 100
+                    }
+                    else if thirdNode1.nodeType == 1{
+                        isNextLeftclear = forthNode1.confidence - thirdNode1.confidence
                     }
                     
-                    if thirdNode2.confidence <= 0.7 && (forthNode2.confidence - thirdNode2.confidence >= 0.05){
-                        if thirdNode2.nodeType == 1 || thirdNode2.nodeType == 0{
-                            print("同时落下：[\(cardLabelDic[detectResultNode1.cardIndex[0]] ?? "none"),Confidence: \(detectResultNode1.confidence),ConfidencePercent: \(detectResultNode1.confidencePercent),\(cardLabelDic[detectResultNode2.cardIndex[0]] ?? "none"), Confidence: \(detectResultNode2.confidence), ConfidencePercent: \(detectResultNode2.confidencePercent)], \(detectResultNode1.nodeType), \(detectResultNode2.nodeType)")
-                            print("下一张右边糊了")
-                            isNextRightclear = false
-                
-                        }
+                    if thirdNode2.nodeType == 0{
+                        isNextRightclear = 100
+                    }
+                    else if thirdNode2.nodeType == 1{
+                        isNextRightclear = forthNode2.confidence - thirdNode2.confidence
                     }
                     
-                    if isLeftclear == false && isRightclear == true{
+                    if thirdNode1.nodeType == 4 && thirdNode2.nodeType == 4{
+                        isNextLeftclear = 1 - thirdNode1.confidence
+                        isNextRightclear = 1 - thirdNode2.confidence
+                    }
+                    
+                    
+                    if isLeftclear > blurThreshold && isLeftclear > isRightclear{
+                        print("左边更糊")
                         self.cardArray.insert(nowNum0, at: 0)
                         self.cardArray.insert(nowNum1, at: 0)
-                    } else if isLeftclear == true && isRightclear == false{
+                    }
+                    else if isRightclear > blurThreshold && isRightclear > isLeftclear{
+                        print("右边更糊")
                         self.cardArray.insert(nowNum1, at: 0)
                         self.cardArray.insert(nowNum0, at: 0)
-                    } else if isLeftclear == false && isRightclear == false{
-                        if firstNode1.confidence -  detectResultNode1.confidence > firstNode2.confidence - detectResultNode2.confidence{
-                            print("同时落下：[\(cardLabelDic[detectResultNode1.cardIndex[0]] ?? "none"),Confidence: \(detectResultNode1.confidence),ConfidencePercent: \(detectResultNode1.confidencePercent),\(cardLabelDic[detectResultNode2.cardIndex[0]] ?? "none"), Confidence: \(detectResultNode2.confidence), ConfidencePercent: \(detectResultNode2.confidencePercent)], \(detectResultNode1.nodeType), \(detectResultNode2.nodeType)")
-                            print("左边比右边更糊，左边先落下")
-                            self.cardArray.insert(nowNum0, at: 0)
-                            self.cardArray.insert(nowNum1, at: 0)
-                        } else if firstNode1.confidence -  detectResultNode1.confidence < firstNode2.confidence - detectResultNode2.confidence{
-                            print("同时落下：[\(cardLabelDic[detectResultNode1.cardIndex[0]] ?? "none"),Confidence: \(detectResultNode1.confidence),ConfidencePercent: \(detectResultNode1.confidencePercent),\(cardLabelDic[detectResultNode2.cardIndex[0]] ?? "none"), Confidence: \(detectResultNode2.confidence), ConfidencePercent: \(detectResultNode2.confidencePercent)], \(detectResultNode1.nodeType), \(detectResultNode2.nodeType)")
-                            print("右边的更糊，右边先落下")
+                    }
+                    else{
+                        if isNextLeftclear == 100 && isNextRightclear != 100{
+                            print("下一张的左边糊，左边后落下")
                             self.cardArray.insert(nowNum1, at: 0)
                             self.cardArray.insert(nowNum0, at: 0)
                         }
-                    // dou qing xi
-                    }else if isLeftclear == true && isRightclear == true{
-                        if isNextLeftclear == false && isNextRightclear == true{
-                            self.cardArray.insert(nowNum1, at: 0)
-                            self.cardArray.insert(nowNum0, at: 0)
-                        } else if isNextLeftclear == true && isNextRightclear == false{
+                        else if isNextLeftclear != 100 && isNextRightclear == 100{
+                            print("下一张的右边糊，右边后落下")
                             self.cardArray.insert(nowNum0, at: 0)
                             self.cardArray.insert(nowNum1, at: 0)
-                        } else if isNextLeftclear == false && isNextRightclear == false{
-                            if forthNode1.confidence - thirdNode1.confidence >= forthNode2.confidence - thirdNode2.confidence{
-                                print("同时落下：[\(cardLabelDic[detectResultNode1.cardIndex[0]] ?? "none"),Confidence: \(detectResultNode1.confidence),ConfidencePercent: \(detectResultNode1.confidencePercent),\(cardLabelDic[detectResultNode2.cardIndex[0]] ?? "none"), Confidence: \(detectResultNode2.confidence), ConfidencePercent: \(detectResultNode2.confidencePercent)], \(detectResultNode1.nodeType), \(detectResultNode2.nodeType)")
+                        }
+                        else
+                        {
+                            if isNextLeftclear > isNextRightclear{
                                 print("下一张的左边更糊，左边后落下")
                                 self.cardArray.insert(nowNum1, at: 0)
                                 self.cardArray.insert(nowNum0, at: 0)
-                            }else if forthNode1.confidence - thirdNode1.confidence < forthNode2.confidence - thirdNode2.confidence{
-                                print("同时落下：[\(cardLabelDic[detectResultNode1.cardIndex[0]] ?? "none"),Confidence: \(detectResultNode1.confidence),ConfidencePercent: \(detectResultNode1.confidencePercent),\(cardLabelDic[detectResultNode2.cardIndex[0]] ?? "none"), Confidence: \(detectResultNode2.confidence), ConfidencePercent: \(detectResultNode2.confidencePercent)], \(detectResultNode1.nodeType), \(detectResultNode2.nodeType)")
+                            }
+                            else if isNextRightclear > isNextLeftclear{
                                 print("下一张的右边更糊，右边后落下")
                                 self.cardArray.insert(nowNum0, at: 0)
                                 self.cardArray.insert(nowNum1, at: 0)
                             }
-                        } else if Double.random(in: 0..<1) < 0.5{
-                            print("同时落下：[\(cardLabelDic[detectResultNode1.cardIndex[0]] ?? "none"),Confidence: \(detectResultNode1.confidence),ConfidencePercent: \(detectResultNode1.confidencePercent),\(cardLabelDic[detectResultNode2.cardIndex[0]] ?? "none"), Confidence: \(detectResultNode2.confidence), ConfidencePercent: \(detectResultNode2.confidencePercent)], \(detectResultNode1.nodeType), \(detectResultNode2.nodeType)")
-                            print("没有牌糊了，随即落下")
-                            self.cardArray.insert(nowNum0, at: 0)
-                            self.cardArray.insert(nowNum1, at: 0)
-                        } else{
-                            print("同时落下：[\(cardLabelDic[detectResultNode1.cardIndex[0]] ?? "none"),Confidence: \(detectResultNode1.confidence),ConfidencePercent: \(detectResultNode1.confidencePercent),\(cardLabelDic[detectResultNode2.cardIndex[0]] ?? "none"), Confidence: \(detectResultNode2.confidence), ConfidencePercent: \(detectResultNode2.confidencePercent)], \(detectResultNode1.nodeType), \(detectResultNode2.nodeType)")
-                            print("没有牌糊了，随即落下")
-                            self.cardArray.insert(nowNum1, at: 0)
-                            self.cardArray.insert(nowNum0, at: 0)
+                            else{
+                                if Double.random(in: 0..<1) < 0.5{
+                                    print("随机落下")
+                                    self.cardArray.insert(nowNum0, at: 0)
+                                    self.cardArray.insert(nowNum1, at: 0)
+                                }
+                                else{
+                                    print("随机落下")
+                                    self.cardArray.insert(nowNum1, at: 0)
+                                    self.cardArray.insert(nowNum0, at: 0)
+                                }
+                            }
                         }
                     }
-                    
-//                    let nowRank0 = [4,2].firstIndex(of: nodeType0)!
-//                    let nowRank1 = [4,2].firstIndex(of: nodeType1)!
-//                    let nextRank0 = [1,4,0].firstIndex(of: nextNodeType0)!
-//                    let nextRank1 = [1,4,0].firstIndex(of: nextNodeType1)!
-//
-//                    if nextRank0 < nextRank1{
-//                        self.cardArray.insert(nowNum0, at: 0)
-//                        self.cardArray.insert(nowNum1, at: 0)
-//                    }
-//                    else if nextRank0 > nextRank1{
-//                        self.cardArray.insert(nowNum1, at: 0)
-//                        self.cardArray.insert(nowNum0, at: 0)
-//                    }
-//                    else if nowRank0 < nowRank0{
-//                        self.cardArray.insert(nowNum0, at: 0)
-//                        self.cardArray.insert(nowNum1, at: 0)
-//                    }
-//                    else if nowRank0 > nowRank1{
-//                        self.cardArray.insert(nowNum1, at: 0)
-//                        self.cardArray.insert(nowNum0, at: 0)
-//                    }
-//                    else if Double.random(in: 0..<1) < 0.5{
-//                        self.cardArray.insert(nowNum0, at: 0)
-//                        self.cardArray.insert(nowNum1, at: 0)
-//                    }
-//                    else{
-//                        self.cardArray.insert(nowNum1, at: 0)
-//                        self.cardArray.insert(nowNum0, at: 0)
-//                    }
-                    
-                    
                 }
                 //单个插入
                 else{
