@@ -30,7 +30,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var cardArray :  [Int] = []
     @Published var winnerPlayer: [Int] = []
 
-    let model = try! cardDetection_s_1014()
+    let model = try! cardDetection_s_1009()
 
     
 
@@ -714,6 +714,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             if self.detectResultList[detectResultListIndex].count == 1{
                 var nowNum = self.detectResultList[detectResultListIndex][0].cardIndex[0]
                 var nodeType = self.detectResultList[detectResultListIndex][0].nodeType
+                print("iNdex ",detectResultListIndex," 牌 count = 1", cardLabelDic[nowNum], " ", nodeType)
+
                 if nodeType == 2 || nodeType == 4{
                     self.cardArray.insert(nowNum, at: 0)
                 }
@@ -733,8 +735,9 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 //当前点决定当前点插入的置信度 4<2
                 //下一个点决定当前点先插入的置信度 1<4<0 (不可能是23）
                 //小的先插入
-                print("iNdex ",detectResultListIndex," 牌 ", cardLabelDic[nowNum0], " ", nodeType0," ", cardLabelDic[nowNum1], " ", nodeType1)
-                
+                print("iNdex ",detectResultListIndex," 牌 count = 2", cardLabelDic[nowNum0], " ", nodeType0," ", cardLabelDic[nowNum1], " ", nodeType1)
+                //Note:
+                // 加入考虑情况，最后一组拍的时候如果是一边模糊一边none
                 //同时插入
                 if (nodeType0 == 2 || nodeType0 == 4) && (nodeType1 == 2 || nodeType1 == 4){
                     //取连续四帧
@@ -756,7 +759,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     var isNextLeftclear:Bool = true
                     var isNextRightclear:Bool = true
                     
-                    if (detectResultNode1.confidence <= 0.8 && (firstNode1.confidence -  detectResultNode1.confidence >= 0.05)) || detectResultNode1.confidence <= 0.7 {
+                    if detectResultNode1.confidence <= 0.7 && (firstNode1.confidence -  detectResultNode1.confidence >= 0.05){
                         if detectResultNode1.nodeType == 2 || detectResultNode1.nodeType == 0{
                             print("同时落下：[\(cardLabelDic[detectResultNode1.cardIndex[0]] ?? "none"),Confidence: \(detectResultNode1.confidence),ConfidencePercent: \(detectResultNode1.confidencePercent),\(cardLabelDic[detectResultNode2.cardIndex[0]] ?? "none"), Confidence: \(detectResultNode2.confidence), ConfidencePercent: \(detectResultNode2.confidencePercent)], \(detectResultNode1.nodeType), \(detectResultNode2.nodeType)")
                             print("左边糊了")
@@ -764,7 +767,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         }
                         
                     }
-                    if (detectResultNode2.confidence <= 0.8 && (firstNode2.confidence - detectResultNode2.confidence >= 0.05)) || detectResultNode2.confidence <= 0.7 {
+                    if detectResultNode2.confidence <= 0.7 && (firstNode2.confidence - detectResultNode2.confidence >= 0.05){
                         if detectResultNode2.nodeType == 2 || detectResultNode2.nodeType == 0{
                             print("同时落下：[\(cardLabelDic[detectResultNode1.cardIndex[0]] ?? "none"),Confidence: \(detectResultNode1.confidence),ConfidencePercent: \(detectResultNode1.confidencePercent),\(cardLabelDic[detectResultNode2.cardIndex[0]] ?? "none"), Confidence: \(detectResultNode2.confidence), ConfidencePercent: \(detectResultNode2.confidencePercent)], \(detectResultNode1.nodeType), \(detectResultNode2.nodeType)")
                             print("右边糊了")
@@ -773,7 +776,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         }
                     }
                     
-                    if (thirdNode1.confidence <= 0.8 && (forthNode1.confidence - thirdNode1.confidence >= 0.05)) || thirdNode1.confidence <= 0.7{
+                    if thirdNode1.confidence <= 0.7 && (forthNode1.confidence - thirdNode1.confidence >= 0.05){
                         if thirdNode1.nodeType == 1 || thirdNode1.nodeType == 0{
                             print("同时落下：[\(cardLabelDic[detectResultNode1.cardIndex[0]] ?? "none"),Confidence: \(detectResultNode1.confidence),ConfidencePercent: \(detectResultNode1.confidencePercent),\(cardLabelDic[detectResultNode2.cardIndex[0]] ?? "none"), Confidence: \(detectResultNode2.confidence), ConfidencePercent: \(detectResultNode2.confidencePercent)], \(detectResultNode1.nodeType), \(detectResultNode2.nodeType)")
                             print("下一张左边糊了")
@@ -781,7 +784,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         }
                     }
                     
-                    if (thirdNode2.confidence <= 0.8 && (forthNode2.confidence - thirdNode2.confidence >= 0.05)) || thirdNode2.confidence <= 0.7{
+                    if thirdNode2.confidence <= 0.7 && (forthNode2.confidence - thirdNode2.confidence >= 0.05){
                         if thirdNode2.nodeType == 1 || thirdNode2.nodeType == 0{
                             print("同时落下：[\(cardLabelDic[detectResultNode1.cardIndex[0]] ?? "none"),Confidence: \(detectResultNode1.confidence),ConfidencePercent: \(detectResultNode1.confidencePercent),\(cardLabelDic[detectResultNode2.cardIndex[0]] ?? "none"), Confidence: \(detectResultNode2.confidence), ConfidencePercent: \(detectResultNode2.confidencePercent)], \(detectResultNode1.nodeType), \(detectResultNode2.nodeType)")
                             print("下一张右边糊了")
@@ -836,7 +839,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         } else{
                             print("同时落下：[\(cardLabelDic[detectResultNode1.cardIndex[0]] ?? "none"),Confidence: \(detectResultNode1.confidence),ConfidencePercent: \(detectResultNode1.confidencePercent),\(cardLabelDic[detectResultNode2.cardIndex[0]] ?? "none"), Confidence: \(detectResultNode2.confidence), ConfidencePercent: \(detectResultNode2.confidencePercent)], \(detectResultNode1.nodeType), \(detectResultNode2.nodeType)")
                             print("没有牌糊了，随即落下")
-
                             self.cardArray.insert(nowNum1, at: 0)
                             self.cardArray.insert(nowNum0, at: 0)
                         }
