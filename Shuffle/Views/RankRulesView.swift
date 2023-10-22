@@ -12,7 +12,6 @@ struct RankRulesView: View {
         let selectedRule = GameManager.gameRules[selectedRuleIndex]!
         
         VStack{
-            Divider()
             ForEach(rankRules.indices, id: \.self) { index in
                 HStack{
                     if index == 0{
@@ -79,8 +78,8 @@ struct RankRulesView: View {
                         }
                 )
             }
-            Spacer()
             
+            Spacer()
         }
         .navigationTitle("牌型顺序")
         .background(
@@ -98,11 +97,11 @@ struct RankRulesView: View {
         var newIndex = draggedIndex
         let offset = Int(dragOffset.height)
         if offset > 0{
-            newIndex = newIndex + offset / 45 + 1
+            newIndex = newIndex + offset / 50 + 1
             newIndex = min(newIndex, rankRules.count)
         }
         else{
-            newIndex = newIndex - (-offset) / 45
+            newIndex = newIndex - (-offset) / 50
             newIndex = max(newIndex, 0)
         }
         
@@ -127,7 +126,15 @@ struct RankRulesView_Previews: PreviewProvider {
         RankRulesSate(index: 0, isChecked: false),
         RankRulesSate(index: 1, isChecked: true),
         RankRulesSate(index: 2, isChecked: true),
-        RankRulesSate(index: 3, isChecked: true)
+        RankRulesSate(index: 3, isChecked: true),
+        RankRulesSate(index: 3, isChecked: true),
+        RankRulesSate(index: 3, isChecked: true),
+        RankRulesSate(index: 3, isChecked: true),
+        RankRulesSate(index: 3, isChecked: true),
+        RankRulesSate(index: 3, isChecked: true),
+        RankRulesSate(index: 3, isChecked: true),
+        RankRulesSate(index: 3, isChecked: true),
+        RankRulesSate(index: 3, isChecked: true),
         // Add more RankRulesState items as needed
     ]
     

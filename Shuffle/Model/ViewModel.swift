@@ -225,7 +225,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 // 设置更短的曝光时间（更快的快门速度）
                 //let desiredExposureDuration: CMTime = CMTimeMake(value: 1, timescale: 200) // 1/1000 秒
 
-                captureDevice.exposureMode = .continuousAutoExposure
+                //captureDevice.exposureMode = .continuousAutoExposure
 
                 self.captureDevice.unlockForConfiguration()
             } catch {
@@ -237,7 +237,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             // 获取当前帧率
             let videoFrameRate = format.videoSupportedFrameRateRanges.first!.maxFrameRate
             print("设定帧率: \(videoFrameRate)")
-            changeCameraFrameRate(to: 60)
+            changeCameraFrameRate(to: 30)
         } catch {
             print("配置前置摄像头时发生错误: \(error)")
         }
@@ -316,7 +316,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             if self.isBackCamera{
                 indexGap = 8
             }
-            if !self.isBlack && (self.cameraFrameRate <= 60 || self.taskIndex % indexGap == 0){
+            if !self.isBlack && (self.cameraFrameRate <= 30 || self.taskIndex % indexGap == 0){
                 do{
                     let cgImage = self.context.createCGImage(ciImage, from: ciImage.extent)!
                     let cgImageFormat = vImage_CGImageFormat(
@@ -480,7 +480,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             
             if frameCounter == 600{
                 DispatchQueue.main.async{
-                    self.changeCameraFrameRate(to: 60)
+                    self.changeCameraFrameRate(to: 30)
                 }
                 return
             }
@@ -560,7 +560,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 print("动作：切牌完成")
                 speakText(input: "切牌完成")
                 DispatchQueue.main.async{
-                    self.changeCameraFrameRate(to: 60)
+                    self.changeCameraFrameRate(to: 30)
                     self.computeWinnerPlayer()
                 }
             }
@@ -571,7 +571,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 print("动作：洗牌完成 ", self.setFrameRate)
                 speakText(input: "洗牌完成")
                 DispatchQueue.main.async{
-                    self.changeCameraFrameRate(to: 60)
+                    self.changeCameraFrameRate(to: 30)
 //                    self.handleShuffleResult()
                     self.handleDetecResultList()
                     self.centerX = 0
@@ -1156,7 +1156,21 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             
         }
         
-        
+        //先删除相同的
+        if result.count > 2{
+            // 使用 Set 来去除重复元素
+            var uniqueCardIndexes = Set<Int>()
+
+            result = result.filter {
+                let cardIndex0 = $0.cardIndex[0]
+                if uniqueCardIndexes.contains(cardIndex0) {
+                    return false // 已经存在相同的 cardIndex[0]
+                } else {
+                    uniqueCardIndexes.insert(cardIndex0)
+                    return true
+                }
+            }
+        }
         
         if result.count > 2{
             result.sort{$0.confidence > $1.confidence}
