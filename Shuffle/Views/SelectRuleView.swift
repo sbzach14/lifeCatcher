@@ -11,6 +11,7 @@ struct SelectRuleView: View {
         4:"三公",
         5:"二八杠",
         6:"九点半",
+        7:"宝子"
     ]
         
     
@@ -65,6 +66,8 @@ private func destinationView(for index: Int) -> some View {
         return AnyView(TwoEightGangGameRuleSettingView())
     case 6:
         return AnyView(NinePointFiveGameRuleSettingView())
+    case 7:
+        return AnyView(BaoziGameRuleSettingView())
     default:
         return AnyView(EmptyView())
     }

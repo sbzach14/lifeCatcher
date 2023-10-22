@@ -17,9 +17,10 @@ class GameManager {
         let rule3 = TinyNineGameRule(ruleIndex: 3, ruleName: "小九")
         let rule4 = ThreeMenGameRule(ruleIndex: 4, ruleName: "三公")
         let rule5 = TwoEightGangGameRule(ruleIndex: 5, ruleName: "二八杠")
-        let rule6 = NinePointFiveGameRule(ruleIndex: 6, ruleName: "九点半")        
+        let rule6 = NinePointFiveGameRule(ruleIndex: 6, ruleName: "九点半")
+        let rule7 = BaoziGameRule(ruleIndex: 7, ruleName: "宝子")
         
-        return [rule0.ruleIndex: rule0, rule1.ruleIndex: rule1, rule2.ruleIndex: rule2, rule3.ruleIndex: rule3, rule4.ruleIndex: rule4, rule5.ruleIndex: rule5, rule6.ruleIndex: rule6]
+        return [rule0.ruleIndex: rule0, rule1.ruleIndex: rule1, rule2.ruleIndex: rule2, rule3.ruleIndex: rule3, rule4.ruleIndex: rule4, rule5.ruleIndex: rule5, rule6.ruleIndex: rule6, rule7.ruleIndex: rule7]
     }()
     
     
@@ -44,7 +45,8 @@ class GameManager {
             3: TinyNineGame.FindWinner,
             4: ThreeMenGame.FindWinner,
             5: TwoEightGangGame.FindWinner,
-            6: NinePointFiveGame.FindWinner
+            6: NinePointFiveGame.FindWinner,
+            7: BaoziGame.FindWinner,
         ]
 
         // 检查 gameIndex 是否存在于字典中
