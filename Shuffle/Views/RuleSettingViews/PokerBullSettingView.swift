@@ -241,6 +241,33 @@ struct PokerBullSettingView: View {
                     .frame(height: 50)
                     
                     
+                    HStack{Image("icon_search")
+                            .resizable()
+                            .frame(width: 40, height: 40).padding(.leading, 20)
+                        Text("规则说明")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .foregroundColor(.white) // 左侧间距
+                        Picker("setting", selection: $setting) {
+                            ForEach(0...selectedRule.setting.count - 1, id: \.self) {
+                                index in
+                                Text(selectedRule.setting[index]!).tag(index)
+                            }
+                        }
+                        .pickerStyle(MenuPickerStyle())
+                        .frame(width: 160, height: 30, alignment: .trailing)
+                        .padding(.trailing, 30) // 右侧间距
+                        .accentColor(.white) // 右侧间距
+                        .onChange(of: setting) { _ in
+                            handleSettingChange()
+                        }
+                    }.background(
+                        Image("list_bg") // 背景图片
+                            .resizable()
+                            .scaledToFill()
+                    )
+                    .frame(height: 50)
+                    
+                    
                     if(setting == 3){
                         HStack{Image("icon_list")
                                         .frame(width: 40, height: 40).padding(.leading, 20)
