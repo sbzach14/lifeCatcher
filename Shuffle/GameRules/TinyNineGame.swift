@@ -9,6 +9,12 @@ class TinyNineGameRule : Rule{
     let setting: [Int: String] = [
         0: "标准"
     ]
+    let ruleInfo: [Int: String] = [
+        0:"""
+一人发两张牌，一共四十张牌1-10
+对子最大，如果不是对子比较两张牌加起来除以十的余数，如果一样则一样大
+"""
+    ]
     let playerNum : [Int] = [2,3,4,5,6,7,8,9,10]
 }
 

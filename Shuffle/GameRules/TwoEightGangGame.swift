@@ -8,6 +8,15 @@ class TwoEightGangGameRule : Rule{
     let setting: [Int: String] = [
         0: "标准"
     ]
+    let ruleInfo:[Int: String] = [
+        0:"""
+36张牌，2-10，一人两张
+大小：
+对子
+28
+两张牌加起来的点数，点数一样一样大
+"""
+    ]
     let playerNum : [Int] = [2,3,4,5,6,7,8,9,10]
     
 }

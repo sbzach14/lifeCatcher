@@ -9,6 +9,15 @@ class NinePointFiveGameRule : Rule{
     let setting: [Int: String] = [
         0: "标准"
     ]
+    let ruleInfo:[Int:String] = [
+        0:"""
+一共52张牌，A-K，每人发两张比大小，J，Q，K算半点
+大小：
+九点半，
+1-9的对子，
+散牌，计算点数之和处以10的余数大小
+"""
+    ]
     let playerNum : [Int] = [2,3,4,5,6,7,8,9,10]
     
     override init(ruleIndex: Int, ruleName: String) {

@@ -9,6 +9,16 @@ class ThreeMenGameRule : Rule{
     let setting: [Int: String] = [
         0: "标准"
     ]
+    let ruleInfo: [Int:String] = [
+        0:"""
+52张牌，A-K，每人发三张牌，A最小，K最大
+大小：
+三三，三个3
+三条，三个同点数牌
+三公，三个公牌J，Q，K
+散牌
+"""
+    ]
     let playerNum : [Int] = [2,3,4,5,6,7,8,9,10]
     
     override init(ruleIndex: Int, ruleName: String) {

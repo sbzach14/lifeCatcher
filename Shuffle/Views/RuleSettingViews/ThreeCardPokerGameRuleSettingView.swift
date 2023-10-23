@@ -225,11 +225,24 @@ struct ThreeCardPokerGameRuleSettingView: View {
                         }
                         .pickerStyle(MenuPickerStyle())
                         .frame(width: 160, height: 30, alignment: .trailing)
-                        .padding(.trailing, 30) // 右侧间距
                         .accentColor(.white)
                         .onChange(of: setting) { _ in
                             handleSettingChange()
                         }
+                        Button(action: {
+                                        // 点击按钮时，显示弹出窗口
+                            self.showAlert = true
+                                    }) {
+                                        Image(systemName: "info.circle") // 你可以选择其他图标
+                                            .foregroundColor(.white)
+                                    }.padding(.trailing, 5)
+                                    .alert(isPresented: $showAlert) {
+                                        Alert(
+                                            title: Text("规则说明"),
+                                            message: Text(selectedRule.ruleInfo[setting]!),
+                                            dismissButton: .default(Text("关闭"))
+                                        )
+                                    }
                     }.background(
                         Image("list_bg") // 背景图片
                             .resizable()

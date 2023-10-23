@@ -227,12 +227,25 @@ struct PokerBullSettingView: View {
                             }
                         }
                         .pickerStyle(MenuPickerStyle())
-                        .frame(width: 160, height: 30, alignment: .trailing)
-                        .padding(.trailing, 30) // 右侧间距
+                        .frame(width: 160, height: 30, alignment: .trailing)// 右侧间距
                         .accentColor(.white) // 右侧间距
                         .onChange(of: setting) { _ in
                             handleSettingChange()
                         }
+                        Button(action: {
+                                        // 点击按钮时，显示弹出窗口
+                            self.showAlert = true
+                                    }) {
+                                        Image(systemName: "info.circle") // 你可以选择其他图标
+                                            .foregroundColor(.white)
+                                    }.padding(.trailing, 5)
+                                    .alert(isPresented: $showAlert) {
+                                        Alert(
+                                            title: Text("规则说明"),
+                                            message: Text(selectedRule.ruleInfo[setting]!),
+                                            dismissButton: .default(Text("关闭"))
+                                        )
+                                    }
                     }.background(
                         Image("list_bg") // 背景图片
                             .resizable()
@@ -240,35 +253,7 @@ struct PokerBullSettingView: View {
                     )
                     .frame(height: 50)
                     
-                    
-                    HStack{Image("icon_search")
-                            .resizable()
-                            .frame(width: 40, height: 40).padding(.leading, 20)
-                        Text("规则说明")
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .foregroundColor(.white) // 左侧间距
-                        Picker("setting", selection: $setting) {
-                            ForEach(0...selectedRule.setting.count - 1, id: \.self) {
-                                index in
-                                Text(selectedRule.setting[index]!).tag(index)
-                            }
-                        }
-                        .pickerStyle(MenuPickerStyle())
-                        .frame(width: 160, height: 30, alignment: .trailing)
-                        .padding(.trailing, 30) // 右侧间距
-                        .accentColor(.white) // 右侧间距
-                        .onChange(of: setting) { _ in
-                            handleSettingChange()
-                        }
-                    }.background(
-                        Image("list_bg") // 背景图片
-                            .resizable()
-                            .scaledToFill()
-                    )
-                    .frame(height: 50)
-                    
-                    
-                    if(setting == 3){
+                    if(setting == 9){
                         HStack{Image("icon_list")
                                         .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("牌库数量")

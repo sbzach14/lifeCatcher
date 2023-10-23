@@ -9,6 +9,14 @@ class BaoziGameRule : Rule{
     let setting: [Int: String] = [
         0: "标准"
     ]
+    let ruleInfo: [Int: String] = [
+        0: """
+一共52张牌，a-k，a最大
+每人发两张牌
+对子最大，然后比相加的点数，相加点数相同比最大牌。
+J，Q，K算点数的时候算1，2，3点
+"""
+    ]
     let playerNum : [Int] = [2,3,4,5,6,7,8,9,10]
 }
 
