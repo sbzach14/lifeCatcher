@@ -10,8 +10,6 @@ struct MainContentView: View {
     var allCardIndex: [Int]
     var minCardNum : Int
     @ObservedObject var viewModel = ViewModel()
-    
-    
     var body: some View {
         ZStack {
             if viewModel.isBlack {

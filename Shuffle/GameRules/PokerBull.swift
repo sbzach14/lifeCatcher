@@ -30,7 +30,7 @@ class PokerBullRule : Rule{
 1)选其中三张组牛，三张牌的点数相加为0的为牛(K，Q，J，10为0点).
 2)若能组成牛的，再统计剩下的两张的点数，为几就称为牛几。
 3)若同牛同点比最大的牌。
-4) 若不能组成牛，比最大的牌
+4)若不能组成牛，比最大的牌
 """,
         1:"""
 54张牌，每家5张牌
@@ -42,7 +42,9 @@ class PokerBullRule : Rule{
         2:"""
 40张牌，1-10，每家5张牌。
 1)选其中三张组牛，三张牌的点数相加为0的为牛。
-2)若能组成牛的，再统计剩下的两张的点数，为几就称为牛几。3)若同牛同点比最大的牌。4)若不能组成牛，比最大的牌
+2)若能组成牛的，再统计剩下的两张的点数，为几就称为牛几。
+3)若同牛同点比最大的牌。
+4)若不能组成牛，比最大的牌
 """,
         3:"""
 54张牌，每家5张牌
@@ -66,9 +68,8 @@ class PokerBullRule : Rule{
 54张牌，每家5张牌
 1)五花 (JQKW任意5张)，比最大牌
 2)四条
-3) 五小(所有等于5和比5小的报牌)，比最大牌
-4)牛 有三张牌点数相加为0的为牛。大小王JQK为0点，A-9分别算1-9点10算0点。若能组成牛
-的，再统计剩下的两张的点数，为几就称为牛几(牛10也称为牛牛)若同牛同点比最大的牌大王>小王>黑头K>....方片A
+3)五小(所有等于5和比5小的报牌)，比最大牌
+4)牛,有三张牌点数相加为0的为牛。大小王JQK为0点，A-9分别算1-9点10算0点。若能组成牛的，再统计剩下的两张的点数，为几就称为牛几(牛10也称为牛牛)若同牛同点比最大的牌大王>小王>黑头K>....方片A
 5) 单张 比最大牌 大王>小王>黑头K>...方片A
 """,
         6:"""
@@ -78,7 +79,7 @@ class PokerBullRule : Rule{
 3，5小:5张牌点数加起来小于10点，同点情况下比最小牌。
 4，葫芦: 3条加1对，同是葫芦比三条大小。
 5，一条龙:5张顺子，清色大于杂色，同杂色比最大牌。同样大小的清色顺子，黑红梅方排序;
-6，铁板牛牛: 3条加2张单牌，切2单牌点数和为0点，同是铁板牛牛比3条大小。
+6，铁板牛牛: 3条加2张单牌，且2单牌点数和为0点，同是铁板牛牛比3条大小。
 7，其他和常规斗牛一样。
 """,
         7:"""
@@ -89,7 +90,7 @@ K>Q>J>10>大王>小王...3>2>1，每人5张
 不过大小王比KQJ10小，都算0点
 """,
         8:"""
-54张，
+52张，
 数字比较： k>q>j>10>9>8>7>6>5>4>3>2>a。
 花色比较：黑桃>红桃>梅花>方块。
 牌型比较：无牛<有牛<牛牛<银牛<金牛<炸弹<五小牛。
@@ -260,13 +261,28 @@ K>Q>J>10>大王>小王...3>2>1，每人5张
 class PokerBull{
     static func FindWinner(inputCards:[Int], args:[Int], rankRules:[Int], suitRules: [Int]) -> [Int]? {
         
+        let testCardLabelDic : [Int:String] = [
+            0: "♠️A ", 1: "♠️2 ", 2: "♠️3 ", 3: "♠️4 ", 4: "♠️5 ", 5: "♠️6 ", 6: "♠️7 ", 7: "♠️8 ", 8: "♠️9 ", 9: "♠️10 ",
+            10: "♠️J ", 11: "♠️Q ", 12: "♠️K ", 13: "♥️A ", 14: "♥️2 ", 15: "♥️3 ", 16: "♥️4 ", 17: "♥️5 ", 18: "♥️6 ",
+            19: "♥️7 ", 20: "♥️8 ", 21: "♥️9 ", 22: "♥️10 ", 23: "♥️J ", 24: "♥️Q ", 25: "♥️K ", 26: "♣️A ", 27: "♣️2 ",
+            28: "♣️3 ", 29: "♣️4 ", 30: "♣️5 ", 31: "♣️6 ", 32: "♣️7 ", 33: "♣️8 ", 34: "♣️9 ", 35: "♣️10 ", 36: "♣️J ",
+            37: "♣️Q ", 38: "♣️K ", 39: "♦️A ", 40: "♦️2 ", 41: "♦️3 ", 42: "♦️4 ", 43: "♦️5 ", 44: "♦️6", 45: "♦️7",
+            46: "♦️8 ", 47: "♦️9 ", 48: "♦️10 ", 49: "♦️J ", 50: "♦️Q ", 51: "♦️K ", 52: "none", 53: "小王", 54: "大王"
+        ]
 
 //        let json = Python.import("json")
 //
 //        let pythonObject =  json.PokerBullGame.calResult(inputCards, args, rankRules, suitRules)
         // 使用 map() 函数将 PythonList 转换为 Int 数组
 //        let intArray = Array<Int>(pythonObject)!
+        print("Array")
+        var inputString : String = ""
+        for i in 0..<inputCards.count{
+            inputString += testCardLabelDic[inputCards[i]]!
+        }
+        print(inputString)
         
+        let winnersArray = PokerBullGame.calResult(cardArray: inputCards, args: args, rankRules: rankRules, suitRules: suitRules)
         return nil
     }
     
@@ -278,8 +294,6 @@ class PokerBull{
         if(handNum * playerNum > cardNum){
             return "牌数不足"
         }
-        
-        
         return ""
         
     }
@@ -416,7 +430,7 @@ class BullPlayer {
     }
     
     func evaluateHandCards(bullRules: [Int], sameBullPointComparision: Int, fiveLittleComparision: Int, fiveLittleEqualToStraight: Bool, rankRules: [Int]) {
-        self.evaluateFlag = BullHandEvaluator.evaluate(cards: self.playerCard, bullRules: bullRules, inputSameBullPointComparision: sameBullPointComparision, inputFiveLittleComparision: fiveLittleComparision, inputFiveLittleEqualToStraight: fiveLittleEqualToStraight, rankRules: rankRules)
+        self.evaluateFlag = BullHandEvaluator.evaluate(cards: self.playerCard, inputBullRules: bullRules, inputSameBullPointComparision: sameBullPointComparision, inputFiveLittleComparision: fiveLittleComparision, inputFiveLittleEqualToStraight: fiveLittleEqualToStraight, rankRules: rankRules)
     }
 }
 
@@ -601,6 +615,7 @@ class PokerBullGame {
     
     static func calWinners(deck: [Card], args: [Int], rankRules: [Int]) -> [Int] {
         // 解析 args
+        print("牛牛参数长度 ", args.count)
         let playerNum = args[0]
         let cardsNum = args[1]
         let handNum = args[2]
@@ -609,11 +624,13 @@ class PokerBullGame {
         let fiveLittleComparision = args[5]
         let sameBullPointComparision = args[6]
         let jokerMinZero = args[7]
-        let numberChangeArray = Array(args[8...15])
-        let bullRule = Array(args[15...24])
-
-        let fiveLittleEqualToStraight = args[25] == 1
+        let numberChangeArray = Array(args[8...14])
+        let bullRule = Array(args[14...23])
+        let fiveLittleEqualToStraight = args[24] == 1
         // 组建bull deck
+        //debuglog
+
+        
         let bullDeck: [PokerBullCard] = deck.map { PokerBullCard.init(card: $0, numberChangeArray: numberChangeArray, isNoSuit: noSuit, jokerMinZero: jokerMinZero) }
         var allPlayers: [BullPlayer] = (0..<playerNum).map { BullPlayer(playerIndex: $0) }
         
@@ -760,16 +777,32 @@ class BullHandEvaluator {
     static var FOUR_CARDS_RANK_RULE_DIC: [Int: ([PokerBullGame.PokerBullCard]) -> (Bool, Int)] = [:]
 
     
-    static func evaluate(cards: [PokerBullGame.PokerBullCard], bullRules: [Int], inputSameBullPointComparision: Int, inputFiveLittleComparision: Int, inputFiveLittleEqualToStraight: Bool, rankRules: [Int]) -> Int {
-            
+    static func evaluate(cards: [PokerBullGame.PokerBullCard], inputBullRules: [Int], inputSameBullPointComparision: Int, inputFiveLittleComparision: Int, inputFiveLittleEqualToStraight: Bool, rankRules: [Int]) -> Int {
+        let suitRules :[Int] = [3,2,1,0]
+
+        var handCardsString:String = ""
+        for handCard in cards{
+            handCardsString += TexasPokerRule.testCardLabelDic[handCard.trueRank
+                                                               - 1 + suitRules[handCard.suit]*13]!
+        }
+        print("牛牛手牌：", handCardsString)
+        for i in 0...inputBullRules.count{
+            if inputBullRules[i] != 0{
+                self.bullRules.append(i)
+            }
+        }
         
-        self.bullRules = bullRules
+        var bullString:String = ""
+        for funcIndex in self.bullRules{
+            bullString += String(funcIndex) + " "
+            
+        }
+        print("牛牛牛规则", bullString)
         self.sameBullPointComparison = inputSameBullPointComparision
         self.fiveLittleComparison = inputFiveLittleComparision
         self.fiveLittleEqualToStraight = inputFiveLittleEqualToStraight
         let rank_rules: [Int] = rankRules
         
-
         var funcs: [(_ cards: [PokerBullGame.PokerBullCard]) -> (Bool, Int)] = []
         var ruleDic: [Int: ([PokerBullGame.PokerBullCard]) -> (Bool, Int)] = [:]
 
@@ -784,14 +817,17 @@ class BullHandEvaluator {
         }
 
         var i = funcs.count + 1
+        var tempIndex = 0
         for funcTuple in funcs {
             i -= 1
             let (flag, rank) = funcTuple(cards)
             if flag != true {
+                tempIndex += 1
                 continue
             } else {
                 let eval = (1 << (8 + i)) | rank
                 print(eval)
+                print("牛牛牌型是 ", PokerBullRule.fiveCardsRankRules[rank_rules[tempIndex]] as Any)
                 return eval
             }
         }

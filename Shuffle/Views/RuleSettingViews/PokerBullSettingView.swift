@@ -30,7 +30,7 @@ struct PokerBullSettingView: View {
     @State private var jokerIsMinZero: Int = 0
     @State private var BullRules: [Int] = [0]
     @State private var selectedIndices: Set<Int> = []
-    @State private var bullrulelist: [Int] = []
+    @State private var bullrulelist: [Int] = [1,0,0,0,0,0,0,0,0]
     @State private var tenValueRange: Int = 0
     @State private var JValueRange:Int = 0
     @State private var QValueRange:Int = 0
@@ -679,6 +679,7 @@ struct PokerBullSettingView: View {
                     showAlertWithMessage()
                 }
                 else {
+                    print("牛牛rulelist", bullrulelist.count)
                     //organize the args
                     args = [
                         selectedRule.playerNum[playerNum], selectedRule.cardsNum[cardsNum],
@@ -692,6 +693,8 @@ struct PokerBullSettingView: View {
                         JValueRange,
                         QValueRange,
                         KValueRange,
+                        blackJokerValueRange,
+                        redJokerValueRange,
                         threeValueRange,
                         sixValueRange,
                         spadeAValueRange] + bullrulelist + [0]
@@ -732,6 +735,7 @@ struct PokerBullSettingView: View {
         //标准五张牛牛
         if(setting == 0)
         {
+            print("标准牛牛")
             cardsNum = 5
             handNum = 2
             isCompareSuit = 1
@@ -744,6 +748,218 @@ struct PokerBullSettingView: View {
             JValueRange = 0
             QValueRange = 0
             KValueRange = 0
+            blackJokerValueRange = 0
+            redJokerValueRange = 0
+            threeValueRange = 0
+            sixValueRange = 0
+            spadeAValueRange = 0
+            bullrulelist = [1,0,0,0,0,0,0,0,0]
+            rankRules = [
+                RankRulesSate(index: 9, isChecked: true),
+                RankRulesSate(index: 10, isChecked: true),
+                RankRulesSate(index: 42, isChecked: true),
+            ]
+        }
+        if(setting == 1){
+            cardsNum = 6
+            handNum = 2
+            isCompareSuit = 1
+            suitRules = [3,2,1,0]
+            wayToDeal = 0
+            fiveLittleRank = 0
+            secondRankRule = 0
+            jokerIsMinZero = 0
+            tenValueRange = 0
+            JValueRange = 0
+            QValueRange = 0
+            KValueRange = 0
+            blackJokerValueRange = 0
+            redJokerValueRange = 0
+            threeValueRange = 0
+            sixValueRange = 0
+            spadeAValueRange = 0
+            bullrulelist = [1,0,0,0,0,0,0,0,0]
+            rankRules = [
+                RankRulesSate(index: 9, isChecked: true),
+                RankRulesSate(index: 10, isChecked: true),
+                RankRulesSate(index: 42, isChecked: true),
+            ]
+        }
+        //标准三张牛牛
+        if(setting == 2){
+            cardsNum = 3
+            handNum = 2
+            isCompareSuit = 1
+            suitRules = [3,2,1,0]
+            wayToDeal = 0
+            fiveLittleRank = 0
+            secondRankRule = 0
+            jokerIsMinZero = 0
+            tenValueRange = 0
+            JValueRange = 0
+            QValueRange = 0
+            KValueRange = 0
+            blackJokerValueRange = 0
+            redJokerValueRange = 0
+            threeValueRange = 0
+            sixValueRange = 0
+            spadeAValueRange = 0
+            bullrulelist = [1,0,0,0,0,0,0,0,0]
+            rankRules = [
+                RankRulesSate(index: 9, isChecked: true),
+                RankRulesSate(index: 10, isChecked: true),
+                RankRulesSate(index: 42, isChecked: true),
+            ]
+        }
+        if(setting == 3){
+            cardsNum = 6
+            handNum = 2
+            isCompareSuit = 1
+            suitRules = [3,2,1,0]
+            wayToDeal = 0
+            fiveLittleRank = 0
+            secondRankRule = 0
+            jokerIsMinZero = 0
+            tenValueRange = 0
+            JValueRange = 0
+            QValueRange = 0
+            KValueRange = 0
+            blackJokerValueRange = 0
+            redJokerValueRange = 0
+            threeValueRange = 0
+            sixValueRange = 0
+            spadeAValueRange = 0
+            bullrulelist = [1,0,1,0,0,0,0,0,0]
+            rankRules = [
+                RankRulesSate(index: 9, isChecked: true),
+                RankRulesSate(index: 10, isChecked: true),
+                RankRulesSate(index: 42, isChecked: true),
+            ]
+        }
+        if(setting == 4){
+            cardsNum = 6
+            handNum = 2
+            isCompareSuit = 1
+            suitRules = [3,2,1,0]
+            wayToDeal = 0
+            fiveLittleRank = 0
+            secondRankRule = 0
+            jokerIsMinZero = 0
+            tenValueRange = 0
+            JValueRange = 0
+            QValueRange = 0
+            KValueRange = 0
+            blackJokerValueRange = 0
+            redJokerValueRange = 0
+            threeValueRange = 0
+            sixValueRange = 0
+            spadeAValueRange = 0
+            bullrulelist = [1,1,0,1,0,0,0,0,0]
+            rankRules = [
+                RankRulesSate(index: 9, isChecked: true),
+                RankRulesSate(index: 10, isChecked: true),
+                RankRulesSate(index: 42, isChecked: true),
+            ]
+        }
+        if(setting == 5){
+            cardsNum = 6
+            handNum = 2
+            isCompareSuit = 1
+            suitRules = [3,2,1,0]
+            wayToDeal = 0
+            fiveLittleRank = 0
+            secondRankRule = 0
+            jokerIsMinZero = 0
+            tenValueRange = 0
+            JValueRange = 0
+            QValueRange = 0
+            KValueRange = 0
+            blackJokerValueRange = 0
+            redJokerValueRange = 0
+            threeValueRange = 0
+            sixValueRange = 0
+            spadeAValueRange = 0
+            bullrulelist = [1,0,0,0,0,0,0,0,0]
+            rankRules = [
+                RankRulesSate(index: 11, isChecked: true),
+                RankRulesSate(index: 1, isChecked: true),
+                RankRulesSate(index: 17, isChecked: true),
+                RankRulesSate(index: 9, isChecked: true),
+                RankRulesSate(index: 10, isChecked: true),
+                RankRulesSate(index: 42, isChecked: true),
+            ]
+        }
+        if(setting == 6){
+            cardsNum = 3
+            handNum = 2
+            isCompareSuit = 1
+            suitRules = [3,2,1,0]
+            wayToDeal = 0
+            fiveLittleRank = 1
+            secondRankRule = 0
+            jokerIsMinZero = 0
+            tenValueRange = 0
+            JValueRange = 0
+            QValueRange = 0
+            KValueRange = 0
+            blackJokerValueRange = 0
+            redJokerValueRange = 0
+            threeValueRange = 0
+            sixValueRange = 0
+            spadeAValueRange = 0
+            bullrulelist = [1,0,0,0,0,0,0,0,0]
+            rankRules = [
+                RankRulesSate(index: 0, isChecked: true),
+                RankRulesSate(index: 2, isChecked: true),
+                RankRulesSate(index: 7, isChecked: true),
+                RankRulesSate(index: 30, isChecked: true),
+                RankRulesSate(index: 8, isChecked: true),
+                RankRulesSate(index: 26, isChecked: true),
+                RankRulesSate(index: 9, isChecked: true),
+                RankRulesSate(index: 10, isChecked: true),
+                RankRulesSate(index: 42, isChecked: true),
+            ]
+        }
+        if(setting == 7){
+            cardsNum = 6
+            handNum = 2
+            isCompareSuit = 1
+            suitRules = [3,2,1,0]
+            wayToDeal = 0
+            fiveLittleRank = 0
+            secondRankRule = 0
+            jokerIsMinZero = 1
+            tenValueRange = 0
+            JValueRange = 0
+            QValueRange = 0
+            KValueRange = 0
+            blackJokerValueRange = 0
+            redJokerValueRange = 0
+            threeValueRange = 0
+            sixValueRange = 0
+            spadeAValueRange = 0
+            bullrulelist = [1,0,0,0,0,0,0,0,0]
+            rankRules = [
+                RankRulesSate(index: 9, isChecked: true),
+                RankRulesSate(index: 10, isChecked: true),
+                RankRulesSate(index: 42, isChecked: true),
+            ]
+        }
+        if(setting == 8){
+            cardsNum = 5
+            handNum = 2
+            isCompareSuit = 1
+            suitRules = [3,2,1,0]
+            wayToDeal = 0
+            fiveLittleRank = 0
+            secondRankRule = 0
+            jokerIsMinZero = 0
+            tenValueRange = 0
+            JValueRange = 0
+            QValueRange = 0
+            KValueRange = 0
+            blackJokerValueRange = 0
+            redJokerValueRange = 0
             threeValueRange = 0
             sixValueRange = 0
             spadeAValueRange = 0
@@ -758,12 +974,7 @@ struct PokerBullSettingView: View {
                 RankRulesSate(index: 42, isChecked: true),
             ]
         }
-        //标准四张牛牛
-        if(setting == 1){
-            
-        }
-        //标准三张牛牛
-        if(setting == 2){
+        if(setting == 9){
             
         }
     }
