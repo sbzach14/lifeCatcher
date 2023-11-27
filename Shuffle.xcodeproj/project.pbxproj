@@ -62,6 +62,14 @@
 		B03B7B2D2A963C05006A0647 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B2C2A963C05006A0647 /* Card.swift */; };
 		B03B7B2F2A963C1B006A0647 /* utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B2E2A963C1B006A0647 /* utils.swift */; };
 		B03B7B532A98AD32006A0647 /* ShuffleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B522A98AD32006A0647 /* ShuffleTests.swift */; };
+		B058BE5D2B09F70E0078E792 /* BlurDetector_origin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058BE5C2B09F70E0078E792 /* BlurDetector_origin.swift */; };
+		B058BE5F2B09FFC20078E792 /* BlurDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058BE5E2B09FFC20078E792 /* BlurDetector.swift */; };
+		B058BE612B0A0D6F0078E792 /* TestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058BE602B0A0D6F0078E792 /* TestView.swift */; };
+		B0652A642B0B4BB8000D2DB4 /* 000095.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B0652A632B0B4BB8000D2DB4 /* 000095.jpg */; };
+		B0652A662B0B4F04000D2DB4 /* IMG_8929.JPG in Resources */ = {isa = PBXBuildFile; fileRef = B0652A652B0B4F04000D2DB4 /* IMG_8929.JPG */; };
+		B0652A682B0B68B9000D2DB4 /* 001027.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B0652A672B0B68B8000D2DB4 /* 001027.jpg */; };
+		B0652A6A2B0B694D000D2DB4 /* 004133.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B0652A692B0B694C000D2DB4 /* 004133.jpg */; };
+		B0652A6C2B0B79B5000D2DB4 /* 001522.jpg in Resources */ = {isa = PBXBuildFile; fileRef = B0652A6B2B0B79B5000D2DB4 /* 001522.jpg */; };
 		B0CC72FC2AE3CFC300E0A3E7 /* cardDetection_s_1009.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = B0CC72FB2AE3CFC300E0A3E7 /* cardDetection_s_1009.mlmodel */; };
 		B0CC72FE2AE6797500E0A3E7 /* cardDetection_n_1023.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = B0CC72FD2AE6797400E0A3E7 /* cardDetection_n_1023.mlmodel */; };
 /* End PBXBuildFile section */
@@ -141,6 +149,14 @@
 		B03B7B2E2A963C1B006A0647 /* utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = utils.swift; sourceTree = "<group>"; };
 		B03B7B502A98AD32006A0647 /* ShuffleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShuffleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B03B7B522A98AD32006A0647 /* ShuffleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShuffleTests.swift; sourceTree = "<group>"; };
+		B058BE5C2B09F70E0078E792 /* BlurDetector_origin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurDetector_origin.swift; sourceTree = "<group>"; };
+		B058BE5E2B09FFC20078E792 /* BlurDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurDetector.swift; sourceTree = "<group>"; };
+		B058BE602B0A0D6F0078E792 /* TestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView.swift; sourceTree = "<group>"; };
+		B0652A632B0B4BB8000D2DB4 /* 000095.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 000095.jpg; sourceTree = "<group>"; };
+		B0652A652B0B4F04000D2DB4 /* IMG_8929.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = IMG_8929.JPG; sourceTree = "<group>"; };
+		B0652A672B0B68B8000D2DB4 /* 001027.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 001027.jpg; sourceTree = "<group>"; };
+		B0652A692B0B694C000D2DB4 /* 004133.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 004133.jpg; sourceTree = "<group>"; };
+		B0652A6B2B0B79B5000D2DB4 /* 001522.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 001522.jpg; sourceTree = "<group>"; };
 		B0CC72FB2AE3CFC300E0A3E7 /* cardDetection_s_1009.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection_s_1009.mlmodel; sourceTree = "<group>"; };
 		B0CC72FD2AE6797400E0A3E7 /* cardDetection_n_1023.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection_n_1023.mlmodel; sourceTree = "<group>"; };
 		F11ED84932036610B96BC234 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
@@ -236,6 +252,7 @@
 				A892C5FF2A765A0A003FA2B3 /* MainMenuView.swift */,
 				A887B64F2A7FE1AF009F488F /* ShowRecordHistoryView.swift */,
 				A887B6572A8511A4009F488F /* InfoView.swift */,
+				B058BE602B0A0D6F0078E792 /* TestView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -299,6 +316,8 @@
 				A8FBC7C12A3F0A5C00EDDFD7 /* CVUtils.swift */,
 				A88EFE0A2A7FC05900897243 /* JsonUtils.swift */,
 				A887B6512A8104BC009F488F /* TimeUtils.swift */,
+				B058BE5C2B09F70E0078E792 /* BlurDetector_origin.swift */,
+				B058BE5E2B09FFC20078E792 /* BlurDetector.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -342,6 +361,11 @@
 				A88EFE022A7E8ACC00897243 /* Resnet50FP16.mlmodel */,
 				B01A281A2ABF15C900A74AA4 /* cardDetection.mlmodel */,
 				A892C6102A7D145C003FA2B3 /* YOLOv3TinyFP16.mlmodel */,
+				B0652A632B0B4BB8000D2DB4 /* 000095.jpg */,
+				B0652A672B0B68B8000D2DB4 /* 001027.jpg */,
+				B0652A6B2B0B79B5000D2DB4 /* 001522.jpg */,
+				B0652A692B0B694C000D2DB4 /* 004133.jpg */,
+				B0652A652B0B4F04000D2DB4 /* IMG_8929.JPG */,
 				A83853492ADA7BE600346038 /* Icon.xcassets */,
 				A838534B2ADA7C0200346038 /* BackGround.xcassets */,
 				A838534D2ADA7D7100346038 /* GameClass.xcassets */,
@@ -470,10 +494,15 @@
 			files = (
 				A838534A2ADA7BE600346038 /* Icon.xcassets in Resources */,
 				50053F84284ACAED00C86BF4 /* Assets.xcassets in Resources */,
+				B0652A682B0B68B9000D2DB4 /* 001027.jpg in Resources */,
 				A838534E2ADA7D7100346038 /* GameClass.xcassets in Resources */,
+				B0652A6C2B0B79B5000D2DB4 /* 001522.jpg in Resources */,
+				B0652A662B0B4F04000D2DB4 /* IMG_8929.JPG in Resources */,
 				A88F209D2A10EB39005E4A27 /* python-stdlib in Resources */,
 				A83853502ADA83F600346038 /* Icon_Repo.xcassets in Resources */,
 				A838534C2ADA7C0200346038 /* BackGround.xcassets in Resources */,
+				B0652A6A2B0B694D000D2DB4 /* 004133.jpg in Resources */,
+				B0652A642B0B4BB8000D2DB4 /* 000095.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -548,6 +577,7 @@
 				A887B6522A8104BC009F488F /* TimeUtils.swift in Sources */,
 				A892C6002A765A0A003FA2B3 /* MainMenuView.swift in Sources */,
 				A8922FC02A6553FB00A7033E /* PokerBullSettingView.swift in Sources */,
+				B058BE5F2B09FFC20078E792 /* BlurDetector.swift in Sources */,
 				A812F9312A3DCD0800AA392F /* ThreeCardPokerGame.swift in Sources */,
 				A8E0E2EF2AAE00910091FC1D /* TwoEightGangGameRuleSettingView.swift in Sources */,
 				18CA14DB284AC42C00F90372 /* MyApp.swift in Sources */,
@@ -555,9 +585,11 @@
 				B03B7B2D2A963C05006A0647 /* Card.swift in Sources */,
 				A8E0E2E52AADEF560091FC1D /* ThreeMenGame.swift in Sources */,
 				A887B64E2A7FDF56009F488F /* RecordHistoryViewModel.swift in Sources */,
+				B058BE612B0A0D6F0078E792 /* TestView.swift in Sources */,
 				18CA14D2284AC42C00F90372 /* ViewModel.swift in Sources */,
 				A88F20AE2A13A470005E4A27 /* PokerBull.swift in Sources */,
 				A8D0D9362A24A4C20061A90E /* TexasPoker.swift in Sources */,
+				B058BE5D2B09F70E0078E792 /* BlurDetector_origin.swift in Sources */,
 				A8FBC7C22A3F0A5C00EDDFD7 /* CVUtils.swift in Sources */,
 				18CA14D3284AC42C00F90372 /* ShowCardView.swift in Sources */,
 				A8E0E2F12AAE00B90091FC1D /* NinePointFiveGameRuleSettingView.swift in Sources */,
