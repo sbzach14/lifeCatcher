@@ -91,7 +91,7 @@ class BlurDetector_8{
         let image = UIImage(contentsOfFile: imagePath)!
         let ciImage = CIImage(image: image)!
         //let cgImage = CIContext().createCGImage(ciImage, from: ciImage.extent)!
-        let pixelBuffer = createCVPixelBuffer(ciImage:ciImage, targetSize: CGSize(width: 640, height: 480))!
+        let pixelBuffer = createCVPixelBuffer(ciImage:ciImage, targetSize: CGSize(width: 640, height: 480), targetArea: [0,0,0,0])!
         let newCIImage = CIImage(cvImageBuffer: pixelBuffer)
         let cgImage = CIContext().createCGImage(newCIImage, from: newCIImage.extent)!
         

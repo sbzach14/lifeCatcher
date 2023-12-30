@@ -6,11 +6,107 @@ import MobileCoreServices
 import Foundation
 import Accelerate
 
-//处理ciimage，输出合适大小的pixelbuffer供模型输入
-func createCVPixelBuffer(ciImage: CIImage, targetSize: CGSize, isSavedImage: Bool = false) -> CVPixelBuffer? {
+func cropTest()->CGImage{
     
+    let imagePath = Bundle.main.path(forResource: "IMG_4619 2", ofType: "JPG")!
+    let image = UIImage(contentsOfFile: imagePath)!
+    let originalImage = CIImage(image: image)!
+    
+    let model = ViewModel()
+    model.originSize = [1920, 1080]
+    let pixelBuffer = createCVPixelBuffer(ciImage:originalImage, targetSize: CGSize(width: 640, height: 480), targetArea: [0,0,0,0])!
+    model.processImageOrigin(pixelBuffer, taskIndex: 0)
+    model.isHorizon = true
+    print(model.lastBoxes)
+    model.computeTargetArea()
+    print(model.targetArea)
+    let newpixelBuffer = createCVPixelBuffer(ciImage:originalImage, targetSize: CGSize(width: 640, height: 480), targetArea: model.targetArea)!
+    
+    let ciImage = CIImage(cvPixelBuffer: newpixelBuffer)
+    let cgImage = CIContext().createCGImage(ciImage, from: ciImage.extent)!
+    
+//    // 框的参数
+//    let boxRect = CGRect(x: 0, y: 0, width: 300, height: 400)
+//
+//    // 用 CIFilter 创建包含框的新 CIImage
+//    let boxImage = originalImage.cropped(to: boxRect)
+//    
+//    var cgImage = CIContext().createCGImage(boxImage, from: boxImage.extent)!
+//    
+//    
+//    
+//    /// The 8-bit-per-channel, 4-channel source pixel buffer.
+//    let sourceBuffer8 = try! vImage.PixelBuffer<vImage.Interleaved8x4>(
+//        cgImage: cgImage,
+//        cgImageFormat: &BlurDetector_8.sourceFormat8)
+//    
+//    
+//    /// The 8-bit planar destination pixel buffer.
+//    var destinationBuffer8 = vImage.PixelBuffer<vImage.Planar8>(width: 300,
+//                                                                height: 400)
+//    
+//    
+//    
+////        cameraImage = rescaleBuffer8.makeCGImage(
+////            cgImageFormat: BlurDetector_8.sourceFormat8)!
+////        let savedUIImage = UIImage(cgImage: cameraImage!)
+////        UIImageWriteToSavedPhotosAlbum(savedUIImage, self, nil, nil)
+//    
+//            
+//    
+//    
+//    let divisor: Int = 0x1000
+//    let fDivisor = Float(divisor)
+//    
+//    sourceBuffer8.multiply(by: (0,
+//                                Int(BlurDetector_8.defaultRedCoefficient * fDivisor),
+//                                Int(BlurDetector_8.defaultGreenCoefficient * fDivisor),
+//                                Int(BlurDetector_8.defaultBlueCoefficient * fDivisor)),
+//                           divisor: divisor,
+//                           preBias: (0, 0, 0, 0),
+//                           postBias: 0,
+//                           destination: destinationBuffer8)
+//    
+//    
+//        let centerX = 100
+//        let centerY = 100
+//        let widthX = 200
+//        let heightY = 200
+//        
+//        // 定义感兴趣区域
+//        let regionOfInterest = CGRect(x: centerX - widthX / 2, y: centerY - heightY / 2, width: widthX, height: heightY)
+//
+//        // 调用 withUnsafeRegionOfInterest 方法
+//        destinationBuffer8.withUnsafeRegionOfInterest(regionOfInterest) { roiBuffer in
+//            // 在闭包中执行对感兴趣区域的操作
+//            // roiBuffer 是感兴趣区域的 vImage.PixelBuffer
+//            
+//            cgImage = roiBuffer.makeCGImage(cgImageFormat: BlurDetector_8.destinationFormat8)!
+//        }
+
+    return cgImage
+}
+
+//处理ciimage，输出合适大小的pixelbuffer供模型输入
+func createCVPixelBuffer(ciImage: CIImage, targetSize: CGSize, targetArea: [Float], isSavedImage: Bool = false) -> CVPixelBuffer? {
+    
+    // Extract target area from original image
+    let xCenter = CGFloat(targetArea[0])
+    let yCenter = ciImage.extent.height - CGFloat(targetArea[1])
+    let width = CGFloat(targetArea[2])
+    let height = CGFloat(targetArea[3])
+    
+    var croppedCIImage = ciImage
+    
+    if width != 0{
+        croppedCIImage = ciImage.cropped(to: CGRect(x: xCenter - width / 2, y: yCenter - height / 2, width: width, height: height))
+    }
+    
+        
     // Resize the image to the target size
-    let resizedCIImage = ciImage.resize(to: targetSize)
+    let resizedCIImage = croppedCIImage.resize(to: targetSize)
+    // Apply translation
+    let finalCIImage = resizedCIImage.transformed(by: CGAffineTransform(translationX: -resizedCIImage.extent.minX, y: -resizedCIImage.extent.minY))
     
     // Create a pixel buffer
     var pixelBuffer: CVPixelBuffer?
@@ -38,7 +134,7 @@ func createCVPixelBuffer(ciImage: CIImage, targetSize: CGSize, isSavedImage: Boo
     let context = CIContext()
     
     // Render the resized CIImage onto the pixel buffer
-    context.render(resizedCIImage, to: buffer, bounds: resizedCIImage.extent, colorSpace: colorSpace)
+    context.render(finalCIImage, to: buffer, bounds: finalCIImage.extent, colorSpace: colorSpace)
 
     // Unlock the pixel buffer
     CVPixelBufferUnlockBaseAddress(buffer, CVPixelBufferLockFlags(rawValue: 0))
@@ -79,17 +175,16 @@ extension CIImage {
         }
         
         else{
+            
             let originAr = self.extent.size.width / self.extent.size.height
             let targetAr = size.width / size.height
             
-            //如果长宽颠倒则先旋转90度再缩放
             if (originAr > 1 && targetAr > 1) || (originAr < 1 && targetAr < 1){
                 let scaleX = size.width / self.extent.size.width
                 let scaleY = size.height / self.extent.size.height
                 return self.transformed(by: CGAffineTransform(scaleX: scaleX, y: scaleY))
             }
             
-            //长宽不颠倒直接进行缩放
             else{
                 let rotationTransform = CGAffineTransform(rotationAngle: -.pi / 2)  // 顺时针旋转90度
                 let rotatedImage = self.transformed(by: rotationTransform)
