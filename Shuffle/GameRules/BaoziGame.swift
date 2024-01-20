@@ -327,6 +327,7 @@ class BaoziGameHandEvaluator{
     var rankRulesDic: [Int: ([BaoziCard]) -> Int] = [:]
     var samePointComparision: Int = 0
     var pointComparision: Int = 0
+    var QValueRange: Int = 0
     
     init(rankRules: [Int],
          suitRules: [Int]){
@@ -345,41 +346,95 @@ class BaoziGameHandEvaluator{
     
     func evalHand(cards: [Card], KValueRange: Int, QValueRange: Int, JValueRange: Int, JokerValueRange: Int, samePointComparision: Int, pointComparision: Int, cardRank: Int)->Int{
         
+        self.samePointComparision = samePointComparision
+        self.pointComparision = pointComparision
+        self.QValueRange = QValueRange
+        
         var score = 0
         var num1 = BaoziCard(card: cards[0], KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, JokerValueRange: JokerValueRange, cardRank: cardRank)
         var num2 = BaoziCard(card: cards[1], KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, JokerValueRange: JokerValueRange, cardRank: cardRank)
+        var i = self.rankRules.count + 1
+        for ruleIndex in self.rankRules{
+            let rank = self.rankRulesDic[ruleIndex]!([num1, num2])
+            i -= 1
+            if rank == 0 {
+                continue
+            } else {
+                score = (1<<(i + 12)) | rank
+                return score
+            }
+        }
         
-        if num1.rank == num2.rank {
-            score = num1.rank << 8
-        }
-        else {
-            score = ((num1.point + num2.point) % 10) << 4 | max(num1.rank, num2.rank)
-        }
+        
+//        if num1.rank == num2.rank {
+//            score = num1.rank << 8
+//        }
+//        else {
+//            score = ((num1.point + num2.point) % 10) << 4 | max(num1.rank, num2.rank)
+//        }
         return score
     }
     
     func eval_isPair(cards:[BaoziCard]) -> Int{
-        if cards[0].rank == cards[1].rank {
-            
+        if cards[0].originalRank == cards[1].originalRank {
+            return cards[0].rank
         }
         return 0
         
     }
     func eval_isPairTen(cards:[BaoziCard]) -> Int{
+        if cards[0].originalRank == cards[1].originalRank && cards[0].originalRank == 10{
+            return 1
+        }
         return 0
     }
     func eval_isPairFive(cards:[BaoziCard]) -> Int{
+        if cards[0].originalRank == cards[1].originalRank && cards[0].originalRank == 5 {
+            return 1
+        }
         return 0
         
     }
     func eval_isPairJoker(cards:[BaoziCard]) -> Int{
+        if cards[0].originalRank > 13 && cards[1].originalRank > 13 {
+            return 1
+        }
         return 0
     }
     
     func eval_isJokerPlusA(cards:[BaoziCard]) -> Int{
+        if max(cards[0].originalRank, cards[1].originalRank) > 13 && min(cards[0].originalRank, cards[1].originalRank) == 1 {
+            return 1
+        }
         return 0
     }
     func eval_Points(cards:[BaoziCard]) -> Int{
+        var point = 0
+        var mod = 0
+        if self.QValueRange == 3 {
+            mod = 20
+            point = (cards[0].point + cards[1].point) % mod
+        } else {
+            mod = 10
+            point = (cards[0].point + cards[1].point) % mod
+        }
+        
+        if self.pointComparision == 1 {
+            point = (point + mod - 1) % mod
+        }
+        if self.samePointComparision == 0 {
+            return point
+        } else if self.samePointComparision == 1 {
+            return point << 4 | max(cards[0].rank, cards[1].rank)
+        } else if self.samePointComparision == 2 {
+            return point << 4 | max(cards[0].rank, cards[1].rank)
+        } else if self.samePointComparision == 3 {
+            
+            return point << 6 | max(cards[0].rank, cards[1].rank) | (self.blackRedJudger(card: cards[0]) + self.blackRedJudger(card: cards[1]))
+        }
+        
+        
+        
         return 0
     }
     
@@ -397,6 +452,7 @@ class BaoziGameHandEvaluator{
 }
 
 class BaoziCard{
+    var originalRank:Int
     var rank:Int
     var point:Int
     var suit:Int
@@ -444,5 +500,6 @@ class BaoziCard{
         }
         // suit initialization
         self.suit = card.suit[0]
+        self.originalRank = card.rank
     }
 }
