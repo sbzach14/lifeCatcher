@@ -5,7 +5,7 @@ class SettingViewModel: ObservableObject {
     @Published var isBlack: Bool = false
     @Published var isMute: Bool = false
     @Published var isBackCamera: Bool = false
-    @Published var isContrastAug: Bool = false
+    @Published var isRemote: Bool = false
     @Published var isActive: Bool = false
     @Published var activeDate: String = ""
     
@@ -18,14 +18,14 @@ class SettingViewModel: ObservableObject {
             self.isBlack = configData["isBlack"]!
             self.isMute = configData["isMute"]!
             self.isBackCamera = configData["isBackCamera"]!
-            self.isContrastAug = configData["isContrastAug"]!
+            self.isRemote = configData["isRemote"]!
             self.isActive = configData["isActive"]!
         } else {
             // If config.json is not found or invalid, set default values
             self.isBlack = false
             self.isMute = false
             self.isBackCamera = false
-            self.isContrastAug = false
+            self.isRemote = false
             self.isActive = false
         }
         
@@ -47,7 +47,7 @@ class SettingViewModel: ObservableObject {
                 "isBlack": self.isBlack,
                 "isMute": self.isMute,
                 "isBackCamera" : self.isBackCamera,
-                "isContrastAug" : self.isContrastAug,
+                "isRemote" : self.isRemote,
                 "isActive": self.isActive
             ]
 

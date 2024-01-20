@@ -18,7 +18,7 @@ func cropTest()->CGImage{
     model.processImageOrigin(pixelBuffer, taskIndex: 0)
     model.isHorizon = true
     print(model.lastBoxes)
-    model.computeTargetArea()
+    model.computeTargetArea(stateResult: model.lastBoxes)
     print(model.targetArea)
     let newpixelBuffer = createCVPixelBuffer(ciImage:originalImage, targetSize: CGSize(width: 640, height: 480), targetArea: model.targetArea)!
     

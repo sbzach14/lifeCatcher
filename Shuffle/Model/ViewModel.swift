@@ -27,7 +27,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var cardArray :  [Int] = []
     @Published var winnerPlayer: [Int] = []
 
-    let model = try! cardDetection_n_1217()
+    let model = try! cardDetection_s_0114()
     let imageSize : [Int] = [640, 480]
     var originSize : [Float] = [0,0]
     
@@ -106,8 +106,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     var isBlack: Bool = false
     var isMute: Bool = false
     var isBackCamera: Bool = false
+    var isRemote: Bool = false
     var setFrameRate: Float64 = 120.0
-    var isContrastAug: Bool = false
     var cameraFrameRate: Int = 0
     
     var testCVPixelBuffer : CVPixelBuffer?
@@ -148,13 +148,13 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             self.isBlack = configData["isBlack"]!
             self.isMute = configData["isMute"]!
             self.isBackCamera = configData["isBackCamera"]!
-            self.isContrastAug = configData["isContrastAug"]!
+            self.isRemote = configData["isRemote"]!
         } else {
             // If config.json is not found or invalid, set default values
             self.isBlack = false
             self.isMute = false
             self.isBackCamera = false
-            self.isContrastAug = false
+            self.isRemote = false
         }
         
         setupAVCapture()
@@ -453,7 +453,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     // MARK: process image origin
     func processImageOrigin(_ pixelBuffer: CVPixelBuffer, taskIndex: Int){
         
-        let result = try! model.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: 0.25)
+        let result = try! model.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: 0.7)
         let cardResult = getCard(from: result.confidence, from: result.coordinates, from: pixelBuffer)
         
         
@@ -479,7 +479,9 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 DispatchQueue.main.async{
                     self.changeCameraFrameRate(to: Int(self.setFrameRate))
                     self.initCardArray()
-                    self.computeTargetArea()
+                    if self.isRemote{
+                        self.computeTargetArea(stateResult: self.lastBoxes)
+                    }
                 }
             }
             else if (self.stateCard[0] == -1 || self.stateCard[1] == -1) && self.stateCard[0] != self.stateCard[1]
@@ -491,7 +493,9 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 DispatchQueue.main.async{
                     self.changeCameraFrameRate(to: Int(self.setFrameRate))
                     self.initCardArray()
-                    self.computeTargetArea()
+                    if self.isRemote{
+                        self.computeTargetArea(stateResult: self.lastBoxes)
+                    }
                 }
                 
             }
@@ -503,7 +507,9 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 speakText(input: 0)
                 DispatchQueue.main.async{
                     self.changeCameraFrameRate(to: Int(self.setFrameRate))
-                    self.computeTargetArea()
+                    if self.isRemote{
+                        self.computeTargetArea(stateResult: self.lastBoxes)
+                    }
                 }
             }
         }
@@ -516,6 +522,11 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     self.cutCardArray(cardResult: cardResult, taskIndex: taskIndex)
                     self.computeWinnerPlayer()
                     self.initBoxes()
+                }
+            }
+            else{
+                if self.isRemote{
+                    updateTargetArea(coordinates: self.lastBoxes)
                 }
             }
         }
@@ -537,6 +548,10 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
             else{
                 self.detectResultList[taskIndex] = cardResult
+                
+                if self.isRemote{
+                    updateTargetArea(coordinates: self.lastBoxes)
+                }
             }
         }
         
@@ -607,6 +622,60 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
         
+        //整理同一个数字的多条链路
+        //整理两次
+        for _ in 0..<2{
+            for key in self.confidenceDic.keys{
+                
+                var deleteFlag = false
+                if self.confidenceDic[key] == 100{
+                    for numIndex in 0..<self.detectResultList[0]!.count{
+                        
+                        var end = -1
+                        var head = -1
+                        
+                        for keyIndex in 2..<sortedKeys.count - 3{
+                            let detectResultListIndex = sortedKeys[keyIndex]
+                            let nowNum = self.detectResultList[detectResultListIndex]![numIndex].cardIndex[0]
+                            if nowNum == key && self.detectResultList[detectResultListIndex]![numIndex].nodeType == 2{
+                                end = detectResultListIndex
+                            }
+                            else if nowNum == key
+                                        && self.detectResultList[detectResultListIndex]![numIndex].nodeType == 1
+                                        && end != -1{
+                                head = detectResultListIndex
+                                
+                                var isSameNum = head - end <= 5
+                                //                            var middleNum = self.detectResultList[end+1][numIndex].cardIndex[0]
+                                //                            for updateIndex in end+1...head-1{
+                                //                                if self.detectResultList[updateIndex][numIndex].cardIndex[0] != middleNum{
+                                //                                    isSameNum = false
+                                //                                    break;
+                                //                                }
+                                //                            }
+                                
+                                if isSameNum{
+                                    for updateIndex in end...head{
+                                        self.detectResultList[updateIndex]![numIndex].cardIndex[0] = nowNum
+                                        self.detectResultList[updateIndex]![numIndex].nodeType = 3
+                                    }
+                                    print("合并链 " + cardLabelDic[nowNum]!)
+                                }
+                                else{
+                                    deleteFlag = true
+                                    print("删除链 " + cardLabelDic[nowNum]!)
+                                }
+                            }
+                            
+                            if nowNum == key && deleteFlag{
+                                self.detectResultList[detectResultListIndex]![numIndex].nodeType = 0
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
         //找到所有不在链上但在单独节点的数字
         for key in self.confidenceDic.keys{
             if self.confidenceDic[key] == 0{
@@ -661,57 +730,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 }
             }
         }
-        
-        //整理同一个数字的多条链路
-        for key in self.confidenceDic.keys{
-            
-            var deleteFlag = false
-            if self.confidenceDic[key] == 100{
-                for numIndex in 0..<self.detectResultList[0]!.count{
-                    
-                    var end = -1
-                    var head = -1
-                    
-                    for keyIndex in 2..<sortedKeys.count - 3{
-                        let detectResultListIndex = sortedKeys[keyIndex]
-                        let nowNum = self.detectResultList[detectResultListIndex]![numIndex].cardIndex[0]
-                        if nowNum == key && self.detectResultList[detectResultListIndex]![numIndex].nodeType == 2{
-                            end = detectResultListIndex
-                        }
-                        else if nowNum == key
-                                    && self.detectResultList[detectResultListIndex]![numIndex].nodeType == 1
-                                    && end != -1{
-                            head = detectResultListIndex
-                            
-                            var isSameNum = head - end <= 5
-//                            var middleNum = self.detectResultList[end+1][numIndex].cardIndex[0]
-//                            for updateIndex in end+1...head-1{
-//                                if self.detectResultList[updateIndex][numIndex].cardIndex[0] != middleNum{
-//                                    isSameNum = false
-//                                    break;
-//                                }
-//                            }
-                            
-                            if isSameNum{
-                                for updateIndex in end...head{
-                                    self.detectResultList[updateIndex]![numIndex].cardIndex[0] = nowNum
-                                    self.detectResultList[updateIndex]![numIndex].nodeType = 3
-                                }
-                                print("合并链 " + cardLabelDic[nowNum]!)
-                            }
-                            else{
-                                deleteFlag = true
-                                print("删除链 " + cardLabelDic[nowNum]!)
-                            }
-                        }
-                        
-                        if nowNum == key && deleteFlag{
-                            self.detectResultList[detectResultListIndex]![numIndex].nodeType = 0
-                        }
-                    }
-                }
-            }
-        }
+    
         
         for keyIndex in 2..<sortedKeys.count - 3{
             let detectResultListIndex = sortedKeys[keyIndex]
@@ -972,15 +991,96 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     }
     
     
+//    // MARK: compute targetArea
+//    func computeTargetArea(){
+//        
+//        if self.isHorizon
+//        {
+//            let minX = self.originSize[0] * (self.lastBoxes[0][0] - self.lastBoxes[0][2] / 2)
+//            let maxX = self.originSize[0] * (self.lastBoxes[1][0] + self.lastBoxes[1][2] / 2)
+//            let minY = self.originSize[1] * min(self.lastBoxes[0][1] - self.lastBoxes[0][3] / 2, self.lastBoxes[1][1] - self.lastBoxes[1][3] / 2)
+//            let maxY = self.originSize[1] * max(self.lastBoxes[0][1] + self.lastBoxes[0][3] / 2, self.lastBoxes[1][1] + self.lastBoxes[1][3] / 2)
+//            
+//            if minX + Float(self.imageSize[0]) >= self.originSize[0]{
+//                self.targetArea[0] = self.originSize[0] - Float(self.imageSize[0] / 2) - 1
+//                self.targetArea[2] = Float(self.imageSize[0])
+//            }
+//            else if maxX - Float(self.imageSize[0]) <= 0{
+//                self.targetArea[0] = Float(self.imageSize[0] / 2) + 1
+//                self.targetArea[2] = Float(self.imageSize[0])
+//            }
+//            else{
+//                self.targetArea[0] = (maxX + minX) / 2
+//                self.targetArea[2] = max(maxX - minX + 100, Float(self.imageSize[0]))
+//            }
+//            
+//            self.targetArea[3] = min(self.originSize[1] - 2, self.targetArea[2] / Float(self.imageSize[0]) * Float(self.imageSize[1]))
+//            
+//            if self.targetArea[3] == self.originSize[1] - 2{
+//                self.targetArea[1] = self.originSize[1] / 2
+//            }
+//            else if minY + self.targetArea[3] >= self.originSize[1]{
+//                self.targetArea[1] = self.originSize[1] - self.targetArea[3] / 2 - 1
+//            }
+//            else if maxY - self.targetArea[3] <= 0{
+//                self.targetArea[1] = self.targetArea[3] / 2 + 1
+//            }
+//            else{
+//                self.targetArea[1] = (maxY + minY) / 2
+//            }
+//        }
+//        else{
+//            let minY = self.originSize[1] * (self.lastBoxes[0][1] - self.lastBoxes[0][3] / 2)
+//            let maxY = self.originSize[1] * (self.lastBoxes[1][1] + self.lastBoxes[1][3] / 2)
+//            let minX = self.originSize[0] * min(self.lastBoxes[0][0] - self.lastBoxes[0][2] / 2, self.lastBoxes[1][0] - self.lastBoxes[1][2] / 2)
+//            let maxX = self.originSize[0] * max(self.lastBoxes[0][0] + self.lastBoxes[0][2] / 2, self.lastBoxes[1][0] + self.lastBoxes[1][2] / 2)
+//            
+//            if minY + Float(self.imageSize[0]) >= self.originSize[1]{
+//                self.targetArea[1] = self.originSize[1] - Float(self.imageSize[0] / 2) - 1
+//                self.targetArea[3] = Float(self.imageSize[0])
+//            }
+//            else if maxY - Float(self.imageSize[0]) <= 0{
+//                self.targetArea[1] = Float(self.imageSize[0] / 2) + 1
+//                self.targetArea[3] = Float(self.imageSize[0])
+//            }
+//            else{
+//                self.targetArea[1] = (maxY + minY) / 2
+//                self.targetArea[3] = max(maxY - minY + 100, Float(self.imageSize[0]))
+//            }
+//            
+//            self.targetArea[2] = min(self.originSize[0] - 2, self.targetArea[3] / Float(self.imageSize[0]) * Float(self.imageSize[1]))
+//            
+//            if self.targetArea[2] == self.originSize[0] - 2{
+//                self.targetArea[0] = self.originSize[0] / 2
+//            }
+//            else if minX + self.targetArea[2] >= self.originSize[0]{
+//                self.targetArea[0] = self.originSize[0] - self.targetArea[2] / 2 - 1
+//            }
+//            else if maxX - self.targetArea[2] <= 0{
+//                self.targetArea[0] = self.targetArea[2] / 2 + 1
+//            }
+//            else{
+//                self.targetArea[0] = (maxX + minX) / 2
+//            }
+//        }
+//    }
+    
     // MARK: compute targetArea
-    func computeTargetArea(){
+    func computeTargetArea(stateResult: [[Float]]){
+        
+        var originBoxes = stateResult
+        
         
         if self.isHorizon
         {
-            let minX = self.originSize[0] * (self.lastBoxes[0][0] - self.lastBoxes[0][2] / 2)
-            let maxX = self.originSize[0] * (self.lastBoxes[1][0] + self.lastBoxes[1][2] / 2)
-            let minY = self.originSize[1] * min(self.lastBoxes[0][1] - self.lastBoxes[0][3] / 2, self.lastBoxes[1][1] - self.lastBoxes[1][3] / 2)
-            let maxY = self.originSize[1] * max(self.lastBoxes[0][1] + self.lastBoxes[0][3] / 2, self.lastBoxes[1][1] + self.lastBoxes[1][3] / 2)
+            if originBoxes[0][0] > originBoxes[1][0]{
+                originBoxes.swapAt(0, 1)
+            }
+            
+            let minX = self.originSize[0] * (originBoxes[0][0] - originBoxes[0][2] / 2)
+            let maxX = self.originSize[0] * (originBoxes[1][0] + originBoxes[1][2] / 2)
+            let minY = self.originSize[1] * min(originBoxes[0][1] - originBoxes[0][3] / 2, originBoxes[1][1] - originBoxes[1][3] / 2)
+            let maxY = self.originSize[1] * max(originBoxes[0][1] + originBoxes[0][3] / 2, originBoxes[1][1] + originBoxes[1][3] / 2)
             
             if minX + Float(self.imageSize[0]) >= self.originSize[0]{
                 self.targetArea[0] = self.originSize[0] - Float(self.imageSize[0] / 2) - 1
@@ -1009,13 +1109,18 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             else{
                 self.targetArea[1] = (maxY + minY) / 2
             }
-            print("minX minY ", minX, minY, "maxX maxY", maxX, maxY, " targetAera", targetArea)
+            
         }
         else{
-            let minY = self.originSize[1] * (self.lastBoxes[0][1] - self.lastBoxes[0][3] / 2)
-            let maxY = self.originSize[1] * (self.lastBoxes[1][1] + self.lastBoxes[1][3] / 2)
-            let minX = self.originSize[0] * min(self.lastBoxes[0][0] - self.lastBoxes[0][2] / 2, self.lastBoxes[1][0] - self.lastBoxes[1][2] / 2)
-            let maxX = self.originSize[0] * max(self.lastBoxes[0][0] + self.lastBoxes[0][2] / 2, self.lastBoxes[1][0] + self.lastBoxes[1][2] / 2)
+            
+            if originBoxes[0][1] > originBoxes[1][1]{
+                originBoxes.swapAt(0, 1)
+            }
+            
+            let minY = self.originSize[1] * (originBoxes[0][1] - originBoxes[0][3] / 2)
+            let maxY = self.originSize[1] * (originBoxes[1][1] + originBoxes[1][3] / 2)
+            let minX = self.originSize[0] * min(originBoxes[0][0] - originBoxes[0][2] / 2, originBoxes[1][0] - originBoxes[1][2] / 2)
+            let maxX = self.originSize[0] * max(originBoxes[0][0] + originBoxes[0][2] / 2, originBoxes[1][0] + originBoxes[1][2] / 2)
             
             if minY + Float(self.imageSize[0]) >= self.originSize[1]{
                 self.targetArea[1] = self.originSize[1] - Float(self.imageSize[0] / 2) - 1
@@ -1044,6 +1149,40 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             else{
                 self.targetArea[0] = (maxX + minX) / 2
             }
+        }
+    }
+    
+    // MARK: update targetArea
+    func updateTargetArea(coordinates:[[Float]]){
+        if self.isHorizon{
+            var targetX = self.targetArea[0]
+            var targetY = self.targetArea[1]
+            var targetW = self.targetArea[2]
+            var targetH = self.targetArea[3]
+            var x0 = (coordinates[0][0] * targetW + targetX) / originSize[0]
+            var y0 = (coordinates[0][1] * targetH + targetY) / originSize[1]
+            var w0 = (coordinates[0][2] * targetW) / originSize[0]
+            var h0 = (coordinates[0][3] * targetH) / originSize[1]
+            var x1 = (coordinates[1][0] * targetW + targetX) / originSize[0]
+            var y1 = (coordinates[1][1] * targetH + targetY) / originSize[1]
+            var w1 = (coordinates[1][2] * targetW) / originSize[0]
+            var h1 = (coordinates[1][3] * targetH) / originSize[1]
+            computeTargetArea(stateResult: [[x0,y0,w0,h0],[x1,y1,w1,h1]])
+        }
+        else{
+            var targetX = self.targetArea[0]
+            var targetY = self.targetArea[1]
+            var targetW = self.targetArea[2]
+            var targetH = self.targetArea[3]
+            var x0 = ((1 - coordinates[0][1]) * targetW + targetX) / originSize[0]
+            var y0 = (coordinates[0][0] * targetH + targetY) / originSize[1]
+            var w0 = (coordinates[0][3] * targetW) / originSize[0]
+            var h0 = (coordinates[0][2] * targetH) / originSize[1]
+            var x1 = ((1 - coordinates[1][1]) * targetW + targetX) / originSize[0]
+            var y1 = (coordinates[1][0] * targetH + targetY) / originSize[1]
+            var w1 = (coordinates[1][3] * targetW) / originSize[0]
+            var h1 = (coordinates[1][2] * targetH) / originSize[1]
+            computeTargetArea(stateResult: [[x0,y0,w0,h0],[x1,y1,w1,h1]])
         }
     }
 

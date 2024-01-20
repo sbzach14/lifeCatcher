@@ -64,7 +64,7 @@ func createConfigJSON() {
         "isMute": false,
         "isActive": false,
         "isBackCamera": false,
-        "isContrastAug": false
+        "isRemote": false
     ]
 
     do {

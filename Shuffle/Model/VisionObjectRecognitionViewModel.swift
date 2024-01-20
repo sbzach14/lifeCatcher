@@ -19,7 +19,6 @@ class VisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVid
     var isBlack: Bool = false
     var isMute: Bool = false
     var isBackCamera: Bool = false
-    var isContrastAug: Bool = false
     
     private var speechSynthesizer = AVSpeechSynthesizer()
     
@@ -30,13 +29,11 @@ class VisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVid
             self.isBlack = configData["isBlack"]!
             self.isMute = configData["isMute"]!
             self.isBackCamera = configData["isBackCamera"]!
-            self.isContrastAug = configData["isContrastAug"]!
         } else {
             // If config.json is not found or invalid, set default values
             self.isBlack = false
             self.isMute = false
             self.isBackCamera = false
-            self.isContrastAug = false
         }
         
         setupAVCapture()
@@ -177,13 +174,7 @@ class VisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVid
         // 处理视频帧数据
         if let ciImage = imageFromSampleBuffer(sampleBuffer) {
             
-            let outputImage: CIImage
-            if self.isContrastAug{
-                outputImage = performHistogramEqualization(ciImage: ciImage)!
-            }
-            else{
-                outputImage = ciImage
-            }
+            let outputImage = ciImage
             
             let rotationTransform = CGAffineTransform(rotationAngle: -.pi / 2)  // 顺时针旋转90度
             let rotatedImage = outputImage.transformed(by: rotationTransform)
