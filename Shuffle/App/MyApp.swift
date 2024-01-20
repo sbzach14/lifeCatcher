@@ -20,6 +20,7 @@ struct MyApp: App {
     
     var body: some Scene {
         WindowGroup {
+//            TestView()
             MainMenuView().onAppear {
                 requestPermissions()
                 initFile()

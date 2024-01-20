@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1801A9B42B550CE500B2AD06 /* cardDetection_s_0114.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 1801A9B32B550CE500B2AD06 /* cardDetection_s_0114.mlmodel */; };
 		18CA14D2284AC42C00F90372 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C3284AC42C00F90372 /* ViewModel.swift */; };
 		18CA14D3284AC42C00F90372 /* ShowCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C5284AC42C00F90372 /* ShowCardView.swift */; };
 		18CA14D4284AC42C00F90372 /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C6284AC42C00F90372 /* MainContentView.swift */; };
@@ -48,7 +49,6 @@
 		A88F20B02A1DEE63005E4A27 /* TinyNineGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88F20AF2A1DEE63005E4A27 /* TinyNineGame.swift */; };
 		A8922FC02A6553FB00A7033E /* PokerBullSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8922FBF2A6553FB00A7033E /* PokerBullSettingView.swift */; };
 		A892C6002A765A0A003FA2B3 /* MainMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A892C5FF2A765A0A003FA2B3 /* MainMenuView.swift */; };
-		A892C6112A7D145D003FA2B3 /* YOLOv3TinyFP16.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A892C6102A7D145C003FA2B3 /* YOLOv3TinyFP16.mlmodel */; };
 		A8D0D9342A223D210061A90E /* TexasPokerRuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D0D9332A223D210061A90E /* TexasPokerRuleSettingView.swift */; };
 		A8D0D9362A24A4C20061A90E /* TexasPoker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D0D9352A24A4C20061A90E /* TexasPoker.swift */; };
 		A8D0D9382A35D9970061A90E /* RankRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D0D9372A35D9970061A90E /* RankRulesView.swift */; };
@@ -63,12 +63,13 @@
 		A8EFFEB12B28766C00FC884F /* CutNumRangeSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8EFFEB02B28766C00FC884F /* CutNumRangeSettingView.swift */; };
 		A8FBC7BB2A3DF1B000EDDFD7 /* SuitRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8FBC7BA2A3DF1B000EDDFD7 /* SuitRulesView.swift */; };
 		A8FBC7C22A3F0A5C00EDDFD7 /* CVUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8FBC7C12A3F0A5C00EDDFD7 /* CVUtils.swift */; };
-		B01A281B2ABF15C900A74AA4 /* cardDetection.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = B01A281A2ABF15C900A74AA4 /* cardDetection.mlmodel */; };
 		B03B7B2D2A963C05006A0647 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B2C2A963C05006A0647 /* Card.swift */; };
 		B03B7B2F2A963C1B006A0647 /* utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B2E2A963C1B006A0647 /* utils.swift */; };
 		B03B7B532A98AD32006A0647 /* ShuffleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B522A98AD32006A0647 /* ShuffleTests.swift */; };
-		B0CC72FC2AE3CFC300E0A3E7 /* cardDetection_s_1009.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = B0CC72FB2AE3CFC300E0A3E7 /* cardDetection_s_1009.mlmodel */; };
-		B0CC72FE2AE6797500E0A3E7 /* cardDetection_n_1023.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = B0CC72FD2AE6797400E0A3E7 /* cardDetection_n_1023.mlmodel */; };
+		B058BE5D2B09F70E0078E792 /* BlurDetector_origin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058BE5C2B09F70E0078E792 /* BlurDetector_origin.swift */; };
+		B058BE5F2B09FFC20078E792 /* BlurDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058BE5E2B09FFC20078E792 /* BlurDetector.swift */; };
+		B058BE612B0A0D6F0078E792 /* TestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058BE602B0A0D6F0078E792 /* TestView.swift */; };
+		B093149E2B400B8700DE515A /* NewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B093149D2B400B8700DE515A /* NewViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,6 +83,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1801A9B32B550CE500B2AD06 /* cardDetection_s_0114.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; name = cardDetection_s_0114.mlmodel; path = ../../../Downloads/cardDetection_s_0114.mlmodel; sourceTree = "<group>"; };
 		18CA1477284ABEC600F90372 /* Shuffle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Shuffle.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		18CA14C3284AC42C00F90372 /* ViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
 		18CA14C5284AC42C00F90372 /* ShowCardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowCardView.swift; sourceTree = "<group>"; };
@@ -131,7 +133,6 @@
 		A88F20B12A1E3D4C005E4A27 /* Shuffle.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Shuffle.entitlements; sourceTree = "<group>"; };
 		A8922FBF2A6553FB00A7033E /* PokerBullSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokerBullSettingView.swift; sourceTree = "<group>"; };
 		A892C5FF2A765A0A003FA2B3 /* MainMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenuView.swift; sourceTree = "<group>"; };
-		A892C6102A7D145C003FA2B3 /* YOLOv3TinyFP16.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = YOLOv3TinyFP16.mlmodel; sourceTree = "<group>"; };
 		A8D0D9332A223D210061A90E /* TexasPokerRuleSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TexasPokerRuleSettingView.swift; sourceTree = "<group>"; };
 		A8D0D9352A24A4C20061A90E /* TexasPoker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TexasPoker.swift; sourceTree = "<group>"; };
 		A8D0D9372A35D9970061A90E /* RankRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankRulesView.swift; sourceTree = "<group>"; };
@@ -146,13 +147,14 @@
 		A8EFFEB02B28766C00FC884F /* CutNumRangeSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CutNumRangeSettingView.swift; sourceTree = "<group>"; };
 		A8FBC7BA2A3DF1B000EDDFD7 /* SuitRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SuitRulesView.swift; sourceTree = "<group>"; };
 		A8FBC7C12A3F0A5C00EDDFD7 /* CVUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CVUtils.swift; sourceTree = "<group>"; };
-		B01A281A2ABF15C900A74AA4 /* cardDetection.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection.mlmodel; sourceTree = "<group>"; };
 		B03B7B2C2A963C05006A0647 /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
 		B03B7B2E2A963C1B006A0647 /* utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = utils.swift; sourceTree = "<group>"; };
 		B03B7B502A98AD32006A0647 /* ShuffleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShuffleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B03B7B522A98AD32006A0647 /* ShuffleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShuffleTests.swift; sourceTree = "<group>"; };
-		B0CC72FB2AE3CFC300E0A3E7 /* cardDetection_s_1009.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection_s_1009.mlmodel; sourceTree = "<group>"; };
-		B0CC72FD2AE6797400E0A3E7 /* cardDetection_n_1023.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection_n_1023.mlmodel; sourceTree = "<group>"; };
+		B058BE5C2B09F70E0078E792 /* BlurDetector_origin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurDetector_origin.swift; sourceTree = "<group>"; };
+		B058BE5E2B09FFC20078E792 /* BlurDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurDetector.swift; sourceTree = "<group>"; };
+		B058BE602B0A0D6F0078E792 /* TestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView.swift; sourceTree = "<group>"; };
+		B093149D2B400B8700DE515A /* NewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewViewModel.swift; sourceTree = "<group>"; };
 		F11ED84932036610B96BC234 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -226,6 +228,7 @@
 				18CA14C3284AC42C00F90372 /* ViewModel.swift */,
 				A88EFE082A7FAD1100897243 /* SettingViewModel.swift */,
 				A887B64D2A7FDF56009F488F /* RecordHistoryViewModel.swift */,
+				B093149D2B400B8700DE515A /* NewViewModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -250,6 +253,7 @@
 				A887B6572A8511A4009F488F /* InfoView.swift */,
 				A8EFFEB02B28766C00FC884F /* CutNumRangeSettingView.swift */,
 				A87A82042B2EF66200B1B37B /* DealTypeView.swift */,
+				B058BE602B0A0D6F0078E792 /* TestView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -313,6 +317,8 @@
 				A8FBC7C12A3F0A5C00EDDFD7 /* CVUtils.swift */,
 				A88EFE0A2A7FC05900897243 /* JsonUtils.swift */,
 				A887B6512A8104BC009F488F /* TimeUtils.swift */,
+				B058BE5C2B09F70E0078E792 /* BlurDetector_origin.swift */,
+				B058BE5E2B09FFC20078E792 /* BlurDetector.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -351,12 +357,8 @@
 		A8FBC7BE2A3F057700EDDFD7 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				B0CC72FB2AE3CFC300E0A3E7 /* cardDetection_s_1009.mlmodel */,
-				B0CC72FD2AE6797400E0A3E7 /* cardDetection_n_1023.mlmodel */,
-				A875FECE2B550B65003D51C3 /* cardDetection_s_0114.mlmodel */,
+				1801A9B32B550CE500B2AD06 /* cardDetection_s_0114.mlmodel */,
 				A88EFE022A7E8ACC00897243 /* Resnet50FP16.mlmodel */,
-				B01A281A2ABF15C900A74AA4 /* cardDetection.mlmodel */,
-				A892C6102A7D145C003FA2B3 /* YOLOv3TinyFP16.mlmodel */,
 				A83853492ADA7BE600346038 /* Icon.xcassets */,
 				A838534B2ADA7C0200346038 /* BackGround.xcassets */,
 				A838534D2ADA7D7100346038 /* GameClass.xcassets */,
@@ -556,6 +558,7 @@
 				A88716852A0F701500B7F2CD /* GameManager.swift in Sources */,
 				A887167F2A0623E500B7F2CD /* AuthManager.swift in Sources */,
 				18CA14D4284AC42C00F90372 /* MainContentView.swift in Sources */,
+				B093149E2B400B8700DE515A /* NewViewModel.swift in Sources */,
 				A88F20B02A1DEE63005E4A27 /* TinyNineGame.swift in Sources */,
 				A809B3E22AE5126700F728A9 /* BaoziGame.swift in Sources */,
 				A88EFE0B2A7FC05900897243 /* JsonUtils.swift in Sources */,
@@ -563,6 +566,7 @@
 				A887B6522A8104BC009F488F /* TimeUtils.swift in Sources */,
 				A892C6002A765A0A003FA2B3 /* MainMenuView.swift in Sources */,
 				A8922FC02A6553FB00A7033E /* PokerBullSettingView.swift in Sources */,
+				B058BE5F2B09FFC20078E792 /* BlurDetector.swift in Sources */,
 				A812F9312A3DCD0800AA392F /* ThreeCardPokerGame.swift in Sources */,
 				A8E0E2EF2AAE00910091FC1D /* TwoEightGangGameRuleSettingView.swift in Sources */,
 				18CA14DB284AC42C00F90372 /* MyApp.swift in Sources */,
@@ -570,9 +574,12 @@
 				B03B7B2D2A963C05006A0647 /* Card.swift in Sources */,
 				A8E0E2E52AADEF560091FC1D /* ThreeMenGame.swift in Sources */,
 				A887B64E2A7FDF56009F488F /* RecordHistoryViewModel.swift in Sources */,
+				B058BE612B0A0D6F0078E792 /* TestView.swift in Sources */,
 				18CA14D2284AC42C00F90372 /* ViewModel.swift in Sources */,
 				A88F20AE2A13A470005E4A27 /* PokerBull.swift in Sources */,
 				A8D0D9362A24A4C20061A90E /* TexasPoker.swift in Sources */,
+				1801A9B42B550CE500B2AD06 /* cardDetection_s_0114.mlmodel in Sources */,
+				B058BE5D2B09F70E0078E792 /* BlurDetector_origin.swift in Sources */,
 				A8FBC7C22A3F0A5C00EDDFD7 /* CVUtils.swift in Sources */,
 				A8EFFEB12B28766C00FC884F /* CutNumRangeSettingView.swift in Sources */,
 				18CA14D3284AC42C00F90372 /* ShowCardView.swift in Sources */,
@@ -581,7 +588,6 @@
 				18CA14D6284AC42C00F90372 /* CameraView.swift in Sources */,
 				A88EFE072A7FA95A00897243 /* SettingView.swift in Sources */,
 				A83853532ADA918000346038 /* CustomUI.swift in Sources */,
-				B0CC72FC2AE3CFC300E0A3E7 /* cardDetection_s_1009.mlmodel in Sources */,
 				A8E0E2E72AADF6E20091FC1D /* TwoEightGangGame.swift in Sources */,
 				A887B6502A7FE1AF009F488F /* ShowRecordHistoryView.swift in Sources */,
 				A8D0D9382A35D9970061A90E /* RankRulesView.swift in Sources */,
@@ -596,7 +602,6 @@
 				B0CC72FE2AE6797500E0A3E7 /* cardDetection_n_1023.mlmodel in Sources */,
 				A80D65F82AFF75ED005B5E5E /* AddRuleSettingView.swift in Sources */,
 				A8E0E2ED2AAE00740091FC1D /* ThreeMenGameRuleSettingView.swift in Sources */,
-				A892C6112A7D145D003FA2B3 /* YOLOv3TinyFP16.mlmodel in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

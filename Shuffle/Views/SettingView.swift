@@ -64,17 +64,19 @@ struct SettingView: View {
                             Divider()
                                 .foregroundColor(.white)
                         
-//                            HStack {
-//                                Text("isAug")
-//                                    .foregroundColor(.primary)
-//                                    .padding()
-//
-//                                Spacer()
-//
-//                                Toggle("", isOn: $viewModel.isContrastAug)
-//                                    .padding()
-//                            }
-//                            Divider()
+                        HStack {
+                            Text("远距离")
+                                .foregroundColor(.white)
+                                .padding()
+
+                            Spacer()
+
+                            Toggle("", isOn: $viewModel.isRemote)
+                                .toggleStyle(CustomToggleStyle())
+                                .padding()
+                        }
+                        Divider()
+                            .foregroundColor(.white)
 
                             NavigationLink(
                                 destination: InfoView(activeDate: viewModel.activeDate)
