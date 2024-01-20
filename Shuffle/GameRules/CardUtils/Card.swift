@@ -10,10 +10,12 @@ import Foundation
 class Card {
     var suit: [Int]
     var rank: Int
+    var cardIndex: Int
     
-    init(suit: [Int], rank: Int) {
+    init(suit: [Int], rank: Int, cardIndex: Int) {
         self.suit = suit
         self.rank = rank
+        self.cardIndex = cardIndex
     }
     
     static func calScore(card: Card) -> Int {

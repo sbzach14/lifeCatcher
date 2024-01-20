@@ -3,53 +3,6 @@ import Foundation
 
 class TexasPokerRule : Rule{
     //Test to be deleted
-    static let testCardLabelDic : [Int:String] = [
-        0: "♠️A ", 1: "♠️2 ", 2: "♠️3 ", 3: "♠️4 ", 4: "♠️5 ", 5: "♠️6 ", 6: "♠️7 ", 7: "♠️8 ", 8: "♠️9 ", 9: "♠️10 ",
-        10: "♠️J ", 11: "♠️Q ", 12: "♠️K ", 13: "♥️A ", 14: "♥️2 ", 15: "♥️3 ", 16: "♥️4 ", 17: "♥️5 ", 18: "♥️6 ",
-        19: "♥️7 ", 20: "♥️8 ", 21: "♥️9 ", 22: "♥️10 ", 23: "♥️J ", 24: "♥️Q ", 25: "♥️K ", 26: "♣️A ", 27: "♣️2 ",
-        28: "♣️3 ", 29: "♣️4 ", 30: "♣️5 ", 31: "♣️6 ", 32: "♣️7 ", 33: "♣️8 ", 34: "♣️9 ", 35: "♣️10 ", 36: "♣️J ",
-        37: "♣️Q ", 38: "♣️K ", 39: "♦️A ", 40: "♦️2 ", 41: "♦️3 ", 42: "♦️4 ", 43: "♦️5 ", 44: "♦️6", 45: "♦️7",
-        46: "♦️8 ", 47: "♦️9 ", 48: "♦️10 ", 49: "♦️J ", 50: "♦️Q ", 51: "♦️K ", 52: "none", 53: "小王", 54: "大王"
-    ]
-    //Test to be deleted
-    let setting: [Int: String] = [
-        0: "标准",
-        1: "短牌",
-        2: "自定义"
-    ]
-    let ruleInfo: [Int: String] = [
-        0:"""
-5张德州扑克:
-52张牌，不要大小王，每人先发2张牌，再一次发3张1张1张公共牌，然后每次发公共牌之前都要烧一张牌。
-先比牌型，再比主要部分牌大小，不分花色。
-同花顺
-四条
-葫芦，三条带一对
-同花
-顺子
-三条
-两对
-一对
-高牌
-""",
-        1:"""
-使用一副去掉 2、3、4和5的牌，共36张牌。
-短牌皇家同花顺：A-6-7-8-9 的同花顺。
-短牌同花顺：任意五张同花的连续牌。
-四条：四张相同的牌。
-满堂红：三张相同的牌加上一对。
-短牌同花：五张同花但非连续的牌。
-短牌顺子：A-6-7-8-9 或更高的五张连续牌。
-三条：三张相同的牌。
-两对：两对不同的牌。
-一对：两张相同的牌。
-高牌：没有其他组合时，最大的牌。
-""",
-        2:"""
-自定义你的规则
-"""
-    ]
-    let playerNum : [Int] = [2,3,4,5,6,7,8]
     let isCompareSuit : [Int: String] = [
         0: "否",
         1: "是"
@@ -84,27 +37,53 @@ class TexasPokerRule : Rule{
             1: "一对",
             0: "高牌"
         ]
+        self.playerNum = [2,3,4,5,6,7,8]
+        self.setting = [
+            0: "标准",
+            1: "短牌",
+            2: "自定义"
+        ]
+        self.ruleInfo = [
+            0:"""
+    5张德州扑克:
+    52张牌，不要大小王，每人先发2张牌，再一次发3张1张1张公共牌，然后每次发公共牌之前都要烧一张牌。
+    先比牌型，再比主要部分牌大小，不分花色。
+    同花顺
+    四条
+    葫芦，三条带一对
+    同花
+    顺子
+    三条
+    两对
+    一对
+    高牌
+    """,
+            1:"""
+    使用一副去掉 2、3、4和5的牌，共36张牌。
+    短牌皇家同花顺：A-6-7-8-9 的同花顺。
+    短牌同花顺：任意五张同花的连续牌。
+    四条：四张相同的牌。
+    满堂红：三张相同的牌加上一对。
+    短牌同花：五张同花但非连续的牌。
+    短牌顺子：A-6-7-8-9 或更高的五张连续牌。
+    三条：三张相同的牌。
+    两对：两对不同的牌。
+    一对：两张相同的牌。
+    高牌：没有其他组合时，最大的牌。
+    """,
+            2:"""
+    自定义你的规则
+    """]
     }
 }
 
 //德州扑克
 class TexasPoker{
     
-    
-    
 
-    static func FindWinner(inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> [Int]? {
+    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int]) {
         
         
-        
-        let testCardLabelDic : [Int:String] = [
-            0: "♠️A ", 1: "♠️2 ", 2: "♠️3 ", 3: "♠️4 ", 4: "♠️5 ", 5: "♠️6 ", 6: "♠️7 ", 7: "♠️8 ", 8: "♠️9 ", 9: "♠️10 ",
-            10: "♠️J ", 11: "♠️Q ", 12: "♠️K ", 13: "♥️A ", 14: "♥️2 ", 15: "♥️3 ", 16: "♥️4 ", 17: "♥️5 ", 18: "♥️6 ",
-            19: "♥️7 ", 20: "♥️8 ", 21: "♥️9 ", 22: "♥️10 ", 23: "♥️J ", 24: "♥️Q ", 25: "♥️K ", 26: "♣️A ", 27: "♣️2 ",
-            28: "♣️3 ", 29: "♣️4 ", 30: "♣️5 ", 31: "♣️6 ", 32: "♣️7 ", 33: "♣️8 ", 34: "♣️9 ", 35: "♣️10 ", 36: "♣️J ",
-            37: "♣️Q ", 38: "♣️K ", 39: "♦️A ", 40: "♦️2 ", 41: "♦️3 ", 42: "♦️4 ", 43: "♦️5 ", 44: "♦️6", 45: "♦️7",
-            46: "♦️8 ", 47: "♦️9 ", 48: "♦️10 ", 49: "♦️J ", 50: "♦️Q ", 51: "♦️K ", 52: "none", 53: "小王", 54: "大王"
-        ]
 //        let json = Python.import("json")
 //
 //        let pythonObject =  json.TexasPokerGame.calResult(inputCards, args, rankRules, suitRules)
@@ -113,10 +92,10 @@ class TexasPoker{
         print("Array")
         var inputString : String = ""
         for i in 0..<inputCards.count{
-            inputString += testCardLabelDic[inputCards[i]]!
+            inputString += GameManager.cardLabelDic[inputCards[i]]!
         }
         print(inputString)
-        let winnersArray = TexasPokerGame.calResult(cardArray: inputCards, args: args, rankRules: rankRules, suitRules: suitRules)
+        let winnersArray = TexasPokerGame.calResult(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, cardArray: inputCards, args: args, rankRules: rankRules, suitRules: suitRules)
         print("winner ", winnersArray)
         return winnersArray
     }
@@ -184,21 +163,26 @@ class TexasPokerGame {
 //    #5 communityNum 0/3/5
 //    #6 handUseType 0无限制/1必须/2至少
 //    #7 handUseNum 1-5
-    static func calResult(cardArray: [Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> [Int] {
+    static func calResult(diyDealStatus:[[Bool]], diyDealNum:[Int], cardArray: [Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int]) {
         var deck = initDeck(initialCards: cardArray, suitRules: suitRules)
-            let winners = calWinners(deck: &deck, args: args, rankRules: rankRules)
-            return winners
+            let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: &deck, args: args, rankRules: rankRules)
+            return (winners, leftCards)
         }
     
-    static func calWinners(deck: inout [Card], args: [Int], rankRules: [Int]) -> [Int] {
-        let playerNum = args[0]
-        let isCompareSuit = args[1] == 1
-        let isAceStraight = args[2] == 1
-        let minRank = args[3]
-        let handNum = args[4]
-        let communityNum = args[5]
-        let handUseType = args[6]
-        let handUseNum = args[7]
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: inout [Card], args: [Int], rankRules: [Int]) -> ([Int], [Int]) {
+        let rule = GameManager.gameRules[0] as! TexasPokerRule
+        let dealType = args[0]
+        let diyDealType = args[1]
+        let playerNum = args[2]
+        
+        //TODO 按照rulesettingview里的内容修改
+        let isCompareSuit = args[3] == 1
+        let isAceStraight = args[4] == 1
+        let minRank = rule.handNum[args[5]]
+        let handNum = rule.handNum[args[6]]
+        let communityNum = rule.communityNum[args[7]]
+        let handUseType = args[8]
+        let handUseNum = rule.handUseNum[args[9]]
         
         var maxRank = 0
         var winners = [Int]()
@@ -210,28 +194,74 @@ class TexasPokerGame {
         }
         
         // 发牌
-        for _ in 0..<handNum {
-            for i in 0..<playerNum {
-                allPlayCards[i].insertCard(card: deck.removeFirst())
+        // 正发
+        if dealType == 0 || dealType == 1{
+            for _ in 0..<handNum {
+                if dealType == 0{
+                    for i in 0..<playerNum {
+                        allPlayCards[i].insertCard(card: deck.removeFirst())
+                    }
+                } else if dealType == 1 {
+                    allPlayCards[0].insertCard(card: deck.removeFirst())
+                    for i in stride(from: playerNum - 1, to: 0, by: -1) {
+                        allPlayCards[i].insertCard(card: deck.removeFirst())
+                    }
+                }
+                
             }
-        }
-        
-        if communityNum == 3 {
-            deck.removeFirst()
-            for _ in 0..<3 {
-                community.append(deck.removeFirst())
-            }
-        } else if communityNum == 5 {
-            deck.removeFirst()
-            for _ in 0..<3 {
-                community.append(deck.removeFirst())
-            }
-            for _ in 0..<2 {
+            if communityNum == 3 {
                 deck.removeFirst()
-                community.append(deck.removeFirst())
+                for _ in 0..<3 {
+                    community.append(deck.removeFirst())
+                }
+            } else if communityNum == 5 {
+                deck.removeFirst()
+                for _ in 0..<3 {
+                    community.append(deck.removeFirst())
+                }
+                for _ in 0..<2 {
+                    deck.removeFirst()
+                    community.append(deck.removeFirst())
+                }
             }
         }
-        
+        // 自定义发牌 dealType = 2
+        else {
+            for actionIndex in 0...diyDealStatus.count - 1{
+                let cardNum = diyDealNum[actionIndex]
+                let action = diyDealStatus[actionIndex]
+                //派牌
+                if action[0] == true{
+                    if diyDealType == 0{
+                        for i in 0..<playerNum {
+                            for _ in 0..<cardNum{
+                                allPlayCards[i].insertCard(card: deck.removeFirst())
+                            }
+                        }
+                    } else if diyDealType == 1{
+                        for _ in 0..<cardNum{
+                            allPlayCards[0].insertCard(card: deck.removeFirst())
+                        }
+                        for i in stride(from: playerNum - 1, to: 0, by: -1) {
+                            for _ in 0..<cardNum{
+                                allPlayCards[i].insertCard(card: deck.removeFirst())
+                            }
+                        }
+                    }
+                    
+                //公牌
+                } else if action[1] == true {
+                    for _ in 0..<cardNum{
+                        community.append(deck.removeFirst())
+                    }
+                //去牌
+                } else if action[2] == true {
+                    for _ in 0..<cardNum{
+                        deck.removeFirst()
+                    }
+                }
+            }
+        }
         
         for i in 0..<playerNum {
             
@@ -249,7 +279,12 @@ class TexasPokerGame {
             }
         }
         
-        return winners
+        var leftCards:[Int] = []
+        for card in deck{
+            leftCards.append(card.cardIndex)
+        }
+        
+        return (winners, leftCards)
     }
 }
 
@@ -260,20 +295,20 @@ class HandEvaluator {
 
         var handCardsString:String = ""
         for handCard in cards{
-            handCardsString += TexasPokerRule.testCardLabelDic[handCard.rank
+            handCardsString += GameManager.cardLabelDic[handCard.rank
                                                                - 1 + suitRules[handCard.suit[0]]*13]!
         }
         print("手牌：", handCardsString, "A顺子：", isAceStraight)
         var communityCardsString: String = ""
         for communityCard in community{
-            communityCardsString += TexasPokerRule.testCardLabelDic[communityCard.rank - 1 + suitRules[communityCard.suit[0]] * 13]!
+            communityCardsString += GameManager.cardLabelDic[communityCard.rank - 1 + suitRules[communityCard.suit[0]] * 13]!
         }
         print("公共牌：", communityCardsString)
         
         let (cardsLength, allSortedCards) = sortCards(cards: cards, community: community, handUseType: handUseType, handUseNum: handUseNum, isAceStraight: isAceStraight, minRank: minRank)
         var sortedString:String = ""
         for sortedcard in allSortedCards[0]{
-            sortedString += TexasPokerRule.testCardLabelDic[sortedcard.rank - 1 + suitRules[sortedcard.suit[0]] * 13]!
+            sortedString += GameManager.cardLabelDic[sortedcard.cardIndex]!
         }
         
         print("排序后的牌 ", sortedString," length: ", cardsLength)
@@ -295,7 +330,7 @@ class HandEvaluator {
         var communityCopy:[Card] = []
         
         for card in cards {
-            var copy:Card = Card(suit: card.suit, rank: card.rank)
+            var copy:Card = Card(suit: card.suit, rank: card.rank, cardIndex: card.cardIndex)
             if copy.rank == 1 {
                 copy.rank = 14
             }
@@ -303,7 +338,7 @@ class HandEvaluator {
         }
         
         for card in community {
-            var copy:Card = Card(suit: card.suit, rank: card.rank)
+            var copy:Card = Card(suit: card.suit, rank: card.rank, cardIndex: card.cardIndex)
 
             if copy.rank == 1 {
                 copy.rank = 14
@@ -354,7 +389,7 @@ class HandEvaluator {
                 var aceCards = [Card]()
                 for card in cardsList {
                     if card.rank == 14 {
-                        aceCards.append(Card(suit: card.suit, rank: minRank - 1))
+                        aceCards.append(Card(suit: card.suit, rank: minRank - 1, cardIndex: card.cardIndex))
                     }
                 }
                 cardsList += aceCards

@@ -9,13 +9,32 @@
 import SwiftUI
 
 struct CutNumRangeSettingView: View {
+    @Binding var cutNumRangeSetting:[Int]
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack{
+            HStack{
+                Text("    X =  ")
+                TextField("X = ", value: $cutNumRangeSetting[0], format: .number).textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding()
+                
+            }
+            HStack{
+                Text("    Y =  ")
+
+                TextField("Y = ", value: $cutNumRangeSetting[1], format: .number).textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding()
+                
+            }
+            
+            
+            Spacer()
+        }.background(Image("bg").resizable().scaledToFill()).navigationTitle("打色范围设置")
     }
 }
 
 struct CutNumRangeSettingView_Previews: PreviewProvider {
     static var previews: some View {
-        CutNumRangeSettingView()
+        let cutNumRangeSetting: Binding<[Int]> = .constant([2,10])
+        CutNumRangeSettingView(cutNumRangeSetting: cutNumRangeSetting)
     }
 }
