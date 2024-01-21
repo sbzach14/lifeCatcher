@@ -214,7 +214,8 @@ struct PokerBullSettingView: View {
                                     }
                                     .pickerStyle(MenuPickerStyle())
                                     .frame(maxWidth: .infinity, alignment: .trailing)
-                                    .padding(.trailing, 60) // 右侧间距
+                                    .padding(.trailing, 30) // 右侧间距
+                                    .accentColor(.white)
                                 }.background(
                                     Image("list_bg") // 背景图片
                                         .resizable()
@@ -442,15 +443,11 @@ struct PokerBullSettingView: View {
                             Button(action: {
                                 navigateToRankRules = true
                             }) {
-                                Image(systemName: "gear")
+                                Image("icon_next")
                                     .resizable()
-                                    .foregroundColor(.white)
-                                    .padding(3)
-                                    .background(Color.blue)
-                                    .cornerRadius(10)
-                                    .frame(width: 40, height: 40) // 设置正方形大小
+                                    .frame(width: 30, height: 30) // 设置正方形大小
                             }
-                            .padding(.trailing, 30)
+                            .padding(.trailing, 40)
                             .background(
                                 NavigationLink(
                                     destination: RankRulesView(rankRules: $rankRules, selectedRuleIndex: selectedRule.ruleIndex),

@@ -340,8 +340,7 @@ struct ThreeCardPokerGameRuleSettingView: View {
                         }
                         
 
-                        HStack
-                        {Image("icon_ranksetting")
+                        HStack{Image("icon_ranksetting")
                                 .resizable()
                                 .frame(width: 40, height: 40).padding(.leading, 20)
                             Text("自定义牌型顺序")
@@ -351,15 +350,11 @@ struct ThreeCardPokerGameRuleSettingView: View {
                             Button(action: {
                                 navigateToRankRules = true
                             }) {
-                                Image(systemName: "gear")
+                                Image("icon_next")
                                     .resizable()
-                                    .foregroundColor(.white)
-                                    .padding(3)
-                                    .background(Color.blue)
-                                    .cornerRadius(10)
-                                    .frame(width: 40, height: 40) // 设置正方形大小
+                                    .frame(width: 30, height: 30) // 设置正方形大小
                             }
-                            .padding(.trailing, 30)
+                            .padding(.trailing, 40)
                             .background(
                                 NavigationLink(
                                     destination: RankRulesView(rankRules: $rankRules, selectedRuleIndex: selectedRule.ruleIndex),
@@ -388,15 +383,11 @@ struct ThreeCardPokerGameRuleSettingView: View {
                                 Button(action: {
                                     navigateToSuitRules = true
                                 }) {
-                                    Image(systemName: "gear")
+                                    Image("icon_next")
                                         .resizable()
-                                        .foregroundColor(.white)
-                                        .padding(3)
-                                        .background(Color.blue)
-                                        .cornerRadius(10)
-                                        .frame(width: 40, height: 40) // 设置正方形大小
+                                        .frame(width: 30, height: 30) // 设置正方形大小
                                 }
-                                .padding(.trailing, 30)
+                                .padding(.trailing, 40)
                                 .background(
                                     NavigationLink(
                                         destination: SuitRulesView(suitRules: $suitRules),

@@ -67,7 +67,7 @@ class generalRuleSetting{
         2: "3"
     ]
     static let allCuttingSetting: [Int: String] = [
-        0:"不切牌",
+        0:"切牌",
         1:"去色",
         2:"留色"
     ]
@@ -80,10 +80,10 @@ class generalRuleSetting{
 }
 
 struct AddRuleSettingView: View{
+    var gameType: Int
     var selectedSaveIndex: Int
+    @State private var _selectedSaveIndex: Int = -1
     @State private var editType: Int = 0
-    
-    @State private var gameType: Int = 0
     @State private var setting: Int = 0
     @State private var calMode: Int = 0
     @State private var dealType: Int = 0
@@ -116,11 +116,13 @@ struct AddRuleSettingView: View{
 //    @State private var selectedRule: Rule = Rule(ruleIndex: 0, ruleName: "德州")
     @State private var playerNumList:[Int] = [2,3,4,5,6,7,8]
     @State private var currentNum: Int = 2
-    @State private var AllCardIndex:[Int] = []
     @State private var minCardNum:Int = 0
     
     private func SetUpAll(){
         print("init success")
+        
+        _selectedSaveIndex = self.selectedSaveIndex
+        
         //新建规则时初始化
         if self.selectedSaveIndex == -1 && self.editType == 0{
             
@@ -139,12 +141,11 @@ struct AddRuleSettingView: View{
             for rankIndex in 0...RuleManager.allPreSetRules[self.gameType]![self.setting]![2].count - 1 {
                 self.rankRules.append(RankRulesSate(index: RuleManager.allPreSetRules[self.gameType]![self.setting]![2][rankIndex], isChecked: (RuleManager.allPreSetRules[self.gameType]![self.setting]![3][rankIndex] != 0)))
             }
-            print(self.cardToUse)
+            self.cardToUse = GameGetAllCardIndex()
         //选择已经保存的规则时初始化
         }else if self.selectedSaveIndex > -1 && editType == 0{
             print("init rule \(self.selectedSaveIndex)")
             let rules = RuleManager.allUsersGameRule[self.selectedSaveIndex]
-            self.gameType = rules.gameType
             
             let selectedRule = GameManager.gameRules[gameType]!
             self.playerNumList = selectedRule.playerNum
@@ -173,6 +174,8 @@ struct AddRuleSettingView: View{
                 self.rankRules.append(RankRulesSate(index: rules.rankRules[i], isChecked: (rules.rankRuleChecked[i] != 0)))
             }
         }
+        
+        
         //从别的设置页面返回时不再初始化各个参数
         self.editType = 1
     }
@@ -183,31 +186,6 @@ struct AddRuleSettingView: View{
                 Spacer()
                 ScrollView{
                     VStack{
-                        //类别
-                        HStack{
-                            Image("icon_shufflemode")
-                                .resizable()
-                                .frame(width: 40, height: 40).padding(.leading, 20)
-                            Text("类别")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .foregroundColor(.white) // 左侧间距
-                            Picker("gameType", selection: $gameType) {
-                                ForEach(0...generalRuleSetting.allGameType.count - 1, id: \.self){
-                                    index in Text(generalRuleSetting.allGameType[index]!).tag(index)
-                                }
-                            }
-                            .pickerStyle(MenuPickerStyle())
-                            .frame(width: 160, height: 30, alignment: .trailing)
-                            .padding(.trailing, 30) // 右侧间距
-                            .accentColor(.white).onChange(of: gameType) { _ in
-                                handleGameTypeChange(selectedRuleIndex: gameType)
-                            }
-                        }.background(
-                            Image("list_bg") // 背景图片
-                                .resizable()
-                                .scaledToFill()
-                        )
-                        .frame(height: 50)
                         
                         let selectedRule = GameManager.gameRules[gameType]
                         //游戏玩法
@@ -226,7 +204,6 @@ struct AddRuleSettingView: View{
                             }
                             .pickerStyle(MenuPickerStyle())
                             .frame(width: 160, height: 30, alignment: .trailing)
-                            .padding(.trailing, 0) // 右侧间距
                             .accentColor(.white).onChange(of: setting) { _ in
                                 handleSettingChange(selectedRuleIndex: gameType)
                             }.background(){
@@ -248,7 +225,9 @@ struct AddRuleSettingView: View{
                             }) {
                                 Image(systemName: "info.circle") // 你可以选择其他图标
                                     .foregroundColor(.white)
-                            }.padding(.trailing, 3)
+                            }
+                            .frame(width: 10, height: 10, alignment: .trailing)
+                            .padding(.trailing, 12.5)
                                 .alert(isPresented: $showAlert) {
                                     Alert(
                                         title: Text("规则说明"),
@@ -324,8 +303,7 @@ struct AddRuleSettingView: View{
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .foregroundColor(.white) // 左侧间距
                             NavigationLink(destination: DealTypeView(dealType: $dealType, diyDealType: $diyDealType, diyDealNum: $diyDealNum, diyDealStatus: $diyDealStatus)){
-                                Text(generalRuleSetting.allDealType[dealType]!).frame(maxWidth: .infinity, alignment: .trailing)
-                                    .foregroundColor(.white).padding(.trailing,50)
+                                Image("icon_next").resizable().frame(width: 30, height: 30).padding(.trailing, 40)
                             }
                         }.background(
                             Image("list_bg") // 背景图片
@@ -347,8 +325,7 @@ struct AddRuleSettingView: View{
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .foregroundColor(.white) // 左侧间距
                             NavigationLink(destination: UsingCardsSettingView(cardToUse: $cardToUse)){
-                                Text(concatenatedString).frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(.white) // 左侧间距
+                                Image("icon_next").resizable().frame(width: 30, height: 30).padding(.trailing, 40)
                             }
                             
                             
@@ -398,7 +375,7 @@ struct AddRuleSettingView: View{
                                     }
                                 }
                                 .pickerStyle(MenuPickerStyle())
-                                .frame(width: 160, height: 30, alignment: .trailing)
+                                .frame(width: 200, height: 30, alignment: .trailing)
                                 .padding(.trailing,30) // 右侧间距
                                 .accentColor(.white)
                                 
@@ -452,7 +429,7 @@ struct AddRuleSettingView: View{
                                     }
                                 }
                                 .pickerStyle(MenuPickerStyle())
-                                .frame(width: 160, height: 30, alignment: .trailing)
+                                .frame(width: 200, height: 30, alignment: .trailing)
                                 .padding(.trailing,30) // 右侧间距
                                 .accentColor(.white)
                                 
@@ -472,8 +449,8 @@ struct AddRuleSettingView: View{
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .foregroundColor(.white) // 左侧间距
                                 NavigationLink(destination: CutNumRangeSettingView(cutNumRangeSetting: $cutNumRangeSetting)){
-                                    Text("X = \(cutNumRangeSetting[0]), Y = \(cutNumRangeSetting[1])").frame(maxWidth: .infinity, alignment: .trailing)
-                                        .foregroundColor(.white).padding(.trailing,50)
+                                    Text("\(cutNumRangeSetting[0])～\(cutNumRangeSetting[1])").frame(maxWidth: .infinity, alignment: .trailing)
+                                        .foregroundColor(.white).padding(.trailing,40)
                                 }
                                 
                             }.background(
@@ -508,7 +485,8 @@ struct AddRuleSettingView: View{
                             .frame(height: 50)
                             
                             HStack
-                            {Image("icon_shufflemode")
+                            {
+                                Image("icon_shufflemode")
                                     .resizable()
                                     .frame(width: 40, height: 40).padding(.leading, 20)
                                 Text("连报轮数")
@@ -530,57 +508,6 @@ struct AddRuleSettingView: View{
                                     .scaledToFill()
                             )
                             .frame(height: 50)
-                            
-                            
-                            
-                            //报牌张数暂时没用
-//                            HStack
-//                            {Image("icon_shufflemode")
-//                                    .resizable()
-//                                    .frame(width: 40, height: 40).padding(.leading, 20)
-//                                Text("报牌张数")
-//                                    .frame(maxWidth: .infinity, alignment: .leading)
-//                                    .foregroundColor(.white) // 左侧间距
-//                                Picker("reportNumber", selection: $reportNumber) {
-//                                    ForEach(0...3, id: \.self){
-//                                        index in Text(String(index)).tag(index)
-//                                    }
-//                                }
-//                                .pickerStyle(MenuPickerStyle())
-//                                .frame(width: 160, height: 30, alignment: .trailing)
-//                                .padding(.trailing,30) // 右侧间距
-//                                .accentColor(.white)
-//
-//                            }.background(
-//                                Image("list_bg") // 背景图片
-//                                    .resizable()
-//                                    .scaledToFill()
-//                            )
-                            .frame(height: 50)
-                            //结果播报
-                            HStack
-                            {Image("icon_shufflemode")
-                                    .resizable()
-                                    .frame(width: 40, height: 40).padding(.leading, 20)
-                                Text("结果播报")
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(.white) // 左侧间距
-                                Picker("voiceReport", selection: $voiceReport) {
-                                    ForEach(0...generalRuleSetting.allVoiceReport.count - 1, id: \.self){
-                                        index in Text(generalRuleSetting.allVoiceReport[index]!).tag(index)
-                                    }
-                                }
-                                .pickerStyle(MenuPickerStyle())
-                                .frame(width: 160, height: 30, alignment: .trailing)
-                                .padding(.trailing,30) // 右侧间距
-                                .accentColor(.white)
-                                
-                            }.background(
-                                Image("list_bg") // 背景图片
-                                    .resizable()
-                                    .scaledToFill()
-                            )
-                            .frame(height: 50)
                         }
                     }
                 }
@@ -589,50 +516,50 @@ struct AddRuleSettingView: View{
                 
                 HStack {
                     
-                    Text("保存")
-                        .foregroundColor(.white)
-                        .frame(alignment: .center)
-                        .onTapGesture {
-                            saveData()
-                        }
-                        .alert(isPresented: $saveSuccessAlert) {
-                            Alert(
-                                title: Text("保存成功"),
-                                message: Text(alertMessage),
-                                dismissButton: .default(Text("OK"))
-                            )
-                        }
-                }
-                
-                Button(action: {
-                    //TODO 检测是否可以保存设置
-                    alertMessage = alertMessageCheck()
-                    if(alertMessage != "")
-                    {
-                        showAlertWithMessage()
+                    Spacer()
+                    
+                    Button(action: {self.saveData()}){
+                        Image("icon_save").resizable().frame(width: 150, height: 60)
+                    }.alert(isPresented: $saveSuccessAlert) {
+                        Alert(
+                            title: Text("保存成功"),
+                            message: Text(alertMessage),
+                            dismissButton: .default(Text("OK"))
+                        )
                     }
-                    else {
-                        //TODO 将保存的规则数据全部传入main content view 开始识别
-                        self.isNavigateToMainContentView = true
-                        self.AllCardIndex = self.GameGetAllCardIndex()
-                        self.minCardNum = self.GameGetMinCardNum()
-                       
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        //TODO 检测是否可以保存设置
+                        alertMessage = alertMessageCheck()
+                        if(alertMessage != "")
+                        {
+                            showAlertWithMessage()
+                        }
+                        else {
+                            //TODO 将保存的规则数据全部传入main content view 开始识别
+                            self.isNavigateToMainContentView = true
+                            self.minCardNum = self.GameGetMinCardNum()
+                            
+                        }
+                        
+                    }) {
+                        Image("icon_start").resizable().frame(width: 150, height: 60)
                     }
-
-                }) {
-                    Image("icon_start").resizable().frame(width: 150, height: 60)
-                }
-                .padding()
-                .alert(isPresented: $showAlert) {
-                    Alert(
-                        title: Text("参数错误"),
-                        message: Text(alertMessage),
-                        dismissButton: .default(Text("OK"))
+                    .alert(isPresented: $showAlert) {
+                        Alert(
+                            title: Text("参数错误"),
+                            message: Text(alertMessage),
+                            dismissButton: .default(Text("OK"))
+                        )
+                    }.background(NavigationLink(destination: MainContentView(playerNum: playerNum, shuffleMode: shuffleMode, dealType: dealType, diyDealType: diyDealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, calModeArgs: [cutSetting, reportSetting, positionSetting], cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport + 1, cutSetting: cutSetting, reportNumber: reportNumber, voiceReport: voiceReport, ruleIndex: gameType, args: args, rankRules: GameManager.getCheckedIndexes(rankRules: rankRules), suitRules: suitRules, allCardIndex: cardToUse, minCardNum: minCardNum),
+                                                isActive: $isNavigateToMainContentView,
+                                                label: EmptyView.init).hidden()
                     )
-                }.background(NavigationLink(destination: MainContentView(playerNum: playerNum, shuffleMode: shuffleMode, dealType: dealType, diyDealType: diyDealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, calModeArgs: [cutSetting, reportSetting, positionSetting], cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport + 1, cutSetting: cutSetting, reportNumber: reportNumber, voiceReport: voiceReport, ruleIndex: gameType, args: args, rankRules: GameManager.getCheckedIndexes(rankRules: rankRules), suitRules: suitRules, allCardIndex: self.AllCardIndex, minCardNum: self.minCardNum),
-                                            isActive: $isNavigateToMainContentView,
-                                            label: EmptyView.init).hidden()
-                )
+                    
+                    Spacer()
+                }.padding()
                 
             }.background(Image("bg").resizable().scaledToFill())
             .onAppear(){
@@ -644,6 +571,7 @@ struct AddRuleSettingView: View{
     private func saveData(){
         var rankRulesToAdd: [Int] = []
         var rankRuleToAddChecked: [Int] = []
+        let selectedRule = GameManager.gameRules[gameType]
         
         for i in rankRules{
             rankRulesToAdd.append(i.index)
@@ -653,11 +581,12 @@ struct AddRuleSettingView: View{
                 rankRuleToAddChecked.append(0)
             }
         }
-        let ruleToAdd = GameRule(RuleName: generalRuleSetting.allGameType[gameType]!, gameType: gameType, setting: setting, calMode: calMode, dealType: dealType, diyDealType: diyDealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, playerNum: playerNum, shuffleMode: shuffleMode, cardToUse: cardToUse, cutNumSetting: cutNumSetting, reportSetting: reportSetting, cutNumRangeSetting: cutNumRangeSetting, positionSetting: positionSetting, consecutiveReport: consecutiveReport, cutSetting: cutSetting, reportNumber: reportNumber, voiceReport: voiceReport, args: args, suitRanks: suitRules, rankRules: rankRulesToAdd, rankRuleChecked: rankRuleToAddChecked)
-        if selectedSaveIndex == -1{
+        let ruleToAdd = GameRule(RuleName: selectedRule!.setting[setting]!, gameType: gameType, setting: setting, calMode: calMode, dealType: dealType, diyDealType: diyDealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, playerNum: playerNum, shuffleMode: shuffleMode, cardToUse: cardToUse, cutNumSetting: cutNumSetting, reportSetting: reportSetting, cutNumRangeSetting: cutNumRangeSetting, positionSetting: positionSetting, consecutiveReport: consecutiveReport, cutSetting: cutSetting, reportNumber: reportNumber, voiceReport: voiceReport, args: args, suitRanks: suitRules, rankRules: rankRulesToAdd, rankRuleChecked: rankRuleToAddChecked)
+        if _selectedSaveIndex == -1{
             RuleManager.allUsersGameRule.append(ruleToAdd)
+            _selectedSaveIndex = RuleManager.allUsersGameRule.count - 1
         }else {
-            RuleManager.allUsersGameRule[selectedSaveIndex] = ruleToAdd
+            RuleManager.allUsersGameRule[_selectedSaveIndex] = ruleToAdd
         }
         RuleManager.saveGameRule()
         self.saveSuccessAlert = true
@@ -669,12 +598,12 @@ struct AddRuleSettingView: View{
         print("重置规则 \(generalRuleSetting.allGameType[selectedRule.ruleIndex])")
         if self.setting != selectedRule.setting.count - 1 || selectedRule.setting.count == 1{
             args = RuleManager.allPreSetRules[self.gameType]![self.setting]![0]
+            cardToUse = GameGetAllCardIndex()
             print("重置之后的args \(args)")
             suitRules = RuleManager.allPreSetRules[self.gameType]![self.setting]![1]
             rankRules.removeAll()
             for index in 0...RuleManager.allPreSetRules[self.gameType]![self.setting]![2].count - 1{
-                rankRules.append(RankRulesSate(index: RuleManager.allPreSetRules[self.gameType]![self.setting]![2][index], isChecked: (RuleManager.allPreSetRules[self.gameType]![self.setting]![3][index]
-                                                                                                                                     != 0)))
+                rankRules.append(RankRulesSate(index: RuleManager.allPreSetRules[self.gameType]![self.setting]![2][index], isChecked: (RuleManager.allPreSetRules[self.gameType]![self.setting]![3][index] != 0)))
             }
         }
     }
@@ -827,6 +756,6 @@ struct AddRuleSettingView: View{
 struct AddRuleSettingView_Previews: PreviewProvider{
     static var previews: some View{
         RuleManager.LoadAllPresetRules()
-        return AddRuleSettingView(selectedSaveIndex: -1)
+        return AddRuleSettingView(gameType: 0, selectedSaveIndex: -1)
     }
 }
