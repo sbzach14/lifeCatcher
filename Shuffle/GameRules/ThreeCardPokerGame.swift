@@ -4,28 +4,7 @@ import Foundation
 //import PythonKit
 
 class ThreeCardPokerGameRule : Rule{
-    let setting: [Int: String] = [
-        0: "标准",
-        1: "自定义"
-    ]
-    let ruleInfo:[Int: String] = [
-        0:"""
-共52张牌，A-K，A最大，一人发三张
-大小比较：
-10: "235",
-6: "同花顺",
-4: "同花",
-3: "顺子",
-2: "真对子",
-1: "对子",
-0: "散牌"
-同牌型比最大牌，同点数比较花色
-""",
-        1:"""
-自定义你的规则
-"""
-    ]
-    let playerNum : [Int] = [2,3,4,5,6,7,8]
+    
     let handNum: [Int] = [3,4,5,6,7,8,9,10,11,12]
     let minRank: [Int] = [2,3,4,5,6,7,8,9,10]
     let isCompareSuit : [Int: String] = [
@@ -120,6 +99,42 @@ class ThreeCardPokerGameRule : Rule{
             1: "对子",
             0: "散牌"
         ]
+        self.setting = [
+            0: "金花",
+            1: "金花顺大",
+            2: "金花AKJ",
+            3: "金花4选3（未完成）",
+            4: "百变金花",
+            5: "自定义"
+        ]
+        self.ruleInfo = [
+            0:"""
+    牌数:52张(没有大小王)每家3张牌规则:
+    1)豹子: 3张同样大小的牌
+    2)顺金: 花色相同的顺子
+    3)金花:花色相同的牌
+    4)顺子:花色不全相同的相连3张牌
+    5)对子: 对A最大，对2最小
+    6)散牌: A最大 2最小
+    """,
+            1:"顺子大于清。其他和常规金花一样",
+            2:"52张，3条 > 同花AKJ > 同花235 > AKJ > 235 > 同花顺 > 顺子 > 同花 > 对子 > 单张",
+            3:"AAA 最大",
+            4:"""
+            牌数:54张牌，每家3张牌。王可变任意牌规则:
+            1)豹子: 3张同样大小的牌
+            2)顺金: 花色相同的顺子
+            3)金花:花色相同的牌
+            4) 顺子: 花色不全相同的相连3张牌
+            5) 对子: 对A...对2
+            6) 散牌: A最大 2最小
+            """,
+            5:"""
+    自定义你的规则
+    """
+        ]
+        self.playerNum = [2,3,4,5,6,7,8]
+
     }
 }
 
@@ -130,11 +145,11 @@ class ThreeCardPokerGameRule : Rule{
 class ThreeCardPokerGame{
     
     
-    static func FindWinner(inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> [Int]? {
+    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int], [Int]) {
         
         var deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let winners = calWinners(deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
-        return winners
+        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winners, leftCards)
     }
     
     static func legalCheck(playerNum: Int, minRank: Int, handNum: Int, isHeadCard: Int, isRedJoker: Int, isBlackJoker: Int) -> String{
@@ -175,37 +190,92 @@ class ThreeCardPokerGame{
     }
     
     
-    static func calWinners(deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> [Int] {
-        let playerNum = args[0]
-        let handNum = args[1]
-        let isCompareSuit = args[2]
-        let minRank = args[3]
-        let isAce = args[4]
-        let isAceStraight = args[5]
-        let isHeadCard = args[6]
-        let isRedJoker = args[7]
-        let redJokerSuit = args[8]
-        let redJokerRank = args[9]
-        let isBlackJoker = args[10]
-        let blackJokerSuit = args[11]
-        let blackJokerRank = args[12]
-        let isReverseHighCard = args[13]
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int]) {
+        print("炸金花参数 \(args)")
+        let rule = GameManager.gameRules[2] as! ThreeCardPokerGameRule
+        let dealType = args[0]
+        let diyDealType = args[1]
+        let playerNum = args[2]
+        let handNum = rule.handNum[args[3]]
+        let isCompareSuit = args[4]
+        let minRank = rule.minRank[args[5]]
+        let isAce = args[6]
+        let isAceStraight = args[7]
+        let isHeadCard = args[8]
+        let isRedJoker = args[9]
+        let redJokerSuit = args[10]
+        let redJokerRank = args[11]
+        let isBlackJoker = args[12]
+        let blackJokerSuit = args[13]
+        let blackJokerRank = args[14]
+        let isReverseHighCard = args[15]
         
         var maxRank = 0
         var winners: [Int] = []
         var allPlayCards: [Player] = []
+        var community = [Card]()
         
         for _ in 0..<playerNum {
             allPlayCards.append(Player())
         }
         
-        
         var deck = deck
         // 发牌
-        for _ in 0..<handNum {
-            for i in 0..<playerNum {
-                allPlayCards[i].insertCard(card: deck.removeFirst())
+        if dealType == 0 || dealType == 1{
+            for _ in 0..<handNum {
+                if dealType == 0{
+                    for i in 0..<playerNum {
+                        allPlayCards[i].insertCard(card: deck.removeFirst())
+                    }
+                } else if dealType == 1 {
+                    allPlayCards[0].insertCard(card: deck.removeFirst())
+                    for i in stride(from: playerNum - 1, to: 0, by: -1) {
+                        allPlayCards[i].insertCard(card: deck.removeFirst())
+                    }
+                }
             }
+        } else if dealType == 2{
+            for actionIndex in 0...diyDealStatus.count - 1{
+                let cardNum = diyDealNum[actionIndex]
+                let action = diyDealStatus[actionIndex]
+                //派牌
+                if action[0] == true{
+                    if diyDealType == 0{
+                        for i in 0..<playerNum {
+                            for _ in 0..<cardNum{
+                                allPlayCards[i].insertCard(card: deck.removeFirst())
+                            }
+                        }
+                    } else if diyDealType == 1{
+                        for _ in 0..<cardNum{
+                            allPlayCards[0].insertCard(card: deck.removeFirst())
+                        }
+                        for i in stride(from: playerNum - 1, to: 0, by: -1) {
+                            for _ in 0..<cardNum{
+                                allPlayCards[i].insertCard(card: deck.removeFirst())
+                            }
+                        }
+                    }
+                //公牌
+                } else if action[1] == true {
+                    for _ in 0..<cardNum{
+                        community.append(deck.removeFirst())
+                    }
+                //去牌
+                } else if action[2] == true {
+                    for _ in 0..<cardNum{
+                        deck.removeFirst()
+                    }
+                }
+            }
+        }
+        
+        for i in 0..<playerNum{
+            var playerCardStr = ""
+            for card in allPlayCards[i].playerCard{
+                playerCardStr += GameManager.cardLabelDic[card.cardIndex]! + " "
+            }
+            print("玩家 \(i) 手牌 \(playerCardStr)")
         }
         
         for i in 0..<playerNum {
@@ -227,9 +297,23 @@ class ThreeCardPokerGame{
             ).evalHand(cards: allPlayCards[i].playerCard)
         }
         
-        winners = winners.sorted(by: { allPlayCards[$0].evaluateFlag > allPlayCards[$1].evaluateFlag })
+        for i in 0..<playerNum {
+            let rank = allPlayCards[i].evaluateFlag
+            if rank > maxRank {
+                maxRank = rank
+                winners.removeAll()
+                winners.append(i)
+            } else if rank == maxRank {
+                winners.append(i)
+            }
+        }
         
-        return winners
+        var leftCards: [Int] = []
+        for card in deck{
+            leftCards.append(card.cardIndex)
+        }
+        
+        return (winners, leftCards)
     }
 }
 
@@ -372,7 +456,7 @@ class ThreeCardPokerGameHandEvaluator {
             }
         }
         
-        var handCombinations = cards.combinations(ofCount: 3)
+        let handCombinations = cards.combinations(ofCount: 3)
         for handCombination in handCombinations{
             allCards.append(handCombination)
             var aceList = Array(handCombination)
@@ -446,7 +530,6 @@ class ThreeCardPokerGameHandEvaluator {
                 cnt += 1
             }
         }
-        
         if cnt == 2 {
             for _ in 1..<3 {
                 rank = rank << 4 | maxRank

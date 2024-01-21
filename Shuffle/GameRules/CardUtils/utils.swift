@@ -13,12 +13,12 @@ func initDeck(initialCards: [Int], suitRules: [Int]) -> [Card] {
     
     for cardIndex in initialCards {
         if cardIndex < 52 {
-            deckList.append(Card(suit: [suitRules[cardIndex / 13]], rank: cardIndex % 13 + 1))
+            deckList.append(Card(suit: [suitRules[cardIndex / 13]], rank: cardIndex % 13 + 1, cardIndex: cardIndex))
         } else {
             if cardIndex == 53 {
-                deckList.append(Card(suit: [0], rank: 14))
+                deckList.append(Card(suit: [0], rank: 14, cardIndex: cardIndex))
             } else if cardIndex == 54 {
-                deckList.append(Card(suit: [0], rank: 15))
+                deckList.append(Card(suit: [0], rank: 15, cardIndex: cardIndex))
             }
         }
     }

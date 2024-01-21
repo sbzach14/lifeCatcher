@@ -50,6 +50,10 @@ struct MyApp: App {
         //创建cls json文件
         createRecordHistoryJSON()
         
+        //读取储存的规则
+        RuleManager.allUsersGameRule = RuleManager.loadGameRule()!
+        //读取预设的游戏规则
+        RuleManager.LoadAllPresetRules()
         
     }
     

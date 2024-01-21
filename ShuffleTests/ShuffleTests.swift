@@ -132,7 +132,7 @@ final class ShuffleTests: XCTestCase {
         for cardIndex in inputArray{
             let suit = [cardIndex / 13]
             let rank = (cardIndex % 13) + 1
-            let card = Card(suit: suit, rank: rank)
+            let card = Card(suit: suit, rank: rank, cardIndex: cardIndex)
             returnCard.append(card)
         }
         return returnCard
