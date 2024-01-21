@@ -178,7 +178,7 @@ class TexasPokerGame {
         //TODO 按照rulesettingview里的内容修改
         let isCompareSuit = args[3] == 1
         let isAceStraight = args[4] == 1
-        let minRank = rule.handNum[args[5]]
+        let minRank = rule.minRank[args[5]]
         let handNum = rule.handNum[args[6]]
         let communityNum = rule.communityNum[args[7]]
         let handUseType = args[8]
@@ -328,7 +328,6 @@ class HandEvaluator {
         var cardsLength = 0
         var cardCopy:[Card] = []
         var communityCopy:[Card] = []
-        
         for card in cards {
             var copy:Card = Card(suit: card.suit, rank: card.rank, cardIndex: card.cardIndex)
             if copy.rank == 1 {
@@ -420,6 +419,7 @@ class HandEvaluator {
         ]
         
         var rankResult = 0
+        let rule = GameManager.gameRules[0] as! TexasPokerRule
         for (index, ruleIndex) in rankRules.enumerated() {
             let rankFlag = 1 << (rankRules.count - index + 23)
             rankResult = ruleDict[ruleIndex]!(sortedCards, cardsLength)
@@ -428,7 +428,7 @@ class HandEvaluator {
             }
             if rankResult != 0 {
                 rankResult |= rankFlag
-                print("判断结果 ", ruleIndex)
+                print("判断结果 ", rule.rankRules[ruleIndex] as Any)
                 break
             }
         }
@@ -457,7 +457,7 @@ class HandEvaluator {
                 if rankList[i] - rankList[i+1] == 1 {
                     cnt += 1
                     if straightHeadRank == 0 {
-                        straightHeadRank = i
+                        straightHeadRank = rankList[i]
                     }
                     if cnt == 5 {
                         rank = straightHeadRank
@@ -552,7 +552,11 @@ class HandEvaluator {
             var rank = 0
             var cnt = 1
             var straightHeadRank = 0
-            for i in 0..<(cards.count - 1) {
+            
+            
+            
+            for i in 0..<(cards.count - 1)  {
+                print("比较 \(cards[i].rank)，\(cards[i + 1].rank)")
                 if cards[i].rank - cards[i+1].rank == 1 {
                     cnt += 1
                     if straightHeadRank == 0 {

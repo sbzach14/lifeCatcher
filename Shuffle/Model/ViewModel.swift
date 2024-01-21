@@ -181,20 +181,23 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         setupAVCapture()
         startCamera()
 
-        //规则测试代码
-//        for i in 0..<1{
-//            print("测试用例 ",i + 1,"")
-//            var randomCardArray = Array(0...51)
-//            randomCardArray.shuffle()
-//            self.cardArray = randomCardArray
-//
-//            var cardString:String = "当前牌库："
-//            for cardIndex in cardArray{
-//                cardString += cardLabelDic[cardIndex]! + " "
-//            }
-//            print(cardString)
-//            self.computeWinnerPlayer()
-//        }
+//        规则测试代码
+        for i in 0..<1{
+            print("测试用例 ",i + 1,"")
+            var randomCardArray = Array(0...51)
+            randomCardArray.shuffle()
+            self.cardArray = randomCardArray
+
+            var cardString:String = "当前牌库："
+            for cardIndex in cardArray{
+                cardString += cardLabelDic[cardIndex]! + " "
+            }
+            
+            print(cardArray)
+            print(cardString)
+            self.cardArray = [53,0,12,2,54,13,25,20,38,25,35,24]
+            self.computeWinnerPlayer()
+        }
 
     }
     

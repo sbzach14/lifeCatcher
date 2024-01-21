@@ -450,33 +450,6 @@ public class RuleManager{
                 allPreSetRules[i]![2]!.append(suitRules)
                 allPreSetRules[i]![2]!.append(rankRules)
                 allPreSetRules[i]![2]!.append(rankRuleChecked)
-//               斗牛-10张比2次分花色
-                cardsNum = 5
-                handNum = 2
-                isCompareSuit = 1
-                wayToDeal = 0
-                fiveLittleRank = 0
-                secondRankRule = 0
-                jokerIsMinZero = 0
-                tenValueRange = 0
-                JValueRange = 0
-                QValueRange = 0
-                KValueRange = 0
-                blackJokerValueRange = 0
-                redJokerValueRange = 0
-                threeValueRange = 0
-                sixValueRange = 0
-                spadeAValueRange = 0
-                bullrulelist = [1,0,0,0,0,0,0,0,0]
-                args = [cardsNum,handNum,isCompareSuit,wayToDeal,fiveLittleRank,secondRankRule,jokerIsMinZero,tenValueRange,JValueRange,QValueRange,KValueRange,blackJokerValueRange,redJokerValueRange,threeValueRange,sixValueRange,spadeAValueRange] + bullrulelist
-                suitRules = [3,2,1,0]
-                rankRules = [1, 7, 9, 10, 42]
-                rankRuleChecked = [1,1,1,1,1]
-                allPreSetRules[i]![3]!.append(args)
-                allPreSetRules[i]![3]!.append(suitRules)
-                allPreSetRules[i]![3]!.append(rankRules)
-                allPreSetRules[i]![3]!.append(rankRuleChecked)
-                
                 //斗牛-36张炸弹最大
                 cardsNum = 2
                 handNum = 1
@@ -499,10 +472,10 @@ public class RuleManager{
                 suitRules = [3,2,1,0]
                 rankRules = [1, 0, 2, 7, 8, 9, 43, 42]
                 rankRuleChecked = [1,1,1,1,1,1,1,1]
-                allPreSetRules[i]![4]!.append(args)
-                allPreSetRules[i]![4]!.append(suitRules)
-                allPreSetRules[i]![4]!.append(rankRules)
-                allPreSetRules[i]![4]!.append(rankRuleChecked)
+                allPreSetRules[i]![3]!.append(args)
+                allPreSetRules[i]![3]!.append(suitRules)
+                allPreSetRules[i]![3]!.append(rankRules)
+                allPreSetRules[i]![3]!.append(rankRuleChecked)
                 //斗牛-顺算牛
                 cardsNum = 6
                 handNum = 1
@@ -525,10 +498,10 @@ public class RuleManager{
                 suitRules = [3,2,1,0]
                 rankRules = [9,10,42]
                 rankRuleChecked = [1,1,1]
-                allPreSetRules[i]![5]!.append(args)
-                allPreSetRules[i]![5]!.append(suitRules)
-                allPreSetRules[i]![5]!.append(rankRules)
-                allPreSetRules[i]![5]!.append(rankRuleChecked)
+                allPreSetRules[i]![4]!.append(args)
+                allPreSetRules[i]![4]!.append(suitRules)
+                allPreSetRules[i]![4]!.append(rankRules)
+                allPreSetRules[i]![4]!.append(rankRuleChecked)
 //                斗牛-4带1
                 cardsNum = 6
                 handNum = 1
@@ -551,10 +524,10 @@ public class RuleManager{
                 suitRules = [3,2,1,0]
                 rankRules = [1, 32, 9, 10, 42]
                 rankRuleChecked = [1,1,1,1,1]
-                allPreSetRules[i]![6]!.append(args)
-                allPreSetRules[i]![6]!.append(suitRules)
-                allPreSetRules[i]![6]!.append(rankRules)
-                allPreSetRules[i]![6]!.append(rankRuleChecked)
+                allPreSetRules[i]![5]!.append(args)
+                allPreSetRules[i]![5]!.append(suitRules)
+                allPreSetRules[i]![5]!.append(rankRules)
+                allPreSetRules[i]![5]!.append(rankRuleChecked)
                 //斗牛-对子
                 cardsNum = 5
                 handNum = 1
@@ -577,10 +550,10 @@ public class RuleManager{
                 suitRules = [3,2,1,0]
                 rankRules = [24,9, 10, 42]
                 rankRuleChecked = [1,1,1,1]
-                allPreSetRules[i]![7]!.append(args)
-                allPreSetRules[i]![7]!.append(suitRules)
-                allPreSetRules[i]![7]!.append(rankRules)
-                allPreSetRules[i]![7]!.append(rankRuleChecked)
+                allPreSetRules[i]![6]!.append(args)
+                allPreSetRules[i]![6]!.append(suitRules)
+                allPreSetRules[i]![6]!.append(rankRules)
+                allPreSetRules[i]![6]!.append(rankRuleChecked)
                 //斗牛-40张炸弹最大
                 cardsNum = 3
                 handNum = 1
@@ -603,10 +576,10 @@ public class RuleManager{
                 suitRules = [3,2,1,0]
                 rankRules = [1, 7, 8, 9, 10, 42]
                 rankRuleChecked = [1,1,1,1,1,1]
-                allPreSetRules[i]![8]!.append(args)
-                allPreSetRules[i]![8]!.append(suitRules)
-                allPreSetRules[i]![8]!.append(rankRules)
-                allPreSetRules[i]![8]!.append(rankRuleChecked)
+                allPreSetRules[i]![7]!.append(args)
+                allPreSetRules[i]![7]!.append(suitRules)
+                allPreSetRules[i]![7]!.append(rankRules)
+                allPreSetRules[i]![7]!.append(rankRuleChecked)
                 //斗牛-54张炸弹最大
                 cardsNum = 6
                 handNum = 1
@@ -629,10 +602,10 @@ public class RuleManager{
                 suitRules = [3,2,1,0]
                 rankRules = [1, 7, 9, 10, 42]
                 rankRuleChecked = [1,1,1,1,1]
-                allPreSetRules[i]![9]!.append(args)
-                allPreSetRules[i]![9]!.append(suitRules)
-                allPreSetRules[i]![9]!.append(rankRules)
-                allPreSetRules[i]![9]!.append(rankRuleChecked)
+                allPreSetRules[i]![8]!.append(args)
+                allPreSetRules[i]![8]!.append(suitRules)
+                allPreSetRules[i]![8]!.append(rankRules)
+                allPreSetRules[i]![8]!.append(rankRuleChecked)
                 //斗牛3条算牛
                 cardsNum = 5
                 handNum = 1
@@ -655,10 +628,10 @@ public class RuleManager{
                 suitRules = [3,2,1,0]
                 rankRules = [45, 44, 42]
                 rankRuleChecked = [1,1,1]
-                allPreSetRules[i]![10]!.append(args)
-                allPreSetRules[i]![10]!.append(suitRules)
-                allPreSetRules[i]![10]!.append(rankRules)
-                allPreSetRules[i]![10]!.append(rankRuleChecked)
+                allPreSetRules[i]![9]!.append(args)
+                allPreSetRules[i]![9]!.append(suitRules)
+                allPreSetRules[i]![9]!.append(rankRules)
+                allPreSetRules[i]![9]!.append(rankRuleChecked)
                 break
             //炸金花
             case 2:
@@ -816,20 +789,6 @@ public class RuleManager{
                 allPreSetRules[i]![1]!.append(suitRules)
                 allPreSetRules[i]![1]!.append(rankRules)
                 allPreSetRules[i]![1]!.append(rankRuleChecked)
-                //32张牌九
-                handNum = 1
-                redJokerValueRange = 1
-                blackJokerValueRange = 1
-                samePointComparision = 0
-                isCompareSuit = 0
-                args = [handNum, redJokerValueRange, blackJokerValueRange, samePointComparision, isCompareSuit]
-                suitRules = [3,2,1,0]
-                rankRules = [2,1,0]
-                rankRuleChecked = [0,1,1]
-                allPreSetRules[i]![2]!.append(args)
-                allPreSetRules[i]![2]!.append(suitRules)
-                allPreSetRules[i]![2]!.append(rankRules)
-                allPreSetRules[i]![2]!.append(rankRuleChecked)
                 break
             //三公
             case 4:

@@ -375,8 +375,19 @@ struct TexasPokerRuleSettingView_Previews:
     PreviewProvider {
     static var previews: some View {
         let args: Binding<[Int]> = .constant([])  // 提供一个初始值
-        let suitRules: Binding<[Int]> = .constant([])  // 提供一个初始值
-        let rankRules: Binding<[RankRulesSate]> = .constant([])  // 提供一个初始值
+        let suitRules: Binding<[Int]> = .constant([3,2,1,0])  // 提供一个初始值
+        let rankRules: Binding<[RankRulesSate]> = .constant([RankRulesSate(index: 11, isChecked: true),
+                                                             RankRulesSate(index: 10, isChecked: true),
+                                                             RankRulesSate(index: 9, isChecked: true),
+                                                             RankRulesSate(index: 8, isChecked: true),
+                                                             RankRulesSate(index: 7, isChecked: true),
+                                                             RankRulesSate(index: 6, isChecked: true),
+                                                             RankRulesSate(index: 5, isChecked: false),
+                                                             RankRulesSate(index: 4, isChecked: false),
+                                                             RankRulesSate(index: 3, isChecked: false),
+                                                             RankRulesSate(index: 2, isChecked: true),
+                                                             RankRulesSate(index: 1, isChecked: true),
+                                                             RankRulesSate(index: 0, isChecked: true)])  // 提供一个初始值
         TexasPokerRuleSettingView(args: args, suitRules: suitRules, rankRules: rankRules)
     }
 }

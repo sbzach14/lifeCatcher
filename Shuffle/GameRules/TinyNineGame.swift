@@ -30,8 +30,7 @@ class TinyNineGameRule : Rule{
         self.setting = [
             0: "标准",
             1: "湖南小九",
-            2: "32张牌九(未完成，4张牌如何比较和发牌)",
-            3: "自定义"
+            2: "自定义"
         ]
         
         self.rankRules = [2:"对王，对A，A加王",
@@ -50,15 +49,7 @@ class TinyNineGameRule : Rule{
 >A>K>Q>J>10>9>8>7>6>5>4>3>2
 
 """,
-            2:"""
-        32张大牌九 每人四张牌、头两张牌尾两张牌
-        大小王/红Q两个/红2两个/黑J两个/黑9两个/黑5两个/4个10/4个8/4个7/4个6/4个4.共32张大小排名
-
-        1》对子:两个王>对红Q>红Q+黑9>对红2>对红8>对红4>对红10>对红6>对黑4>对黑J>对黑10 >对红7>对黑6>对黑9>对黑8>对黑7>对黑
-        5>Q和8>2和8对子要分红黑 一红一黑不算对子只算点数
-        2》点数:9点最大0点最小。J为1点Q为2点小王算3点大王算6点同点时比最大的牌，
-        同点同牌庄家大最大的牌从大到小:红 Q>红2>红8>红4>红10>红6>黑4>黑J>黑10>红7>黑6>黑9>黑8>黑7>黑5>大王>小王
-""", 3:"请自定义你的规则"
+     2:"请自定义你的规则"
         ]
         self.playerNum = [2,3,4,5,6,7,8,9,10]    }
 }
@@ -231,6 +222,9 @@ class TinyNineGameHandEvaluator{
         self.samePointComparision = samePointComparision
         var score = 0
         
+        //打印手牌
+        print("手牌 \(GameManager.cardLabelDic[cards[0].cardIndex])  \(GameManager.cardLabelDic[cards[1].cardIndex])")
+        
         var i = self.rankRules.count + 1
         for ruleIndex in self.rankRules{
             let (flag, rank) = self.rankRulesDic[ruleIndex]!(cards)
@@ -239,6 +233,7 @@ class TinyNineGameHandEvaluator{
                 continue
             } else {
                 score = (1 << (i + 10)) | rank
+                print("牌型 \(ruleIndex) 分数 \(score)")
                 return score
             }
         }
@@ -255,16 +250,16 @@ class TinyNineGameHandEvaluator{
     
     func isPairKingPairAKingPlusA(cards: [Card]) -> (Bool, Int){
         if cards[0].rank > 13 && cards[1].rank > 13 {
-            return (true, 0)
+            return (true, 1)
         }
         if cards[0].rank > 13 && cards[1].rank == 1 {
-            return (true, 0)
+            return (true, 1)
         }
         if cards[0].rank == 1 && cards[1].rank > 13 {
-            return (true, 0)
+            return (true, 1)
         }
         if cards[0].rank == 1 && cards[1].rank == 1{
-            return (true, 0)
+            return (true, 1)
         }
         
         return (false, 0)
@@ -286,7 +281,7 @@ class TinyNineGameHandEvaluator{
             let rank = RankForMaxCard(cards: cards)
             return (true, points << 6 | rank)
         } else if self.samePointComparision == 1{
-            return (true, 0)
+            return (true, points << 6 | 1)
         }
         return (false, 0)
     }
