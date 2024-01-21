@@ -13,13 +13,13 @@ struct CutNumRangeSettingView: View {
     var body: some View {
         VStack{
             HStack{
-                Text("    X =  ")
+                Text("    最小位置   ").foregroundColor(.white)
                 TextField("X = ", value: $cutNumRangeSetting[0], format: .number).textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()
                 
             }
             HStack{
-                Text("    Y =  ")
+                Text("    最大位置   ").foregroundColor(.white)
 
                 TextField("Y = ", value: $cutNumRangeSetting[1], format: .number).textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding()

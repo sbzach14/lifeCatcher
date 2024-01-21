@@ -27,7 +27,12 @@ struct DealTypeView: View {
     @Binding var diyDealStatus: [[Bool]] // [[0，派牌，1，公牌， 2， 去牌]]
     var body: some View {
         VStack{
+            
             HStack{
+                Image("icon_shufflemode")
+                    .resizable()
+                    .frame(width: 40, height: 40).padding(.leading, 20)
+                
                 Text("发牌定制").frame(maxWidth: .infinity, alignment: .leading)
                     .foregroundColor(.white)
                 Picker("dealType", selection: $dealType) {
@@ -40,13 +45,22 @@ struct DealTypeView: View {
                 .padding(.trailing,30) // 右侧间距
                 .accentColor(.white)
                 
-            }
+            }.background(
+                Image("list_bg") // 背景图片
+                    .resizable()
+                    .scaledToFill()
+            )
+            .frame(height: 50)
             
             if dealType == 2{
                 Group{
                     VStack{
                         
                         HStack{
+                            Image("icon_shufflemode")
+                                .resizable()
+                                .frame(width: 40, height: 40).padding(.leading, 20)
+                            
                             Text("正发反发").frame(maxWidth: .infinity, alignment: .leading)
                                 .foregroundColor(.white)
                             Picker("diyDealType", selection: $diyDealType) {
@@ -59,65 +73,97 @@ struct DealTypeView: View {
                             .padding(.trailing,30) // 右侧间距
                             .accentColor(.white)
                         }
+                        .background(
+                            Image("list_bg") // 背景图片
+                                .resizable()
+                                .scaledToFill()
+                        )
+                        .frame(height: 50)
+                        
                         Spacer().frame(height: 50) // 这里设置了Spacer的高度为20
 
                         HStack{
-                            Spacer().frame(width: 10)
-                            Text("轮").frame(maxWidth: .infinity, alignment: .leading)
-                                .foregroundColor(.white)
-                            Spacer().frame(width: 20)
-                            Text("牌数").frame(maxWidth: .infinity, alignment: .leading)
-                                .foregroundColor(.white)
-                            Spacer().frame(width: 120)
-                            Text("派牌").frame(maxWidth: .infinity, alignment: .trailing)
-                                .foregroundColor(.white).padding(.trailing, -40)
                             
-                            Text("公牌").frame(maxWidth: .infinity, alignment: .trailing)
-                                .foregroundColor(.white).padding(.trailing, -20)
-
-                            Text("去牌").frame(maxWidth: .infinity, alignment: .trailing)
+                            Text("轮").frame(maxWidth: 40, alignment: .leading)
                                 .foregroundColor(.white)
+                                .padding(.leading,30)
+                            
+                            Text("牌数").frame(maxWidth: 40, alignment: .leading)
+                                .foregroundColor(.white)
+                            
+                            Spacer()
+                            
+                            Text("派牌").frame(maxWidth: 40, alignment: .trailing)
+                                .foregroundColor(.white)
+                            
+                            Text("公牌").frame(maxWidth: 40, alignment: .trailing)
+                                .foregroundColor(.white)
+
+                            Text("去牌").frame(maxWidth: 40, alignment: .trailing)
+                                .foregroundColor(.white).padding(.trailing, 30)
 
                         }
                         ForEach(diyDealNum.indices, id:\.self){
                             index in
                             HStack{
-                                Spacer().frame(width: 10)
 
-                                Text("  \(index + 1)").foregroundColor(Color.white)
-                                Spacer().frame(width: 50)
-                                Stepper("\(diyDealNum[index])", value: $diyDealNum[index]).foregroundColor(Color.white)
+                                Text("  \(index + 1)").frame(maxWidth: 40, alignment: .leading)
+                                    .foregroundColor(.white)
+                                    .padding(.leading,30)
+                                
+                                
+                                
+                                Stepper("\(diyDealNum[index])", value: $diyDealNum[index]).frame(maxWidth: 200, alignment: .leading)
+                                    .foregroundColor(.white)
+                                    .padding(.leading,20)
+                                
+                                Spacer()
 
-                                Spacer().frame(width: 50)
+                                
                                 Image(systemName: diyDealStatus[index][0] ? "checkmark.square.fill" : "square")
                                         .onTapGesture {
                                             HandleDealStatusToggle(roundIndex: index, toggleIndex: 0)
-                                        }
-                                Spacer().frame(width: 20)
+                                        }.frame(maxWidth: 40, alignment: .trailing)
+                                    .foregroundColor(.white)
+                                
                                     Image(systemName: diyDealStatus[index][1] ? "checkmark.square.fill" : "square")
                                         .onTapGesture {
                                             HandleDealStatusToggle(roundIndex: index, toggleIndex: 1)
-                                        }
-                                Spacer().frame(width: 20)
+                                        }.frame(maxWidth: 40, alignment: .trailing)
+                                    .foregroundColor(.white)
+                                
                                     Image(systemName: diyDealStatus[index][2] ? "checkmark.square.fill" : "square")
                                         .onTapGesture {
                                             HandleDealStatusToggle(roundIndex: index, toggleIndex: 2)
-                                        }
+                                        }.frame(maxWidth: 40, alignment: .trailing)
+                                    .foregroundColor(.white).padding(.trailing, 30)
 
                             }
                         }
                         
                         Spacer().frame(height: 50) // 这里设置了Spacer的高度为20
-                        Button("添加"){
-                            AddNewDealSetting()
+                        
+                        HStack{
+                            Spacer()
                             
-                        }.foregroundColor(Color.white).border(Color.white, width: 1.5)
+                            Button(action: {AddNewDealSetting()}){
+                                Image("icon_add").resizable().frame(width: 150, height: 60)
+                            }
+                            
+                            Spacer()
+                            
+                            Button(action: {DeleteNewDealSetting()}){
+                                Image("icon_delete").resizable().frame(width: 150, height: 60)
+                            }
+                            
+                            Spacer()
+                        }
                     }
                 }
             }
             Spacer()
 
-        }.background(Image("bg").resizable().scaledToFill()).navigationTitle("打色范围设置")
+        }.background(Image("bg").resizable().scaledToFill()).navigationTitle("发牌设置")
         
         
     }
@@ -134,8 +180,13 @@ struct DealTypeView: View {
     private func AddNewDealSetting(){
         self.diyDealNum.append(1)
         self.diyDealStatus.append([true, false, false])
-        
-        
+    }
+    
+    private func DeleteNewDealSetting(){
+        if self.diyDealNum.count > 0{
+            self.diyDealNum.removeLast()
+            self.diyDealStatus.removeLast()
+        }
     }
 }
 

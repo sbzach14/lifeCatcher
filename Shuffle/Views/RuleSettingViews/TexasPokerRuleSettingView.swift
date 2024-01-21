@@ -235,15 +235,11 @@ struct TexasPokerRuleSettingView: View {
                         Button(action: {
                             navigateToRankRules = true
                         }) {
-                            Image(systemName: "gear")
+                            Image("icon_next")
                                 .resizable()
-                                .foregroundColor(.white)
-                                .padding(3)
-                                .background(Color.blue)
-                                .cornerRadius(10)
-                                .frame(width: 40, height: 40) // 设置正方形大小
+                                .frame(width: 30, height: 30) // 设置正方形大小
                         }
-                        .padding(.trailing, 30)
+                        .padding(.trailing, 40)
                         .background(
                             NavigationLink(
                                 destination: RankRulesView(rankRules: $rankRules, selectedRuleIndex: selectedRule.ruleIndex),
@@ -275,15 +271,11 @@ struct TexasPokerRuleSettingView: View {
                             Button(action: {
                                 navigateToSuitRules = true
                             }) {
-                                Image(systemName: "gear")
+                                Image("icon_next")
                                     .resizable()
-                                    .foregroundColor(.white)
-                                    .padding(3)
-                                    .background(Color.blue)
-                                    .cornerRadius(10)
-                                    .frame(width: 40, height: 40) // 设置正方形大小
+                                    .frame(width: 30, height: 30) // 设置正方形大小
                             }
-                            .padding(.trailing, 30)
+                            .padding(.trailing, 40)
                             .background(
                                 NavigationLink(
                                     destination: SuitRulesView(suitRules: $suitRules),

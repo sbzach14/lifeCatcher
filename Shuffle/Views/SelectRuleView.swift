@@ -4,7 +4,7 @@ struct SelectRuleView: View {
     @State private var searchText = ""
     @State private var selectedRuleIndex: Int? = nil
     @State private var rules:[GameRule] = RuleManager.allUsersGameRule
-
+    @State private var isNavigateToSelectGameView : Bool = false
     private var GameImageDic:[Int:String] = [
         0:"德州",
         1:"牛牛",
@@ -18,70 +18,73 @@ struct SelectRuleView: View {
     
     var body: some View {
             VStack {
-                HStack{
-                    SearchBar(searchText: $searchText)
-                    NavigationLink(destination: AddRuleSettingView(selectedSaveIndex: -1)) {
-                    Text("添加").foregroundColor(.white).frame(alignment: .trailing)
-                    }
-                }
+                
                 List {
                     if rules.count != 0{
                         ForEach(0..<rules.count, id: \.self) { index in
                             
                             NavigationLink(
-                                destination: AddRuleSettingView(selectedSaveIndex: index)
+                                destination: AddRuleSettingView(gameType: rules[index].gameType, selectedSaveIndex: index)
                             ) {
-                                // Your existing content here
-                        let name: String = rules[index].RuleName
+                                
+                                let name: String = rules[index].RuleName
 
                                 let calmode: String = generalRuleSetting.allCuttingSetting[rules[index].calMode]!
-//                                var reportSetting: String
-//                                if rules[index].calMode == 0{
-//                                    reportSetting = generalRuleSetting.allReportSettingWithoutCutting[rules[index].reportSetting]!
-//                                } else {
-//                                    reportSetting = generalRuleSetting.allReportSettingWithCutting[rules[index].reportSetting]!
-//                                }
                                
                                 
                                 let dealType: String = generalRuleSetting.allDealType[rules[index].dealType]!
 
                                 HStack(spacing: 5) {
                                     Text(name)
-                                        .foregroundColor(.black)
-                                    Divider()
-                                        .colorInvert()
+                                        .foregroundColor(.white)
+                                    
                                     Spacer()
-                                    Text(calmode)
-                                        .foregroundColor(.black)
-                                    if rules[index].calMode == 0 {
-                                            Text(generalRuleSetting.allReportSettingWithoutCutting[rules[index].reportSetting]!)
-                                                       .foregroundColor(.black)
-                                               } else {
-                                                Text(generalRuleSetting.allReportSettingWithCutting[rules[index].reportSetting]!)
-                                                       .foregroundColor(.black)
-                                               }
-//                                    Text(reportSetting)
+//                                    Text(calmode)
 //                                        .foregroundColor(.black)
-                                    Text(dealType)
-                                        .foregroundColor(.black)
+//                                    if rules[index].calMode == 0 {
+//                                            Text(generalRuleSetting.allReportSettingWithoutCutting[rules[index].reportSetting]!)
+//                                                       .foregroundColor(.black)
+//                                               } else {
+//                                                Text(generalRuleSetting.allReportSettingWithCutting[rules[index].reportSetting]!)
+//                                                       .foregroundColor(.black)
+//                                               }
+//                                    Text(dealType)
+//                                        .foregroundColor(.black)
                                 }
-                                .padding()
                             }
+                            .padding()
+                            .listRowBackground(Image("list_bg")
+                                .resizable()
+                                .scaledToFill())
                         }.onDelete { indices in
                             RuleManager.allUsersGameRule.remove(atOffsets: indices)
                             rules = RuleManager.allUsersGameRule
                             RuleManager.saveGameRule()
-                        }.background(Image("list_bg") // 背景图片
-                            .resizable()
-                            .scaledToFill())
+                        }
                     }
-                }.listStyle(GroupedListStyle()).background(Color.blue).accentColor(Color.blue)
+                }.listStyle(PlainListStyle())
+                    .background(Color.clear)
+                    .listRowBackground(Color.clear)
+                
+                
+                HStack{
+                    
+                    Button(action: {
+                        self.isNavigateToSelectGameView = true
+                    }){
+                        Image("icon_add").resizable().frame(width: 150, height: 60)
+                    }.background(NavigationLink(destination: SelectGameView(),
+                                                isActive: $isNavigateToSelectGameView,
+                                                label: EmptyView.init).hidden()
+                    )
+                }.padding()
 
             }
             .background(
                 Image("bg")
                     .resizable()
                     .scaledToFill()
+                
             ).navigationTitle("选择规则").onAppear(){
                 self.rules = RuleManager.allUsersGameRule
             }
