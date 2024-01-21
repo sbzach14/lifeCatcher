@@ -75,7 +75,6 @@
 		B058BE5D2B09F70E0078E792 /* BlurDetector_origin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058BE5C2B09F70E0078E792 /* BlurDetector_origin.swift */; };
 		B058BE5F2B09FFC20078E792 /* BlurDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058BE5E2B09FFC20078E792 /* BlurDetector.swift */; };
 		B058BE612B0A0D6F0078E792 /* TestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058BE602B0A0D6F0078E792 /* TestView.swift */; };
-		B093149E2B400B8700DE515A /* NewViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B093149D2B400B8700DE515A /* NewViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -166,7 +165,6 @@
 		B058BE5C2B09F70E0078E792 /* BlurDetector_origin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurDetector_origin.swift; sourceTree = "<group>"; };
 		B058BE5E2B09FFC20078E792 /* BlurDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurDetector.swift; sourceTree = "<group>"; };
 		B058BE602B0A0D6F0078E792 /* TestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView.swift; sourceTree = "<group>"; };
-		B093149D2B400B8700DE515A /* NewViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewViewModel.swift; sourceTree = "<group>"; };
 		F11ED84932036610B96BC234 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -240,7 +238,6 @@
 				18CA14C3284AC42C00F90372 /* ViewModel.swift */,
 				A88EFE082A7FAD1100897243 /* SettingViewModel.swift */,
 				A887B64D2A7FDF56009F488F /* RecordHistoryViewModel.swift */,
-				B093149D2B400B8700DE515A /* NewViewModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -584,7 +581,6 @@
 				A88716852A0F701500B7F2CD /* GameManager.swift in Sources */,
 				A887167F2A0623E500B7F2CD /* AuthManager.swift in Sources */,
 				18CA14D4284AC42C00F90372 /* MainContentView.swift in Sources */,
-				B093149E2B400B8700DE515A /* NewViewModel.swift in Sources */,
 				A88F20B02A1DEE63005E4A27 /* TinyNineGame.swift in Sources */,
 				A809B3E22AE5126700F728A9 /* BaoziGame.swift in Sources */,
 				A88EFE0B2A7FC05900897243 /* JsonUtils.swift in Sources */,
@@ -612,7 +608,6 @@
 				A8E0E2F12AAE00B90091FC1D /* NinePointFiveGameRuleSettingView.swift in Sources */,
 				A88EFE0D2A7FDC9500897243 /* RecordHistoryView.swift in Sources */,
 				18CA14D6284AC42C00F90372 /* CameraView.swift in Sources */,
-				181C96952B5CFA0B0042006E /* cardDetection_n_0121.mlmodel in Sources */,
 				A88EFE072A7FA95A00897243 /* SettingView.swift in Sources */,
 				A83853532ADA918000346038 /* CustomUI.swift in Sources */,
 				A8E0E2E72AADF6E20091FC1D /* TwoEightGangGame.swift in Sources */,
