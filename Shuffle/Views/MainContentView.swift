@@ -9,7 +9,7 @@ struct MainContentView: View {
     var suitRules: [Int]
     var allCardIndex: [Int]
     var minCardNum : Int
-    @ObservedObject var viewModel = ViewModel()
+    @StateObject var viewModel = ViewModel()
     var body: some View {
         ZStack {
             if viewModel.isBlack {
@@ -40,7 +40,6 @@ struct MainContentView: View {
         }
         .onAppear {
             viewModel.initialize(shuffleMode: shuffleMode, calModeArgs: calModeArgs, ruleIndex: ruleIndex, args: args, rankRules: rankRules, suitRules: suitRules, allCardIndex: allCardIndex, minCardNum: minCardNum)
-            viewModel.startCamera()
         }
         .onDisappear {
             viewModel.stopCamera()

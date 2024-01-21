@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		1801A9B42B550CE500B2AD06 /* cardDetection_s_0114.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 1801A9B32B550CE500B2AD06 /* cardDetection_s_0114.mlmodel */; };
+		181C96952B5CFA0B0042006E /* cardDetection_n_0121.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 181C96942B5CFA0B0042006E /* cardDetection_n_0121.mlmodel */; };
 		18CA14D2284AC42C00F90372 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C3284AC42C00F90372 /* ViewModel.swift */; };
 		18CA14D3284AC42C00F90372 /* ShowCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C5284AC42C00F90372 /* ShowCardView.swift */; };
 		18CA14D4284AC42C00F90372 /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C6284AC42C00F90372 /* MainContentView.swift */; };
@@ -79,6 +80,7 @@
 
 /* Begin PBXFileReference section */
 		1801A9B32B550CE500B2AD06 /* cardDetection_s_0114.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; name = cardDetection_s_0114.mlmodel; path = ../../../Downloads/cardDetection_s_0114.mlmodel; sourceTree = "<group>"; };
+		181C96942B5CFA0B0042006E /* cardDetection_n_0121.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; name = cardDetection_n_0121.mlmodel; path = ../../../Downloads/cardDetection_n_0121.mlmodel; sourceTree = "<group>"; };
 		18CA1477284ABEC600F90372 /* Shuffle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Shuffle.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		18CA14C3284AC42C00F90372 /* ViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
 		18CA14C5284AC42C00F90372 /* ShowCardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowCardView.swift; sourceTree = "<group>"; };
@@ -344,6 +346,7 @@
 			isa = PBXGroup;
 			children = (
 				1801A9B32B550CE500B2AD06 /* cardDetection_s_0114.mlmodel */,
+				181C96942B5CFA0B0042006E /* cardDetection_n_0121.mlmodel */,
 				A88EFE022A7E8ACC00897243 /* Resnet50FP16.mlmodel */,
 				A83853492ADA7BE600346038 /* Icon.xcassets */,
 				A838534B2ADA7C0200346038 /* BackGround.xcassets */,
@@ -571,6 +574,7 @@
 				A8E0E2F12AAE00B90091FC1D /* NinePointFiveGameRuleSettingView.swift in Sources */,
 				A88EFE0D2A7FDC9500897243 /* RecordHistoryView.swift in Sources */,
 				18CA14D6284AC42C00F90372 /* CameraView.swift in Sources */,
+				181C96952B5CFA0B0042006E /* cardDetection_n_0121.mlmodel in Sources */,
 				A88EFE072A7FA95A00897243 /* SettingView.swift in Sources */,
 				A83853532ADA918000346038 /* CustomUI.swift in Sources */,
 				A8E0E2E72AADF6E20091FC1D /* TwoEightGangGame.swift in Sources */,

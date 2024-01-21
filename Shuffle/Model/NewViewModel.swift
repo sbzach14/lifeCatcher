@@ -570,14 +570,14 @@ class NewViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBu
             print("检测结果：[\(cardLabelDic[cardResult[0].cardIndex[0]] ?? "none"),Confidence: \(cardResult[0].confidence),ConfidencePercent: \(cardResult[0].confidencePercent),\(cardLabelDic[cardResult[1].cardIndex[0]] ?? "none"), Confidence: \(cardResult[1].confidence), ConfidencePercent: \(cardResult[1].confidencePercent)]")
         }
         
-        if self.state == "shuffle" || self.state == "cut" {
-            
-            let modelCIImage = CIImage(cvPixelBuffer: pixelBuffer)
-            let cgImage = CIContext().createCGImage(modelCIImage, from: modelCIImage.extent)
-            let savedUIImage = UIImage(cgImage: cgImage!)
-            UIImageWriteToSavedPhotosAlbum(savedUIImage, self, #selector(self.imageSaved(_:didFinishSavingWithError:contextInfo:)), nil)
-
-        }
+//        if self.state == "shuffle" || self.state == "cut" {
+//            
+//            let modelCIImage = CIImage(cvPixelBuffer: pixelBuffer)
+//            let cgImage = CIContext().createCGImage(modelCIImage, from: modelCIImage.extent)
+//            let savedUIImage = UIImage(cgImage: cgImage!)
+//            UIImageWriteToSavedPhotosAlbum(savedUIImage, self, #selector(self.imageSaved(_:didFinishSavingWithError:contextInfo:)), nil)
+//
+//        }
     }
     
     
