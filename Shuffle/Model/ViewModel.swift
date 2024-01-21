@@ -27,7 +27,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var cardArray :  [Int] = []
     @Published var winnerPlayer: [Int] = []
 
-    let model = try! cardDetection_s_0114()
+    let model = try! cardDetection_n_0121()
     let imageSize : [Int] = [640, 480]
     var originSize : [Float] = [0,0]
     

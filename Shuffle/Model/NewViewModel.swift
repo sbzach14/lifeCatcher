@@ -27,8 +27,8 @@ class NewViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBu
     @Published var cardArray :  [Int] = []
     @Published var winnerPlayer: [Int] = []
 
-    let model = try! cardDetection_s_0114()
-    let state_model = try! cardDetection_s_0114()
+    let model = try! cardDetection_n_0121()
+    let state_model = try! cardDetection_n_0121()
     let imageSize : [Int] = [640, 480]
     var originSize : [Float] = [0,0]
     
@@ -1269,9 +1269,10 @@ class NewViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBu
         }
         
         if cardArray.count >= minCardNum{
-            winnerPlayer = [GameManager.selectGame(gameIndex: ruleIndex, inputCards: cardArray, args: args, rankRules: rankRules, suitRules: suitRules, calModeArgs: calModeArgs, minCardNum: minCardNum)]
-            
-            speakText(input: winnerPlayer)
+            //TODO uncomment this
+//            winnerPlayer = [GameManager.selectGame(gameIndex: ruleIndex, inputCards: cardArray, args: args, rankRules: rankRules, suitRules: suitRules, calModeArgs: calModeArgs, minCardNum: minCardNum)]
+//            
+//            speakText(input: winnerPlayer)
         }
         else{
             //speakText(input: "检测错误")

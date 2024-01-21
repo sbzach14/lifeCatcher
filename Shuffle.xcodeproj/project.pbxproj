@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1801A9B42B550CE500B2AD06 /* cardDetection_s_0114.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 1801A9B32B550CE500B2AD06 /* cardDetection_s_0114.mlmodel */; };
 		18CA14D2284AC42C00F90372 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C3284AC42C00F90372 /* ViewModel.swift */; };
 		18CA14D3284AC42C00F90372 /* ShowCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C5284AC42C00F90372 /* ShowCardView.swift */; };
 		18CA14D4284AC42C00F90372 /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C6284AC42C00F90372 /* MainContentView.swift */; };
@@ -26,7 +25,14 @@
 		A83853502ADA83F600346038 /* Icon_Repo.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A838534F2ADA83F600346038 /* Icon_Repo.xcassets */; };
 		A83853532ADA918000346038 /* CustomUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83853522ADA918000346038 /* CustomUI.swift */; };
 		A83DC67A2A22352C00EC8210 /* SelectRuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83DC6792A22352C00EC8210 /* SelectRuleView.swift */; };
-		A875FECF2B550B65003D51C3 /* cardDetection_s_0114.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A875FECE2B550B65003D51C3 /* cardDetection_s_0114.mlmodel */; };
+		A875FED12B5D1484003D51C3 /* IMG_1436.JPG in Resources */ = {isa = PBXBuildFile; fileRef = A875FED02B5D1484003D51C3 /* IMG_1436.JPG */; };
+		A875FED32B5D1491003D51C3 /* IMG_1437.JPG in Resources */ = {isa = PBXBuildFile; fileRef = A875FED22B5D1491003D51C3 /* IMG_1437.JPG */; };
+		A875FED52B5D150A003D51C3 /* IMG_1435.JPG in Resources */ = {isa = PBXBuildFile; fileRef = A875FED42B5D150A003D51C3 /* IMG_1435.JPG */; };
+		A875FED72B5D1601003D51C3 /* cardDetection_n_0121.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A875FED62B5D1601003D51C3 /* cardDetection_n_0121.mlmodel */; };
+		A875FED92B5D1668003D51C3 /* IMG_0255.JPG in Resources */ = {isa = PBXBuildFile; fileRef = A875FED82B5D1668003D51C3 /* IMG_0255.JPG */; };
+		A875FEDB2B5D16FE003D51C3 /* IMG_1493.JPG in Resources */ = {isa = PBXBuildFile; fileRef = A875FEDA2B5D16FE003D51C3 /* IMG_1493.JPG */; };
+		A875FEDD2B5D1706003D51C3 /* IMG_1192.JPG in Resources */ = {isa = PBXBuildFile; fileRef = A875FEDC2B5D1706003D51C3 /* IMG_1192.JPG */; };
+		A875FEDF2B5D170D003D51C3 /* IMG_0610.JPG in Resources */ = {isa = PBXBuildFile; fileRef = A875FEDE2B5D170D003D51C3 /* IMG_0610.JPG */; };
 		A87A82052B2EF66200B1B37B /* DealTypeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87A82042B2EF66200B1B37B /* DealTypeView.swift */; };
 		A887167F2A0623E500B7F2CD /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887167E2A0623E500B7F2CD /* AuthManager.swift */; };
 		A88716852A0F701500B7F2CD /* GameManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88716842A0F701500B7F2CD /* GameManager.swift */; };
@@ -83,7 +89,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		1801A9B32B550CE500B2AD06 /* cardDetection_s_0114.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; name = cardDetection_s_0114.mlmodel; path = ../../../Downloads/cardDetection_s_0114.mlmodel; sourceTree = "<group>"; };
 		18CA1477284ABEC600F90372 /* Shuffle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Shuffle.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		18CA14C3284AC42C00F90372 /* ViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
 		18CA14C5284AC42C00F90372 /* ShowCardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowCardView.swift; sourceTree = "<group>"; };
@@ -109,7 +114,14 @@
 		A838534F2ADA83F600346038 /* Icon_Repo.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Icon_Repo.xcassets; sourceTree = "<group>"; };
 		A83853522ADA918000346038 /* CustomUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomUI.swift; sourceTree = "<group>"; };
 		A83DC6792A22352C00EC8210 /* SelectRuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectRuleView.swift; sourceTree = "<group>"; };
-		A875FECE2B550B65003D51C3 /* cardDetection_s_0114.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection_s_0114.mlmodel; sourceTree = "<group>"; };
+		A875FED02B5D1484003D51C3 /* IMG_1436.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = IMG_1436.JPG; sourceTree = "<group>"; };
+		A875FED22B5D1491003D51C3 /* IMG_1437.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = IMG_1437.JPG; sourceTree = "<group>"; };
+		A875FED42B5D150A003D51C3 /* IMG_1435.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = IMG_1435.JPG; sourceTree = "<group>"; };
+		A875FED62B5D1601003D51C3 /* cardDetection_n_0121.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection_n_0121.mlmodel; sourceTree = "<group>"; };
+		A875FED82B5D1668003D51C3 /* IMG_0255.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = IMG_0255.JPG; sourceTree = "<group>"; };
+		A875FEDA2B5D16FE003D51C3 /* IMG_1493.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = IMG_1493.JPG; sourceTree = "<group>"; };
+		A875FEDC2B5D1706003D51C3 /* IMG_1192.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = IMG_1192.JPG; sourceTree = "<group>"; };
+		A875FEDE2B5D170D003D51C3 /* IMG_0610.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = IMG_0610.JPG; sourceTree = "<group>"; };
 		A87A82042B2EF66200B1B37B /* DealTypeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DealTypeView.swift; sourceTree = "<group>"; };
 		A887167E2A0623E500B7F2CD /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		A88716812A06413600B7F2CD /* DOC.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DOC.md; sourceTree = "<group>"; };
@@ -357,7 +369,14 @@
 		A8FBC7BE2A3F057700EDDFD7 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				1801A9B32B550CE500B2AD06 /* cardDetection_s_0114.mlmodel */,
+				A875FED62B5D1601003D51C3 /* cardDetection_n_0121.mlmodel */,
+				A875FEDA2B5D16FE003D51C3 /* IMG_1493.JPG */,
+				A875FEDC2B5D1706003D51C3 /* IMG_1192.JPG */,
+				A875FEDE2B5D170D003D51C3 /* IMG_0610.JPG */,
+				A875FED82B5D1668003D51C3 /* IMG_0255.JPG */,
+				A875FED22B5D1491003D51C3 /* IMG_1437.JPG */,
+				A875FED42B5D150A003D51C3 /* IMG_1435.JPG */,
+				A875FED02B5D1484003D51C3 /* IMG_1436.JPG */,
 				A88EFE022A7E8ACC00897243 /* Resnet50FP16.mlmodel */,
 				A83853492ADA7BE600346038 /* Icon.xcassets */,
 				A838534B2ADA7C0200346038 /* BackGround.xcassets */,
@@ -485,11 +504,18 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A875FEDD2B5D1706003D51C3 /* IMG_1192.JPG in Resources */,
+				A875FED52B5D150A003D51C3 /* IMG_1435.JPG in Resources */,
+				A875FED12B5D1484003D51C3 /* IMG_1436.JPG in Resources */,
 				A838534A2ADA7BE600346038 /* Icon.xcassets in Resources */,
+				A875FED92B5D1668003D51C3 /* IMG_0255.JPG in Resources */,
 				50053F84284ACAED00C86BF4 /* Assets.xcassets in Resources */,
+				A875FEDF2B5D170D003D51C3 /* IMG_0610.JPG in Resources */,
 				A838534E2ADA7D7100346038 /* GameClass.xcassets in Resources */,
 				A88F209D2A10EB39005E4A27 /* python-stdlib in Resources */,
+				A875FEDB2B5D16FE003D51C3 /* IMG_1493.JPG in Resources */,
 				A83853502ADA83F600346038 /* Icon_Repo.xcassets in Resources */,
+				A875FED32B5D1491003D51C3 /* IMG_1437.JPG in Resources */,
 				A838534C2ADA7C0200346038 /* BackGround.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -578,7 +604,7 @@
 				18CA14D2284AC42C00F90372 /* ViewModel.swift in Sources */,
 				A88F20AE2A13A470005E4A27 /* PokerBull.swift in Sources */,
 				A8D0D9362A24A4C20061A90E /* TexasPoker.swift in Sources */,
-				1801A9B42B550CE500B2AD06 /* cardDetection_s_0114.mlmodel in Sources */,
+				A875FED72B5D1601003D51C3 /* cardDetection_n_0121.mlmodel in Sources */,
 				B058BE5D2B09F70E0078E792 /* BlurDetector_origin.swift in Sources */,
 				A8FBC7C22A3F0A5C00EDDFD7 /* CVUtils.swift in Sources */,
 				A8EFFEB12B28766C00FC884F /* CutNumRangeSettingView.swift in Sources */,
@@ -591,15 +617,12 @@
 				A8E0E2E72AADF6E20091FC1D /* TwoEightGangGame.swift in Sources */,
 				A887B6502A7FE1AF009F488F /* ShowRecordHistoryView.swift in Sources */,
 				A8D0D9382A35D9970061A90E /* RankRulesView.swift in Sources */,
-				A875FECF2B550B65003D51C3 /* cardDetection_s_0114.mlmodel in Sources */,
 				A88EFDC42A7D217200897243 /* VisionObjectRecognitionViewModel.swift in Sources */,
 				A88EFE032A7E8ACD00897243 /* Resnet50FP16.mlmodel in Sources */,
 				A8EFFEAF2B25BF8900FC884F /* UsingCardsSettingView.swift in Sources */,
 				A8E0E2EB2AAE00620091FC1D /* TinyNineGameRuleSettingView.swift in Sources */,
-				B01A281B2ABF15C900A74AA4 /* cardDetection.mlmodel in Sources */,
 				A87A82052B2EF66200B1B37B /* DealTypeView.swift in Sources */,
 				A8FBC7BB2A3DF1B000EDDFD7 /* SuitRulesView.swift in Sources */,
-				B0CC72FE2AE6797500E0A3E7 /* cardDetection_n_1023.mlmodel in Sources */,
 				A80D65F82AFF75ED005B5E5E /* AddRuleSettingView.swift in Sources */,
 				A8E0E2ED2AAE00740091FC1D /* ThreeMenGameRuleSettingView.swift in Sources */,
 			);

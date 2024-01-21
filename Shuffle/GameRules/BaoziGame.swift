@@ -23,7 +23,8 @@ class BaoziGameRule : Rule{
         1:"1",
     ]
     let JokerValueRange:[Int:String] = [
-        0:"0"
+        0:"0",
+        1:"1"
     ]
     let samePointComparision:[Int:String] = [
         0:"同点同对庄家大",
@@ -40,6 +41,10 @@ class BaoziGameRule : Rule{
         0:"K最大",
         1:"A最大",
         2:"K，Q，J，10一样大, 都为最大"
+    ]
+    let pairRank :[Int:String] = [
+        0:"对子按照牌大小分大小",
+        1:"对子不分大小"
     ]
     
     
@@ -62,8 +67,7 @@ class BaoziGameRule : Rule{
             12: "宝子Q",
             13: "宝子K",
             14: "江苏52张二八",
-            15: "52张宝子2",
-            16: "自定义"
+            15: "自定义"
         ]
         self.rankRules = [5:"对子",
                           4:"对10",
@@ -163,10 +167,6 @@ class BaoziGameRule : Rule{
     KK最大...AA最小，K算3点、Q算2点、 J算1点，九点最大，0点最小，同点比单张大小!
     """,
             15:"""
-    扑克张数:52张 分花色1) AA>KK>QQ>JJ...>222) 9点最大，0点最小 J=1Q=2 K=3 A=4同点比最大牌
-    A>K>Q>J>10>9>8>7 同点同牌比颜色黑色>红色0点一样大
-    """,
-            16:"""
     自定义你的规则
     """,
         ]
@@ -218,6 +218,7 @@ class BaoziGame{
     //7 samePointComparision
     //8 pointComparision
     //9 cardRank
+    //10 pairRank
     static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int]) {
         let dealType = args[0]
         let diyDealType = args[1]
@@ -229,6 +230,7 @@ class BaoziGame{
         let samePointComparision = args[7]
         let pointComparision = args[8]
         let cardRank = args[9]
+        let pairRank = args[10]
         
         var maxRank = 0
         var winners: [Int] = []
@@ -297,7 +299,7 @@ class BaoziGame{
             allPlayCards[i].evaluateFlag = BaoziGameHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules
-            ).evalHand(cards: allPlayCards[i].playerCard, KValueRange: KValueRange,QValueRange: QValueRange,JValueRange: JValueRange,JokerValueRange: JokerValueRange,samePointComparision: samePointComparision,pointComparision: pointComparision,cardRank: cardRank)
+            ).evalHand(cards: allPlayCards[i].playerCard, KValueRange: KValueRange,QValueRange: QValueRange,JValueRange: JValueRange,JokerValueRange: JokerValueRange,samePointComparision: samePointComparision,pointComparision: pointComparision,cardRank: cardRank,pairRank: pairRank)
         }
         
         for i in 0..<playerNum {
@@ -328,6 +330,7 @@ class BaoziGameHandEvaluator{
     var samePointComparision: Int = 0
     var pointComparision: Int = 0
     var QValueRange: Int = 0
+    var PairRank :Int = 0
     
     init(rankRules: [Int],
          suitRules: [Int]){
@@ -344,15 +347,15 @@ class BaoziGameHandEvaluator{
         
     }
     
-    func evalHand(cards: [Card], KValueRange: Int, QValueRange: Int, JValueRange: Int, JokerValueRange: Int, samePointComparision: Int, pointComparision: Int, cardRank: Int)->Int{
+    func evalHand(cards: [Card], KValueRange: Int, QValueRange: Int, JValueRange: Int, JokerValueRange: Int, samePointComparision: Int, pointComparision: Int, cardRank: Int, pairRank: Int)->Int{
         
         self.samePointComparision = samePointComparision
         self.pointComparision = pointComparision
         self.QValueRange = QValueRange
-        
+        self.PairRank = pairRank
         var score = 0
-        var num1 = BaoziCard(card: cards[0], KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, JokerValueRange: JokerValueRange, cardRank: cardRank)
-        var num2 = BaoziCard(card: cards[1], KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, JokerValueRange: JokerValueRange, cardRank: cardRank)
+        let num1 = BaoziCard(card: cards[0], KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, JokerValueRange: JokerValueRange, cardRank: cardRank)
+        let num2 = BaoziCard(card: cards[1], KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, JokerValueRange: JokerValueRange, cardRank: cardRank)
         var i = self.rankRules.count + 1
         for ruleIndex in self.rankRules{
             let rank = self.rankRulesDic[ruleIndex]!([num1, num2])
@@ -377,7 +380,11 @@ class BaoziGameHandEvaluator{
     
     func eval_isPair(cards:[BaoziCard]) -> Int{
         if cards[0].originalRank == cards[1].originalRank {
-            return cards[0].rank
+            if self.PairRank == 0 {
+                return cards[0].rank
+            } else {
+                return 1
+            }
         }
         return 0
         
@@ -480,15 +487,17 @@ class BaoziCard{
         if card.rank == 11{
             self.point = Int(rule.JValueRange[JValueRange]!)!
         }
-        else if cardRank == 12{
+        else if card.rank == 12{
             if QValueRange < 3{
                 self.point = Int(rule.QValueRange[QValueRange]!)!
             } else {
                 self.point = 1
             }
         }
-        else if cardRank == 13{
+        else if card.rank == 13{
             self.point = Int(rule.KValueRange[KValueRange]!)!
+        } else if card.rank > 13 {
+            self.point = Int(rule.JokerValueRange[JokerValueRange]!)!
         }
         else{
             point = cardRank

@@ -80,7 +80,7 @@ class BlurDetector_8{
                                        -1,  8, -1,
                                        -1, -1, -1]
     
-    let model = try! cardDetection_n_1023()
+    let model = try! cardDetection_n_0121()
     @Published var cameraImage : CGImage?
 
     
