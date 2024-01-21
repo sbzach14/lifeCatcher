@@ -69,7 +69,7 @@ class NinePointFiveGameRule : Rule{
             7: "临沂九点半，对王最大",
             8: "江西九点半2",
             9: "九点半最大2",
-            10: "自定义",
+            10: "自定义九点半",
         ]
         self.ruleInfo = [
             0:"""

@@ -28,9 +28,9 @@ class TinyNineGameRule : Rule{
     override init(ruleIndex: Int, ruleName: String) {
         super.init(ruleIndex: ruleIndex, ruleName: ruleName)
         self.setting = [
-            0: "标准",
+            0: "标准小九",
             1: "湖南小九",
-            2: "自定义"
+            2: "自定义小九"
         ]
         
         self.rankRules = [2:"对王，对A，A加王",

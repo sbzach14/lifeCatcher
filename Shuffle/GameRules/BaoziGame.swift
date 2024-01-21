@@ -67,7 +67,7 @@ class BaoziGameRule : Rule{
             12: "宝子Q",
             13: "宝子K",
             14: "江苏52张二八",
-            15: "自定义"
+            15: "自定义宝子"
         ]
         self.rankRules = [5:"对子",
                           4:"对10",

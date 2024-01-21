@@ -105,7 +105,7 @@ class ThreeCardPokerGameRule : Rule{
             2: "金花AKJ",
             3: "金花4选3（未完成）",
             4: "百变金花",
-            5: "自定义"
+            5: "自定义炸金花"
         ]
         self.ruleInfo = [
             0:"""
