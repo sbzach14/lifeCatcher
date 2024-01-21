@@ -147,16 +147,16 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         self.minCardNum = minCardNum
         self.initCardArray()
         
-        // Python 初始化
-        print("pythonInitialize")
-        guard let stdLibPath = Bundle.main.path(forResource: "python-stdlib", ofType: nil) else { return }
-        guard let libDynloadPath = Bundle.main.path(forResource: "python-stdlib/lib-dynload", ofType: nil) else { return }
-
-        setenv("PYTHONHOME", stdLibPath, 1)
-        setenv("PYTHONPATH", "\(stdLibPath):\(libDynloadPath)", 1)
-
-        Py_Initialize()
-        print("pythonInitialize done")
+//        // Python 初始化
+//        print("pythonInitialize")
+//        guard let stdLibPath = Bundle.main.path(forResource: "python-stdlib", ofType: nil) else { return }
+//        guard let libDynloadPath = Bundle.main.path(forResource: "python-stdlib/lib-dynload", ofType: nil) else { return }
+//
+//        setenv("PYTHONHOME", stdLibPath, 1)
+//        setenv("PYTHONPATH", "\(stdLibPath):\(libDynloadPath)", 1)
+//
+//        Py_Initialize()
+//        print("pythonInitialize done")
         
         for key in self.allCardIndex {
             self.laplacianDic[0][key] = 0
@@ -179,7 +179,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
         
         setupAVCapture()
-        
+        startCamera()
+
         //规则测试代码
 //        for i in 0..<1{
 //            print("测试用例 ",i + 1,"")
@@ -303,11 +304,11 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     }
     
     func stopCamera() {
-        if let inputs = session.inputs as? [AVCaptureDeviceInput] {
-            for input in inputs {
-                session.removeInput(input)
-            }
-        }
+//        if let inputs = session.inputs as? [AVCaptureDeviceInput] {
+//            for input in inputs {
+//                session.removeInput(input)
+//            }
+//        }
         session.stopRunning()
         print("关闭相机")
     }
@@ -497,6 +498,9 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         if cardResult[0].cardIndex[0] == self.stateCard[0] && cardResult[1].cardIndex[0] == self.stateCard[1]{
             stateCounter = min(stateCounter + 1, 600)
         }
+        else if self.isRemote && cardResult[0].cardIndex[0] != -1 && cardResult[1].cardIndex[0] != -1{
+            stateCounter = min(stateCounter + 1, 600)
+        }
         else{
             stateCounter = 0
         }
@@ -511,8 +515,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 && shuffleMode == 0{
                 state = "shuffle"
                 print("动作：开始洗牌 ", self.setFrameRate)
-                speakText(input: 0)
                 DispatchQueue.main.async{
+                    self.speakText(input: 0)
                     self.changeCameraFrameRate(to: Int(self.setFrameRate))
                     self.initCardArray()
                     if self.isRemote{
@@ -525,8 +529,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 && shuffleMode != 0{
                 state = "shuffle"
                 print("动作：开始拨牌")
-                speakText(input: 0)
                 DispatchQueue.main.async{
+                    self.speakText(input: 0)
                     self.changeCameraFrameRate(to: Int(self.setFrameRate))
                     self.initCardArray()
                     if self.isRemote{
@@ -540,9 +544,10 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         && stateCounter > 3{
                 state = "cut"
                 print("动作：开始切牌")
-                speakText(input: 0)
                 DispatchQueue.main.async{
+                    self.speakText(input: 0)
                     self.changeCameraFrameRate(to: Int(self.setFrameRate))
+                    self.cutCardArray(cardResult: cardResult, taskIndex: taskIndex)
                     if self.isRemote{
                         self.computeTargetArea(stateResult: self.lastBoxes)
                     }
@@ -555,14 +560,13 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 print("动作：切牌完成")
                 DispatchQueue.main.async{
                     self.changeCameraFrameRate(to: 30)
-                    self.cutCardArray(cardResult: cardResult, taskIndex: taskIndex)
                     self.computeWinnerPlayer()
                     self.initBoxes()
                 }
             }
             else{
                 if self.isRemote{
-                    updateTargetArea(coordinates: self.lastBoxes)
+                    //updateTargetArea(coordinates: self.lastBoxes)
                 }
             }
         }
@@ -586,7 +590,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 self.detectResultList[taskIndex] = cardResult
                 
                 if self.isRemote{
-                    updateTargetArea(coordinates: self.lastBoxes)
+                    //updateTargetArea(coordinates: self.lastBoxes)
                 }
             }
         }
@@ -1195,12 +1199,12 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             var targetY = self.targetArea[1]
             var targetW = self.targetArea[2]
             var targetH = self.targetArea[3]
-            var x0 = (coordinates[0][0] * targetW + targetX) / originSize[0]
-            var y0 = (coordinates[0][1] * targetH + targetY) / originSize[1]
+            var x0 = (coordinates[0][0] * targetW + targetX - targetW / 2) / originSize[0]
+            var y0 = (coordinates[0][1] * targetH + targetY - targetH / 2) / originSize[1]
             var w0 = (coordinates[0][2] * targetW) / originSize[0]
             var h0 = (coordinates[0][3] * targetH) / originSize[1]
-            var x1 = (coordinates[1][0] * targetW + targetX) / originSize[0]
-            var y1 = (coordinates[1][1] * targetH + targetY) / originSize[1]
+            var x1 = (coordinates[1][0] * targetW + targetX - targetW / 2) / originSize[0]
+            var y1 = (coordinates[1][1] * targetH + targetY - targetH / 2) / originSize[1]
             var w1 = (coordinates[1][2] * targetW) / originSize[0]
             var h1 = (coordinates[1][3] * targetH) / originSize[1]
             computeTargetArea(stateResult: [[x0,y0,w0,h0],[x1,y1,w1,h1]])
@@ -1210,12 +1214,12 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             var targetY = self.targetArea[1]
             var targetW = self.targetArea[2]
             var targetH = self.targetArea[3]
-            var x0 = ((1 - coordinates[0][1]) * targetW + targetX) / originSize[0]
-            var y0 = (coordinates[0][0] * targetH + targetY) / originSize[1]
+            var x0 = ((1 - coordinates[0][1]) * targetW + targetX - targetW / 2) / originSize[0]
+            var y0 = (coordinates[0][0] * targetH + targetY - targetH / 2) / originSize[1]
             var w0 = (coordinates[0][3] * targetW) / originSize[0]
             var h0 = (coordinates[0][2] * targetH) / originSize[1]
-            var x1 = ((1 - coordinates[1][1]) * targetW + targetX) / originSize[0]
-            var y1 = (coordinates[1][0] * targetH + targetY) / originSize[1]
+            var x1 = ((1 - coordinates[1][1]) * targetW + targetX - targetW / 2) / originSize[0]
+            var y1 = (coordinates[1][0] * targetH + targetY - targetH / 2) / originSize[1]
             var w1 = (coordinates[1][3] * targetW) / originSize[0]
             var h1 = (coordinates[1][2] * targetH) / originSize[1]
             computeTargetArea(stateResult: [[x0,y0,w0,h0],[x1,y1,w1,h1]])

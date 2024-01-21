@@ -612,6 +612,7 @@
 				A8E0E2F12AAE00B90091FC1D /* NinePointFiveGameRuleSettingView.swift in Sources */,
 				A88EFE0D2A7FDC9500897243 /* RecordHistoryView.swift in Sources */,
 				18CA14D6284AC42C00F90372 /* CameraView.swift in Sources */,
+				181C96952B5CFA0B0042006E /* cardDetection_n_0121.mlmodel in Sources */,
 				A88EFE072A7FA95A00897243 /* SettingView.swift in Sources */,
 				A83853532ADA918000346038 /* CustomUI.swift in Sources */,
 				A8E0E2E72AADF6E20091FC1D /* TwoEightGangGame.swift in Sources */,
