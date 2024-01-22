@@ -39,9 +39,9 @@ class TexasPokerRule : Rule{
         ]
         self.playerNum = [2,3,4,5,6,7,8]
         self.setting = [
-            0: "标准",
-            1: "短牌",
-            2: "自定义"
+            0: "标准德州",
+            1: "短牌德州",
+            2: "自定义德州"
         ]
         self.ruleInfo = [
             0:"""
