@@ -138,8 +138,27 @@ class TexasPoker{
         return result
     }
     
-    static func getMinCardNum(playerNum: Int, handNum: Int, communityNum: Int) -> Int{
-        return playerNum * handNum + communityNum
+    static func getMinCardNum(playerNum: Int, handNum: Int, communityNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+        
+        if dealType == 0 || dealType == 1{
+            return playerNum * handNum + communityNum + 3
+        } else {
+            var minNum = 0
+            for i in 0..<diyDealNum.count {
+                let num = diyDealNum[i]
+                //派牌
+                if diyDealStatus[i][0] == true {
+                    minNum += playerNum * num
+                //公牌
+                } else if diyDealStatus[i][1] == true {
+                    minNum += num
+                //去牌
+                } else {
+                    minNum += num
+                }
+            }
+            return minNum
+        }
     }
 }
 
@@ -188,6 +207,10 @@ class TexasPokerGame {
         var winners = [Int]()
         var allPlayCards = [TexasPlayer]()
         var community = [Card]()
+        if deck.count < TexasPoker.getMinCardNum(playerNum: playerNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+            return ([],[])
+        }
+        
         
         for _ in 0..<playerNum {
             allPlayCards.append(TexasPlayer())
@@ -268,22 +291,25 @@ class TexasPokerGame {
             allPlayCards[i].evaluateFlag = HandEvaluator.evalHand(cards: allPlayCards[i].playerCard, community: community, isCompareSuit: isCompareSuit, isAceStraight: isAceStraight, minRank: minRank, handUseType: handUseType, handUseNum: handUseNum, rankRules: rankRules)
         }
         
+        var resultList = [ResultStruct]()
         for i in 0..<playerNum {
             let rank = allPlayCards[i].evaluateFlag
-            if rank > maxRank {
-                maxRank = rank
-                winners.removeAll()
-                winners.append(i)
-            } else if rank == maxRank {
-                winners.append(i)
-            }
+            resultList.append(ResultStruct(playerID: i, rank: rank))
         }
-        
+        let sortedResultList =  resultList.sorted(by: {$0.rank > $1.rank })
+        for result in sortedResultList {
+            winners.append(result.playerID)
+        }
         var leftCards:[Int] = []
         for card in deck{
             leftCards.append(card.cardIndex)
         }
         
+        if leftCards.count < TexasPoker.getMinCardNum(playerNum: playerNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+            leftCards = []
+        }
+        
+        print("winners:  \(winners)")
         return (winners, leftCards)
     }
 }

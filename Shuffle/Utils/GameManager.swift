@@ -137,7 +137,7 @@ class GameManager {
                 
                 for i in 0...consecutiveReport - 1{
                     let (result, leftCards) = gameFunction(diyDealStatus,diyDealNum, currentCards, newArgs, rankRules, suitRules)
-                    if result != nil && leftCards != nil && leftCards.count != 0{
+                    if result.count != 0 {
                         //报最大
                         if target == 0{
                             reportResult.append(result[0])
@@ -148,18 +148,29 @@ class GameManager {
                         }
                         //剩下的牌组
                         currentCards = leftCards
+                        if leftCards.count == 0 {
+                            break
+                        }
+                    } else if result.count == 0{
+                        break
                     }
                 }
             
             case 1://去色
-                for i in 0..<consecutiveReport{
+                var currentConsecutiveReport = consecutiveReport
+                // 如果是生死门没有连报
+                if consecutiveReport > 1 && target == 2{
+                    currentConsecutiveReport = 1
+                }
+                for i in 0..<currentConsecutiveReport{
                     var aliveTimes = 0
+                    //遍历打色范围
                     for cardIndex in (cutNumRangeSetting[0] - 1)...(cutNumRangeSetting[1] - 1){
                         let cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: currentCards[cardIndex])
                         let newInputCards = Array(currentCards[(cardIndex+1)...])//去掉上面的牌
                         var resultTargetPos = 0
                         let (result, leftCards) = gameFunction(diyDealStatus,diyDealNum, newInputCards, newArgs, rankRules, suitRules)
-                        if result != nil && leftCards != nil && leftCards.count != 0 {
+                        if result.count != 0 {
                             //报切几张目标位置最大
                             if target == 0{
                                 resultTargetPos = result[0]
@@ -171,15 +182,16 @@ class GameManager {
                             } else if target == 2{
                                 resultTargetPos = result[0]
                             }
+                        } else if (result.isEmpty) {
+                            break
                         }
                         let resultPos = (cardRank + resultTargetPos) % playerNum//起始发牌位置+目标输赢发牌位置
                         print("切牌数字 \(cardRank) 计算结果位置 \(resultPos) 目标位置 \(targetPos)")
                         if target == 0 || target == 1{
                             if resultPos == targetPos{//targetPos 0 - playerNum-1
-                                print("切第\(cardIndex + 1)张最大")
+                                print("切第\(cardIndex + 1)张最大/最小")
                                 reportResult.append(cardIndex)
                                 currentCards = leftCards
-                                
                                 break
                             }
                         } else {
@@ -188,23 +200,35 @@ class GameManager {
                             }
                         }
                         
+                        if currentCards.count == 0 {
+                            break
+                        }
                     }
                     //生死门暂时没有连报
                     if target == 2{
                         reportResult.append(100 * aliveTimes / (cutNumRangeSetting[1] - cutNumRangeSetting[0] + 1))
                     }
+                    if currentCards.count == 0{
+                        break
+                    }
                 }
                 
                 
             case 2://留色
-                for i in 0..<consecutiveReport{
+                var currentConsecutiveReport = consecutiveReport
+                // 如果是生死门没有连报
+
+                if consecutiveReport > 1 && target == 2{
+                    currentConsecutiveReport = 1
+                }
+                for i in 0..<currentConsecutiveReport{
                     var aliveProb = 0
 
                     for cardIndex in (cutNumRangeSetting[0] - 1)...(cutNumRangeSetting[1] - 1){
                         let cardRank = inputCards[cardIndex] % 13
                         var resultTargetPos = 0
                         let (result, leftCards) = gameFunction(diyDealStatus, diyDealNum, inputCards, newArgs, rankRules, suitRules)
-                        if result != nil && leftCards != nil && leftCards.count != 0 {
+                        if result.count != 0 {
                             if target == 0{
                                 resultTargetPos = result[0]
                             }
@@ -214,6 +238,8 @@ class GameManager {
                                 resultTargetPos = result[0]
                                 
                             }
+                        } else if result.isEmpty {
+                            break
                         }
                         let resultPos = (cardRank + resultTargetPos) % playerNum//起始发牌位置+目标输赢发牌位置
                         if target == 0 || target == 1 {
@@ -228,6 +254,13 @@ class GameManager {
                                 aliveProb += 1
                             }
                         }
+                        if currentCards.count == 0 {
+                            break
+                        }
+                    }
+                    
+                    if currentCards.count == 0 {
+                        break
                     }
                     //生死门暂时没有连报
                     if target == 2{

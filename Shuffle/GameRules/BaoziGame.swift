@@ -193,18 +193,82 @@ class BaoziGame{
         return errMessage
     }
     
-    static func getAllCardIndex() -> [Int]{
+    static func getAllCardIndex(setting: Int) -> [Int]{
         var result : [Int] = []
-        for i in 0...3{
-            for rank in 0...12{//a-k
-                result.append(rank + i * 13)
-            }
+        switch setting {
+        case 0:
+            result = Array(0...9) + Array(13...22) + Array(26...35) + Array(39...48)
+            break
+        case 1:
+            result = Array(0...9) + Array(13...22) + Array(26...35) + Array(39...48)
+            break
+        case 2:
+            result = Array(0...8) + Array(13...21) + Array(26...34) + Array(39...47) + [11,24,37,50]
+            break
+        case 3:
+            result = Array(0...51)
+            break
+        case 4:
+            result = Array(0...51)
+            break
+        case 5:
+            result = Array(0...51) + [53,54]
+            break
+        case 6:
+            result = Array(0...51) + [53,54]
+            break
+        case 7:
+            result = Array(0...9) + Array(13...22) + Array(26...35) + Array(39...48)
+            break
+        case 8:
+            result = Array(0...51) + [53,54]
+            break
+        case 9:
+            result = Array(0...51) + [53,54]
+            break
+        case 10:
+            result = Array(0...51)
+            break
+        case 11:
+            result = Array(0...9) + Array(13...22) + Array(26...35) + Array(39...48) + [10,23,36,49]
+            break
+        case 12:
+            result = Array(0...9) + Array(13...22) + Array(26...35) + Array(39...48) + [11,24,37,50]
+            break
+        case 13:
+            result = Array(0...9) + Array(13...22) + Array(26...35) + Array(39...48) + [12,25,38,51]
+            break
+        case 14:
+            result = Array(0...51)
+            break
+        default:
+            result = Array(0...51) + [53,54]
+            break
         }
         return result
     }
     
-    static func getMinCardNum(playerNum: Int) -> Int{
-        return playerNum * 2
+    static func getMinCardNum(playerNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+        
+        if dealType == 0 || dealType == 1{
+            return playerNum * 2
+        } else {
+            var minNum = 0
+            for i in 0..<diyDealNum.count {
+                let num = diyDealNum[i]
+                //派牌
+                if diyDealStatus[i][0] == true {
+                    minNum += playerNum * num
+                //公牌
+                } else if diyDealStatus[i][1] == true {
+                    minNum += num
+                //去牌
+                } else {
+                    minNum += num
+                }
+            }
+            return minNum
+        }
     }
     
     //args
@@ -236,6 +300,11 @@ class BaoziGame{
         var winners: [Int] = []
         var allPlayCards: [Player] = []
         var community = [Card]()
+        if deck.count < self.getMinCardNum(playerNum: playerNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
+            return ([], [])
+        }
+        
+        
         
         for _ in 0..<playerNum {
             allPlayCards.append(Player())
@@ -302,23 +371,26 @@ class BaoziGame{
             ).evalHand(cards: allPlayCards[i].playerCard, KValueRange: KValueRange,QValueRange: QValueRange,JValueRange: JValueRange,JokerValueRange: JokerValueRange,samePointComparision: samePointComparision,pointComparision: pointComparision,cardRank: cardRank,pairRank: pairRank)
         }
         
+        var resultList = [ResultStruct]()
         for i in 0..<playerNum {
             let rank = allPlayCards[i].evaluateFlag
-            if rank > maxRank {
-                maxRank = rank
-                winners.removeAll()
-                winners.append(i)
-            } else if rank == maxRank {
-                winners.append(i)
-            }
+            resultList.append(ResultStruct(playerID: i, rank: rank))
+        }
+        
+        let sortedResultList =  resultList.sorted(by: {$0.rank > $1.rank })
+        for result in sortedResultList {
+            winners.append(result.playerID)
         }
         
         var leftCards:[Int] = []
         for card in deck{
             leftCards.append(card.cardIndex)
         }
-        print("宝子 winner \(winners)")
+        if leftCards.count < self.getMinCardNum(playerNum: playerNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
+            leftCards = []
+        }
         
+        print("winners \(winners)")
         return (winners, leftCards)
     }
 }

@@ -200,10 +200,9 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             for cardIndex in cardArray{
                 cardString += cardLabelDic[cardIndex]! + " "
             }
-            
             print(cardArray)
             print(cardString)
-            self.cardArray = [53,0,12,2,54,13,25,20,38,25,35,24]
+            self.cardArray = [0,13,26, 3,16,29, 4,5,6, 7,8,9, 42,45,47, 42,45,44, 5,19,33, 4,18,32,]
             self.computeWinnerPlayer()
         }
 

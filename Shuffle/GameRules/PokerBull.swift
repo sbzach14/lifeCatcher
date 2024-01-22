@@ -299,18 +299,66 @@ class PokerBull{
         
     }
     
-    static func GetAllCardIndex()->[Int]{
+    static func GetAllCardIndex(setting: Int)->[Int]{
         var result : [Int] = []
-        for i in 0...3{
-            for rank in 0...12{
-                    result.append(rank + i * 13)
-            }
+        switch setting {
+        case 0:
+            result = Array(0...51) + [53,54]
+            break
+        case 1:
+            result = Array(0...51) + [53,54]
+            break
+        case 2:
+            result = Array(0...51) + [53,54]
+            break
+        case 3:
+            result = Array(0...8) + Array(13...21) + Array(26...34) + Array(39...47)
+            break
+        case 4:
+            result = Array(0...51) + [53,54]
+            break
+        case 5:
+            result = Array(0...51) + [53,54]
+            break
+        case 6:
+            result = Array(0...51)
+            break
+        case 7:
+            result = Array(0...9) + Array(13...22) + Array(26...35) + Array(39...48)
+            break
+        case 8:
+            result = Array(0...51) + [53,54]
+            break
+        case 9:
+            result = Array(0...51)
+            break
+        default:
+            result = Array(0...51) + [53,54]
         }
         return result
     }
     
-    static func GetMinCardNum(playerNum: Int, handNum: Int) -> Int{
-        return playerNum * handNum
+    static func GetMinCardNum(playerNum: Int, handNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+        
+        if dealType == 0 || dealType == 1{
+            return playerNum * handNum
+        } else {
+            var minNum = 0
+            for i in 0..<diyDealNum.count {
+                let num = diyDealNum[i]
+                //派牌
+                if diyDealStatus[i][0] == true {
+                    minNum += playerNum * num
+                //公牌
+                } else if diyDealStatus[i][1] == true {
+                    minNum += num
+                //去牌
+                } else {
+                    minNum += num
+                }
+            }
+            return minNum
+        }
     }
     
 }
@@ -646,6 +694,9 @@ class PokerBullGame {
 
         var allPlayers: [BullPlayer] = (0..<playerNum).map { BullPlayer(playerIndex: $0) }
         var community = [PokerBullCard]()
+        if deck.count < PokerBull.GetMinCardNum(playerNum: playerNum, handNum: handNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+            return ([], [])
+        }
         
         if wayToDealCards == 0{
             // 发牌
@@ -717,6 +768,10 @@ class PokerBullGame {
 
         for leftCard in bullDeck{
             leftCards.append(leftCard.cardIndex)
+        }
+        
+        if leftCards.count < PokerBull.GetMinCardNum(playerNum: playerNum, handNum: handNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+            leftCards = []
         }
         
         return ([allPlayers.sorted { $0.evaluateFlag > $1.evaluateFlag }[0].playerID],leftCards)

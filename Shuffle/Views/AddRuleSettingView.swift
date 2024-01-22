@@ -121,12 +121,13 @@ struct AddRuleSettingView: View{
     private func SetUpAll(){
         print("init success")
         
-        _selectedSaveIndex = self.selectedSaveIndex
         
         //新建规则时初始化
         if self.selectedSaveIndex == -1 && self.editType == 0{
             
             print("init new rule")
+            _selectedSaveIndex = self.selectedSaveIndex
+
             let selectedRule = GameManager.gameRules[gameType]!
             self.playerNumList = selectedRule.playerNum
             self.currentNum = playerNumList[self.playerNum]
@@ -145,6 +146,8 @@ struct AddRuleSettingView: View{
         //选择已经保存的规则时初始化
         }else if self.selectedSaveIndex > -1 && editType == 0{
             print("init rule \(self.selectedSaveIndex)")
+            _selectedSaveIndex = self.selectedSaveIndex
+
             let rules = RuleManager.allUsersGameRule[self.selectedSaveIndex]
             
             let selectedRule = GameManager.gameRules[gameType]!
@@ -631,7 +634,7 @@ struct AddRuleSettingView: View{
             break
         case 1:
             let selectedRule = GameManager.gameRules[gameType] as! PokerBullRule
-            allCardIndex = PokerBull.GetAllCardIndex()
+            allCardIndex = PokerBull.GetAllCardIndex(setting: self.setting)
             break
         case 2:
             let selectedRule = GameManager.gameRules[gameType] as! ThreeCardPokerGameRule
@@ -639,25 +642,25 @@ struct AddRuleSettingView: View{
             break
         case 3:
             let selectedRule = GameManager.gameRules[gameType] as! TinyNineGameRule
-            allCardIndex = TinyNineGame.getAllCardIndex()
+            allCardIndex = TinyNineGame.getAllCardIndex(setting: self.setting)
             break
         case 4:
             let selectedRule = GameManager.gameRules[gameType]
             as! ThreeMenGameRule
-            allCardIndex = ThreeMenGame.getAllCardIndex()
+            allCardIndex = ThreeMenGame.getAllCardIndex(setting: self.setting)
             break
         case 5:
             let selectedRule = GameManager.gameRules[gameType] as! TwoEightGangGameRule
-            allCardIndex = TwoEightGangGame.getAllCardIndex()
+            allCardIndex = TwoEightGangGame.getAllCardIndex(setting: self.setting)
             break
         case 6:
             let selectedRule = GameManager.gameRules[gameType] as! NinePointFiveGameRule
-            allCardIndex = NinePointFiveGame.getAllCardIndex()
+            allCardIndex = NinePointFiveGame.getAllCardIndex(setting: self.setting)
             break
         case 7:
             let selectedRule = GameManager.gameRules[gameType] as!
             BaoziGameRule
-            allCardIndex = BaoziGame.getAllCardIndex()
+            allCardIndex = BaoziGame.getAllCardIndex(setting: self.setting)
             break
         default:
             print("GameType error")
@@ -669,36 +672,36 @@ struct AddRuleSettingView: View{
         switch gameType {
         case 0:
             let selectedRule = GameManager.gameRules[gameType] as! TexasPokerRule
-            minCardNum = TexasPoker.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: selectedRule.handNum[args[3]], communityNum: selectedRule.communityNum[args[4]])
+            minCardNum = TexasPoker.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: selectedRule.handNum[args[3]], communityNum: selectedRule.communityNum[args[4]], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 1:
             let selectedRule = GameManager.gameRules[gameType] as! PokerBullRule
-            minCardNum = PokerBull.GetMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: selectedRule.handNum[args[1]])
+            minCardNum = PokerBull.GetMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: selectedRule.handNum[args[1]], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
         case 2:
             let selectedRule = GameManager.gameRules[gameType] as! ThreeCardPokerGameRule
-            minCardNum = ThreeCardPokerGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: selectedRule.handNum[args[0]])
+            minCardNum = ThreeCardPokerGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: selectedRule.handNum[args[0]], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 3:
             let selectedRule = GameManager.gameRules[gameType] as! TinyNineGameRule
-            minCardNum = TinyNineGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum])
+            minCardNum = TinyNineGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 4:
             let selectedRule = GameManager.gameRules[gameType]
             as! ThreeMenGameRule
-            minCardNum = ThreeMenGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum])
+            minCardNum = ThreeMenGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 5:
             let selectedRule = GameManager.gameRules[gameType] as! TwoEightGangGameRule
-            minCardNum = TwoEightGangGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum])
+            minCardNum = TwoEightGangGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 6:
             let selectedRule = GameManager.gameRules[gameType] as! NinePointFiveGameRule
-            minCardNum = NinePointFiveGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum])
+            minCardNum = NinePointFiveGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 7:
             let selectedRule = GameManager.gameRules[gameType] as!
             BaoziGameRule
-            minCardNum = BaoziGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum])
+            minCardNum = BaoziGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         default:
             print("GameType error")
