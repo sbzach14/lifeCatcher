@@ -88,11 +88,11 @@ class SettingViewModel: ObservableObject {
                 print("Error updating para.json: \(error)")
             }
         }
-        else if searchText == "WHOSYOURDADDY"{
+        else if (searchText == "WHOSYOURDADDY" || AuthManager.authKey(input: searchText) == true) && self.isActive == false{
             fetchInternetCurrentDate { internetDate in
                 if let internetDate = internetDate {
                     
-                    self.isActive.toggle()
+                    self.isActive = true
                     
                     let activeTimeString = readParaJSON()!["activeTime"]
                     if activeTimeString == ""{
