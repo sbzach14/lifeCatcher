@@ -10,6 +10,13 @@
 		181C969C2B5D51B00042006E /* Icon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 181C969B2B5D51B00042006E /* Icon.xcassets */; };
 		181C969E2B5D9DC90042006E /* SelectGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C969D2B5D9DC90042006E /* SelectGameView.swift */; };
 		181C96A02B5DB5980042006E /* tip.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 181C969F2B5DB5980042006E /* tip.mp3 */; };
+		181C96A22B5F86090042006E /* cardDetection_s_0123.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 181C96A12B5F86090042006E /* cardDetection_s_0123.mlmodel */; };
+		181C96A82B60DC180042006E /* ChickenBattleGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C96A72B60DC180042006E /* ChickenBattleGame.swift */; };
+		181C96AA2B60DD610042006E /* CardNineGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C96A92B60DD610042006E /* CardNineGame.swift */; };
+		181C96AC2B60E26A0042006E /* JiaJiaBaoGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C96AB2B60E26A0042006E /* JiaJiaBaoGame.swift */; };
+		181C96AE2B60F03C0042006E /* JiaJiaBaoGameRuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C96AD2B60F03C0042006E /* JiaJiaBaoGameRuleSettingView.swift */; };
+		184F40A72B60FE170001B3DC /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184F40A62B60FE170001B3DC /* LoadingView.swift */; };
+		184F40AB2B610EF50001B3DC /* CardNineRuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184F40AA2B610EF50001B3DC /* CardNineRuleSettingView.swift */; };
 		18CA14D2284AC42C00F90372 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C3284AC42C00F90372 /* ViewModel.swift */; };
 		18CA14D3284AC42C00F90372 /* ShowCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C5284AC42C00F90372 /* ShowCardView.swift */; };
 		18CA14D4284AC42C00F90372 /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C6284AC42C00F90372 /* MainContentView.swift */; };
@@ -86,6 +93,13 @@
 		181C969B2B5D51B00042006E /* Icon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Icon.xcassets; sourceTree = "<group>"; };
 		181C969D2B5D9DC90042006E /* SelectGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectGameView.swift; sourceTree = "<group>"; };
 		181C969F2B5DB5980042006E /* tip.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = tip.mp3; sourceTree = "<group>"; };
+		181C96A12B5F86090042006E /* cardDetection_s_0123.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection_s_0123.mlmodel; sourceTree = "<group>"; };
+		181C96A72B60DC180042006E /* ChickenBattleGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChickenBattleGame.swift; sourceTree = "<group>"; };
+		181C96A92B60DD610042006E /* CardNineGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardNineGame.swift; sourceTree = "<group>"; };
+		181C96AB2B60E26A0042006E /* JiaJiaBaoGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JiaJiaBaoGame.swift; sourceTree = "<group>"; };
+		181C96AD2B60F03C0042006E /* JiaJiaBaoGameRuleSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JiaJiaBaoGameRuleSettingView.swift; sourceTree = "<group>"; };
+		184F40A62B60FE170001B3DC /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
+		184F40AA2B610EF50001B3DC /* CardNineRuleSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardNineRuleSettingView.swift; sourceTree = "<group>"; };
 		18CA1477284ABEC600F90372 /* Shuffle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Shuffle.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		18CA14C3284AC42C00F90372 /* ViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
 		18CA14C5284AC42C00F90372 /* ShowCardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowCardView.swift; sourceTree = "<group>"; };
@@ -254,6 +268,7 @@
 				A87A82042B2EF66200B1B37B /* DealTypeView.swift */,
 				B058BE602B0A0D6F0078E792 /* TestView.swift */,
 				181C969D2B5D9DC90042006E /* SelectGameView.swift */,
+				184F40A62B60FE170001B3DC /* LoadingView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -297,6 +312,8 @@
 				A8E0E2EC2AAE00740091FC1D /* ThreeMenGameRuleSettingView.swift */,
 				A8E0E2EE2AAE00910091FC1D /* TwoEightGangGameRuleSettingView.swift */,
 				A8E0E2F02AAE00B90091FC1D /* NinePointFiveGameRuleSettingView.swift */,
+				181C96AD2B60F03C0042006E /* JiaJiaBaoGameRuleSettingView.swift */,
+				184F40AA2B610EF50001B3DC /* CardNineRuleSettingView.swift */,
 			);
 			path = RuleSettingViews;
 			sourceTree = "<group>";
@@ -335,6 +352,9 @@
 				A8E0E2E42AADEF560091FC1D /* ThreeMenGame.swift */,
 				A8E0E2E62AADF6E20091FC1D /* TwoEightGangGame.swift */,
 				A8E0E2E82AADF9240091FC1D /* NinePointFiveGame.swift */,
+				181C96A72B60DC180042006E /* ChickenBattleGame.swift */,
+				181C96A92B60DD610042006E /* CardNineGame.swift */,
+				181C96AB2B60E26A0042006E /* JiaJiaBaoGame.swift */,
 			);
 			path = GameRules;
 			sourceTree = "<group>";
@@ -358,6 +378,7 @@
 			isa = PBXGroup;
 			children = (
 				A875FED62B5D1601003D51C3 /* cardDetection_n_0121.mlmodel */,
+				181C96A12B5F86090042006E /* cardDetection_s_0123.mlmodel */,
 				A88EFE022A7E8ACC00897243 /* Resnet50FP16.mlmodel */,
 				181C969F2B5DB5980042006E /* tip.mp3 */,
 				A838534B2ADA7C0200346038 /* BackGround.xcassets */,
@@ -574,13 +595,18 @@
 				A88EFE092A7FAD1100897243 /* SettingViewModel.swift in Sources */,
 				B03B7B2D2A963C05006A0647 /* Card.swift in Sources */,
 				181C969E2B5D9DC90042006E /* SelectGameView.swift in Sources */,
+				184F40A72B60FE170001B3DC /* LoadingView.swift in Sources */,
+				181C96AA2B60DD610042006E /* CardNineGame.swift in Sources */,
+				181C96AC2B60E26A0042006E /* JiaJiaBaoGame.swift in Sources */,
 				A8E0E2E52AADEF560091FC1D /* ThreeMenGame.swift in Sources */,
 				A887B64E2A7FDF56009F488F /* RecordHistoryViewModel.swift in Sources */,
 				B058BE612B0A0D6F0078E792 /* TestView.swift in Sources */,
 				18CA14D2284AC42C00F90372 /* ViewModel.swift in Sources */,
 				A88F20AE2A13A470005E4A27 /* PokerBull.swift in Sources */,
+				181C96A22B5F86090042006E /* cardDetection_s_0123.mlmodel in Sources */,
 				A8D0D9362A24A4C20061A90E /* TexasPoker.swift in Sources */,
 				A875FED72B5D1601003D51C3 /* cardDetection_n_0121.mlmodel in Sources */,
+				181C96A82B60DC180042006E /* ChickenBattleGame.swift in Sources */,
 				B058BE5D2B09F70E0078E792 /* BlurDetector_origin.swift in Sources */,
 				A8FBC7C22A3F0A5C00EDDFD7 /* CVUtils.swift in Sources */,
 				A8EFFEB12B28766C00FC884F /* CutNumRangeSettingView.swift in Sources */,
@@ -589,6 +615,7 @@
 				A88EFE0D2A7FDC9500897243 /* RecordHistoryView.swift in Sources */,
 				18CA14D6284AC42C00F90372 /* CameraView.swift in Sources */,
 				A88EFE072A7FA95A00897243 /* SettingView.swift in Sources */,
+				184F40AB2B610EF50001B3DC /* CardNineRuleSettingView.swift in Sources */,
 				A83853532ADA918000346038 /* CustomUI.swift in Sources */,
 				A8E0E2E72AADF6E20091FC1D /* TwoEightGangGame.swift in Sources */,
 				A887B6502A7FE1AF009F488F /* ShowRecordHistoryView.swift in Sources */,
@@ -599,6 +626,7 @@
 				A8E0E2EB2AAE00620091FC1D /* TinyNineGameRuleSettingView.swift in Sources */,
 				A87A82052B2EF66200B1B37B /* DealTypeView.swift in Sources */,
 				A8FBC7BB2A3DF1B000EDDFD7 /* SuitRulesView.swift in Sources */,
+				181C96AE2B60F03C0042006E /* JiaJiaBaoGameRuleSettingView.swift in Sources */,
 				A80D65F82AFF75ED005B5E5E /* AddRuleSettingView.swift in Sources */,
 				A8E0E2ED2AAE00740091FC1D /* ThreeMenGameRuleSettingView.swift in Sources */,
 			);

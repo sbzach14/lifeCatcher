@@ -57,11 +57,11 @@ class TinyNineGameRule : Rule{
 
 
 class TinyNineGame{
-    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int]) {
+    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
         print("Rank rules \(rankRules)")
         var deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (winners, leftCards)
+        let (winners, leftCards, winnerRanks) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winners, leftCards, winnerRanks)
     }
     
     static func legalCheck(playerNum: Int) -> String{
@@ -122,7 +122,7 @@ class TinyNineGame{
     //5 blackJokerValueRange
     //6 samePointComparision
     
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
         let rule  = GameManager.gameRules[3] as! TinyNineGameRule
         let dealType = args[0]
         let diyDealType = args[1]
@@ -135,10 +135,11 @@ class TinyNineGame{
         
         var maxRank = 0
         var winners: [Int] = []
+        var winnerRanks: [Int] = []
         var allPlayCards: [Player] = []
         var community = [Card]()
         if deck.count < TinyNineGame.getMinCardNum(playerNum: playerNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
-            return ([], [])
+            return ([], [],[])
         }
         
         for _ in 0..<playerNum {
@@ -214,6 +215,7 @@ class TinyNineGame{
         let sortedResultList =  resultList.sorted(by: {$0.rank > $1.rank })
         for result in sortedResultList {
             winners.append(result.playerID)
+            winnerRanks.append(result.rank)
         }
         
         var leftCards:[Int] = []
@@ -226,7 +228,7 @@ class TinyNineGame{
         }
         
         print("winners \(winners)")
-        return (winners, leftCards)
+        return (winners, leftCards, winnerRanks)
     }
 }
 

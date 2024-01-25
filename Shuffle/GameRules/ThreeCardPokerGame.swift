@@ -143,12 +143,12 @@ class ThreeCardPokerGameRule : Rule{
 class ThreeCardPokerGame{
     
     
-    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int], [Int]) {
+    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int], [Int], [Int]) {
         
         var deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
+        let (winners, leftCards,winnerRanks) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
         print("winners2 \(winners)")
-        return (winners, leftCards)
+        return (winners, leftCards,winnerRanks)
     }
     
     static func legalCheck(playerNum: Int, minRank: Int, handNum: Int, isHeadCard: Int, isRedJoker: Int, isBlackJoker: Int) -> String{
@@ -207,7 +207,7 @@ class ThreeCardPokerGame{
     }
     
     
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
         print("炸金花参数 \(args)")
         let rule = GameManager.gameRules[2] as! ThreeCardPokerGameRule
         let dealType = args[0]
@@ -229,10 +229,11 @@ class ThreeCardPokerGame{
         
         var maxRank = 0
         var winners: [Int] = []
+        var winnerRanks: [Int] = []
         var allPlayCards: [Player] = []
         var community = [Card]()
         if deck.count < ThreeCardPokerGame.getMinCardNum(playerNum: playerNum, handNum: handNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
-            return ([],[])
+            return ([],[],[])
         }
         
         for _ in 0..<playerNum {
@@ -328,6 +329,7 @@ class ThreeCardPokerGame{
         
         for result in sortedResultList {
             winners.append(result.playerID)
+            winnerRanks.append(result.rank)
         }
         
         var leftCards: [Int] = []
@@ -338,7 +340,7 @@ class ThreeCardPokerGame{
             leftCards = []
         }
         print("winners \(winners)")
-        return (winners, leftCards)
+        return (winners, leftCards, winnerRanks)
     }
 }
 

@@ -3,7 +3,8 @@ import AVFoundation
 
 @main
 struct MyApp: App {
-    
+    @State private var showMainMenu = false
+
     init(){
         // 创建导航栏外观样式
         let appearance = UINavigationBarAppearance()
@@ -20,14 +21,24 @@ struct MyApp: App {
     
     var body: some Scene {
         WindowGroup {
-//            TestView()
-            MainMenuView().onAppear {
-                requestPermissions()
-                initFile()
-                timeCheck()
+            if self.showMainMenu == true{
+                MainMenuView().onAppear {
+                    requestPermissions()
+                    initFile()
+                    timeCheck()
+                }
+            } else {
+                LoadingView().onAppear {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        withAnimation(Animation.linear(duration: 0.5)) {
+                            self.showMainMenu = true
+                        }
+                    }
+                }
             }
         }
     }
+    
     
     private func requestPermissions() {
         AVCaptureDevice.requestAccess(for: .video) { granted in

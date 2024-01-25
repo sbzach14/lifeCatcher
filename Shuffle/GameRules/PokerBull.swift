@@ -263,7 +263,7 @@ class PokerBullRule : Rule{
 }
 
 class PokerBull{
-    static func FindWinner(diyDealStatus:[[Bool]], diyDealNum:[Int], inputCards:[Int], args:[Int], rankRules:[Int], suitRules: [Int]) -> ([Int],[Int]) {
+    static func FindWinner(diyDealStatus:[[Bool]], diyDealNum:[Int], inputCards:[Int], args:[Int], rankRules:[Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
         
         let testCardLabelDic : [Int:String] = [
             0: "♠️A ", 1: "♠️2 ", 2: "♠️3 ", 3: "♠️4 ", 4: "♠️5 ", 5: "♠️6 ", 6: "♠️7 ", 7: "♠️8 ", 8: "♠️9 ", 9: "♠️10 ",
@@ -286,8 +286,8 @@ class PokerBull{
         }
         print(inputString)
         
-        let (winnersArray, leftCards) = PokerBullGame.calResult(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, cardArray: inputCards, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (winnersArray, leftCards)
+        let (winnersArray, leftCards, winnerRanks) = PokerBullGame.calResult(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, cardArray: inputCards, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winnersArray, leftCards, winnerRanks)
     }
     
     static func legalCheck(playerNum: Int, handNum: Int, cardNum: Int)->String{
@@ -657,13 +657,13 @@ class PokerBullGame {
         // Rest of the PokerBullCard class translation...
     }
     
-    static func calResult(diyDealStatus:[[Bool]], diyDealNum:[Int], cardArray: [Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int]) {
+    static func calResult(diyDealStatus:[[Bool]], diyDealNum:[Int], cardArray: [Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
         let deck = initDeck(initialCards: cardArray, suitRules: suitRules)
-        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules,suitRules: suitRules)
-        return (winners, leftCards)
+        let (winners, leftCards, winnerRanks) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules,suitRules: suitRules)
+        return (winners, leftCards, winnerRanks)
     }
     
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
         // 解析 args
         //TODO 整理牛牛的参数，并且debug
         print("牛牛参数长度 \(args.count) 牛牛参数 \(args)")
@@ -695,7 +695,7 @@ class PokerBullGame {
         var allPlayers: [BullPlayer] = (0..<playerNum).map { BullPlayer(playerIndex: $0) }
         var community = [PokerBullCard]()
         if deck.count < PokerBull.GetMinCardNum(playerNum: playerNum, handNum: handNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
-            return ([], [])
+            return ([], [],[])
         }
         
         if wayToDealCards == 0{
@@ -773,8 +773,18 @@ class PokerBullGame {
         if leftCards.count < PokerBull.GetMinCardNum(playerNum: playerNum, handNum: handNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
             leftCards = []
         }
+        var sortedPlayers = allPlayers.sorted{$0.evaluateFlag > $1.evaluateFlag}
         
-        return ([allPlayers.sorted { $0.evaluateFlag > $1.evaluateFlag }[0].playerID],leftCards)
+        var winners:[Int] = []
+        var winnerRanks:[Int] = []
+        
+        for player in sortedPlayers{
+            winners.append(player.playerID)
+            winnerRanks.append(player.evaluateFlag)
+        }
+        print("winners \(winners), \(winnerRanks)")
+        
+        return (winners,leftCards,winnerRanks)
     }
     
     // Rest of the PokerBullGame class translation...

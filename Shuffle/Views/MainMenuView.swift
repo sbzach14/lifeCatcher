@@ -47,7 +47,7 @@ struct MainMenuView: View {
                     }
                 }
             }
-            .navigationBarTitle("记录此刻")
+            .navigationBarTitle("盘古")
             .background(
                 Image("bg")
                     .resizable()

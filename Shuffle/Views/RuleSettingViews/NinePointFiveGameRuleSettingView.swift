@@ -64,7 +64,7 @@ struct NinePointFiveGameRuleSettingView: View {
 //                )
 //                .hidden()
 //            )
-        }.navigationTitle("规则设置").background(Image("bg").resizable().scaledToFill())
+        }.navigationTitle("九点半规则设置").background(Image("bg").resizable().scaledToFill())
     }
     
     private func showAlertWithMessage() {

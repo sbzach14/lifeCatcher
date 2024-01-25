@@ -158,11 +158,11 @@ class ThreeMenGameRule : Rule{
 
 
 class ThreeMenGame{
-    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int]) {
+    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
         print("Rank Rules \(rankRules)")
         var deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (winners, leftCards)
+        let (winners, leftCards, winnerRanks) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winners, leftCards, winnerRanks)
     }
     
     static func legalCheck(playerNum: Int) -> String{
@@ -254,7 +254,7 @@ class ThreeMenGame{
     //6 isCompareSuit
     //7 threeCardComparision
     //8 mixManComparision
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
         let rule = GameManager.gameRules[4] as! ThreeMenGameRule
         let dealType = args[0]
         let diyDealType = args[1]
@@ -268,10 +268,11 @@ class ThreeMenGame{
         
         var maxRank = 0
         var winners: [Int] = []
+        var winnerRanks: [Int] = []
         var allPlayCards: [Player] = []
         var community = [Card]()
         if deck.count < ThreeMenGame.getMinCardNum(playerNum: playerNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
-            return ([], [])
+            return ([], [],[])
         }
         
         for _ in 0..<playerNum {
@@ -348,6 +349,7 @@ class ThreeMenGame{
         let sortedResultList =  resultList.sorted(by: {$0.rank > $1.rank })
         for result in sortedResultList {
             winners.append(result.playerID)
+            winnerRanks.append(result.rank)
         }
         var leftCards:[Int] = []
         for card in deck{
@@ -359,7 +361,7 @@ class ThreeMenGame{
         }
         
         print("winners \(winners)")
-        return (winners, leftCards)
+        return (winners, leftCards, winnerRanks)
     }
 }
 
@@ -380,10 +382,23 @@ class ThreeMenGameHandEvaluator{
     }
     
     func evalHand(cards: [Card], pointComparision: Int, samePointComparision: Int, isAAsMan: Int, isCompareSuit: Int, threeCardComparision: Int, mixManComparision: Int)->Int{
+        
         var cards = cards
+        
+        if isCompareSuit == 0{
+            for i in 0..<cards.count{
+                cards[i].suit[0] = 0
+            }
+        }
+        
+        print("手牌花色 \(cards[0].suit[0]) \(cards[1].suit[0]) \(cards[2].suit[0])")
+        
         cards.sort(by: { card1, card2 in
             return (card1.rank<<2 | card1.suit[0]) > (card2.rank << 2 | card2.suit[0])
         })
+        
+    
+        
         self.pointComparision = pointComparision
         self.samePointComparision = samePointComparision
         self.isAAsMan = isAAsMan
@@ -430,7 +445,7 @@ class ThreeMenGameHandEvaluator{
         return rankResult
     }
     func eval_anyThreeMan_allSameRank(cards: [Card]) -> Int{
-        if cards[0].rank > 10 && cards[1].rank > 10 && cards[2].rank > 10 {
+        if cards[0].rank >= 10 && cards[1].rank >= 10 && cards[2].rank >= 10 {
             return 1
         }
         

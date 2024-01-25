@@ -25,9 +25,10 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     
     // cardArray, 装有所以poker的array
     @Published var cardArray :  [Int] = []
-    @Published var winnerPlayer: [Int] = []
+    @Published var winnerPlayer: [[Int]] = []
+    @Published var winnerPlayerShow: String = ""
 
-    let model = try! cardDetection_n_0121()
+    let model = try! cardDetection_s_0123()
     let imageSize : [Int] = [640, 480]
     var originSize : [Float] = [0,0]
     
@@ -190,21 +191,25 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         startCamera()
 
 //        规则测试代码
-        for i in 0..<1{
-            print("测试用例 ",i + 1,"")
-            var randomCardArray = Array(0...51)
-            randomCardArray.shuffle()
-            self.cardArray = randomCardArray
-
-            var cardString:String = "当前牌库："
-            for cardIndex in cardArray{
-                cardString += cardLabelDic[cardIndex]! + " "
-            }
-            print(cardArray)
-            print(cardString)
-            self.cardArray = [0,13,26, 3,16,29, 4,5,6, 7,8,9, 42,45,47, 42,45,44, 5,19,33, 4,18,32,]
-            self.computeWinnerPlayer()
-        }
+        print("calArgs \(calModeArgs[2])")
+//        for i in 0..<1{
+//            print("测试用例 ",i + 1,"")
+//            var randomCardArray = Array(0...51)
+//            randomCardArray.shuffle()
+//            //切断
+//            randomCardArray = Array(randomCardArray.prefix(35))
+//            
+//            self.cardArray = randomCardArray
+//
+//            var cardString:String = "当前牌库："
+//            for cardIndex in cardArray{
+//                cardString += cardLabelDic[cardIndex]! + " "
+//            }
+//            print(cardArray)
+//            print(cardString)
+//            self.cardArray = [4,18,32, 4,6,0, 0,12,10, 1,2,4, 4,17,30, 13,12,10, 1,15,4, 5,4,6, 18,30,6, 53,54,3, 53,4,5, 54,6,20, 53,4,0, 54,7,22, 8,32,41]
+//            self.computeWinnerPlayer()
+//        }
 
     }
     
@@ -218,6 +223,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         cardArray = []
         lastCards = [[-1], [-1]]
         winnerPlayer = []
+        winnerPlayerShow = ""
         stateCounter = 0
         stateCard = [-1, -1]
         tempCardArray = []
@@ -1408,20 +1414,31 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 //        else{
 //            speakText(input: 1)
 //        }
-        
+        print("开始需要的最少牌数 \(minCardNum)")
         if cardArray.count >= minCardNum{
             winnerPlayer = GameManager.selectGame(gameIndex: ruleIndex, inputCards: cardArray, playerNum: playerNum, args: args, rankRules: rankRules, suitRules: suitRules, dealType: dealType, diyDealType: diyDealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, cutSetting: cutSetting, minCardNum: minCardNum)
+            
+            winnerPlayerShow = ""
+            for winnerSet in winnerPlayer{
+                for winner in winnerSet{
+                    winnerPlayerShow += String(winner + 1) + " "
+                }
+                winnerPlayerShow += "/"
+            }
+            
             if calModeArgs[0] == 0{
                 print("每轮游戏胜者 \(winnerPlayer)")
-            } else if calModeArgs[0] == 1{
-                print("每轮切第几张最大 \(winnerPlayer)")
-            } else if calModeArgs[1] == 2{
-                print("每轮切第几张最小 \(winnerPlayer)")
+            } else if calModeArgs[1] == 0{
+                print("每轮切第几张目标位置最大 \(winnerPlayer)")
+            } else if calModeArgs[1] == 1{
+                print("每轮切第几张目标位置最小 \(winnerPlayer)")
+            } else if calModeArgs[1] == 2 {
+                print("目标生死门 \(winnerPlayer)")
             }
             speakText(input: winnerPlayer)
         }
         else{
-            //speakText(input: "检测错误")
+            speakText(input: "检测错误")
         }
     }
     
@@ -1436,19 +1453,28 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     }
     
 
-    func speakText(input: [Int]) {
-        if !self.isMute{
-            speechSynthesizer.stopSpeaking(at: .immediate)
-            if input.isEmpty {
-                let speechUtterance = AVSpeechUtterance(string: "无")
-                speechSynthesizer.speak(speechUtterance)
-            } else {
-                let speechStrings = input.map { String($0 + 1) }
-                let joinedSpeech = speechStrings.joined(separator: "和")
-                let speechUtterance = AVSpeechUtterance(string: joinedSpeech)
-                speechSynthesizer.speak(speechUtterance)
+    func speakText(input: [[Int]]) {
+            if !self.isMute{
+                speechSynthesizer.stopSpeaking(at: .immediate)
+                
+                for eachInput in input{
+                    print("播报的input \(eachInput)")
+                    if eachInput.isEmpty {
+                        let speechUtterance = AVSpeechUtterance(string: "无")
+                        speechUtterance.postUtteranceDelay = 0.3
+                        speechSynthesizer.speak(speechUtterance)
+                    } else {
+                        let speechStrings = eachInput.map { String($0 + 1) }
+                        let joinedSpeech = speechStrings.joined(separator: "和")
+                        let speechUtterance = AVSpeechUtterance(string: joinedSpeech)
+                        speechUtterance.postUtteranceDelay = 0.3
+                        speechSynthesizer.speak(speechUtterance)
+                    }
+                }
             }
-        }
+            
+        
+        
     }
 
     

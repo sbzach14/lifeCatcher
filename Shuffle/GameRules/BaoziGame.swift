@@ -177,11 +177,11 @@ class BaoziGameRule : Rule{
 
 
 class BaoziGame{
-    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int]) {
+    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
         
         var deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (winners, leftCards)
+        let (winners, leftCards, winnerRanks) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winners, leftCards, winnerRanks)
     }
     
     static func legalCheck(playerNum: Int) -> String{
@@ -283,7 +283,7 @@ class BaoziGame{
     //8 pointComparision
     //9 cardRank
     //10 pairRank
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
         let dealType = args[0]
         let diyDealType = args[1]
         let playerNum = args[2]
@@ -298,10 +298,11 @@ class BaoziGame{
         
         var maxRank = 0
         var winners: [Int] = []
+        var winnerRanks:[Int] = []
         var allPlayCards: [Player] = []
         var community = [Card]()
         if deck.count < self.getMinCardNum(playerNum: playerNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
-            return ([], [])
+            return ([], [], [])
         }
         
         
@@ -380,6 +381,7 @@ class BaoziGame{
         let sortedResultList =  resultList.sorted(by: {$0.rank > $1.rank })
         for result in sortedResultList {
             winners.append(result.playerID)
+            winnerRanks.append(result.rank)
         }
         
         var leftCards:[Int] = []
@@ -391,7 +393,7 @@ class BaoziGame{
         }
         
         print("winners \(winners)")
-        return (winners, leftCards)
+        return (winners, leftCards, winnerRanks)
     }
 }
 
@@ -428,6 +430,8 @@ class BaoziGameHandEvaluator{
         var score = 0
         let num1 = BaoziCard(card: cards[0], KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, JokerValueRange: JokerValueRange, cardRank: cardRank)
         let num2 = BaoziCard(card: cards[1], KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, JokerValueRange: JokerValueRange, cardRank: cardRank)
+        print("手牌 \(GameManager.cardLabelDic[cards[0].cardIndex])  \(GameManager.cardLabelDic[cards[1].cardIndex]) rank \(num1.rank) \(num2.rank) point \(num1.point) \(num2.point) suit \(num1.suit) \(num2.suit)")
+        
         var i = self.rankRules.count + 1
         for ruleIndex in self.rankRules{
             let rank = self.rankRulesDic[ruleIndex]!([num1, num2])
@@ -436,6 +440,7 @@ class BaoziGameHandEvaluator{
                 continue
             } else {
                 score = (1<<(i + 12)) | rank
+                print("牌型 \(ruleIndex) score \(score)")
                 return score
             }
         }
@@ -453,7 +458,12 @@ class BaoziGameHandEvaluator{
     func eval_isPair(cards:[BaoziCard]) -> Int{
         if cards[0].originalRank == cards[1].originalRank {
             if self.PairRank == 0 {
-                return cards[0].rank
+                if self.samePointComparision == 3{
+                    return cards[0].rank << 2 | (self.blackRedJudger(card: cards[0]) + self.blackRedJudger(card: cards[1]))
+                    
+                } else {
+                    return cards[0].rank
+                }
             } else {
                 return 1
             }
@@ -502,24 +512,21 @@ class BaoziGameHandEvaluator{
             point = (point + mod - 1) % mod
         }
         if self.samePointComparision == 0 {
-            return point
+            return point + 1
         } else if self.samePointComparision == 1 {
-            return point << 4 | max(cards[0].rank, cards[1].rank)
+            return point << 4 | max(cards[0].rank, cards[1].rank) + 1
         } else if self.samePointComparision == 2 {
-            return point << 4 | max(cards[0].rank, cards[1].rank)
+            return point << 4 | max(cards[0].rank, cards[1].rank) + 1
         } else if self.samePointComparision == 3 {
             
-            return point << 6 | max(cards[0].rank, cards[1].rank) | (self.blackRedJudger(card: cards[0]) + self.blackRedJudger(card: cards[1]))
+            return point << 6 | max(cards[0].rank, cards[1].rank) << 2 | (self.blackRedJudger(card: cards[0]) + self.blackRedJudger(card: cards[1]))
         }
-        
-        
-        
         return 0
     }
     
     func blackRedJudger(card: BaoziCard) -> Int{
         //红
-        if card.suit == 1 || card.suit == 3 {
+        if self.suitRules.firstIndex(of: card.suit) == 1 || self.suitRules.firstIndex(of: card.suit) == 3 {
             return 1
         //黑
         } else{
@@ -542,19 +549,15 @@ class BaoziCard{
         if card.rank > 13{
             self.rank = card.rank + 1
         }
-        
-        if card.rank == 1 && cardRank == 1{
+        else if card.rank == 1 && cardRank == 1{
             self.rank = 14
         }
-        else{
-            self.rank = card.rank
-        }
-        
-        if card.rank >= 10 && card.rank <= 13 && cardRank == 2 {
+        else if card.rank >= 10 && card.rank <= 13 && cardRank == 2 {
             self.rank = 10
         } else {
             self.rank = card.rank
         }
+        
         //point initialization
         if card.rank == 11{
             self.point = Int(rule.JValueRange[JValueRange]!)!
@@ -572,7 +575,7 @@ class BaoziCard{
             self.point = Int(rule.JokerValueRange[JokerValueRange]!)!
         }
         else{
-            point = cardRank
+            self.point = card.rank
         }
         
         //如果Q算半点大家全部*2
