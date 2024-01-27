@@ -13,7 +13,7 @@ public func TimeLimitations(activeDate: Date, nowDate: Date) -> Bool {
     // 计算当前日期与激活日期的时间间隔
     let timeInterval = nowDate.timeIntervalSince(activeDate)
     
-    // 判断时间间隔是否超过十五天
+    
     let maxTimeInterval: TimeInterval = 365 * 24 * 60 * 60 // 365 天的时间间隔
     if timeInterval <= maxTimeInterval {
         return true
