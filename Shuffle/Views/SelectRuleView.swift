@@ -66,6 +66,7 @@ struct SelectRuleView: View {
                     .background(Color.clear)
                     .listRowBackground(Color.clear)
                 
+                Spacer()
                 
                 HStack{
                     
