@@ -256,6 +256,9 @@ class GameManager {
                     if target == 2{
                         reportResult.append([100 * aliveTimes / totalTimes])
                     }
+                    if reportResult.count != i + 1{
+                        reportResult.append([])
+                    }
                     if currentCards.count == 0{
                         break
                     }
@@ -274,6 +277,7 @@ class GameManager {
                     var totalTimes = 0
                     
                     print("下一轮--------")
+                    
 
                     for cardIndex in (cutNumRangeSetting[0] - 1)...(cutNumRangeSetting[1] - 1){
                         let cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: currentCards[cardIndex])
@@ -323,6 +327,9 @@ class GameManager {
                     //生死门暂时没有连报
                     if target == 2{
                         reportResult.append([100 * aliveTimes / totalTimes])
+                    }
+                    if reportResult.count != i + 1{
+                        reportResult.append([])
                     }
                     if currentCards.count == 0 {
                         break
@@ -1620,8 +1627,10 @@ public class RuleManager{
                 var KValueRange = 0
                 var QValueRange = 0
                 var JValueRange = 0
+                var handNum = 0
+                var isCompareSuit = 1
                 
-                args = [samePointComparision,CardRankList,redJokerValueRange,blackJokerValueRange,KValueRange,QValueRange,JValueRange]
+                args = [samePointComparision,CardRankList,redJokerValueRange,blackJokerValueRange,KValueRange,QValueRange,JValueRange, handNum, isCompareSuit]
                 suitRules = [0,1,0,1]
                 rankRules = [4,2,1,0]
                 rankRuleChecked = [1,1,1,1]
@@ -1629,6 +1638,62 @@ public class RuleManager{
                 allPreSetRules[i]![0]!.append(suitRules)
                 allPreSetRules[i]![0]!.append(rankRules)
                 allPreSetRules[i]![0]!.append(rankRuleChecked)
+                //通用54张佳佳宝，比四张
+                samePointComparision = 0
+                CardRankList = 0
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                handNum = 1
+                isCompareSuit = 1
+                args = [samePointComparision,CardRankList,redJokerValueRange,blackJokerValueRange,KValueRange,QValueRange,JValueRange, handNum, isCompareSuit]
+                suitRules = [0,1,0,1]
+                rankRules = [4,2,1,0]
+                rankRuleChecked = [1,1,1,1]
+                allPreSetRules[i]![1]!.append(args)
+                allPreSetRules[i]![1]!.append(suitRules)
+                allPreSetRules[i]![1]!.append(rankRules)
+                allPreSetRules[i]![1]!.append(rankRuleChecked)
+                
+//                2: "通用四张，9点对子算点数",
+                samePointComparision = 1
+                CardRankList = 1
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 1
+                QValueRange = 1
+                JValueRange = 0
+                handNum = 0
+                isCompareSuit = 0
+                args = [samePointComparision,CardRankList,redJokerValueRange,blackJokerValueRange,KValueRange,QValueRange,JValueRange, handNum, isCompareSuit]
+                suitRules = [0,1,0,1]
+                rankRules = [0]
+                rankRuleChecked = [1]
+                allPreSetRules[i]![2]!.append(args)
+                allPreSetRules[i]![2]!.append(suitRules)
+                allPreSetRules[i]![2]!.append(rankRules)
+                allPreSetRules[i]![2]!.append(rankRuleChecked)
+//                3: "通用四张，54张佳佳宝1",
+                samePointComparision = 1
+                CardRankList = 1
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                handNum = 1
+                isCompareSuit = 1
+                args = [samePointComparision,CardRankList,redJokerValueRange,blackJokerValueRange,KValueRange,QValueRange,JValueRange, handNum, isCompareSuit]
+                suitRules = [0,1,0,1]
+                rankRules = [4,2,1,0]
+                rankRuleChecked = [1,1,1,1]
+                allPreSetRules[i]![3]!.append(args)
+                allPreSetRules[i]![3]!.append(suitRules)
+                allPreSetRules[i]![3]!.append(rankRules)
+                allPreSetRules[i]![3]!.append(rankRuleChecked)
+                
                 break
             case 9:
                 //杭州小牌九

@@ -6,12 +6,15 @@ import Foundation
 //九点半
 
 class JiaJiaBaoGameRule : Rule{
+    
     let samePointComparision: [Int: String] = [
         0:"同点比最大牌",
+        1:"同点庄家大"
     ]
     
     let CardRankList: [Int:String] = [
-        0:"王>红A>红K....红2>黑 A>黑K>....黑2最小"
+        0:"王>红A>红K....红2>黑 A>黑K>....黑2最小",
+        1:"王>A>K>...2"
     ]
     
     let redJokerValueRange: [Int:String] = [
@@ -21,13 +24,23 @@ class JiaJiaBaoGameRule : Rule{
         0:"1"
     ]
     let KValueRange: [Int:String] = [
-        0:"3"
+        0:"3",
+        1:"1"
     ]
     let QValueRange: [Int: String] = [
-        0:"2"
+        0:"2",
+        1:"1"
     ]
     let JValueRange: [Int: String] = [
         0:"1"
+    ]
+    let handNum: [Int: String] = [
+        0:"2",
+        1:"4"
+    ]
+    let isCompareSuit: [Int:String] = [
+        0:"否",
+        1:"是"
     ]
     
     
@@ -40,11 +53,14 @@ class JiaJiaBaoGameRule : Rule{
             2:"红对子",
             3:"混队子",
             4:"对王",
-            
+            5:"对子"
         ]
         self.setting = [
             0: "通用54张佳佳宝",
-            1: "自定义佳佳宝",
+            1: "通用54张佳佳宝，比四张（todo）",
+            2: "通用四张，9点对子算点数（todo）",
+            3: "通用四张，54张佳佳宝1（todo）",
+            4: "自定义佳佳宝",
         ]
         self.ruleInfo = [
             0:"""
@@ -53,8 +69,23 @@ class JiaJiaBaoGameRule : Rule{
     2)9点>8点>....0点最小
     3) 王为1点，K为3点,Q为2点，J为1点。
     4) 最大牌从大到小:王>红A>红K....红2>黑 A>黑K>....黑2最小
-    """,
+    """, 
             1:"""
+    和通用佳佳宝规则一样, 发四张比两轮，比前两张和后两张
+    """,
+            2:"""
+    扑克张数:54 52不分花色
+    1)9点最大0点最小，对子算点数
+    2) J/Q/K王算1点，同点庄大
+    """,
+            3:"""
+    54张佳佳宝，不分花色
+    对王最大>对A>对K...对2
+    9点>8点>....0点最小
+    3)王为1点，K为3点,Q为2点，J为1点。
+    """,
+            
+            4:"""
     自定义你的规则
     """,
 
@@ -76,9 +107,9 @@ class JiaJiaBaoGame{
         return (winners, leftCards, winnerRanks)
     }
     
-    static func legalCheck(playerNum: Int) -> String{
+    static func legalCheck(playerNum: Int, handNum: Int) -> String{
         var errMessage : String = ""
-        if(playerNum * 2 > 54)
+        if(playerNum * handNum > 54)
         {
             errMessage = "需要牌数量超出牌堆总数，请重新设置！"
         }
@@ -91,6 +122,12 @@ class JiaJiaBaoGame{
         case 0:
             result = Array(0...51) + [53,54]
             break
+        case 1:
+            result = Array(0...51) + [53,54]
+        case 2:
+            result = Array(0...51) + [53,54]
+        case 3:
+            result = Array(0...51) + [53,54]
         default:
             result = Array(0...51) + [53,54]
             break
@@ -99,7 +136,7 @@ class JiaJiaBaoGame{
         return result
     }
     
-    static func getMinCardNum(playerNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+    static func getMinCardNum(playerNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], handNum: Int) -> Int{
         
         if dealType == 0 || dealType == 1{
             return playerNum * 2
@@ -133,9 +170,12 @@ class JiaJiaBaoGame{
     //7 KValueRange
     //8 QValueRange
     //9 JValueRange
+    //10 handNum
+    //11 isCompareSuit
 
     
     static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
+        let rule = GameManager.gameRules[8] as! JiaJiaBaoGameRule
         let dealType = args[0]
         let diyDealType = args[1]
         let playerNum = args[2]
@@ -146,6 +186,9 @@ class JiaJiaBaoGame{
         let KValueRange = args[7]
         let QValueRange = args[8]
         let JValueRange = args[9]
+        let handNum :Int = Int(rule.handNum[args[10]]!)!
+        let isCompareSuit = args[11]
+        
 
         
         var maxRank = 0
@@ -153,7 +196,7 @@ class JiaJiaBaoGame{
         var winnerRanks: [Int] = []
         var allPlayCards: [Player] = []
         var community = [Card]()
-        if deck.count < self.getMinCardNum(playerNum: playerNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
+        if deck.count < self.getMinCardNum(playerNum: playerNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, handNum: handNum){
             return ([], [], [])
         }
         
@@ -165,7 +208,7 @@ class JiaJiaBaoGame{
         var deck = deck
         // 发牌
         if dealType == 0 || dealType == 1{
-            for _ in 0..<2 {
+            for _ in 0..<handNum {
                 if dealType == 0{
                     for i in 0..<playerNum {
                         allPlayCards[i].insertCard(card: deck.removeFirst())
@@ -213,13 +256,16 @@ class JiaJiaBaoGame{
             }
         }
         
+        if handNum == 2{
+            
+        }
         
-        
+
         for i in 0..<playerNum {
             allPlayCards[i].evaluateFlag = JiaJiaBaoGameHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules
-            ).evalHand(cards: allPlayCards[i].playerCard, redJokerValueRange: redJokerValueRange,blackJokerRange: blackJokerValueRange,KValueRange: KValueRange,QValueRange: QValueRange,JValueRange: JValueRange,samePointComparision: samePointComparision, cardRankList: CardRankList)
+            ).evalHand(cards: allPlayCards[i].playerCard, redJokerValueRange: redJokerValueRange,blackJokerRange: blackJokerValueRange,KValueRange: KValueRange,QValueRange: QValueRange,JValueRange: JValueRange,samePointComparision: samePointComparision, cardRankList: CardRankList, isCompareSuit: isCompareSuit)
         }
         
         
@@ -239,7 +285,7 @@ class JiaJiaBaoGame{
         for card in deck{
             leftCards.append(card.cardIndex)
         }
-        if leftCards.count < JiaJiaBaoGame.getMinCardNum(playerNum: playerNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+        if leftCards.count < JiaJiaBaoGame.getMinCardNum(playerNum: playerNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, handNum: handNum){
             leftCards = []
         }
         print("winners \(winners)")
@@ -267,16 +313,16 @@ class JiaJiaBaoGameHandEvaluator{
         ]
     }
     
-    func evalHand(cards: [Card], redJokerValueRange: Int, blackJokerRange: Int, KValueRange: Int, QValueRange: Int, JValueRange: Int, samePointComparision: Int, cardRankList: Int)->Int{
+    func evalHand(cards: [Card], redJokerValueRange: Int, blackJokerRange: Int, KValueRange: Int, QValueRange: Int, JValueRange: Int, samePointComparision: Int, cardRankList: Int, isCompareSuit: Int)->Int{
         var cards = cards
         self.samePointComparision = samePointComparision
         
         
         
         
-        let num1 = JiaJiaBaoCard(card: cards[0], redJokerValueRange: redJokerValueRange, blackJokerValueRange: blackJokerRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange,CardRankList: cardRankList)
+        let num1 = JiaJiaBaoCard(card: cards[0], redJokerValueRange: redJokerValueRange, blackJokerValueRange: blackJokerRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange,CardRankList: cardRankList, isCompareSuit: isCompareSuit)
         
-        let num2 = JiaJiaBaoCard(card: cards[1], redJokerValueRange: redJokerValueRange, blackJokerValueRange: blackJokerRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, CardRankList: cardRankList)
+        let num2 = JiaJiaBaoCard(card: cards[1], redJokerValueRange: redJokerValueRange, blackJokerValueRange: blackJokerRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, CardRankList: cardRankList, isCompareSuit: isCompareSuit)
         
         var numList = [num1, num2]
         numList = numList.sorted(by: {$0.rank > $1.rank})
@@ -343,12 +389,17 @@ class JiaJiaBaoGameHandEvaluator{
         var suit: Int = 0
         var cardIndex: Int = 0
         
-        init(card: Card, redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange: Int, JValueRange: Int, CardRankList: Int){
+        init(card: Card, redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange: Int, JValueRange: Int, CardRankList: Int, isCompareSuit: Int){
             let rule = GameManager.gameRules[8] as! JiaJiaBaoGameRule
             //cardIndex Initialization
             self.cardIndex = card.cardIndex
             //suit Initialization
-            self.suit = card.suit[0]
+            if isCompareSuit == 0{
+                self.suit = 0
+            } else {
+                self.suit = card.suit[0]
+            }
+            
             //Point Initialization
             if card.rank == 15 {
                 self.point =  Int(rule.redJokerValueRange[redJokerValueRange]!)!

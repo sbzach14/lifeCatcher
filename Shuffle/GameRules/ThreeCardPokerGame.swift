@@ -103,7 +103,7 @@ class ThreeCardPokerGameRule : Rule{
             0: "金花",
             1: "金花顺大",
             2: "金花AKJ",
-            3: "百变金花",
+            3: "金花",
             4: "自定义"
         ]
         self.ruleInfo = [
