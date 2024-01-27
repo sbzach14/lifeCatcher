@@ -18,7 +18,9 @@ class generalRuleSetting{
         4:"三公",
         5:"二八杠",
         6:"九点半",
-        7:"宝子"
+        7:"宝子",
+        8:"佳佳宝",
+        9:"牌九"
     ]
     static let allCalMode: [Int: String] = [
         0:"不打色",
@@ -64,7 +66,9 @@ class generalRuleSetting{
     static let allConsecutiveReport:[Int:String] = [
         0: "1",
         1: "2",
-        2: "3"
+        2: "3",
+        3: "4",
+        4: "5"
     ]
     static let allCuttingSetting: [Int: String] = [
         0:"切牌",
@@ -97,7 +101,7 @@ struct AddRuleSettingView: View{
     @State private var cutNumSetting: Int = 0
     @State private var reportSetting: Int = 0
     //打色范围
-    @State private var cutNumRangeSetting: [Int] = [2,10]
+    @State private var cutNumRangeSetting: [Int] = [1,5]
     @State private var positionSetting: Int = 0
     @State private var consecutiveReport: Int = 0
     @State private var cutSetting: Int = 0
@@ -108,6 +112,7 @@ struct AddRuleSettingView: View{
     @State private var rankRules: [RankRulesSate] = []
     
     @State private var showAlert = false
+    @State private var showRuleInfo = false
     @State private var saveSuccessAlert = false
     @State private var alertMessage = ""
     @State private var isNavigateToSelectRuleView = false
@@ -121,16 +126,17 @@ struct AddRuleSettingView: View{
     private func SetUpAll(){
         print("init success")
         
-        _selectedSaveIndex = self.selectedSaveIndex
         
         //新建规则时初始化
         if self.selectedSaveIndex == -1 && self.editType == 0{
             
             print("init new rule")
+            _selectedSaveIndex = self.selectedSaveIndex
+
             let selectedRule = GameManager.gameRules[gameType]!
             self.playerNumList = selectedRule.playerNum
             self.currentNum = playerNumList[self.playerNum]
-            self.cutNumRangeSetting = [2,10]
+            self.cutNumRangeSetting = [1,5]
             for cardIndex in 0...54{
                 if cardIndex != 52{
                     self.cardToUse.append(cardIndex)
@@ -145,6 +151,8 @@ struct AddRuleSettingView: View{
         //选择已经保存的规则时初始化
         }else if self.selectedSaveIndex > -1 && editType == 0{
             print("init rule \(self.selectedSaveIndex)")
+            _selectedSaveIndex = self.selectedSaveIndex
+
             let rules = RuleManager.allUsersGameRule[self.selectedSaveIndex]
             
             let selectedRule = GameManager.gameRules[gameType]!
@@ -218,7 +226,7 @@ struct AddRuleSettingView: View{
                             Button(action: {
                                 // 点击按钮时，显示弹出窗口
                                 if self.setting != selectedRule!.setting.count - 1{
-                                    self.showAlert = true
+                                    self.showRuleInfo = true
                                 } else{
                                     self.isNavigateToGameSettingView = true
                                 }
@@ -228,7 +236,7 @@ struct AddRuleSettingView: View{
                             }
                             .frame(width: 10, height: 10, alignment: .trailing)
                             .padding(.trailing, 12.5)
-                                .alert(isPresented: $showAlert) {
+                                .alert(isPresented: $showRuleInfo) {
                                     Alert(
                                         title: Text("规则说明"),
                                         message: Text(selectedRule!.ruleInfo[setting]!),
@@ -437,8 +445,8 @@ struct AddRuleSettingView: View{
                                 Image("list_bg") // 背景图片
                                     .resizable()
                                     .scaledToFill()
-                            )
-                            .frame(height: 50)
+                            ).frame(height: 50)
+                            
                             //打色范围
     //                        cutNumRangeSetting[0] = Int(xInput)
                             HStack
@@ -448,11 +456,10 @@ struct AddRuleSettingView: View{
                                 Text("打色范围")
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .foregroundColor(.white) // 左侧间距
-                                NavigationLink(destination: CutNumRangeSettingView(cutNumRangeSetting: $cutNumRangeSetting)){
+                                NavigationLink(destination:  CutNumRangeSettingView(cutNumRangeSetting: $cutNumRangeSetting)){
                                     Text("\(cutNumRangeSetting[0])～\(cutNumRangeSetting[1])").frame(maxWidth: .infinity, alignment: .trailing)
                                         .foregroundColor(.white).padding(.trailing,40)
                                 }
-                                
                             }.background(
                                 Image("list_bg") // 背景图片
                                     .resizable()
@@ -469,8 +476,8 @@ struct AddRuleSettingView: View{
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .foregroundColor(.white) // 左侧间距
                                 Picker("positionSetting", selection: $positionSetting) {
-                                    ForEach(1...self.currentNum, id: \.self){
-                                        index in Text(String(index)).tag(index)
+                                    ForEach(0...self.currentNum - 1, id: \.self){
+                                        index in Text(String(index + 1)).tag(index)
                                     }
                                 }
                                 .pickerStyle(MenuPickerStyle())
@@ -631,7 +638,7 @@ struct AddRuleSettingView: View{
             break
         case 1:
             let selectedRule = GameManager.gameRules[gameType] as! PokerBullRule
-            allCardIndex = PokerBull.GetAllCardIndex()
+            allCardIndex = PokerBull.GetAllCardIndex(setting: self.setting)
             break
         case 2:
             let selectedRule = GameManager.gameRules[gameType] as! ThreeCardPokerGameRule
@@ -639,26 +646,30 @@ struct AddRuleSettingView: View{
             break
         case 3:
             let selectedRule = GameManager.gameRules[gameType] as! TinyNineGameRule
-            allCardIndex = TinyNineGame.getAllCardIndex()
+            allCardIndex = TinyNineGame.getAllCardIndex(setting: self.setting)
             break
         case 4:
             let selectedRule = GameManager.gameRules[gameType]
             as! ThreeMenGameRule
-            allCardIndex = ThreeMenGame.getAllCardIndex()
+            allCardIndex = ThreeMenGame.getAllCardIndex(setting: self.setting)
             break
         case 5:
             let selectedRule = GameManager.gameRules[gameType] as! TwoEightGangGameRule
-            allCardIndex = TwoEightGangGame.getAllCardIndex()
+            allCardIndex = TwoEightGangGame.getAllCardIndex(setting: self.setting)
             break
         case 6:
             let selectedRule = GameManager.gameRules[gameType] as! NinePointFiveGameRule
-            allCardIndex = NinePointFiveGame.getAllCardIndex()
+            allCardIndex = NinePointFiveGame.getAllCardIndex(setting: self.setting)
             break
         case 7:
             let selectedRule = GameManager.gameRules[gameType] as!
             BaoziGameRule
-            allCardIndex = BaoziGame.getAllCardIndex()
+            allCardIndex = BaoziGame.getAllCardIndex(setting: self.setting)
             break
+        case 8:
+            allCardIndex = JiaJiaBaoGame.getAllCardIndex(setting: self.setting)
+        case 9:
+            allCardIndex = CardNineGame.getAllCardIndex(setting: self.setting)
         default:
             print("GameType error")
         }
@@ -669,37 +680,43 @@ struct AddRuleSettingView: View{
         switch gameType {
         case 0:
             let selectedRule = GameManager.gameRules[gameType] as! TexasPokerRule
-            minCardNum = TexasPoker.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: selectedRule.handNum[args[3]], communityNum: selectedRule.communityNum[args[4]])
+            minCardNum = TexasPoker.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: selectedRule.handNum[args[3]], communityNum: selectedRule.communityNum[args[4]], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 1:
             let selectedRule = GameManager.gameRules[gameType] as! PokerBullRule
-            minCardNum = PokerBull.GetMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: selectedRule.handNum[args[1]])
+            minCardNum = PokerBull.GetMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: selectedRule.handNum[args[1]], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
         case 2:
             let selectedRule = GameManager.gameRules[gameType] as! ThreeCardPokerGameRule
-            minCardNum = ThreeCardPokerGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: selectedRule.handNum[args[0]])
+            minCardNum = ThreeCardPokerGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: selectedRule.handNum[args[0]], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 3:
             let selectedRule = GameManager.gameRules[gameType] as! TinyNineGameRule
-            minCardNum = TinyNineGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum])
+            minCardNum = TinyNineGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 4:
             let selectedRule = GameManager.gameRules[gameType]
             as! ThreeMenGameRule
-            minCardNum = ThreeMenGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum])
+            minCardNum = ThreeMenGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 5:
             let selectedRule = GameManager.gameRules[gameType] as! TwoEightGangGameRule
-            minCardNum = TwoEightGangGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum])
+            minCardNum = TwoEightGangGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 6:
             let selectedRule = GameManager.gameRules[gameType] as! NinePointFiveGameRule
-            minCardNum = NinePointFiveGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum])
+            minCardNum = NinePointFiveGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 7:
             let selectedRule = GameManager.gameRules[gameType] as!
             BaoziGameRule
-            minCardNum = BaoziGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum])
+            minCardNum = BaoziGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
+        case 8:
+            let selectedRule = GameManager.gameRules[gameType] as! JiaJiaBaoGameRule
+            minCardNum = JiaJiaBaoGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+        case 9:
+            let selectedRule = GameManager.gameRules[gameType] as! CardNineGameRule
+            minCardNum = CardNineGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
         default:
             print("GameType error")
         }
@@ -708,6 +725,10 @@ struct AddRuleSettingView: View{
     
     private func alertMessageCheck()-> String{
         var alertMessage:String = ""
+        if cutNumRangeSetting[0] > self.cardToUse.count || cutNumRangeSetting[1] > self.cardToUse.count || cutNumRangeSetting[0] > cutNumRangeSetting[1]{
+            alertMessage += "打色范围设置超出可用牌范围，或X值>Y值，请重新设置"
+            
+        }
         switch gameType {
         //德州
         case 0:
@@ -715,7 +736,6 @@ struct AddRuleSettingView: View{
             alertMessage = TexasPoker.legalCheck(playerNum: selectedRule.playerNum[playerNum], minRank: selectedRule.minRank[args[2]], handUseType: args[5], handUseNum: selectedRule.handUseNum[args[6]], handNum: selectedRule.handNum[args[3]], communityNum: selectedRule.communityNum[args[4]])
             break
         default:
-            print("GameType error")
             break
         }
         return alertMessage
@@ -740,6 +760,10 @@ struct AddRuleSettingView: View{
             return AnyView(NinePointFiveGameRuleSettingView(args: self.$args, suitRules: self.$suitRules, rankRules: self.$rankRules))
         case 7:
             return AnyView(BaoziGameRuleSettingView(args: self.$args, suitRules: self.$suitRules, rankRules: self.$rankRules))
+        case 8:
+            return AnyView(JiaJiaBaoGameRuleSettingView(args: self.$args, suitRules: self.$suitRules, rankRules: self.$rankRules))
+        case 9:
+            return AnyView(CardNineGameRuleSettingView(args: self.$args, suitRules: self.$suitRules, rankRules: self.$rankRules))
         default:
             return AnyView(EmptyView())
         }

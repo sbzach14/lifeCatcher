@@ -6,7 +6,7 @@ import Foundation
 //小九
 
 class TinyNineGameRule : Rule{
-    let handNum :[Int] = [2, 4]
+    let handNum :[Int] = [2]
     let redJokerValueRange:[Int:String] = [
         0: "1",
         1: "6"
@@ -57,11 +57,11 @@ class TinyNineGameRule : Rule{
 
 
 class TinyNineGame{
-    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int]) {
+    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
         print("Rank rules \(rankRules)")
         var deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (winners, leftCards)
+        let (winners, leftCards, winnerRanks) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winners, leftCards, winnerRanks)
     }
     
     static func legalCheck(playerNum: Int) -> String{
@@ -73,18 +73,44 @@ class TinyNineGame{
         return errMessage
     }
     
-    static func getAllCardIndex() -> [Int]{
+    static func getAllCardIndex(setting: Int) -> [Int]{
         var result : [Int] = []
-        for i in 0...3{
-            for rank in 0...9{//a-10
-                result.append(rank + i * 13)
-            }
+        switch setting{
+        case 0:
+            result = Array(0...9) + Array(13...22) + Array(26...35) + Array(39...48)
+            break
+        case 1:
+            result = Array(0...51) + [53,54]
+            break
+        default:
+            result = Array(0...51) + [53,54]
+            break
+            
         }
         return result
     }
     
-    static func getMinCardNum(playerNum: Int) -> Int{
-        return playerNum * 2
+    static func getMinCardNum(playerNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+        
+        if dealType == 0 || dealType == 1{
+            return playerNum * 2
+        } else {
+            var minNum = 0
+            for i in 0..<diyDealNum.count {
+                let num = diyDealNum[i]
+                //派牌
+                if diyDealStatus[i][0] == true {
+                    minNum += playerNum * num
+                //公牌
+                } else if diyDealStatus[i][1] == true {
+                    minNum += num
+                //去牌
+                } else {
+                    minNum += num
+                }
+            }
+            return minNum
+        }
     }
     
     //args
@@ -96,7 +122,7 @@ class TinyNineGame{
     //5 blackJokerValueRange
     //6 samePointComparision
     
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
         let rule  = GameManager.gameRules[3] as! TinyNineGameRule
         let dealType = args[0]
         let diyDealType = args[1]
@@ -109,8 +135,12 @@ class TinyNineGame{
         
         var maxRank = 0
         var winners: [Int] = []
+        var winnerRanks: [Int] = []
         var allPlayCards: [Player] = []
         var community = [Card]()
+        if deck.count < TinyNineGame.getMinCardNum(playerNum: playerNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
+            return ([], [],[])
+        }
         
         for _ in 0..<playerNum {
             allPlayCards.append(Player())
@@ -176,22 +206,29 @@ class TinyNineGame{
             ).evalHand(cards: allPlayCards[i].playerCard, redJokerValueRange: redJokerValueRange,blackJokerValueRange: blackJokerValueRange, samePointComparision: samePointComparision)
         }
         
+        var resultList = [ResultStruct]()
         for i in 0..<playerNum {
             let rank = allPlayCards[i].evaluateFlag
-            if rank > maxRank {
-                maxRank = rank
-                winners.removeAll()
-                winners.append(i)
-            } else if rank == maxRank {
-                winners.append(i)
-            }
+            resultList.append(ResultStruct(playerID: i, rank: rank))
         }
+        
+        let sortedResultList =  resultList.sorted(by: {$0.rank > $1.rank })
+        for result in sortedResultList {
+            winners.append(result.playerID)
+            winnerRanks.append(result.rank)
+        }
+        
         var leftCards:[Int] = []
         for card in deck{
             leftCards.append(card.cardIndex)
         }
         
-        return (winners, leftCards)
+        if leftCards.count < self.getMinCardNum(playerNum: playerNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus) {
+            leftCards = []
+        }
+        
+        print("winners \(winners)")
+        return (winners, leftCards, winnerRanks)
     }
 }
 
@@ -237,14 +274,7 @@ class TinyNineGameHandEvaluator{
                 return score
             }
         }
-//        let num1 = cards[0].rank
-//        let num2 = cards[1].rank
-//
-//        if num1 == num2 {
-//            score = num1 + 100
-//        } else {
-//            score = (num1 + num2) % 10
-//        }
+
         return score
     }
     

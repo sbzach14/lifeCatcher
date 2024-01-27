@@ -30,8 +30,10 @@ class GameManager {
         let rule5 = TwoEightGangGameRule(ruleIndex: 5, ruleName: "二八杠")
         let rule6 = NinePointFiveGameRule(ruleIndex: 6, ruleName: "九点半")
         let rule7 = BaoziGameRule(ruleIndex: 7, ruleName: "宝子")
+        let rule8 = JiaJiaBaoGameRule(ruleIndex: 8, ruleName: "佳佳宝")
+        let rule9 = CardNineGameRule(ruleIndex: 9, ruleName: "牌九")
         
-        return [rule0.ruleIndex: rule0, rule1.ruleIndex: rule1, rule2.ruleIndex: rule2, rule3.ruleIndex: rule3, rule4.ruleIndex: rule4, rule5.ruleIndex: rule5, rule6.ruleIndex: rule6, rule7.ruleIndex: rule7]
+        return [rule0.ruleIndex: rule0, rule1.ruleIndex: rule1, rule2.ruleIndex: rule2, rule3.ruleIndex: rule3, rule4.ruleIndex: rule4, rule5.ruleIndex: rule5, rule6.ruleIndex: rule6, rule7.ruleIndex: rule7, rule8.ruleIndex: rule8, rule9.ruleIndex: rule9]
     }()
     
     static func cutRankConvert(cutNumSetting: Int, cardIndex: Int)->Int{
@@ -94,8 +96,40 @@ class GameManager {
         
     }
     
-    static func selectGame(gameIndex: Int, inputCards: [Int], playerNum: Int, args : [Int], rankRules : [Int], suitRules: [Int],dealType: Int, diyDealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], calModeArgs: [Int], cutNumSetting: Int, cutNumRangeSetting: [Int], consecutiveReport: Int, cutSetting: Int,  minCardNum: Int) -> [Int] {
-        var reportResult:[Int] = []
+    static func extractWinnerSet(inputWinners: [Int], inputWinnerRanks:[Int], isWinner: Bool) -> [Int]{
+        var winners:[Int] = []
+        var winnerRanks:[Int] = []
+        
+        var resultList:[Int] = []
+        print("输入数组 \(inputWinners) \(inputWinnerRanks)")
+
+        if isWinner == true{
+            winners = inputWinners
+            winnerRanks = inputWinnerRanks
+        } else {
+            winners = inputWinners.reversed()
+            winnerRanks = inputWinnerRanks.reversed()
+        }
+        print("当前的结果数组 \(winners) \(winnerRanks)")
+        for index in 0..<winners.count{
+            print("当前resultList \(resultList)")
+            if index == 0{
+                resultList.append(winners[index])
+                continue
+            } else {
+                if winnerRanks[index] == winnerRanks[index - 1] {
+                    resultList.append(winners[index])
+                } else {
+                    break
+                }
+            }
+        }
+        print("最终目标玩家 \(resultList)")
+        return resultList
+    }
+    
+    static func selectGame(gameIndex: Int, inputCards: [Int], playerNum: Int, args : [Int], rankRules : [Int], suitRules: [Int],dealType: Int, diyDealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], calModeArgs: [Int], cutNumSetting: Int, cutNumRangeSetting: [Int], consecutiveReport: Int, cutSetting: Int,  minCardNum: Int) -> [[Int]] {
+        var reportResult:[[Int]] = []
         //TODO dealType 0 正发，1 反发 搞清楚ui
         //cutNumSetting 点数设置
         //cutNumRangeSetting 打色范围 [下限，上限]
@@ -117,7 +151,7 @@ class GameManager {
         
         // 定义一个字典，将游戏索引映射到游戏函数
         // 返回的result包括两个int数组，一个是按牌大小从大到小排序的玩家编号数组，一个是这一轮结束之后牌库里剩下的牌
-        let gameFunctions: [Int: ([[Bool]],[Int], [Int], [Int], [Int], [Int]) -> ([Int],[Int])] = [
+        let gameFunctions: [Int: ([[Bool]],[Int], [Int], [Int], [Int], [Int]) -> ([Int],[Int],[Int])] = [
             0: TexasPoker.FindWinner,
             1: PokerBull.FindWinner,
             2: ThreeCardPokerGame.FindWinner,
@@ -126,6 +160,8 @@ class GameManager {
             5: TwoEightGangGame.FindWinner,
             6: NinePointFiveGame.FindWinner,
             7: BaoziGame.FindWinner,
+            8: JiaJiaBaoGame.FindWinner,
+            9: CardNineGame.FindWinner
         ]
 
         // 检查 gameIndex 是否存在于字典中
@@ -136,104 +172,168 @@ class GameManager {
             case 0://不打色
                 
                 for i in 0...consecutiveReport - 1{
-                    let (result, leftCards) = gameFunction(diyDealStatus,diyDealNum, currentCards, newArgs, rankRules, suitRules)
-                    if result != nil && leftCards != nil && leftCards.count != 0{
+                    let (result, leftCards,winnerRanks) = gameFunction(diyDealStatus,diyDealNum, currentCards, newArgs, rankRules, suitRules)
+                    if result.count != 0 {
                         //报最大
                         if target == 0{
-                            reportResult.append(result[0])
+                            
+                            reportResult.append(extractWinnerSet(inputWinners: result, inputWinnerRanks: winnerRanks, isWinner: true))
                         }
                         //报最小
                         else if target == 1{
-                            reportResult.append(result[result.count - 1])
+                            reportResult.append(extractWinnerSet(inputWinners: result, inputWinnerRanks: winnerRanks, isWinner: false))
                         }
                         //剩下的牌组
                         currentCards = leftCards
+                        if leftCards.count == 0 {
+                            print("剩余的牌不足")
+                            break
+                        }
+                    } else if result.count == 0{
+                        print("当前牌不足")
+                        break
                     }
                 }
             
             case 1://去色
-                for i in 0..<consecutiveReport{
+                var currentConsecutiveReport = consecutiveReport
+                // 如果是生死门没有连报
+                if consecutiveReport > 1 && target == 2{
+                    currentConsecutiveReport = 1
+                }
+                for i in 0..<currentConsecutiveReport{
                     var aliveTimes = 0
+                    var totalTimes = 0
+                    //遍历打色范围
+                    print("下一轮--------")
                     for cardIndex in (cutNumRangeSetting[0] - 1)...(cutNumRangeSetting[1] - 1){
                         let cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: currentCards[cardIndex])
+                        print("切第\(cardIndex + 1) 张 切到的牌是 \(GameManager.cardLabelDic[currentCards[cardIndex]]) 点数是 \(cardRank)")
+                        
                         let newInputCards = Array(currentCards[(cardIndex+1)...])//去掉上面的牌
-                        var resultTargetPos = 0
-                        let (result, leftCards) = gameFunction(diyDealStatus,diyDealNum, newInputCards, newArgs, rankRules, suitRules)
-                        if result != nil && leftCards != nil && leftCards.count != 0 {
+                        var resultTargetPos:[Int] = []
+                        let (result, leftCards, winnerRanks) = gameFunction(diyDealStatus,diyDealNum, newInputCards, newArgs, rankRules, suitRules)
+                        if result.count != 0 {
                             //报切几张目标位置最大
                             if target == 0{
-                                resultTargetPos = result[0]
+                                resultTargetPos = extractWinnerSet(inputWinners: result, inputWinnerRanks: winnerRanks, isWinner: true)
                             }
                             //报切几张目标位置最小
                             else if target == 1{
-                                resultTargetPos = result[result.count - 1]
+                                resultTargetPos = extractWinnerSet(inputWinners: result, inputWinnerRanks: winnerRanks, isWinner: false)
                             //报生死门
                             } else if target == 2{
-                                resultTargetPos = result[0]
+                                resultTargetPos = extractWinnerSet(inputWinners: result, inputWinnerRanks: winnerRanks, isWinner: true)
                             }
+                        } else if (result.isEmpty) {
+                            break
                         }
-                        let resultPos = (cardRank + resultTargetPos) % playerNum//起始发牌位置+目标输赢发牌位置
+                        var resultPos:[Int] = []
+                        for resultTargetPo in resultTargetPos {
+                            resultPos.append((cardRank + resultTargetPo) % playerNum)
+                        }
+//                        let resultPos = (cardRank + resultTargetPos) % playerNum//起始发牌位置+目标输赢发牌位置
                         print("切牌数字 \(cardRank) 计算结果位置 \(resultPos) 目标位置 \(targetPos)")
                         if target == 0 || target == 1{
-                            if resultPos == targetPos{//targetPos 0 - playerNum-1
-                                print("切第\(cardIndex + 1)张最大")
-                                reportResult.append(cardIndex)
+                            if resultPos.contains(where: {$0 == targetPos}) {//targetPos 0 - playerNum-1
+                                print("切第\(cardIndex + 1)张最大/最小")
+                                reportResult.append([cardIndex])
                                 currentCards = leftCards
-                                
                                 break
                             }
                         } else {
-                            if resultPos == targetPos{
+                            if resultPos.contains(where: {$0 == targetPos}){
                                 aliveTimes += 1
                             }
+                            totalTimes += 1
                         }
                         
+                        if currentCards.count == 0 {
+                            break
+                        }
                     }
                     //生死门暂时没有连报
                     if target == 2{
-                        reportResult.append(100 * aliveTimes / (cutNumRangeSetting[1] - cutNumRangeSetting[0] + 1))
+                        reportResult.append([100 * aliveTimes / totalTimes])
+                    }
+                    if reportResult.count != i + 1{
+                        reportResult.append([])
+                    }
+                    if currentCards.count == 0{
+                        break
                     }
                 }
                 
                 
             case 2://留色
-                for i in 0..<consecutiveReport{
-                    var aliveProb = 0
+                var currentConsecutiveReport = consecutiveReport
+                // 如果是生死门没有连报
+
+                if consecutiveReport > 1 && target == 2{
+                    currentConsecutiveReport = 1
+                }
+                for i in 0..<currentConsecutiveReport{
+                    var aliveTimes = 0
+                    var totalTimes = 0
+                    
+                    print("下一轮--------")
+                    
 
                     for cardIndex in (cutNumRangeSetting[0] - 1)...(cutNumRangeSetting[1] - 1){
-                        let cardRank = inputCards[cardIndex] % 13
-                        var resultTargetPos = 0
-                        let (result, leftCards) = gameFunction(diyDealStatus, diyDealNum, inputCards, newArgs, rankRules, suitRules)
-                        if result != nil && leftCards != nil && leftCards.count != 0 {
+                        let cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: currentCards[cardIndex])
+                        
+                        print("切第\(cardIndex + 1) 张 切到的牌是 \(GameManager.cardLabelDic[currentCards[cardIndex]]) 点数是 \(cardRank)")
+                        
+                        var resultTargetPos:[Int] = []
+                        let (result, leftCards, winnerRanks) = gameFunction(diyDealStatus, diyDealNum, currentCards, newArgs, rankRules, suitRules)
+                        if result.count != 0 {
                             if target == 0{
-                                resultTargetPos = result[0]
+                                resultTargetPos = extractWinnerSet(inputWinners: result, inputWinnerRanks: winnerRanks, isWinner: true)
                             }
                             else if target == 1{
-                                resultTargetPos = result[result.count - 1]
+                                resultTargetPos = extractWinnerSet(inputWinners: result, inputWinnerRanks: winnerRanks, isWinner: false)
                             } else if target == 2{
-                                resultTargetPos = result[0]
+                                resultTargetPos = extractWinnerSet(inputWinners: result, inputWinnerRanks: winnerRanks, isWinner: true)
                                 
                             }
+                        } else if result.isEmpty {
+                            break
                         }
-                        let resultPos = (cardRank + resultTargetPos) % playerNum//起始发牌位置+目标输赢发牌位置
+                        var resultPos:[Int] = []
+                        for resultTargetPo in resultTargetPos {
+                            resultPos.append((cardRank + resultTargetPo) % playerNum)
+                        }
+//                        let resultPos = (cardRank + resultTargetPos) % playerNum//起始发牌位置+目标输赢发牌位置
+                        print("切牌数字 \(cardRank) 计算结果位置 \(resultPos) 目标位置 \(targetPos)")
                         if target == 0 || target == 1 {
-                            if resultPos == targetPos{
-                                print("切第\(cardIndex + 1)张最大")
-                                reportResult.append(cardIndex)
+                            if resultPos.contains(where: {$0 == targetPos}){
+                                print("切第\(cardIndex + 1)张最大/最小")
+                                reportResult.append([cardIndex])
                                 currentCards = leftCards
                                 break
                             }
                         } else {
-                            if resultPos == targetPos{
-                                aliveProb += 1
+                            if resultPos.contains(where: {$0 == targetPos}){
+                                aliveTimes += 1
                             }
+                            totalTimes += 1
+                        }
+                        if currentCards.count == 0 {
+                            break
                         }
                     }
+                    
+
                     //生死门暂时没有连报
                     if target == 2{
-                        reportResult.append(100 * aliveProb / (cutNumRangeSetting[1] - cutNumRangeSetting[0] + 1))
+                        reportResult.append([100 * aliveTimes / totalTimes])
                     }
-                    
+                    if reportResult.count != i + 1{
+                        reportResult.append([])
+                    }
+                    if currentCards.count == 0 {
+                        break
+                    }
                 }
                 
                 
@@ -849,15 +949,15 @@ public class RuleManager{
                 mixManComparision = 0
                 args = [pointComparision, samePointComparision, isAAsMan, isCompareSuit, threeCardComparision,mixManComparision]
                 suitRules = [3,2,1,0]
-                rankRules = [3,1,0]
-                rankRuleChecked = [1,1,1]
+                rankRules = [3,0]
+                rankRuleChecked = [1,1]
                 allPreSetRules[i]![3]!.append(args)
                 allPreSetRules[i]![3]!.append(suitRules)
                 allPreSetRules[i]![3]!.append(rankRules)
                 allPreSetRules[i]![3]!.append(rankRuleChecked)
 //                4:"三公5-A大于K",
                 pointComparision = 1
-                samePointComparision = 3
+                samePointComparision = 2
                 isAAsMan = 1
                 isCompareSuit = 0
                 threeCardComparision = 0
@@ -939,7 +1039,7 @@ public class RuleManager{
                 mixManComparision = 1
                 args = [pointComparision, samePointComparision, isAAsMan, isCompareSuit, threeCardComparision,mixManComparision]
                 suitRules = [3,2,1,0]
-                rankRules = [1,0]
+                rankRules = [7,0]
                 rankRuleChecked = [1,1]
                 allPreSetRules[i]![9]!.append(args)
                 allPreSetRules[i]![9]!.append(suitRules)
@@ -1015,7 +1115,7 @@ public class RuleManager{
                 allPreSetRules[i]![1]!.append(rankRuleChecked)
 //                2: "二八分黑红",
                 samePointComparision = 1
-                isCompareSuit = 0
+                isCompareSuit = 1
                 KValueRange = 0
                 QValueRange = 0
                 JValueRange = 0
@@ -1297,7 +1397,7 @@ public class RuleManager{
                 JValueRange = 0
                 JokerValueRange = 0
                 samePointComparision = 0
-                pointComparision = 1
+                pointComparision = 0
                 cardRank = 0
                 pairRank = 0
                 args = [KValueRange,QValueRange,JValueRange,JokerValueRange, samePointComparision, pointComparision, cardRank, pairRank]
@@ -1514,6 +1614,110 @@ public class RuleManager{
                 allPreSetRules[i]![14]!.append(rankRules)
                 allPreSetRules[i]![14]!.append(rankRuleChecked)
                 break
+            case 8:
+                //通用54张佳佳宝
+                let rule = GameManager.gameRules[i] as! JiaJiaBaoGameRule
+                for j in 0...rule.setting.count - 1{
+                    allPreSetRules[i]![j] = []
+                }
+                var samePointComparision = 0
+                var CardRankList = 0
+                var redJokerValueRange = 0
+                var blackJokerValueRange = 0
+                var KValueRange = 0
+                var QValueRange = 0
+                var JValueRange = 0
+                var handNum = 0
+                var isCompareSuit = 1
+                
+                args = [samePointComparision,CardRankList,redJokerValueRange,blackJokerValueRange,KValueRange,QValueRange,JValueRange, handNum, isCompareSuit]
+                suitRules = [0,1,0,1]
+                rankRules = [4,2,1,0]
+                rankRuleChecked = [1,1,1,1]
+                allPreSetRules[i]![0]!.append(args)
+                allPreSetRules[i]![0]!.append(suitRules)
+                allPreSetRules[i]![0]!.append(rankRules)
+                allPreSetRules[i]![0]!.append(rankRuleChecked)
+                //通用54张佳佳宝，比四张
+                samePointComparision = 0
+                CardRankList = 0
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                handNum = 1
+                isCompareSuit = 1
+                args = [samePointComparision,CardRankList,redJokerValueRange,blackJokerValueRange,KValueRange,QValueRange,JValueRange, handNum, isCompareSuit]
+                suitRules = [0,1,0,1]
+                rankRules = [4,2,1,0]
+                rankRuleChecked = [1,1,1,1]
+                allPreSetRules[i]![1]!.append(args)
+                allPreSetRules[i]![1]!.append(suitRules)
+                allPreSetRules[i]![1]!.append(rankRules)
+                allPreSetRules[i]![1]!.append(rankRuleChecked)
+                
+//                2: "通用四张，9点对子算点数",
+                samePointComparision = 1
+                CardRankList = 1
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 1
+                QValueRange = 1
+                JValueRange = 0
+                handNum = 0
+                isCompareSuit = 0
+                args = [samePointComparision,CardRankList,redJokerValueRange,blackJokerValueRange,KValueRange,QValueRange,JValueRange, handNum, isCompareSuit]
+                suitRules = [0,1,0,1]
+                rankRules = [0]
+                rankRuleChecked = [1]
+                allPreSetRules[i]![2]!.append(args)
+                allPreSetRules[i]![2]!.append(suitRules)
+                allPreSetRules[i]![2]!.append(rankRules)
+                allPreSetRules[i]![2]!.append(rankRuleChecked)
+//                3: "通用四张，54张佳佳宝1",
+                samePointComparision = 1
+                CardRankList = 1
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                handNum = 1
+                isCompareSuit = 1
+                args = [samePointComparision,CardRankList,redJokerValueRange,blackJokerValueRange,KValueRange,QValueRange,JValueRange, handNum, isCompareSuit]
+                suitRules = [0,1,0,1]
+                rankRules = [4,2,1,0]
+                rankRuleChecked = [1,1,1,1]
+                allPreSetRules[i]![3]!.append(args)
+                allPreSetRules[i]![3]!.append(suitRules)
+                allPreSetRules[i]![3]!.append(rankRules)
+                allPreSetRules[i]![3]!.append(rankRuleChecked)
+                
+                break
+            case 9:
+                //杭州小牌九
+                let rule = GameManager.gameRules[i] as! CardNineGameRule
+                for j in 0...rule.setting.count - 1{
+                    allPreSetRules[i]![j] = []
+                }
+                var redJokerValueRange = 0
+                var blackJokerValueRange = 0
+                var KValueRange = 0
+                var QValueRange = 0
+                var JValueRange = 0
+                var pointComparision = 0
+                var samePointComparision = 0
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision]
+                suitRules = [0,1,0,1]
+                rankRules = [4,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1]
+                allPreSetRules[i]![0]!.append(args)
+                allPreSetRules[i]![0]!.append(suitRules)
+                allPreSetRules[i]![0]!.append(rankRules)
+                allPreSetRules[i]![0]!.append(rankRuleChecked)
+                break
+                
             default:
                 print("There is no preset rule for this game!!!!!")
                 break

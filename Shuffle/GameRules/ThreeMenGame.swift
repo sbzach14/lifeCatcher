@@ -158,11 +158,11 @@ class ThreeMenGameRule : Rule{
 
 
 class ThreeMenGame{
-    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int]) {
+    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
         print("Rank Rules \(rankRules)")
         var deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (winners, leftCards)
+        let (winners, leftCards, winnerRanks) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winners, leftCards, winnerRanks)
     }
     
     static func legalCheck(playerNum: Int) -> String{
@@ -174,18 +174,74 @@ class ThreeMenGame{
         return errMessage
     }
     
-    static func getAllCardIndex() -> [Int]{
+    static func getAllCardIndex(setting: Int) -> [Int]{
         var result : [Int] = []
-        for i in 0...3{
-            for rank in 0...12{
-                result.append(rank + i * 13)
-            }
+        switch setting{
+        case 0:
+            result = Array(0...51) + [53,54]
+            break
+        case 1:
+            result = Array(0...51) + [53,54]
+            break
+        case 2:
+            result = Array(0...51) + [53,54]
+            break
+        case 3:
+            result = Array(0...51) + [53,54]
+            break
+        case 4:
+            result = Array(0...51) + [53,54]
+            break
+        case 5:
+            result = Array(0...51) + [53,54]
+            break
+        case 6:
+            result = Array(0...51) + [53,54]
+            break
+        case 7:
+            result = Array(0...51)
+            break
+        case 8:
+            result = Array(0...8) + Array(13...21) + Array(26...34) + Array(39...47)
+            break
+        case 9:
+            result = Array(0...51)
+            break
+        case 10:
+            result = Array(0...51) + [53,54]
+            break
+        case 11:
+            result = Array(0...51) + [53,54]
+            break
+        default:
+            result = Array(0...51) + [53,54]
+            break
         }
+        
         return result
     }
     
-    static func getMinCardNum(playerNum: Int) -> Int{
-        return playerNum * 3
+    static func getMinCardNum(playerNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+        
+        if dealType == 0 || dealType == 1{
+            return playerNum * 3
+        } else {
+            var minNum = 0
+            for i in 0..<diyDealNum.count {
+                let num = diyDealNum[i]
+                //派牌
+                if diyDealStatus[i][0] == true {
+                    minNum += playerNum * num
+                //公牌
+                } else if diyDealStatus[i][1] == true {
+                    minNum += num
+                //去牌
+                } else {
+                    minNum += num
+                }
+            }
+            return minNum
+        }
     }
     
     //args
@@ -198,7 +254,7 @@ class ThreeMenGame{
     //6 isCompareSuit
     //7 threeCardComparision
     //8 mixManComparision
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
         let rule = GameManager.gameRules[4] as! ThreeMenGameRule
         let dealType = args[0]
         let diyDealType = args[1]
@@ -212,8 +268,12 @@ class ThreeMenGame{
         
         var maxRank = 0
         var winners: [Int] = []
+        var winnerRanks: [Int] = []
         var allPlayCards: [Player] = []
         var community = [Card]()
+        if deck.count < ThreeMenGame.getMinCardNum(playerNum: playerNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
+            return ([], [],[])
+        }
         
         for _ in 0..<playerNum {
             allPlayCards.append(Player())
@@ -280,22 +340,28 @@ class ThreeMenGame{
             ).evalHand(cards: allPlayCards[i].playerCard, pointComparision: pointPointComparision, samePointComparision: samePointComparision, isAAsMan: isAAsMan, isCompareSuit: isCompareSuit, threeCardComparision: threeCardComparision,mixManComparision: mixManComparision)
         }
         
+        var resultList = [ResultStruct]()
         for i in 0..<playerNum {
             let rank = allPlayCards[i].evaluateFlag
-            if rank > maxRank {
-                maxRank = rank
-                winners.removeAll()
-                winners.append(i)
-            } else if rank == maxRank {
-                winners.append(i)
-            }
+            resultList.append(ResultStruct(playerID: i, rank: rank))
+        }
+        
+        let sortedResultList =  resultList.sorted(by: {$0.rank > $1.rank })
+        for result in sortedResultList {
+            winners.append(result.playerID)
+            winnerRanks.append(result.rank)
         }
         var leftCards:[Int] = []
         for card in deck{
             leftCards.append(card.cardIndex)
         }
         
-        return (winners, leftCards)
+        if leftCards.count < ThreeMenGame.getMinCardNum(playerNum: playerNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus) {
+            leftCards = []
+        }
+        
+        print("winners \(winners)")
+        return (winners, leftCards, winnerRanks)
     }
 }
 
@@ -316,10 +382,23 @@ class ThreeMenGameHandEvaluator{
     }
     
     func evalHand(cards: [Card], pointComparision: Int, samePointComparision: Int, isAAsMan: Int, isCompareSuit: Int, threeCardComparision: Int, mixManComparision: Int)->Int{
+        
         var cards = cards
+        
+        if isCompareSuit == 0{
+            for i in 0..<cards.count{
+                cards[i].suit[0] = 0
+            }
+        }
+        
+        print("手牌花色 \(cards[0].suit[0]) \(cards[1].suit[0]) \(cards[2].suit[0])")
+        
         cards.sort(by: { card1, card2 in
-            return Card.calScore(card: card1) > Card.calScore(card: card2)
+            return (card1.rank<<2 | card1.suit[0]) > (card2.rank << 2 | card2.suit[0])
         })
+        
+    
+        
         self.pointComparision = pointComparision
         self.samePointComparision = samePointComparision
         self.isAAsMan = isAAsMan
@@ -327,7 +406,7 @@ class ThreeMenGameHandEvaluator{
         self.threeCardComparision = threeCardComparision
         self.mixManComparision = mixManComparision
         let score = calcHandInfoFlg(sortedCards: cards)
-        
+        print("score \(score)")
         return score
     }
     
@@ -344,23 +423,32 @@ class ThreeMenGameHandEvaluator{
             7  : self.eval_anyThreeMan_allSameRank
         ]
         
+        var handCardString = ""
+        for card in sortedCards{
+            handCardString += GameManager.cardLabelDic[card.cardIndex]!
+        }
+        
+        print("手牌 \(handCardString)")
+        
         for (index, ruleIndex) in rankRules.enumerated() {
             var rankFlag = 1 << (rankRules.count - index + 12)
-            var rankResult = ruleDict[ruleIndex]!(sortedCards)
+            rankResult = ruleDict[ruleIndex]!(sortedCards)
             
             if rankResult != 0 {
                 rankResult |= rankFlag
+                print("牌型 \(ruleIndex) rank \(rankResult)")
                 break
             }
         }
 
-        
+        print("rankResult \(rankResult)")
         return rankResult
     }
     func eval_anyThreeMan_allSameRank(cards: [Card]) -> Int{
-        if cards[0].rank > 10 && cards[1].rank > 10 && cards[2].rank > 10 {
+        if cards[0].rank >= 10 && cards[1].rank >= 10 && cards[2].rank >= 10 {
             return 1
         }
+        
         return 0
     }
     func eval_anyPairPlusJokerPlusThreeKQJ(cards: [Card]) -> Int{
@@ -383,7 +471,7 @@ class ThreeMenGameHandEvaluator{
     func eval_mixMan(cards: [Card]) -> Int {
         if cards[0].rank > 10 && cards[1].rank > 10 && cards[2].rank > 10 {
             if self.mixManComparision == 0{
-                return Card.calScore(card: cards[0])
+                return cards[0].rank << 2 | cards[0].suit[0]
             } else if self.mixManComparision == 1{
                 return 1
             }
@@ -426,7 +514,7 @@ class ThreeMenGameHandEvaluator{
     func eval_threemen(_ cards: [Card]) -> Int {
         var rank = 0
         if cards[0].rank > 10 && cards[1].rank > 10 && cards[2].rank > 10 && cards[1].rank == cards[0].rank && cards[1].rank == cards[2].rank{
-            rank = Card.calScore(card: cards[0])
+            rank = cards[0].rank << 2 | cards[0].suit[0]
         }
         return rank
     }
@@ -456,10 +544,10 @@ class ThreeMenGameHandEvaluator{
                     }
                 }
             }
-            rank = sumRank << 8 | menNum << 6 | Card.calScore(card: cards[0])
+            rank = sumRank << 8 | menNum << 6 | (cards[0].rank << 2 | cards[0].suit[0])
             break
         case 1:
-            rank = sumRank << 6 | Card.calScore(card: cards[0])
+            rank = sumRank << 6 | (cards[0].rank << 2 | cards[0].suit[0])
             break
         case 2:
             var menNum = 0

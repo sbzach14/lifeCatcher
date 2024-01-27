@@ -45,7 +45,8 @@ class TwoEightGangGameRule : Rule{
             2: "二八分黑红",
             3: "二八最大对k次大",
             4: "二八杠10点大",
-            5: "江苏52张二八"
+            5: "江苏52张二八",
+            6: "自定义"
         ]
         self.ruleInfo = [
             0:"""
@@ -86,7 +87,8 @@ class TwoEightGangGameRule : Rule{
     """,
             5:"""
     KK最大...AA最小，K算3点、Q算2点、 J算1点，28最大，0点最小，同点比单张大小!
-    """
+    """,
+            6:"自定义你的规则"
         ]
         self.playerNum = [2,3,4,5,6,7,8,9,10]
     }
@@ -95,11 +97,11 @@ class TwoEightGangGameRule : Rule{
 
 
 class TwoEightGangGame{
-    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum: [Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int]) {
+    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum: [Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
         
         var deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (winners, leftCards)
+        let (winners, leftCards, winnerRanks) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winners, leftCards, winnerRanks)
     }
     
     static func legalCheck(playerNum: Int) -> String{
@@ -111,18 +113,56 @@ class TwoEightGangGame{
         return errMessage
     }
     
-    static func getAllCardIndex() -> [Int]{
+    static func getAllCardIndex(setting:Int) -> [Int]{
         var result : [Int] = []
-        for i in 0...3{
-            for rank in 1...9{//2-10
-                result.append(rank + i * 13)
-            }
+        switch setting {
+        case 0:
+            result = Array(0...9) + Array(13...22) + Array(26...35) + Array(39...48)
+            break
+        case 1:
+            result = Array(0...9) + Array(13...22) + Array(26...35) + Array(39...48)
+            break
+        case 2:
+            result = Array(0...9) + Array(13...22) + Array(26...35) + Array(39...48)
+            break
+        case 3:
+            result = Array(0...9) + Array(13...22) + Array(26...35) + Array(39...48)
+            break
+        case 4:
+            result = Array(0...9) + Array(13...22) + Array(26...35) + Array(39...48)
+            break
+        case 5:
+            result = Array(0...51)
+            break
+        default:
+            result = Array(0...9) + Array(13...22) + Array(26...35) + Array(39...48)
+            break
         }
+        
         return result
     }
     
-    static func getMinCardNum(playerNum: Int) -> Int{
-        return playerNum * 2
+    static func getMinCardNum(playerNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+        
+        if dealType == 0 || dealType == 1{
+            return playerNum * 2
+        } else {
+            var minNum = 0
+            for i in 0..<diyDealNum.count {
+                let num = diyDealNum[i]
+                //派牌
+                if diyDealStatus[i][0] == true {
+                    minNum += playerNum * num
+                //公牌
+                } else if diyDealStatus[i][1] == true {
+                    minNum += num
+                //去牌
+                } else {
+                    minNum += num
+                }
+            }
+            return minNum
+        }
     }
     
     //args
@@ -135,7 +175,7 @@ class TwoEightGangGame{
     //6 QValueRange
     //7 JValueRange
     //8 pointComparision
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int], [Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int], [Int], [Int]) {
         let dealType = args[0]
         let diyDealType = args[1]
         let playerNum = args[2]
@@ -149,8 +189,12 @@ class TwoEightGangGame{
         
         var maxRank = 0
         var winners: [Int] = []
+        var winnerRanks: [Int] = []
         var allPlayCards: [Player] = []
         var community = [Card]()
+        if deck.count < TwoEightGangGame.getMinCardNum(playerNum: playerNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+            return ([],[],[])
+        }
         
         for _ in 0..<playerNum {
             allPlayCards.append(Player())
@@ -218,22 +262,28 @@ class TwoEightGangGame{
             ).evalHand(cards: allPlayCards[i].playerCard, samePointComparision: samePointComparision, isCompareSuit: isCompareSuit, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, pointComparision: pointComparision)
         }
         
+        var resultList = [ResultStruct]()
         for i in 0..<playerNum {
             let rank = allPlayCards[i].evaluateFlag
-            if rank > maxRank {
-                maxRank = rank
-                winners.removeAll()
-                winners.append(i)
-            } else if rank == maxRank {
-                winners.append(i)
-            }
+            resultList.append(ResultStruct(playerID: i, rank: rank))
+        }
+        
+        let sortedResultList =  resultList.sorted(by: {$0.rank > $1.rank })
+        for result in sortedResultList {
+            winners.append(result.playerID)
+            winnerRanks.append(result.rank)
         }
         var leftCards:[Int] = []
         for card in deck{
             leftCards.append(card.cardIndex)
         }
         
-        return (winners, leftCards)
+        if leftCards.count < TwoEightGangGame.getMinCardNum(playerNum: playerNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+            leftCards = []
+        }
+        
+        print("winners \(winners)")
+        return (winners, leftCards, winnerRanks)
     }
 }
 
@@ -267,9 +317,20 @@ class TwoEightGangGameHandEvaluator{
         self.JValueRange = JValueRange
         self.pointComparision = pointComparision
         var cards = cards
+        if isCompareSuit == 0{
+            for i in 0..<cards.count{
+                cards[i].suit[0] = 0
+            }
+        }
         cards.sort(by: { card1, card2 in
             return Card.calScore(card: card1) > Card.calScore(card: card2)
         })
+        var handString = "手牌 "
+        for card in cards{
+            handString += GameManager.cardLabelDic[card.cardIndex]!
+            handString += "花色 \(card.suit[0])"
+        }
+        print(handString)
         var score = 0
         var i = self.rankRules.count + 1
         for ruleIndex in self.rankRules{
@@ -279,6 +340,7 @@ class TwoEightGangGameHandEvaluator{
                 continue
             } else {
                 score = (1 << (i + 10)) | rank
+                print("牌型 \(ruleIndex) score \(score)")
                 return score
             }
         }
@@ -320,24 +382,26 @@ class TwoEightGangGameHandEvaluator{
     }
     
     func eval_Points(cards: [Card]) -> Int{
-        var num1 = self.PointsConvertor(card: cards[0]) % 10
-        var num2 = self.PointsConvertor(card: cards[1]) % 10
+        var num1 = self.PointsConvertor(card: cards[0])
+        var num2 = self.PointsConvertor(card: cards[1])
         //0 最大 1 最小
         if self.pointComparision == 1 {
             num1 = (num1 + 10 - 1) % 10
             num2 = (num2 + 10 - 1) % 10
         }
+        let rank = (num1 + num2) % 10
+        
         
         if self.samePointComparision == 0 {
-            return num1 << 6 | Card.calScore(card: cards[0])
+            return rank << 6 | cards[0].rank << 2 | cards[0].suit[0]
         } else {
-            return num1 << 8 | Card.calScore(card: cards[0]) | (self.blackRedJudger(card: cards[0]) + self.blackRedJudger(card: cards[1]))
+            return rank << 8 | cards[0].rank << 4 | cards[0].suit[0] << 2 | (self.blackRedJudger(card: cards[0]) + self.blackRedJudger(card: cards[1]))
         }
     }
     
     func blackRedJudger(card: Card) -> Int{
         //红
-        if card.suit[0] == 1 || card.suit[0] == 3 {
+        if self.suitRules.firstIndex(of: card.suit[0]) == 1 || self.suitRules.firstIndex(of: card.suit[0]) == 3 {
             return 1
         //黑
         } else{

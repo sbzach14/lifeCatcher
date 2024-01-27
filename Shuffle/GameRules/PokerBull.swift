@@ -263,7 +263,7 @@ class PokerBullRule : Rule{
 }
 
 class PokerBull{
-    static func FindWinner(diyDealStatus:[[Bool]], diyDealNum:[Int], inputCards:[Int], args:[Int], rankRules:[Int], suitRules: [Int]) -> ([Int],[Int]) {
+    static func FindWinner(diyDealStatus:[[Bool]], diyDealNum:[Int], inputCards:[Int], args:[Int], rankRules:[Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
         
         let testCardLabelDic : [Int:String] = [
             0: "♠️A ", 1: "♠️2 ", 2: "♠️3 ", 3: "♠️4 ", 4: "♠️5 ", 5: "♠️6 ", 6: "♠️7 ", 7: "♠️8 ", 8: "♠️9 ", 9: "♠️10 ",
@@ -286,8 +286,8 @@ class PokerBull{
         }
         print(inputString)
         
-        let (winnersArray, leftCards) = PokerBullGame.calResult(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, cardArray: inputCards, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (winnersArray, leftCards)
+        let (winnersArray, leftCards, winnerRanks) = PokerBullGame.calResult(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, cardArray: inputCards, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winnersArray, leftCards, winnerRanks)
     }
     
     static func legalCheck(playerNum: Int, handNum: Int, cardNum: Int)->String{
@@ -299,18 +299,66 @@ class PokerBull{
         
     }
     
-    static func GetAllCardIndex()->[Int]{
+    static func GetAllCardIndex(setting: Int)->[Int]{
         var result : [Int] = []
-        for i in 0...3{
-            for rank in 0...12{
-                    result.append(rank + i * 13)
-            }
+        switch setting {
+        case 0:
+            result = Array(0...51) + [53,54]
+            break
+        case 1:
+            result = Array(0...51) + [53,54]
+            break
+        case 2:
+            result = Array(0...51) + [53,54]
+            break
+        case 3:
+            result = Array(0...8) + Array(13...21) + Array(26...34) + Array(39...47)
+            break
+        case 4:
+            result = Array(0...51) + [53,54]
+            break
+        case 5:
+            result = Array(0...51) + [53,54]
+            break
+        case 6:
+            result = Array(0...51)
+            break
+        case 7:
+            result = Array(0...9) + Array(13...22) + Array(26...35) + Array(39...48)
+            break
+        case 8:
+            result = Array(0...51) + [53,54]
+            break
+        case 9:
+            result = Array(0...51)
+            break
+        default:
+            result = Array(0...51) + [53,54]
         }
         return result
     }
     
-    static func GetMinCardNum(playerNum: Int, handNum: Int) -> Int{
-        return playerNum * handNum
+    static func GetMinCardNum(playerNum: Int, handNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+        
+        if dealType == 0 || dealType == 1{
+            return playerNum * handNum
+        } else {
+            var minNum = 0
+            for i in 0..<diyDealNum.count {
+                let num = diyDealNum[i]
+                //派牌
+                if diyDealStatus[i][0] == true {
+                    minNum += playerNum * num
+                //公牌
+                } else if diyDealStatus[i][1] == true {
+                    minNum += num
+                //去牌
+                } else {
+                    minNum += num
+                }
+            }
+            return minNum
+        }
     }
     
 }
@@ -609,13 +657,13 @@ class PokerBullGame {
         // Rest of the PokerBullCard class translation...
     }
     
-    static func calResult(diyDealStatus:[[Bool]], diyDealNum:[Int], cardArray: [Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int]) {
+    static func calResult(diyDealStatus:[[Bool]], diyDealNum:[Int], cardArray: [Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
         let deck = initDeck(initialCards: cardArray, suitRules: suitRules)
-        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules,suitRules: suitRules)
-        return (winners, leftCards)
+        let (winners, leftCards, winnerRanks) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules,suitRules: suitRules)
+        return (winners, leftCards, winnerRanks)
     }
     
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
         // 解析 args
         //TODO 整理牛牛的参数，并且debug
         print("牛牛参数长度 \(args.count) 牛牛参数 \(args)")
@@ -646,6 +694,9 @@ class PokerBullGame {
 
         var allPlayers: [BullPlayer] = (0..<playerNum).map { BullPlayer(playerIndex: $0) }
         var community = [PokerBullCard]()
+        if deck.count < PokerBull.GetMinCardNum(playerNum: playerNum, handNum: handNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+            return ([], [],[])
+        }
         
         if wayToDealCards == 0{
             // 发牌
@@ -719,7 +770,21 @@ class PokerBullGame {
             leftCards.append(leftCard.cardIndex)
         }
         
-        return ([allPlayers.sorted { $0.evaluateFlag > $1.evaluateFlag }[0].playerID],leftCards)
+        if leftCards.count < PokerBull.GetMinCardNum(playerNum: playerNum, handNum: handNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+            leftCards = []
+        }
+        var sortedPlayers = allPlayers.sorted{$0.evaluateFlag > $1.evaluateFlag}
+        
+        var winners:[Int] = []
+        var winnerRanks:[Int] = []
+        
+        for player in sortedPlayers{
+            winners.append(player.playerID)
+            winnerRanks.append(player.evaluateFlag)
+        }
+        print("winners \(winners), \(winnerRanks)")
+        
+        return (winners,leftCards,winnerRanks)
     }
     
     // Rest of the PokerBullGame class translation...

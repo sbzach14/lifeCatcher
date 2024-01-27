@@ -81,7 +81,7 @@ class TexasPokerRule : Rule{
 class TexasPoker{
     
 
-    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int]) {
+    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int], [Int]) {
         
         
 //        let json = Python.import("json")
@@ -138,8 +138,27 @@ class TexasPoker{
         return result
     }
     
-    static func getMinCardNum(playerNum: Int, handNum: Int, communityNum: Int) -> Int{
-        return playerNum * handNum + communityNum
+    static func getMinCardNum(playerNum: Int, handNum: Int, communityNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+        
+        if dealType == 0 || dealType == 1{
+            return playerNum * handNum + communityNum + 3
+        } else {
+            var minNum = 0
+            for i in 0..<diyDealNum.count {
+                let num = diyDealNum[i]
+                //派牌
+                if diyDealStatus[i][0] == true {
+                    minNum += playerNum * num
+                //公牌
+                } else if diyDealStatus[i][1] == true {
+                    minNum += num
+                //去牌
+                } else {
+                    minNum += num
+                }
+            }
+            return minNum
+        }
     }
 }
 
@@ -163,13 +182,13 @@ class TexasPokerGame {
 //    #5 communityNum 0/3/5
 //    #6 handUseType 0无限制/1必须/2至少
 //    #7 handUseNum 1-5
-    static func calResult(diyDealStatus:[[Bool]], diyDealNum:[Int], cardArray: [Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int]) {
+    static func calResult(diyDealStatus:[[Bool]], diyDealNum:[Int], cardArray: [Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int], [Int]) {
         var deck = initDeck(initialCards: cardArray, suitRules: suitRules)
-            let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: &deck, args: args, rankRules: rankRules)
-            return (winners, leftCards)
+            let (winners, leftCards, winnerRanks) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: &deck, args: args, rankRules: rankRules)
+            return (winners, leftCards, winnerRanks)
         }
     
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: inout [Card], args: [Int], rankRules: [Int]) -> ([Int], [Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: inout [Card], args: [Int], rankRules: [Int]) -> ([Int], [Int],[Int]) {
         let rule = GameManager.gameRules[0] as! TexasPokerRule
         let dealType = args[0]
         let diyDealType = args[1]
@@ -186,8 +205,13 @@ class TexasPokerGame {
         
         var maxRank = 0
         var winners = [Int]()
+        var winnerRanks :[Int] = []
         var allPlayCards = [TexasPlayer]()
         var community = [Card]()
+        if deck.count < TexasPoker.getMinCardNum(playerNum: playerNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+            return ([],[],[])
+        }
+        
         
         for _ in 0..<playerNum {
             allPlayCards.append(TexasPlayer())
@@ -268,23 +292,27 @@ class TexasPokerGame {
             allPlayCards[i].evaluateFlag = HandEvaluator.evalHand(cards: allPlayCards[i].playerCard, community: community, isCompareSuit: isCompareSuit, isAceStraight: isAceStraight, minRank: minRank, handUseType: handUseType, handUseNum: handUseNum, rankRules: rankRules)
         }
         
+        var resultList = [ResultStruct]()
         for i in 0..<playerNum {
             let rank = allPlayCards[i].evaluateFlag
-            if rank > maxRank {
-                maxRank = rank
-                winners.removeAll()
-                winners.append(i)
-            } else if rank == maxRank {
-                winners.append(i)
-            }
+            resultList.append(ResultStruct(playerID: i, rank: rank))
         }
-        
+        let sortedResultList =  resultList.sorted(by: {$0.rank > $1.rank })
+        for result in sortedResultList {
+            winners.append(result.playerID)
+            winnerRanks.append(result.rank)
+        }
         var leftCards:[Int] = []
         for card in deck{
             leftCards.append(card.cardIndex)
         }
         
-        return (winners, leftCards)
+        if leftCards.count < TexasPoker.getMinCardNum(playerNum: playerNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+            leftCards = []
+        }
+        
+        print("winners:  \(winners)")
+        return (winners, leftCards, winnerRanks)
     }
 }
 
