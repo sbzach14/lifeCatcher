@@ -130,14 +130,13 @@ class GameManager {
         return resultList
     }
     
-    static func selectGame(gameIndex: Int, inputCards: [Int], playerNum: Int, args : [Int], rankRules : [Int], suitRules: [Int],dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], calModeArgs: [Int], cutNumSetting: Int, cutNumRangeSetting: [Int], consecutiveReport: Int, cutSetting: Int,  minCardNum: Int) -> [[Int]] {
+    static func selectGame(gameIndex: Int, inputCards: [Int], playerNum: Int, args : [Int], rankRules : [Int], suitRules: [Int],dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], calModeArgs: [Int], cutNumSetting: Int, cutNumRangeSetting: [Int], consecutiveReport: Int, minCardNum: Int) -> [[Int]] {
         var reportResult:[[Int]] = []
         //TODO dealType 0 正发，1 反发 搞清楚ui
         //cutNumSetting 点数设置
         //cutNumRangeSetting 打色范围 [下限，上限]
         //consecutiveReport 连报轮数 1，2，3，不洗牌接着玩
-        //TODO cutSetting 0, 不切牌， 1，切牌
-        //calModeArgs [calMode, target, targetPos]
+        //calModeArgs [target, targetPos]
         //calmode 0不打色 1去色 2留色
         //target 0max 1min 2生死门
         //targetPos 这里变为0开始
@@ -146,11 +145,12 @@ class GameManager {
         //dealType 0 正发 1 反发
         //diyDealNum 派牌，公牌，或者去牌的数量
         //diyDealStatus 派牌/公牌/去牌
-        let calMode = calModeArgs[0]
-        let target = calModeArgs[1]
-        let targetPos = calModeArgs[2]
+        let target = calModeArgs[0]
+        let targetPos = calModeArgs[1]
         let newArgs = [dealNum + dealType] + [playerNum] + args
         
+        //todo 根据target获取不同的calmode和其他属性
+        let calMode = target
         
         // 定义一个字典，将游戏索引映射到游戏函数
         // 返回的result包括两个int数组，一个是按牌大小从大到小排序的玩家编号数组，一个是这一轮结束之后牌库里剩下的牌
@@ -2420,7 +2420,6 @@ struct GameRule: Codable{
     var RuleName: String
     var gameType: Int = 0
     var setting: Int = 0
-    var calMode: Int = 0
     var dealNum: Int = 0
     var coloringType: Int = 0
     var dealType: Int = 0
@@ -2429,24 +2428,23 @@ struct GameRule: Codable{
     var diyDealStatus: [[Bool]] = []
     var playerNum: Int = 0
     var shuffleMode: Int = 0
+    var cutMode: Int = 0
     var cardToUse: [Int] = []
     var cutNumSetting: Int = 0
     var reportSetting: Int = 0
     var cutNumRangeSetting: [Int] = []
     var positionSetting: Int = 0
     var consecutiveReport: Int = 0
-    var cutSetting: Int = 0
     var reportNumber: Int = 0
     var voiceReport: Int = 0
     var args: [Int] = []
     var suitRanks: [Int] = []
     var rankRules: [Int] = []
     var rankRuleChecked: [Int] = []
-    init(RuleName: String, gameType: Int, setting: Int, calMode: Int, dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], playerNum: Int, shuffleMode: Int, cardToUse: [Int], cutNumSetting: Int, reportSetting: Int, cutNumRangeSetting: [Int], positionSetting: Int, consecutiveReport: Int, cutSetting: Int, reportNumber: Int, voiceReport: Int, args: [Int], suitRanks: [Int], rankRules: [Int], rankRuleChecked: [Int]) {
+    init(RuleName: String, gameType: Int, setting: Int, dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], playerNum: Int, shuffleMode: Int, cutMode: Int, cardToUse: [Int], cutNumSetting : Int, reportSetting: Int, cutNumRangeSetting: [Int], positionSetting: Int, consecutiveReport: Int, reportNumber: Int, voiceReport: Int, args: [Int], suitRanks: [Int], rankRules: [Int], rankRuleChecked: [Int]) {
         self.RuleName = RuleName
         self.gameType = gameType
         self.setting = setting
-        self.calMode = calMode
         self.dealNum = dealNum
         self.coloringType = coloringType
         self.dealType = dealType
@@ -2454,13 +2452,13 @@ struct GameRule: Codable{
         self.diyDealStatus = diyDealStatus
         self.playerNum = playerNum
         self.shuffleMode = shuffleMode
+        self.cutMode = cutMode
         self.cardToUse = cardToUse
         self.cutNumSetting = cutNumSetting
         self.reportSetting = reportSetting
         self.cutNumRangeSetting = cutNumRangeSetting
         self.positionSetting = positionSetting
         self.consecutiveReport = consecutiveReport
-        self.cutSetting = cutSetting
         self.reportNumber = reportNumber
         self.voiceReport = voiceReport
         self.args = args

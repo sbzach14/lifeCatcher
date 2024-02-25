@@ -5,6 +5,7 @@ struct MainContentView: View {
     var shuffleMode: Int
     var dealNum: Int
     var coloringType: Int
+    var cutMode: Int
     var dealType: Int
     var diyDealNum: [Int]
     var diyDealStatus: [[Bool]]
@@ -12,7 +13,6 @@ struct MainContentView: View {
     var cutNumSetting: Int
     var cutNumRangeSetting: [Int]
     var consecutiveReport: Int
-    var cutSetting: Int
     var reportNumber: Int
     var voiceReport: Int
     var ruleIndex: Int
@@ -51,7 +51,7 @@ struct MainContentView: View {
             }
         }
         .onAppear {
-            viewModel.initialize(playerNum: playerNum, shuffleMode: shuffleMode,dealNum: dealNum,coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, cutSetting: cutSetting, reportNumber: reportNumber, voiceReport: voiceReport, ruleIndex: ruleIndex, args: args, rankRules: rankRules, suitRules: suitRules, allCardIndex: allCardIndex, minCardNum: minCardNum)
+            viewModel.initialize(playerNum: playerNum, shuffleMode: shuffleMode, cutMode: cutMode,dealNum: dealNum,coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, reportNumber: reportNumber, voiceReport: voiceReport, ruleIndex: ruleIndex, args: args, rankRules: rankRules, suitRules: suitRules, allCardIndex: allCardIndex, minCardNum: minCardNum)
         }
         .onDisappear {
             viewModel.stopCamera()

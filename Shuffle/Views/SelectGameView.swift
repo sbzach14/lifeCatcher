@@ -11,24 +11,27 @@ import SwiftUI
 struct SelectGameView: View {
     var body: some View {
         
-        ScrollView{
-            Spacer()
-            
-            VStack{
+        VStack{
+            ScrollView{
+                Spacer()
                 
-                ForEach(Array(GameManager.gameRules.keys).sorted(), id: \.self) { key in
-                    if let value = GameManager.gameRules[key] {
-                        NavigationLink(
-                            destination: AddRuleSettingView(gameType: key, selectedSaveIndex: -1)
-                        ){
-                            Image(value.ruleName)
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                                .frame(height: 70)
+                VStack{
+                    
+                    ForEach(Array(GameManager.gameRules.keys).sorted(), id: \.self) { key in
+                        if let value = GameManager.gameRules[key] {
+                            NavigationLink(
+                                destination: AddRuleSettingView(gameType: key, selectedSaveIndex: -1)
+                            ){
+                                Image(value.ruleName)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
+                                    .frame(height: 70)
+                            }
                         }
                     }
                 }
             }.padding()
+            
         }
         .background(Image("bg").resizable().scaledToFill())
             .navigationTitle("选择游戏")

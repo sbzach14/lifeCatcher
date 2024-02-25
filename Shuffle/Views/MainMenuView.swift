@@ -8,7 +8,7 @@ struct MainMenuView: View {
     var body: some View {
         NavigationView {
             VStack{
-                SearchBar(searchText: $searchText)
+                
                 ScrollView {
                     VStack(spacing: 0) {
                         NavigationLink(

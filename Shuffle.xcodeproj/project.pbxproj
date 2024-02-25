@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		181C969C2B5D51B00042006E /* Icon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 181C969B2B5D51B00042006E /* Icon.xcassets */; };
 		181C969E2B5D9DC90042006E /* SelectGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C969D2B5D9DC90042006E /* SelectGameView.swift */; };
-		181C96A02B5DB5980042006E /* tip.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 181C969F2B5DB5980042006E /* tip.mp3 */; };
+		181C96A02B5DB5980042006E /* success_tip.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 181C969F2B5DB5980042006E /* success_tip.mp3 */; };
 		181C96A22B5F86090042006E /* cardDetection_s_0123.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 181C96A12B5F86090042006E /* cardDetection_s_0123.mlmodel */; };
 		181C96A82B60DC180042006E /* ChickenBattleGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C96A72B60DC180042006E /* ChickenBattleGame.swift */; };
 		181C96AA2B60DD610042006E /* CardNineGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C96A92B60DD610042006E /* CardNineGame.swift */; };
@@ -17,12 +17,15 @@
 		181C96AE2B60F03C0042006E /* JiaJiaBaoGameRuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C96AD2B60F03C0042006E /* JiaJiaBaoGameRuleSettingView.swift */; };
 		184F40A72B60FE170001B3DC /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184F40A62B60FE170001B3DC /* LoadingView.swift */; };
 		184F40AB2B610EF50001B3DC /* CardNineRuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184F40AA2B610EF50001B3DC /* CardNineRuleSettingView.swift */; };
+		18C8929B2B65118F009D37DC /* fail_tip.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18C892992B65118F009D37DC /* fail_tip.mp3 */; };
+		18C8929C2B65118F009D37DC /* start_tip.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18C8929A2B65118F009D37DC /* start_tip.mp3 */; };
 		18CA14D2284AC42C00F90372 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C3284AC42C00F90372 /* ViewModel.swift */; };
 		18CA14D3284AC42C00F90372 /* ShowCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C5284AC42C00F90372 /* ShowCardView.swift */; };
 		18CA14D4284AC42C00F90372 /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C6284AC42C00F90372 /* MainContentView.swift */; };
 		18CA14D6284AC42C00F90372 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C8284AC42C00F90372 /* CameraView.swift */; };
 		18CA14DB284AC42C00F90372 /* MyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14D0284AC42C00F90372 /* MyApp.swift */; };
 		18CA14DC284AC42C00F90372 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14D1284AC42C00F90372 /* ContentView.swift */; };
+		18D9CDEA2B84F7CE00A93684 /* ReportSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D9CDE92B84F7CE00A93684 /* ReportSettingView.swift */; };
 		50053F84284ACAED00C86BF4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50053F81284ACAED00C86BF4 /* Assets.xcassets */; };
 		A809B3E22AE5126700F728A9 /* BaoziGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A809B3E12AE5126700F728A9 /* BaoziGame.swift */; };
 		A809B3E42AE5183400F728A9 /* BaoziGameRuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A809B3E32AE5183400F728A9 /* BaoziGameRuleSettingView.swift */; };
@@ -96,7 +99,7 @@
 /* Begin PBXFileReference section */
 		181C969B2B5D51B00042006E /* Icon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Icon.xcassets; sourceTree = "<group>"; };
 		181C969D2B5D9DC90042006E /* SelectGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectGameView.swift; sourceTree = "<group>"; };
-		181C969F2B5DB5980042006E /* tip.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = tip.mp3; sourceTree = "<group>"; };
+		181C969F2B5DB5980042006E /* success_tip.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = success_tip.mp3; sourceTree = "<group>"; };
 		181C96A12B5F86090042006E /* cardDetection_s_0123.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection_s_0123.mlmodel; sourceTree = "<group>"; };
 		181C96A72B60DC180042006E /* ChickenBattleGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChickenBattleGame.swift; sourceTree = "<group>"; };
 		181C96A92B60DD610042006E /* CardNineGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardNineGame.swift; sourceTree = "<group>"; };
@@ -104,6 +107,8 @@
 		181C96AD2B60F03C0042006E /* JiaJiaBaoGameRuleSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JiaJiaBaoGameRuleSettingView.swift; sourceTree = "<group>"; };
 		184F40A62B60FE170001B3DC /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		184F40AA2B610EF50001B3DC /* CardNineRuleSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardNineRuleSettingView.swift; sourceTree = "<group>"; };
+		18C892992B65118F009D37DC /* fail_tip.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = fail_tip.mp3; sourceTree = "<group>"; };
+		18C8929A2B65118F009D37DC /* start_tip.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = start_tip.mp3; sourceTree = "<group>"; };
 		18CA1477284ABEC600F90372 /* Shuffle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Shuffle.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		18CA14C3284AC42C00F90372 /* ViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewModel.swift; sourceTree = "<group>"; };
 		18CA14C5284AC42C00F90372 /* ShowCardView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowCardView.swift; sourceTree = "<group>"; };
@@ -111,6 +116,7 @@
 		18CA14C8284AC42C00F90372 /* CameraView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		18CA14D0284AC42C00F90372 /* MyApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyApp.swift; sourceTree = "<group>"; };
 		18CA14D1284AC42C00F90372 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		18D9CDE92B84F7CE00A93684 /* ReportSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportSettingView.swift; sourceTree = "<group>"; };
 		50053F80284ACAED00C86BF4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50053F81284ACAED00C86BF4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		50053F82284ACAED00C86BF4 /* CountMyActions.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = CountMyActions.entitlements; sourceTree = "<group>"; };
@@ -277,7 +283,7 @@
 				B058BE602B0A0D6F0078E792 /* TestView.swift */,
 				181C969D2B5D9DC90042006E /* SelectGameView.swift */,
 				184F40A62B60FE170001B3DC /* LoadingView.swift */,
-				A8A3B40A2B68DA5D008A3723 /* ReportSettingView.swift */,
+				18D9CDE92B84F7CE00A93684 /* ReportSettingView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -392,7 +398,9 @@
 				A875FED62B5D1601003D51C3 /* cardDetection_n_0121.mlmodel */,
 				181C96A12B5F86090042006E /* cardDetection_s_0123.mlmodel */,
 				A88EFE022A7E8ACC00897243 /* Resnet50FP16.mlmodel */,
-				181C969F2B5DB5980042006E /* tip.mp3 */,
+				181C969F2B5DB5980042006E /* success_tip.mp3 */,
+				18C892992B65118F009D37DC /* fail_tip.mp3 */,
+				18C8929A2B65118F009D37DC /* start_tip.mp3 */,
 				A838534B2ADA7C0200346038 /* BackGround.xcassets */,
 				181C969B2B5D51B00042006E /* Icon.xcassets */,
 				A838534D2ADA7D7100346038 /* GameClass.xcassets */,
@@ -521,11 +529,13 @@
 			files = (
 				50053F84284ACAED00C86BF4 /* Assets.xcassets in Resources */,
 				A838534E2ADA7D7100346038 /* GameClass.xcassets in Resources */,
+				18C8929B2B65118F009D37DC /* fail_tip.mp3 in Resources */,
 				A88F209D2A10EB39005E4A27 /* python-stdlib in Resources */,
 				A83853502ADA83F600346038 /* Icon_Repo.xcassets in Resources */,
 				A838534C2ADA7C0200346038 /* BackGround.xcassets in Resources */,
-				181C96A02B5DB5980042006E /* tip.mp3 in Resources */,
+				181C96A02B5DB5980042006E /* success_tip.mp3 in Resources */,
 				181C969C2B5D51B00042006E /* Icon.xcassets in Resources */,
+				18C8929C2B65118F009D37DC /* start_tip.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -589,7 +599,7 @@
 				B03B7B2F2A963C1B006A0647 /* utils.swift in Sources */,
 				A812F92F2A3DCBA500AA392F /* ThreeCardPokerGameRuleSettingView.swift in Sources */,
 				A809B3E42AE5183400F728A9 /* BaoziGameRuleSettingView.swift in Sources */,
-				A8A3B40B2B68DA5D008A3723 /* ReportSettingView.swift in Sources */,
+				18D9CDEA2B84F7CE00A93684 /* ReportSettingView.swift in Sources */,
 				A83DC67A2A22352C00EC8210 /* SelectRuleView.swift in Sources */,
 				A88716852A0F701500B7F2CD /* GameManager.swift in Sources */,
 				A887167F2A0623E500B7F2CD /* AuthManager.swift in Sources */,
