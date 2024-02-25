@@ -3,6 +3,7 @@ import SwiftUI
 struct MainContentView: View {
     var playerNum:Int
     var shuffleMode: Int
+    var cutMode: Int
     var dealType: Int
     var diyDealType: Int
     var diyDealNum: [Int]
@@ -11,7 +12,6 @@ struct MainContentView: View {
     var cutNumSetting: Int
     var cutNumRangeSetting: [Int]
     var consecutiveReport: Int
-    var cutSetting: Int
     var reportNumber: Int
     var voiceReport: Int
     var ruleIndex: Int
@@ -50,7 +50,7 @@ struct MainContentView: View {
             }
         }
         .onAppear {
-            viewModel.initialize(playerNum: playerNum, shuffleMode: shuffleMode, dealType: dealType, diyDealType: diyDealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, cutSetting: cutSetting, reportNumber: reportNumber, voiceReport: voiceReport, ruleIndex: ruleIndex, args: args, rankRules: rankRules, suitRules: suitRules, allCardIndex: allCardIndex, minCardNum: minCardNum)
+            viewModel.initialize(playerNum: playerNum, shuffleMode: shuffleMode, cutMode: cutMode, dealType: dealType, diyDealType: diyDealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, reportNumber: reportNumber, voiceReport: voiceReport, ruleIndex: ruleIndex, args: args, rankRules: rankRules, suitRules: suitRules, allCardIndex: allCardIndex, minCardNum: minCardNum)
         }
         .onDisappear {
             viewModel.stopCamera()

@@ -17,6 +17,7 @@ struct SelectRuleView: View {
     ]
     
     var body: some View {
+        VStack{
             VStack {
                 
                 List {
@@ -28,28 +29,25 @@ struct SelectRuleView: View {
                             ) {
                                 
                                 let name: String = rules[index].RuleName
-
-                                let calmode: String = generalRuleSetting.allCuttingSetting[rules[index].calMode]!
-                               
                                 
                                 let dealType: String = generalRuleSetting.allDealType[rules[index].dealType]!
-
+                                
                                 HStack(spacing: 5) {
                                     Text(name)
                                         .foregroundColor(.white)
                                     
                                     Spacer()
-//                                    Text(calmode)
-//                                        .foregroundColor(.black)
-//                                    if rules[index].calMode == 0 {
-//                                            Text(generalRuleSetting.allReportSettingWithoutCutting[rules[index].reportSetting]!)
-//                                                       .foregroundColor(.black)
-//                                               } else {
-//                                                Text(generalRuleSetting.allReportSettingWithCutting[rules[index].reportSetting]!)
-//                                                       .foregroundColor(.black)
-//                                               }
-//                                    Text(dealType)
-//                                        .foregroundColor(.black)
+                                    //                                    Text(calmode)
+                                    //                                        .foregroundColor(.black)
+                                    //                                    if rules[index].calMode == 0 {
+                                    //                                            Text(generalRuleSetting.allReportSettingWithoutCutting[rules[index].reportSetting]!)
+                                    //                                                       .foregroundColor(.black)
+                                    //                                               } else {
+                                    //                                                Text(generalRuleSetting.allReportSettingWithCutting[rules[index].reportSetting]!)
+                                    //                                                       .foregroundColor(.black)
+                                    //                                               }
+                                    //                                    Text(dealType)
+                                    //                                        .foregroundColor(.black)
                                 }
                             }
                             .padding()
@@ -67,6 +65,7 @@ struct SelectRuleView: View {
                     .listRowBackground(Color.clear)
                 
                 
+                
                 HStack{
                     
                     Button(action: {
@@ -77,23 +76,24 @@ struct SelectRuleView: View {
                                                 isActive: $isNavigateToSelectGameView,
                                                 label: EmptyView.init).hidden()
                     )
-                }.padding()
+                }
+            }.padding()
 
-            }
-            .background(
-                Image("bg")
-                    .resizable()
-                    .scaledToFill()
-                
-            ).navigationTitle("选择规则").onAppear(){
-                self.rules = RuleManager.allUsersGameRule
-            }
+        }
+        .background(
+            Image("bg")
+                .resizable()
+                .scaledToFill()
+            
+        ).navigationTitle("选择规则").onAppear(){
+            self.rules = RuleManager.allUsersGameRule
+        }
     }
 }
 
 struct SelectRuleView_Previews: PreviewProvider {
-    static let testRule1 =  GameRule(RuleName: "规则001", gameType: 0, setting: 0, calMode: 2, dealType: 0, diyDealType: 0, diyDealNum: [], diyDealStatus: [], playerNum: 0, shuffleMode: 0, cardToUse: [0,1,2,3,4,5,6,7,8,9], cutNumSetting: 0, reportSetting: 0, cutNumRangeSetting: [2,10], positionSetting: 0, consecutiveReport: 0, cutSetting: 0, reportNumber: 0, voiceReport: 0,args: [], suitRanks: [], rankRules: [], rankRuleChecked: [])
-    static let testRule2 = GameRule(RuleName: "规则002", gameType: 0, setting: 0, calMode: 1, dealType: 0, diyDealType: 0, diyDealNum: [], diyDealStatus: [], playerNum: 0, shuffleMode: 0, cardToUse: [0,1,2,3,4,5,6,7,8,9], cutNumSetting: 0, reportSetting: 2, cutNumRangeSetting: [2,10], positionSetting: 0, consecutiveReport: 0, cutSetting: 0, reportNumber: 0, voiceReport: 0,args: [], suitRanks: [], rankRules: [], rankRuleChecked: [])
+    static let testRule1 =  GameRule(RuleName: "规则001", gameType: 0, setting: 0, dealType: 0, diyDealType: 0, diyDealNum: [], diyDealStatus: [], playerNum: 0, shuffleMode: 0, cutMode: 0, cardToUse: [0,1,2,3,4,5,6,7,8,9], cutNumSetting: 0, reportSetting: 0, cutNumRangeSetting: [2,10], positionSetting: 0, consecutiveReport: 0, reportNumber: 0, voiceReport: 0,args: [], suitRanks: [], rankRules: [], rankRuleChecked: [])
+    static let testRule2 = GameRule(RuleName: "规则002", gameType: 0, setting: 0, dealType: 0, diyDealType: 0, diyDealNum: [], diyDealStatus: [], playerNum: 0, shuffleMode: 0, cutMode: 0, cardToUse: [0,1,2,3,4,5,6,7,8,9], cutNumSetting: 0, reportSetting: 2, cutNumRangeSetting: [2,10], positionSetting: 0, consecutiveReport: 0, reportNumber: 0, voiceReport: 0,args: [], suitRanks: [], rankRules: [], rankRuleChecked: [])
             
     static var previews: some View {
         if RuleManager.allUsersGameRule.count == 0 {

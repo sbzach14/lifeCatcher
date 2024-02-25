@@ -80,7 +80,7 @@ struct DealTypeView: View {
                         )
                         .frame(height: 50)
                         
-                        Spacer().frame(height: 50) // 这里设置了Spacer的高度为20
+                        Spacer().frame(height: 25)
 
                         HStack{
                             
@@ -103,45 +103,47 @@ struct DealTypeView: View {
                                 .foregroundColor(.white).padding(.trailing, 30)
 
                         }
-                        ForEach(diyDealNum.indices, id:\.self){
-                            index in
-                            HStack{
-
-                                Text("  \(index + 1)").frame(maxWidth: 40, alignment: .leading)
-                                    .foregroundColor(.white)
-                                    .padding(.leading,30)
-                                
-                                
-                                
-                                Stepper("\(diyDealNum[index])", value: $diyDealNum[index]).frame(maxWidth: 200, alignment: .leading)
-                                    .foregroundColor(.white)
-                                    .padding(.leading,20)
-                                
-                                Spacer()
-
-                                
-                                Image(systemName: diyDealStatus[index][0] ? "checkmark.square.fill" : "square")
+                        ScrollView{
+                            ForEach(diyDealNum.indices, id:\.self){
+                                index in
+                                HStack{
+                                    
+                                    Text("  \(index + 1)").frame(maxWidth: 40, alignment: .leading)
+                                        .foregroundColor(.white)
+                                        .padding(.leading,30)
+                                    
+                                    
+                                    
+                                    Stepper("\(diyDealNum[index])", value: $diyDealNum[index]).frame(maxWidth: 200, alignment: .leading)
+                                        .foregroundColor(.white)
+                                        .padding(.leading,20)
+                                    
+                                    Spacer()
+                                    
+                                    
+                                    Image(systemName: diyDealStatus[index][0] ? "checkmark.square.fill" : "square")
                                         .onTapGesture {
                                             HandleDealStatusToggle(roundIndex: index, toggleIndex: 0)
                                         }.frame(maxWidth: 40, alignment: .trailing)
-                                    .foregroundColor(.white)
-                                
+                                        .foregroundColor(.white)
+                                    
                                     Image(systemName: diyDealStatus[index][1] ? "checkmark.square.fill" : "square")
                                         .onTapGesture {
                                             HandleDealStatusToggle(roundIndex: index, toggleIndex: 1)
                                         }.frame(maxWidth: 40, alignment: .trailing)
-                                    .foregroundColor(.white)
-                                
+                                        .foregroundColor(.white)
+                                    
                                     Image(systemName: diyDealStatus[index][2] ? "checkmark.square.fill" : "square")
                                         .onTapGesture {
                                             HandleDealStatusToggle(roundIndex: index, toggleIndex: 2)
                                         }.frame(maxWidth: 40, alignment: .trailing)
-                                    .foregroundColor(.white).padding(.trailing, 30)
-
+                                        .foregroundColor(.white).padding(.trailing, 30)
+                                    
+                                }
                             }
                         }
                         
-                        Spacer().frame(height: 50) // 这里设置了Spacer的高度为20
+                        Spacer()
                         
                         HStack{
                             Spacer()
@@ -157,7 +159,7 @@ struct DealTypeView: View {
                             }
                             
                             Spacer()
-                        }
+                        }.padding()
                     }
                 }
             }

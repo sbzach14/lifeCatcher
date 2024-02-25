@@ -22,15 +22,19 @@ class generalRuleSetting{
         8:"佳佳宝",
         9:"牌九"
     ]
-    static let allCalMode: [Int: String] = [
-        0:"不打色",
-        1:"去色",
-        2:"留色"
-    ]
     static let allShuffleMode: [Int:String] = [
         0:"洗牌",
         1:"拨到顶",
-        2:"拨中间"
+        2:"拨中间",
+        3:"洗牌+拨到顶",
+        4:"洗牌+拨中间"
+    ]
+    static let allCutMode: [Int:String] = [
+        0:"不切牌",
+        1:"看底",
+        2:"看顶",
+        3:"连续切牌",
+        4:"看手牌"
     ]
     static let allDealType: [Int: String] = [
         0:"正发",
@@ -46,21 +50,14 @@ class generalRuleSetting{
         4:"花色打色, 黑 = 1，红 = 2，梅 = 3，方 = 4",
         5:"花色打色, 黑 = 4，红 = 3，梅 = 2，方 = 1"
     ]
-    static let allReportSettingWithoutCutting:[Int:String] = [
-        0:"报最大",
-        1:"报最小",
-    ]
-    static let allReportSettingWithCutting:[Int:String] = [
-        0:"报切几张目标位置最大",
-        1:"报切几张目标位置最小",
-        2:"报目标生死门",
-    ]
+    
     static let allReportSetting:[Int:String] = [
         0:"报最大",
         1:"报最小",
         2:"报切几张目标位置最大",
         3:"报切几张目标位置最小",
         4:"报目标生死门",
+        5:"啊啊啊阿啊阿啊阿啊阿啊阿啊阿啊阿啊阿啊阿啊阿啊阿啊阿啊阿啊阿啊阿啊阿啊阿啊"
     ]
     
     static let allConsecutiveReport:[Int:String] = [
@@ -69,11 +66,6 @@ class generalRuleSetting{
         2: "3",
         3: "4",
         4: "5"
-    ]
-    static let allCuttingSetting: [Int: String] = [
-        0:"切牌",
-        1:"去色",
-        2:"留色"
     ]
     
     static let allVoiceReport:[Int:String] = [
@@ -89,13 +81,13 @@ struct AddRuleSettingView: View{
     @State private var _selectedSaveIndex: Int = -1
     @State private var editType: Int = 0
     @State private var setting: Int = 0
-    @State private var calMode: Int = 0
     @State private var dealType: Int = 0
     @State private var diyDealType: Int = 0
     @State private var diyDealNum: [Int] = []
     @State private var diyDealStatus: [[Bool]] = []
     @State private var playerNum: Int = 0
     @State private var shuffleMode: Int = 0
+    @State private var cutMode: Int = 0
     @State private var cardToUse: [Int] = []
     //色点设置
     @State private var cutNumSetting: Int = 0
@@ -104,7 +96,6 @@ struct AddRuleSettingView: View{
     @State private var cutNumRangeSetting: [Int] = [1,5]
     @State private var positionSetting: Int = 0
     @State private var consecutiveReport: Int = 0
-    @State private var cutSetting: Int = 0
     @State private var reportNumber: Int = 0
     @State private var voiceReport: Int = 0
     @State private var args:[Int] = []
@@ -160,12 +151,12 @@ struct AddRuleSettingView: View{
             self.currentNum = playerNumList[self.playerNum]
             
             self.setting = rules.setting
-            self.calMode = rules.calMode
             self.dealType = rules.dealType
             self.diyDealType = rules.diyDealType
             self.diyDealNum = rules.diyDealNum
             self.diyDealStatus = rules.diyDealStatus
             self.playerNum = rules.playerNum
+            self.cutMode = rules.cutMode
             self.shuffleMode = rules.shuffleMode
             self.cardToUse = rules.cardToUse
             self.cutNumSetting = rules.cutNumSetting
@@ -173,7 +164,6 @@ struct AddRuleSettingView: View{
             self.cutNumRangeSetting = rules.cutNumRangeSetting
             self.positionSetting = rules.positionSetting
             self.consecutiveReport = rules.consecutiveReport
-            self.cutSetting = rules.cutSetting
             self.reportNumber = rules.reportNumber
             self.voiceReport = rules.voiceReport
             self.args = rules.args
@@ -194,48 +184,47 @@ struct AddRuleSettingView: View{
                 Spacer()
                 ScrollView{
                     VStack{
-                        
                         let selectedRule = GameManager.gameRules[gameType]
                         //游戏玩法
                         
-                        HStack{
-                            Image("icon_shufflemode")
-                                .resizable()
-                                .frame(width: 40, height: 40).padding(.leading, 20)
-                            Text("游戏玩法")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .foregroundColor(.white) // 左侧间距
-                            Picker("setting", selection: $setting) {
-                                ForEach(0...(selectedRule?.setting.count)! - 1, id: \.self){
-                                    index in Text(selectedRule!.setting[index]!).tag(index)
+                            HStack{
+                                Image("icon_shufflemode")
+                                    .resizable()
+                                    .frame(width: 40, height: 40).padding(.leading, 20)
+                                Text("游戏玩法")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .foregroundColor(.white) // 左侧间距
+                                Picker("setting", selection: $setting) {
+                                    ForEach(0...(selectedRule?.setting.count)! - 1, id: \.self){
+                                        index in Text(selectedRule!.setting[index]!).tag(index)
+                                    }
                                 }
-                            }
-                            .pickerStyle(MenuPickerStyle())
-                            .frame(width: 160, height: 30, alignment: .trailing)
-                            .accentColor(.white).onChange(of: setting) { _ in
-                                handleSettingChange(selectedRuleIndex: gameType)
-                            }.background(){
-                                NavigationLink(
-                                                destination: destinationView(for: gameType),
-                                                isActive: $isNavigateToGameSettingView
-                                            ) {
-                                                EmptyView()
-                                            }
-                            }
-                            
-                            Button(action: {
-                                // 点击按钮时，显示弹出窗口
-                                if self.setting != selectedRule!.setting.count - 1{
-                                    self.showRuleInfo = true
-                                } else{
-                                    self.isNavigateToGameSettingView = true
+                                .pickerStyle(MenuPickerStyle())
+                                .frame(width: 160, height: 30, alignment: .trailing)
+                                .accentColor(.white).onChange(of: setting) { _ in
+                                    handleSettingChange(selectedRuleIndex: gameType)
+                                }.background(){
+                                    NavigationLink(
+                                        destination: destinationView(for: gameType),
+                                        isActive: $isNavigateToGameSettingView
+                                    ) {
+                                        EmptyView()
+                                    }
                                 }
-                            }) {
-                                Image(systemName: "info.circle") // 你可以选择其他图标
-                                    .foregroundColor(.white)
-                            }
-                            .frame(width: 10, height: 10, alignment: .trailing)
-                            .padding(.trailing, 12.5)
+                                
+                                Button(action: {
+                                    // 点击按钮时，显示弹出窗口
+                                    if self.setting != selectedRule!.setting.count - 1{
+                                        self.showRuleInfo = true
+                                    } else{
+                                        self.isNavigateToGameSettingView = true
+                                    }
+                                }) {
+                                    Image(systemName: "info.circle") // 你可以选择其他图标
+                                        .foregroundColor(.white)
+                                }
+                                .frame(width: 10, height: 10, alignment: .trailing)
+                                .padding(.trailing, 12.5)
                                 .alert(isPresented: $showRuleInfo) {
                                     Alert(
                                         title: Text("规则说明"),
@@ -243,150 +232,6 @@ struct AddRuleSettingView: View{
                                         dismissButton: .default(Text("关闭"))
                                     )
                                 }
-                        }.background(
-                            Image("list_bg") // 背景图片
-                                .resizable()
-                                .scaledToFill()
-                        )
-                        .frame(height: 50)
-                        
-                        //人数设置
-                        HStack{
-                            Image("icon_shufflemode")
-                                .resizable()
-                                .frame(width: 40, height: 40).padding(.leading, 20)
-                            Text("人数设置")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .foregroundColor(.white) // 左侧间距
-                            Picker("playerNum", selection: $playerNum) {
-                                ForEach(0...(self.playerNumList.count) - 1, id: \.self){
-                                    index in Text(String(self.playerNumList[index])).tag(index)
-                                }
-                            }
-                            .pickerStyle(MenuPickerStyle())
-                            .frame(width: 160, height: 30, alignment: .trailing)
-                            .padding(.trailing, 30) // 右侧间距
-                            .accentColor(.white).onChange(of: playerNum) { _ in
-                                handlePlayerNumChange(playerNumIndex: playerNum)
-                                
-                            }
-                            
-                        }.background(
-                            Image("list_bg") // 背景图片
-                                .resizable()
-                                .scaledToFill()
-                        )
-                        .frame(height: 50)
-                        
-                        HStack
-                        {Image("icon_shufflemode")
-                                .resizable()
-                                .frame(width: 40, height: 40).padding(.leading, 20)
-                            Text("洗牌模式")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .foregroundColor(.white) // 左侧间距
-                            Picker("shuffleMode", selection: $shuffleMode) {
-                                ForEach(0...generalRuleSetting.allShuffleMode.count - 1, id: \.self){
-                                    index in Text(generalRuleSetting.allShuffleMode[index]!).tag(index)
-                                }
-                            }
-                            .pickerStyle(MenuPickerStyle())
-                            .frame(width: 160, height: 30, alignment: .trailing)
-                            .padding(.trailing,30) // 右侧间距
-                            .accentColor(.white)
-                            
-                        }.background(
-                            Image("list_bg") // 背景图片
-                                .resizable()
-                                .scaledToFill()
-                        )
-                        .frame(height: 50)
-                        
-                        //发牌定制
-                        HStack
-                        {Image("icon_shufflemode")
-                                .resizable()
-                                .frame(width: 40, height: 40).padding(.leading, 20)
-                            Text("发牌定制")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .foregroundColor(.white) // 左侧间距
-                            NavigationLink(destination: DealTypeView(dealType: $dealType, diyDealType: $diyDealType, diyDealNum: $diyDealNum, diyDealStatus: $diyDealStatus)){
-                                Image("icon_next").resizable().frame(width: 30, height: 30).padding(.trailing, 40)
-                            }
-                        }.background(
-                            Image("list_bg") // 背景图片
-                                .resizable()
-                                .scaledToFill()
-                        )
-                        .frame(height: 50)
-                        
-                        //用牌设置
-                        let firstFiveCard = self.cardToUse.prefix(5)
-                        let firstFiveStringArray = firstFiveCard.compactMap{GameManager.cardLabelDic[$0]}
-                        let concatenatedString = firstFiveStringArray.joined(separator: ",")
-                        
-                        HStack
-                        {Image("icon_shufflemode")
-                                .resizable()
-                                .frame(width: 40, height: 40).padding(.leading, 20)
-                            Text("用牌设置")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .foregroundColor(.white) // 左侧间距
-                            NavigationLink(destination: UsingCardsSettingView(cardToUse: $cardToUse)){
-                                Image("icon_next").resizable().frame(width: 30, height: 30).padding(.trailing, 40)
-                            }
-                            
-                            
-                        }.background(
-                            Image("list_bg") // 背景图片
-                                .resizable()
-                                .scaledToFill()
-                        )
-                        .frame(height: 50)
-                        
-                        //TODO 暂时没有功能
-                        HStack
-                        {Image("icon_shufflemode")
-                                .resizable()
-                                .frame(width: 40, height: 40).padding(.leading, 20)
-                            Text("切牌设置")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .foregroundColor(.white) // 左侧间距
-                            Picker("cutSetting", selection: $cutSetting) {
-                                ForEach(0...generalRuleSetting.allCuttingSetting.count - 1, id: \.self){
-                                    index in Text(generalRuleSetting.allCuttingSetting[index]!).tag(index)
-                                }
-                            }
-                            .pickerStyle(MenuPickerStyle())
-                            .frame(width: 160, height: 30, alignment: .trailing)
-                            .padding(.trailing,30) // 右侧间距
-                            .accentColor(.white)
-                            
-                        }.background(
-                            Image("list_bg") // 背景图片
-                                .resizable()
-                                .scaledToFill()
-                        )
-                        .frame(height: 50)
-                        //报法设置
-                        if cutSetting == 0{
-                            HStack
-                            {Image("icon_shufflemode")
-                                    .resizable()
-                                    .frame(width: 40, height: 40).padding(.leading, 20)
-                                Text("报法设置")
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(.white) // 左侧间距
-                                Picker("reportSetting", selection: $reportSetting) {
-                                    ForEach(0...generalRuleSetting.allReportSettingWithoutCutting.count - 1, id: \.self){
-                                        index in Text(generalRuleSetting.allReportSettingWithoutCutting[index]!).tag(index)
-                                    }
-                                }
-                                .pickerStyle(MenuPickerStyle())
-                                .frame(width: 200, height: 30, alignment: .trailing)
-                                .padding(.trailing,30) // 右侧间距
-                                .accentColor(.white)
-                                
                             }.background(
                                 Image("list_bg") // 背景图片
                                     .resizable()
@@ -394,17 +239,46 @@ struct AddRuleSettingView: View{
                             )
                             .frame(height: 50)
                             
-                        } else if cutSetting == 1 || cutSetting == 2{
+                            //人数设置
+                            HStack{
+                                Image("icon_shufflemode")
+                                    .resizable()
+                                    .frame(width: 40, height: 40).padding(.leading, 20)
+                                Text("人数设置")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .foregroundColor(.white) // 左侧间距
+                                Picker("playerNum", selection: $playerNum) {
+                                    ForEach(0...(self.playerNumList.count) - 1, id: \.self){
+                                        index in Text(String(self.playerNumList[index])).tag(index)
+                                    }
+                                }
+                                .pickerStyle(MenuPickerStyle())
+                                .frame(width: 160, height: 30, alignment: .trailing)
+                                .padding(.trailing, 30) // 右侧间距
+                                .accentColor(.white).onChange(of: playerNum) { _ in
+                                    handlePlayerNumChange(playerNumIndex: playerNum)
+                                    
+                                }
+                                
+                            }.background(
+                                Image("list_bg") // 背景图片
+                                    .resizable()
+                                    .scaledToFill()
+                            )
+                            .frame(height: 50)
+                        
+                        
+                        
                             HStack
                             {Image("icon_shufflemode")
                                     .resizable()
                                     .frame(width: 40, height: 40).padding(.leading, 20)
-                                Text("报法设置")
+                                Text("洗牌模式")
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .foregroundColor(.white) // 左侧间距
-                                Picker("reportSetting", selection: $reportSetting) {
-                                    ForEach(0...generalRuleSetting.allReportSettingWithCutting.count - 1, id: \.self){
-                                        index in Text(generalRuleSetting.allReportSettingWithCutting[index]!).tag(index)
+                                Picker("shuffleMode", selection: $shuffleMode) {
+                                    ForEach(0...generalRuleSetting.allShuffleMode.count - 1, id: \.self){
+                                        index in Text(generalRuleSetting.allShuffleMode[index]!).tag(index)
                                     }
                                 }
                                 .pickerStyle(MenuPickerStyle())
@@ -419,7 +293,92 @@ struct AddRuleSettingView: View{
                             )
                             .frame(height: 50)
                             
-                        }
+                            HStack
+                            {Image("icon_shufflemode")
+                                    .resizable()
+                                    .frame(width: 40, height: 40).padding(.leading, 20)
+                                Text("切牌模式")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .foregroundColor(.white) // 左侧间距
+                                Picker("cutMode", selection: $cutMode) {
+                                    ForEach(0...generalRuleSetting.allCutMode.count - 1, id: \.self){
+                                        index in Text(generalRuleSetting.allCutMode[index]!).tag(index)
+                                    }
+                                }
+                                .pickerStyle(MenuPickerStyle())
+                                .frame(width: 160, height: 30, alignment: .trailing)
+                                .padding(.trailing,30) // 右侧间距
+                                .accentColor(.white)
+                                
+                            }.background(
+                                Image("list_bg") // 背景图片
+                                    .resizable()
+                                    .scaledToFill()
+                            )
+                            .frame(height: 50)
+                        
+                        
+                        
+                            //发牌定制
+                            HStack
+                            {Image("icon_shufflemode")
+                                    .resizable()
+                                    .frame(width: 40, height: 40).padding(.leading, 20)
+                                Text("发牌定制")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .foregroundColor(.white) // 左侧间距
+                                NavigationLink(destination: DealTypeView(dealType: $dealType, diyDealType: $diyDealType, diyDealNum: $diyDealNum, diyDealStatus: $diyDealStatus)){
+                                    Image("icon_next").resizable().frame(width: 30, height: 30).padding(.trailing, 40)
+                                }
+                            }.background(
+                                Image("list_bg") // 背景图片
+                                    .resizable()
+                                    .scaledToFill()
+                            )
+                            .frame(height: 50)
+                            
+                            HStack
+                            {Image("icon_shufflemode")
+                                    .resizable()
+                                    .frame(width: 40, height: 40).padding(.leading, 20)
+                                Text("用牌设置")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .foregroundColor(.white) // 左侧间距
+                                NavigationLink(destination: UsingCardsSettingView(cardToUse: $cardToUse)){
+                                    Image("icon_next").resizable().frame(width: 30, height: 30).padding(.trailing, 40)
+                                }
+                                
+                                
+                            }.background(
+                                Image("list_bg") // 背景图片
+                                    .resizable()
+                                    .scaledToFill()
+                            )
+                            .frame(height: 50)
+                            
+                            
+                            //报法设置
+                            HStack{
+                                Image("icon_shufflemode")
+                                    .resizable()
+                                    .frame(width: 40, height: 40).padding(.leading, 20)
+                                Text("报法设置")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .foregroundColor(.white) // 左侧间距
+                                NavigationLink(destination:  ReportSettingView(reportSetting: $reportSetting)){
+                                
+                                    let text = generalRuleSetting.allReportSetting[reportSetting]!
+                                    Text("[\(reportSetting)] : " + text).frame(width: 180, height: 50, alignment: .trailing)
+                                        .foregroundColor(.white).padding(.trailing,40)
+                                        .multilineTextAlignment(.leading)
+                                }
+                            }.background(
+                                Image("list_bg") // 背景图片
+                                    .resizable()
+                                    .scaledToFill()
+                            )
+                            .frame(height: 50)
+                        
                         
                         
                         Group{
@@ -448,16 +407,15 @@ struct AddRuleSettingView: View{
                             ).frame(height: 50)
                             
                             //打色范围
-    //                        cutNumRangeSetting[0] = Int(xInput)
                             HStack
                             {Image("icon_shufflemode")
                                     .resizable()
                                     .frame(width: 40, height: 40).padding(.leading, 20)
-                                Text("打色范围")
+                                Text("打色参数")
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .foregroundColor(.white) // 左侧间距
                                 NavigationLink(destination:  CutNumRangeSettingView(cutNumRangeSetting: $cutNumRangeSetting)){
-                                    Text("\(cutNumRangeSetting[0])～\(cutNumRangeSetting[1])").frame(maxWidth: .infinity, alignment: .trailing)
+                                    Text("X = \(cutNumRangeSetting[0])   Y = \(cutNumRangeSetting[1])").frame(maxWidth: .infinity, alignment: .trailing)
                                         .foregroundColor(.white).padding(.trailing,40)
                                 }
                             }.background(
@@ -465,8 +423,9 @@ struct AddRuleSettingView: View{
                                     .resizable()
                                     .scaledToFill()
                             ).frame(height: 50)
-                            
-                            //TODO:打色范围，设置X和Y
+                        }
+                        
+                        Group{
                             //位置设置
                             HStack
                             {Image("icon_shufflemode")
@@ -560,7 +519,7 @@ struct AddRuleSettingView: View{
                             message: Text(alertMessage),
                             dismissButton: .default(Text("OK"))
                         )
-                    }.background(NavigationLink(destination: MainContentView(playerNum: playerNum, shuffleMode: shuffleMode, dealType: dealType, diyDealType: diyDealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, calModeArgs: [cutSetting, reportSetting, positionSetting], cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport + 1, cutSetting: cutSetting, reportNumber: reportNumber, voiceReport: voiceReport, ruleIndex: gameType, args: args, rankRules: GameManager.getCheckedIndexes(rankRules: rankRules), suitRules: suitRules, allCardIndex: cardToUse, minCardNum: minCardNum),
+                    }.background(NavigationLink(destination: MainContentView(playerNum: playerNum, shuffleMode: shuffleMode, cutMode: cutMode, dealType: dealType, diyDealType: diyDealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, calModeArgs: [reportSetting, positionSetting], cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport + 1, reportNumber: reportNumber, voiceReport: voiceReport, ruleIndex: gameType, args: args, rankRules: GameManager.getCheckedIndexes(rankRules: rankRules), suitRules: suitRules, allCardIndex: cardToUse, minCardNum: minCardNum),
                                                 isActive: $isNavigateToMainContentView,
                                                 label: EmptyView.init).hidden()
                     )
@@ -588,7 +547,7 @@ struct AddRuleSettingView: View{
                 rankRuleToAddChecked.append(0)
             }
         }
-        let ruleToAdd = GameRule(RuleName: selectedRule!.setting[setting]!, gameType: gameType, setting: setting, calMode: calMode, dealType: dealType, diyDealType: diyDealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, playerNum: playerNum, shuffleMode: shuffleMode, cardToUse: cardToUse, cutNumSetting: cutNumSetting, reportSetting: reportSetting, cutNumRangeSetting: cutNumRangeSetting, positionSetting: positionSetting, consecutiveReport: consecutiveReport, cutSetting: cutSetting, reportNumber: reportNumber, voiceReport: voiceReport, args: args, suitRanks: suitRules, rankRules: rankRulesToAdd, rankRuleChecked: rankRuleToAddChecked)
+        let ruleToAdd = GameRule(RuleName: selectedRule!.setting[setting]!, gameType: gameType, setting: setting, dealType: dealType, diyDealType: diyDealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, playerNum: playerNum, shuffleMode: shuffleMode, cutMode: cutMode,  cardToUse: cardToUse, cutNumSetting: cutNumSetting, reportSetting: reportSetting, cutNumRangeSetting: cutNumRangeSetting, positionSetting: positionSetting, consecutiveReport: consecutiveReport, reportNumber: reportNumber, voiceReport: voiceReport, args: args, suitRanks: suitRules, rankRules: rankRulesToAdd, rankRuleChecked: rankRuleToAddChecked)
         if _selectedSaveIndex == -1{
             RuleManager.allUsersGameRule.append(ruleToAdd)
             _selectedSaveIndex = RuleManager.allUsersGameRule.count - 1
@@ -713,7 +672,7 @@ struct AddRuleSettingView: View{
             break
         case 8:
             let selectedRule = GameManager.gameRules[gameType] as! JiaJiaBaoGameRule
-            minCardNum = JiaJiaBaoGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            minCardNum = JiaJiaBaoGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus, handNum:Int(selectedRule.handNum[args[7]]!)!)
         case 9:
             let selectedRule = GameManager.gameRules[gameType] as! CardNineGameRule
             minCardNum = CardNineGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)

@@ -20,8 +20,6 @@ struct RecordHistoryView: View {
             }
             .hidden()
             
-            SearchBar(searchText: $searchText)
-            
             ScrollView {
                 VStack(spacing: 0) {
                     ForEach(viewModel.recordHistoryData.keys.sorted(), id: \.self) { key in

@@ -27,24 +27,19 @@ struct SettingView: View {
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0)  {
+                        HStack {
+                            Text("静音").foregroundColor(.white).padding()
+                            Spacer()
+                            Toggle("", isOn: $viewModel.isMute).toggleStyle(CustomToggleStyle())
+                                .padding()
+                        }
+                        Divider()
+                            .foregroundColor(.white)
+                        
                             HStack {
                                 Text("黑屏").foregroundColor(.white).padding()
                                 Spacer()
                                 Toggle("", isOn: $viewModel.isBlack).toggleStyle(CustomToggleStyle())
-                                    .padding()
-                            }
-                            Divider()
-                                .foregroundColor(.white)
-
-                            HStack {
-                                Text("静音")
-                                    .foregroundColor(.white)
-                                    .padding()
-
-                                Spacer()
-
-                                Toggle("", isOn: $viewModel.isMute)
-                                    .toggleStyle(CustomToggleStyle())
                                     .padding()
                             }
                             Divider()
