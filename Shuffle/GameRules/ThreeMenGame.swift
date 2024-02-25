@@ -50,16 +50,16 @@ class ThreeMenGameRule : Rule{
         ]
         
         self.setting = [
-            0: "常规三公",
-            1:"三公3-0点大",
-            2:"三公2-3同大",
-            3:"三公4-3同大无混公",
-            4:"三公5-A大于K",
-            5:"三公8-单张比花色",
-            6:"三公9-3公一样大",
-            7:"三公10-333最大",
-            8:"三公12-AAA最大",
-            9:"三公13-10算公",
+            0: "常规三公[310]",
+            1:"三公3-0点大[311]",
+            2:"三公2-3同大[312]",
+            3:"三公4-3同大无混公[313]",
+            4:"三公5-A大于K[314]",
+            5:"三公8-单张比花色[315]",
+            6:"三公9-3公一样大[316]",
+            7:"三公10-333最大[317]",
+            8:"三公12-AAA最大[318]",
+            9:"三公13-10算公[319]",
             10:"三公7-单张比花色",
             11:"三公11-单张比花色",
             12:"自定义三公"
@@ -256,8 +256,8 @@ class ThreeMenGame{
     //8 mixManComparision
     static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
         let rule = GameManager.gameRules[4] as! ThreeMenGameRule
-        let dealType = args[0]
-        let diyDealType = args[1]
+        let dealNum = args[0]
+        let dealType = args[1]
         let playerNum = args[2]
         let pointPointComparision = args[3]
         let samePointComparision = args[4]
@@ -282,54 +282,67 @@ class ThreeMenGame{
         
         var deck = deck
         // 发牌
-        if dealType == 0 || dealType == 1{
-            for _ in 0..<3 {
+        if dealNum == 0{
+            for _ in 0..<3{
+                //正发
                 if dealType == 0{
                     for i in 0..<playerNum {
                         allPlayCards[i].insertCard(card: deck.removeFirst())
                     }
+                //反发
                 } else if dealType == 1 {
-                    allPlayCards[0].insertCard(card: deck.removeFirst())
-                    for i in stride(from: playerNum - 1, to: 0, by: -1) {
-                        allPlayCards[i].insertCard(card: deck.removeFirst())
+                    for i in 0..<playerNum {
+                        allPlayCards[i].insertCard(card: deck.removeLast())
                     }
                 }
             }
+            
         } else {
             for actionIndex in 0...diyDealStatus.count - 1{
                 let cardNum = diyDealNum[actionIndex]
                 let action = diyDealStatus[actionIndex]
                 //派牌
                 if action[0] == true{
-                    if diyDealType == 0{
+                    //正发
+                    if dealType == 0{
                         for i in 0..<playerNum {
                             for _ in 0..<cardNum{
                                 allPlayCards[i].insertCard(card: deck.removeFirst())
                             }
                         }
-                    } else if diyDealType == 1{
-                        for _ in 0..<cardNum{
-                            allPlayCards[0].insertCard(card: deck.removeFirst())
-                        }
-                        for i in stride(from: playerNum - 1, to: 0, by: -1) {
+                    //反发
+                    } else if dealType == 1{
+                        for i in 0..<playerNum {
                             for _ in 0..<cardNum{
-                                allPlayCards[i].insertCard(card: deck.removeFirst())
+                                allPlayCards[i].insertCard(card: deck.removeLast())
                             }
                         }
                     }
                 //公牌
                 } else if action[1] == true {
-                    for _ in 0..<cardNum{
-                        community.append(deck.removeFirst())
+                    if dealType == 0{
+                        for _ in 0..<cardNum{
+                            community.append(deck.removeFirst())
+                        }
+                    } else if dealType == 1{
+                        for _ in 0..<cardNum{
+                            community.append(deck.removeLast())
+                        }
                     }
+                    
                 //去牌
                 } else if action[2] == true {
-                    for _ in 0..<cardNum{
-                        deck.removeFirst()
+                    if dealType == 0 {
+                        for _ in 0..<cardNum{
+                            deck.removeFirst()
+                        }
+                    } else if dealType == 1{
+                        for _ in 0..<cardNum{
+                            deck.removeLast()
+                        }
                     }
                 }
             }
-            
         }
         
         

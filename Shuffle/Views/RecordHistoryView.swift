@@ -20,6 +20,8 @@ struct RecordHistoryView: View {
             }
             .hidden()
             
+            SearchBar(searchText: $searchText)
+            
             ScrollView {
                 VStack(spacing: 0) {
                     ForEach(viewModel.recordHistoryData.keys.sorted(), id: \.self) { key in
@@ -44,13 +46,11 @@ struct RecordHistoryView: View {
                         }
                     }
                 }
-            }
-        }
-        .background(
-            Image("bg")
-                .resizable()
-                .scaledToFill()
-        )
+            }.padding()
+            
+            Spacer()
+            
+        }.background(Image("bg").resizable().scaledToFill())
         .navigationBarTitle("历史记录")
         .onAppear {
             // Show the navigation bar when this view appears

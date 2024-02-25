@@ -8,6 +8,8 @@ class TwoEightGangGameRule : Rule{
     let samePointComparision:[Int:String] = [
         0:"同点比最大牌",
         1:"同点比最大牌，最大牌相同时红红>黑红>黑黑，同点同色庄大",
+        2:"同点比最大花色",
+        3:"同点庄家大"
     ]
     
     let isCompareSuit:[Int:String] = [
@@ -21,10 +23,12 @@ class TwoEightGangGameRule : Rule{
     ]
     
     let QValueRange:[Int:String] = [
-        0:"2"
+        0:"2",
+        1:"0"
     ]
     let JValueRange:[Int:String] = [
-        0:"1"
+        0:"1",
+        1:"0"
     ]
     let pointComparision:[Int:String] = [
         0:"9点最大，0点最小",
@@ -40,13 +44,16 @@ class TwoEightGangGameRule : Rule{
             2:"对子",
         ]
         self.setting = [
-            0: "二八杠对子大",
-            1: "二八杠28比对子大",
-            2: "二八分黑红",
-            3: "二八最大对k次大",
+            0: "二八杠对子大[240]",
+            1: "二八杠28比对子大[241]",
+            2: "二八分黑红[242]",
+            3: "二八最大对k次大[243]",
             4: "二八杠10点大",
             5: "江苏52张二八",
-            6: "自定义"
+            6: "28杠28比对子大[244]",
+            7: "28杠28比对子大[245]",
+            8: "28杠比花色[246]",
+            9: "自定义"
         ]
         self.ruleInfo = [
             0:"""
@@ -88,7 +95,26 @@ class TwoEightGangGameRule : Rule{
             5:"""
     KK最大...AA最小，K算3点、Q算2点、 J算1点，28最大，0点最小，同点比单张大小!
     """,
-            6:"自定义你的规则"
+            6:"""
+扑克张数:40张1到10
+1)28>对10>对9>对8>....>对A
+2)10点>9点>8点.....0点
+3)同点庄家大
+""",
+            7:"""
+扑克张数:52张1到K
+1)28>对K>对Q>对J>对10>....>对A
+2)9点>8点>7点>.....0点 JQK都为10点
+""",
+            8:"""
+扑克张数:40张1到10
+1)对10>对9>对8>....对A。同是对5，
+比最大花色: ♠️>♥️>♣️>♦️
+2)2+8，不比花色
+3)9点>8点>7点>...>0点。同点比最大
+花色: ♠️>♥️>♣️>♦️
+""",
+            9:"自定义你的规则"
         ]
         self.playerNum = [2,3,4,5,6,7,8,9,10]
     }
@@ -134,6 +160,15 @@ class TwoEightGangGame{
         case 5:
             result = Array(0...51)
             break
+        case 6:
+            result = Array(0...9) + Array(13...22) + Array(26...35) + Array(39...48)
+            break
+        case 7:
+            result = Array(0...51)
+            break
+        case 8:
+            result = Array(0...9) + Array(13...22) + Array(26...35) + Array(39...48)
+            break
         default:
             result = Array(0...9) + Array(13...22) + Array(26...35) + Array(39...48)
             break
@@ -176,8 +211,8 @@ class TwoEightGangGame{
     //7 JValueRange
     //8 pointComparision
     static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int], [Int], [Int]) {
-        let dealType = args[0]
-        let diyDealType = args[1]
+        let dealNum = args[0]
+        let dealType = args[1]
         let playerNum = args[2]
         let samePointComparision = args[3]
         let isCompareSuit = args[4]
@@ -205,50 +240,64 @@ class TwoEightGangGame{
         
         var deck = deck
         // 发牌
-        if dealType == 0 || dealType == 1{
-            for _ in 0..<2 {
+        if dealNum == 0{
+            for _ in 0..<2{
+                //正发
                 if dealType == 0{
                     for i in 0..<playerNum {
                         allPlayCards[i].insertCard(card: deck.removeFirst())
                     }
+                //反发
                 } else if dealType == 1 {
-                    allPlayCards[0].insertCard(card: deck.removeFirst())
-                    for i in stride(from: playerNum - 1, to: 0, by: -1) {
-                        allPlayCards[i].insertCard(card: deck.removeFirst())
+                    for i in 0..<playerNum {
+                        allPlayCards[i].insertCard(card: deck.removeLast())
                     }
                 }
             }
+            
         } else {
             for actionIndex in 0...diyDealStatus.count - 1{
                 let cardNum = diyDealNum[actionIndex]
                 let action = diyDealStatus[actionIndex]
                 //派牌
                 if action[0] == true{
-                    if diyDealType == 0{
+                    //正发
+                    if dealType == 0{
                         for i in 0..<playerNum {
                             for _ in 0..<cardNum{
                                 allPlayCards[i].insertCard(card: deck.removeFirst())
                             }
                         }
-                    } else if diyDealType == 1{
-                        for _ in 0..<cardNum{
-                            allPlayCards[0].insertCard(card: deck.removeFirst())
-                        }
-                        for i in stride(from: playerNum - 1, to: 0, by: -1) {
+                    //反发
+                    } else if dealType == 1{
+                        for i in 0..<playerNum {
                             for _ in 0..<cardNum{
-                                allPlayCards[i].insertCard(card: deck.removeFirst())
+                                allPlayCards[i].insertCard(card: deck.removeLast())
                             }
                         }
                     }
                 //公牌
                 } else if action[1] == true {
-                    for _ in 0..<cardNum{
-                        community.append(deck.removeFirst())
+                    if dealType == 0{
+                        for _ in 0..<cardNum{
+                            community.append(deck.removeFirst())
+                        }
+                    } else if dealType == 1{
+                        for _ in 0..<cardNum{
+                            community.append(deck.removeLast())
+                        }
                     }
+                    
                 //去牌
                 } else if action[2] == true {
-                    for _ in 0..<cardNum{
-                        deck.removeFirst()
+                    if dealType == 0 {
+                        for _ in 0..<cardNum{
+                            deck.removeFirst()
+                        }
+                    } else if dealType == 1{
+                        for _ in 0..<cardNum{
+                            deck.removeLast()
+                        }
                     }
                 }
             }
@@ -339,7 +388,7 @@ class TwoEightGangGameHandEvaluator{
             if rank == 0{
                 continue
             } else {
-                score = (1 << (i + 10)) | rank
+                score = (1 << (i + 11)) | rank
                 print("牌型 \(ruleIndex) score \(score)")
                 return score
             }
@@ -363,6 +412,8 @@ class TwoEightGangGameHandEvaluator{
         if cards[0].rank == cards[1].rank {
             if self.samePointComparision == 1{
                 return cards[0].rank << 2 | (self.blackRedJudger(card: cards[0]) + self.blackRedJudger(card: cards[1]))
+            } else if self.samePointComparision == 2 {
+                return cards[0].rank << 2 | max(cards[0].suit[0], cards[1].suit[0])
             } else {
                 return cards[0].rank
             }
@@ -389,13 +440,17 @@ class TwoEightGangGameHandEvaluator{
             num1 = (num1 + 10 - 1) % 10
             num2 = (num2 + 10 - 1) % 10
         }
-        let rank = (num1 + num2) % 10
+        let rank = (num1 + num2) % 10 + 1
         
         
         if self.samePointComparision == 0 {
             return rank << 6 | cards[0].rank << 2 | cards[0].suit[0]
-        } else {
+        } else if self.samePointComparision == 1 {
             return rank << 8 | cards[0].rank << 4 | cards[0].suit[0] << 2 | (self.blackRedJudger(card: cards[0]) + self.blackRedJudger(card: cards[1]))
+        } else if self.samePointComparision == 2 {
+            return rank << 2 | max(cards[0].suit[0], cards[1].suit[0])
+        } else {
+            return rank
         }
     }
     

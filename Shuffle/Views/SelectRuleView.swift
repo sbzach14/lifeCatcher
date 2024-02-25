@@ -64,6 +64,7 @@ struct SelectRuleView: View {
                     .background(Color.clear)
                     .listRowBackground(Color.clear)
                 
+                Spacer()
                 
                 
                 HStack{
@@ -92,8 +93,8 @@ struct SelectRuleView: View {
 }
 
 struct SelectRuleView_Previews: PreviewProvider {
-    static let testRule1 =  GameRule(RuleName: "规则001", gameType: 0, setting: 0, dealType: 0, diyDealType: 0, diyDealNum: [], diyDealStatus: [], playerNum: 0, shuffleMode: 0, cutMode: 0, cardToUse: [0,1,2,3,4,5,6,7,8,9], cutNumSetting: 0, reportSetting: 0, cutNumRangeSetting: [2,10], positionSetting: 0, consecutiveReport: 0, reportNumber: 0, voiceReport: 0,args: [], suitRanks: [], rankRules: [], rankRuleChecked: [])
-    static let testRule2 = GameRule(RuleName: "规则002", gameType: 0, setting: 0, dealType: 0, diyDealType: 0, diyDealNum: [], diyDealStatus: [], playerNum: 0, shuffleMode: 0, cutMode: 0, cardToUse: [0,1,2,3,4,5,6,7,8,9], cutNumSetting: 0, reportSetting: 2, cutNumRangeSetting: [2,10], positionSetting: 0, consecutiveReport: 0, reportNumber: 0, voiceReport: 0,args: [], suitRanks: [], rankRules: [], rankRuleChecked: [])
+    static let testRule1 =  GameRule(RuleName: "规则001", gameType: 0, setting: 0, dealNum: 0, coloringType: 0, dealType: 0, diyDealNum: [], diyDealStatus: [], playerNum: 0, shuffleMode: 0, cutMode: 0, cardToUse: [0,1,2,3,4,5,6,7,8,9], cutNumSetting: 0, reportSetting: 0, cutNumRangeSetting: [2,10], positionSetting: 0, consecutiveReport: 0, reportNumber: 0, voiceReport: 0,args: [], suitRanks: [], rankRules: [], rankRuleChecked: [])
+    static let testRule2 = GameRule(RuleName: "规则002", gameType: 0, setting: 0, dealNum: 0, coloringType: 0, dealType: 0, diyDealNum: [], diyDealStatus: [], playerNum: 0, shuffleMode: 0, cutMode: 0, cardToUse: [0,1,2,3,4,5,6,7,8,9], cutNumSetting: 0, reportSetting: 2, cutNumRangeSetting: [2,10], positionSetting: 0, consecutiveReport: 0, reportNumber: 0, voiceReport: 0,args: [], suitRanks: [], rankRules: [], rankRuleChecked: [])
             
     static var previews: some View {
         if RuleManager.allUsersGameRule.count == 0 {

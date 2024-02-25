@@ -13,6 +13,11 @@ class DealClass{
         0:"正发",
         1:"反发",
     ]
+    
+    static let coloringDic: [Int: String] = [
+        0:"正面打色",
+        1:"反面打色"
+    ]
 }
 struct DealStatus{
     var shouldDeal:Bool = false
@@ -21,8 +26,9 @@ struct DealStatus{
 }
 
 struct DealTypeView: View {
+    @Binding var dealNum: Int
+    @Binding var coloringType: Int
     @Binding var dealType: Int
-    @Binding var diyDealType: Int
     @Binding var diyDealNum: [Int]
     @Binding var diyDealStatus: [[Bool]] // [[0，派牌，1，公牌， 2， 去牌]]
     var body: some View {
@@ -35,13 +41,13 @@ struct DealTypeView: View {
                 
                 Text("发牌定制").frame(maxWidth: .infinity, alignment: .leading)
                     .foregroundColor(.white)
-                Picker("dealType", selection: $dealType) {
+                Picker("dealType", selection: $dealNum) {
                     ForEach(0...generalRuleSetting.allDealType.count - 1, id: \.self){
                         index in Text(generalRuleSetting.allDealType[index]!).tag(index)
                     }
                 }
                 .pickerStyle(MenuPickerStyle())
-                .frame(width: 160, height: 30, alignment: .trailing)
+                .frame(width: 180, height: 30, alignment: .trailing)
                 .padding(.trailing,30) // 右侧间距
                 .accentColor(.white)
                 
@@ -52,33 +58,55 @@ struct DealTypeView: View {
             )
             .frame(height: 50)
             
-            if dealType == 2{
+            HStack{
+                Image("icon_shufflemode")
+                    .resizable()
+                    .frame(width: 40, height: 40).padding(.leading, 20)
+                
+                Text("打色模式").frame(maxWidth: .infinity, alignment: .leading)
+                    .foregroundColor(.white)
+                Picker("dealType", selection: $coloringType) {
+                    ForEach(0...DealClass.coloringDic.count - 1, id: \.self){
+                        index in Text(DealClass.coloringDic[index]!).tag(index)
+                    }
+                }
+                .pickerStyle(MenuPickerStyle())
+                .frame(width: 160, height: 30, alignment: .trailing)
+                .padding(.trailing,30) // 右侧间距
+                .accentColor(.white)
+            }.background(
+                Image("list_bg") // 背景图片
+                    .resizable()
+                    .scaledToFill()
+            )
+            .frame(height: 50)
+            
+            HStack{
+                Image("icon_shufflemode")
+                    .resizable()
+                    .frame(width: 40, height: 40).padding(.leading, 20)
+                
+                Text("正发反发").frame(maxWidth: .infinity, alignment: .leading)
+                    .foregroundColor(.white)
+                Picker("dealType", selection: $dealType) {
+                    ForEach(0...DealClass.dealDic.count - 1, id: \.self){
+                        index in Text(DealClass.dealDic[index]!).tag(index)
+                    }
+                }
+                .pickerStyle(MenuPickerStyle())
+                .frame(width: 160, height: 30, alignment: .trailing)
+                .padding(.trailing,30) // 右侧间距
+                .accentColor(.white)
+            }.background(
+                Image("list_bg") // 背景图片
+                    .resizable()
+                    .scaledToFill()
+            )
+            .frame(height: 50)
+            
+            if dealNum == 1{
                 Group{
                     VStack{
-                        
-                        HStack{
-                            Image("icon_shufflemode")
-                                .resizable()
-                                .frame(width: 40, height: 40).padding(.leading, 20)
-                            
-                            Text("正发反发").frame(maxWidth: .infinity, alignment: .leading)
-                                .foregroundColor(.white)
-                            Picker("diyDealType", selection: $diyDealType) {
-                                ForEach(0...DealClass.dealDic.count - 1, id: \.self){
-                                    index in Text(DealClass.dealDic[index]!).tag(index)
-                                }
-                            }
-                            .pickerStyle(MenuPickerStyle())
-                            .frame(width: 160, height: 30, alignment: .trailing)
-                            .padding(.trailing,30) // 右侧间距
-                            .accentColor(.white)
-                        }
-                        .background(
-                            Image("list_bg") // 背景图片
-                                .resizable()
-                                .scaledToFill()
-                        )
-                        .frame(height: 50)
                         
                         Spacer().frame(height: 25)
 
@@ -196,10 +224,11 @@ struct DealTypeView: View {
 
 struct DealTypeView_Previews: PreviewProvider {
     static var previews: some View {
-        let dealType: Binding<Int> = .constant(2)
-        let diyDealType: Binding<Int> = .constant(0)
+        let dealNum: Binding<Int> = .constant(1)
+        let coloringType: Binding<Int> = .constant(1)
+        let dealType: Binding<Int> = .constant(0)
         let diyDealNum: Binding<[Int]> = .constant([2,1,1,1])
         let diyDealStatus: Binding<[[Bool]]> = .constant([[false, false, true], [false,true,false], [true, false,false], [true, false,false]])
-        DealTypeView(dealType: dealType, diyDealType: diyDealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus)
+        DealTypeView(dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus)
     }
 }
