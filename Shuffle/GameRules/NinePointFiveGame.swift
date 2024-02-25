@@ -32,7 +32,8 @@ class NinePointFiveGameRule : Rule{
     ]
     
     let samePointComparision: [Int: String] = [
-        0: "同点同对庄赢"
+        0: "同点同对庄赢",
+        1: "同点时 两红>一红一黑>两黑",
     ]
     
     let isPairSameRank: [Int: String] = [
@@ -44,6 +45,7 @@ class NinePointFiveGameRule : Rule{
         0:"无限制",
         1:"同色才是对子，不同色直接算点数"
     ]
+    
     
     
     override init(ruleIndex: Int, ruleName: String) {
@@ -59,17 +61,21 @@ class NinePointFiveGameRule : Rule{
             0: "散牌"
         ]
         self.setting = [
-            0: "54张九点半",
-            1: "54张9点半1",
-            2: "江西九点半",
-            3: "安徽九点半",
-            4: "江西54张九点半",
-            5: "九点半最大",
-            6: "江西九点半1",
-            7: "临沂九点半，对王最大",
+            0: "54张九点半[227]",
+            1: "54张9点半1[228]",
+            2: "江西九点半[229]",
+            3: "安徽九点半[230]",
+            4: "江西54张九点半[231]",
+            5: "九点半最大[232]",
+            6: "江西九点半1[233]",
+            7: "临沂九点半，对王最大[234]",
             8: "江西九点半2",
             9: "九点半最大2",
-            10: "自定义九点半",
+            10:"安徽九点半[226]",
+            11:"安徽九点半[235]",
+            12:"江西九点半[237]",
+            13:"54张九点半[238]",
+            14: "自定义九点半",
         ]
         self.ruleInfo = [
             0:"""
@@ -134,6 +140,29 @@ class NinePointFiveGameRule : Rule{
     2) 王/K/Q/J算半点，对子算点数，9点半最大。
     """,
             10:"""
+            扑克张数:54张不分花色
+            1)9+k>对子，对子一样大，两黑或者两红才算对子，对子一黑一红算点数
+            2)9点>8点半.....0点最小
+            3)大王算1点，k算半点，Q算2点，J算一点，同色才为对子,不同色算点数。
+            """,
+            11:"""
+            扑克张数:54张不分花色
+            1)9+k>对子，对子一样大，两黑或者两红才算对子，对子一黑一红算点数
+            2)9点>8点半.....0点最小
+            3)大王算1点，k算半点，Q算2点，J算一点，同色才为对子，不同色算点数。
+            """,
+            12:"""
+            扑克张数:54张分花色
+            1) 9+王>对K>对Q>对J>......>对1
+            2)9点>8点半>8点>7点半>...0最小同色才算对子同点时两红>一红一黑>两黑
+            王=半点K=3 Q=2 J=1
+            """,
+            13:"""
+            扑克张数:54张不分花色,对子算点数
+            1)九点半最大
+            2)9点>8点半>8点>.....0点最小大小王，JKQ算半点
+            """,
+            14:"""
     自定义你的规则
     """,
 
@@ -197,6 +226,18 @@ class NinePointFiveGame{
         case 9:
             result = Array(0...51) + [53,54]
             break
+        case 10:
+            result = Array(0...51) + [53,54]
+            break
+        case 11:
+            result = Array(0...51) + [53,54]
+            break
+        case 12:
+            result = Array(0...51) + [53,54]
+            break
+        case 13:
+            result = Array(0...51) + [53,54]
+            break
         default:
             result = Array(0...51) + [53,54]
             break
@@ -242,8 +283,8 @@ class NinePointFiveGame{
     //10 pairRequirement
     
     static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
-        let dealType = args[0]
-        let diyDealType = args[1]
+        let dealNum = args[0]
+        let dealType = args[1]
         let playerNum = args[2]
         let redJokerValueRange = args[3]
         let blackJokerValueRange = args[4]
@@ -270,50 +311,64 @@ class NinePointFiveGame{
         
         var deck = deck
         // 发牌
-        if dealType == 0 || dealType == 1{
-            for _ in 0..<2 {
+        if dealNum == 0{
+            for _ in 0..<2{
+                //正发
                 if dealType == 0{
                     for i in 0..<playerNum {
                         allPlayCards[i].insertCard(card: deck.removeFirst())
                     }
+                //反发
                 } else if dealType == 1 {
-                    allPlayCards[0].insertCard(card: deck.removeFirst())
-                    for i in stride(from: playerNum - 1, to: 0, by: -1) {
-                        allPlayCards[i].insertCard(card: deck.removeFirst())
+                    for i in 0..<playerNum {
+                        allPlayCards[i].insertCard(card: deck.removeLast())
                     }
                 }
             }
+            
         } else {
             for actionIndex in 0...diyDealStatus.count - 1{
                 let cardNum = diyDealNum[actionIndex]
                 let action = diyDealStatus[actionIndex]
                 //派牌
                 if action[0] == true{
-                    if diyDealType == 0{
+                    //正发
+                    if dealType == 0{
                         for i in 0..<playerNum {
                             for _ in 0..<cardNum{
                                 allPlayCards[i].insertCard(card: deck.removeFirst())
                             }
                         }
-                    } else if diyDealType == 1{
-                        for _ in 0..<cardNum{
-                            allPlayCards[0].insertCard(card: deck.removeFirst())
-                        }
-                        for i in stride(from: playerNum - 1, to: 0, by: -1) {
+                    //反发
+                    } else if dealType == 1{
+                        for i in 0..<playerNum {
                             for _ in 0..<cardNum{
-                                allPlayCards[i].insertCard(card: deck.removeFirst())
+                                allPlayCards[i].insertCard(card: deck.removeLast())
                             }
                         }
                     }
                 //公牌
                 } else if action[1] == true {
-                    for _ in 0..<cardNum{
-                        community.append(deck.removeFirst())
+                    if dealType == 0{
+                        for _ in 0..<cardNum{
+                            community.append(deck.removeFirst())
+                        }
+                    } else if dealType == 1{
+                        for _ in 0..<cardNum{
+                            community.append(deck.removeLast())
+                        }
                     }
+                    
                 //去牌
                 } else if action[2] == true {
-                    for _ in 0..<cardNum{
-                        deck.removeFirst()
+                    if dealType == 0 {
+                        for _ in 0..<cardNum{
+                            deck.removeFirst()
+                        }
+                    } else if dealType == 1{
+                        for _ in 0..<cardNum{
+                            deck.removeLast()
+                        }
                     }
                 }
             }
@@ -401,7 +456,7 @@ class NinePointFiveGameHandEvaluator{
             if rank == 0{
                 continue
             } else {
-                score = (1 << (i + 6)) | rank
+                score = (1 << (i + 8)) | rank
                 print("牌型 \(ruleIndex) rank \(score)")
 
                 break
@@ -484,6 +539,19 @@ class NinePointFiveGameHandEvaluator{
         
         rank = cards[0].point + cards[1].point
         rank = rank % 20
+        if self.samePointComparision == 1{
+            //两红
+            if self.blackRedJudger(card: cards[0]) == self.blackRedJudger(card: cards[1]) && self.blackRedJudger(card: cards[0]) == 0{
+                return (rank + 1) << 2 | 2
+            //混色
+            } else if self.blackRedJudger(card: cards[0]) != self.blackRedJudger(card: cards[1]){
+                return (rank + 1) << 2 | 1
+            //两黑
+            } else if self.blackRedJudger(card: cards[0]) == self.blackRedJudger(card: cards[1]) && self.blackRedJudger(card: cards[0]) == 1{
+                return (rank + 1) << 2
+            }
+            
+        }
         
         return rank + 1
     }
@@ -491,7 +559,6 @@ class NinePointFiveGameHandEvaluator{
     func blackRedJudger(card: NinePointFiveCard) -> Int{
         //黑色
         if self.suitRules.firstIndex(of: card.suit) == 0 || self.suitRules.firstIndex(of: card.suit) == 2 {
-            
             return 1
         //红色
         } else {

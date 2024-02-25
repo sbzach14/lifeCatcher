@@ -49,8 +49,9 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     public var state : String = "idle" //
     public var shuffleMode : Int = 0 //0shuffle 1riffleTop 2riffleCenter
     public var playerNum: Int = 0
+    public var dealNum: Int = 0
+    public var coloringType: Int = 0
     public var dealType: Int = 0
-    public var diyDealType: Int = 0
     public var diyDealNum: [Int] = []
     public var diyDealStatus: [[Bool]] = []
     public var calModeArgs : [Int] = [0, 0, 1]
@@ -124,12 +125,13 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     var testCVPixelBuffer : CVPixelBuffer?
 
 
-    func initialize(playerNum: Int, shuffleMode : Int, dealType: Int, diyDealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], calModeArgs : [Int],cutNumSetting: Int, cutNumRangeSetting:[Int], consecutiveReport: Int, cutSetting:Int, reportNumber: Int, voiceReport:Int, ruleIndex: Int, args : [Int], rankRules : [Int], suitRules : [Int], allCardIndex : [Int], minCardNum : Int) {
+    func initialize(playerNum: Int, shuffleMode : Int, dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], calModeArgs : [Int],cutNumSetting: Int, cutNumRangeSetting:[Int], consecutiveReport: Int, cutSetting:Int, reportNumber: Int, voiceReport:Int, ruleIndex: Int, args : [Int], rankRules : [Int], suitRules : [Int], allCardIndex : [Int], minCardNum : Int) {
         
         self.playerNum = (GameManager.gameRules[ruleIndex]?.playerNum[playerNum])!
         self.shuffleMode = shuffleMode
+        self.dealNum = dealNum
+        self.coloringType = coloringType
         self.dealType = dealType
-        self.diyDealType = diyDealType
         self.diyDealNum = diyDealNum
         self.diyDealStatus = diyDealStatus
         self.calModeArgs = calModeArgs
@@ -192,24 +194,25 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 
 //        规则测试代码
         print("calArgs \(calModeArgs[2])")
-//        for i in 0..<1{
-//            print("测试用例 ",i + 1,"")
-//            var randomCardArray = Array(0...51)
-//            randomCardArray.shuffle()
-//            //切断
-//            randomCardArray = Array(randomCardArray.prefix(35))
-//            
-//            self.cardArray = randomCardArray
-//
-//            var cardString:String = "当前牌库："
-//            for cardIndex in cardArray{
-//                cardString += cardLabelDic[cardIndex]! + " "
-//            }
-//            print(cardArray)
-//            print(cardString)
-//            self.cardArray = [4,18,32, 4,6,0, 0,12,10, 1,2,4, 4,17,30, 13,12,10, 1,15,4, 5,4,6, 18,30,6, 53,54,3, 53,4,5, 54,6,20, 53,4,0, 54,7,22, 8,32,41]
-//            self.computeWinnerPlayer()
-//        }
+        for i in 0..<1{
+            print("测试用例 ",i + 1,"")
+            var randomCardArray = Array(0...51)
+            randomCardArray.shuffle()
+            //切断
+            randomCardArray = Array(randomCardArray.prefix(35))
+            self.cardArray = randomCardArray
+            
+            self.cardArray = [4,18,32, 4,6,0, 0,12,10, 1,2,4, 4,17,30, 13,12,10, 1,15,4, 5,4,6, 18,30,6, 53,54,3, 53,4,5, 54,6,20, 53,4,0, 54,7,22, 8,32,41]
+            
+            var cardString:String = "当前牌库："
+            for cardIndex in cardArray{
+                cardString += cardLabelDic[cardIndex]! + " "
+            }
+            print(cardArray)
+            print(cardString)
+            
+            self.computeWinnerPlayer()
+        }
 
     }
     
@@ -1406,7 +1409,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     func computeWinnerPlayer() {
         print("计算信息")
         
-        print("测试游戏：\(generalRuleSetting.allGameType[ruleIndex]), 游戏人数 \(playerNum), args：\(args), 花色顺序：\(suitRules), 发牌模式: \(dealType), 自定义发牌模式: \(diyDealType), 自定义发牌类型和发牌数量：\(diyDealStatus), \(diyDealNum), 打色模式：\(calModeArgs[0]), 打色目标，\(calModeArgs[1]), 目标位置：\(calModeArgs[2]), 打色点数设置: \(cutNumSetting), 打色范围：\(cutNumRangeSetting[0])- \(cutNumRangeSetting[1]), 连报轮数：\(consecutiveReport)")
+        print("测试游戏：\(generalRuleSetting.allGameType[ruleIndex]), 游戏人数 \(playerNum), args：\(args), 花色顺序：\(suitRules), 发牌定制: \(dealNum), 打色模式: \(coloringType) 正发反发: \(dealType),  自定义发牌类型和发牌数量：\(diyDealStatus), \(diyDealNum), 打色模式：\(calModeArgs[0]), 打色目标，\(calModeArgs[1]), 目标位置：\(calModeArgs[2]), 打色点数设置: \(cutNumSetting), 打色范围：\(cutNumRangeSetting[0])- \(cutNumRangeSetting[1]), 连报轮数：\(consecutiveReport)")
         
 //        if cardArray.count == self.allCardIndex.count{
 //            speakText(input: 0)
@@ -1416,7 +1419,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 //        }
         print("开始需要的最少牌数 \(minCardNum)")
         if cardArray.count >= minCardNum && cardArray.count > cutNumRangeSetting[0] && cardArray.count > cutNumRangeSetting[1] - minCardNum{
-            winnerPlayer = GameManager.selectGame(gameIndex: ruleIndex, inputCards: cardArray, playerNum: playerNum, args: args, rankRules: rankRules, suitRules: suitRules, dealType: dealType, diyDealType: diyDealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, cutSetting: cutSetting, minCardNum: minCardNum)
+            winnerPlayer = GameManager.selectGame(gameIndex: ruleIndex, inputCards: cardArray, playerNum: playerNum, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, cutSetting: cutSetting, minCardNum: minCardNum)
             
             winnerPlayerShow = ""
             for winnerSet in winnerPlayer{

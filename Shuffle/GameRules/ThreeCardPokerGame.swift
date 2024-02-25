@@ -100,11 +100,15 @@ class ThreeCardPokerGameRule : Rule{
             0: "散牌"
         ]
         self.setting = [
-            0: "金花",
-            1: "金花顺大",
-            2: "金花AKJ",
-            3: "金花",
-            4: "自定义"
+            0: "金花[301]",
+            1: "金花顺大[302]",
+            2: "金花AKJ[303]",
+            3: "百变金花[305]",
+            4: "金花4选3[420]",
+            5: "金花A23[306]",
+            6: "金花5选3[560]",
+            7: "金花6选3[610]",
+            8: "自定义"
         ]
         self.ruleInfo = [
             0:"""
@@ -128,6 +132,42 @@ class ThreeCardPokerGameRule : Rule{
             6) 散牌: A最大 2最小
             """,
             4:"""
+            游戏说明
+            牌数:52张(没有大小王)每家4张牌，选3张规则:
+            1)豹子:3张同样大小的牌
+            2)顺金:花色相同的顺子
+            3)金花:花色相同的牌
+            4)顺子:花色不全相同的相连3张牌
+            5)对子:对A...对26) 散牌:A最大2最小
+            """,
+            5:"""
+            牌数:52张(没有大小王)每家3张牌规则:
+            1)豹子:3张同样大小的牌
+            2)顺金:花色相同的顺子
+            3)金花:花色相同的牌
+            4)顺子:QKA> A23>JQK...>234
+            5)对子:对A...对2
+            6) 散牌:A最大2最小
+            """,
+            6:"""
+            牌数:52张(没有大小王)每家5张牌，选3张规则:
+            1)豹子:3张同样大小的牌
+            2)顺金:花色相同的顺子
+            3)金花:花色相同的牌
+            4)顺子:花色不全相同的相连3张牌
+            5)对子:对A...对2
+            6)散牌:A最大2最小
+            """,
+            7:"""
+            牌数:52张(没有大小王)每家6张牌，选3张规则:
+            1)豹子:3张同样大小的牌
+            2)顺金:花色相同的顺子
+            3)金花:花色相同的牌
+            4)顺子:花色不全相同的相连3张牌
+            5)对子:对A...对2
+            6)散牌:A最大2最小
+            """,
+            8:"""
     自定义你的规则
     """
         ]
@@ -210,8 +250,8 @@ class ThreeCardPokerGame{
     static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
         print("炸金花参数 \(args)")
         let rule = GameManager.gameRules[2] as! ThreeCardPokerGameRule
-        let dealType = args[0]
-        let diyDealType = args[1]
+        let dealNum = args[0]
+        let dealType = args[1]
         let playerNum = args[2]
         let handNum = rule.handNum[args[3]]
         let isCompareSuit = args[4]
@@ -226,6 +266,7 @@ class ThreeCardPokerGame{
         let blackJokerSuit = args[13]
         let blackJokerRank = args[14]
         let isReverseHighCard = args[15]
+        
         
         var maxRank = 0
         var winners: [Int] = []
@@ -242,50 +283,64 @@ class ThreeCardPokerGame{
         
         var deck = deck
         // 发牌
-        if dealType == 0 || dealType == 1{
-            for _ in 0..<handNum {
+        if dealNum == 0{
+            for _ in 0..<handNum{
+                //正发
                 if dealType == 0{
                     for i in 0..<playerNum {
                         allPlayCards[i].insertCard(card: deck.removeFirst())
                     }
+                //反发
                 } else if dealType == 1 {
-                    allPlayCards[0].insertCard(card: deck.removeFirst())
-                    for i in stride(from: playerNum - 1, to: 0, by: -1) {
-                        allPlayCards[i].insertCard(card: deck.removeFirst())
+                    for i in 0..<playerNum {
+                        allPlayCards[i].insertCard(card: deck.removeLast())
                     }
                 }
             }
-        } else if dealType == 2{
+            
+        } else {
             for actionIndex in 0...diyDealStatus.count - 1{
                 let cardNum = diyDealNum[actionIndex]
                 let action = diyDealStatus[actionIndex]
                 //派牌
                 if action[0] == true{
-                    if diyDealType == 0{
+                    //正发
+                    if dealType == 0{
                         for i in 0..<playerNum {
                             for _ in 0..<cardNum{
                                 allPlayCards[i].insertCard(card: deck.removeFirst())
                             }
                         }
-                    } else if diyDealType == 1{
-                        for _ in 0..<cardNum{
-                            allPlayCards[0].insertCard(card: deck.removeFirst())
-                        }
-                        for i in stride(from: playerNum - 1, to: 0, by: -1) {
+                    //反发
+                    } else if dealType == 1{
+                        for i in 0..<playerNum {
                             for _ in 0..<cardNum{
-                                allPlayCards[i].insertCard(card: deck.removeFirst())
+                                allPlayCards[i].insertCard(card: deck.removeLast())
                             }
                         }
                     }
                 //公牌
                 } else if action[1] == true {
-                    for _ in 0..<cardNum{
-                        community.append(deck.removeFirst())
+                    if dealType == 0{
+                        for _ in 0..<cardNum{
+                            community.append(deck.removeFirst())
+                        }
+                    } else if dealType == 1{
+                        for _ in 0..<cardNum{
+                            community.append(deck.removeLast())
+                        }
                     }
+                    
                 //去牌
                 } else if action[2] == true {
-                    for _ in 0..<cardNum{
-                        deck.removeFirst()
+                    if dealType == 0 {
+                        for _ in 0..<cardNum{
+                            deck.removeFirst()
+                        }
+                    } else if dealType == 1{
+                        for _ in 0..<cardNum{
+                            deck.removeLast()
+                        }
                     }
                 }
             }
@@ -298,7 +353,55 @@ class ThreeCardPokerGame{
             }
             print("玩家 \(i) 手牌 \(playerCardStr)")
         }
-        
+        if handNum == 3 {
+            for i in 0..<playerNum {
+                allPlayCards[i].evaluateFlag = ThreeCardPokerGameHandEvaluator(
+                    isCompareSuit: isCompareSuit,
+                    minRank: minRank,
+                    isAce: isAce,
+                    isAceStraight: isAceStraight,
+                    isHeadCard: isHeadCard,
+                    isRedJoker: isRedJoker,
+                    redJokerSuit: redJokerSuit,
+                    redJokerRank: redJokerRank,
+                    isBlackJoker: isBlackJoker,
+                    blackJokerSuit: blackJokerSuit,
+                    blackJokerRank: blackJokerRank,
+                    isReverseHighCard: isReverseHighCard,
+                    rankRules: rankRules,
+                    suitRules: suitRules
+                ).evalHand(cards: allPlayCards[i].playerCard)
+                print("evaluateFlag \(allPlayCards[i].evaluateFlag)")
+            }
+        } else if handNum > 3{
+            for i in 0..<playerNum {
+                var allcards = Array(allPlayCards[i].playerCard)
+                var maxFlag = 0
+                for combination in allcards.combinations(ofCount: 3){
+                    allPlayCards[i].evaluateFlag = ThreeCardPokerGameHandEvaluator(
+                        isCompareSuit: isCompareSuit,
+                        minRank: minRank,
+                        isAce: isAce,
+                        isAceStraight: isAceStraight,
+                        isHeadCard: isHeadCard,
+                        isRedJoker: isRedJoker,
+                        redJokerSuit: redJokerSuit,
+                        redJokerRank: redJokerRank,
+                        isBlackJoker: isBlackJoker,
+                        blackJokerSuit: blackJokerSuit,
+                        blackJokerRank: blackJokerRank,
+                        isReverseHighCard: isReverseHighCard,
+                        rankRules: rankRules,
+                        suitRules: suitRules
+                    ).evalHand(cards: combination)
+                    print("evaluateFlag \(allPlayCards[i].evaluateFlag)")
+                    if maxFlag < allPlayCards[i].evaluateFlag {
+                        maxFlag = allPlayCards[i].evaluateFlag
+                    }
+                }
+                allPlayCards[i].evaluateFlag = maxFlag
+            }
+        }
         for i in 0..<playerNum {
             allPlayCards[i].evaluateFlag = ThreeCardPokerGameHandEvaluator(
                 isCompareSuit: isCompareSuit,
@@ -487,13 +590,13 @@ class ThreeCardPokerGameHandEvaluator {
         
         let handCombinations = cards.combinations(ofCount: 3)
         for handCombination in handCombinations{
-            print("handCombination \(handCombination[0].rank)")
             allCards.append(handCombination)
             
             var aceList = [Card]()
             for card in handCombination{
                 aceList.append(Card(suit: card.suit, rank: card.rank, cardIndex: card.cardIndex))
             }
+            print("aceList \(aceList[0].rank) \(aceList[1].rank) \(aceList[2].rank)")
             
             if self.isAceStraight != 0 && self.isAce == 2{
                 var isAdd = false
@@ -504,9 +607,7 @@ class ThreeCardPokerGameHandEvaluator {
                     }
                 }
                 if isAdd{
-                    print("aceList \(aceList[0].rank) handCombination \(handCombination[0].rank)")
                     allCards.append(aceList)
-                    
                 }
             }
         }
@@ -994,9 +1095,6 @@ class ThreeCardPokerGameHandEvaluator {
                 rankList.append(cards[i].rank)
             }
         }
-        
-        print("Rank List \(rankList)")
-
         if cntC == 3 {
             straightHead = 15
             for i in 0..<3 {

@@ -42,7 +42,8 @@ class PokerBullRule : Rule{
         0:"同牛同点比最大的牌，无牛也比最大的牌",
         1:"同牛同点比牛架后两张，无牛比最大的牌",
         2:"同牛同点一样大，无牛一样大",
-        3:"同牛同点比最大的牌，最大一样比次大，次大一样比第三大"
+        3:"同牛同点比最大的牌，最大一样比次大，次大一样比第三大",
+        4:"同为牛牛相比5张总点数，点输越小越大，同牛同点一样大，无牛一样大"
     ]
     
     let jokerIsMinZero:[Int:String] = [
@@ -60,6 +61,7 @@ class PokerBullRule : Rule{
         7:"五张牌相加小于等于9",
         8:"任意三张牌点数之和是10的倍数并且大于20点",
     ]
+    
     let tenValueRange:[Int:String] = [
         0:"0",
         1:"1",
@@ -71,6 +73,7 @@ class PokerBullRule : Rule{
         0:"0",
         1:"1",
         2:"11",
+        3:"和A一样"
     ]
     let QValueRange:[Int:String] = [
         0:"0",
@@ -160,24 +163,30 @@ class PokerBullRule : Rule{
         42:"高牌",
         43:"铁板牛牛+牛",
         44:"三条牛+牛",
-        45:"三条牛牛 + 牛牛"
+        45:"三条牛牛 + 牛牛",
+        46:"三条"
     ]
     override init(ruleIndex: Int, ruleName: String) {
         super.init(ruleIndex: ruleIndex, ruleName: ruleName)
         self.rankRules = PokerBullRule.fiveCardsRankRules
         self.playerNum = [2,3,4,5,6,7,8]
         self.setting = [
-            0: "斗牛-分花色",
-            1: "斗牛-不分花色",
-            2: "斗牛-不分花色2",
-            3: "斗牛-36张炸弹最大",
-            4: "斗牛-顺算牛",
-            5: "斗牛-4带1",
-            6: "斗牛-对子",
+            0: "斗牛-分花色[501]",
+            1: "斗牛-不分花色[502]",
+            2: "斗牛-不分花色2[503]",
+            3: "斗牛-36张炸弹最大[505]",
+            4: "斗牛-顺算牛[506]",
+            5: "斗牛-4带1[507]",
+            6: "斗牛-对子[508]",
             7: "斗牛-40张炸弹最大",
             8: "斗牛-54张炸弹最大",
-            9: "斗牛3条算牛",
-            10: "自定义斗牛"
+            9: "斗牛3条算牛[513]",
+            10: "斗牛10张比两次分花色[504]",
+            11: "斗牛4条3条[509]",
+            12: "斗牛5大5小[510]",
+            13: "斗牛-40张同点一样大[511]",
+            14: "斗牛-40张第二轮有公牌[512]",
+            15: "自定义斗牛"
         ]
         self.ruleInfo = [
             0: """
@@ -256,6 +265,53 @@ class PokerBullRule : Rule{
     K>...方块K>....黑桃10>红桃 10>梅花10>方块 10>黑桃 9...>方块1
     """,
             10:"""
+            52张牌
+            1.每家10张牌，比两次
+            2.大小关系：炸弹>3带2>有牛>无牛
+            3.同牛同点比最大牌
+            4.无牛比最大牌
+            5.单张大小关系: 黑桃K>...>方片A
+            """,
+            11:"""
+            扑克张数 54张 52张 40张 36张 20张
+            1）四条，同样四条比大小
+            2）三条，同样三条比大小
+            3）牛，三张牌点输相加为0算牛，三张顺子也为牛。若同牛同点比最大的牌，最大牌黑桃K>...>方片A
+            4）无牛比最大牌：黑桃K>...>方片A
+            """,
+            12:"""
+            人数牌数:52张(没有大小王)每家5张牌
+            1)5大:5张牌点数和40点以上，包
+            括40点
+            手法10点
+            2)5小:5张牌点数和10点以内，包括10点
+            3)炸弹，4张一样的牌
+            4)3同带1对
+            5)3同牛和普通牛。都是牛5的情况，3同牛大于普通牛
+            6)同牛同点比最大的牌.
+            7)无牛比最大的牌.
+            8)单张大小:大王>小王>黑桃K>...方块K>....黑桃10>红桃10>梅花10>方块10>黑桃 9...>方块1
+            """,
+            13:"""
+            40张斗牛 同点一样大用到的牌:123456789J J算一点 1=J
+            1)炸弹:9999>8888··>1111=JJJJ 1和J可代替组合为炸弹炸弹相同比最后一张牌
+            2)5小:五张牌相加，总点数在10以内包括10，总点数越小牌越大如1111J>11223>11233
+            3)牛牛:5张相加总数为10的倍数算牛牛。三同牛牛。普通牛牛。
+            同为牛牛时5张相加比总点数，总点数越小越大
+            4)牛9>牛8>···>牛1:3同牛，普通牛。同点一样大，不比单张，不比花色
+            5)无牛:无牛一样大
+            """,
+            14:"""
+            扑克张数:40张
+            第一轮一人先发5张，第二轮每人先先发2张，去掉2张，最后3张为公牌。发牌配置选择自定义，按次序配置第1轮，第2轮的发牌方式。
+            1、炸弹最大10101010>9999>8888...1111
+            2、有牛:包括3同牛，普通牛。3张一样的为3同牛。3同牛3>普通牛3.同点比单张大小:黑桃10>红桃10>梅花10>方块10>黑桃9>方块1
+            3、无牛比单张:黑桃10>红桃10>梅花10>方块10>黑桃9.>方块1
+            1.9版本:
+            2个人玩玩4轮没有公牌，
+            3个人玩3轮，第3轮每人两张去掉一张3张公牌
+            """,
+            15:"""
     自定义你的规则
     """
         ]
@@ -331,6 +387,21 @@ class PokerBull{
             break
         case 9:
             result = Array(0...51)
+            break
+        case 10:
+            result = Array(0...51)
+            break
+        case 11:
+            result = Array(0...51) + [53,54]
+            break
+        case 12:
+            result = Array(0...51)
+            break
+        case 13:
+            result = Array(0...8) + Array(13...21) + Array(26...34) + Array(39...47) + [10, 23, 36, 49]
+            break
+        case 14:
+            result = Array(0...9) + Array(13...22) + Array(26...35) + Array(39...48)
             break
         default:
             result = Array(0...51) + [53,54]
@@ -478,8 +549,8 @@ class BullPlayer {
         self.playerCard.append(card)
     }
     
-    func evaluateHandCards(bullRules: [Int], sameBullPointComparision: Int, fiveLittleComparision: Int, fiveLittleEqualToStraight: Bool, rankRules: [Int]) {
-        self.evaluateFlag = BullHandEvaluator.evaluate(cards: self.playerCard, inputBullRules: bullRules, inputSameBullPointComparision: sameBullPointComparision, inputFiveLittleComparision: fiveLittleComparision, inputFiveLittleEqualToStraight: fiveLittleEqualToStraight, rankRules: rankRules)
+    func evaluateHandCards(bullRules: [Int], sameBullPointComparision: Int, fiveLittleComparision: Int, fiveLittleEqualToStraight: Bool, rankRules: [Int], startIndex: Int) {
+        self.evaluateFlag = BullHandEvaluator.evaluate(cards: Array(self.playerCard[startIndex..<startIndex+5]), inputBullRules: bullRules, inputSameBullPointComparision: sameBullPointComparision, inputFiveLittleComparision: fiveLittleComparision, inputFiveLittleEqualToStraight: fiveLittleEqualToStraight, rankRules: rankRules)
     }
 }
 
@@ -552,6 +623,11 @@ class PokerBullGame {
                         } else if self.JValue == 2 {
                             self.rank1Value = 11
                             self.rank2Value = 11
+                        } else if self.JValue == 3 {
+                            self.rank1Value = 1
+                            self.rank2Value = 1
+                            self.trueRank = 1
+                            
                         }
                     } else if card.rank == 12{
                         if self.QValue == 0{
@@ -668,8 +744,8 @@ class PokerBullGame {
         //TODO 整理牛牛的参数，并且debug
         print("牛牛参数长度 \(args.count) 牛牛参数 \(args)")
         let rule = GameManager.gameRules[1] as! PokerBullRule
-        let dealType = args[0]
-        let diyDealType = args[1]
+        let dealNum = args[0]
+        let dealType = args[1]
         let playerNum = args[2]
         let cardsNum = rule.cardsNum[args[3]]
         let handNum = rule.handNum[args[4]]
@@ -694,76 +770,92 @@ class PokerBullGame {
 
         var allPlayers: [BullPlayer] = (0..<playerNum).map { BullPlayer(playerIndex: $0) }
         var community = [PokerBullCard]()
+        
         if deck.count < PokerBull.GetMinCardNum(playerNum: playerNum, handNum: handNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
             return ([], [],[])
         }
         
-        if wayToDealCards == 0{
-            // 发牌
-            if dealType == 0 || dealType == 1{
-                for _ in 0..<handNum{
-                    if dealType == 0{
-                        for i in 0..<playerNum {
-                            allPlayers[i].insertCard(card: bullDeck.removeFirst())
-                        }
-                    } else if dealType == 1 {
-                        allPlayers[0].insertCard(card: bullDeck.removeFirst())
-                        for i in stride(from: playerNum - 1, to: 0, by: -1) {
-                            allPlayers[i].insertCard(card: bullDeck.removeFirst())
-                        }
+        // 发牌
+        if dealNum == 0{
+            for _ in 0..<handNum{
+                //正发
+                if dealType == 0{
+                    for i in 0..<playerNum {
+                        allPlayers[i].insertCard(card: bullDeck.removeFirst())
+                    }
+                //反发
+                } else if dealType == 1 {
+                    for i in 0..<playerNum {
+                        allPlayers[i].insertCard(card: bullDeck.removeLast())
                     }
                 }
-                
-            } else {
-                for actionIndex in 0...diyDealStatus.count - 1{
-                    let cardNum = diyDealNum[actionIndex]
-                    let action = diyDealStatus[actionIndex]
-                    //派牌
-                    if action[0] == true{
-                        if diyDealType == 0{
-                            for i in 0..<playerNum {
-                                for _ in 0..<cardNum{
-                                    allPlayers[i].insertCard(card: bullDeck.removeFirst())
-                                }
-                            }
-                        } else if diyDealType == 1{
+            }
+            
+        } else {
+            for actionIndex in 0...diyDealStatus.count - 1{
+                let cardNum = diyDealNum[actionIndex]
+                let action = diyDealStatus[actionIndex]
+                //派牌
+                if action[0] == true{
+                    //正发
+                    if dealType == 0{
+                        for i in 0..<playerNum {
                             for _ in 0..<cardNum{
-                                allPlayers[0].insertCard(card: bullDeck.removeFirst())
-                            }
-                            for i in stride(from: playerNum - 1, to: 0, by: -1) {
-                                for _ in 0..<cardNum{
-                                    allPlayers[i].insertCard(card: bullDeck.removeFirst())
-                                }
+                                allPlayers[i].insertCard(card: bullDeck.removeFirst())
                             }
                         }
-                    //公牌
-                    } else if action[1] == true {
+                    //反发
+                    } else if dealType == 1{
+                        for i in 0..<playerNum {
+                            for _ in 0..<cardNum{
+                                allPlayers[i].insertCard(card: bullDeck.removeLast())
+                            }
+                        }
+                    }
+                //公牌
+                } else if action[1] == true {
+                    if dealType == 0{
                         for _ in 0..<cardNum{
                             community.append(bullDeck.removeFirst())
                         }
-                    //去牌
-                    } else if action[2] == true {
+                    } else if dealType == 1{
+                        for _ in 0..<cardNum{
+                            community.append(bullDeck.removeLast())
+                        }
+                    }
+                    
+                //去牌
+                } else if action[2] == true {
+                    if dealType == 0 {
                         for _ in 0..<cardNum{
                             bullDeck.removeFirst()
                         }
+                    } else if dealType == 1{
+                        for _ in 0..<cardNum{
+                            bullDeck.removeLast()
+                        }
                     }
                 }
-            }
-        }
-        if wayToDealCards == 1 {
-            for i in 0..<handNum {
-                allPlayers[i % playerNum].insertCard(card: bullDeck.removeFirst())
-            }
-            allPlayers.sort { $0.playerCard[0].rank2Value > $1.playerCard[0].rank2Value}
-            for i in 0..<((playerNum - 1) * handNum) {
-                allPlayers[i % playerNum].insertCard(card: bullDeck.removeFirst())
             }
         }
         
 //        // 计算牌额大小
-        for player in allPlayers {
-            player.evaluateHandCards(bullRules: bullRule, sameBullPointComparision: sameBullPointComparision, fiveLittleComparision: fiveLittleComparision, fiveLittleEqualToStraight: fiveLittleEqualToStraight, rankRules: rankRules)
+        if wayToDealCards == 0{
+            if handNum == 5{
+                for player in allPlayers {
+                    player.evaluateHandCards(bullRules: bullRule, sameBullPointComparision: sameBullPointComparision, fiveLittleComparision: fiveLittleComparision, fiveLittleEqualToStraight: fiveLittleEqualToStraight, rankRules: rankRules, startIndex: 0)
+                }
+            } else if handNum == 10{
+                //TODO 根据报法来决定，返回值怎么写
+                
+            }
+        } else if wayToDealCards == 1{
+            for player in allPlayers {
+                player.playerCard = player.playerCard + community
+                player.evaluateHandCards(bullRules: bullRule, sameBullPointComparision: sameBullPointComparision, fiveLittleComparision: fiveLittleComparision, fiveLittleEqualToStraight: fiveLittleEqualToStraight, rankRules: rankRules, startIndex: 0)
+            }
         }
+        
         var leftCards:[Int] = []
 
         for leftCard in bullDeck{
@@ -886,7 +978,8 @@ class BullHandEvaluator {
         42: isHighCard,
         43: isIronBullPlusBull,
         44: isThreeCardBullPlusBull,
-        45: isThreeCardBullBUllPlusBullBull
+        45: isThreeCardBullBUllPlusBullBull,
+        46: Is_threeCard(cards:)
             ]
     
     static var TEN_CARDS_RANK_RULE_DIC: [Int: ([PokerBullGame.PokerBullCard]) -> (Bool, Int)] = [:]
@@ -1288,6 +1381,8 @@ class BullHandEvaluator {
                             print("同牛同点比牛架，不能加入这个牛型")
                         } else if self.sameBullPointComparison == 2 {
                             rank = 0
+                        } else if sameBullPointComparison == 4{
+                            rank = 0x111111 & ~( cards.reduce(0){$0 + $1.rank1Value})
                         }
                     }
                 }
@@ -2171,6 +2266,17 @@ class BullHandEvaluator {
         }
         return (false, 0)
     }
+    
+    static func Is_threeCard(cards: [PokerBullGame.PokerBullCard]) -> (Bool, Int) {
+        var counts: [Int: [PokerBullGame.PokerBullCard]] = [:]
+        for card in cards {
+            counts[card.trueRank, default: []].append(card)
+            if counts[card.trueRank]!.count == 3 {
+                return (true, card.rank2Value)
+            }
+        }
+        return (false, 0)
+    }
 
     // ... (other rank rule functions)
     //
@@ -2203,6 +2309,8 @@ class BullHandEvaluator {
             let sortedCards = sortBullCardsFromHighToLow(cards: cards)
             let rank = sortedCards[0].score << 12 | sortedCards[1].score << 6 | sortedCards[2].score
             return rank
+        case 4:
+            return 1
         default:
             return 0
         }

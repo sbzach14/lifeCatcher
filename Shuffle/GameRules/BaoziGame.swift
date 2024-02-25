@@ -24,7 +24,9 @@ class BaoziGameRule : Rule{
     ]
     let JokerValueRange:[Int:String] = [
         0:"0",
-        1:"1"
+        1:"1",
+        2:"5",
+        3:"6"
     ]
     let samePointComparision:[Int:String] = [
         0:"同点同对庄家大",
@@ -46,30 +48,38 @@ class BaoziGameRule : Rule{
         0:"对子按照牌大小分大小",
         1:"对子不分大小"
     ]
+    let AValueRange :[Int:String] = [
+        0: "1",
+        1: "4"
+    ]
     
     
     override init(ruleIndex: Int, ruleName: String) {
         super.init(ruleIndex: ruleIndex, ruleName: ruleName)
         
         self.setting = [
-            0: "宝子2张9点大",
-            1: "宝子2张10点大",
-            2: "宝子P对大",
-            3: "52张宝子",
-            4: "52张上海宝子",
-            5: "54张宝子12",
-            6: "唐山54张宝子",
-            7: "40张宝子分花色",
-            8: "54张宝子13",
-            9: "54张比宝子14",
-            10: "52张新疆宝子",
+            0: "宝子2张9点大[201]",
+            1: "宝子2张10点大[202]",
+            2: "宝子P对大[203]",
+            3: "52张宝子[204]",
+            4: "52张上海宝子[205]",
+            5: "54张宝子12[206]",
+            6: "唐山54张宝子[207]",
+            7: "40张宝子分花色[208]",
+            8: "54张宝子13[209]",
+            9: "54张比宝子14[210]",
+            10: "52张新疆宝子[211]",
             11: "宝子J",
             12: "宝子Q",
             13: "宝子K",
             14: "江苏52张二八",
-            15: "自定义宝子"
+            15: "52张宝子对子算点数[216]",
+            16: "54张宝子15[213]",
+            17: "宝子2张9点大[212]",
+            18: "自定义宝子"
         ]
-        self.rankRules = [5:"对子",
+        self.rankRules = [6:"同色对子",
+                          5:"对子",
                           4:"对10",
                           3:"对5",
                           2:"对王",
@@ -167,6 +177,26 @@ class BaoziGameRule : Rule{
     KK最大...AA最小，K算3点、Q算2点、 J算1点，九点最大，0点最小，同点比单张大小!
     """,
             15:"""
+            扑克张数 52张不分花色
+            1. K Q J 算0点
+            2. 9点最大,
+            3. 0点最小, 同点庄大
+            4. 对子算点数
+            """,
+            16:"""
+            扑克张数：54张，不分花色
+            W=5，K=3，Q=2，J=1，A=4
+            1）对子 WW > AA > KK > QQ...22
+            2) 9点最大，0点最小，同点比最大牌不分花色，同点同最大牌庄家大，0点一样大，W>K>Q>J>.....2
+            """,
+            17:"""
+            扑克张数：54张
+            1）对王>对k>对Q>...对A，2张牌全黑或者全红才算对子，对黑>对红
+            2）9点最大，0点最小，王=6点，K=3点，Q=2点，J=1点。
+            3）同点比最大牌点数，点数一样比最大牌花色黑桃>红桃>梅花>方片，K最大A最小
+            """,
+            
+            18:"""
     自定义你的规则
     """,
         ]
@@ -241,6 +271,16 @@ class BaoziGame{
         case 14:
             result = Array(0...51)
             break
+        case 15:
+            result = Array(0...51)
+            break
+        case 16:
+            result = Array(0...51) + [53,54]
+            break
+        case 17:
+            result = Array(0...51) + [53,54]
+            break
+        
         default:
             result = Array(0...51) + [53,54]
             break
@@ -284,8 +324,8 @@ class BaoziGame{
     //9 cardRank
     //10 pairRank
     static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
-        let dealType = args[0]
-        let diyDealType = args[1]
+        let dealNum = args[0]
+        let dealType = args[1]
         let playerNum = args[2]
         let KValueRange = args[3]
         let QValueRange = args[4]
@@ -295,6 +335,7 @@ class BaoziGame{
         let pointComparision = args[8]
         let cardRank = args[9]
         let pairRank = args[10]
+        let AValueRange = args[11]
         
         var maxRank = 0
         var winners: [Int] = []
@@ -314,54 +355,67 @@ class BaoziGame{
         
         var deck = deck
         // 发牌
-        if dealType == 0 || dealType == 1{
-            for _ in 0..<2 {
+        if dealNum == 0{
+            for _ in 0..<2{
+                //正发
                 if dealType == 0{
                     for i in 0..<playerNum {
                         allPlayCards[i].insertCard(card: deck.removeFirst())
                     }
+                //反发
                 } else if dealType == 1 {
-                    allPlayCards[0].insertCard(card: deck.removeFirst())
-                    for i in stride(from: playerNum - 1, to: 0, by: -1) {
-                        allPlayCards[i].insertCard(card: deck.removeFirst())
+                    for i in 0..<playerNum {
+                        allPlayCards[i].insertCard(card: deck.removeLast())
                     }
                 }
             }
+            
         } else {
             for actionIndex in 0...diyDealStatus.count - 1{
                 let cardNum = diyDealNum[actionIndex]
                 let action = diyDealStatus[actionIndex]
                 //派牌
                 if action[0] == true{
-                    if diyDealType == 0{
+                    //正发
+                    if dealType == 0{
                         for i in 0..<playerNum {
                             for _ in 0..<cardNum{
                                 allPlayCards[i].insertCard(card: deck.removeFirst())
                             }
                         }
-                    } else if diyDealType == 1{
-                        for _ in 0..<cardNum{
-                            allPlayCards[0].insertCard(card: deck.removeFirst())
-                        }
-                        for i in stride(from: playerNum - 1, to: 0, by: -1) {
+                    //反发
+                    } else if dealType == 1{
+                        for i in 0..<playerNum {
                             for _ in 0..<cardNum{
-                                allPlayCards[i].insertCard(card: deck.removeFirst())
+                                allPlayCards[i].insertCard(card: deck.removeLast())
                             }
                         }
                     }
                 //公牌
                 } else if action[1] == true {
-                    for _ in 0..<cardNum{
-                        community.append(deck.removeFirst())
+                    if dealType == 0{
+                        for _ in 0..<cardNum{
+                            community.append(deck.removeFirst())
+                        }
+                    } else if dealType == 1{
+                        for _ in 0..<cardNum{
+                            community.append(deck.removeLast())
+                        }
                     }
+                    
                 //去牌
                 } else if action[2] == true {
-                    for _ in 0..<cardNum{
-                        deck.removeFirst()
+                    if dealType == 0 {
+                        for _ in 0..<cardNum{
+                            deck.removeFirst()
+                        }
+                    } else if dealType == 1{
+                        for _ in 0..<cardNum{
+                            deck.removeLast()
+                        }
                     }
                 }
             }
-            
         }
         
         
@@ -369,7 +423,7 @@ class BaoziGame{
             allPlayCards[i].evaluateFlag = BaoziGameHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules
-            ).evalHand(cards: allPlayCards[i].playerCard, KValueRange: KValueRange,QValueRange: QValueRange,JValueRange: JValueRange,JokerValueRange: JokerValueRange,samePointComparision: samePointComparision,pointComparision: pointComparision,cardRank: cardRank,pairRank: pairRank)
+            ).evalHand(cards: allPlayCards[i].playerCard, KValueRange: KValueRange,QValueRange: QValueRange,JValueRange: JValueRange,JokerValueRange: JokerValueRange,samePointComparision: samePointComparision,pointComparision: pointComparision,cardRank: cardRank,pairRank: pairRank, AValueRange: AValueRange)
         }
         
         var resultList = [ResultStruct]()
@@ -416,20 +470,21 @@ class BaoziGameHandEvaluator{
             2:eval_isPairJoker(cards:),
             3:eval_isPairFive(cards:),
             4:eval_isPairTen(cards:),
-            5:eval_isPair(cards:)
+            5:eval_isPair(cards:),
+            6:eval_isSameColorPair(cards:)
         ]
         
     }
     
-    func evalHand(cards: [Card], KValueRange: Int, QValueRange: Int, JValueRange: Int, JokerValueRange: Int, samePointComparision: Int, pointComparision: Int, cardRank: Int, pairRank: Int)->Int{
+    func evalHand(cards: [Card], KValueRange: Int, QValueRange: Int, JValueRange: Int, JokerValueRange: Int, samePointComparision: Int, pointComparision: Int, cardRank: Int, pairRank: Int, AValueRange: Int)->Int{
         
         self.samePointComparision = samePointComparision
         self.pointComparision = pointComparision
         self.QValueRange = QValueRange
         self.PairRank = pairRank
         var score = 0
-        let num1 = BaoziCard(card: cards[0], KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, JokerValueRange: JokerValueRange, cardRank: cardRank)
-        let num2 = BaoziCard(card: cards[1], KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, JokerValueRange: JokerValueRange, cardRank: cardRank)
+        let num1 = BaoziCard(card: cards[0], KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, JokerValueRange: JokerValueRange, cardRank: cardRank, AValueRange: AValueRange)
+        let num2 = BaoziCard(card: cards[1], KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, JokerValueRange: JokerValueRange, cardRank: cardRank, AValueRange: AValueRange)
         print("手牌 \(GameManager.cardLabelDic[cards[0].cardIndex])  \(GameManager.cardLabelDic[cards[1].cardIndex]) rank \(num1.rank) \(num2.rank) point \(num1.point) \(num2.point) suit \(num1.suit) \(num2.suit)")
         
         var i = self.rankRules.count + 1
@@ -453,6 +508,18 @@ class BaoziGameHandEvaluator{
 //            score = ((num1.point + num2.point) % 10) << 4 | max(num1.rank, num2.rank)
 //        }
         return score
+    }
+    
+    func eval_isSameColorPair(cards:[BaoziCard]) -> Int{
+        if self.blackRedJudger(card: cards[0]) == self.blackRedJudger(card: cards[1]) && cards[0].originalRank == cards[1].originalRank {
+            var colorRank = 1
+            if self.blackRedJudger(card: cards[0]) == 1{
+                colorRank = 0
+            }
+            return cards[0].rank << 2 | colorRank
+        }
+        
+        return 0
     }
     
     func eval_isPair(cards:[BaoziCard]) -> Int{
@@ -543,7 +610,7 @@ class BaoziCard{
     var point:Int
     var suit:Int
     
-    init(card: Card, KValueRange:Int, QValueRange: Int, JValueRange: Int, JokerValueRange: Int, cardRank:Int){
+    init(card: Card, KValueRange:Int, QValueRange: Int, JValueRange: Int, JokerValueRange: Int, cardRank:Int, AValueRange: Int){
         //rank initialization
         let rule = GameManager.gameRules[7] as! BaoziGameRule
         if card.rank > 13{
@@ -573,6 +640,8 @@ class BaoziCard{
             self.point = Int(rule.KValueRange[KValueRange]!)!
         } else if card.rank > 13 {
             self.point = Int(rule.JokerValueRange[JokerValueRange]!)!
+        } else if card.rank == 1{
+            self.point = Int(rule.AValueRange[AValueRange]!)!
         }
         else{
             self.point = card.rank

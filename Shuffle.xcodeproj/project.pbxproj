@@ -43,6 +43,8 @@
 		A887B6522A8104BC009F488F /* TimeUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B6512A8104BC009F488F /* TimeUtils.swift */; };
 		A887B6562A81370F009F488F /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = A887B6552A81370F009F488F /* AsyncAlgorithms */; };
 		A887B6582A8511A4009F488F /* InfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B6572A8511A4009F488F /* InfoView.swift */; };
+		A88C71EA2B8600AE001D8BD8 /* NinePoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88C71E92B8600AE001D8BD8 /* NinePoint.swift */; };
+		A88C71EC2B8B261A001D8BD8 /* FourCardGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88C71EB2B8B261A001D8BD8 /* FourCardGame.swift */; };
 		A88EFDC42A7D217200897243 /* VisionObjectRecognitionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFDC12A7D217100897243 /* VisionObjectRecognitionViewModel.swift */; };
 		A88EFDC82A7D249C00897243 /* VisionObjectRecognitionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFDC72A7D249C00897243 /* VisionObjectRecognitionView.swift */; };
 		A88EFE032A7E8ACD00897243 /* Resnet50FP16.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A88EFE022A7E8ACC00897243 /* Resnet50FP16.mlmodel */; };
@@ -57,6 +59,7 @@
 		A88F20B02A1DEE63005E4A27 /* TinyNineGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88F20AF2A1DEE63005E4A27 /* TinyNineGame.swift */; };
 		A8922FC02A6553FB00A7033E /* PokerBullSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8922FBF2A6553FB00A7033E /* PokerBullSettingView.swift */; };
 		A892C6002A765A0A003FA2B3 /* MainMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A892C5FF2A765A0A003FA2B3 /* MainMenuView.swift */; };
+		A8A3B40B2B68DA5D008A3723 /* ReportSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8A3B40A2B68DA5D008A3723 /* ReportSettingView.swift */; };
 		A8D0D9342A223D210061A90E /* TexasPokerRuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D0D9332A223D210061A90E /* TexasPokerRuleSettingView.swift */; };
 		A8D0D9362A24A4C20061A90E /* TexasPoker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D0D9352A24A4C20061A90E /* TexasPoker.swift */; };
 		A8D0D9382A35D9970061A90E /* RankRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D0D9372A35D9970061A90E /* RankRulesView.swift */; };
@@ -133,6 +136,8 @@
 		A887B64F2A7FE1AF009F488F /* ShowRecordHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRecordHistoryView.swift; sourceTree = "<group>"; };
 		A887B6512A8104BC009F488F /* TimeUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeUtils.swift; sourceTree = "<group>"; };
 		A887B6572A8511A4009F488F /* InfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoView.swift; sourceTree = "<group>"; };
+		A88C71E92B8600AE001D8BD8 /* NinePoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NinePoint.swift; sourceTree = "<group>"; };
+		A88C71EB2B8B261A001D8BD8 /* FourCardGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FourCardGame.swift; sourceTree = "<group>"; };
 		A88EFDC12A7D217100897243 /* VisionObjectRecognitionViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisionObjectRecognitionViewModel.swift; sourceTree = "<group>"; };
 		A88EFDC72A7D249C00897243 /* VisionObjectRecognitionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionObjectRecognitionView.swift; sourceTree = "<group>"; };
 		A88EFE022A7E8ACC00897243 /* Resnet50FP16.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = Resnet50FP16.mlmodel; sourceTree = "<group>"; };
@@ -148,6 +153,7 @@
 		A88F20B12A1E3D4C005E4A27 /* Shuffle.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Shuffle.entitlements; sourceTree = "<group>"; };
 		A8922FBF2A6553FB00A7033E /* PokerBullSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokerBullSettingView.swift; sourceTree = "<group>"; };
 		A892C5FF2A765A0A003FA2B3 /* MainMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainMenuView.swift; sourceTree = "<group>"; };
+		A8A3B40A2B68DA5D008A3723 /* ReportSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportSettingView.swift; sourceTree = "<group>"; };
 		A8D0D9332A223D210061A90E /* TexasPokerRuleSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TexasPokerRuleSettingView.swift; sourceTree = "<group>"; };
 		A8D0D9352A24A4C20061A90E /* TexasPoker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TexasPoker.swift; sourceTree = "<group>"; };
 		A8D0D9372A35D9970061A90E /* RankRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankRulesView.swift; sourceTree = "<group>"; };
@@ -269,6 +275,7 @@
 				B058BE602B0A0D6F0078E792 /* TestView.swift */,
 				181C969D2B5D9DC90042006E /* SelectGameView.swift */,
 				184F40A62B60FE170001B3DC /* LoadingView.swift */,
+				A8A3B40A2B68DA5D008A3723 /* ReportSettingView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -355,6 +362,8 @@
 				181C96A72B60DC180042006E /* ChickenBattleGame.swift */,
 				181C96A92B60DD610042006E /* CardNineGame.swift */,
 				181C96AB2B60E26A0042006E /* JiaJiaBaoGame.swift */,
+				A88C71E92B8600AE001D8BD8 /* NinePoint.swift */,
+				A88C71EB2B8B261A001D8BD8 /* FourCardGame.swift */,
 			);
 			path = GameRules;
 			sourceTree = "<group>";
@@ -577,6 +586,7 @@
 				B03B7B2F2A963C1B006A0647 /* utils.swift in Sources */,
 				A812F92F2A3DCBA500AA392F /* ThreeCardPokerGameRuleSettingView.swift in Sources */,
 				A809B3E42AE5183400F728A9 /* BaoziGameRuleSettingView.swift in Sources */,
+				A8A3B40B2B68DA5D008A3723 /* ReportSettingView.swift in Sources */,
 				A83DC67A2A22352C00EC8210 /* SelectRuleView.swift in Sources */,
 				A88716852A0F701500B7F2CD /* GameManager.swift in Sources */,
 				A887167F2A0623E500B7F2CD /* AuthManager.swift in Sources */,
@@ -616,6 +626,7 @@
 				18CA14D6284AC42C00F90372 /* CameraView.swift in Sources */,
 				A88EFE072A7FA95A00897243 /* SettingView.swift in Sources */,
 				184F40AB2B610EF50001B3DC /* CardNineRuleSettingView.swift in Sources */,
+				A88C71EC2B8B261A001D8BD8 /* FourCardGame.swift in Sources */,
 				A83853532ADA918000346038 /* CustomUI.swift in Sources */,
 				A8E0E2E72AADF6E20091FC1D /* TwoEightGangGame.swift in Sources */,
 				A887B6502A7FE1AF009F488F /* ShowRecordHistoryView.swift in Sources */,
@@ -624,6 +635,7 @@
 				A88EFE032A7E8ACD00897243 /* Resnet50FP16.mlmodel in Sources */,
 				A8EFFEAF2B25BF8900FC884F /* UsingCardsSettingView.swift in Sources */,
 				A8E0E2EB2AAE00620091FC1D /* TinyNineGameRuleSettingView.swift in Sources */,
+				A88C71EA2B8600AE001D8BD8 /* NinePoint.swift in Sources */,
 				A87A82052B2EF66200B1B37B /* DealTypeView.swift in Sources */,
 				A8FBC7BB2A3DF1B000EDDFD7 /* SuitRulesView.swift in Sources */,
 				181C96AE2B60F03C0042006E /* JiaJiaBaoGameRuleSettingView.swift in Sources */,

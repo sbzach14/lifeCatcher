@@ -3,8 +3,9 @@ import SwiftUI
 struct MainContentView: View {
     var playerNum:Int
     var shuffleMode: Int
+    var dealNum: Int
+    var coloringType: Int
     var dealType: Int
-    var diyDealType: Int
     var diyDealNum: [Int]
     var diyDealStatus: [[Bool]]
     var calModeArgs: [Int]
@@ -50,7 +51,7 @@ struct MainContentView: View {
             }
         }
         .onAppear {
-            viewModel.initialize(playerNum: playerNum, shuffleMode: shuffleMode, dealType: dealType, diyDealType: diyDealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, cutSetting: cutSetting, reportNumber: reportNumber, voiceReport: voiceReport, ruleIndex: ruleIndex, args: args, rankRules: rankRules, suitRules: suitRules, allCardIndex: allCardIndex, minCardNum: minCardNum)
+            viewModel.initialize(playerNum: playerNum, shuffleMode: shuffleMode,dealNum: dealNum,coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, cutSetting: cutSetting, reportNumber: reportNumber, voiceReport: voiceReport, ruleIndex: ruleIndex, args: args, rankRules: rankRules, suitRules: suitRules, allCardIndex: allCardIndex, minCardNum: minCardNum)
         }
         .onDisappear {
             viewModel.stopCamera()
