@@ -29,7 +29,7 @@ class TinyNineGameRule : Rule{
         super.init(ruleIndex: ruleIndex, ruleName: ruleName)
         self.setting = [
             0: "标准小九",
-            1: "湖南小九",
+            1: "湖南小九[255]",
             2: "自定义小九"
         ]
         

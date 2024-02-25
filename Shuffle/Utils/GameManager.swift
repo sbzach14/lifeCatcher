@@ -2306,6 +2306,106 @@ public class RuleManager{
                 allPreSetRules[i]![10]!.append(suitRules)
                 allPreSetRules[i]![10]!.append(rankRules)
                 allPreSetRules[i]![10]!.append(rankRuleChecked)
+                break
+            //4张
+            case 11:
+                let rule = GameManager.gameRules[i] as! FourCardGameRule
+                for j in 0...rule.setting.count - 1{
+                    allPreSetRules[i]![j] = []
+                }
+//                0: "4张比单张[410]",
+                var redJokerValueRange = 0
+                var blackJokerValueRange = 0
+                var KValueRange = 1
+                var QValueRange = 1
+                var JValueRange = 1
+                var pointComparision = 0
+                var samePointComparision = 0
+                var cardRankRule = 0
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, samePointComparision,cardRankRule]
+                suitRules = [3,2,1,0]
+                rankRules = [2,1,0]
+                rankRuleChecked = [1,1,1]
+                allPreSetRules[i]![0]!.append(args)
+                allPreSetRules[i]![0]!.append(suitRules)
+                allPreSetRules[i]![0]!.append(rankRules)
+                allPreSetRules[i]![0]!.append(rankRuleChecked)
+//                1: "4张9点[411]",
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                pointComparision = 0
+                samePointComparision = 0
+                cardRankRule = 0
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, samePointComparision,cardRankRule]
+                suitRules = [3,2,1,0]
+                rankRules = [0]
+                rankRuleChecked = [1]
+                allPreSetRules[i]![1]!.append(args)
+                allPreSetRules[i]![1]!.append(suitRules)
+                allPreSetRules[i]![1]!.append(rankRules)
+                allPreSetRules[i]![1]!.append(rankRuleChecked)
+                break
+            //2张
+            case 12:
+                let rule = GameManager.gameRules[i] as! TwoCardGameRule
+                for j in 0...rule.setting.count - 1{
+                    allPreSetRules[i]![j] = []
+                }
+//                0: "A59[250]",
+                var redJokerValueRange = 0
+                var blackJokerValueRange = 0
+                var KValueRange = 0
+                var QValueRange = 0
+                var JValueRange = 0
+                var pointComparision = 0
+                var samePointComparision = 0
+                var cardRankRule = 0
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, samePointComparision,cardRankRule]
+                suitRules = [3,2,1,0]
+                rankRules = [2,1,0]
+                rankRuleChecked = [1,1,1]
+                allPreSetRules[i]![0]!.append(args)
+                allPreSetRules[i]![0]!.append(suitRules)
+                allPreSetRules[i]![0]!.append(rankRules)
+                allPreSetRules[i]![0]!.append(rankRuleChecked)
+//                1: "合合[251]",
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                pointComparision = 0
+                samePointComparision = 1
+                cardRankRule = 1
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, samePointComparision,cardRankRule]
+                suitRules = [3,2,1,0]
+                rankRules = [2,0]
+                rankRuleChecked = [1,1]
+                allPreSetRules[i]![1]!.append(args)
+                allPreSetRules[i]![1]!.append(suitRules)
+                allPreSetRules[i]![1]!.append(rankRules)
+                allPreSetRules[i]![1]!.append(rankRuleChecked)
+//                2: "梭哈[258]",
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                pointComparision = 0
+                samePointComparision = 0
+                cardRankRule = 0
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, samePointComparision,cardRankRule]
+                suitRules = [3,2,1,0]
+                rankRules = [2,1]
+                rankRuleChecked = [1,1]
+                allPreSetRules[i]![2]!.append(args)
+                allPreSetRules[i]![2]!.append(suitRules)
+                allPreSetRules[i]![2]!.append(rankRules)
+                allPreSetRules[i]![2]!.append(rankRuleChecked)
+                break
             default:
                 print("There is no preset rule for this game!!!!!")
                 break

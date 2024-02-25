@@ -45,6 +45,7 @@
 		A887B6582A8511A4009F488F /* InfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B6572A8511A4009F488F /* InfoView.swift */; };
 		A88C71EA2B8600AE001D8BD8 /* NinePoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88C71E92B8600AE001D8BD8 /* NinePoint.swift */; };
 		A88C71EC2B8B261A001D8BD8 /* FourCardGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88C71EB2B8B261A001D8BD8 /* FourCardGame.swift */; };
+		A88C71EE2B8B3824001D8BD8 /* TwoCardGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88C71ED2B8B3824001D8BD8 /* TwoCardGame.swift */; };
 		A88EFDC42A7D217200897243 /* VisionObjectRecognitionViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFDC12A7D217100897243 /* VisionObjectRecognitionViewModel.swift */; };
 		A88EFDC82A7D249C00897243 /* VisionObjectRecognitionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFDC72A7D249C00897243 /* VisionObjectRecognitionView.swift */; };
 		A88EFE032A7E8ACD00897243 /* Resnet50FP16.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A88EFE022A7E8ACC00897243 /* Resnet50FP16.mlmodel */; };
@@ -138,6 +139,7 @@
 		A887B6572A8511A4009F488F /* InfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoView.swift; sourceTree = "<group>"; };
 		A88C71E92B8600AE001D8BD8 /* NinePoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NinePoint.swift; sourceTree = "<group>"; };
 		A88C71EB2B8B261A001D8BD8 /* FourCardGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FourCardGame.swift; sourceTree = "<group>"; };
+		A88C71ED2B8B3824001D8BD8 /* TwoCardGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoCardGame.swift; sourceTree = "<group>"; };
 		A88EFDC12A7D217100897243 /* VisionObjectRecognitionViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VisionObjectRecognitionViewModel.swift; sourceTree = "<group>"; };
 		A88EFDC72A7D249C00897243 /* VisionObjectRecognitionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionObjectRecognitionView.swift; sourceTree = "<group>"; };
 		A88EFE022A7E8ACC00897243 /* Resnet50FP16.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = Resnet50FP16.mlmodel; sourceTree = "<group>"; };
@@ -364,6 +366,7 @@
 				181C96AB2B60E26A0042006E /* JiaJiaBaoGame.swift */,
 				A88C71E92B8600AE001D8BD8 /* NinePoint.swift */,
 				A88C71EB2B8B261A001D8BD8 /* FourCardGame.swift */,
+				A88C71ED2B8B3824001D8BD8 /* TwoCardGame.swift */,
 			);
 			path = GameRules;
 			sourceTree = "<group>";
@@ -625,6 +628,7 @@
 				A88EFE0D2A7FDC9500897243 /* RecordHistoryView.swift in Sources */,
 				18CA14D6284AC42C00F90372 /* CameraView.swift in Sources */,
 				A88EFE072A7FA95A00897243 /* SettingView.swift in Sources */,
+				A88C71EE2B8B3824001D8BD8 /* TwoCardGame.swift in Sources */,
 				184F40AB2B610EF50001B3DC /* CardNineRuleSettingView.swift in Sources */,
 				A88C71EC2B8B261A001D8BD8 /* FourCardGame.swift in Sources */,
 				A83853532ADA918000346038 /* CustomUI.swift in Sources */,

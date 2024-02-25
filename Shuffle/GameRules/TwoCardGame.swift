@@ -3,15 +3,13 @@ import Foundation
 //import Python
 //import PythonKit
 
-//九点半
-
-class CardNineGameRule : Rule{
+class TwoCardGameRule : Rule{
     
     let redJokerValueRange:[Int:String] = [
-        0:"6"
+        0:"1"
     ]
     let blackJokerValueRange: [Int: String] = [
-        0:"6"
+        0:"1"
     ]
     let KValueRange:[Int:String] = [
         0:"3",
@@ -20,13 +18,18 @@ class CardNineGameRule : Rule{
         0:"2",
     ]
     let JValueRange:[Int:String] = [
-        0:"1"
+        0:"1",
     ]
     let pointComparision:[Int: String] = [
         0:"9点最大，0点最小",
     ]
     let samePointComparision:[Int: String] = [
-        0:"同点比最大牌，最大牌相同时庄家赢",
+        0:"同点一样大",
+        1:"同点比最大牌"
+    ]
+    let cardRankRule:[Int: String] = [
+        0:"A最大，2最小",
+        1:"A>王>K>Q>J>...>2"
     ]
     
     
@@ -34,53 +37,33 @@ class CardNineGameRule : Rule{
     override init(ruleIndex: Int, ruleName: String) {
         super.init(ruleIndex: ruleIndex, ruleName: ruleName)
         self.rankRules = [
-            4: "对子",
-            3: "Q + 9",
-            2: "Q + 8",
-            1: "2 + 8",
+            2: "对子",
+            1: "单张",
             0: "点数"
         ]
         self.setting = [
-            0: "杭州小牌九",
-            1: "温州牌九[260]",
-            2: "通用四张-牌九大牌九1[...",
-            3: "52张小牌九[262]",
-            4: "宁波小牌九[263]",
-            5: "杭州牌九[264]",
-            6: "32张牌9[456]",
-            7: "湖南牌九[265]",
-            8: "通用四张-32张牌九[416]",
-            9: "山西牌九[268]",
-            10: "通用四张-54张大牌九[..",
-            11: "34张小牌九[457]",
-            12: "通用四张-32张牌九二[...",
-            13: "温州牌九黑大3[269]",
-            14: "南京牌九[261]",
-            15: "32张牌九[266]",
-            16: "山西牌九[269]",
-            17: "通用四张-杭州牌九[420]",
+            0: "A59[250]",
+            1: "合合[251]",
+            2: "梭哈[258]",
         ]
         self.ruleInfo = [
             0:"""
-    杭州小牌九 一共32张，每家发2张牌。
-    1、选牌
-      红心2、方块2、黑桃4、红心4、梅花4、方块4、黑桃5、红心5、黑桃6、红心6、梅花6、方块6、黑桃7、红心7、梅花7、方块7、黑桃8、红心8、梅花8、方块8、黑桃9、红心9、  黑桃10、红心10、梅花10、方块10、黑桃J、梅花J、红心Q、方块Q、大王、黑桃3
-    2、大小顺序：
-    1）最大：对子，分红对和黑对, 同点红对 > 混对 > 黑对
-    2）不成对时，Q+9 > Q+8 > 2+8 > 9点，0点最小，大王=6点，黑桃3=3点，J=1点，Q=2点
-    3）同点时比最大牌
-    4）最大牌也相同时，庄家赢。
+    AA KK ... 22
+    A5 K6...
+    A4
     """,
+            
             1:"""
-    扑克张数:32张
-    用牌红对Q，两张红5，两张红9，两张红2，两张红J，对王，4个4/4个6/4个7/4个8/4个10
-    1)对红Q最大>对红2>黑A+黑3,.>对红5
-    2)红Q+红9>红Q+红8黑8>红2+红
-    8.....0点最小。
-    3) A=6点,同点比最大牌
+    扑克张数:54张不分花色
+    1)对A最大>对王>对K>.....>对22)9点>8点....0点最小
+    3)王为1点，K为3点,Q为2点，J为1点。同点比最大牌。
+    4)最大的牌从大到小，A>王
+    >K>Q>J>10>9>8>7>6>5>4>3>2
     """,
             2:"""
-""",
+对A最大对2最小
+单张A最大2最小不分花色
+"""
 
         ]
         self.playerNum = [2,3,4,5,6,7,8,9,10]
@@ -89,7 +72,7 @@ class CardNineGameRule : Rule{
 }
 
 
-class CardNineGame{
+class TwoCardGame{
     
     
     
@@ -113,7 +96,13 @@ class CardNineGame{
         var result : [Int] = []
         switch setting {
         case 0:
-            result = [14,40,3,16,29,42,4,17,5,18,31,44,6,19,32,45,7,20,33,46,8,22,9,22,35,48,10,36,24,50,54,2]
+            result = Array(0...51)
+            break
+        case 1:
+            result = Array(0...51) + [53,54]
+            break
+        case 2:
+            result = Array(0...51)
             break
         default:
             result = Array(0...51) + [53,54]
@@ -157,6 +146,7 @@ class CardNineGame{
     //7 JValueRange
     //8 pointComparision
     //9 samePointComparision
+    //10 cardRankRule
 
 
     
@@ -171,6 +161,7 @@ class CardNineGame{
         let JValueRange = args[7]
         let pointComparision = args[8]
         let samePointComparision = args[9]
+        let cardRankRule = args[10]
 
         
         var maxRank = 0
@@ -190,7 +181,7 @@ class CardNineGame{
         var deck = deck
         // 发牌
         if dealNum == 0{
-            for _ in 0..<2{
+            for _ in 0..<4{
                 //正发
                 if dealType == 0{
                     for i in 0..<playerNum {
@@ -255,10 +246,10 @@ class CardNineGame{
         
         
         for i in 0..<playerNum {
-            allPlayCards[i].evaluateFlag = CardNineGameHandEvaluator(
+            allPlayCards[i].evaluateFlag = TwoCardGameHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules
-            ).evalHand(cards: allPlayCards[i].playerCard, redJokerValueRange: redJokerValueRange,blackJokerValueRange: blackJokerValueRange,KValueRange: KValueRange,QValueRange: QValueRange,JValueRange: JValueRange,pointComparision: pointComparision,samePointComparision: samePointComparision)
+            ).evalHand(cards: allPlayCards[i].playerCard, redJokerValueRange: redJokerValueRange,blackJokerValueRange: blackJokerValueRange,KValueRange: KValueRange,QValueRange: QValueRange,JValueRange: JValueRange,pointComparision: pointComparision,samePointComparision: samePointComparision,cardRankRule: cardRankRule)
         }
         
         
@@ -278,7 +269,7 @@ class CardNineGame{
         for card in deck{
             leftCards.append(card.cardIndex)
         }
-        if leftCards.count < CardNineGame.getMinCardNum(playerNum: playerNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+        if leftCards.count < TwoCardGame.getMinCardNum(playerNum: playerNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
             leftCards = []
         }
         print("winners \(winners)")
@@ -286,12 +277,13 @@ class CardNineGame{
     }
 }
 
-class CardNineGameHandEvaluator{
+class TwoCardGameHandEvaluator{
     var rankRules: [Int]
     var suitRules: [Int]
-    var ruleDict: [Int: ([CardNineCard]) -> Int] = [:]
+    var ruleDict: [Int: ([TwoCardCard]) -> Int] = [:]
     var pointComparision:Int = 0
     var samePointComparision: Int = 0
+    var cardRankRule: Int = 0
     
     init(rankRules: [Int],
          suitRules: [Int]){
@@ -299,21 +291,20 @@ class CardNineGameHandEvaluator{
         self.suitRules = suitRules
         self.ruleDict = [
             0:self.eval_isPoint(cards:),
-            1:self.eval_is2Plus8(cards:),
-            2:self.eval_isQPlus8(cards:),
-            3:self.eval_isQPlus9(cards:),
-            4:self.eval_isPair(cards:)
+            1:self.eval_isHighCard(cards:),
+            2:self.eval_isPair(cards:),
+
         ]
     }
     
-    func evalHand(cards: [Card],redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange:Int, JValueRange:Int, pointComparision: Int, samePointComparision: Int)->Int{
+    func evalHand(cards: [Card],redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange:Int, JValueRange:Int, pointComparision: Int, samePointComparision: Int, cardRankRule: Int)->Int{
         var cards = cards
         self.pointComparision = pointComparision
         self.samePointComparision = samePointComparision
         
-        let num1 = CardNineCard(card: cards[0], redJokerValueRange: redJokerValueRange, blackJokerValueRange: blackJokerValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange)
+        let num1 = TwoCardCard(card: cards[0], redJokerValueRange: redJokerValueRange, blackJokerValueRange: blackJokerValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, cardRankRule: cardRankRule)
         
-        let num2 = CardNineCard(card: cards[1], redJokerValueRange: redJokerValueRange, blackJokerValueRange: blackJokerValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange)
+        let num2 = TwoCardCard(card: cards[1], redJokerValueRange: redJokerValueRange, blackJokerValueRange: blackJokerValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange,cardRankRule: cardRankRule)
         
         var numList = [num1, num2]
         numList = numList.sorted(by: {$0.rank > $1.rank})
@@ -338,46 +329,58 @@ class CardNineGameHandEvaluator{
         return score
     }
     
-    func eval_isPair(cards:[CardNineCard]) -> Int{
+    func eval_isPair(cards:[TwoCardCard]) -> Int{
         if cards[0].rank == cards[1].rank{
-            return cards[0].rank << 2 | (cards[0].suit + cards[1].suit)
+            return cards[0].rank
+        } else if cards[0].cardIndex == 54 && cards[1].cardIndex == 53{
+            return cards[0].rank
         }
         return 0
-    }
-    func eval_isQPlus9(cards: [CardNineCard]) -> Int {
-        if cards[0].rank == 12 && cards[1].rank == 9{
-            return 1
-        }
-        return 0
-    }
-    func eval_isQPlus8(cards: [CardNineCard]) -> Int {
-        if cards[0].rank == 12 && cards[1].rank == 8{
-            return 1
-        }
-        return 0
-    }
-    func eval_is2Plus8(cards: [CardNineCard]) -> Int {
-        if cards[0].rank == 8 && cards[1].rank == 2{
-            return 1
-        }
-        return 0
-    }
-    func eval_isPoint(cards:[CardNineCard]) -> Int {
-        let point = (cards[0].point + cards[1].point) % 10
-        return point << 4 | cards[0].rank
     }
     
-    class CardNineCard{
+    func eval_isHighCard(cards: [TwoCardCard]) -> Int{
+        return cards[0].rank
+    }
+    
+    func eval_isPoint(cards:[TwoCardCard]) -> Int {
+        let point = cards.reduce(0){$0 + $1.point} % 10
+        if self.samePointComparision == 0{
+            return point + 1
+        } else if self.samePointComparision == 1{
+            return point + 1 << 4 | cards[0].rank
+
+        } else {
+            return 0
+        }
+    }
+    
+    class TwoCardCard{
         var rank: Int = 0
         var point: Int = 0
         var suit: Int = 0
         var cardIndex: Int = 0
         
-        init(card: Card, redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange:Int, JValueRange:Int){
-            let rule = GameManager.gameRules[9] as! CardNineGameRule
+        init(card: Card, redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange:Int, JValueRange:Int, cardRankRule: Int){
+            let rule = GameManager.gameRules[12] as! TwoCardGameRule
             self.cardIndex = card.cardIndex
             //Rank Initialization
-            self.rank = card.rank
+            if cardRankRule == 0 {
+                if card.rank == 1{
+                    self.rank = 13
+                } else if card.rank < 14 {
+                    self.rank = card.rank - 1
+                } else {
+                    self.rank = card.rank
+                }
+            } else if cardRankRule == 1{
+                if card.rank == 1{
+                    self.rank = 15
+                } else {
+                    self.rank = card.rank - 1
+                }
+            } else {
+                self.rank = card.rank
+            }
             //suit Initialization
             self.suit = card.suit[0]
             //Point Initialization

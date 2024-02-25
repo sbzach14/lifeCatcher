@@ -8,19 +8,22 @@ import Foundation
 class FourCardGameRule : Rule{
     
     let redJokerValueRange:[Int:String] = [
-        0:"6"
+        0:"0"
     ]
     let blackJokerValueRange: [Int: String] = [
-        0:"6"
+        0:"0"
     ]
     let KValueRange:[Int:String] = [
-        0:"3",
+        0:"0",
+        1:"13"
     ]
     let QValueRange:[Int:String] = [
-        0:"2",
+        0:"0",
+        1:"12"
     ]
     let JValueRange:[Int:String] = [
-        0:"1"
+        0:"0",
+        1:"11"
     ]
     let pointComparision:[Int: String] = [
         0:"9点最大，0点最小",
@@ -293,9 +296,9 @@ class FourCardGameHandEvaluator{
         self.pointComparision = pointComparision
         self.samePointComparision = samePointComparision
         
-        let num1 = FourCardCard(card: cards[0], redJokerValueRange: redJokerValueRange, blackJokerValueRange: blackJokerValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange)
+        let num1 = FourCardCard(card: cards[0], redJokerValueRange: redJokerValueRange, blackJokerValueRange: blackJokerValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, cardRankRule: cardRankRule)
         
-        let num2 = FourCardCard(card: cards[1], redJokerValueRange: redJokerValueRange, blackJokerValueRange: blackJokerValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange)
+        let num2 = FourCardCard(card: cards[1], redJokerValueRange: redJokerValueRange, blackJokerValueRange: blackJokerValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange,cardRankRule: cardRankRule)
         
         var numList = [num1, num2]
         numList = numList.sorted(by: {$0.rank > $1.rank})
@@ -310,7 +313,7 @@ class FourCardGameHandEvaluator{
             if rank == 0{
                 continue
             } else {
-                score = (1 << (i + 8)) | rank
+                score = (1 << (i + 5)) | rank
                 print("牌型 \(ruleIndex) rank \(score) i \(i)")
 
                 break
@@ -322,7 +325,7 @@ class FourCardGameHandEvaluator{
     
     func eval_isPair(cards:[FourCardCard]) -> Int{
         if cards[0].rank == cards[1].rank{
-            return cards[0].rank << 2 | (cards[0].suit + cards[1].suit)
+            return cards[0].rank
         }
         return 0
     }
@@ -332,8 +335,8 @@ class FourCardGameHandEvaluator{
     }
     
     func eval_isPoint(cards:[FourCardCard]) -> Int {
-        let point = cards.reduce(0){$0 + $1.rank} % 10
-        return point << 4 | cards[0].rank
+        let point = cards.reduce(0){$0 + $1.point} % 10
+        return point + 1
     }
     
     class FourCardCard{
@@ -342,12 +345,21 @@ class FourCardGameHandEvaluator{
         var suit: Int = 0
         var cardIndex: Int = 0
         
-        init(card: Card, redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange:Int, JValueRange:Int){
-            let rule = GameManager.gameRules[12] as! FourCardGameRule
+        init(card: Card, redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange:Int, JValueRange:Int, cardRankRule: Int){
+            let rule = GameManager.gameRules[11] as! FourCardGameRule
             self.cardIndex = card.cardIndex
             //Rank Initialization
-            
-            self.rank = card.rank
+            if cardRankRule == 0 {
+                if card.rank == 1{
+                    self.rank = 13
+                } else if card.rank < 14 {
+                    self.rank = card.rank - 1
+                } else {
+                    self.rank = card.rank
+                }
+            } else {
+                self.rank = card.rank
+            }
             //suit Initialization
             self.suit = card.suit[0]
             //Point Initialization
