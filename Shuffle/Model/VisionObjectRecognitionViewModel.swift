@@ -16,26 +16,9 @@ class VisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVid
     @Published var detectedObjects: [DetectedObject] = []
     @Published var cameraImage : CGImage?
     
-    var isBlack: Bool = false
-    var isMute: Bool = false
-    var isBackCamera: Bool = false
-    
     private var speechSynthesizer = AVSpeechSynthesizer()
     
     func initialize(){
-        
-        // Load data from config.json
-        if let configData = readConfigJSON() {
-            self.isBlack = configData["isBlack"]!
-            self.isMute = configData["isMute"]!
-            self.isBackCamera = configData["isBackCamera"]!
-        } else {
-            // If config.json is not found or invalid, set default values
-            self.isBlack = false
-            self.isMute = false
-            self.isBackCamera = false
-        }
-        
         setupAVCapture()
         setupVision()
         startCaptureSession()
@@ -47,15 +30,7 @@ class VisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVid
         var deviceInput: AVCaptureDeviceInput!
         var videoDevice: AVCaptureDevice
         
-        
-        if self.isBackCamera{
-            videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)!
-        }
-        else{
-            videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front)!
-        }
-        
-        
+        videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)!
         
         do {
             try videoDevice.lockForConfiguration()
@@ -116,7 +91,6 @@ class VisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVid
         session.stopRunning()
     }
     
-    
     // MARK: - Vision Setup
     
     func setupVision() {
@@ -152,10 +126,7 @@ class VisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVid
         }
     }
 
-    
-    
     // MARK: - AVCaptureVideoDataOutputSampleBufferDelegate
-    
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else {
             return
@@ -262,10 +233,8 @@ class VisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVid
     }
     
     func speakText(input: String){
-        if !self.isMute{
-            let speechUtterance = AVSpeechUtterance(string: input)
-            speechSynthesizer.speak(speechUtterance)
-        }
+        let speechUtterance = AVSpeechUtterance(string: input)
+        speechSynthesizer.speak(speechUtterance)
     }
         
 }

@@ -6,21 +6,7 @@ struct VisionObjectRecognitionView: View {
     var body: some View {
         
         
-        if viewModel.isBlack {
-            ZStack {
-                Color.black
-                    .edgesIgnoringSafeArea(.all)
-                    .opacity(1.0)
-            }
-            .onAppear {
-                UIScreen.main.brightness = 0.0
-            }
-            .onDisappear {
-                UIScreen.main.brightness = 1.0
-            }
-            .navigationBarBackButtonHidden(true)
-        }
-        else{
+        
             VStack {
                 Text(viewModel.detectedObjects.map { $0.cls }.joined(separator: " "))
                     .font(.title)
@@ -55,7 +41,6 @@ struct VisionObjectRecognitionView: View {
             .onDisappear {
                 viewModel.stopCamera()
             }
-        }
     }
 }
 

@@ -59,13 +59,30 @@ public func readParaJSON() -> [String: String]? {
 
 func createConfigJSON() {
     // Create the config dictionary with default values
-    let configDict: [String: Bool] = [
+    
+    let intDict : [String: Int] = [
+        "volumeUp": 0,
+        "volumeDown": 0
+    ]
+    
+    let floatDict : [String: Float] = [
+        "volumeValue": 0
+    ]
+    
+    let boolDict: [String: Bool] = [
         "isBlack": false,
         "isMute": false,
         "isActive": false,
         "isBackCamera": false,
         "isRemote": false
     ]
+    
+    let configDict: [String: Any] = [
+        "Int": intDict,
+        "Float": floatDict,
+        "Bool": boolDict
+    ]
+    
 
     do {
         // Convert the dictionary to JSON Data
@@ -93,7 +110,7 @@ func createConfigJSON() {
 }
 
 
-public func readConfigJSON() -> [String: Bool]? {
+public func readConfigJSON() -> [String: Any]? {
     do {
         let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         let fileURL = documentsURL.appendingPathComponent("config.json")
@@ -101,7 +118,7 @@ public func readConfigJSON() -> [String: Bool]? {
         let jsonData = try Data(contentsOf: fileURL)
         let jsonObject = try JSONSerialization.jsonObject(with: jsonData, options: [])
 
-        if let configData = jsonObject as? [String: Bool] {
+        if let configData = jsonObject as? [String: Any] {
             return configData
         }
     } catch {

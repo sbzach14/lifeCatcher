@@ -36,7 +36,7 @@ struct ShowCardView: View {
             
             HStack {
                 Button {
-                    viewModel.showCardToggle()
+                    viewModel.isShowCard.toggle()
                 } label: {
                     Label("ShowCard", systemImage: "magnifyingglass")
                         .foregroundColor(.primary)

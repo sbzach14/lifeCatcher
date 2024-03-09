@@ -295,56 +295,7 @@ struct TexasPokerRuleSettingView: View {
                     
                 }
             }
-                        
-//            Button(action: {
-//                alertMessage = TexasPoker.legalCheck(
-//                    playerNum: selectedRule.playerNum[playerNum],
-//                    minRank: selectedRule.minRank[minRank],
-//                    handUseType: handUseType,
-//                    handUseNum: selectedRule.handUseNum[handUseNum],
-//                    handNum: selectedRule.handNum[handNum],
-//                    communityNum: selectedRule.communityNum[communityNum]
-//                )
-//
-//                if(alertMessage != "")
-//                {
-//                    showAlertWithMessage()
-//                }
-//                else {
-//                    navigateToMainContent = true
-//                }
-//
-//            }) {
-//                Image("icon_start").resizable().frame(width: 150, height: 60)
-//            }
-//            .padding()
-//            .alert(isPresented: $showAlert) {
-//                Alert(
-//                    title: Text("参数错误"),
-//                    message: Text(alertMessage),
-//                    dismissButton: .default(Text("OK"))
-//                )
-//            }
-//            .background(
-//                NavigationLink(
-//                    destination: MainContentView(
-//                        shuffleMode: shuffleMode,
-//                        calModeArgs: [calMode, target, targetPos],
-//                        ruleIndex: selectedRule.ruleIndex, args : [
-//                        selectedRule.playerNum[playerNum],
-//                        isCompareSuit,
-//                        isAceStraight,
-//                        selectedRule.minRank[minRank],
-//                        selectedRule.handNum[handNum],
-//                        selectedRule.communityNum[communityNum],
-//                        handUseType,
-//                        selectedRule.handUseNum[handUseNum]
-//                    ], rankRules : GameManager.getCheckedIndexes(rankRules: rankRules), suitRules: suitRules, allCardIndex: TexasPoker.getAllCardIndex(minRank: selectedRule.minRank[minRank]), minCardNum : TexasPoker.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: selectedRule.handNum[handNum], communityNum: selectedRule.communityNum[communityNum])),
-//                    isActive: $navigateToMainContent,
-//                    label: EmptyView.init
-//                )
-//                .hidden()
-//            )
+
         }.navigationTitle("规则设置")
             .background(Image("bg").resizable().scaledToFill())
     }

@@ -409,61 +409,6 @@ struct ThreeCardPokerGameRuleSettingView: View {
     
             Spacer()
 
-//            Button(action: {
-//                alertMessage = ThreeCardPokerGame.legalCheck(
-//                    playerNum: selectedRule.playerNum[playerNum],
-//                    minRank: selectedRule.minRank[minRank],
-//                    handNum: selectedRule.handNum[handNum],
-//                    isHeadCard: isHeadCard,
-//                    isRedJoker: isRedJoker,
-//                    isBlackJoker: isBlackJoker
-//                )
-//
-//                if(alertMessage != "")
-//                {
-//                    showAlertWithMessage()
-//                }
-//                else {
-//                    navigateToMainContent = true
-//                }
-//
-//            }) {
-//                Image("icon_start").resizable().frame(width: 150, height: 60)
-//            }
-//            .padding()
-//            .alert(isPresented: $showAlert) {
-//                Alert(
-//                    title: Text("参数错误"),
-//                    message: Text(alertMessage),
-//                    dismissButton: .default(Text("OK"))
-//                )
-//            }
-//            .background(
-//                NavigationLink(
-//                    destination: MainContentView(
-//                        shuffleMode: shuffleMode,
-//                        calModeArgs: [calMode, target, targetPos],
-//                        ruleIndex: selectedRule.ruleIndex, args : [
-//                        selectedRule.playerNum[playerNum],
-//                        selectedRule.handNum[handNum],
-//                        isCompareSuit,
-//                        selectedRule.minRank[minRank],
-//                        isAce,
-//                        isAceStraight,
-//                        isHeadCard,
-//                        isRedJoker,
-//                        redJokerSuit,
-//                        redJokerRank,
-//                        isBlackJoker,
-//                        blackJokerSuit,
-//                        blackJokerRank,
-//                        isReverseHighCard
-//                    ], rankRules : GameManager.getCheckedIndexes(rankRules: rankRules), suitRules: suitRules, allCardIndex: ThreeCardPokerGame.getAllCardIndex(minRank: selectedRule.minRank[minRank], isAce: isAce, isHeadCard: isHeadCard, isRedJoker: isRedJoker, isBlackJoker: isBlackJoker), minCardNum : ThreeCardPokerGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: selectedRule.handNum[handNum])),
-//                    isActive: $navigateToMainContent,
-//                    label: EmptyView.init
-//                )
-//                .hidden()
-//            )
         }.navigationTitle("规则设置").background(Image("bg").resizable().scaledToFill())
     }
     

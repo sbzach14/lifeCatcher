@@ -1,26 +1,7 @@
 import SwiftUI
 
 struct MainContentView: View {
-    var playerNum:Int
-    var shuffleMode: Int
-    var dealNum: Int
-    var coloringType: Int
-    var cutMode: Int
-    var dealType: Int
-    var diyDealNum: [Int]
-    var diyDealStatus: [[Bool]]
-    var calModeArgs: [Int]
-    var cutNumSetting: Int
-    var cutNumRangeSetting: [Int]
-    var consecutiveReport: Int
-    var reportNumber: Int
-    var voiceReport: Int
-    var ruleIndex: Int
-    var args: [Int]
-    var rankRules: [Int]
-    var suitRules: [Int]
-    var allCardIndex: [Int]
-    var minCardNum : Int
+    var saveRuleIndex : Int
     @StateObject var viewModel = ViewModel()
     var body: some View {
         ZStack {
@@ -51,7 +32,7 @@ struct MainContentView: View {
             }
         }
         .onAppear {
-            viewModel.initialize(playerNum: playerNum, shuffleMode: shuffleMode, cutMode: cutMode,dealNum: dealNum,coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, reportNumber: reportNumber, voiceReport: voiceReport, ruleIndex: ruleIndex, args: args, rankRules: rankRules, suitRules: suitRules, allCardIndex: allCardIndex, minCardNum: minCardNum)
+            viewModel.initialize(saveRuleIndex : saveRuleIndex)
         }
         .onDisappear {
             viewModel.stopCamera()

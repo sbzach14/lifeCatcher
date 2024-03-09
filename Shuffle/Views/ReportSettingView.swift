@@ -23,8 +23,20 @@ struct ReportSettingView: View {
             
             ScrollView{
                 VStack { // 垂直间距
+                    HStack {
+                        Text("[\(reportSetting)] : " + generalRuleSetting.allReportSetting[reportSetting]!)
+                            .foregroundColor(.green)
+                            .lineLimit(nil) // 可以显示多行文本
+                            .fixedSize(horizontal: false, vertical: true) // 允许垂直方向上的大小自适应
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.vertical, 10)
+                    .onTapGesture {
+                        self.presentationMode.wrappedValue.dismiss()
+                     }
+                    Divider()
+                    
                     ForEach(0..<filteredReportSettings.count, id: \.self) { index in
-                            
                             let currentIndex = filteredReportSettings[index]
                            HStack {
                                Text("[\(currentIndex)] : " + generalRuleSetting.allReportSetting[currentIndex]!)
