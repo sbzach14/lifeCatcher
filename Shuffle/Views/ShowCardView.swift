@@ -14,22 +14,111 @@ struct ShowCardView: View {
         VStack(alignment: .leading) {
             if viewModel.isShowCard {
                 ScrollView {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 45))]) {
-                        ForEach(viewModel.cardArray.indices, id: \.self) { index in
-                            ZStack {
-                                Rectangle()
-                                    .foregroundColor(Color.white)
-                                    .aspectRatio(contentMode: .fit)
-                                    .cornerRadius(10)
-                                    .shadow(radius: 2)
-                                Text(viewModel.cardLabelDic[viewModel.cardArray[index]]!)
-                                    .font(.system(size: 14)).foregroundColor(Color.black)
-                            }.padding(5)
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 25))]) {
+                        ForEach(viewModel.cardArray, id: \.self) { index in
+                            CardIconView(index: index)
                         }
                     }
+                  
+                    //TODO: 替换成viewmodel保存的计算结果
+                    let result = Array(0...3)
+                    
+                    ForEach(result, id: \.self) { resultIndex in
+                        VStack(spacing: 20){
+                            
+                            VStack{
+                                
+                                Divider()
+                                
+                                Spacer().frame(height: 20)
+                                
+                                HStack{
+                                    HStack{
+                                        Text("轮").foregroundColor(.blue)
+                                        Text("\(resultIndex+1)")
+                                    }.frame(width: 45, alignment: .leading)
+                                    
+                                    
+                                    HStack{
+                                        Text("色牌").foregroundColor(.blue)
+                                        
+                                        //TODO: 替换成本轮色牌（若每轮相同则是本局色牌）
+                                        let colorCardIndex = 0
+                                        
+                                        CardIconView(index: colorCardIndex)
+                                        
+                                    }.frame(width: 70, alignment: .leading)
+                                    
+                                    HStack{
+                                        Text("公牌").foregroundColor(.blue)
+                                        
+                                        //TODO: 替换成本轮公牌（若每轮相同则是本局公牌）
+                                        let pubCardList = Array(0...5)
+                                        
+                                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 25))]){
+                                            
+                                            ForEach(pubCardList, id: \.self) { pubCardIndex in
+                                                CardIconView(index: pubCardIndex)
+                                            }
+                                        }
+                                    }.frame(width: .infinity, alignment: .leading)
+                                    
+                                    
+                                    Spacer()
+                                }
+                                
+                                Spacer().frame(height: 20)
+                                
+                                HStack{
+                                    Text("位置").frame(width: 45, alignment: .leading).foregroundColor(.blue)
+                                    
+                                    Text("排名").frame(width: 45, alignment: .leading).foregroundColor(.blue)
+                                    
+                                    Text("牌型").frame(width: 45, alignment: .leading).foregroundColor(.blue)
+                                    
+                                    Text("手牌").frame(width: 45, alignment: .leading).foregroundColor(.blue)
+                                    
+                                    Spacer()
+                                }
+                                
+                                //TODO: 替换成位置数量
+                                let posList = Array(0...4)
+                                
+                                ForEach(posList, id: \.self) { posIndex in
+                                    HStack{
+                                        Text("\(posIndex)").frame(width: 45, alignment: .leading)
+                                        
+                                        //TODO: 替换成该位置玩家的排名
+                                        let rate = 2
+                                        
+                                        Text("\(rate)").frame(width: 45, alignment: .leading)
+                                        
+                                        //TODO: 替换成该位置玩家的牌型
+                                        let cardRank = "对子"
+                                        
+                                        Text(cardRank).frame(width: 45, alignment: .leading)
+                                        
+                                        //TODO: 替换成该位置玩家的手牌
+                                        let handCardList = Array(0...12)
+                                        
+                                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 25))]){
+                                            
+                                            ForEach(handCardList, id: \.self) { handCardIndex in
+                                                CardIconView(index: handCardIndex)
+                                            }
+                                            
+                                        }
+                                        Spacer()
+                                    }
+                                }
+                                Spacer().frame(height: 20)
+                            }
+                        }
+                    }
+                    Divider()
                 }
                 .bubbleBackground()
-                .padding(.horizontal)
+                .padding(.horizontal, 10)
             }
             
             Spacer()
@@ -39,22 +128,27 @@ struct ShowCardView: View {
                     viewModel.isShowCard.toggle()
                 } label: {
                     Label("ShowCard", systemImage: "magnifyingglass")
-                        .foregroundColor(.primary)
+                        .foregroundColor(.blue)
                         .labelStyle(.iconOnly)
                         .bubbleBackground()
                 }
                 
-                Text("Winner :")
-                    .font(.title)
-                    .foregroundColor(.primary)
-                
-                Text(viewModel.winnerPlayerShow)
-                                    .font(.title)
-                                    .foregroundColor(.primary)
-                
                 Spacer()
+                
+                if viewModel.isShowCard{
+                    Button {
+                        viewModel.generateTestResult()
+                    } label: {
+                        Text("测试")
+                            .foregroundColor(.blue)
+                            .labelStyle(.iconOnly)
+                            .bubbleBackground()
+                    }
+                }
             }
-            .padding(.horizontal)
+            .padding(.horizontal,10)
+            
+            
         }
     }
 }
@@ -67,6 +161,22 @@ extension View {
                     .foregroundColor(.primary)
                     .opacity(0.4)
             }
+    }
+}
+
+struct CardIconView: View{
+    var index: Int
+    var body: some View {
+        ZStack {
+            Rectangle()
+                .foregroundColor(Color.white)
+                .aspectRatio(contentMode: .fit)
+                .cornerRadius(5)
+                .shadow(radius: 2)
+                .frame(width: 25, height: 25)
+            Text(GameManager.cardLabelDic[index]!)
+                .font(.system(size: 10)).foregroundColor(Color.black)
+        }
     }
 }
 

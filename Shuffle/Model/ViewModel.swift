@@ -142,17 +142,17 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         
         // Load data from config.json
         if let configData = readConfigJSON() {
-            var boolDict = configData["Bool"] as! [String : Bool]
+            let boolDict = configData["Bool"] as! [String : Bool]
             self.isBlack = boolDict["isBlack"]!
             self.isMute = boolDict["isMute"]!
             self.isBackCamera = boolDict["isBackCamera"]!
             self.isRemote = boolDict["isRemote"]!
             
-            var intDict = configData["Int"] as! [String : Int]
+            let intDict = configData["Int"] as! [String : Int]
             self.volumeUp = intDict["volumeUp"]!
             self.volumeDown = intDict["volumeDown"]!
             
-            var floatDict = configData["Float"] as! [String : Float]
+            let floatDict = configData["Float"] as! [String : Float]
             self.volumeValue = floatDict["volumeValue"]!
         } else {
             // If config.json is not found or invalid, set default values
@@ -1169,8 +1169,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                             && nextDetectResultNode0.nodeType == 0
                             && nextDetectResultNode1.nodeType == 2{
                             
-                            var nextLeftLaplacianPercent = nextDetectResultNode0.laplacianVariance / detectResultNode0.laplacianVariance
-                            var nextRightLaplacianPercent = nextDetectResultNode1.laplacianVariance / detectResultNode1.laplacianVariance
+                            let nextLeftLaplacianPercent = nextDetectResultNode0.laplacianVariance / detectResultNode0.laplacianVariance
+                            let nextRightLaplacianPercent = nextDetectResultNode1.laplacianVariance / detectResultNode1.laplacianVariance
                             
                             if nextLeftLaplacianPercent < nextRightLaplacianPercent{
                                 detectCardArray.insert(nowNum0, at: 0)
@@ -1199,8 +1199,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                             && nextDetectResultNode1.nodeType == 0
                             && nextDetectResultNode0.nodeType == 2{
                             
-                            var nextLeftLaplacianPercent = nextDetectResultNode0.laplacianVariance / detectResultNode0.laplacianVariance
-                            var nextRightLaplacianPercent = nextDetectResultNode1.laplacianVariance / detectResultNode1.laplacianVariance
+                            let nextLeftLaplacianPercent = nextDetectResultNode0.laplacianVariance / detectResultNode0.laplacianVariance
+                            let nextRightLaplacianPercent = nextDetectResultNode1.laplacianVariance / detectResultNode1.laplacianVariance
                             
                             if nextLeftLaplacianPercent < nextRightLaplacianPercent{
                                 detectCardArray.insert(nowNum0, at: 0)
@@ -1403,33 +1403,33 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     // MARK: update targetArea
     func updateTargetArea(coordinates:[[Float]]){
         if self.isHorizon{
-            var targetX = self.targetArea[0]
-            var targetY = self.targetArea[1]
-            var targetW = self.targetArea[2]
-            var targetH = self.targetArea[3]
-            var x0 = (coordinates[0][0] * targetW + targetX - targetW / 2) / originSize[0]
-            var y0 = (coordinates[0][1] * targetH + targetY - targetH / 2) / originSize[1]
-            var w0 = (coordinates[0][2] * targetW) / originSize[0]
-            var h0 = (coordinates[0][3] * targetH) / originSize[1]
-            var x1 = (coordinates[1][0] * targetW + targetX - targetW / 2) / originSize[0]
-            var y1 = (coordinates[1][1] * targetH + targetY - targetH / 2) / originSize[1]
-            var w1 = (coordinates[1][2] * targetW) / originSize[0]
-            var h1 = (coordinates[1][3] * targetH) / originSize[1]
+            let targetX = self.targetArea[0]
+            let targetY = self.targetArea[1]
+            let targetW = self.targetArea[2]
+            let targetH = self.targetArea[3]
+            let x0 = (coordinates[0][0] * targetW + targetX - targetW / 2) / originSize[0]
+            let y0 = (coordinates[0][1] * targetH + targetY - targetH / 2) / originSize[1]
+            let w0 = (coordinates[0][2] * targetW) / originSize[0]
+            let h0 = (coordinates[0][3] * targetH) / originSize[1]
+            let x1 = (coordinates[1][0] * targetW + targetX - targetW / 2) / originSize[0]
+            let y1 = (coordinates[1][1] * targetH + targetY - targetH / 2) / originSize[1]
+            let w1 = (coordinates[1][2] * targetW) / originSize[0]
+            let h1 = (coordinates[1][3] * targetH) / originSize[1]
             computeTargetArea(stateResult: [[x0,y0,w0,h0],[x1,y1,w1,h1]])
         }
         else{
-            var targetX = self.targetArea[0]
-            var targetY = self.targetArea[1]
-            var targetW = self.targetArea[2]
-            var targetH = self.targetArea[3]
-            var x0 = ((1 - coordinates[0][1]) * targetW + targetX - targetW / 2) / originSize[0]
-            var y0 = (coordinates[0][0] * targetH + targetY - targetH / 2) / originSize[1]
-            var w0 = (coordinates[0][3] * targetW) / originSize[0]
-            var h0 = (coordinates[0][2] * targetH) / originSize[1]
-            var x1 = ((1 - coordinates[1][1]) * targetW + targetX - targetW / 2) / originSize[0]
-            var y1 = (coordinates[1][0] * targetH + targetY - targetH / 2) / originSize[1]
-            var w1 = (coordinates[1][3] * targetW) / originSize[0]
-            var h1 = (coordinates[1][2] * targetH) / originSize[1]
+            let targetX = self.targetArea[0]
+            let targetY = self.targetArea[1]
+            let targetW = self.targetArea[2]
+            let targetH = self.targetArea[3]
+            let x0 = ((1 - coordinates[0][1]) * targetW + targetX - targetW / 2) / originSize[0]
+            let y0 = (coordinates[0][0] * targetH + targetY - targetH / 2) / originSize[1]
+            let w0 = (coordinates[0][3] * targetW) / originSize[0]
+            let h0 = (coordinates[0][2] * targetH) / originSize[1]
+            let x1 = ((1 - coordinates[1][1]) * targetW + targetX - targetW / 2) / originSize[0]
+            let y1 = (coordinates[1][0] * targetH + targetY - targetH / 2) / originSize[1]
+            let w1 = (coordinates[1][3] * targetW) / originSize[0]
+            let h1 = (coordinates[1][2] * targetH) / originSize[1]
             computeTargetArea(stateResult: [[x0,y0,w0,h0],[x1,y1,w1,h1]])
         }
     }
@@ -1451,7 +1451,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         
         
         /// The 8-bit planar destination pixel buffer.
-        var destinationBuffer8 = vImage.PixelBuffer<vImage.Planar8>(width: sourceBuffer8.width,
+        let destinationBuffer8 = vImage.PixelBuffer<vImage.Planar8>(width: sourceBuffer8.width,
                                                                     height: sourceBuffer8.height)
         
         let divisor: Int = 0x1000
@@ -1591,11 +1591,23 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         return result
     }
     
+    //MARK: generate test result
+    func generateTestResult(){
+        var testArray:[Int] = []
+        for i in self.allCardIndex{
+            testArray.append(i)
+        }
+        testArray.shuffle()
+        self.cardArray = testArray
+        
+        //computeWinnerPlayer()
+    }
+    
     //MARK: comupute winner
     func computeWinnerPlayer() {
         print("计算信息")
         
-        print("测试游戏：\(generalRuleSetting.allGameType[ruleIndex]), 游戏人数 \((GameManager.gameRules[ruleIndex]?.playerNum[playerNum])!), args：\(args), 花色顺序：\(suitRules), 发牌定制: \(dealNum), 打色模式: \(coloringType) 正发反发: \(dealType),  自定义发牌类型和发牌数量：\(diyDealStatus), \(diyDealNum), 打色模式：\(calModeArgs[0]), 目标位置：\(calModeArgs[1]), 打色点数设置: \(cutNumSetting), 打色范围：\(cutNumRangeSetting[0])- \(cutNumRangeSetting[1]), 连报轮数：\(consecutiveReport)")
+        print("测试游戏：\(String(describing: generalRuleSetting.allGameType[ruleIndex])), 游戏人数 \((GameManager.gameRules[ruleIndex]?.playerNum[playerNum])!), args：\(args), 花色顺序：\(suitRules), 发牌定制: \(dealNum), 打色模式: \(coloringType) 正发反发: \(dealType),  自定义发牌类型和发牌数量：\(diyDealStatus), \(diyDealNum), 打色模式：\(calModeArgs[0]), 目标位置：\(calModeArgs[1]), 打色点数设置: \(cutNumSetting), 打色范围：\(cutNumRangeSetting[0])- \(cutNumRangeSetting[1]), 连报轮数：\(consecutiveReport)")
         
         
         print("开始需要的最少牌数 \(minCardNum)")
