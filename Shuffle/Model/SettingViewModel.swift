@@ -8,18 +8,28 @@ class SettingViewModel: ObservableObject {
     @Published var isRemote: Bool = false
     @Published var isActive: Bool = false
     @Published var activeDate: String = ""
-    
+    @Published var volumeUp: Int = 0
+    @Published var volumeDown: Int = 0
+    @Published var volumeValue: Float = 0.5
     
     @Published var searchText : String = ""
 
     init() {
         // Load data from config.json
         if let configData = readConfigJSON() {
-            self.isBlack = configData["isBlack"]!
-            self.isMute = configData["isMute"]!
-            self.isBackCamera = configData["isBackCamera"]!
-            self.isRemote = configData["isRemote"]!
-            self.isActive = configData["isActive"]!
+            let boolDict = configData["Bool"] as! [String : Bool]
+            self.isBlack = boolDict["isBlack"]!
+            self.isMute = boolDict["isMute"]!
+            self.isBackCamera = boolDict["isBackCamera"]!
+            self.isRemote = boolDict["isRemote"]!
+            self.isActive = boolDict["isActive"]!
+            
+            let intDict = configData["Int"] as! [String : Int]
+            self.volumeUp = intDict["volumeUp"]!
+            self.volumeDown = intDict["volumeDown"]!
+            
+            let floatDict = configData["Float"] as! [String : Float]
+            self.volumeValue = floatDict["volumeValue"]!
         } else {
             // If config.json is not found or invalid, set default values
             self.isBlack = false
@@ -27,6 +37,10 @@ class SettingViewModel: ObservableObject {
             self.isBackCamera = false
             self.isRemote = false
             self.isActive = false
+            
+            self.volumeUp = 0
+            self.volumeDown = 0
+            self.volumeValue = 0.5
         }
         
         self.activeDate = readParaJSON()!["activeTime"]!
@@ -43,12 +57,27 @@ class SettingViewModel: ObservableObject {
             let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
             let fileURL = documentsURL.appendingPathComponent("config.json")
 
-            let configData: [String: Bool] = [
+            let boolDict: [String: Bool] = [
                 "isBlack": self.isBlack,
                 "isMute": self.isMute,
                 "isBackCamera" : self.isBackCamera,
                 "isRemote" : self.isRemote,
                 "isActive": self.isActive
+            ]
+            
+            let intDict : [String: Int] = [
+                "volumeUp": self.volumeUp,
+                "volumeDown": self.volumeDown
+            ]
+            
+            let floatDict : [String: Float] = [
+                "volumeValue": self.volumeValue
+            ]
+            
+            let configData: [String: Any] = [
+                "Int": intDict,
+                "Float": floatDict,
+                "Bool": boolDict
             ]
 
             let jsonData = try JSONSerialization.data(withJSONObject: configData, options: .prettyPrinted)
@@ -128,5 +157,3 @@ class SettingViewModel: ObservableObject {
         searchText = ""
     }
 }
-
-// Usage in SettingView remains unchanged

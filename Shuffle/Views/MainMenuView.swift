@@ -72,14 +72,14 @@ struct SearchBar: View {
     
     var body: some View {
         ZStack(alignment: .leading) {
-            TextField("         Search", text: $searchText)
+            TextField("Search", text: $searchText)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .disableAutocorrection(true)
                 .accentColor(.white)
+                .padding(.leading, 30).frame(maxWidth: .infinity, alignment: .leading)
             
             Image(systemName: "magnifyingglass")
                 .foregroundColor(.gray)
-                .padding(.leading, 10)
             
             if !searchText.isEmpty {
                 Button(action: {
@@ -88,6 +88,7 @@ struct SearchBar: View {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundColor(.gray)
                 }
+                .frame(maxWidth: .infinity, alignment: .trailing).padding(.trailing, 10)
             }
         }
         .padding()

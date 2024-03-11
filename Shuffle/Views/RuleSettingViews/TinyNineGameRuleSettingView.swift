@@ -26,42 +26,6 @@ struct TinyNineGameRuleSettingView: View {
     
             Spacer()
 
-//            Button(action: {
-//                alertMessage = TinyNineGame.legalCheck(
-//                    playerNum: selectedRule.playerNum[playerNum]
-//                )
-//
-//                if(alertMessage != "")
-//                {
-//                    showAlertWithMessage()
-//                }
-//                else {
-//                    navigateToMainContent = true
-//                }
-//
-//            }) {
-//                Image("icon_start").resizable().frame(width: 150, height: 60)
-//            }
-//            .padding()
-//            .alert(isPresented: $showAlert) {
-//                Alert(
-//                    title: Text("参数错误"),
-//                    message: Text(alertMessage),
-//                    dismissButton: .default(Text("OK"))
-//                )
-//            }
-//            .background(
-//                NavigationLink(
-//                    destination: MainContentView(
-//                        shuffleMode: shuffleMode,
-//                        calModeArgs: [calMode, target, targetPos],
-//                        ruleIndex: selectedRule.ruleIndex, args : [
-//                        selectedRule.playerNum[playerNum]], rankRules : GameManager.getCheckedIndexes(rankRules: rankRules), suitRules: suitRules, allCardIndex: TinyNineGame.getAllCardIndex(), minCardNum : TinyNineGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum])),
-//                    isActive: $navigateToMainContent,
-//                    label: EmptyView.init
-//                )
-//                .hidden()
-//            )
         }.navigationTitle("规则设置").background(Image("bg").resizable().scaledToFill())
     }
     

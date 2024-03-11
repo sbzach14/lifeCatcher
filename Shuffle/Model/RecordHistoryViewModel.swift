@@ -15,7 +15,8 @@ class RecordHistoryViewModel: ObservableObject {
     init() {
         // Load data from config.json
         if let configData = readConfigJSON() {
-            self.isActive = configData["isActive"]!
+            let boolDict = configData["Bool"] as! [String : Bool]
+            self.isActive = boolDict["isActive"]!
         } else {
             self.isActive = false
         }

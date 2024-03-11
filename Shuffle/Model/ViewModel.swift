@@ -15,6 +15,7 @@ import CoreML
 import Photos
 import Accelerate
 import AudioToolbox
+import MediaPlayer
 
 
 /// - Tag: ViewModel
@@ -35,7 +36,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     var startAudioPlayer: AVAudioPlayer?
     var successAudioPlayer: AVAudioPlayer?
     var failAudioPlayer: AVAudioPlayer?
-
+    private let commandCenter = MPRemoteCommandCenter.shared()
     
     // 创建一个后台队列
     let videoProcessingQueue = DispatchQueue(label: "com.example.videoProcessing", qos: .userInitiated)
@@ -118,48 +119,20 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     var isMute: Bool = false
     var isBackCamera: Bool = false
     var isRemote: Bool = false
+    var volumeUp: Int = 0
+    var volumeDown: Int = 0
+    var volumeValue: Float = 0.5
     var setFrameRate: Float64 = 120.0
     var cameraFrameRate: Int = 0
     
     
     var testCVPixelBuffer : CVPixelBuffer?
+    var selectedSaveIndex : Int = 0
+    var isWorking: Bool = true
 
-
-    func initialize(playerNum: Int, shuffleMode : Int, cutMode : Int, dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], calModeArgs : [Int],cutNumSetting: Int, cutNumRangeSetting:[Int], consecutiveReport: Int, reportNumber: Int, voiceReport:Int, ruleIndex: Int, args : [Int], rankRules : [Int], suitRules : [Int], allCardIndex : [Int], minCardNum : Int) {
+    func initialize(saveRuleIndex: Int) {
         
-        self.playerNum = (GameManager.gameRules[ruleIndex]?.playerNum[playerNum])!
-        self.shuffleMode = shuffleMode
-        self.dealNum = dealNum
-        self.coloringType = coloringType
-        self.cutMode = cutMode
-        self.dealType = dealType
-        self.diyDealNum = diyDealNum
-        self.diyDealStatus = diyDealStatus
-        self.calModeArgs = calModeArgs
-        self.consecutiveReport = consecutiveReport
-        self.cutNumSetting = cutNumSetting
-        self.cutNumRangeSetting = cutNumRangeSetting
-        self.reportNumber = reportNumber
-        self.voiceReport = voiceReport
-        
-        self.ruleIndex = ruleIndex
-        self.args = args
-        self.rankRules = rankRules
-        self.suitRules = suitRules
-        self.allCardIndex = allCardIndex
-        self.minCardNum = minCardNum
-        self.initCardArray()
-        
-//        // Python 初始化
-//        print("pythonInitialize")
-//        guard let stdLibPath = Bundle.main.path(forResource: "python-stdlib", ofType: nil) else { return }
-//        guard let libDynloadPath = Bundle.main.path(forResource: "python-stdlib/lib-dynload", ofType: nil) else { return }
-//
-//        setenv("PYTHONHOME", stdLibPath, 1)
-//        setenv("PYTHONPATH", "\(stdLibPath):\(libDynloadPath)", 1)
-//
-//        Py_Initialize()
-//        print("pythonInitialize done")
+        self.loadSaveRule(saveRuleIndex: saveRuleIndex)
         
         for key in self.allCardIndex {
             self.laplacianDic[0][key] = 0
@@ -169,16 +142,28 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         
         // Load data from config.json
         if let configData = readConfigJSON() {
-            self.isBlack = configData["isBlack"]!
-            self.isMute = configData["isMute"]!
-            self.isBackCamera = configData["isBackCamera"]!
-            self.isRemote = configData["isRemote"]!
+            let boolDict = configData["Bool"] as! [String : Bool]
+            self.isBlack = boolDict["isBlack"]!
+            self.isMute = boolDict["isMute"]!
+            self.isBackCamera = boolDict["isBackCamera"]!
+            self.isRemote = boolDict["isRemote"]!
+            
+            let intDict = configData["Int"] as! [String : Int]
+            self.volumeUp = intDict["volumeUp"]!
+            self.volumeDown = intDict["volumeDown"]!
+            
+            let floatDict = configData["Float"] as! [String : Float]
+            self.volumeValue = floatDict["volumeValue"]!
         } else {
             // If config.json is not found or invalid, set default values
             self.isBlack = false
             self.isMute = false
             self.isBackCamera = false
             self.isRemote = false
+            
+            self.volumeUp = 0
+            self.volumeDown = 0
+            self.volumeValue = 0.5
         }
         
         let startSoundURL = Bundle.main.url(forResource: "start_tip", withExtension: "mp3")
@@ -195,12 +180,14 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             print("Error playing sound: \(error.localizedDescription)")
         }
         
+        self.isWorking = true
+        
         setupAVCapture()
         startCamera()
         
 
 //        规则测试代码
-        print("calArgs \(calModeArgs[2])")
+        print("calArgs \(calModeArgs[1])")
         for i in 0..<1{
             print("测试用例 ",i + 1,"")
             var randomCardArray = Array(0...51)
@@ -242,16 +229,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         isHorizon = true
         targetArea = [0,0,0,0]
     }
-    
-    func showCardToggle() {
-        if self.isShowCard{
-            self.isShowCard = false
-        }
-        else{
-            self.isShowCard = true
-        }
-    }
-    
+
     func setupAVCapture(){
         if self.isBackCamera{
             self.captureDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
@@ -323,16 +301,23 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         
         session.startRunning()
         print("开启相机")
+        
+        // 监听系统音量的变化
+        let audioSession = AVAudioSession.sharedInstance()
+        do {
+            try audioSession.setActive(true)
+            audioSession.addObserver(self, forKeyPath: "outputVolume", options: .new, context: nil)
+        } catch {
+            print("Error setting up audio session: \(error.localizedDescription)")
+        }
     }
     
     func stopCamera() {
-//        if let inputs = session.inputs as? [AVCaptureDeviceInput] {
-//            for input in inputs {
-//                session.removeInput(input)
-//            }
-//        }
         session.stopRunning()
         print("关闭相机")
+        // 移除监听
+        let audioSession = AVAudioSession.sharedInstance()
+        audioSession.removeObserver(self, forKeyPath: "outputVolume")
     }
     
     func changeCameraFrameRate(to frameRate: Int) {
@@ -444,7 +429,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 }
             }
                 
-            if !self.isShowCard{
+            if !self.isShowCard && self.isWorking{
                 
                 self.detectionQueue.async {
                     let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: self.imageSize[0], height: self.imageSize[1]), targetArea: self.targetArea)!
@@ -557,6 +542,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     //2侧或1侧 长或短
                     
                     var errorFlag = false
+                    var reportFlag = true
                     
                     if detectState.isShort && self.cutMode != 0{
                         //切牌
@@ -567,10 +553,11 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                             self.speakText(input: 2)
                         }
                         
-                        else if self.cutMode != 4{
+                        else {
                             var cutIndex = self.cardArray.firstIndex(of: cutCard)!
                             if self.cutMode == 1{
                                 //看底
+                                self.cutCardArray(index: cutIndex)
                             }
                             else if self.cutMode == 2{
                                 //看顶
@@ -578,18 +565,21 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                                 if cutIndex < 0{
                                     cutIndex = self.cardArray.count - 1
                                 }
+                                self.cutCardArray(index: cutIndex)
                             }
                             else if self.cutMode == 3{
                                 //切牌
+                                self.cutCardArray(index: cutIndex)
                             }
-                            
+                            else if self.cutMode == 4{
+                                //看手 假设切牌后手牌在牌堆第一张（等于看顶），在报法代码中计算在2、3、4的情况
+                                cutIndex -= 1
+                                if cutIndex < 0{
+                                    cutIndex = self.cardArray.count - 1
+                                }
+                                self.cutCardArray(index: cutIndex)
+                            }
                             self.speakText(input: 1)
-                            self.cutCardArray(index: cutIndex)
-                        }
-                        else if self.cutMode == 4{
-                            //看手
-                            //todo 修改getcard 和相关代码 使得返回全部手牌 现在只能返回最多2张
-                            //todo 根据发牌方式和位置找位置 有可能因缺牌导致错误
                         }
                     }
                     
@@ -604,6 +594,10 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                             else{
                                 self.speakText(input: 2)
                             }
+                        
+                        if self.cutMode == 1 || self.cutMode == 2 || self.cutMode == 4{
+                            reportFlag = false
+                        }
                     }
                     else if detectState.isSingle
                         && (self.shuffleMode == 1 || self.shuffleMode == 2 || self.shuffleMode == 3 || self.shuffleMode == 4){
@@ -627,13 +621,17 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                             }
                             self.speakText(input: 1)
                         }
+                        
+                        if self.cutMode == 1 || self.cutMode == 2 || self.cutMode == 4{
+                            reportFlag = false
+                        }
                     }
                     else{
                         errorFlag = true
                         self.speakText(input: 2)
                     }
                     
-                    if !errorFlag{
+                    if !errorFlag && reportFlag{
                         self.computeWinnerPlayer()
                     }
                 }
@@ -1171,8 +1169,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                             && nextDetectResultNode0.nodeType == 0
                             && nextDetectResultNode1.nodeType == 2{
                             
-                            var nextLeftLaplacianPercent = nextDetectResultNode0.laplacianVariance / detectResultNode0.laplacianVariance
-                            var nextRightLaplacianPercent = nextDetectResultNode1.laplacianVariance / detectResultNode1.laplacianVariance
+                            let nextLeftLaplacianPercent = nextDetectResultNode0.laplacianVariance / detectResultNode0.laplacianVariance
+                            let nextRightLaplacianPercent = nextDetectResultNode1.laplacianVariance / detectResultNode1.laplacianVariance
                             
                             if nextLeftLaplacianPercent < nextRightLaplacianPercent{
                                 detectCardArray.insert(nowNum0, at: 0)
@@ -1201,8 +1199,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                             && nextDetectResultNode1.nodeType == 0
                             && nextDetectResultNode0.nodeType == 2{
                             
-                            var nextLeftLaplacianPercent = nextDetectResultNode0.laplacianVariance / detectResultNode0.laplacianVariance
-                            var nextRightLaplacianPercent = nextDetectResultNode1.laplacianVariance / detectResultNode1.laplacianVariance
+                            let nextLeftLaplacianPercent = nextDetectResultNode0.laplacianVariance / detectResultNode0.laplacianVariance
+                            let nextRightLaplacianPercent = nextDetectResultNode1.laplacianVariance / detectResultNode1.laplacianVariance
                             
                             if nextLeftLaplacianPercent < nextRightLaplacianPercent{
                                 detectCardArray.insert(nowNum0, at: 0)
@@ -1405,33 +1403,33 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     // MARK: update targetArea
     func updateTargetArea(coordinates:[[Float]]){
         if self.isHorizon{
-            var targetX = self.targetArea[0]
-            var targetY = self.targetArea[1]
-            var targetW = self.targetArea[2]
-            var targetH = self.targetArea[3]
-            var x0 = (coordinates[0][0] * targetW + targetX - targetW / 2) / originSize[0]
-            var y0 = (coordinates[0][1] * targetH + targetY - targetH / 2) / originSize[1]
-            var w0 = (coordinates[0][2] * targetW) / originSize[0]
-            var h0 = (coordinates[0][3] * targetH) / originSize[1]
-            var x1 = (coordinates[1][0] * targetW + targetX - targetW / 2) / originSize[0]
-            var y1 = (coordinates[1][1] * targetH + targetY - targetH / 2) / originSize[1]
-            var w1 = (coordinates[1][2] * targetW) / originSize[0]
-            var h1 = (coordinates[1][3] * targetH) / originSize[1]
+            let targetX = self.targetArea[0]
+            let targetY = self.targetArea[1]
+            let targetW = self.targetArea[2]
+            let targetH = self.targetArea[3]
+            let x0 = (coordinates[0][0] * targetW + targetX - targetW / 2) / originSize[0]
+            let y0 = (coordinates[0][1] * targetH + targetY - targetH / 2) / originSize[1]
+            let w0 = (coordinates[0][2] * targetW) / originSize[0]
+            let h0 = (coordinates[0][3] * targetH) / originSize[1]
+            let x1 = (coordinates[1][0] * targetW + targetX - targetW / 2) / originSize[0]
+            let y1 = (coordinates[1][1] * targetH + targetY - targetH / 2) / originSize[1]
+            let w1 = (coordinates[1][2] * targetW) / originSize[0]
+            let h1 = (coordinates[1][3] * targetH) / originSize[1]
             computeTargetArea(stateResult: [[x0,y0,w0,h0],[x1,y1,w1,h1]])
         }
         else{
-            var targetX = self.targetArea[0]
-            var targetY = self.targetArea[1]
-            var targetW = self.targetArea[2]
-            var targetH = self.targetArea[3]
-            var x0 = ((1 - coordinates[0][1]) * targetW + targetX - targetW / 2) / originSize[0]
-            var y0 = (coordinates[0][0] * targetH + targetY - targetH / 2) / originSize[1]
-            var w0 = (coordinates[0][3] * targetW) / originSize[0]
-            var h0 = (coordinates[0][2] * targetH) / originSize[1]
-            var x1 = ((1 - coordinates[1][1]) * targetW + targetX - targetW / 2) / originSize[0]
-            var y1 = (coordinates[1][0] * targetH + targetY - targetH / 2) / originSize[1]
-            var w1 = (coordinates[1][3] * targetW) / originSize[0]
-            var h1 = (coordinates[1][2] * targetH) / originSize[1]
+            let targetX = self.targetArea[0]
+            let targetY = self.targetArea[1]
+            let targetW = self.targetArea[2]
+            let targetH = self.targetArea[3]
+            let x0 = ((1 - coordinates[0][1]) * targetW + targetX - targetW / 2) / originSize[0]
+            let y0 = (coordinates[0][0] * targetH + targetY - targetH / 2) / originSize[1]
+            let w0 = (coordinates[0][3] * targetW) / originSize[0]
+            let h0 = (coordinates[0][2] * targetH) / originSize[1]
+            let x1 = ((1 - coordinates[1][1]) * targetW + targetX - targetW / 2) / originSize[0]
+            let y1 = (coordinates[1][0] * targetH + targetY - targetH / 2) / originSize[1]
+            let w1 = (coordinates[1][3] * targetW) / originSize[0]
+            let h1 = (coordinates[1][2] * targetH) / originSize[1]
             computeTargetArea(stateResult: [[x0,y0,w0,h0],[x1,y1,w1,h1]])
         }
     }
@@ -1453,7 +1451,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         
         
         /// The 8-bit planar destination pixel buffer.
-        var destinationBuffer8 = vImage.PixelBuffer<vImage.Planar8>(width: sourceBuffer8.width,
+        let destinationBuffer8 = vImage.PixelBuffer<vImage.Planar8>(width: sourceBuffer8.width,
                                                                     height: sourceBuffer8.height)
         
         let divisor: Int = 0x1000
@@ -1593,16 +1591,28 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         return result
     }
     
+    //MARK: generate test result
+    func generateTestResult(){
+        var testArray:[Int] = []
+        for i in self.allCardIndex{
+            testArray.append(i)
+        }
+        testArray.shuffle()
+        self.cardArray = testArray
+        
+        //computeWinnerPlayer()
+    }
+    
     //MARK: comupute winner
     func computeWinnerPlayer() {
         print("计算信息")
         
-        print("测试游戏：\(generalRuleSetting.allGameType[ruleIndex]), 游戏人数 \(playerNum), args：\(args), 花色顺序：\(suitRules), 发牌定制: \(dealNum), 打色模式: \(coloringType) 正发反发: \(dealType),  自定义发牌类型和发牌数量：\(diyDealStatus), \(diyDealNum), 打色模式：\(calModeArgs[0]), 打色目标，\(calModeArgs[1]), 目标位置：\(calModeArgs[2]), 打色点数设置: \(cutNumSetting), 打色范围：\(cutNumRangeSetting[0])- \(cutNumRangeSetting[1]), 连报轮数：\(consecutiveReport)")
+        print("测试游戏：\(String(describing: generalRuleSetting.allGameType[ruleIndex])), 游戏人数 \((GameManager.gameRules[ruleIndex]?.playerNum[playerNum])!), args：\(args), 花色顺序：\(suitRules), 发牌定制: \(dealNum), 打色模式: \(coloringType) 正发反发: \(dealType),  自定义发牌类型和发牌数量：\(diyDealStatus), \(diyDealNum), 打色模式：\(calModeArgs[0]), 目标位置：\(calModeArgs[1]), 打色点数设置: \(cutNumSetting), 打色范围：\(cutNumRangeSetting[0])- \(cutNumRangeSetting[1]), 连报轮数：\(consecutiveReport)")
         
         
         print("开始需要的最少牌数 \(minCardNum)")
         if cardArray.count >= minCardNum && cardArray.count > cutNumRangeSetting[0] && cardArray.count > cutNumRangeSetting[1] - minCardNum{
-            winnerPlayer = GameManager.selectGame(gameIndex: ruleIndex, inputCards: cardArray, playerNum: playerNum, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, minCardNum: minCardNum)
+            winnerPlayer = GameManager.selectGame(gameIndex: ruleIndex, inputCards: cardArray, playerNum: (GameManager.gameRules[ruleIndex]?.playerNum[playerNum])!, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, minCardNum: minCardNum)
             
             winnerPlayerShow = ""
             for winnerSet in winnerPlayer{
@@ -1612,38 +1622,31 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 winnerPlayerShow += "/"
             }
             
-            if calModeArgs[0] == 0{
-                print("每轮游戏胜者 \(winnerPlayer)")
-            } else if calModeArgs[1] == 0{
-                print("每轮切第几张目标位置最大 \(winnerPlayer)")
-            } else if calModeArgs[1] == 1{
-                print("每轮切第几张目标位置最小 \(winnerPlayer)")
-            } else if calModeArgs[1] == 2 {
-                print("目标生死门 \(winnerPlayer)")
-            }
             speakText(input: winnerPlayer)
         }
     }
     
     func speakText(input: Int){
-        var isSpeak = self.isHeadphonesConnected() || !self.isMute
+        let isSpeak = self.isHeadphonesConnected() || !self.isMute
         
         if isSpeak{
             if input == 0{
+                self.startAudioPlayer?.volume = self.volumeValue
                 self.startAudioPlayer?.play()
             }
             else if input == 1{
+                self.successAudioPlayer?.volume = self.volumeValue
                 self.successAudioPlayer?.play()
             }
             else if input == 2{
+                self.failAudioPlayer?.volume = self.volumeValue
                 self.failAudioPlayer?.play()
             }
         }
     }
-    
 
     func speakText(input: [[Int]]) {
-        var isSpeak = self.isHeadphonesConnected() || !self.isMute
+        let isSpeak = self.isHeadphonesConnected() || !self.isMute
         
         if isSpeak{
             speechSynthesizer.stopSpeaking(at: .immediate)
@@ -1663,8 +1666,21 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     speechUtterance.preUtteranceDelay = 1
                 }
                 
+                speechUtterance.volume = self.volumeValue
                 speechSynthesizer.speak(speechUtterance)
             }
+        }
+    }
+    
+    func speakText(input: String){
+        let isSpeak = self.isHeadphonesConnected() || !self.isMute
+        
+        if isSpeak{
+            speechSynthesizer.stopSpeaking(at: .immediate)
+
+            let speechUtterance = AVSpeechUtterance(string: input)
+            speechUtterance.volume = self.volumeValue
+            speechSynthesizer.speak(speechUtterance)
         }
     }
 
@@ -1687,6 +1703,162 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
 
         return false
+    }
+    
+    
+    // 监听系统音量变化的回调方法
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        guard keyPath == "outputVolume" else {
+            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+            return
+        }
+        
+        // 获取音量变化的大小
+        if let newVolume = change?[.newKey] as? Float {
+            if newVolume > 0 {
+                // 调用方法处理音量增加事件
+                handleVolumeIncrease()
+            } else {
+                // 调用方法处理音量减少事件
+                handleVolumeDecrease()
+            }
+        }
+    }
+    
+    private func handleVolumeIncrease() {
+        
+        let selectedRule = GameManager.gameRules[ruleIndex]!
+        
+        // 处理音量增加事件的逻辑
+        if self.volumeUp == 1{
+            let playNumList = selectedRule.playerNum
+            self.playerNum += 1
+            if self.playerNum >= playNumList.count{
+                self.playerNum = 0
+            }
+            speakText(input: "人数" + String(selectedRule.playerNum[self.playerNum]))
+        }
+        else if self.volumeUp == 2{
+            let currentNum = selectedRule.playerNum[self.playerNum]
+            var positionSetting = self.calModeArgs[1] + 1
+            if positionSetting >= currentNum{
+                positionSetting = 0
+            }
+            self.calModeArgs[1] = positionSetting
+            speakText(input: "位置" + String(positionSetting))
+        }
+        else if self.volumeUp == 3{
+            self.shuffleMode += 1
+            if self.shuffleMode >= generalRuleSetting.allShuffleMode.count{
+                self.shuffleMode = 0
+            }
+            speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode]!)
+        }
+        else if self.volumeUp == 4{
+            self.selectedSaveIndex += 1
+            if self.selectedSaveIndex >= RuleManager.allUsersGameRule.count{
+                self.selectedSaveIndex = 0
+            }
+            loadSaveRule(saveRuleIndex: self.selectedSaveIndex)
+            speakText(input: "方案" + String(self.selectedSaveIndex+1))
+        }
+        else if self.volumeUp == 5{
+            isWorking.toggle()
+            if isWorking{
+                speakText(input: "开始")
+            }
+            else{
+                speakText(input: "暂停")
+            }
+        }
+        else if self.volumeUp == 6{
+            //TODO 报下一轮（下一次连报）
+        }
+    }
+    
+    private func handleVolumeDecrease() {
+        // 处理音量减少事件的逻辑
+        
+        let selectedRule = GameManager.gameRules[ruleIndex]!
+        
+        if self.volumeDown == 1{
+            let playNumList = selectedRule.playerNum
+            self.playerNum -= 1
+            if self.playerNum < 0{
+                self.playerNum = playNumList.count - 1
+            }
+            speakText(input: "人数" + String(selectedRule.playerNum[self.playerNum]))
+        }
+        else if self.volumeDown == 2{
+            let currentNum = selectedRule.playerNum[self.playerNum]
+            var positionSetting = self.calModeArgs[1] - 1
+            if positionSetting < 0{
+                positionSetting = currentNum - 1
+            }
+            self.calModeArgs[1] = positionSetting
+            speakText(input: "位置" + String(positionSetting))
+        }
+        else if self.volumeDown == 3{
+            self.shuffleMode -= 1
+            if self.shuffleMode < 0{
+                self.shuffleMode = generalRuleSetting.allShuffleMode.count - 1
+            }
+            speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode]!)
+        }
+        else if self.volumeDown == 4{
+            self.selectedSaveIndex -= 1
+            if self.selectedSaveIndex < 0{
+                self.selectedSaveIndex = RuleManager.allUsersGameRule.count - 1
+            }
+            loadSaveRule(saveRuleIndex: self.selectedSaveIndex)
+            speakText(input: "方案" + String(self.selectedSaveIndex+1))
+        }
+        else if self.volumeDown == 5{
+            isWorking.toggle()
+            if isWorking{
+                speakText(input: "开始")
+            }
+            else{
+                speakText(input: "暂停")
+            }
+        }
+        else if self.volumeDown == 6{
+            //TODO 报下一轮（下一次连报）
+        }
+        else if self.volumeDown == 7{
+            self.volumeUp += 1
+            if self.volumeUp >= volumeSetting.volumeUpDict.count{
+                self.volumeUp = 0
+            }
+            speakText(input: volumeSetting.volumeUpDict[self.volumeUp]!)
+        }
+    }
+    
+    private func loadSaveRule(saveRuleIndex: Int){
+        self.selectedSaveIndex = saveRuleIndex
+        let rules = RuleManager.allUsersGameRule[self.selectedSaveIndex]
+        
+        self.ruleIndex = rules.gameType
+        self.playerNum = rules.playerNum
+        self.dealNum = rules.dealNum
+        self.coloringType = rules.coloringType
+        self.cutMode = rules.cutMode
+        self.dealType = rules.dealType
+        self.diyDealNum = rules.diyDealNum
+        self.diyDealStatus = rules.diyDealStatus
+        self.playerNum = rules.playerNum
+        self.shuffleMode = rules.shuffleMode
+        self.allCardIndex = rules.cardToUse
+        self.cutNumSetting = rules.cutNumSetting
+        self.cutNumRangeSetting = rules.cutNumRangeSetting
+        self.calModeArgs = [rules.reportSetting, rules.positionSetting]
+        self.consecutiveReport = rules.consecutiveReport
+        self.reportNumber = rules.reportNumber
+        self.voiceReport = rules.voiceReport
+        self.args = rules.args
+        self.suitRules = rules.suitRanks
+        self.rankRules = rules.rankRules
+        self.minCardNum = rules.minCardNum
     }
 }
 

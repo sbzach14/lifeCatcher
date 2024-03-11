@@ -467,58 +467,7 @@ struct PokerBullSettingView: View {
             }//ScrollView
             
             Spacer()
-            
-//            Button(action: {
-//                alertMessage = PokerBull.legalCheck(
-//                    playerNum: selectedRule.playerNum[playerNum], handNum: selectedRule.handNum[handNum],cardNum: selectedRule.cardsNum[cardsNum]
-//                )
-//
-//                if(alertMessage != "")
-//                {
-//                    showAlertWithMessage()
-//                }
-//                else {
-//                    print("牛牛rulelist", bullrulelist.count)
-//                    //organize the args
-//                    args = [
-//                        selectedRule.playerNum[playerNum], selectedRule.cardsNum[cardsNum],
-//                        selectedRule.handNum[handNum],
-//                        wayToDeal,
-//                        isCompareSuit,
-//                        fiveLittleRank,
-//                        secondRankRule,
-//                        jokerIsMinZero,
-//                        tenValueRange,
-//                        JValueRange,
-//                        QValueRange,
-//                        KValueRange,
-//                        blackJokerValueRange,
-//                        redJokerValueRange,
-//                        threeValueRange,
-//                        sixValueRange,
-//                        spadeAValueRange] + bullrulelist + [0]
-//                    navigateToMainContent = true
-//                }
-//
-//
-//
-//            }) {
-//                Image("icon_start").resizable().frame(width: 150, height: 60)
-//            }.padding()
-//                .alert(isPresented: $showAlert) {
-//                    Alert(
-//                        title: Text("参数错误"),
-//                        message: Text(alertMessage),
-//                        dismissButton: .default(Text("OK"))
-//                    )
-//                }.background(
-//                    NavigationLink(
-//                        destination: MainContentView(shuffleMode: shuffleMode,calModeArgs:[calMode, target, targetPos], ruleIndex: selectedRule.ruleIndex, args : args, rankRules : GameManager.getCheckedIndexes(rankRules: rankRules), suitRules: suitRules, allCardIndex: PokerBull.GetAllCardIndex(), minCardNum: PokerBull.GetMinCardNum(playerNum: playerNum, handNum: handNum)),
-//                        isActive: $navigateToMainContent,
-//                        label: EmptyView.init
-//                    )
-//                    .hidden()
-//                )
+
         }.navigationTitle("规则设置")
             .background(Image("bg").resizable().scaledToFill())
     }

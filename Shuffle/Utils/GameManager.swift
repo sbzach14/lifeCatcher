@@ -2968,7 +2968,8 @@ struct GameRule: Codable{
     var suitRanks: [Int] = []
     var rankRules: [Int] = []
     var rankRuleChecked: [Int] = []
-    init(RuleName: String, gameType: Int, setting: Int, dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], playerNum: Int, shuffleMode: Int, cutMode: Int, cardToUse: [Int], cutNumSetting : Int, reportSetting: Int, cutNumRangeSetting: [Int], positionSetting: Int, consecutiveReport: Int, reportNumber: Int, voiceReport: Int, args: [Int], suitRanks: [Int], rankRules: [Int], rankRuleChecked: [Int]) {
+    var minCardNum: Int
+    init(RuleName: String, gameType: Int, setting: Int, dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], playerNum: Int, shuffleMode: Int, cutMode: Int, cardToUse: [Int], cutNumSetting : Int, reportSetting: Int, cutNumRangeSetting: [Int], positionSetting: Int, consecutiveReport: Int, reportNumber: Int, voiceReport: Int, args: [Int], suitRanks: [Int], rankRules: [Int], rankRuleChecked: [Int], minCardNum: Int) {
         self.RuleName = RuleName
         self.gameType = gameType
         self.setting = setting
@@ -2992,6 +2993,7 @@ struct GameRule: Codable{
         self.suitRanks = suitRanks
         self.rankRules = rankRules
         self.rankRuleChecked = rankRuleChecked
+        self.minCardNum = minCardNum
     }
 }
 
