@@ -21,6 +21,8 @@ class GameManager {
         2: "♥️红桃",
         3: "♠️黑桃"
     ]
+    
+    
     static var gameRules: [Int: Rule] = {
         let rule0 = TexasPokerRule(ruleIndex: 0, ruleName: "德州")
         let rule1 = PokerBullRule(ruleIndex: 1, ruleName: "牛牛")
@@ -34,8 +36,10 @@ class GameManager {
         let rule9 = CardNineGameRule(ruleIndex: 9, ruleName: "牌九")
         let rule10 = NinePointGameRule(ruleIndex: 10, ruleName: "九点")
         let rule11 = FourCardGameRule(ruleIndex: 11, ruleName: "4张")
-        
-        return [rule0.ruleIndex: rule0, rule1.ruleIndex: rule1, rule2.ruleIndex: rule2, rule3.ruleIndex: rule3, rule4.ruleIndex: rule4, rule5.ruleIndex: rule5, rule6.ruleIndex: rule6, rule7.ruleIndex: rule7, rule8.ruleIndex: rule8, rule9.ruleIndex: rule9]
+        let rule12 = TwoCardGameRule(ruleIndex: 12, ruleName: "2张")
+        let rule13 = ThreeCardPointGameRule(ruleIndex: 13, ruleName: "3张")
+        let rule14 = TenPointFiveGameRule(ruleIndex: 14, ruleName: "10点半")
+        return [rule0.ruleIndex: rule0, rule1.ruleIndex: rule1, rule2.ruleIndex: rule2, rule3.ruleIndex: rule3, rule4.ruleIndex: rule4, rule5.ruleIndex: rule5, rule6.ruleIndex: rule6, rule7.ruleIndex: rule7, rule8.ruleIndex: rule8, rule9.ruleIndex: rule9,rule10.ruleIndex:rule10, rule11.ruleIndex: rule11,rule12.ruleIndex:rule12, rule13.ruleIndex:rule13, rule14.ruleIndex: rule14]
     }()
     
     static func cutRankConvert(cutNumSetting: Int, cardIndex: Int)->Int{
@@ -339,8 +343,6 @@ class GameManager {
                         break
                     }
                 }
-                
-                
             default:
                 print("calModeArgs 0 error")
             }
@@ -2094,14 +2096,376 @@ public class RuleManager{
                 var JValueRange = 0
                 var pointComparision = 0
                 var samePointComparision = 0
-                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision]
-                suitRules = [0,1,0,1]
-                rankRules = [4,3,2,1,0]
-                rankRuleChecked = [1,1,1,1,1]
+                var AValueRange = 0
+                var pairRank = 0
+                var cardRankRule = 0
+                var handNum = 0
+                
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule, handNum]
+                suitRules = [3,2,1,0]
+                rankRules = [7,5,6,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1]
                 allPreSetRules[i]![0]!.append(args)
                 allPreSetRules[i]![0]!.append(suitRules)
                 allPreSetRules[i]![0]!.append(rankRules)
                 allPreSetRules[i]![0]!.append(rankRuleChecked)
+//                1: "温州牌九[260]",
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                pointComparision = 0
+                samePointComparision = 0
+                AValueRange = 1
+                pairRank = 0
+                cardRankRule = 0
+                handNum = 0
+                
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule, handNum]
+                suitRules = [3,2,1,0]
+                rankRules = [8,9,10,11,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![1]!.append(args)
+                allPreSetRules[i]![1]!.append(suitRules)
+                allPreSetRules[i]![1]!.append(rankRules)
+                allPreSetRules[i]![1]!.append(rankRuleChecked)
+//                2: "通用四张-牌九大牌九1[...",
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                pointComparision = 0
+                samePointComparision = 0
+                AValueRange = 0
+                pairRank = 0
+                cardRankRule = 0
+                handNum = 0
+                
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule, handNum]
+                suitRules = [3,2,1,0]
+                rankRules = [12,8,9,13,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![2]!.append(args)
+                allPreSetRules[i]![2]!.append(suitRules)
+                allPreSetRules[i]![2]!.append(rankRules)
+                allPreSetRules[i]![2]!.append(rankRuleChecked)
+//                3: "52张小牌九[262]",
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                pointComparision = 0
+                samePointComparision = 0
+                AValueRange = 0
+                pairRank = 0
+                cardRankRule = 0
+                handNum = 0
+                
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule, handNum]
+                suitRules = [3,2,1,0]
+                rankRules = [8,9,10,11,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![3]!.append(args)
+                allPreSetRules[i]![3]!.append(suitRules)
+                allPreSetRules[i]![3]!.append(rankRules)
+                allPreSetRules[i]![3]!.append(rankRuleChecked)
+//                4: "宁波小牌九[263]",
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                pointComparision = 0
+                samePointComparision = 0
+                AValueRange = 0
+                pairRank = 0
+                cardRankRule = 0
+                handNum = 0
+                
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule, handNum]
+                suitRules = [3,2,1,0]
+                rankRules = [8,9,10,11,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![4]!.append(args)
+                allPreSetRules[i]![4]!.append(suitRules)
+                allPreSetRules[i]![4]!.append(rankRules)
+                allPreSetRules[i]![4]!.append(rankRuleChecked)
+//                5: "杭州牌九[264]",
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                pointComparision = 0
+                samePointComparision = 0
+                AValueRange = 0
+                pairRank = 0
+                cardRankRule = 0
+                handNum = 0
+                
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule, handNum]
+                suitRules = [3,2,1,0]
+                rankRules = [8,9,10,11,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![5]!.append(args)
+                allPreSetRules[i]![5]!.append(suitRules)
+                allPreSetRules[i]![5]!.append(rankRules)
+                allPreSetRules[i]![5]!.append(rankRuleChecked)
+//                6: "32张牌9[456]",
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                pointComparision = 0
+                samePointComparision = 0
+                AValueRange = 0
+                pairRank = 0
+                cardRankRule = 0
+                handNum = 0
+                
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule, handNum]
+                suitRules = [3,2,1,0]
+                rankRules = [8,9,10,11,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![6]!.append(args)
+                allPreSetRules[i]![6]!.append(suitRules)
+                allPreSetRules[i]![6]!.append(rankRules)
+                allPreSetRules[i]![6]!.append(rankRuleChecked)
+//                7: "湖南牌九[265]",
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                pointComparision = 0
+                samePointComparision = 0
+                AValueRange = 0
+                pairRank = 0
+                cardRankRule = 0
+                handNum = 0
+                
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule, handNum]
+                suitRules = [3,2,1,0]
+                rankRules = [8,9,10,11,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![7]!.append(args)
+                allPreSetRules[i]![7]!.append(suitRules)
+                allPreSetRules[i]![7]!.append(rankRules)
+                allPreSetRules[i]![7]!.append(rankRuleChecked)
+//                8: "通用四张-32张牌九[416]",
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                pointComparision = 0
+                samePointComparision = 0
+                AValueRange = 0
+                pairRank = 0
+                cardRankRule = 0
+                handNum = 0
+                
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule, handNum]
+                suitRules = [3,2,1,0]
+                rankRules = [8,9,10,11,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![8]!.append(args)
+                allPreSetRules[i]![8]!.append(suitRules)
+                allPreSetRules[i]![8]!.append(rankRules)
+                allPreSetRules[i]![8]!.append(rankRuleChecked)
+//                9: "山西牌九[268]",
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                pointComparision = 0
+                samePointComparision = 0
+                AValueRange = 0
+                pairRank = 0
+                cardRankRule = 0
+                handNum = 0
+                
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule, handNum]
+                suitRules = [3,2,1,0]
+                rankRules = [8,9,10,11,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![9]!.append(args)
+                allPreSetRules[i]![9]!.append(suitRules)
+                allPreSetRules[i]![9]!.append(rankRules)
+                allPreSetRules[i]![9]!.append(rankRuleChecked)
+//                10: "通用四张-54张大牌九[..",
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                pointComparision = 0
+                samePointComparision = 0
+                AValueRange = 0
+                pairRank = 0
+                cardRankRule = 0
+                handNum = 0
+                
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule, handNum]
+                suitRules = [3,2,1,0]
+                rankRules = [8,9,10,11,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![10]!.append(args)
+                allPreSetRules[i]![10]!.append(suitRules)
+                allPreSetRules[i]![10]!.append(rankRules)
+                allPreSetRules[i]![10]!.append(rankRuleChecked)
+//                11: "34张小牌九[457]",
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                pointComparision = 0
+                samePointComparision = 0
+                AValueRange = 0
+                pairRank = 0
+                cardRankRule = 0
+                handNum = 0
+                
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule, handNum]
+                suitRules = [3,2,1,0]
+                rankRules = [8,9,10,11,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![11]!.append(args)
+                allPreSetRules[i]![11]!.append(suitRules)
+                allPreSetRules[i]![11]!.append(rankRules)
+                allPreSetRules[i]![11]!.append(rankRuleChecked)
+//                12: "通用四张-32张牌九二[...",
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                pointComparision = 0
+                samePointComparision = 0
+                AValueRange = 0
+                pairRank = 0
+                cardRankRule = 0
+                handNum = 0
+                
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule, handNum]
+                suitRules = [3,2,1,0]
+                rankRules = [8,9,10,11,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![12]!.append(args)
+                allPreSetRules[i]![12]!.append(suitRules)
+                allPreSetRules[i]![12]!.append(rankRules)
+                allPreSetRules[i]![12]!.append(rankRuleChecked)
+//                13: "温州牌九黑大3[269]",
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                pointComparision = 0
+                samePointComparision = 0
+                AValueRange = 0
+                pairRank = 0
+                cardRankRule = 0
+                handNum = 0
+                
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule, handNum]
+                suitRules = [3,2,1,0]
+                rankRules = [8,9,10,11,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![13]!.append(args)
+                allPreSetRules[i]![13]!.append(suitRules)
+                allPreSetRules[i]![13]!.append(rankRules)
+                allPreSetRules[i]![13]!.append(rankRuleChecked)
+//                14: "南京牌九[261]",
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                pointComparision = 0
+                samePointComparision = 0
+                AValueRange = 0
+                pairRank = 0
+                cardRankRule = 0
+                handNum = 0
+                
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule, handNum]
+                suitRules = [3,2,1,0]
+                rankRules = [8,9,10,11,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![14]!.append(args)
+                allPreSetRules[i]![14]!.append(suitRules)
+                allPreSetRules[i]![14]!.append(rankRules)
+                allPreSetRules[i]![14]!.append(rankRuleChecked)
+//                15: "32张牌九[266]",
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                pointComparision = 0
+                samePointComparision = 0
+                AValueRange = 0
+                pairRank = 0
+                cardRankRule = 0
+                handNum = 0
+                
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule, handNum]
+                suitRules = [3,2,1,0]
+                rankRules = [8,9,10,11,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![15]!.append(args)
+                allPreSetRules[i]![15]!.append(suitRules)
+                allPreSetRules[i]![15]!.append(rankRules)
+                allPreSetRules[i]![15]!.append(rankRuleChecked)
+//                16: "山西牌九[269]",
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                pointComparision = 0
+                samePointComparision = 0
+                AValueRange = 0
+                pairRank = 0
+                cardRankRule = 0
+                handNum = 0
+                
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule, handNum]
+                suitRules = [3,2,1,0]
+                rankRules = [8,9,10,11,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![16]!.append(args)
+                allPreSetRules[i]![16]!.append(suitRules)
+                allPreSetRules[i]![16]!.append(rankRules)
+                allPreSetRules[i]![16]!.append(rankRuleChecked)
+//                17: "通用四张-杭州牌九[420]",
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                pointComparision = 0
+                samePointComparision = 0
+                AValueRange = 0
+                pairRank = 0
+                cardRankRule = 0
+                handNum = 0
+                
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule, handNum]
+                suitRules = [3,2,1,0]
+                rankRules = [8,9,10,11,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![17]!.append(args)
+                allPreSetRules[i]![17]!.append(suitRules)
+                allPreSetRules[i]![17]!.append(rankRules)
+                allPreSetRules[i]![17]!.append(rankRuleChecked)
                 break
             case 10:
 //                0:"福建54张9点[221]",
@@ -2405,6 +2769,169 @@ public class RuleManager{
                 allPreSetRules[i]![2]!.append(suitRules)
                 allPreSetRules[i]![2]!.append(rankRules)
                 allPreSetRules[i]![2]!.append(rankRuleChecked)
+                break
+            //三张
+            case 13:
+                let rule = GameManager.gameRules[i] as! ThreeCardPointGameRule
+                for j in 0...rule.setting.count - 1{
+                    allPreSetRules[i]![j] = []
+                }
+//                0: "三张9点[330]",
+                var redJokerValueRange = 0
+                var blackJokerValueRange = 0
+                var KValueRange = 0
+                var QValueRange = 0
+                var JValueRange = 0
+                var samePointComparision = 0
+                var isCompareSuit = 0
+                var pointComparision = 0
+
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, samePointComparision,isCompareSuit, pointComparision]
+                suitRules = [3,2,1,0]
+                rankRules = [0]
+                rankRuleChecked = [1]
+                allPreSetRules[i]![0]!.append(args)
+                allPreSetRules[i]![0]!.append(suitRules)
+                allPreSetRules[i]![0]!.append(rankRules)
+                allPreSetRules[i]![0]!.append(rankRuleChecked)
+//                1: "三张9点半[331]",
+                redJokerValueRange = 1
+                blackJokerValueRange = 1
+                KValueRange = 1
+                QValueRange = 1
+                JValueRange = 1
+                samePointComparision = 0
+                isCompareSuit = 0
+                pointComparision = 0
+
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, samePointComparision,isCompareSuit, pointComparision]
+                suitRules = [3,2,1,0]
+                rankRules = [2,0]
+                rankRuleChecked = [1,1]
+                allPreSetRules[i]![1]!.append(args)
+                allPreSetRules[i]![1]!.append(suitRules)
+                allPreSetRules[i]![1]!.append(rankRules)
+                allPreSetRules[i]![1]!.append(rankRuleChecked)
+//                2: "三张10点半[332]",
+                redJokerValueRange = 1
+                blackJokerValueRange = 1
+                KValueRange = 1
+                QValueRange = 1
+                JValueRange = 1
+                samePointComparision = 0
+                isCompareSuit = 0
+                pointComparision = 0
+
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, samePointComparision,isCompareSuit, pointComparision]
+                suitRules = [3,2,1,0]
+                rankRules = [1,0]
+                rankRuleChecked = [1,1]
+                allPreSetRules[i]![2]!.append(args)
+                allPreSetRules[i]![2]!.append(suitRules)
+                allPreSetRules[i]![2]!.append(rankRules)
+                allPreSetRules[i]![2]!.append(rankRuleChecked)
+//                3: "三张9点[333]",
+                redJokerValueRange = 2
+                blackJokerValueRange = 2
+                KValueRange = 2
+                QValueRange = 2
+                JValueRange = 0
+                samePointComparision = 0
+                isCompareSuit = 0
+                pointComparision = 0
+
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, samePointComparision,isCompareSuit, pointComparision]
+                suitRules = [3,2,1,0]
+                rankRules = [0]
+                rankRuleChecked = [1]
+                allPreSetRules[i]![3]!.append(args)
+                allPreSetRules[i]![3]!.append(suitRules)
+                allPreSetRules[i]![3]!.append(rankRules)
+                allPreSetRules[i]![3]!.append(rankRuleChecked)
+//                4: "三张9点[334]",
+                redJokerValueRange = 3
+                blackJokerValueRange = 3
+                KValueRange = 3
+                QValueRange = 3
+                JValueRange = 2
+                samePointComparision = 0
+                isCompareSuit = 0
+                pointComparision = 0
+
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, samePointComparision,isCompareSuit, pointComparision]
+                suitRules = [3,2,1,0]
+                rankRules = [0]
+                rankRuleChecked = [1]
+                allPreSetRules[i]![4]!.append(args)
+                allPreSetRules[i]![4]!.append(suitRules)
+                allPreSetRules[i]![4]!.append(rankRules)
+                allPreSetRules[i]![4]!.append(rankRuleChecked)
+//                5: "三张10点半[335]"
+                redJokerValueRange = 1
+                blackJokerValueRange = 1
+                KValueRange = 1
+                QValueRange = 1
+                JValueRange = 1
+                samePointComparision = 0
+                isCompareSuit = 0
+                pointComparision = 1
+
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, samePointComparision,isCompareSuit, pointComparision]
+                suitRules = [3,2,1,0]
+                rankRules = [1,0]
+                rankRuleChecked = [1,1]
+                allPreSetRules[i]![5]!.append(args)
+                allPreSetRules[i]![5]!.append(suitRules)
+                allPreSetRules[i]![5]!.append(rankRules)
+                allPreSetRules[i]![5]!.append(rankRuleChecked)
+                break
+            //10点半
+            case 14:
+                let rule = GameManager.gameRules[i] as! TenPointFiveGameRule
+                for j in 0...rule.setting.count - 1{
+                    allPreSetRules[i]![j] = []
+                }
+                
+//                0: "十点半[270]",
+                var redJokerValueRange = 0
+                var blackJokerValueRange = 0
+                var KValueRange = 0
+                var QValueRange = 0
+                var JValueRange = 0
+                var samePointComparision = 0
+                var isCompareSuit = 0
+                var pointComparision = 0
+                var cardRankRule = 0
+
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, samePointComparision,isCompareSuit, pointComparision, cardRankRule]
+                suitRules = [3,2,1,0]
+                rankRules = [1,0]
+                rankRuleChecked = [1,1]
+                allPreSetRules[i]![0]!.append(args)
+                allPreSetRules[i]![0]!.append(suitRules)
+                allPreSetRules[i]![0]!.append(rankRules)
+                allPreSetRules[i]![0]!.append(rankRuleChecked)
+
+//                1: "十点半[271]"
+                redJokerValueRange = 0
+                blackJokerValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                samePointComparision = 0
+                isCompareSuit = 0
+                pointComparision = 0
+                cardRankRule = 0
+
+                args = [redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, samePointComparision,isCompareSuit, pointComparision, cardRankRule]
+                suitRules = [3,2,1,0]
+                rankRules = [1,0]
+                rankRuleChecked = [1,1]
+                allPreSetRules[i]![1]!.append(args)
+                allPreSetRules[i]![1]!.append(suitRules)
+                allPreSetRules[i]![1]!.append(rankRules)
+                allPreSetRules[i]![1]!.append(rankRuleChecked)
+                
                 break
             default:
                 print("There is no preset rule for this game!!!!!")
