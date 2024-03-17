@@ -665,6 +665,9 @@ class HandEvaluator {
                         cardList.append(card)
                     }
                 }
+                if cardList.count < 3{
+                    continue
+                }
                 for i in 0..<(cardList.count - 1) {
                     if cardList[i].rank - cardList[i+1].rank == 1 {
                         cnt += 1

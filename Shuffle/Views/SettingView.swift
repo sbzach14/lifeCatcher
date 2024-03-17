@@ -10,7 +10,7 @@ import SwiftUI
 
 class volumeSetting{
     static let volumeUpDict: [Int: String] = [
-        0: "无",
+        0: "无功能",
         1: "增加人数",
         2: "下一个位置",
         3: "下一个洗牌手法",
@@ -20,7 +20,7 @@ class volumeSetting{
     ]
     
     static let volumeDownDict: [Int: String] = [
-        0: "无",
+        0: "无功能",
         1: "减少人数",
         2: "上一个位置",
         3: "上一个洗牌手法",
@@ -141,7 +141,7 @@ struct SettingView: View {
                             HStack {
                                 Text("音量大小").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
                                 
-                                Slider(value: $viewModel.volumeValue, in: 0...1)
+                                Slider(value: $viewModel.volumeValue, in: 0.01...0.99)
                                     .frame(width: 200, height: 30, alignment: .trailing)
                                     .padding(.trailing,30) // 右侧间距
                                     .accentColor(.white)
