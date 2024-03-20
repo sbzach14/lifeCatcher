@@ -395,6 +395,7 @@ public class RuleManager{
     //[game:[rule1:[args, suitRule, rankrule, rankRuleChecked]]]
     //
     static var allPreSetRules: [Int:[Int:[[Int]]]] = [:]
+    static var allPreSetReportRules: [Int: ReportClass] = [:]
 
     static func saveGameRule(){
         do {
@@ -420,6 +421,10 @@ public class RuleManager{
             }
         }
         return []
+    }
+    //初始化预设好的报法
+    static func LoadAllReportRules(){
+        
     }
     
     //存储所有预设好的规则
