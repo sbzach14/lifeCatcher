@@ -71,7 +71,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     public var allCardIndex : [Int] = Array(0...51)
     public var minCardNum : Int = 0
 
-    
     let context = CIContext()
     var taskImageArray : [String] = []
     
@@ -121,7 +120,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     var isRemote: Bool = false
     var volumeUp: Int = 0
     var volumeDown: Int = 0
-    var volumeValue: Float = 0.5
     var setFrameRate: Float64 = 120.0
     var cameraFrameRate: Int = 0
     
@@ -129,8 +127,12 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     var testCVPixelBuffer : CVPixelBuffer?
     var selectedSaveIndex : Int = 0
     var isWorking: Bool = true
+    
+    var viewController: MyViewController?
 
     func initialize(saveRuleIndex: Int) {
+        
+        print("viewmodel init")
         
         self.loadSaveRule(saveRuleIndex: saveRuleIndex)
         
@@ -152,8 +154,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             self.volumeUp = intDict["volumeUp"]!
             self.volumeDown = intDict["volumeDown"]!
             
-            let floatDict = configData["Float"] as! [String : Float]
-            self.volumeValue = floatDict["volumeValue"]!
         } else {
             // If config.json is not found or invalid, set default values
             self.isBlack = false
@@ -163,7 +163,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             
             self.volumeUp = 0
             self.volumeDown = 0
-            self.volumeValue = 0.5
         }
         
         let startSoundURL = Bundle.main.url(forResource: "start_tip", withExtension: "mp3")
@@ -182,31 +181,31 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         
         self.isWorking = true
         
+        
         setupAVCapture()
         startCamera()
-        
 
-//        规则测试代码
-        print("calArgs \(calModeArgs[1])")
-        for i in 0..<1{
-            print("测试用例 ",i + 1,"")
-            var randomCardArray = Array(0...51)
-            randomCardArray.shuffle()
-            //切断
-            randomCardArray = Array(randomCardArray.prefix(35))
-            self.cardArray = randomCardArray
-            
-            self.cardArray = [4,18,32, 4,6,0, 0,12,10, 1,2,4, 4,17,30, 13,12,10, 1,15,4, 5,4,6, 18,30,6, 53,54,3, 53,4,5, 54,6,20, 53,4,0, 54,7,22, 8,32,41]
-            
-            var cardString:String = "当前牌库："
-            for cardIndex in cardArray{
-                cardString += cardLabelDic[cardIndex]! + " "
-            }
-            print(cardArray)
-            print(cardString)
-            
-            self.computeWinnerPlayer()
-        }
+//      规则测试代码
+//        print("calArgs \(calModeArgs[1])")
+//        for i in 0..<1{
+//            print("测试用例 ",i + 1,"")
+//            var randomCardArray = Array(0...51)
+//            randomCardArray.shuffle()
+//            //切断
+//            randomCardArray = Array(randomCardArray.prefix(35))
+//            self.cardArray = randomCardArray
+//            
+//            self.cardArray = [4,18,32, 4,6,0, 0,12,10, 1,2,4, 4,17,30, 13,12,10, 1,15,4, 5,4,6, 18,30,6, 53,54,3, 53,4,5, 54,6,20, 53,4,0, 54,7,22, 8,32,41]
+//            
+//            var cardString:String = "当前牌库："
+//            for cardIndex in cardArray{
+//                cardString += cardLabelDic[cardIndex]! + " "
+//            }
+//            print(cardArray)
+//            print(cardString)
+//            
+//            self.computeWinnerPlayer()
+//        }
 
     }
     
@@ -298,26 +297,13 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     }
     
     func startCamera() {
-        
         session.startRunning()
         print("开启相机")
-        
-        // 监听系统音量的变化
-        let audioSession = AVAudioSession.sharedInstance()
-        do {
-            try audioSession.setActive(true)
-            audioSession.addObserver(self, forKeyPath: "outputVolume", options: .new, context: nil)
-        } catch {
-            print("Error setting up audio session: \(error.localizedDescription)")
-        }
     }
     
     func stopCamera() {
         session.stopRunning()
         print("关闭相机")
-        // 移除监听
-        let audioSession = AVAudioSession.sharedInstance()
-        audioSession.removeObserver(self, forKeyPath: "outputVolume")
     }
     
     func changeCameraFrameRate(to frameRate: Int) {
@@ -517,9 +503,10 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         
         if state == "idle"{
             if self.stateCard[0] != -1 || self.stateCard[1] != -1{
-                state = "shuffle"
+                
                 print("动作：开始识别 ", self.setFrameRate)
                 DispatchQueue.main.async{
+                    self.state = "shuffle"
                     self.speakText(input: 0)
                     self.changeCameraFrameRate(to: Int(self.setFrameRate))
                     self.initCardArray()
@@ -531,9 +518,10 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
         else if state == "shuffle"{
             if self.stateCard[0] == -1 && self.stateCard[1] == -1 && stateCounter > 10{
-                state = "idle"
+
                 print("动作：识别完成 ", self.setFrameRate)
                 DispatchQueue.main.async{
+                    self.state = "idle"
                     self.changeCameraFrameRate(to: 30)
                     let detectState = self.handleDetecResultList()
                     self.initBoxes()
@@ -602,10 +590,10 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     else if detectState.isSingle
                         && (self.shuffleMode == 1 || self.shuffleMode == 2 || self.shuffleMode == 3 || self.shuffleMode == 4){
                         
+                        self.cardArray = detectState.detectionResult
+                        
                         if(self.shuffleMode == 1 || self.shuffleMode == 3){
                             //拨到顶
-                            self.cardArray = detectState.detectionResult
-                            
                             if self.cardArray.count == self.allCardIndex.count{
                                 self.speakText(input: 1)
                             }
@@ -631,9 +619,13 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         self.speakText(input: 2)
                     }
                     
+                    print("result  isShort:\(detectState.isShort)  isSingle:\(detectState.isSingle)  cardArray:\(self.cardArray)")
+                    
                     if !errorFlag && reportFlag{
-                        self.computeWinnerPlayer()
+                        //self.computeWinnerPlayer()
                     }
+                    
+                    
                 }
             }
             else{
@@ -859,7 +851,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
         
         var isSingle = true
-        if leftSideCnt == 0 || rightSideCnt == 0{
+        if leftSideCnt != 0 && rightSideCnt != 0{
             isSingle = false
         }
         
@@ -1627,29 +1619,25 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     }
     
     func speakText(input: Int){
-        let isSpeak = self.isHeadphonesConnected() || !self.isMute
+        let isSpeak = self.isHeadphonesConnected() == self.isMute
         
         if isSpeak{
             if input == 0{
-                self.startAudioPlayer?.volume = self.volumeValue
                 self.startAudioPlayer?.play()
             }
             else if input == 1{
-                self.successAudioPlayer?.volume = self.volumeValue
                 self.successAudioPlayer?.play()
             }
             else if input == 2{
-                self.failAudioPlayer?.volume = self.volumeValue
                 self.failAudioPlayer?.play()
             }
         }
     }
 
     func speakText(input: [[Int]]) {
-        let isSpeak = self.isHeadphonesConnected() || !self.isMute
+        let isSpeak = self.isHeadphonesConnected() == self.isMute
         
         if isSpeak{
-            speechSynthesizer.stopSpeaking(at: .immediate)
             for (index, eachInput) in input.enumerated() {
                 print("播报的input \(eachInput)")
                 var speakString = "无"
@@ -1666,66 +1654,29 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     speechUtterance.preUtteranceDelay = 1
                 }
                 
-                speechUtterance.volume = self.volumeValue
                 speechSynthesizer.speak(speechUtterance)
             }
         }
     }
     
     func speakText(input: String){
-        let isSpeak = self.isHeadphonesConnected() || !self.isMute
+        let isSpeak = self.isHeadphonesConnected() == self.isMute
         
         if isSpeak{
-            speechSynthesizer.stopSpeaking(at: .immediate)
-
             let speechUtterance = AVSpeechUtterance(string: input)
-            speechUtterance.volume = self.volumeValue
             speechSynthesizer.speak(speechUtterance)
         }
     }
 
     
     func isHeadphonesConnected() -> Bool {
-        let audioSession = AVAudioSession.sharedInstance()
-
-        do {
-            try audioSession.setCategory(.playAndRecord, options: .defaultToSpeaker)
-            try audioSession.setActive(true)
-
-            let route = audioSession.currentRoute
-            for output in route.outputs {
-                if output.portType == AVAudioSession.Port.headphones {
-                    return true
-                }
-            }
-        } catch {
-            print("Error checking headphones connection: \(error.localizedDescription)")
-        }
-
-        return false
+        let currentRoute = AVAudioSession.sharedInstance().currentRoute
+        let connectedBluetoothHeadphones = currentRoute.outputs.contains { $0.portType == .bluetoothA2DP }
+        return connectedBluetoothHeadphones
     }
     
     
-    // 监听系统音量变化的回调方法
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        guard keyPath == "outputVolume" else {
-            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-            return
-        }
-        
-        // 获取音量变化的大小
-        if let newVolume = change?[.newKey] as? Float {
-            if newVolume > 0 {
-                // 调用方法处理音量增加事件
-                handleVolumeIncrease()
-            } else {
-                // 调用方法处理音量减少事件
-                handleVolumeDecrease()
-            }
-        }
-    }
-    
-    private func handleVolumeIncrease() {
+    public func handleVolumeIncrease() {
         
         let selectedRule = GameManager.gameRules[ruleIndex]!
         
@@ -1745,7 +1696,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 positionSetting = 0
             }
             self.calModeArgs[1] = positionSetting
-            speakText(input: "位置" + String(positionSetting))
+            speakText(input: "位置" + String(positionSetting+1))
         }
         else if self.volumeUp == 3{
             self.shuffleMode += 1
@@ -1776,7 +1727,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
     }
     
-    private func handleVolumeDecrease() {
+    public func handleVolumeDecrease() {
         // 处理音量减少事件的逻辑
         
         let selectedRule = GameManager.gameRules[ruleIndex]!
@@ -1796,7 +1747,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 positionSetting = currentNum - 1
             }
             self.calModeArgs[1] = positionSetting
-            speakText(input: "位置" + String(positionSetting))
+            speakText(input: "位置" + String(positionSetting+1))
         }
         else if self.volumeDown == 3{
             self.shuffleMode -= 1

@@ -32,51 +32,55 @@ struct ShowCardView: View {
                                 
                                 Spacer().frame(height: 20)
                                 
+                                
                                 HStack{
-                                    HStack{
-                                        Text("轮").foregroundColor(.blue)
-                                        Text("\(resultIndex+1)")
-                                    }.frame(width: 45, alignment: .leading)
+                                    Text("轮次").font(.system(size: 25))
+                                    Text("\(resultIndex+1)").font(.system(size: 25))
+                                    Spacer()
+                                }
+                                
+                                Spacer().frame(height: 40)
+                                
+                                //TODO: 替换成本轮色牌（若每轮相同则是本局色牌）没有则隐藏
+                                HStack{
+                                    Text("色牌").font(.system(size: 25))
                                     
+                                    let colorCardIndex = 0
                                     
-                                    HStack{
-                                        Text("色牌").foregroundColor(.blue)
-                                        
-                                        //TODO: 替换成本轮色牌（若每轮相同则是本局色牌）
-                                        let colorCardIndex = 0
-                                        
-                                        CardIconView(index: colorCardIndex)
-                                        
-                                    }.frame(width: 70, alignment: .leading)
-                                    
-                                    HStack{
-                                        Text("公牌").foregroundColor(.blue)
-                                        
-                                        //TODO: 替换成本轮公牌（若每轮相同则是本局公牌）
-                                        let pubCardList = Array(0...5)
-                                        
-                                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 25))]){
-                                            
-                                            ForEach(pubCardList, id: \.self) { pubCardIndex in
-                                                CardIconView(index: pubCardIndex)
-                                            }
-                                        }
-                                    }.frame(width: .infinity, alignment: .leading)
-                                    
+                                    CardIconView(index: colorCardIndex)
                                     
                                     Spacer()
+                                    
                                 }
                                 
                                 Spacer().frame(height: 20)
                                 
+                                //TODO: 替换成本轮公牌（若每轮相同则是本局公牌）没有则隐藏
                                 HStack{
-                                    Text("位置").frame(width: 45, alignment: .leading).foregroundColor(.blue)
+                                    Text("公牌").font(.system(size: 25))
                                     
-                                    Text("排名").frame(width: 45, alignment: .leading).foregroundColor(.blue)
+                                    let pubCardList = Array(0...5)
                                     
-                                    Text("牌型").frame(width: 45, alignment: .leading).foregroundColor(.blue)
+                                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 25))]){
+                                        
+                                        ForEach(pubCardList, id: \.self) { pubCardIndex in
+                                            CardIconView(index: pubCardIndex)
+                                        }
+                                    }
                                     
-                                    Text("手牌").frame(width: 45, alignment: .leading).foregroundColor(.blue)
+                                    Spacer()
+                                }
+                                    
+                                Spacer().frame(height: 40)
+                                
+                                HStack{
+                                    Text("位置").frame(width: 60, alignment: .leading).font(.system(size: 25))
+                                    
+                                    Text("排名").frame(width: 60, alignment: .leading).font(.system(size: 25))
+                                    
+//                                    Text("牌型").frame(width: 60, alignment: .leading).font(.system(size: 25))
+                                    
+                                    Text("手牌").frame(width: 60, alignment: .leading).font(.system(size: 25))
                                     
                                     Spacer()
                                 }
@@ -86,17 +90,17 @@ struct ShowCardView: View {
                                 
                                 ForEach(posList, id: \.self) { posIndex in
                                     HStack{
-                                        Text("\(posIndex)").frame(width: 45, alignment: .leading)
+                                        Text("\(posIndex)").frame(width: 60, alignment: .leading).font(.system(size: 25))
                                         
                                         //TODO: 替换成该位置玩家的排名
                                         let rate = 2
                                         
-                                        Text("\(rate)").frame(width: 45, alignment: .leading)
+                                        Text("\(rate)").frame(width: 60, alignment: .leading).font(.system(size: 25))
                                         
-                                        //TODO: 替换成该位置玩家的牌型
-                                        let cardRank = "对子"
-                                        
-                                        Text(cardRank).frame(width: 45, alignment: .leading)
+//                                        //TODO: 替换成该位置玩家的牌型
+//                                        let cardRank = "对子"
+//                                        
+//                                        Text(cardRank).frame(width: 45, alignment: .leading).font(.system(size: 25))
                                         
                                         //TODO: 替换成该位置玩家的手牌
                                         let handCardList = Array(0...12)
@@ -158,8 +162,7 @@ extension View {
         self.padding()
             .background {
                 RoundedRectangle(cornerRadius: 10)
-                    .foregroundColor(.primary)
-                    .opacity(0.4)
+                    .foregroundColor(.gray)
             }
     }
 }

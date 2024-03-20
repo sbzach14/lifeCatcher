@@ -151,7 +151,7 @@ class GameManager {
         //diyDealStatus 派牌/公牌/去牌
         let target = calModeArgs[0]
         let targetPos = calModeArgs[1]
-        let newArgs = [dealNum + dealType] + [playerNum] + args
+        let newArgs = [dealNum, dealType] + [playerNum] + args
         
         //todo 根据target获取不同的calmode和其他属性
         let calMode = target
