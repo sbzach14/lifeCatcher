@@ -123,11 +123,11 @@ class TwoEightGangGameRule : Rule{
 
 
 class TwoEightGangGame{
-    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum: [Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
+    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum: [Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
         
         var deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let (winners, leftCards, winnerRanks) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (winners, leftCards, winnerRanks)
+        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winners, leftCards)
     }
     
     static func legalCheck(playerNum: Int) -> String{
@@ -210,7 +210,7 @@ class TwoEightGangGame{
     //6 QValueRange
     //7 JValueRange
     //8 pointComparision
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int], [Int], [Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo], [Int]) {
         let dealNum = args[0]
         let dealType = args[1]
         let playerNum = args[2]
@@ -223,12 +223,12 @@ class TwoEightGangGame{
         
         
         var maxRank = 0
-        var winners: [Int] = []
-        var winnerRanks: [Int] = []
+        var returnPlayerInfos: [GameReturnPlayerInfo] = []
+
         var allPlayCards: [Player] = []
         var community = [Card]()
         if deck.count < TwoEightGangGame.getMinCardNum(playerNum: playerNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
-            return ([],[],[])
+            return ([],[])
         }
         
         for _ in 0..<playerNum {
@@ -305,7 +305,7 @@ class TwoEightGangGame{
         
         
         for i in 0..<playerNum {
-            allPlayCards[i].evaluateFlag = TwoEightGangGameHandEvaluator(
+            (allPlayCards[i].evaluateFlag, allPlayCards[i].cardType, allPlayCards[i].isPair) = TwoEightGangGameHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules
             ).evalHand(cards: allPlayCards[i].playerCard, samePointComparision: samePointComparision, isCompareSuit: isCompareSuit, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, pointComparision: pointComparision)
@@ -319,8 +319,12 @@ class TwoEightGangGame{
         
         let sortedResultList =  resultList.sorted(by: {$0.rank > $1.rank })
         for result in sortedResultList {
-            winners.append(result.playerID)
-            winnerRanks.append(result.rank)
+            var currentReturnPlayerInfo = GameReturnPlayerInfo()
+            currentReturnPlayerInfo.playerID = result.playerID
+            currentReturnPlayerInfo.playerRank = result.rank
+            currentReturnPlayerInfo.playerCardsType = allPlayCards[result.playerID].cardType
+            currentReturnPlayerInfo.isPair = allPlayCards[result.playerID].isPair
+            returnPlayerInfos.append(currentReturnPlayerInfo)
         }
         var leftCards:[Int] = []
         for card in deck{
@@ -331,8 +335,7 @@ class TwoEightGangGame{
             leftCards = []
         }
         
-        print("winners \(winners)")
-        return (winners, leftCards, winnerRanks)
+        return (returnPlayerInfos, leftCards)
     }
 }
 
@@ -345,7 +348,7 @@ class TwoEightGangGameHandEvaluator{
     var QValueRange = 0
     var JValueRange = 0
     var pointComparision = 0
-    var rankRulesDic:[Int: ([Card]) -> Int] = [:]
+    var rankRulesDic:[Int: ([Card]) -> (Int, String, Int)] = [:]
     init(rankRules: [Int],
          suitRules: [Int]){
         self.rankRules = rankRules
@@ -357,7 +360,7 @@ class TwoEightGangGameHandEvaluator{
         ]
     }
     
-    func evalHand(cards: [Card], samePointComparision: Int, isCompareSuit: Int, KValueRange:Int, QValueRange:Int, JValueRange:Int, pointComparision: Int)->Int{
+    func evalHand(cards: [Card], samePointComparision: Int, isCompareSuit: Int, KValueRange:Int, QValueRange:Int, JValueRange:Int, pointComparision: Int)->(Int, String, Int){
         
         self.samePointComparision = samePointComparision
         self.isCompareSuit = isCompareSuit
@@ -383,14 +386,14 @@ class TwoEightGangGameHandEvaluator{
         var score = 0
         var i = self.rankRules.count + 1
         for ruleIndex in self.rankRules{
-            let rank = self.rankRulesDic[ruleIndex]!(cards)
+            let (rank, cardType, isPair) = self.rankRulesDic[ruleIndex]!(cards)
             i -= 1
             if rank == 0{
                 continue
             } else {
                 score = (1 << (i + 11)) | rank
                 print("牌型 \(ruleIndex) score \(score)")
-                return score
+                return (score, cardType, isPair)
             }
         }
         
@@ -405,36 +408,40 @@ class TwoEightGangGameHandEvaluator{
 //            score = (num1 + num2) % 10
 //        }
         
-        return score
+        return (score, "", 0)
     }
     
-    func eval_isPair(cards: [Card]) -> Int{
+    func eval_isPair(cards: [Card]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank {
+            
+            var cardType: String = "对" + GameManager.CardNumberReportDic[cards[0].originalRank]!
+            
             if self.samePointComparision == 1{
-                return cards[0].rank << 2 | (self.blackRedJudger(card: cards[0]) + self.blackRedJudger(card: cards[1]))
+                return (cards[0].rank << 2 | (self.blackRedJudger(card: cards[0]) + self.blackRedJudger(card: cards[1])), cardType, 1)
             } else if self.samePointComparision == 2 {
-                return cards[0].rank << 2 | max(cards[0].suit[0], cards[1].suit[0])
+                return (cards[0].rank << 2 | max(cards[0].suit[0], cards[1].suit[0]), cardType, 1)
             } else {
-                return cards[0].rank
+                return (cards[0].rank, cardType, 1)
             }
         }
-        return 0
+        return (0,"",0)
     }
     
-    func eval_is28(cards:[Card]) -> Int {
+    func eval_is28(cards:[Card]) -> (Int, String, Int) {
         if cards[0].rank == 8 && cards[1].rank == 2{
             if self.samePointComparision == 1 {
-                return self.blackRedJudger(card: cards[0]) + self.blackRedJudger(card: cards[1]) + 1
+                return (self.blackRedJudger(card: cards[0]) + self.blackRedJudger(card: cards[1]) + 1, "28", 0)
             } else {
-                return 1
+                return (1, "28", 0)
             }
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_Points(cards: [Card]) -> Int{
+    func eval_Points(cards: [Card]) -> (Int, String, Int){
         var num1 = self.PointsConvertor(card: cards[0])
         var num2 = self.PointsConvertor(card: cards[1])
+        var cardType: String = String((num1 + num2) % 10) + "点"
         //0 最大 1 最小
         if self.pointComparision == 1 {
             num1 = (num1 + 10 - 1) % 10
@@ -444,13 +451,13 @@ class TwoEightGangGameHandEvaluator{
         
         
         if self.samePointComparision == 0 {
-            return rank << 6 | cards[0].rank << 2 | cards[0].suit[0]
+            return (rank << 6 | cards[0].rank << 2 | cards[0].suit[0], cardType, 0)
         } else if self.samePointComparision == 1 {
-            return rank << 8 | cards[0].rank << 4 | cards[0].suit[0] << 2 | (self.blackRedJudger(card: cards[0]) + self.blackRedJudger(card: cards[1]))
+            return (rank << 8 | cards[0].rank << 4 | cards[0].suit[0] << 2 | (self.blackRedJudger(card: cards[0]) + self.blackRedJudger(card: cards[1])), cardType, 0)
         } else if self.samePointComparision == 2 {
-            return rank << 2 | max(cards[0].suit[0], cards[1].suit[0])
+            return (rank << 2 | max(cards[0].suit[0], cards[1].suit[0]), cardType, 0)
         } else {
-            return rank
+            return (rank, cardType, 0)
         }
     }
     

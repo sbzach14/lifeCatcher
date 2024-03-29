@@ -27,6 +27,7 @@
 		18CA14DC284AC42C00F90372 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14D1284AC42C00F90372 /* ContentView.swift */; };
 		18D9CDEA2B84F7CE00A93684 /* ReportSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D9CDE92B84F7CE00A93684 /* ReportSettingView.swift */; };
 		50053F84284ACAED00C86BF4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50053F81284ACAED00C86BF4 /* Assets.xcassets */; };
+		A809595A2BB5FB14009A2DB4 /* cardDetection_0327.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A80959592BB5FB14009A2DB4 /* cardDetection_0327.mlmodel */; };
 		A809B3E22AE5126700F728A9 /* BaoziGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A809B3E12AE5126700F728A9 /* BaoziGame.swift */; };
 		A809B3E42AE5183400F728A9 /* BaoziGameRuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A809B3E32AE5183400F728A9 /* BaoziGameRuleSettingView.swift */; };
 		A80D65F82AFF75ED005B5E5E /* AddRuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A80D65F72AFF75ED005B5E5E /* AddRuleSettingView.swift */; };
@@ -124,6 +125,7 @@
 		50053F82284ACAED00C86BF4 /* CountMyActions.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = CountMyActions.entitlements; sourceTree = "<group>"; };
 		5269731033A41881895B5A41 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A6748516A40E187B4F8ACFA3 /* SampleCode.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
+		A80959592BB5FB14009A2DB4 /* cardDetection_0327.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection_0327.mlmodel; sourceTree = "<group>"; };
 		A809B3E12AE5126700F728A9 /* BaoziGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaoziGame.swift; sourceTree = "<group>"; };
 		A809B3E32AE5183400F728A9 /* BaoziGameRuleSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaoziGameRuleSettingView.swift; sourceTree = "<group>"; };
 		A80D65F72AFF75ED005B5E5E /* AddRuleSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddRuleSettingView.swift; sourceTree = "<group>"; };
@@ -403,6 +405,7 @@
 			isa = PBXGroup;
 			children = (
 				A875FED62B5D1601003D51C3 /* cardDetection_n_0121.mlmodel */,
+				A80959592BB5FB14009A2DB4 /* cardDetection_0327.mlmodel */,
 				181C96A12B5F86090042006E /* cardDetection_s_0123.mlmodel */,
 				A88EFE022A7E8ACC00897243 /* Resnet50FP16.mlmodel */,
 				181C969F2B5DB5980042006E /* success_tip.mp3 */,
@@ -630,6 +633,7 @@
 				181C96AA2B60DD610042006E /* CardNineGame.swift in Sources */,
 				A88C71F22B93570D001D8BD8 /* TenPointFiveGame.swift in Sources */,
 				181C96AC2B60E26A0042006E /* JiaJiaBaoGame.swift in Sources */,
+				A809595A2BB5FB14009A2DB4 /* cardDetection_0327.mlmodel in Sources */,
 				A8E0E2E52AADEF560091FC1D /* ThreeMenGame.swift in Sources */,
 				A887B64E2A7FDF56009F488F /* RecordHistoryViewModel.swift in Sources */,
 				B058BE612B0A0D6F0078E792 /* TestView.swift in Sources */,

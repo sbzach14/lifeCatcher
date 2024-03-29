@@ -93,7 +93,7 @@ class TexasPokerRule : Rule{
 class TexasPoker{
     
 
-    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int], [Int]) {
+    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo], [Int]) {
         
         
 //        let json = Python.import("json")
@@ -107,9 +107,8 @@ class TexasPoker{
             inputString += GameManager.cardLabelDic[inputCards[i]]!
         }
         print(inputString)
-        let winnersArray = TexasPokerGame.calResult(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, cardArray: inputCards, args: args, rankRules: rankRules, suitRules: suitRules)
-        print("winner ", winnersArray)
-        return winnersArray
+        let (resultInfoList,leftCards) = TexasPokerGame.calResult(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, cardArray: inputCards, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (resultInfoList, leftCards)
     }
     
     static func legalCheck(playerNum: Int, minRank: Int, handUseType: Int, handUseNum: Int, handNum: Int, communityNum: Int) -> String
@@ -178,6 +177,9 @@ class TexasPoker{
 class TexasPlayer {
     var playerCard = [Card]()
     var evaluateFlag = 0
+    var cardsType: String = ""
+    var cardsSuit: String = ""
+    var isPair: String = ""
     
     func insertCard(card: Card) {
         playerCard.append(card)
@@ -194,13 +196,13 @@ class TexasPokerGame {
 //    #5 communityNum 0/3/5
 //    #6 handUseType 0无限制/1必须/2至少
 //    #7 handUseNum 1-5
-    static func calResult(diyDealStatus:[[Bool]], diyDealNum:[Int], cardArray: [Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int], [Int]) {
+    static func calResult(diyDealStatus:[[Bool]], diyDealNum:[Int], cardArray: [Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
         var deck = initDeck(initialCards: cardArray, suitRules: suitRules)
-            let (winners, leftCards, winnerRanks) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: &deck, args: args, rankRules: rankRules)
-            return (winners, leftCards, winnerRanks)
+            let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: &deck, args: args, rankRules: rankRules)
+            return (winners, leftCards)
         }
     
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: inout [Card], args: [Int], rankRules: [Int]) -> ([Int], [Int],[Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: inout [Card], args: [Int], rankRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
         let rule = GameManager.gameRules[0] as! TexasPokerRule
         let dealType = args[0]
         let diyDealType = args[1]
@@ -216,12 +218,12 @@ class TexasPokerGame {
         let handUseNum = rule.handUseNum[args[9]]
         
         var maxRank = 0
-        var winners = [Int]()
-        var winnerRanks :[Int] = []
+        var returnPlayerInfos: [GameReturnPlayerInfo] = []
+
         var allPlayCards = [TexasPlayer]()
         var community = [Card]()
         if deck.count < TexasPoker.getMinCardNum(playerNum: playerNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
-            return ([],[],[])
+            return ([],[])
         }
         
         
@@ -301,7 +303,7 @@ class TexasPokerGame {
         
         for i in 0..<playerNum {
             
-            allPlayCards[i].evaluateFlag = HandEvaluator.evalHand(cards: allPlayCards[i].playerCard, community: community, isCompareSuit: isCompareSuit, isAceStraight: isAceStraight, minRank: minRank, handUseType: handUseType, handUseNum: handUseNum, rankRules: rankRules)
+            (allPlayCards[i].evaluateFlag, allPlayCards[i].cardsType) = HandEvaluator.evalHand(cards: allPlayCards[i].playerCard, community: community, isCompareSuit: isCompareSuit, isAceStraight: isAceStraight, minRank: minRank, handUseType: handUseType, handUseNum: handUseNum, rankRules: rankRules)
         }
         
         var resultList = [ResultStruct]()
@@ -311,8 +313,12 @@ class TexasPokerGame {
         }
         let sortedResultList =  resultList.sorted(by: {$0.rank > $1.rank })
         for result in sortedResultList {
-            winners.append(result.playerID)
-            winnerRanks.append(result.rank)
+            var currentPlayerReturnInfo: GameReturnPlayerInfo = GameReturnPlayerInfo()
+            currentPlayerReturnInfo.playerID = result.playerID
+            currentPlayerReturnInfo.playerRank = result.rank
+            currentPlayerReturnInfo.playerCardsType = allPlayCards[result.playerID].cardsType
+            
+            returnPlayerInfos.append(currentPlayerReturnInfo)
         }
         var leftCards:[Int] = []
         for card in deck{
@@ -323,14 +329,13 @@ class TexasPokerGame {
             leftCards = []
         }
         
-        print("winners:  \(winners)")
-        return (winners, leftCards, winnerRanks)
+        return (returnPlayerInfos, leftCards)
     }
 }
 
 class HandEvaluator {
     
-    static func evalHand(cards: [Card], community: [Card], isCompareSuit: Bool, isAceStraight: Bool, minRank: Int, handUseType: Int, handUseNum: Int, rankRules: [Int]) -> Int {
+    static func evalHand(cards: [Card], community: [Card], isCompareSuit: Bool, isAceStraight: Bool, minRank: Int, handUseType: Int, handUseNum: Int, rankRules: [Int]) -> (Int, String) {
         let suitRules :[Int] = [3,2,1,0]
 
         var handCardsString:String = ""
@@ -354,13 +359,15 @@ class HandEvaluator {
         print("排序后的牌 ", sortedString," length: ", cardsLength)
         
         var maxScore = 0
+        var maxCardType: String = ""
         for sortedCards in allSortedCards {
-            let score = calcHandInfoFlg(sortedCards: sortedCards, isCompareSuit: isCompareSuit, rankRules: rankRules, cardsLength: cardsLength)
+            let (score, cardType) = calcHandInfoFlg(sortedCards: sortedCards, isCompareSuit: isCompareSuit, rankRules: rankRules, cardsLength: cardsLength)
             if score > maxScore {
                 maxScore = score
+                maxCardType = cardType
             }
         }
-        return maxScore
+        return (maxScore, maxCardType)
     }
     
     static func sortCards(cards: [Card], community: [Card], handUseType: Int, handUseNum: Int, isAceStraight: Bool, minRank: Int) -> (Int, [[Card]]) {
@@ -442,7 +449,7 @@ class HandEvaluator {
         return (cardsLength, returnAllCards)
     }
     
-    static func calcHandInfoFlg(sortedCards: [Card], isCompareSuit: Bool, rankRules: [Int], cardsLength: Int) -> Int {
+    static func calcHandInfoFlg(sortedCards: [Card], isCompareSuit: Bool, rankRules: [Int], cardsLength: Int) -> (Int, String) {
         let ruleDict: [Int: ([Card], Int) -> Int] = [
             0: evalHoleCard,
             1: evalOnePair,
@@ -459,6 +466,7 @@ class HandEvaluator {
         ]
         
         var rankResult = 0
+        var cardType: String = ""
         let rule = GameManager.gameRules[0] as! TexasPokerRule
         for (index, ruleIndex) in rankRules.enumerated() {
             let rankFlag = 1 << (rankRules.count - index + 23)
@@ -469,12 +477,13 @@ class HandEvaluator {
             if rankResult != 0 {
                 rankResult |= rankFlag
                 print("判断结果 ", rule.rankRules[ruleIndex] as Any)
+                cardType = rule.rankRules[ruleIndex]!
                 break
             }
         }
-        
-        return rankResult
+        return (rankResult, cardType)
     }
+    
     
     static func evalStraightFlush(cards: [Card], cardsLength: Int) -> Int {
         var rank = 0

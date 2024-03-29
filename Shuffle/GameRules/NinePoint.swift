@@ -149,11 +149,11 @@ class NinePointGame{
     
     
     
-    static func FindWinner(diyDealStatus:[[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
+    static func FindWinner(diyDealStatus:[[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
         
         var deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let (winners, leftCards, winnerRanks) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (winners, leftCards, winnerRanks)
+        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winners, leftCards)
     }
     
     static func legalCheck(playerNum: Int, handNum: Int) -> String{
@@ -244,7 +244,7 @@ class NinePointGame{
     //10 handNum
     //11 cardRankRule
     
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
         let rule = GameManager.gameRules[10] as! NinePointGameRule
         let dealNum = args[0]
         let dealType = args[1]
@@ -260,12 +260,12 @@ class NinePointGame{
         let cardRankRule = args[11]
         
         var maxRank = 0
-        var winners: [Int] = []
-        var winnerRanks: [Int] = []
+        var returnPlayerInfos: [GameReturnPlayerInfo] = []
+
         var allPlayCards: [Player] = []
         var community = [Card]()
         if deck.count < self.getMinCardNum(playerNum: playerNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
-            return ([], [], [])
+            return ([], [])
         }
         
         for _ in 0..<playerNum {
@@ -341,7 +341,7 @@ class NinePointGame{
         
         
         for i in 0..<playerNum {
-            allPlayCards[i].evaluateFlag = NinePointGameHandEvaluator(
+            (allPlayCards[i].evaluateFlag, allPlayCards[i].cardType, allPlayCards[i].isPair) = NinePointGameHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules
             ).evalHand(cards: allPlayCards[i].playerCard, redJokerValueRange: redJokerValueRange,blackJokerRange: blackJokerValueRange,KValueRange: KValueRange,QValueRange: QValueRange,JValueRange: JValueRange,samePointComparision: samePointComparision,isCompareSuit: isCompareSuit,cardRankRule: cardRankRule)
@@ -356,8 +356,12 @@ class NinePointGame{
         
         let sortedResultList =  resultList.sorted(by: {$0.rank > $1.rank })
         for result in sortedResultList {
-            winners.append(result.playerID)
-            winnerRanks.append(result.rank)
+            var currentReturnPlayerInfo = GameReturnPlayerInfo()
+            currentReturnPlayerInfo.playerID = result.playerID
+            currentReturnPlayerInfo.playerRank = result.rank
+            currentReturnPlayerInfo.playerCardsType = allPlayCards[result.playerID].cardType
+            currentReturnPlayerInfo.isPair = allPlayCards[result.playerID].isPair
+            returnPlayerInfos.append(currentReturnPlayerInfo)
         }
         
         var leftCards:[Int] = []
@@ -367,15 +371,14 @@ class NinePointGame{
         if leftCards.count < NinePointGame.getMinCardNum(playerNum: playerNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
             leftCards = []
         }
-        print("winners \(winners)")
-        return (winners, leftCards, winnerRanks)
+        return (returnPlayerInfos, leftCards)
     }
 }
 
 class NinePointGameHandEvaluator{
     var rankRules: [Int]
     var suitRules: [Int]
-    var ruleDict: [Int: ([NinePointCard]) -> Int] = [:]
+    var ruleDict: [Int: ([NinePointCard]) -> (Int, String, Int)] = [:]
     var samePointComparision: Int = 0
     var cardRankRule: Int = 0
     
@@ -393,7 +396,7 @@ class NinePointGameHandEvaluator{
         ]
     }
     
-    func evalHand(cards: [Card], redJokerValueRange: Int, blackJokerRange: Int, KValueRange: Int, QValueRange: Int, JValueRange: Int, samePointComparision: Int, isCompareSuit: Int, cardRankRule: Int)->Int{
+    func evalHand(cards: [Card], redJokerValueRange: Int, blackJokerRange: Int, KValueRange: Int, QValueRange: Int, JValueRange: Int, samePointComparision: Int, isCompareSuit: Int, cardRankRule: Int)->(Int, String, Int){
         var cards = cards
         cards.sort(by: {card1, card2 in return card1.rank > card2.rank})
         self.samePointComparision = samePointComparision
@@ -406,59 +409,59 @@ class NinePointGameHandEvaluator{
         print("手牌 \(GameManager.cardLabelDic[cards[0].cardIndex])  \(GameManager.cardLabelDic[cards[1].cardIndex]) rank \(num1.rank) \(num2.rank) point \(num1.point) \(num2.point) suit \(num1.suit) \(num2.suit)")
         
         var score = 0
+        var maxCardType: String = ""
+        var maxIsPair: Int = 0
         var i = self.ruleDict.count + 1
         for ruleIndex in self.rankRules{
-            let rank = self.ruleDict[ruleIndex]!(nums)
+            let (rank, cardType, isPair) = self.ruleDict[ruleIndex]!(nums)
             i -= 1
             if rank == 0{
                 continue
             } else {
                 score = (1 << (i + 8)) | rank
+                maxCardType = cardType
+                maxIsPair = isPair
                 print("牌型 \(ruleIndex) rank \(score)")
 
                 break
             }
         }
         
-        return score
+        return (score, maxCardType, maxIsPair)
     }
-    func eval_isPairK(cards:[NinePointCard]) -> Int{
+    func eval_isPairK(cards:[NinePointCard]) -> (Int, String, Int){
         if cards[0].rank == 13 && cards[1].rank == 13{
-            return 1
+            return (1, "对K", 1)
         }
-        return 0
+        return (0, "", 0)
     }
-    func eval_isPairJoker(cards:[NinePointCard]) -> Int{
-        if self.cardRankRule == 0{
-            if cards[0].rank > 13 && cards[1].rank > 13{
-                return 1
-            }
-        } else if cardRankRule == 1{
-            if cards[0].rank > 14 && cards[1].rank > 14{
-                return 1
-            }
+    func eval_isPairJoker(cards:[NinePointCard]) -> (Int, String, Int){
+        if cards[0].originalRank > 13 && cards[1].originalRank > 13 {
+            return (1, "对王", 1)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isPair(cards: [NinePointCard]) -> Int{
+    func eval_isPair(cards: [NinePointCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank{
-            return cards[0].rank
+            let cardType: String = "对" + GameManager.CardNumberReportDic[cards[0].originalRank]!
+            return (cards[0].rank, cardType, 1)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_Point(cards: [NinePointCard]) -> Int{
+    func eval_Point(cards: [NinePointCard]) -> (Int, String, Int){
         var num1 = cards[0].point
         var num2 = cards[1].point
+        var cardType: String = String((num1 + num2) % 10) + "点"
         if self.samePointComparision == 0{
-            return (num1 + num2) % 10
+            return ((num1 + num2) % 10, cardType, 0)
         } else if self.samePointComparision == 1{
-            return ((num1 + num2) % 10) << 4 | cards[0].rank
+            return (((num1 + num2) % 10) << 4 | cards[0].rank, cardType, 0)
         } else if self.samePointComparision == 2{
-            return ((num1 + num2) % 10) << 2 | (self.blackRedJudger(card: cards[0]) + self.blackRedJudger(card: cards[1]))
+            return (((num1 + num2) % 10) << 2 | (self.blackRedJudger(card: cards[0]) + self.blackRedJudger(card: cards[1])), cardType, 0)
         }
-        return 0
+        return (0, cardType, 0)
     }
     
     func blackRedJudger(card: NinePointCard) -> Int{
@@ -477,10 +480,11 @@ class NinePointGameHandEvaluator{
         var rank: Int = 0
         var point: Int = 0
         var suit: Int = 0
-        
+                    var originalRank: Int = 0
         init(card: Card, redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange: Int, JValueRange: Int, isCompareSuit: Int, cardRankRule: Int){
             let rule = GameManager.gameRules[10] as! NinePointGameRule
             //Rank Initialization
+            self.originalRank = card.rank
             if cardRankRule == 0{
                 self.rank = card.rank
             }

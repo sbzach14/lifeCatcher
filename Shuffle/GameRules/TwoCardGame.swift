@@ -76,11 +76,11 @@ class TwoCardGame{
     
     
     
-    static func FindWinner(diyDealStatus:[[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
+    static func FindWinner(diyDealStatus:[[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
         
         var deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let (winners, leftCards, winnerRanks) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (winners, leftCards, winnerRanks)
+        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winners, leftCards)
     }
     
     static func legalCheck(playerNum: Int) -> String{
@@ -150,7 +150,7 @@ class TwoCardGame{
 
 
     
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
         let dealNum = args[0]
         let dealType = args[1]
         let playerNum = args[2]
@@ -165,12 +165,12 @@ class TwoCardGame{
 
         
         var maxRank = 0
-        var winners: [Int] = []
-        var winnerRanks: [Int] = []
+        var returnPlayerInfos: [GameReturnPlayerInfo] = []
+
         var allPlayCards: [Player] = []
         var community = [Card]()
         if deck.count < self.getMinCardNum(playerNum: playerNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
-            return ([], [], [])
+            return ([], [])
         }
         
         for _ in 0..<playerNum {
@@ -246,7 +246,7 @@ class TwoCardGame{
         
         
         for i in 0..<playerNum {
-            allPlayCards[i].evaluateFlag = TwoCardGameHandEvaluator(
+            (allPlayCards[i].evaluateFlag,allPlayCards[i].cardType, allPlayCards[i].isPair) = TwoCardGameHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules
             ).evalHand(cards: allPlayCards[i].playerCard, redJokerValueRange: redJokerValueRange,blackJokerValueRange: blackJokerValueRange,KValueRange: KValueRange,QValueRange: QValueRange,JValueRange: JValueRange,pointComparision: pointComparision,samePointComparision: samePointComparision,cardRankRule: cardRankRule)
@@ -261,8 +261,12 @@ class TwoCardGame{
         
         let sortedResultList =  resultList.sorted(by: {$0.rank > $1.rank })
         for result in sortedResultList {
-            winners.append(result.playerID)
-            winnerRanks.append(result.rank)
+            var currentReturnPlayerInfo = GameReturnPlayerInfo()
+            currentReturnPlayerInfo.playerID = result.playerID
+            currentReturnPlayerInfo.playerRank = result.rank
+            currentReturnPlayerInfo.playerCardsType = allPlayCards[result.playerID].cardType
+            currentReturnPlayerInfo.isPair = allPlayCards[result.playerID].isPair
+            returnPlayerInfos.append(currentReturnPlayerInfo)
         }
         
         var leftCards:[Int] = []
@@ -272,15 +276,14 @@ class TwoCardGame{
         if leftCards.count < TwoCardGame.getMinCardNum(playerNum: playerNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
             leftCards = []
         }
-        print("winners \(winners)")
-        return (winners, leftCards, winnerRanks)
+        return (returnPlayerInfos, leftCards)
     }
 }
 
 class TwoCardGameHandEvaluator{
     var rankRules: [Int]
     var suitRules: [Int]
-    var ruleDict: [Int: ([TwoCardCard]) -> Int] = [:]
+    var ruleDict: [Int: ([TwoCardCard]) -> (Int, String, Int)] = [:]
     var pointComparision:Int = 0
     var samePointComparision: Int = 0
     var cardRankRule: Int = 0
@@ -297,7 +300,7 @@ class TwoCardGameHandEvaluator{
         ]
     }
     
-    func evalHand(cards: [Card],redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange:Int, JValueRange:Int, pointComparision: Int, samePointComparision: Int, cardRankRule: Int)->Int{
+    func evalHand(cards: [Card],redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange:Int, JValueRange:Int, pointComparision: Int, samePointComparision: Int, cardRankRule: Int)->(Int, String, Int){
         var cards = cards
         self.pointComparision = pointComparision
         self.samePointComparision = samePointComparision
@@ -312,45 +315,52 @@ class TwoCardGameHandEvaluator{
         print("手牌 \(GameManager.cardLabelDic[numList[0].cardIndex])  \(GameManager.cardLabelDic[numList[1].cardIndex]) rank \(numList[0].rank) \(numList[1].rank) point \(numList[0].point) \(numList[1].point) suit \(numList[0].suit) \(numList[1].suit)")
         
         var score = 0
+        var maxCardType: String = ""
+        var maxIsPair: Int = 0
         var i = self.ruleDict.count + 1
         for ruleIndex in self.rankRules{
-            let rank = self.ruleDict[ruleIndex]!(numList)
+            let (rank, cardType, isPair) = self.ruleDict[ruleIndex]!(numList)
             i -= 1
             if rank == 0{
                 continue
             } else {
                 score = (1 << (i + 8)) | rank
+                maxCardType = cardType
+                maxIsPair = isPair
                 print("牌型 \(ruleIndex) rank \(score) i \(i)")
 
                 break
             }
         }
         
-        return score
+        return (score, maxCardType, maxIsPair)
     }
     
-    func eval_isPair(cards:[TwoCardCard]) -> Int{
+    func eval_isPair(cards:[TwoCardCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank{
-            return cards[0].rank
-        } else if cards[0].cardIndex == 54 && cards[1].cardIndex == 53{
-            return cards[0].rank
+            let cardType: String = "对" + GameManager.CardNumberReportDic[cards[0].originalRank]!
+            return (cards[0].rank, cardType, 1)
+        } else if cards[0].originalRank > 13 && cards[1].originalRank > 13{
+            return (cards[0].rank, "对王", 1)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isHighCard(cards: [TwoCardCard]) -> Int{
-        return cards[0].rank
+    func eval_isHighCard(cards: [TwoCardCard]) -> (Int, String, Int){
+        let cardType: String = "单牌" + GameManager.CardNumberReportDic[cards[0].originalRank]!
+        return (cards[0].rank, cardType, 0)
     }
     
-    func eval_isPoint(cards:[TwoCardCard]) -> Int {
+    func eval_isPoint(cards:[TwoCardCard]) -> (Int, String, Int) {
         let point = cards.reduce(0){$0 + $1.point} % 10
+        let cardType: String = String(point) + "点"
         if self.samePointComparision == 0{
-            return point + 1
+            return (point + 1, cardType, 0)
         } else if self.samePointComparision == 1{
-            return point + 1 << 4 | cards[0].rank
+            return (point + 1 << 4 | cards[0].rank, cardType, 0)
 
         } else {
-            return 0
+            return (0, "", 0)
         }
     }
     
@@ -359,11 +369,13 @@ class TwoCardGameHandEvaluator{
         var point: Int = 0
         var suit: Int = 0
         var cardIndex: Int = 0
+        var originalRank: Int = 0
         
         init(card: Card, redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange:Int, JValueRange:Int, cardRankRule: Int){
             let rule = GameManager.gameRules[12] as! TwoCardGameRule
             self.cardIndex = card.cardIndex
             //Rank Initialization
+            self.originalRank = card.rank
             if cardRankRule == 0 {
                 if card.rank == 1{
                     self.rank = 13

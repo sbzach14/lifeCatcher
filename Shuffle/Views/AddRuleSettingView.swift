@@ -714,7 +714,7 @@ struct AddRuleSettingView: View{
             minCardNum = JiaJiaBaoGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus, handNum: Int(selectedRule.handNum[args[7]]!)!)
         case 9:
             let selectedRule = GameManager.gameRules[gameType] as! CardNineGameRule
-            minCardNum = CardNineGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            minCardNum = CardNineGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus, handNum: 2)
         default:
             print("GameType error")
         }

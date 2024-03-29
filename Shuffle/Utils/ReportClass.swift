@@ -8,7 +8,7 @@
 
 import Foundation
 
-class ReportClass{
+struct ReportClass{
     var reportName: String = ""
     var reportID: Int = 0
     //0, 报最大,
@@ -18,10 +18,13 @@ class ReportClass{
     //4，报最小次小
     //5，报排名（6名）
     //6，报大1大2，小1小2
-    //7, 报原始排名和生死门
+    //7, 报原始排名4432
     var rankReport: Int = -1
     //0, 报活门
-    //1，报半活门
+    //1，报活门半活门
+    //2, 报活门，人数>4, 报第一活门第二活门
+    //3，4432生死门
+    //4，报死门
     var aliveDeathReport: Int = -1
     //0，报几个对子
     //1，无对子
@@ -30,85 +33,35 @@ class ReportClass{
     //0，报有平点
     //1，报无平点
     //2, 报有一共多少家平点
+    //3，报最大点数有没有平点
     var DrawPointReport: Int = -1
     //0, 报无9点
     var NinePointReport: Int = -1
     //0，报最大家牌
+    //1, 报各家点数
     var isReportWinnerCards: Int = -1
-    //保无牛或最多一家有牛
-    //保至少一家有牛牛
+    //0，保无牛或最多一家有牛
+    //1，保至少一家有牛牛
     var pokerBullReport: Int = -1
-    
-    
-    //0，上10张打色留色再根据色牌点数去牌
-    //1，上10张打色去色再根据色牌点数去牌
-    //2，上10张打色留色
-    //3，上10张打色去色+底为色
-    //4，上10张打色去色
-    //5，上10张打色去色1张
-    //6，上10张打色去色1张+提前去掉的牌为色
-    //7，上10张打色色牌先发
-    //8，上10张去牌
-    //9，上10张去牌面为色去色
-    //10，上10张去牌底为色
-    //11, 上10张抽面牌
-    //12,上10张去牌面为色色先发
-    //13，上下5张去牌
-    //14，上下5张打色色先发
-    //15，上下5张打色留色
-    //16，上下5张打色去色1张
-    //17，下10张打色留色
-    //18，下10张打色留色面牌移动到色牌下面
-    //19，下10张打色色先发
-    //20，看手牌
-    //21，看手牌比第一张从最大牌继续发
-    //22，看手牌面为色留色
-    //23，看手牌面为色去色
-    //24，飞2张
-    //25，飞2张打色留色
-    //26，飞2张打色去色1张
-    //27，飞2张打色色先发
-    //28，飞2张面为色留色
-    //29，飞2张面为色去色
-    //30，飞2张底为色
-    //31，飞2张2张相加为色
-    //32，飞2张打色留色再看底
-    //33，固定范围切牌
-    //34，范围切牌
-    //35，范围切牌面为色去色
-    //36，范围切牌面为色色先发
-    //37，范围打色留色
-    //38，范围打色去色
-    //39，范围打色去色1张
-    //40，范围打色色先发
-    //41，随意打色留色
-    //42，随意打色去色
-    //43，随意打色去色1
-    //44，随意打色色先发
-    //45，随意混合打色
-    //46，指定底牌
-    //47，指定顶牌
-    //48，指定顶牌底牌为色
-    //49，指定牌上一张打色留色
-    //50，指定牌上一张打色去色
-    //51，指定牌下一张打色留色
-    //52，指定牌下一张打色去色
-    //53，底为色4种发牌方式
-    //54，底为色
-    //55，底为色报发牌方式
-    //56，底2张相加为色
-    //57，面为色
-    //58，面为色去色
-    var coloringWay: Int = -1
     //0,XY张
     //1,上下5张
-    //2,下10张
+    //2,下XY张
     //3，上10张
+    //4，上Y张
+    //5，上下XY张
+    //6，看手牌
+    //7, 范围切牌
+    //8，去掉6789张牌
+    //9，固定第Y张
+    //10, 多种洗牌方式
+    
     var reportCutRange: Int = -1
     //0,报大小
     //1,保位置大小
     //2,哪个位置拿最大最多
     //3,报每一个切牌位置的最大或者最小家
+    //4，保位置最大最小次数最多
+    //5，保位置活门且报最大
     var reportTarget: Int = -1
     //0,留色再根据色牌点数去牌
     //1,去色再根据色牌点数去牌
@@ -128,9 +81,16 @@ class ReportClass{
     //15，去掉面牌和底牌，点数相加几点就去掉面上几张牌
     //16，比第一张牌，从最大发
     //17，比第一张牌，从最小发
+    //18，看手牌
+    //19，从点数最大继续发
+    //20，看手牌留色
+    //21，看手牌去色
+    //22，范围切牌加色牌
     var cardsTransformation: Int = -1
     //0，保多轮位置最大次大次数最多
     //1，保多轮同点报最大次大生死门
+    //2，保多轮同点无九点，
+    //3，多轮同点无对子
     var consecutiveReport: Int = -1
     //-1，不报
     //0, 保目标位置
@@ -138,10 +98,7 @@ class ReportClass{
     //2，保Y
     //3，保X或者Y
     var positionToReport: Int = -1
-    //-1，不报
-    //0，报发牌方式
-    var dealWayReport: Int = -1
-    //0, 面牌为色牌
+    //0,切牌为色牌
     //1，底牌为色牌
     //2，飞2张两张牌和为色
     //3，底两张和为色
@@ -149,12 +106,50 @@ class ReportClass{
     //5,去色一张+提前去掉的牌为色
     //6,指定牌上一张牌为色(越界问题)
     //7,指定牌下一张为色
-    
+    //8,固定第Y张牌为色
+    //9,面牌为色牌
+    //10，切牌后面牌为色
+    //11，6789为色
+    //12，看色留色+色牌上X张为色
+    //13，去色补不补看Y
+    //14，固定第10张为色
     var colorCardPos: Int = -1
     //0, 有指定牌，x花色 y数字
     //1, 看色，根据看的色牌来打色
     var hasSpecialCard: Int = -1
     //0, 报指定玩家手里的牌
+    //1，报最大家牌，Y=10 点数，其他点数+花色
+    var specifiedPlayerHand :Int = -1
+    //0, 不同发牌，根据Y值决定
+    var differentDeal: Int = -1
+    
+    init(reportName: String, reportID: Int, rankReport: Int, aliveDeathReport: Int, pairReport: Int, drawPointReport: Int, ninePointReport: Int, pokerBullReport: Int, reportCutRange: Int, reportTarget: Int, cardsTransformation: Int, consecutiveReport: Int, positionToReport: Int, colorCardPos: Int, hasSpecialCard: Int, specifiedPlayerHand : Int, differentDeal: Int) {
+        self.reportName = reportName
+        self.reportID = reportID
+        self.aliveDeathReport = aliveDeathReport
+        self.pairReport = pairReport
+        self.DrawPointReport = drawPointReport
+        self.NinePointReport = ninePointReport
+        self.pokerBullReport = pokerBullReport
+        self.reportCutRange = reportCutRange
+        self.reportTarget = reportTarget
+        self.cardsTransformation = cardsTransformation
+        self.consecutiveReport = consecutiveReport
+        self.positionToReport = positionToReport
+        self.colorCardPos = colorCardPos
+        self.hasSpecialCard = hasSpecialCard
+        self.specifiedPlayerHand = specifiedPlayerHand
+        self.differentDeal = differentDeal
+    }
+}
+
+struct GameReturnPlayerInfo{
+    var playerID: Int = 0
+    var playerRank: Int = 0
+    var playerCardsType: String = ""
+    var playerCardsSuit: String = ""
+    //是否是对子
+    var isPair: Int = 0
 }
 
 class ReportManager{
@@ -165,19 +160,19 @@ class ReportManager{
         2:"[3]:报最大次大",
         3:"[4]:最小次小",
         4:"[5]:报1大2大3大",
-        5:"[6]:报活门",
-        6:"[7]:报活门半活门对子",
-        7:"[8]:报最大次大和生死门",
-        8:"[8_1]:报最大次大活门半活门平点对子",
+        5:"[6]:报活门*",
+        6:"[7]:报活门半活门对子*",
+        7:"[8]:报最大次大和生死门*",
+        8:"[8_1]:报最大次大活门半活门平点对子*",
         9:"[10]:报最大和最大家牌",
         10:"[12]:报排名",
         11:"[13]:报原始排名 4432和生死门",
-        12:"[14]:报最大次大不打几平点对子",
+        12:"[14]:报最大次大不打几平点对子*",
         13:"[45]:上10张打色留色再根据色牌点数去牌保位置最大",
         14:"[46]:上10张打色留色再根据色牌点数去牌保位置最大次大",
         15:"[47]:上10张打色去色全部再根据色牌点数去牌保位置最大",
         16:"[48]:上10张打色去色全部再根据色牌点数去牌保位置最大次大",
-        17:"[49]:上10张打色留色保位置最大跑的快专用",
+        17:"[49]:上10张打色留色保位置最大跑的快专用*",
         18:"[50]:上10张打色留色保位置最大",
         19:"[51]:上10张打色留色保位置最大次大",
         20:"[52]:上10张打色留色保位置最小",
@@ -191,30 +186,30 @@ class ReportManager{
         28:"[61]:上10张打色去色1张保位置最大次大",
         29:"[62]:上10张打色去色1张保位置最小",
         30:"[63]:上10张打色去色1张保位置最小次小",
-        31:"[64]:上10张打色去色1张+提前去掉的牌为色保庄最大",
+        31:"[64]:上10张打色去色1张+提前去掉的牌为色保庄最大*",
         32:"[66]:上10张打色色牌先发保位置最大",
         33:"[67]:上10张打色色牌先发保位置最大次大",
         34:"[68]:上10张打色色牌先发保位置最小",
-        35:"[69]:上10张打色色牌先发保位置最小次",
-        36:"[70]:上10张去牌保多轮位置最大次大次数最多",
+        35:"[69]:上10张打色色牌先发保位置最小次小",
+        36:"[70]:上10张去牌保多轮位置最大次大次数最多*",
         37:"[71]:上10张去牌保位置最大",
-        38:"[71_1]:上10张去牌保位置最大对优先",
+        38:"[71_1]:上10张去牌保位置最大对优先*",
         39:"[72]:上10张去牌保位置最大次大",
         40:"[73]:上10张去牌保位置最小",
         41:"[74]:上10张去牌保位置最小次小",
-        42:"[75]上10张去牌保有活门报括门",
-        43:"[76]:上10张去牌保有活门报最大",
-        44:"[77]:上10张去牌保多轮同点报最大次大生死门",
-        45:"[78_1]:上10张去牌保多轮同点且无9点",
-        46:"[78]:上10张去牌保多轮同点且无对子",
+        42:"[75]上10张去牌保有活门报括门*",
+        43:"[76]:上10张去牌保有活门报最大*",
+        44:"[77]:上10张去牌保多轮同点报最大次大生死门*",
+        45:"[78_1]:上10张去牌保多轮同点且无9点*",
+        46:"[78]:上10张去牌保多轮同点且无对子*",
         47:"[79]:上10张去牌面为色去色保位置最大次大次数最多",
         48:"[80]:上10张去牌底为色保位置最大次大",
-        49:"[81]:上10张去牌保位置最小无对子",
+        49:"[81]:上10张去牌保位置最小无对子*",
         50:"[82]:上10张去牌保34门有最大报最大",
         51:"[83]:上10张去牌保34门最大次大",
         52:"[84]:上10张抽面牌保位置最大",
         53:"[84_1]:上10张抽面牌保位置最小",
-        54:"[85]:上10张去牌保多轮位置最大次数最多",
+        54:"[85]:上10张去牌保多轮位置最大次数最多*",
         55:"[86]:上10张去牌面为色色先发保位置最大次大",
         56:"[87]:上10张去牌面为色色先发保位置最大",
         57:"[88]:上10张去牌面为色色先发保位置最小",
@@ -239,41 +234,41 @@ class ReportManager{
         76:"[112]:下10张打色留色面牌移动到色牌下面保位置最大",
         77:"[120]:下10张打色色先发保位置最大次大",
         78:"[121]:下10张打色色先发保位置最小次小",
-        79:"[130]:看手牌报生死门",
-        80:"[131]:看手牌报最大",
-        81:"[132]:看手牌报最大次大",
-        82:"[133]:看手牌报最大次大生死门",
-        83:"[134]:看手牌比第一张牌从最大牌继续发报最大",
-        84:"[135]:看手牌比第一张牌从最大牌继续发报最大次大",
-        85:"[143]:看手牌面为色留色报最大",
-        86:"[144]:看手牌面为色留色报最大次大",
-        87:"[145]:看手牌面为色留色报最大次大生死门",
-        88:"[147]:看手牌面为色去色报最大",
-        89:"[148]:看手牌面为色去色报最大次",
-        90:"[149]:看手牌面为色去色报最大次大生死门",
-        91:"[200]:飞2张保位置最大",
-        92: "[201]:飞2张保位置最小",
-            93: "[202]:飞2张打色留色保位置最大",
-            94: "[203]:飞2张打色留色保位置最小",
-            95: "[206]:飞2张打色去色1张保位置最大",
-            96: "[207]:飞2张打色去色1张保位置最小",
-            97: "[208]:飞2张打色色先发保位置最大",
-            98: "[209]:飞2张打色色先发保位置最小",
-            99: "[211]:飞2张骰子打色保位置最大",
-            100: "[212]:飞2张面为色留色保位置最大",
-            101: "[213]:飞张面为色留色保位置最小",
-            102: "[214]:飞2张面为色去色保位置最大",
-            103: "[215]:飞2张面为色去色保位置最小",
-            104: "[216]:飞2张底为色保位置最大",
-            105: "[217]:飞2张底为色保位置最小",
-            106: "[218]:飞2张底2张相加为色保位置最大",
-            107: "[221]:飞2张打色留色再看底保位置最大",
+        79:"[130]:看手牌报生死门*",
+        80:"[131]:看手牌报最大*",
+        81:"[132]:看手牌报最大次大*",
+        82:"[133]:看手牌报最大次大生死门*",
+        83:"[134]:看手牌比第一张牌从最大牌继续发报最大*",
+        84:"[135]:看手牌比第一张牌从最大牌继续发报最大次大*",
+        85:"[143]:看手牌面为色留色报最大*",
+        86:"[144]:看手牌面为色留色报最大次大*",
+        87:"[145]:看手牌面为色留色报最大次大生死门*",
+        88:"[147]:看手牌面为色去色报最大*",
+        89:"[148]:看手牌面为色去色报最大次大*",
+        90:"[149]:看手牌面为色去色报最大次大生死门*",
+        91:"[200]:飞2张保位置最大*",
+        92: "[201]:飞2张保位置最小*",
+            93: "[202]:飞2张打色留色保位置最大*",
+            94: "[203]:飞2张打色留色保位置最小*",
+            95: "[206]:飞2张打色去色1张保位置最大*",
+            96: "[207]:飞2张打色去色1张保位置最小*",
+            97: "[208]:飞2张打色色先发保位置最大*",
+            98: "[209]:飞2张打色色先发保位置最小*",
+            99: "[211]:飞2张骰子打色保位置最大*",
+            100: "[212]:飞2张面为色留色保位置最大*",
+            101: "[213]:飞张面为色留色保位置最小*",
+            102: "[214]:飞2张面为色去色保位置最大*",
+            103: "[215]:飞2张面为色去色保位置最小*",
+            104: "[216]:飞2张底为色保位置最大*",
+            105: "[217]:飞2张底为色保位置最小*",
+            106: "[218]:飞2张底2张相加为色保位置最大*",
+            107: "[221]:飞2张打色留色再看底保位置最大*",
             108: "[284]:固定范围切牌报对子和同点数目",
             109: "[285]:固定范围切牌报哪个位置拿最大最多",
-            110: "[2861:固定范围切牌报哪个位置拿最大次大最多",
+            110: "[286]:固定范围切牌报哪个位置拿最大次大最多",
             111: "[289]:范围切牌保指定2家有最大",
-            112: "[290]:范围切牌保有最好活门",
-            113: "[291]:范围切牌保有最好死门",
+            112: "[290]:范围切牌保有最好活门*",
+            113: "[291]:范围切牌保有最好死门*",
             114: "[292]:范围切牌保位置活门",
             115: "[293]:范围切牌保位置死门",
             116: "[296]:范围切牌保位置最小次小",
@@ -326,17 +321,17 @@ class ReportManager{
             163: "[515]:指定牌上一张打色去色全部报位置最大次大",
             164: "[516]:指定牌下一张打色留色报位置最大次大",
             165: "[517]:指定牌下一张打色去色全部报位置最大次大",
-            166: "[518]:底为色4种发牌方式报最小",
-            167: "[519]:底为色4种发牌方式报最大",
+            166: "[518]:底为色4种发牌方式报最小*",
+            167: "[519]:底为色4种发牌方式报最大*",
             168: "[520]:底为色报位置最大次大",
             169: "[521]:底为色报位置最大",
             170: "[522]:底为色报位置最小次小",
             171: "[523]:底为色报位置最小",
             172: "[524]:底为色报位置排名",
-            173: "[525]:底为色报发牌方式保位置最大次大",
+            173: "[525]:底为色报发牌方式保位置最大次大*",
             174: "[526]:底2张相加为色报位置最大次大",
-            175: "[527]:骰子打色报发牌方式保位置最大次才",
-            176: "[528]:底2张相加为色报发牌方式保位置最大",
+            175: "[527]:骰子打色报发牌方式保位置最大次大*",
+            176: "[528]:底2张相加为色报发牌方式保位置最大*",
             177: "[530]:面为色报位置最大次大",
             178: "[531]:面为色报位置最大",
             179: "[532]:面为色报位置最小次小",
@@ -347,12 +342,12 @@ class ReportManager{
             184: "[5421:面为色去色报位置最小次小",
             185: "[543]:面为色去色报位置最小",
             186: "[544]:面为色去色报位置排名",
-            187: "[670]:报4张单张",
-            188: "[671]:报4张单张2",
-            189: "[672]:报4张单张3",
-            190: "[675]:报公牌",
-            191: "[680]:打色留色报发牌方式保位置最大次大",
-            192: "[681]:打色留色报发牌方式保位置最小次小",
+            187: "[670]:报4张单张*",
+            188: "[671]:报4张单张2*",
+            189: "[672]:报4张单张3*",
+            190: "[675]:报公牌*",
+            191: "[680]:打色留色报发牌方式保位置最大次大*",
+            192: "[681]:打色留色报发牌方式保位置最小次小*",
             193: "[700]:去掉14张面牌报哪家最大",
             194: "[701]:去掉14张面牌报哪家最小",
             195: "[702]:去掉14张面牌报哪家最大次大",
@@ -362,39 +357,39 @@ class ReportManager{
             199: "[706]:去掉14张面牌根据第14张牌点数再去牌报最小",
             200: "[707]:去面牌底牌根据面牌底牌点数和去牌报最大次大",
             201: "[708]:固定去掉6、7、8、9张牌，以去牌数为色报位置最大",
-            202: "[710]:跑的快报下家大牌",
+            202: "[710]:跑的快报下家大牌*",
             203: "[719]:比第一张牌从最大牌继续发报最大次大",
             204: "[720]:比第一张牌从最大牌继续发报最大",
             205: "[721]:比第一张牌从最小牌继续发报最大",
             206: "[722]:比第一张牌从最小牌继续发报最大次大",
-            207: "[723]:比第一张牌从最大牌继续发飞2张保庄家最大次大",
-            208: "[724]:比第一张牌从最小牌继续发飞2张保庄家最大次大",
+            207: "[723]:比第一张牌从最大牌继续发飞2张保庄家最大次大*",
+            208: "[724]:比第一张牌从最小牌继续发飞2张保庄家最大次大*",
             209: "[725]:比第一张牌从最大牌继续发报各家点数",
             210: "[740]:报指定玩家手里牌",
             211: "[741]:报玩家手里牌+照牌报后面4张单张",
             212: "[745]:看切牌报上下部分牌张数",
-            213: "[755]看色留色上10 张去牌保位置最大",
+            213: "[755]看色留色上10张去牌保位置最大",
             214: "[758]:看色留色+色牌上X张为色报最大次大",
             215: "[759]:看色留色2次打色保位置最大",
             216: "[760]:看色留色报最大",
             217: "[761]:看色留色报最大次大",
-            218: "[762]:看色留色报最小看色牌，放回原处。",
+            218: "[762]:看色留色报最小",
             219: "[763]:看色留色报最小次小",
             220: "[764]:看色留色报排名",
             221: "[766]:看色牌去色全部报最大",
             222: "[767]:看色牌去色全部报最大次大",
             223: "[768]:看色牌去色全部报最小",
-            224: "[7691:看色牌去色全部报最小次小",
+            224: "[769]:看色牌去色全部报最小次小",
             225: "[770]:看色牌去色全部报排名",
-            226: "[790]:固霍第10张牌作龟留色报最大",
+            226: "[790]:固定第10张牌作色留色报最大",
             227: "[791]:固定第10张牌作色留色报最大...",
-            228: "[793]:固定第10张牌作色留色报最小次",
+            228: "[793]:固定第10张牌作色留色报最小次小",
             229: "[7941:固定第10张牌作色留色报排名",
-            230: "[795]:固定第 10张牌作色留色4种发牌方式报最大",
+            230: "[795]:固定第10张牌作色留色4种发牌方式报最大",
             231: "[796]:固定第10张牌作色留色4种发牌方式报最小",
             232: "[800]:固定第10张牌作色去色全部报最大",
             233: "[801]:固定第10张牌作色去色全部报最大次大",
-            234: "[8021:固定第10张牌作色去色全部报最小",
+            234: "[802]:固定第10张牌作色去色全部报最小",
             235: "[803]:固定第10张牌作色去色全部报最小次小",
             236: "[804]:固定第10张牌作色去色全部报排名",
             237: "[805]:固定第10张牌作色去色全部4种发牌方式报最大",
@@ -411,6 +406,9 @@ class ReportManager{
             248: "[860]:多次同时抽底牌面牌底为色保位置最大",
             249: "[2000]:测试报法",
             250: "[2001]:测试报法2",
+        251:"[756]:看色留色上10张去牌",
+        252:"[792]:固定第10张牌作色留色报最小"
+        
     ]
     static let allReportInfo: [Int: String] = [
         0:"""
@@ -1368,18 +1366,19 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
     }
     
     //将rank相同的玩家放在同一个int数组中
-    static func extractWinnerSet(inputWinners: [Int], inputWinnerRanks: [Int]) -> [[Int]] {
-        var resultList:[[Int]] = []
-        var rankResultList: [Int] = [inputWinners[0]]
+    //默认input都是从大到小
+    static func extractWinnerSet(inputInfo:[GameReturnPlayerInfo]) -> [[GameReturnPlayerInfo]] {
+        var resultList:[[GameReturnPlayerInfo]] = []
+        var rankResultList: [GameReturnPlayerInfo] = [inputInfo[0]]
         
-        for index in 1..<inputWinners.count {
-            if inputWinnerRanks[index] == inputWinnerRanks[index - 1] {
-                rankResultList.append(inputWinners[index])
+        for index in 1..<inputInfo.count {
+            if inputInfo[index].playerRank == inputInfo[index - 1].playerRank {
+                rankResultList.append(inputInfo[index])
             } else {
                 resultList.append(rankResultList)
-                rankResultList = [inputWinners[index]]
+                rankResultList = [inputInfo[index]]
             }
-            if index == inputWinners.count - 1 {
+            if index == inputInfo.count - 1 {
                 resultList.append(rankResultList)
             }
         }
@@ -1421,8 +1420,10 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         case 7:
             cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: inputCards[specialCardIndex + 1])
             break
+        //固定第Y张牌为色
         case 8:
             cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: cutNumRangeSetting[1] - 1)
+            break
         default:
             break
         }
@@ -1430,12 +1431,75 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         return cardRank
     }
     
-    
-    static func GameReporter(gameIndex: Int, inputCards: [Int], diyDealStatus: [[Bool]], diyDealNum:[Int], newArgs: [Int], rankRules:[Int], suitRules:[Int], reportID: Int, cutNumSetting: Int, cutNumRangeSetting: [Int], targetPos: Int, coloringType: Int) -> (String, [Int]){
+    struct SingleReportResultInfo{
         
-        let gameFunctions:[Int: ([[Bool]],[Int], [Int], [Int], [Int], [Int]) -> ([Int],[Int],[Int],[Card], [Int], [String])] = [:]
+        //都存一轮的结果
+        
+        //排序后的玩家id
+        var PlayerRankList: [[Int]] = []
+        //排序后的牌型
+        var PlayerCardList: [[String]] = []
+        //排序后的花色
+        var PlayerSuitList: [[String]] = []
+        //第几张保位置最大最小
+        var cardIndexToConfirmMaxMin: [Int] = []
+        //第几张保位置活门
+        var cardIndexToConfirmAliveDeath: [Int] = []
+        //保XY门最大/最小，X 还是 Y最大/小
+        var XorYMax: [Int] = []
+        //有牛牛的playerID
+        var BullBullPlayerID: [Int] = []
+        //指定牌位置
+        var specialCardPos: Int = -1
+        //报最大最小次打次小等目标集合
+        var targetPlayerList: [[Int]] = []
+        //每轮有无平点
+        var hasDrawPoint: Int = -1
+        //每轮几个对子
+        var pairNum: Int = 0
+        
+    }
+    
+    struct MultipleReportResultInfo{
+        //单轮结果记录
+        var singleResultList: [SingleReportResultInfo] = []
+        //保多轮的cardIndex
+        var cardIndexForMultipleRound: Int = -1
+        //保多轮最大最小目标最大最小的轮数 1为第一轮
+        var winRoundIndex: [Int] = []
+        //多轮对子总数
+        var totalPairNum: Int = -1
+        //多轮平点点数
+        var totalDrawNum: Int = -1
+        //最大/最小最多的位置
+        var maxWinPosition: Int = -1
+    }
+    
+    
+    
+    static func GameReporter(gameIndex: Int, inputCards: [Int], diyDealStatus: [[Bool]], diyDealNum:[Int], newArgs: [Int], rankRules:[Int], suitRules:[Int], reportID: Int, cutNumSetting: Int, cutNumRangeSetting: [Int], targetPos: Int, coloringType: Int, consecutiveNum: Int) -> (String, [Int]){
+        
+        let gameFunctions:[Int: ([[Bool]],[Int], [Int], [Int], [Int], [Int]) -> ([GameReturnPlayerInfo], [Int])] = [:
+//            0: TexasPoker.FindWinner,
+//            1: PokerBull.FindWinner,
+//            2: ThreeCardPokerGame.FindWinner,
+//            3: TinyNineGame.FindWinner,
+//            4: ThreeMenGame.FindWinner,
+//            5: TwoEightGangGame.FindWinner,
+//            6: NinePointFiveGame.FindWinner,
+//            7: BaoziGame.FindWinner,
+//            8: JiaJiaBaoGame.FindWinner,
+//            9: CardNineGame.FindWinner,
+//            10: NinePointGame.FindWinner,
+//            11: FourCardGame.FindWinner(diyDealStatus:diyDealNum:inputCards:args:rankRules:suitRules:),
+//            12: TwoCardGame.FindWinner(diyDealStatus:diyDealNum:inputCards:args:rankRules:suitRules:),
+//            13: ThreeCardPointGame.FindWinner(diyDealStatus:diyDealNum:inputCards:args:rankRules:suitRules:),
+//            14: TenPointFiveGame.FindWinner(diyDealStatus:diyDealNum:inputCards:args:rankRules:suitRules:)
+        ]
         let gameFunction = gameFunctions[gameIndex]
+        //最后的report结果
         var reportResult = ""
+        
         var leftCards:[Int] = []
         let playerNum = newArgs[2]
         
@@ -1455,273 +1519,353 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         //切每一张牌的目标玩家
         var allReportResult: [[Int]] = []
         
-        if let reportRule = RuleManager.allPreSetReportRules[reportID]{
+        //装下总结果
+        var multipleResultInfo = MultipleReportResultInfo()
+        
+        
+        for roundID in 1...consecutiveNum {
             
-            var cutRange1: Int = 0
-            var cutRange2: Int = 1
-            
-            //切牌范围
-            switch reportRule.reportCutRange{
-            case -1:
-                break
-            //XY张
-            case 0:
-                cutRange1 = cutNumRangeSetting[0] - 1
-                cutRange2 = cutNumRangeSetting[1] - 1
-            //上下5张
-            case 1:
-                cutRange1 = 0
-                cutRange2 = 4
-                break
-            //下10张
-            case 2:
-                cutRange1 = inputCards.count - 10
-                cutRange2 = inputCards.count - 1
-            //上10张
-            case 3:
-                cutRange1 = 0
-                cutRange2 = 9
-                break
-            default:
-                break
-            }
-            
-            //有无指定牌
-            //指定牌序号
-            var specialCardIndex:Int = -1
-            switch reportRule.hasSpecialCard{
-            case 0:
-                if cutNumRangeSetting[1] == 14 {
-                    specialCardIndex = 53
-                } else if cutNumRangeSetting[1] == 15 {
-                    specialCardIndex = 54
-                } else {
-                    specialCardIndex = (cutNumRangeSetting[0] - 1) * 13 + cutNumRangeSetting[1]
-                }
-                for cardIndex in 0..<inputCards.count{
-                    if inputCards[cardIndex] == specialCardIndex{
-                        specialCardPos = cardIndex + 1
-                    }
-                }
-                break
-            default:
-                break
-            }
-            
-            
-            for cardIndex in cutRange1...cutRange2{
+            if let reportRule = RuleManager.allPreSetReportRules[reportID]{
+                var currentResultInfo = SingleReportResultInfo()
                 
-                //
-                var cardRanks: [Int] = []
-                var cardRank = GetCardRank(reportRule: reportRule, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, inputCards: inputCards, cardIndex: cardIndex, specialCardIndex: specialCardPos)
-                cardRanks = [cardRank]
-                var newInputCardsSet: [[Int]] = []
-                //牌堆变化
-                switch reportRule.cardsTransformation{
-                case -1:
-                    newInputCardsSet = [inputCards]
-                    break
-                //留色再根据色牌点数去牌
+                var cutList: [[Int]] = []
+                
+                //切牌范围
+                switch reportRule.reportCutRange{
+                //XY张
                 case 0:
-                    newInputCardsSet = [Array(inputCards[(cardRank + 1)...])]
-                    break
-                //去色再根据色牌点数去牌
+                    cutList.append([cutNumRangeSetting[0] - 1, cutNumRangeSetting[1] - 1])
+                //上下5张
                 case 1:
-                    newInputCardsSet = [Array(inputCards[(cardRank  + cardIndex + 1)...]) + Array(inputCards[0...cardIndex])]
+                    cutList.append([0,4])
+                    cutList.append([inputCards.count - 5, inputCards.count - 1])
                     break
-                //留色
+                //下XY张
                 case 2:
-                    newInputCardsSet = [Array(inputCards)]
-                    break
-                //去色
+                    cutList.append([inputCards.count - cutNumRangeSetting[1], inputCards.count - cutNumRangeSetting[0]])
+                //上10张
                 case 3:
-                    newInputCardsSet = [Array(inputCards[(cardIndex + 1)...])]
+                    cutList.append([0,9])
                     break
-                //去色补到底部
+                    //4，上Y张
                 case 4:
-                    newInputCardsSet = [Array(inputCards[(cardIndex + 1)...]) + Array(inputCards[0...cardIndex])]
+                    cutList.append([0, cutNumRangeSetting[1] - 1])
                     break
-                //去掉色牌
+                    //5，上下XY张
                 case 5:
-                    newInputCardsSet = [Array(inputCards[0...cardIndex - 1]) + Array(inputCards[(cardIndex + 1)...])]
+                    cutList.append([cutNumRangeSetting[0] - 1, cutNumRangeSetting[1] - 1])
+                    cutList.append([inputCards.count - cutNumRangeSetting[1], inputCards.count - cutNumRangeSetting[0]])
                     break
-                //色牌先发
+                    //6，看手牌
                 case 6:
-                    var subInputCardSet1: [Int] = [inputCards[cardIndex]] + Array(inputCards[0..<cardIndex]) +  Array(inputCards[(cardIndex + 1)...])
-                    newInputCardsSet = [subInputCardSet1]
+                    cutList.append([0, playerNum - 1])
                     break
-                //去掉面牌补到底，去掉底牌补到顶
+                    //7, 范围切牌
                 case 7:
-                var subInputCardSet1: [Int] = Array(inputCards[(cardIndex + 1)...]) + Array(inputCards[0...cardIndex])
-                    var subInputCardSet2: [Int] = Array(inputCards[(inputCards.count - cardIndex - 1)...(inputCards.count - 1)]) + Array(inputCards[0..<(inputCards.count - cardIndex - 1)])
-                    newInputCardsSet = [subInputCardSet1, subInputCardSet2]
-                    cardRanks.append(GetCardRank(reportRule: reportRule, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, inputCards: inputCards, cardIndex: inputCards.count - 1 - cardIndex, specialCardIndex: specialCardPos))
-                break
-                //上下XY张色牌先发
+                    cutList.append([cutNumRangeSetting[0] - 1, cutNumRangeSetting[1] - 1])
+                    break
+                    //8，去掉6789张牌
                 case 8:
-                    
-                    var subInputCardSet1: [Int] = [inputCards[cardIndex]] + Array(inputCards[0..<cardIndex]) +  Array(inputCards[(cardIndex + 1)...])
-                    var subInputCardSet2: [Int] = [inputCards.count - 1 - cardIndex] +  Array(inputCards[0..<(inputCards.count - cardIndex - 1)]) +  Array(inputCards[(inputCards.count - cardIndex - 2)...(inputCards.count - 1)])
-                        newInputCardsSet = [subInputCardSet1, subInputCardSet2]
-                        cardRanks.append(GetCardRank(reportRule: reportRule, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, inputCards: inputCards, cardIndex: inputCards.count - 1 - cardIndex, specialCardIndex:  specialCardPos))
+                    cutList.append([5,8])
                     break
-                //上下XY张留色
+                    //9，固定第Y张
                 case 9:
-                    newInputCardsSet = [Array(inputCards), Array(inputCards)]
-                    cardRanks.append(GetCardRank(reportRule: reportRule, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, inputCards: inputCards, cardIndex: inputCards.count - 1 - cardIndex, specialCardIndex: specialCardPos))
+                    cutList.append([cutNumRangeSetting[0] - 1, cutNumRangeSetting[1] - 1])
+                default:
+                    cutList.append([0,0])
                     break
-                //上下XY张去色1张
-                case 10:
-                    var subInputCardSet1: [Int] = Array(inputCards[0..<cardIndex]) +  Array(inputCards[(cardIndex + 1)...])
-                    var subInputCardSet2: [Int] =  Array(inputCards[0..<(inputCards.count - cardIndex - 1)]) +  Array(inputCards[(inputCards.count - cardIndex - 2)...(inputCards.count - 1)])
-                        newInputCardsSet = [subInputCardSet1, subInputCardSet2]
-                        cardRanks.append(GetCardRank(reportRule: reportRule, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, inputCards: inputCards, cardIndex: inputCards.count - 1 - cardIndex, specialCardIndex: specialCardPos))
-                    break
-                //11，指定牌为底,切牌
-                case 11:
-                    //获得指定牌Index
-                    
-                    newInputCardsSet = [Array(inputCards[(cardIndex + 1)...]) + Array(inputCards[0...cardIndex])]
-                    break
-                //12,指定牌为顶，切牌
-                case 12:
-                    newInputCardsSet = [Array(inputCards[cardIndex...]) + Array(inputCards[0...cardIndex - 1])]
-                    break
-                //13，去掉Y张面牌
-                case 13:
-                    newInputCardsSet = [Array(inputCards[cutNumRangeSetting[1]...])]
-                    break
-                //14，去掉Y张面牌，再根据面牌点数去牌
-                case 14:
-                    var YCardRank: Int = inputCards[cutNumRangeSetting[1]] % 13 + 1
-                    newInputCardsSet = [Array(inputCards[(cutNumRangeSetting[1] + YCardRank)...])]
-                    break
-                //15，去掉面牌和底牌，点数相加几点就去掉面上几张牌
-                case 15:
-                    var AddCardRank = (inputCards[0] % 13 + 1 + inputCards[inputCards.count - 1] % 13 + 1) % 10
-                                    
-                    newInputCardsSet = [Array(inputCards[(1 + AddCardRank)..<(inputCards.count  - 1)])]
-                    break
-                //16，比第一张牌，从最大发
-                case 16:
-                    //找出谁拿最大的牌
-                    var maxRank: Int = 0
-                    var maxIndex: Int = 0
-                    for playerID in 0..<playerNum{
-                        var compCardRank:Int
-                        if inputCards[playerID] == 53 {
-                            compCardRank = 14
-                        } else if inputCards[playerID] == 54 {
-                            compCardRank = 15
-                        } else {
-                            compCardRank = (inputCards[0] % 13 + 1)
-                        }
-                        
-                        if compCardRank > maxRank {
-                            maxRank = compCardRank
-                            maxIndex = playerID
+                }
+                
+                //有无指定牌
+                //指定牌的cardIndex
+                var specialCardIndex:Int = -1
+                switch reportRule.hasSpecialCard{
+                case 0:
+                    if cutNumRangeSetting[1] == 14 {
+                        specialCardIndex = 53
+                    } else if cutNumRangeSetting[1] == 15 {
+                        specialCardIndex = 54
+                    } else {
+                        specialCardIndex = (cutNumRangeSetting[0] - 1) * 13 + cutNumRangeSetting[1]
+                    }
+                    for cardIndex in 0..<inputCards.count{
+                        if inputCards[cardIndex] == specialCardIndex{
+                            specialCardPos = cardIndex + 1
                         }
                     }
-                    var newPrefixArray: [Int] = []
-                    for i in 0..<playerNum{
-                        newPrefixArray.append(inputCards[(maxIndex + i) % playerNum])
-                    }
-                    
-                    newInputCardsSet = [newPrefixArray + inputCards[playerNum...]]
-                    
                     break
-                case 17:
-                    var minRank: Int = 100
-                    var minIndex: Int = 0
-                    for playerID in 0..<playerNum{
-                        var compCardRank:Int
-                        if inputCards[playerID] == 53 {
-                            compCardRank = 14
-                        } else if inputCards[playerID] == 54 {
-                            compCardRank = 15
-                        } else {
-                            compCardRank = (inputCards[0] % 13 + 1)
-                        }
-                        
-                        if compCardRank < minRank {
-                            minRank = compCardRank
-                            minIndex = playerID
-                        }
-                    }
-                    var newPrefixArray: [Int] = []
-                    for i in 0..<playerNum{
-                        newPrefixArray.append(inputCards[(minIndex + i) % playerNum])
-                    }
-                    
-                    newInputCardsSet = [newPrefixArray + inputCards[playerNum...]]
-                    break
-
                 default:
                     break
                 }
                 
-                //返回游戏的结果
+                currentResultInfo.specialCardPos = specialCardPos
                 
-                for cardsID in 0..<newInputCardsSet.count{
-                    
-                    //每一个牌堆对应一个色点
-                    var newInputCards = newInputCardsSet[cardsID]
-                    var newCardRank = cardRanks[cardsID]
-                    //装所有目标位置
-                    var resultTargetPos:[Int] = []
-                    //装活门
-                    var aliveTargetPos: [Int] = []
-                    //装对子
-                    var pairNum: Int = 0
-                    var NoPair: Int = 0
-                    //装9点
-                    var NoNinePoint: Int = 0
-                    //装平点
-                    var hasDrawPoint: Int = 0
-                    //牛牛
-                    var NoBullOrMaxOneBull: Int = 0
-                    var LeastOneBullBull: [Int] = []
-
-                    let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, newInputCards, newArgs, rankRules, suitRules)
-                    
-                    if winners.count != 0 {
-                        var rankResult = extractWinnerSet(inputWinners: winners, inputWinnerRanks: winnerRanks)
-                        //根据报法获得需要的结果
-                        switch reportRule.rankReport{
-                        //最大
+                var cutID = 0
+                for cutRange in cutList{
+                    var cutRange1 = cutRange[0]
+                    var cutRange2 = cutRange[1]
+                    for cardIndex in cutRange1...cutRange2{
+                        
+                        
+                        var cardRank = GetCardRank(reportRule: reportRule, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, inputCards: inputCards, cardIndex: cardIndex, specialCardIndex: specialCardPos)
+                        
+                        var newInputCards: [Int] = []
+                        //牌堆变化
+                        switch reportRule.cardsTransformation{
+                        //留色再根据色牌点数去牌
                         case 0:
-                            resultTargetPos = rankResult[0]
-                        //最大次大
+                            newInputCards = Array(inputCards[(cardRank + 1)...])
+                            break
+                        //去色再根据色牌点数去牌
                         case 1:
-                            for i in 0..<min(rankResult.count - 1, 2){
-                                resultTargetPos += Array(rankResult[i])
-                            }
+                            newInputCards = Array(inputCards[(cardRank  + cardIndex + 1)...]) + Array(inputCards[0...cardIndex])
                             break
-                        //2，1大2大3大，
+                        //留色
                         case 2:
-                            for i in 0..<min(rankResult.count - 1, 3){
-                                resultTargetPos += Array(rankResult[i])
-                            }
+                            newInputCards = inputCards
                             break
-                        //3，最小
+                        //去色
                         case 3:
-                            resultTargetPos = Array(rankResult.reversed())[0]
+                            newInputCards = Array(inputCards[(cardIndex + 1)...])
                             break
-                        //4，最小次小
+                        //去色补到底部
                         case 4:
-                            for i in 0..<min(rankResult.count - 1, 2){
-                                resultTargetPos += Array(rankResult.reversed()[i])
-                            }
+                            newInputCards = Array(inputCards[(cardIndex + 1)...]) + Array(inputCards[0...cardIndex])
                             break
-                        //5，排名（6名）
+                        //去掉色牌
                         case 5:
-                            for i in 0..<min(rankResult.count - 1, 6){
-                                resultTargetPos += Array(rankResult[i])
-                            }
+                            newInputCards = Array(inputCards[0...cardIndex - 1]) + Array(inputCards[(cardIndex + 1)...])
                             break
-                        //6，大1大2，小1小2
+                        //色牌先发
                         case 6:
+                            newInputCards = [inputCards[cardIndex]] + Array(inputCards[0..<cardIndex]) +  Array(inputCards[(cardIndex + 1)...])
+                            break
+                        //去掉面牌补到底，去掉底牌补到顶
+                        case 7:
+                            if cutID == 0 {
+                                newInputCards = Array(inputCards[(cardIndex + 1)...]) + Array(inputCards[0...cardIndex])
+                            } else {
+                                newInputCards = Array(inputCards[(inputCards.count - cardIndex - 1)...(inputCards.count - 1)]) + Array(inputCards[0..<(inputCards.count - cardIndex - 1)])
+                            }
                             
+
+                        break
+                        //上下XY张色牌先发
+                        case 8:
+                            newInputCards = [inputCards[cardIndex]] + Array(inputCards[0..<cardIndex]) +  Array(inputCards[(cardIndex + 1)...])
+                            break
+                        //上下XY张留色
+                        case 9:
+                            newInputCards = Array(inputCards)
+                            break
+                        //上下XY张去色1张
+                        case 10:
+                            newInputCards = Array(inputCards[0..<cardIndex]) +  Array(inputCards[(cardIndex + 1)...])
+                            break
+                        //11，指定牌为底,切牌
+                        case 11:
+                            newInputCards = Array(inputCards[(specialCardPos + 1)...]) + Array(inputCards[0...specialCardPos])
+                            break
+                        //12,指定牌为顶，切牌
+                        case 12:
+                            newInputCards = Array(inputCards[specialCardPos...]) + Array(inputCards[0...specialCardPos - 1])
+                            break
+                        //13，去掉Y张面牌
+                        case 13:
+                            newInputCards = Array(inputCards[cutNumRangeSetting[1]...])
+                            break
+                        //14，去掉Y张面牌，再根据面牌点数去牌
+                        case 14:
+                            var YCardRank: Int = inputCards[cutNumRangeSetting[1]] % 13 + 1
+                            newInputCards = Array(inputCards[(cutNumRangeSetting[1] + YCardRank)...])
+                            break
+                        //15，去掉面牌和底牌，点数相加几点就去掉面上几张牌
+                        case 15:
+                            var AddCardRank = (inputCards[0] % 13 + 1 + inputCards[inputCards.count - 1] % 13 + 1) % 10
+                                            
+                            newInputCards = Array(inputCards[(1 + AddCardRank)..<(inputCards.count  - 1)])
+                            break
+                        //16，比第一张牌，从最大发
+                        case 16:
+                            //找出谁拿最大的牌
+                            var maxRank: Int = 0
+                            var maxIndex: Int = 0
+                            for playerID in 0..<playerNum{
+                                var compCardRank:Int
+                                if inputCards[playerID] == 53 {
+                                    compCardRank = 14
+                                } else if inputCards[playerID] == 54 {
+                                    compCardRank = 15
+                                } else {
+                                    compCardRank = (inputCards[0] % 13 + 1)
+                                }
+                                
+                                if compCardRank > maxRank {
+                                    maxRank = compCardRank
+                                    maxIndex = playerID
+                                }
+                            }
+                            var newPrefixArray: [Int] = []
+                            for i in 0..<playerNum{
+                                newPrefixArray.append(inputCards[(maxIndex + i) % playerNum])
+                            }
+                            
+                            newInputCards = newPrefixArray + inputCards[playerNum...]
+                            
+                            break
+                        case 17:
+                            var minRank: Int = 100
+                            var minIndex: Int = 0
+                            for playerID in 0..<playerNum{
+                                var compCardRank:Int
+                                if inputCards[playerID] == 53 {
+                                    compCardRank = 14
+                                } else if inputCards[playerID] == 54 {
+                                    compCardRank = 15
+                                } else {
+                                    compCardRank = (inputCards[0] % 13 + 1)
+                                }
+                                
+                                if compCardRank < minRank {
+                                    minRank = compCardRank
+                                    minIndex = playerID
+                                }
+                            }
+                            var newPrefixArray: [Int] = []
+                            for i in 0..<playerNum{
+                                newPrefixArray.append(inputCards[(minIndex + i) % playerNum])
+                            }
+                            
+                            newInputCards = newPrefixArray + inputCards[playerNum...]
+                            break
+                        default:
+                            newInputCards = inputCards
+                            break
+                        }
+                        
+                        cutID += 1
+                        
+                        //返回游戏的结果
+                        
+                        //每一个牌堆对应一个色点
+                        var newCardRank = cardRank
+                        //装所有目标位置
+                        var resultTargetPos:[Int] = []
+                        //装活门
+                        var aliveTargetPos: [Int] = []
+                        //装对子
+                        var pairNum: Int = 0
+                        var NoPair: Int = 0
+                        //装9点
+                        var NoNinePoint: Int = 0
+                        //装平点
+                        var hasDrawPoint: Int = 0
+                        //牛牛
+                        var NoBullOrMaxOneBull: Int = 0
+                        var LeastOneBullBull: [Int] = []
+
+                        let (winnersInfo, leftCards) = gameFunction!(diyDealStatus, diyDealNum, newInputCards, newArgs, rankRules, suitRules)
+                        
+                        if winnersInfo.count != 0 {
+                            //重新整理后的winner info
+                            var rankedWinnersInfo = extractWinnerSet(inputInfo: winnersInfo)
+                            //根据报法获得需要的结果
+                            switch reportRule.rankReport{
+                            //最大
+                            case 0:
+                                for maxWinner in rankedWinnersInfo[0]{
+                                    resultTargetPos.append(maxWinner.playerID)
+                                }
+                            //最大次大
+                            case 1:
+                                for i in 0..<min(rankedWinnersInfo.count - 1, 2){
+                                    for winner in rankedWinnersInfo[i]{
+                                        resultTargetPos.append(winner.playerID)
+                                    }
+                                }
+                                break
+                            //2，1大2大3大，
+                            case 2:
+                                for i in 0..<min(rankedWinnersInfo.count - 1, 3){
+                                    for winner in rankedWinnersInfo[i]{
+                                        resultTargetPos.append(winner.playerID)
+                                    }
+                                }
+                                break
+                            //3，最小
+                            case 3:
+                                for minWinner in rankedWinnersInfo[rankedWinnersInfo.count - 1]{
+                                    resultTargetPos.append(minWinner.playerID)
+                                }
+                                break
+                            //4，最小次小
+                            case 4:
+                                for i in 0..<min(rankedWinnersInfo.count - 1, 2){
+                                    for winner in rankedWinnersInfo[rankedWinnersInfo.count - 1 - i]{
+                                        resultTargetPos.append(winner.playerID)
+                                    }
+                                }
+                                break
+                            //5，排名（6名）
+                            case 5:
+                                for i in 0..<min(rankedWinnersInfo.count - 1, 6){
+                                    for winner in rankedWinnersInfo[i]{
+                                        resultTargetPos.append(winner.playerID)
+                                    }
+                                }
+                                break
+                            //6，大1大2，小1小2
+                            case 6:
+                                //大1 大2
+                                for i in 0..<min(rankedWinnersInfo.count - 1, 2){
+                                    for winner in rankedWinnersInfo[i]{
+                                        resultTargetPos.append(winner.playerID)
+                                    }
+                                }
+                                break
+                            default:
+                                break
+                            }
+                            
+                            
+                            
+                            
+                            //报平点
+                            switch reportRule.DrawPointReport {
+                            //0，报有无平点
+                            case 0:
+                                for rankSet in rankedWinnersInfo {
+                                    if rankSet.count > 1{
+                                        currentResultInfo.hasDrawPoint = 1
+                                    }
+                                }
+                                if currentResultInfo.hasDrawPoint != 1 {
+                                    currentResultInfo.hasDrawPoint = -1
+                                }
+                                break
+                            //2, 报有多少家平点
+                            case 2:
+                                for rankSet in rankedWinnersInfo {
+                                    if rankSet.count > 1 {
+                                        multipleResultInfo.totalDrawNum += rankSet.count
+                                    }
+                                }
+                                break
+                            default:
+                                break
+                            }
+                        }
+                        
+                        
+                        //报活门，报半活门
+                        switch reportRule.aliveDeathReport{
+                        case -1:
+                            break
+                        //报活门
+                        case 0:
+                            break
+                        //报半活门
+                        case 1:
                             break
                         default:
                             break
@@ -1729,1206 +1873,468 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         
                         
                         
-                        
-                        //报平点
-                        switch reportRule.DrawPointReport {
-                        //0，报有平点
-                        case 0:
-                            
+                        //报对子
+                        switch reportRule.pairReport{
+                        //几个对子
+                        case 0,1:
+                            for winner in winnersInfo{
+                                if winner.isPair == 1{
+                                    currentResultInfo.pairNum += 1
+                                }
+                            }
                             break
-                        //1，报无平点
-                        case 1:
-                            break
-                        //2, 报有多少家平点
+                        //2, 一共多少个对子
                         case 2:
-                            for rankSet in rankResult {
-                                if rankSet.count > 1 {
-                                    drawPointNum += rankSet.count
+                            for winner in winnersInfo{
+                                if winner.isPair == 1 {
+                                    multipleResultInfo.totalPairNum += 1
                                 }
                             }
                             break
                         default:
                             break
                         }
-                    }
-                    
-                    
-                    //报活门，报半活门
-                    switch reportRule.aliveDeathReport{
-                    case -1:
-                        break
-                    //报活门
-                    case 0:
-                        break
-                    //报半活门
-                    case 1:
-                        break
-                    default:
-                        break
-                    }
-                    
-                    
-                    //报对子
-                    switch reportRule.pairReport{
-                    case -1:
-                        break
-                    //几个对子
-                    case 0:
-                        pairNum = isPairWinner.count
-                        break
-                    //没有对子
-                    case 1:
-                        if isPairWinner.count == 0{
-                            NoPair = 1
-                        }
-                        break
-                    //2, 一共多少个对子
-                    case 2:
-                        totalPairNum += isPairWinner.count
-                        break
-                    default:
-                        break
-                    }
-                    //报9点
-                    //报最大家牌
-                    //报斗牛
-                    switch reportRule.pokerBullReport{
-                    case -1:
-                        break
-                    //保无牛或最多一家有牛
-                    case 0:
-                        var bullNum = 0
-                        for index in 0..<winners.count{
-                            if playerRankName[index].hasPrefix("牛") {
-                                bullNum += 1
+                        //报9点
+                        //报最大家牌
+                        //报斗牛
+                        switch reportRule.pokerBullReport{
+                        //保无牛或最多一家有牛
+                        case 0:
+                            var bullNum = 0
+                            for winner in winnersInfo{
+                                if winner.playerCardsType.hasPrefix("牛") {
+                                    bullNum += 1
+                                    
+                                }
                             }
-                        }
-                        if bullNum > 0{
-                            NoBullOrMaxOneBull = 1
-                        }
-                        break
-                    case 1:
-                        for index in 0..<winners.count{
-                            if playerRankName[index] == "牛牛" {
-                                LeastOneBullBull.append(winners[index])
+                            if bullNum > 0{
+                                NoBullOrMaxOneBull = 1
                             }
+                            break
+                        //1，保至少一家有牛牛
+                        case 1:
+                            for winner in winnersInfo{
+                                if winner.playerCardsType == "牛牛" {
+                                    currentResultInfo.BullBullPlayerID.append(winner.playerID)
+                                }
+                            }
+                            break
+                        default:
+                            break
                         }
-                        break
-                    default:
-                        break
-                    }
-                    
-                    // 打色，位置转换
-                    var resultPos:[Int] = []
-                    for resultTargetPo in resultTargetPos {
-                        resultPos.append((cardRank + resultTargetPo) % playerNum)
-                    }
-                    allReportResult.append(resultPos)
-                    
-                    var targets:[Int] = []
-                    
-                    switch reportRule.positionToReport {
                         
-                    //0, 保目标位置
-                    case 0:
-                        targets.append(targetPos)
-                        break
-                    //1，保X
-                    case 1:
-                        targets.append(cutNumRangeSetting[0])
-                        break
-                    //2，保Y
-                    case 2:
-                        targets.append(cutNumRangeSetting[1])
-                        break
-                    //3，保X或者Y
-                    case 3:
-                        targets.append(cutNumRangeSetting[0])
-                        targets.append(cutNumRangeSetting[1])
-                        break
-                    default:
-                        break
-                    }
-                    
-                    //报什么
-                    switch reportRule.reportTarget{
-                    //报大小
-                    case 0:
-                        break
-                    //保单个位置大小
-                    case 1:
-                        if resultPos.contains(where: {$0 == targets[0]}) {
-                            print("切第\(cardIndex + 1)张最大/最小")
-                            cutPositionSet.append(cardIndex + 1)
+                        // 打色，位置转换
+                        var resultPos:[Int] = []
+                        for resultTargetPo in resultTargetPos {
+                            resultPos.append((cardRank + resultTargetPo) % playerNum)
                         }
-                        break
-                    //2,哪个位置拿最大最多
-                    case 2:
-                        for id in resultTargetPos {
-                            playerWinTimesDic[id]! += 1
+                        allReportResult.append(resultPos)
+                        
+                        var targets:[Int] = []
+                        
+                        
+                        //目标
+                        switch reportRule.positionToReport {
+                        //0, 保目标位置
+                        case 0:
+                            targets.append(targetPos)
+                            break
+                        //1，保X
+                        case 1:
+                            targets.append(cutNumRangeSetting[0])
+                            break
+                        //2，保Y
+                        case 2:
+                            targets.append(cutNumRangeSetting[1])
+                            break
+                        //3，保X或者Y
+                        case 3:
+                            targets.append(cutNumRangeSetting[0])
+                            targets.append(cutNumRangeSetting[1])
+                            break
+                        default:
+                            break
                         }
-                        break
-                    //3, 保2个位置必有一家大小
-                    case 3:
-                        if resultPos.contains(where: {$0 == targets[0] || $0 == targets[1]}){
-                            print("切第\(cardIndex + 1)张最大/最小")
-                            cutPositionSet.append(cardIndex + 1)
+                        
+                        //报什么
+                        switch reportRule.reportTarget{
+                        //报大小
+                        case 0:
+                            currentResultInfo.targetPlayerList.append(resultPos)
+                            break
+                        //保单个位置大小
+                        case 1:
+                            if resultPos.contains(where: {$0 == targets[0]}) {
+                                print("第\(cardIndex + 1)张最大/最小")
+                                currentResultInfo.cardIndexToConfirmMaxMin.append(cardIndex + 1)
+                            }
+                            break
+                        //2,哪个位置拿最大最多
+                        case 2:
+                            for id in resultPos {
+                                playerWinTimesDic[id]! += 1
+                            }
+                            break
+                        //3, 保2个位置必有一家大小
+                        case 3:
+                            var X: Int = 0
+                            var Y: Int = 0
+                            if resultPos.contains(where: {$0 == targets[0]}){
+                                X = 1
+                                currentResultInfo.XorYMax.append(targets[0])
+                            }
+                            if resultPos.contains(where: {$0 == targets[1]}) {
+                                Y = 1
+                                currentResultInfo.XorYMax.append(targets[1])
+                            }
+                            if X == 1 || Y == 1{
+                                print("切第\(cardIndex + 1)张最大/最小")
+                                currentResultInfo.cardIndexToConfirmMaxMin.append(cardIndex + 1)
+                            }
+                            break
+                        default:
+                            break
                         }
-                        break
-                    default:
-                        break
+                        
                     }
                 }
+                
+                
+                
+                multipleResultInfo.singleResultList.append(currentResultInfo)
+                
             }
+            
         }
         
         
         
+        
+        
+        
+        
         //结果整合，把需要的元素填入结果整合的函数中，最后合成一段reportResult字符串
-        reportResult = reportStringGenerator()
+        reportResult = reportStringGenerator(reportID: reportID, multipleReportResultInfo: multipleResultInfo, cutNumRangeSetting: cutNumRangeSetting, playerNum: playerNum)
         
         return (reportResult, leftCards)
         
     }
     
-    static func reportStringGenerator() -> String{
+    static func reportStringGenerator(reportID:Int, multipleReportResultInfo: MultipleReportResultInfo, cutNumRangeSetting: [Int], playerNum: Int) -> String{
         var reportResult:String = ""
-        return reportResult
-        
-    }
-    
-    
-    
-    // 返回剩下的牌
-    static func oldGameReport(gameIndex: Int, inputCards: [Int], diyDealStatus: [[Bool]], diyDealNum:[Int], newArgs: [Int], rankRules:[Int], suitRules:[Int], reportID: Int, cutNumSetting: Int, cutNumRangeSetting: [Int], targetPos: Int, coloringType: Int) -> (String, [Int]) {
-        
-        //gameFunction 返回(winners，leftCards， winnerRanks，winnerHandCards, isPairWinner, playerRankName)
-        let gameFunctions:[Int: ([[Bool]],[Int], [Int], [Int], [Int], [Int]) -> ([Int],[Int],[Int],[Card], [Int], [String])] = [:]
-        let gameFunction = gameFunctions[gameIndex]
-        var reportResult = ""
-        var leftCards:[Int] = []
-        let playerNum = newArgs[2]
-        switch reportID {
+        switch reportID{
 //            0:"[1]:报最大",
-        case 0:
-            let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, inputCards, newArgs, rankRules, suitRules)
-            var resultList:[Int] = []
-            for index in 0..<winners.count{
-                print("当前resultList \(resultList)")
-                if index == 0{
-                    resultList.append(winners[index])
-                    continue
-                } else {
-                    if winnerRanks[index] == winnerRanks[index - 1] {
-                        resultList.append(winners[index])
-                    } else {
-                        break
-                    }
-                }
-            }
-            print("最终目标玩家 \(resultList)")
-            break
 //            1:"[2]:报最小",
-        case 1:
-            let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, inputCards, newArgs, rankRules, suitRules)
-            var reversedWinners = Array(winners.reversed())
-            var reversedWinnerRanks = Array(winnerRanks.reversed())
-            var resultList:[Int] = []
-            for index in 0..<reversedWinners.count{
-                print("当前resultList \(resultList)")
-                if index == 0{
-                    resultList.append(reversedWinners[index])
-                    continue
-                } else {
-                    if reversedWinnerRanks[index] == reversedWinnerRanks[index - 1] {
-                        resultList.append(winners[index])
-                    } else {
-                        break
-                    }
-                }
-            }
-            print("最终目标玩家 \(resultList)")
-            break
-//            2:"[3]:报最大次大",
-        case 2:
-            let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, inputCards, newArgs, rankRules, suitRules)
-            var resultList:[Int] = []
-            for i in 0..<2 {
-                resultList.append(winners[i])
-            }
-            break
-//            3:"[4]:最小次小",
-        case 3:
-            let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, inputCards, newArgs, rankRules, suitRules)
-            var resultList:[Int] = []
-            var reversedWinners = Array(winners.reversed())
+//如果超过两家怎么办
 
-            for i in 0..<2{
-                resultList.append(reversedWinners[i])
-            }
-            break
+//            2:"[3]:报最大次大",
+//            3:"[4]:最小次小",
 //            4:"[5]:报1大2大3大",
-        case 4:
-            let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, inputCards, newArgs, rankRules, suitRules)
-            var resultList:[Int] = []
-            for i in 0..<3 {
-                resultList.append(winners[i])
+//            5:"[6]:报活门*",
+//            168: "[520]:底为色报位置最大次大",
+//            169: "[521]:底为色报位置最大",
+//            170: "[522]:底为色报位置最小次小",
+//            171: "[523]:底为色报位置最小",
+//            172: "[524]:底为色报位置排名",
+//            174: "[526]:底2张相加为色报位置最大次大",
+//            177: "[530]:面为色报位置最大次大",
+//            178: "[531]:面为色报位置最大",
+//            179: "[532]:面为色报位置最小次小",
+//            180: "[533]:面为色报位置最小",
+//            181: "[534]:面为色报位置排名",
+//            182: "[540]:面为色去色报位置最大次大",
+//            183: "[541]:面为色去色报位置最大",
+//            184: "[5421:面为色去色报位置最小次小",
+//            185: "[543]:面为色去色报位置最小",
+//            186: "[544]:面为色去色报位置排名",
+//            193: "[700]:去掉14张面牌报哪家最大",
+//            194: "[701]:去掉14张面牌报哪家最小",
+//            195: "[702]:去掉14张面牌报哪家最大次大",
+//            196: "[703]:去掉14张面牌报哪家1大2大3大",
+//            197: "[704]:去掉14张面牌报哪家最小次小",
+//            198: "[705]:去掉14张面牌根据第14张牌点数再去牌报最大",
+//            199: "[706]:去掉14张面牌根据第14张牌点数再去牌报最小",
+//            200: "[707]:去面牌底牌根据面牌底牌点数和去牌报最大次大",
+//            201: "[708]:固定去掉6、7、8、9张牌，以去牌数为色报位置最大",
+//            203: "[719]:比第一张牌从最大牌继续发报最大次大",
+//            204: "[720]:比第一张牌从最大牌继续发报最大",
+//            205: "[721]:比第一张牌从最小牌继续发报最大",
+//            206: "[722]:比第一张牌从最小牌继续发报最大次大",
+//            214: "[758]:看色留色+色牌上X张为色报最大次大",
+//            216: "[760]:看色留色报最大",
+//            217: "[761]:看色留色报最大次大",
+//            218: "[762]:看色留色报最小",
+//            219: "[763]:看色留色报最小次小",
+//            220: "[764]:看色留色报排名",
+//            221: "[766]:看色牌去色全部报最大",
+//            222: "[767]:看色牌去色全部报最大次大",
+//            223: "[768]:看色牌去色全部报最小",
+//            224: "[769]:看色牌去色全部报最小次小",
+//            225: "[770]:看色牌去色全部报排名",
+//            226: "[790]:固定第10张牌作色留色报最大",
+//            227: "[791]:固定第10张牌作色留色报最大...",
+//            228: "[793]:固定第10张牌作色留色报最小次小",
+//            229: "[7941:固定第10张牌作色留色报排名",
+//            232: "[800]:固定第10张牌作色去色全部报最大",
+//            233: "[801]:固定第10张牌作色去色全部报最大次大",
+//            234: "[802]:固定第10张牌作色去色全部报最小",
+//            235: "[803]:固定第10张牌作色去色全部报最小次小",
+//            236: "[804]:固定第10张牌作色去色全部报排名",
+        case 0...5, 168...172,174,177...186,193...201,203...206,214,216...229,232...236:
+            for resultInfo in multipleReportResultInfo.singleResultList{
+                reportResult += resultInfo.targetPlayerList.reduce("") { $0 + "\($1)" }
             }
+            
+//            6:"[7]:报活门半活门对子*",
+        case 6:
             break
-//            5:"[6]:报活门",
-            
-//            6:"[7]:报活门半活门对子",
-            
-//            7:"[8]:报最大次大和生死门",
-            
-//            8:"[8_1]:报最大次大活门半活门平点对子",
-            
+//            7:"[8]:报最大次大和生死门*",
+        case 7:
+            break
+//            8:"[8_1]:报最大次大活门半活门平点对子*",
+        case 8:
+            break
 //            9:"[10]:报最大和最大家牌",
         case 9:
-            let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, inputCards, newArgs, rankRules, suitRules)
-            var resultList:[Int] = []
-            resultList.append(winners[0])
-            reportResult += playerRankName[0]
-            
+            for resultInfo in multipleReportResultInfo.singleResultList{
+                for index in 0..<resultInfo.PlayerRankList[0].count{
+                    reportResult += String(resultInfo.PlayerRankList[0][index])
+                    reportResult += String(resultInfo.PlayerCardList[0][index])
+                    if cutNumRangeSetting[1] != 10 {
+                        reportResult += String(resultInfo.PlayerSuitList[0][index])
+                    }
+                }
+                reportResult += " "
+            }
+            break
 //            10:"[12]:报排名",
         case 10:
-            let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, inputCards, newArgs, rankRules, suitRules)
-            var resultList: [Int] = []
-            var reportPlayerNumber = min(winners.count, 6)
-            for i in 0..<reportPlayerNumber {
-                resultList.append(winners[i])
+            for resultInfo in multipleReportResultInfo.singleResultList{
+                var contanList: [Int] = []
+                for eachRank in resultInfo.PlayerRankList{
+                    contanList += eachRank
+                }
+                
+                let prefixContanList = Array(contanList.prefix(min(contanList.count, 6)))
+                
+                
+                reportResult = prefixContanList.reduce("") { $0 + "\($1)" }
             }
             break
 //            11:"[13]:报原始排名 4432和生死门",
         case 11:
-            let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, inputCards, newArgs, rankRules, suitRules)
-            let YValue = cutNumRangeSetting[1]
-            var isReportAlive: Bool = false
-            var currentWinners:[Int] = winners
-            var currentWinnersRank: [Int] = winnerRanks
-            if YValue == 11{
-                isReportAlive = true
-            } else if YValue == 20 || YValue == 21{
-                currentWinners = winners.reversed()
-                currentWinnersRank = winners.reversed()
-                if YValue == 21{
-                    isReportAlive = true
-                }
-            } else {
-                reportResult = "Y"
-            }
-            
-            var resultList :[Int] = []
-            var currentRank: Int = 1
-            for i in 0..<currentWinners.count {
-                var newIndex = currentWinners.count - i - 1
-                resultList.append(currentRank)
-                if newIndex != 0 && (currentWinnersRank[newIndex - 1] != currentWinnersRank[newIndex]) {
-                    currentRank += 1
-                }
-            }
-            if isReportAlive {
+            if cutNumRangeSetting[1] == 10 {
+                
+            } else if cutNumRangeSetting[1] == 11{
+                
+            } else if cutNumRangeSetting[1] == 20{
+                
+            } else if cutNumRangeSetting[1] == 21{
                 
             }
             break
-            
-//            12:"[14]:报最大次大不打几平点对子",
+//            12:"[14]:报最大次大不打几平点对子*",
         case 12:
-            let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, inputCards, newArgs, rankRules, suitRules)
-            
-            //最大次大
-            var maxReport: [Int] = []
-            for i in 0..<2{
-                maxReport.append(winners[i])
-            }
-            //TODO：不打几
-            //平点
-            var drawPoint: String = "平点"
-            if winnerRanks[0] == winnerRanks[1] {
-                drawPoint = "男" + drawPoint + "男"
-            } else {
-                drawPoint = "女" + drawPoint + "女"
-            }
-            //对子
-            var pairNum : Int = isPairWinner.count
             break
 //            13:"[45]:上10张打色留色再根据色牌点数去牌保位置最大",
 //            14:"[46]:上10张打色留色再根据色牌点数去牌保位置最大次大",
 //            15:"[47]:上10张打色去色全部再根据色牌点数去牌保位置最大",
 //            16:"[48]:上10张打色去色全部再根据色牌点数去牌保位置最大次大",
-        case 13...16:
-            for cardIndex in (cutNumRangeSetting[0] - 1)...(cutNumRangeSetting[1] - 1){
-                let cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: inputCards[cardIndex])
-                print("切第\(cardIndex + 1) 张 切到的牌是 \(GameManager.cardLabelDic[inputCards[cardIndex]]) 点数是 \(cardRank)")
-                var newInputCards:[Int] = []
-                //
-                if reportID == 13 || reportID == 14{
-                    newInputCards = Array(inputCards[(cardRank + 1)...])
-                } else if reportID == 15 || reportID == 16{
-                    newInputCards = Array(inputCards[(cardIndex + 1)...]) + Array(inputCards[0...cardIndex])
-                    newInputCards = Array(newInputCards[(cardRank + 1)...])
-                }
-                
-                var resultTargetPos:[Int] = []
-                let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, newInputCards, newArgs, rankRules, suitRules)
-                if winners.count != 0 {
-                    var rankResult = extractWinnerSet(inputWinners: winners, inputWinnerRanks: winnerRanks)
-                    //获得所有的可用结果
-                    //最大
-                    if reportID == 13 || reportID == 15{
-                        resultTargetPos = rankResult[0]
-                    //最大次大
-                    } else if reportID == 14 || reportID == 16{
-                        for i in 0..<min(2, rankResult.count){
-                            resultTargetPos += rankResult[i]
-                        }
-                    }
-                }
-                var resultPos:[Int] = []
-                for resultTargetPo in resultTargetPos{
-                    resultPos.append((cardRank + resultTargetPo) % playerNum)
-                }
-                if resultPos.contains(where: {$0 == targetPos}){
-                    print("切第\(cardIndex + 1)张最大/最小")
-                    reportResult += String(cardIndex)
-                }
-            }
-            break
-//            17:"[49]:上10张打色留色保位置最大跑的快专用",
-        case 17:
-            
-            break
+//            17:"[49]:上10张打色留色保位置最大跑的快专用*",
 //            18:"[50]:上10张打色留色保位置最大",
 //            19:"[51]:上10张打色留色保位置最大次大",
 //            20:"[52]:上10张打色留色保位置最小",
 //            21:"[53]:上10张打色留色保位置最小次小",
-        case 18...21:
-            for cardIndex in (cutNumRangeSetting[0] - 1)...(cutNumRangeSetting[1] - 1){
-                let cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: inputCards[cardIndex])
-                let originalCardRank = cutRankConvert(cutNumSetting: 0, cardIndex: inputCards[cardIndex])
-                print("切第\(cardIndex + 1) 张 切到的牌是 \(GameManager.cardLabelDic[inputCards[cardIndex]]) 点数是 \(cardRank)")
-                //留色
-                var newInputCards:[Int] = inputCards
-                var resultTargetPos:[Int] = []
-                let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, newInputCards, newArgs, rankRules, suitRules)
-                if winners.count != 0 {
-                    var rankResult = extractWinnerSet(inputWinners: winners, inputWinnerRanks: winnerRanks)
-                    //获得所有的可用结果
-                    //最大
-                    if reportID == 18{
-                        resultTargetPos = rankResult[0]
-                    //最大次大
-                    } else if reportID == 19{
-                        for i in 0..<min(2, rankResult.count){
-                            resultTargetPos += rankResult[i]
-                        }
-                    //最小
-                    } else if reportID == 20{
-                        resultTargetPos = Array(rankResult.reversed())[0]
-                        
-                    //最小次小
-                    } else if reportID == 21{
-                        for i in 0..<min(2, rankResult.count){
-                            resultTargetPos += Array(rankResult.reversed())[i]
-                        }
-                    }
-                }
-                var resultPos:[Int] = []
-                for resultTargetPo in resultTargetPos{
-                    resultPos.append((cardRank + resultTargetPo) % playerNum)
-                }
-                if resultPos.contains(where: {$0 == targetPos}){
-                    print("切第\(cardIndex + 1)张最大/最小")
-                    reportResult += String(cardIndex)
-                }
-            }
-            
-            break
 //            22:"[54]:上10张打色去色全部+底为色保位置最大",
-        case 22:
-            for cardIndex in (cutNumRangeSetting[0] - 1)...(cutNumRangeSetting[1] - 1){
-                let cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: inputCards[cardIndex])
-                print("切第\(cardIndex + 1) 张 切到的牌是 \(GameManager.cardLabelDic[inputCards[cardIndex]]) 点数是 \(cardRank)")
-                //底牌点数
-                let baseCardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: inputCards[inputCards.count - 1])
-                //去色
-                var newInputCards:[Int] = Array(inputCards[(cardIndex + 1)...]) + Array(inputCards[0...cardIndex])
-                var resultTargetPos:[Int] = []
-                let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, newInputCards, newArgs, rankRules, suitRules)
-                if winners.count != 0 {
-                    var rankResult = extractWinnerSet(inputWinners: winners, inputWinnerRanks: winnerRanks)
-                    //获得所有的可用结果
-                    //最大
-                    resultTargetPos = rankResult[0]
-                }
-                var resultPos:[Int] = []
-                for resultTargetPo in resultTargetPos{
-                    resultPos.append(((cardRank + baseCardRank) % 10 + resultTargetPo) % playerNum)
-                }
-                if resultPos.contains(where: {$0 == targetPos}){
-                    print("切第\(cardIndex + 1)张最大/最小")
-                    reportResult += String(cardIndex)
-                }
-            }
-            break
 //            23:"[55]:上10张打色去色全部保位置最大",
 //            24:"[56]:上10张打色去色全部保位置最大次大",
 //            25:"[57]:上10张打色去色全部保位置最小",
-//            26:"[58]:上10张打色去色全部保位置最小次小",
-        case 23...26:
-            for cardIndex in (cutNumRangeSetting[0] - 1)...(cutNumRangeSetting[1] - 1){
-                let cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: inputCards[cardIndex])
-                print("切第\(cardIndex + 1) 张 切到的牌是 \(GameManager.cardLabelDic[inputCards[cardIndex]]) 点数是 \(cardRank)")
-                //去色
-                var newInputCards:[Int] = Array(inputCards[(cardIndex + 1)...]) + Array(inputCards[0...cardIndex])
-                var resultTargetPos:[Int] = []
-                let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, newInputCards, newArgs, rankRules, suitRules)
-                if winners.count != 0 {
-                    var rankResult = extractWinnerSet(inputWinners: winners, inputWinnerRanks: winnerRanks)
-                    //获得所有的可用结果
-                    //最大
-                    //最大
-                    if reportID == 23{
-                        resultTargetPos = rankResult[0]
-                    //最大次大
-                    } else if reportID == 24{
-                        for i in 0..<min(2, rankResult.count){
-                            resultTargetPos += rankResult[i]
-                        }
-                    //最小
-                    } else if reportID == 25{
-                        resultTargetPos = Array(rankResult.reversed())[0]
-                        
-                    //最小次小
-                    } else if reportID == 26{
-                        for i in 0..<min(2, rankResult.count){
-                            resultTargetPos += Array(rankResult.reversed())[i]
-                        }
-                    }
-                }
-                var resultPos:[Int] = []
-                for resultTargetPo in resultTargetPos{
-                    resultPos.append((cardRank + resultTargetPo) % playerNum)
-                }
-                if resultPos.contains(where: {$0 == targetPos}){
-                    print("切第\(cardIndex + 1)张最大/最小")
-                    reportResult += String(cardIndex)
-                    break
-                }
-            }
-            break
+//            26:"[58]:上10张打色去色全部保位置最小次",
 //            27:"[60]:上10张打色去色1张保位置最大",
 //            28:"[61]:上10张打色去色1张保位置最大次大",
 //            29:"[62]:上10张打色去色1张保位置最小",
 //            30:"[63]:上10张打色去色1张保位置最小次小",
-        case 27...30:
-            for cardIndex in (cutNumRangeSetting[0] - 1)...(cutNumRangeSetting[1] - 1){
-                let cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: inputCards[cardIndex])
-                print("切第\(cardIndex + 1) 张 切到的牌是 \(GameManager.cardLabelDic[inputCards[cardIndex]]) 点数是 \(cardRank)")
-                //去掉色牌1张
-                var newInputCards:[Int] = Array(inputCards[0...cardIndex - 1]) + Array(inputCards[(cardIndex + 1)...])
-                var resultTargetPos:[Int] = []
-                let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, newInputCards, newArgs, rankRules, suitRules)
-                if winners.count != 0 {
-                    var rankResult = extractWinnerSet(inputWinners: winners, inputWinnerRanks: winnerRanks)
-                    //获得所有的可用结果
-                    //最大
-                    //最大
-                    if reportID == 27{
-                        resultTargetPos = rankResult[0]
-                    //最大次大
-                    } else if reportID == 28{
-                        for i in 0..<min(2, rankResult.count){
-                            resultTargetPos += rankResult[i]
-                        }
-                    //最小
-                    } else if reportID == 29{
-                        resultTargetPos = Array(rankResult.reversed())[0]
-                        
-                    //最小次小
-                    } else if reportID == 30{
-                        for i in 0..<min(2, rankResult.count){
-                            resultTargetPos += Array(rankResult.reversed())[i]
-                        }
-                    }
-                }
-                var resultPos:[Int] = []
-                for resultTargetPo in resultTargetPos{
-                    resultPos.append((cardRank + resultTargetPo) % playerNum)
-                }
-                if resultPos.contains(where: {$0 == targetPos}){
-                    print("切第\(cardIndex + 1)张最大/最小")
-                    reportResult += String(cardIndex)
-                    break
-                }
-            }
-            
-            break
-//            31:"[64]:上10张打色去色1张+提前去掉的牌为色保庄最大",
-        case 31:
-            
-            break
+//            31:"[64]:上10张打色去色1张+提前去掉的牌为色保庄最大*",
 //            32:"[66]:上10张打色色牌先发保位置最大",
 //            33:"[67]:上10张打色色牌先发保位置最大次大",
 //            34:"[68]:上10张打色色牌先发保位置最小",
-//            35:"[69]:上10张打色色牌先发保位置最小次小",
-        case 32...35:
-            for cardIndex in (cutNumRangeSetting[0] - 1)...(cutNumRangeSetting[1] - 1){
-                let cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: inputCards[cardIndex])
-                print("切第\(cardIndex + 1) 张 切到的牌是 \(GameManager.cardLabelDic[inputCards[cardIndex]]) 点数是 \(cardRank)")
-                //色牌先发
-                var newInputCards:[Int] = Array(inputCards[(cardIndex)...])
-                var resultTargetPos:[Int] = []
-                let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, newInputCards, newArgs, rankRules, suitRules)
-                if winners.count != 0 {
-                    var rankResult = extractWinnerSet(inputWinners: winners, inputWinnerRanks: winnerRanks)
-                    //获得所有的可用结果
-                    //最大
-                    if reportID == 32{
-                        resultTargetPos = rankResult[0]
-                    //最大次大
-                    } else if reportID == 33{
-                        for i in 0..<min(2, rankResult.count){
-                            resultTargetPos += rankResult[i]
-                        }
-                    //最小
-                    } else if reportID == 34{
-                        resultTargetPos = Array(rankResult.reversed())[0]
-                        
-                    //最小次小
-                    } else if reportID == 35{
-                        for i in 0..<min(2, rankResult.count){
-                            resultTargetPos += Array(rankResult.reversed())[i]
-                        }
-                    }
-                }
-                var resultPos:[Int] = []
-                for resultTargetPo in resultTargetPos{
-                    resultPos.append((cardRank + resultTargetPo) % playerNum)
-                }
-                if resultPos.contains(where: {$0 == targetPos}){
-                    print("切第\(cardIndex + 1)张最大/最小")
-                    reportResult += String(cardIndex)
-                    break
-                }
-            }
-            break
-//            36:"[70]:上10张去牌保多轮位置最大次大次数最多",
-        case 36:
-            for cardIndex in (cutNumRangeSetting[0] - 1)...(cutNumRangeSetting[1] - 1){
-                let cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: inputCards[cardIndex])
-                print("切第\(cardIndex + 1) 张 切到的牌是 \(GameManager.cardLabelDic[inputCards[cardIndex]]) 点数是 \(cardRank)")
-                //色牌先发
-                var newInputCards:[Int] = Array(inputCards[(cardIndex + 1)...])
-                var resultTargetPos:[Int] = []
-                let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, newInputCards, newArgs, rankRules, suitRules)
-                if winners.count != 0 {
-                    var rankResult = extractWinnerSet(inputWinners: winners, inputWinnerRanks: winnerRanks)
-                    //获得所有的可用结果
-                    for i in 0..<min(2, rankResult.count){
-                        resultTargetPos += rankResult[i]
-                    }
-
-                }
-                var resultPos:[Int] = []
-                for resultTargetPo in resultTargetPos{
-                    resultPos.append((cardRank + resultTargetPo) % playerNum)
-                }
-                if resultPos.contains(where: {$0 == targetPos}){
-                    print("切第\(cardIndex + 1)张最大/最小")
-                    //每次返回每一轮的最大次大去牌数量
-                    reportResult += String(cardIndex) + " "
-                }
-            }
-            break
-//            37:"[71]:上10张去牌保位置最大",
-//            38:"[71_1]:上10张去牌保位置最大对优先",
-//            39:"[72]:上10张去牌保位置最大次大",
-//            40:"[73]:上10张去牌保位置最小",
-//            41:"[74]:上10张去牌保位置最小次小",
-        case 37...41:
-            for cardIndex in (cutNumRangeSetting[0] - 1)...(cutNumRangeSetting[1] - 1){
-                let cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: inputCards[cardIndex])
-                print("切第\(cardIndex + 1) 张 切到的牌是 \(GameManager.cardLabelDic[inputCards[cardIndex]]) 点数是 \(cardRank)")
-                //色牌先发
-                var newInputCards:[Int] = Array(inputCards[(cardIndex + 1)...])
-                var resultTargetPos:[Int] = []
-                let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, newInputCards, newArgs, rankRules, suitRules)
-                if winners.count != 0 {
-                    var rankResult = extractWinnerSet(inputWinners: winners, inputWinnerRanks: winnerRanks)
-                    //获得所有的可用结果
-                    //最大
-                    if reportID == 37 || reportID == 38{
-                        resultTargetPos = rankResult[0]
-                    //最大次大
-                    } else if reportID == 39{
-                        for i in 0..<min(2, rankResult.count){
-                            resultTargetPos += rankResult[i]
-                        }
-                    //最小
-                    } else if reportID == 40{
-                        resultTargetPos = Array(rankResult.reversed())[0]
-                        
-                    //最小次小
-                    } else if reportID == 41{
-                        for i in 0..<min(2, rankResult.count){
-                            resultTargetPos += Array(rankResult.reversed())[i]
-                        }
-                    }
-                }
-                var resultPos:[Int] = []
-                for resultTargetPo in resultTargetPos{
-                    resultPos.append((cardRank + resultTargetPo) % playerNum)
-                }
-                if resultPos.contains(where: {$0 == targetPos}){
-                    print("切第\(cardIndex + 1)张最大/最小")
-                    reportResult += String(cardIndex)
-                    break
-                }
-            }
-            break
-//            42:"[75]长去牌保有活门报括门",
-        case 42:
-            break
-//            43:"[76]:上10张去牌保有活门报最大",
-        case 43:
-            
-            break
-//            44:"[77]:上10张去牌保多轮同点报最大次大生死门",
-        case 44:
-            break
-//            45:"[78_1]:上10张去牌保多轮同点且无9点",
-//            46:"[78]:上10张去牌保多轮同点且无对子",
-        case 45...46:
-            for cardIndex in (cutNumRangeSetting[0] - 1)...(cutNumRangeSetting[1] - 1){
-                let cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: inputCards[cardIndex])
-                print("切第\(cardIndex + 1) 张 切到的牌是 \(GameManager.cardLabelDic[inputCards[cardIndex]]) 点数是 \(cardRank)")
-                //去掉面牌
-                var newInputCards:[Int] = Array(inputCards[(cardIndex + 1)...])
-                var resultTargetPos:[Int] = []
-                let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, newInputCards, newArgs, rankRules, suitRules)
-                if winners.count != 0 {
-                    var rankResult = extractWinnerSet(inputWinners: winners, inputWinnerRanks: winnerRanks)
-                    //获得所有的可用结果
-                    //最大
-                    if reportID == 32{
-                        resultTargetPos = rankResult[0]
-                    }
-                }
-                //是否同点
-                var samePoint:Int = 0
-                if resultTargetPos.count > 1{
-                    samePoint += 1
-                }
-                //是否有九点
-                if reportID == 45 {
-                    for playerIndex in resultTargetPos{
-                        if playerRankName[playerIndex] == "9点" {
-                            samePoint += 1
-                        }
-                    }
-                //是否有对子
-                } else if reportID == 46 {
-                    for playerIndex in resultTargetPos{
-                        if playerRankName[playerIndex] == "对子" {
-                            samePoint += 1
-                        }
-                    }
-                }
-                
-                reportResult = String(cardIndex) + " " + String(samePoint)
-            }
-            break
-//            47:"[79]:上10张去牌面为色去色保位置最大次大次数最多",
-        case 47:
-            for cardIndex in (cutNumRangeSetting[0] - 1)...(cutNumRangeSetting[1] - 1){
-                let cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: inputCards[cardIndex])
-                print("切第\(cardIndex + 1) 张 切到的牌是 \(GameManager.cardLabelDic[inputCards[cardIndex]]) 点数是 \(cardRank)")
-                //色牌先发
-                var newInputCards:[Int] = Array(inputCards[(cardIndex + 1)...])
-                var resultTargetPos:[Int] = []
-                let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, newInputCards, newArgs, rankRules, suitRules)
-                if winners.count != 0 {
-                    var rankResult = extractWinnerSet(inputWinners: winners, inputWinnerRanks: winnerRanks)
-                    //获得所有的可用结果
-                    for i in 0..<min(2, rankResult.count){
-                        resultTargetPos += rankResult[i]
-                    }
-
-                }
-                var resultPos:[Int] = []
-                for resultTargetPo in resultTargetPos{
-                    resultPos.append((cardRank + resultTargetPo) % playerNum)
-                }
-                if resultPos.contains(where: {$0 == targetPos}){
-                    print("切第\(cardIndex + 1)张最大/最小")
-                    //每次返回每一轮的最大次大去牌数量
-                    reportResult += String(cardIndex) + " "
-                }
-            }
-            break
+//            35:"[69]:上10张打色色牌先发保位置最小次",
 //            48:"[80]:上10张去牌底为色保位置最大次大",
-        case 48:
-            for cardIndex in (cutNumRangeSetting[0] - 1)...(cutNumRangeSetting[1] - 1){
-                let baseCardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: inputCards[inputCards.count - 1])
-                print("切第\(cardIndex + 1) 张 切到的牌是 \(GameManager.cardLabelDic[inputCards[cardIndex]]) 点数是 \(baseCardRank)")
-                //色牌先发
-                var newInputCards:[Int] = Array(inputCards[(cardIndex + 1)...])
-                var resultTargetPos:[Int] = []
-                let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, newInputCards, newArgs, rankRules, suitRules)
-                if winners.count != 0 {
-                    var rankResult = extractWinnerSet(inputWinners: winners, inputWinnerRanks: winnerRanks)
-                    //获得所有的可用结果
-                    for i in 0..<min(2, rankResult.count){
-                        resultTargetPos += rankResult[i]
-                    }
-
-                }
-                var resultPos:[Int] = []
-                for resultTargetPo in resultTargetPos{
-                    resultPos.append((baseCardRank + resultTargetPo) % playerNum)
-                }
-                if resultPos.contains(where: {$0 == targetPos}){
-                    print("切第\(cardIndex + 1)张最大/最小")
-                    //每次返回每一轮的最大次大去牌数量
-                    reportResult += String(cardIndex) + " "
-                }
-            }
-            break
-//            49:"[81]:上10张去牌保位置最小无对子",
-        case 49:
-            break
-//            50:"[82]:上10张去牌保34门有最大报最大",
-//            51:"[83]:上10张去牌保34门最大次大",
-        case 50...51:
-            //前10张
-            for cardIndex in 0...9 {
-                let cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: inputCards[cardIndex])
-                print("切第\(cardIndex + 1) 张 切到的牌是 \(GameManager.cardLabelDic[inputCards[cardIndex]]) 点数是 \(cardRank)")
-                //补到底部
-                var newInputCards:[Int] = Array(inputCards[(cardIndex + 1)...]) + Array(inputCards[0...cardIndex])
-                var resultTargetPos:[Int] = []
-                let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, newInputCards, newArgs, rankRules, suitRules)
-                if winners.count != 0 {
-                    var rankResult = extractWinnerSet(inputWinners: winners, inputWinnerRanks: winnerRanks)
-                    //获得所有的可用结果
-                    if reportID == 50{
-                        resultTargetPos = rankResult[0]
-                    } else if reportID == 51 {
-                        for i in 0..<min(2, rankResult.count){
-                            resultTargetPos += rankResult[i]
-                        }
-                    }
-                }
-                var resultPos:[Int] = []
-                for resultTargetPo in resultTargetPos{
-                    resultPos.append((cardRank + resultTargetPo) % playerNum)
-                }
-                
-                if resultPos.contains(where: {$0 == cutNumRangeSetting[0] || $0 == cutNumRangeSetting[1]}){
-                    print("切第\(cardIndex + 1)张最大/最小")
-                    //每次返回每一轮的最大次大去牌数量
-                    var maxPos:Int = 0
-                    for pos in resultPos{
-                        if pos == cutNumRangeSetting[0] || pos == cutNumRangeSetting[1] {
-                            maxPos = pos
-                        }
-                    }
-                    reportResult += String(cardIndex) + String(maxPos)
-                    break
-                }
-            }
-            break
 //            52:"[84]:上10张抽面牌保位置最大",
 //            53:"[84_1]:上10张抽面牌保位置最小",
-        case 52...53:
-            for cardIndex in 0...9{
-                let cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: inputCards[cardIndex])
-                print("切第\(cardIndex + 1) 张 切到的牌是 \(GameManager.cardLabelDic[inputCards[cardIndex]]) 点数是 \(cardRank)")
-                //色牌先发
-                var newInputCards:[Int] = Array(inputCards[(cardIndex + 1)...]) + Array(inputCards[0...cardIndex])
-                var resultTargetPos:[Int] = []
-                let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, newInputCards, newArgs, rankRules, suitRules)
-                if winners.count != 0 {
-                    var rankResult = extractWinnerSet(inputWinners: winners, inputWinnerRanks: winnerRanks)
-                    //获得所有的可用结果
-                    //最大
-                    if reportID == 52{
-                        resultTargetPos = rankResult[0]
-                    //最小
-                    } else if reportID == 53{
-                        resultTargetPos = Array(rankResult.reversed())[0]
-                    }
-                }
-                var resultPos:[Int] = []
-                for resultTargetPo in resultTargetPos{
-                    resultPos.append((cardRank + resultTargetPo) % playerNum)
-                }
-                if resultPos.contains(where: {$0 == targetPos}){
-                    print("切第\(cardIndex + 1)张最大/最小")
-                    reportResult += String(cardIndex)
-                    break
-                }
-            }
-            break
-//            54:"[85]:上10张去牌保多轮位置最大次数最多",
-        case 54:
-            for cardIndex in (cutNumRangeSetting[0] - 1)...(cutNumRangeSetting[1] - 1){
-                let cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: inputCards[cardIndex])
-                print("切第\(cardIndex + 1) 张 切到的牌是 \(GameManager.cardLabelDic[inputCards[cardIndex]]) 点数是 \(cardRank)")
-                //色牌先发
-                var newInputCards:[Int] = Array(inputCards[(cardIndex + 1)...])
-                var resultTargetPos:[Int] = []
-                let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, newInputCards, newArgs, rankRules, suitRules)
-                if winners.count != 0 {
-                    var rankResult = extractWinnerSet(inputWinners: winners, inputWinnerRanks: winnerRanks)
-                    //获得所有的可用结果
-                    //最大
-                    resultTargetPos = rankResult[0]
-                }
-                var resultPos:[Int] = []
-                for resultTargetPo in resultTargetPos{
-                    resultPos.append((cardRank + resultTargetPo) % playerNum)
-                }
-                if resultPos.contains(where: {$0 == targetPos}){
-                    print("切第\(cardIndex + 1)张最大/最小")
-                    reportResult += String(cardIndex)
-                }
-            }
-            break
 //            55:"[86]:上10张去牌面为色色先发保位置最大次大",
 //            56:"[87]:上10张去牌面为色色先发保位置最大",
 //            57:"[88]:上10张去牌面为色色先发保位置最小",
-        case 55...57:
-            for cardIndex in (cutNumRangeSetting[0] - 1)...(cutNumRangeSetting[1] - 1){
-                let cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: inputCards[cardIndex])
-                print("切第\(cardIndex + 1) 张 切到的牌是 \(GameManager.cardLabelDic[inputCards[cardIndex]]) 点数是 \(cardRank)")
-                //色牌先发
-                var newInputCards:[Int] = Array(inputCards[(cardIndex + 1)...])
-                var resultTargetPos:[Int] = []
-                let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, newInputCards, newArgs, rankRules, suitRules)
-                if winners.count != 0 {
-                    var rankResult = extractWinnerSet(inputWinners: winners, inputWinnerRanks: winnerRanks)
-                    //获得所有的可用结果
-                    //最大
-                    if reportID == 56{
-                        resultTargetPos = rankResult[0]
-                    //最大次大
-                    } else if reportID == 55{
-                        for i in 0..<min(2, rankResult.count){
-                            resultTargetPos += rankResult[i]
-                        }
-                    //最小
-                    } else if reportID == 57{
-                        resultTargetPos = Array(rankResult.reversed())[0]
-                    }
-                }
-                var resultPos:[Int] = []
-                for resultTargetPo in resultTargetPos{
-                    resultPos.append((cardRank + resultTargetPo) % playerNum)
-                }
-                if resultPos.contains(where: {$0 == targetPos}){
-                    print("切第\(cardIndex + 1)张最大/最小")
-                    reportResult += String(cardIndex)
-                    break
-                }
-            }
-            break
 //            58:"[91]:上10张去牌保无牛或最多一家有牛",
-//            59:"[92]:上10张去牌保至少一家有牛牛",
-        case 58...59:
-            for cardIndex in (cutNumRangeSetting[0] - 1)...(cutNumRangeSetting[1] - 1){
-                let cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: inputCards[cardIndex])
-                print("切第\(cardIndex + 1) 张 切到的牌是 \(GameManager.cardLabelDic[inputCards[cardIndex]]) 点数是 \(cardRank)")
-                //色牌先发
-                var newInputCards:[Int] = Array(inputCards[(cardIndex + 1)...])
-                var resultTargetPos:[Int] = []
-                let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, newInputCards, newArgs, rankRules, suitRules)
-                //保没有牛或最多一家有牛
-                if reportID == 58{
-                    var bullNum = 0
-                    for i in 0...winners.count{
-                        if playerRankName[i].hasPrefix("牛"){
-                            bullNum += 1
-                        }
-                    }
-                    if bullNum <= 1{
-                        reportResult += String(cardIndex) + " " + String(bullNum)
-                        break
-                    } else {
-                        //todo
-                    }
-                //至少有一家是牛牛，把第几家牛牛
-                } else if reportID == 59{
-                    var bullbullNum = 0
-                    var bullbullPlayer: String = ""
-                    for i in 0...winners.count {
-                        if playerRankName[i] == "牛牛" {
-                            bullbullNum += 1
-                            bullbullPlayer += String(winners[i])
-                        }
-                    }
-                    if bullbullNum > 0 {
-                        reportResult += String(cardIndex) + " " + bullbullPlayer
-                        break
-                    } else {
-                        
-                    }
-                }
-            }
-            break
 //            60:"[94]:上下5张去牌保1门最小有2家同点",
 //            61:"[95]:上下5张去牌保4门最大",
-//            62:"[96]:上下5张去牌保34门有最大报最大",
-//            63:"[97]:上下5张去牌保第2门是活门报最大",
-        case 60...63:
-            for cardIndex in 0..<5{
-                print("切第\(cardIndex + 1) 张")
-                //上五张
-                var newInputCardsTop:[Int] = Array(inputCards[(cardIndex + 1)...]) + Array(inputCards[0...cardIndex])
-                //下五张
-                var newInputCardsBottom:[Int] = Array(inputCards[inputCards.count - 1 - cardIndex]...inputCards[inputCards.count - 1])
-                for newInputCards in [newInputCardsTop, newInputCardsBottom] {
-                    var resultTargetPos:[Int] = []
-                    let (winners, leftCards, winnerRanks, winnerHandCards, isPairWinner, playerRankName) = gameFunction!(diyDealStatus, diyDealNum, newInputCardsTop, newArgs, rankRules, suitRules)
-                    if winners.count != 0 {
-                        var rankResult = extractWinnerSet(inputWinners: winners, inputWinnerRanks: winnerRanks)
-                        //获得所有的可用结果
-                        //最大
-                        if reportID == 61 || reportID == 62 || reportID == 63{
-                            resultTargetPos = rankResult[0]
-                        //最小
-                        } else if reportID == 60{
-                            resultTargetPos = Array(rankResult.reversed())[0]
-                        }
-                    }
-                    var resultPos:[Int] = resultTargetPos
-                    var YcardIndex: String = ""
-                    var XcardIndex: String = ""
-                    //Y值
-                    if resultPos.contains(where: {$0 == (cutNumRangeSetting[1] - 1)}){
-                        print("切第\(cardIndex + 1)张最大/最小")
-                        YcardIndex = String(cardIndex)
-                        break
-                    }
-                    //X
-                    if reportID == 62{
-                        if resultPos.contains(where: {$0 == (cutNumRangeSetting[0] - 1)}){
-                            print("切第\(cardIndex + 1)张最大/最小")
-                            XcardIndex = String(cardIndex)
-                            break
-                        }
-                        if XcardIndex != "" {
-                            reportResult += XcardIndex + String(cutNumRangeSetting[0])
-                        }
-                        if YcardIndex != "" {
-                            reportResult += YcardIndex + String(cutNumRangeSetting[1])
-                        }
-                    } else if reportID == 63 {
-                        reportResult += YcardIndex + String(resultTargetPos[0])
-                        
-                    } else {
-                        reportResult += YcardIndex
-                    }
-                }
+        case 13...41, 48,52...53,55...58,60...61,64...78:
+            for resultInfo in multipleReportResultInfo.singleResultList{
+                reportResult += String(resultInfo.cardIndexToConfirmMaxMin[0]) + " "
             }
             break
-//            64:"[98]:上下5张打色色先发保位置最小",
-//            65:"[99]:上下5张打色色先发保位置最大",
+//            42:"[75]上10张去牌保有活门报括门*",
+        case 42:
+            break
+//            43:"[76]:上10张去牌保有活门报最大*",
+        case 43:
+            break
+//            44:"[77]:上10张去牌保多轮同点报最大次大生死门*",
+        case 44:
+            break
+//            45:"[78_1]:上10张去牌保多轮同点且无9点*",
+//            46:"[78]:上10张去牌保多轮同点且无对子*",
+        case 45...46:
+            break
             
-//            66:"[100]:上下5张打色留色保位置最大",
-//            67:"[101]:上下5张打色留色保位置最大次大",
-//            68:"[102]:上下5张打色留色保位置最小",
-//            69:"[103]:上不5张打色留色保位置最小次小",
-//            70:"[105]:上下5张打色去色%张保位置最大",
-//            71:"[106]:上下5张打色去色1张保位置最大次大",
-//            72:"[107]:上下5张打色去色1张保位置最小",
-//            73:"[108]:上下5张打色去色1张保位置最小次小",
-//            74:"[110]:下 10张打色留色保位置最大次大",
-//            75:"[111]:下 10张打色留色保位置最小次小",
-//            76:"[112]:下10张打色留色面牌移动到色牌下面保位置最大",
-//            77:"[120]:下10张打色色先发保位置最大次大",
-//            78:"[121]:下顺张打色色先发保位置最小次小",
-//            79:"[130]:看手牌报生死门",
-//            80:"[131]:看手牌报最大",
-//            81:"[132]:看手牌报最大次大",
-//            82:"[133]:看手牌报最大次大生死门",
-//            83:"[134]:看手牌比第一张牌从最大牌继续发报最大",
-//            84:"[135]:看手牌比第一张牌从最大牌继续发报最大次大",
-//            85:"[143]:看手牌面为色留色报最大",
-//            86:"[144]:看手牌面为色留色报最大次大",
-//            87:"[145]:看手牌面为色留色报最大次大生死门",
-//            88:"[147]:看手牌面为色去色报最大",
-//            89:"[148]:看手牌面为色去色报最大次",
-//            90:"[149]:看手牌面为色去色报最大次大生死门",
-//            91:"[200]:飞2张保位置最大",
-//            92: "[201]:飞2张保位置最小",
-//                93: "[202]:飞2张打色留色保位置最大",
-//                94: "[203]:飞2张打色留色保位置最小",
-//                95: "[206]:飞2张打色去色1张保位置最大",
-//                96: "[207]:飞2张打色去色1张保位置最小",
-//                97: "[208]:飞6张打色色先发保位置最大",
-//                98: "[209]:飞2张打色色先发保位置最小",
-//                99: "[211]:飞2张骰子打色保位置最大",
-//                100: "[212]:飞2张面为色留色保位置最大",
-//                101: "[213]:飞张面为色留色保位置最小",
-//                102: "[214]:飞2张面为色去色保位置最大",
-//                103: "[215]:飞2张面为色去色保位置最小",
-//                104: "[216]:飞2张底为色保位置最大",
-//                105: "[217]:飞2张底为色保位置最小",
-//                106: "[218]:飞2张底2张相加为色保位置最大",
-//                107: "[221]:飞2张打色留色再看底保位置最大",
-//                108: "[284]:固定范围切牌报对子和同点数目",
-//                109: "[285]:固定范围切牌报哪个位置拿最大最多",
-//                110: "[2861:固定范围切牌报哪个位置拿最大次大最多",
-//                111: "[289]:范围切牌保指定2家有最大",
-//                112: "[290]:范围切牌保有最好活门",
-//                113: "[291]:范围切牌保有最好死门",
-//                114: "[292]:范围切牌保位置活门",
-//                115: "[293]:范围切牌保位置死门",
-//                116: "[296]:范围切牌保位置最小次小",
-//                117: "[297]:范围切牌面为色去色保位置最大次大",
-//                118: "[298]:范围切牌面为色色先发保位置最大次大",
-//                119: "[299_1]:范围切牌保位置最大",
-//                120: "[299]:范围切牌保位置最大次大",
-//                121: "[300]:范围打色留色保位置最大",
-//                122: "[3011:范围打色留色保位置最大次大",
-//                123: "[304]:范围打色去色全部保位置最大",
-//                124: "[305]:范围打色去色全部保位置最大次大",
-//                125: "[310]:范围打色去色1张保位置最大",
-//                126: "[3111:范围打色去色1张保位置最大次大",
-//                127: "[316]:范围打色色先发保位置最大",
-//                128: "[317]:范围打色色先发保位置最大次大",
-//                129: "[330]:范围打色留色保位置最小",
-//                130: "[331]:范围打色留色保位置最小次小",
-//                131: "[334]:范围打色去色全部保位置最小",
-//                132: "[335]:范围打色去色全部保位置最小次小",
-//                133: "[338]:范围打色去色1张保位置最小",
-//                134: "[339]:范围打色去色1张保位置最小次小",
-//                135: "[342]:范围打色色先发保位置最小",
-//                136: "[343]:范围打色色先发保位置最小次小",
-//                137: "[400]:随意打色留色保位置最大次大",
-//                138: "[401]:随意打色留色保位童最小次小",
-//                139: "[402]:随意打色去色全部保位置最大次大",
-//                140: "[403]:随意打色去色全部保位置最小次小",
-//                141: "[410]:随意打色去色1保位置最大次大",
-//                142: "[411]:随意打色去色1保位置最小次小",
-//                143: "[415]:随意打色色先发保位置最大次大",
-//                144: "[416]:随意打色色先发保位置最小次小",
-//                145: "[420]:随意混合打色保位置最大次大",
-//                146: "[421]:随意混合打色保位置最小次小",
-//                147: "[422]:随意混合打色报大1大2小1小2",
-//                148: "[450]:指定底牌报最大次大",
-//                149: "[451]:指定底牌报最大",
-//                150: "[452]:指定底牌报最小次小",
-//                151: "[453]:指定底牌报最小",
-//                152: "[454]:指定底牌报生死门",
-//                153: "[500]:指定顶牌报最大次大",
-//                154: "[501]:指定顶牌报最大",
-//                155: "[502]:指定顶牌报最小次小",
-//                156: "[503]:指定顶牌报最小",
-//                157: "[504]:指定顶牌报生死门",
-//                158: "[510]:指定顶牌底牌为色报位置最大次大",
-//                159: "[511]:指定顶牌底牌为色报位置最大",
-//                160: "[512]:指定顶牌底牌为色报位置最小次小",
-//                161: "[513]:指定顶牌底牌为色报位置最小",
-//                162: "[514]:指定牌上一张打色留色报位置最大次大",
-//                163: "[515]:指定牌上一张打色去色全部报位置最大次大",
-//                164: "[516]:指定牌下一张打色留色报位置最大次大",
-//                165: "[517]:指定牌下一张打色去色全部报位置最大次大",
-//                166: "[518]:底为色4种发牌方式报最小",
-//                167: "[519]:底为色4种发牌方式报最大",
-//                168: "[520]:底为色报位置最大次大",
-//                169: "[521]:底为色报位置最大",
-//                170: "[522]:底为色报位置最小次小",
-//                171: "[523]:底为色报位置最小",
-//                172: "[524]:底为色报位置排名",
-//                173: "[525]:底为色报发牌方式保位置最大次大",
-//                174: "[526]:底2张相加为色报位置最大次大",
-//                175: "[527]:骰子打色报发牌方式保位置最大次才",
-//                176: "[528]:底2张相加为色报发牌方式保位置最大",
-//                177: "[530]:面为色报位置最大次大",
-//                178: "[531]:面为色报位置最大",
-//                179: "[532]:面为色报位置最小次小",
-//                180: "[533]:面为色报位置最小",
-//                181: "[534]:面为色报位置排名",
-//                182: "[540]:面为色去色报位置最大次大",
-//                183: "[541]:面为色去色报位置最大",
-//                184: "[5421:面为色去色报位置最小次小",
-//                185: "[543]:面海色去色报位置最小",
-//                186: "[544]:面为色去色报位置排名",
-//                187: "[670]:报4张单张",
-//                188: "[671]:报4张单张2",
-//                189: "[672]:报4张单张3",
-//                190: "[675]:报公牌",
-//                191: "[680]:打色留色报发牌方式保位置最大次大",
-//                192: "[681]:打色留色报发牌方式保位置最小次小",
-//                193: "[700]:去掉14张面牌报哪家最大",
-//                194: "[701]:去掉14张面牌报哪家最小",
-//                195: "[702]:去掉14张面牌报哪家最大次大",
-//                196: "[703]:去掉14张面牌报哪家1大2大3大",
-//                197: "[704]:去掉14张面牌报哪家最小次小",
-//                198: "[705]:去掉14张面牌根据第14张牌点数再去牌报最大",
-//                199: "[706]:去掉 14张面牌根据第14张牌点数再去牌报最小",
-//                200: "[707]:去面牌底牌根据面牌底牌点数和去牌报最大次大",
-//                201:"[708]:固定去掉6、7、8、9张牌，以去牌数为色报位置最大",
-//                202: "[710]:跑的快报下家大牌",
-//                203: "[719]:比第一张牌从最大牌继续发报最大次大",
-//                204: "[720]:比第一张牌从最大牌继续发报最大",
-//                205: "[721]:比第一张牌从最小牌继续发报最大",
-//                206: "[722]:比第一张牌从最小牌继续发报最大次大",
-//                207: "[723]:比第一张牌从最大牌继续发飞2张保庄家最大次大",
-//                208: "[724]:比第一张牌从最小牌继续发飞2张保庄家最大次大",
-//                209: "[725]:比第一张牌从最大牌继续发报各家点数",
-//                210: "[740]:报指定玩家手里牌",
-//                211: "[741]:报玩家手里牌+照牌报后面4张单张",
-//                212: "[745]:看切牌报上下部分牌张数",
-//                213: "[755]看色留色上10 张去牌保位置最大",
-//                214: "[758]:看色留色+色牌上X张为色报最大次大",
-//                215: "[759]:看色留色2次打色保位置最大",
-//                216: "[760]:看色留色报最大",
-//                217: "[761]:看色留色报最大次大",
-//                218: "[762]:看色留色报最小看色牌，放回原处。",
-//                219: "[763]:看色留色报最小次小",
-//                220: "[764]:看色留色报排名",
-//                221: "[766]:看色牌去色全部报最大",
-//                222: "[767]:看色牌去色全部报最大次大",
-//                223: "[768]:看色牌去色全部报最小",
-//                224: "[7691:看色牌去色全部报最小次小",
-//                225: "[770]:看色牌去色全部报排名",
-//                226: "[790]:固霍第10张牌作龟留色报最大",
-//                227: "[791]:固定第10张牌作色留色报最大...",
-//                228: "[793]:固定第10张牌作色留色报最小次",
-//                229: "[7941:固定第10张牌作色留色报排名",
-//                230: "[795]:固定第 10张牌作色留色4种发牌方式报最大",
-//                231: "[796]:固定第10张牌作色留色4种发牌方式报最小",
-//                232: "[800]:固定第10张牌作色去色全部报最大",
-//                233: "[801]:固定第10张牌作色去色全部报最大次大",
-//                234: "[8021:固定第10张牌作色去色全部报最小",
-//                235: "[803]:固定第10张牌作色去色全部报最小次小",
-//                236: "[804]:固定第10张牌作色去色全部报排名",
-//                237: "[805]:固定第10张牌作色去色全部4种发牌方式报最大",
-//                238: "[806]:固定第10张牌作色去色全部4种发牌方式报最小",
-//                239: "[810]:固定去面上Y张牌,从X-Y张选择色牌，保1大2大",
-//                240: "[815]:报从第几门开始发保最大",
-//                241: "[816]:报发牌方式保2家同点3家不同点无9点",
-//                242: "[817]:报发牌方式保位置最大次大",
-//                243: "[818]:报发牌方式保位置最大",
-//                244: "[821]:调位置报1段位多门活门",
-//                245: "[822]:报多段位多门活门",
-//                246: "[840]:调位置多门报切牌位置保位置是死门",
-//                247: "[850]:报发几家牌可保最后2家牌任何家最大次大",
-//                248: "[860]:多次同时抽底牌面牌底为色保位置最大",
-//                249: "[2000]:测试报法",
-//                250: "[2001]:测试报法2",
+//            47:"[79]:上10张去牌面为色去色保位置最大次大次数最多",
+//            54:"[85]:上10张去牌保多轮位置最大次数最多*",
+        case 47,54:
+            reportResult += String(multipleReportResultInfo.cardIndexForMultipleRound) + " "
+            reportResult += multipleReportResultInfo.winRoundIndex.reduce("") { $0 + "\($1)" }
+            break
+//        49:"[81]:上10张去牌保位置最小无对子",
+        case 49:
+            
+            break
+//            50:"[82]:上10张去牌保34门有最大报最大",
+//            51:"[83]:上10张去牌保34门最大次大",
+//            62:"[96]:上下5张去牌保34门有最大报最大",
+//            63:"[97]:上下5张去牌保第2门是活门报最大",
+
+        case 50...51,62...63:
+            for resultInfo in multipleReportResultInfo.singleResultList{
+                reportResult += resultInfo.cardIndexToConfirmMaxMin.reduce("") { $0 + "\($1)" }
+                reportResult += resultInfo.XorYMax.reduce("") { $0 + "\($1)" }
+            }
+            break
+//            59:"[92]:上10张去牌保至少一家有牛牛",
+        case 59:
+            for resultInfo in multipleReportResultInfo.singleResultList{
+                reportResult += resultInfo.cardIndexToConfirmMaxMin.reduce("") { $0 + "\($1)" }
+                reportResult += resultInfo.BullBullPlayerID.reduce("") { $0 + "\($1)" }
+            }
+            
+            break
+//            79:"[130]:看手牌报生死门*",
+//            80:"[131]:看手牌报最大*",
+//            81:"[132]:看手牌报最大次大*",
+//            82:"[133]:看手牌报最大次大生死门*",
+//            83:"[134]:看手牌比第一张牌从最大牌继续发报最大*",
+//            84:"[135]:看手牌比第一张牌从最大牌继续发报最大次大*",
+//            85:"[143]:看手牌面为色留色报最大*",
+//            86:"[144]:看手牌面为色留色报最大次大*",
+//            87:"[145]:看手牌面为色留色报最大次大生死门*",
+//            88:"[147]:看手牌面为色去色报最大*",
+//            89:"[148]:看手牌面为色去色报最大次大*",
+//            90:"[149]:看手牌面为色去色报最大次大生死门*",
+        case 79...90:
+            break
+//            91:"[200]:飞2张保位置最大*",
+//            92: "[201]:飞2张保位置最小*",
+//                93: "[202]:飞2张打色留色保位置最大*",
+//                94: "[203]:飞2张打色留色保位置最小*",
+//                95: "[206]:飞2张打色去色1张保位置最大*",
+//                96: "[207]:飞2张打色去色1张保位置最小*",
+//                97: "[208]:飞2张打色色先发保位置最大*",
+//                98: "[209]:飞2张打色色先发保位置最小*",
+//                99: "[211]:飞2张骰子打色保位置最大*",
+//                100: "[212]:飞2张面为色留色保位置最大*",
+//                101: "[213]:飞张面为色留色保位置最小*",
+//                102: "[214]:飞2张面为色去色保位置最大*",
+//                103: "[215]:飞2张面为色去色保位置最小*",
+//                104: "[216]:飞2张底为色保位置最大*",
+//                105: "[217]:飞2张底为色保位置最小*",
+//                106: "[218]:飞2张底2张相加为色保位置最大*",
+//                107: "[221]:飞2张打色留色再看底保位置最大*",
+        case 91...107:
+            break
+//            108: "[284]:固定范围切牌报对子和同点数目",
+        case 108:
+            reportResult += String(multipleReportResultInfo.totalPairNum) + "，"
+            reportResult += String(multipleReportResultInfo.totalDrawNum)
+            break
+//            109: "[285]:固定范围切牌报哪个位置拿最大最多",
+//            110: "[286]:固定范围切牌报哪个位置拿最大次大最多",
+        case 109...110:
+            reportResult += String(multipleReportResultInfo.maxWinPosition)
+            break
+//            111: "[289]:范围切牌保指定2家有最大",
+//            112: "[290]:范围切牌保有最好活门*",
+//            113: "[291]:范围切牌保有最好死门*",
+//            114: "[292]:范围切牌保位置活门",
+//            115: "[293]:范围切牌保位置死门",
+//            116: "[296]:范围切牌保位置最小次小",
+//            117: "[297]:范围切牌面为色去色保位置最大次大",
+//            118: "[298]:范围切牌面为色色先发保位置最大次大",
+//            119: "[299_1]:范围切牌保位置最大",
+//            120: "[299]:范围切牌保位置最大次大",
+//            121: "[300]:范围打色留色保位置最大",
+//            122: "[3011:范围打色留色保位置最大次大",
+//            123: "[304]:范围打色去色全部保位置最大",
+//            124: "[305]:范围打色去色全部保位置最大次大",
+//            125: "[310]:范围打色去色1张保位置最大",
+//            126: "[3111:范围打色去色1张保位置最大次大",
+//            127: "[316]:范围打色色先发保位置最大",
+//            128: "[317]:范围打色色先发保位置最大次大",
+//            129: "[330]:范围打色留色保位置最小",
+//            130: "[331]:范围打色留色保位置最小次小",
+//            131: "[334]:范围打色去色全部保位置最小",
+//            132: "[335]:范围打色去色全部保位置最小次小",
+//            133: "[338]:范围打色去色1张保位置最小",
+//            134: "[339]:范围打色去色1张保位置最小次小",
+//            135: "[342]:范围打色色先发保位置最小",
+//            136: "[343]:范围打色色先发保位置最小次小",
+        case 111...136:
+            break
+//            137: "[400]:随意打色留色保位置最大次大",
+//            138: "[401]:随意打色留色保位童最小次小",
+//            139: "[402]:随意打色去色全部保位置最大次大",
+//            140: "[403]:随意打色去色全部保位置最小次小",
+//            141: "[410]:随意打色去色1保位置最大次大",
+//            142: "[411]:随意打色去色1保位置最小次小",
+//            143: "[415]:随意打色色先发保位置最大次大",
+//            144: "[416]:随意打色色先发保位置最小次小",
+        case 137...144:
+            break
+//            145: "[420]:随意混合打色保位置最大次大",
+//            146: "[421]:随意混合打色保位置最小次小",
+//            147: "[422]:随意混合打色报大1大2小1小2",
+        case 145...147:
+            break
+//            148: "[450]:指定底牌报最大次大",
+//            149: "[451]:指定底牌报最大",
+//            150: "[452]:指定底牌报最小次小",
+//            151: "[453]:指定底牌报最小",
+//            152: "[454]:指定底牌报生死门",
+//            153: "[500]:指定顶牌报最大次大",
+//            154: "[501]:指定顶牌报最大",
+//            155: "[502]:指定顶牌报最小次小",
+//            156: "[503]:指定顶牌报最小",
+//            157: "[504]:指定顶牌报生死门",
+//            158: "[510]:指定顶牌底牌为色报位置最大次大",
+//            159: "[511]:指定顶牌底牌为色报位置最大",
+//            160: "[512]:指定顶牌底牌为色报位置最小次小",
+//            161: "[513]:指定顶牌底牌为色报位置最小",
+//            162: "[514]:指定牌上一张打色留色报位置最大次大",
+//            163: "[515]:指定牌上一张打色去色全部报位置最大次大",
+//            164: "[516]:指定牌下一张打色留色报位置最大次大",
+//            165: "[517]:指定牌下一张打色去色全部报位置最大次大",
+        case 148...165:
+            for resultInfo in multipleReportResultInfo.singleResultList{
+                reportResult += String(resultInfo.specialCardPos) + " "
+                reportResult += resultInfo.targetPlayerList.reduce("") { $0 + "\($1)" }
+            }
+            break
+//            166: "[518]:底为色4种发牌方式报最小*",
+//            167: "[519]:底为色4种发牌方式报最大*",
+        case 166...167:
+            break
         default:
-            reportResult = "报法不存在"
+            break
             
         }
-        
-        
-        
-        return (reportResult, leftCards)
+        return reportResult
         
     }
     

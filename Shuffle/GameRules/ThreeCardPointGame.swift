@@ -100,11 +100,11 @@ class ThreeCardPointGameRule : Rule{
 
 
 class ThreeCardPointGame{
-    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
+    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
         print("Rank rules \(rankRules)")
         var deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let (winners, leftCards, winnerRanks) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (winners, leftCards, winnerRanks)
+        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winners, leftCards)
     }
     
     static func legalCheck(playerNum: Int) -> String{
@@ -182,7 +182,7 @@ class ThreeCardPointGame{
     //10 isCompareSuit
     //11 pointComparision
     
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
         let rule  = GameManager.gameRules[3] as! ThreeCardPointGameRule
         let dealNum = args[0]
         let dealType = args[1]
@@ -199,12 +199,12 @@ class ThreeCardPointGame{
         
         
         var maxRank = 0
-        var winners: [Int] = []
-        var winnerRanks: [Int] = []
+        var returnPlayerInfos: [GameReturnPlayerInfo] = []
+
         var allPlayCards: [Player] = []
         var community = [Card]()
         if deck.count < ThreeCardPointGame.getMinCardNum(playerNum: playerNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
-            return ([], [],[])
+            return ([],[])
         }
         
         for _ in 0..<playerNum {
@@ -278,7 +278,7 @@ class ThreeCardPointGame{
         }
         
         for i in 0..<playerNum {
-            allPlayCards[i].evaluateFlag = ThreeCardPointGameHandEvaluator(
+            (allPlayCards[i].evaluateFlag,allPlayCards[i].cardType, allPlayCards[i].isPair) = ThreeCardPointGameHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules
             ).evalHand(cards: allPlayCards[i].playerCard, redJokerValueRange: redJokerValueRange,blackJokerValueRange: blackJokerValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, samePointComparision: samePointComparision,pointComparision: pointComparision)
@@ -292,8 +292,12 @@ class ThreeCardPointGame{
         
         let sortedResultList =  resultList.sorted(by: {$0.rank > $1.rank })
         for result in sortedResultList {
-            winners.append(result.playerID)
-            winnerRanks.append(result.rank)
+            var currentReturnPlayerInfo = GameReturnPlayerInfo()
+            currentReturnPlayerInfo.playerID = result.playerID
+            currentReturnPlayerInfo.playerRank = result.rank
+            currentReturnPlayerInfo.playerCardsType = allPlayCards[result.playerID].cardType
+            currentReturnPlayerInfo.isPair = allPlayCards[result.playerID].isPair
+            returnPlayerInfos.append(currentReturnPlayerInfo)
         }
         
         var leftCards:[Int] = []
@@ -305,8 +309,7 @@ class ThreeCardPointGame{
             leftCards = []
         }
         
-        print("winners \(winners)")
-        return (winners, leftCards, winnerRanks)
+        return (returnPlayerInfos, leftCards)
     }
 }
 
@@ -316,7 +319,7 @@ class ThreeCardPointGameHandEvaluator{
     var suitRules: [Int]
     var samePointComparision = 0
     var pointComparision = 0
-    var rankRulesDic:[Int:([ThreeCardPointCard]) -> (Bool, Int)] = [:]
+    var rankRulesDic:[Int:([ThreeCardPointCard]) -> (Bool, Int, String, Int)] = [:]
     
     init(rankRules: [Int],
          suitRules: [Int]){
@@ -330,10 +333,12 @@ class ThreeCardPointGameHandEvaluator{
         
     }
     
-    func evalHand(cards: [Card], redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange: Int, JValueRange: Int, samePointComparision: Int, pointComparision: Int)->Int{
+    func evalHand(cards: [Card], redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange: Int, JValueRange: Int, samePointComparision: Int, pointComparision: Int)->(Int, String, Int){
         
         self.samePointComparision = samePointComparision
         var score = 0
+        var maxCardType: String = ""
+        var maxIsPair: Int = 0
         
         //打印手牌
         print("手牌 \(GameManager.cardLabelDic[cards[0].cardIndex])  \(GameManager.cardLabelDic[cards[1].cardIndex])")
@@ -344,44 +349,48 @@ class ThreeCardPointGameHandEvaluator{
         
         var i = self.rankRules.count + 1
         for ruleIndex in self.rankRules{
-            let (flag, rank) = self.rankRulesDic[ruleIndex]!([num1, num2])
+            let (flag, rank, cardType, isPair) = self.rankRulesDic[ruleIndex]!([num1, num2])
             i -= 1
             if flag == false{
                 continue
             } else {
                 score = (1 << (i + 10)) | rank
+                maxCardType = cardType
+                maxIsPair = isPair
                 print("牌型 \(ruleIndex) 分数 \(score)")
-                return score
+                return (score, maxCardType, maxIsPair)
             }
         }
 
-        return score
+        return (score, maxCardType, maxIsPair)
     }
     
-    func eval_NinePointFive(cards: [ThreeCardPointCard]) -> (Bool, Int) {
+    func eval_NinePointFive(cards: [ThreeCardPointCard]) -> (Bool, Int, String, Int) {
         if (cards[0].point + cards[1].point + cards[2].point) % 20 == 19 {
-            return (true, 1)
+            return (true, 1, "9点半", 0)
         }
-        return (false, 0)
+        return (false, 0, "", 0)
     }
     
-    func eval_TenPointFive(cards: [ThreeCardPointCard]) -> (Bool, Int) {
+    func eval_TenPointFive(cards: [ThreeCardPointCard]) -> (Bool, Int, String, Int) {
         if cards[0].point + cards[1].point + cards[2].point == 21 {
-            return(true, 1)
+            return(true, 1, "10点半", 0)
         }
-        return (false, 0)
+        return (false, 0, "", 0)
     }
     
-    func eval_Points(cards: [ThreeCardPointCard]) -> (Bool, Int){
+    func eval_Points(cards: [ThreeCardPointCard]) -> (Bool, Int, String, Int){
         //9点最大
+        var cardType: String = ""
+        cardType = String((cards[0].point + cards[1].point + cards[2].point) % 20) + "点"
         if self.pointComparision == 0{
-            return(true, (cards[0].point + cards[1].point + cards[2].point) % 20)
+            return(true, (cards[0].point + cards[1].point + cards[2].point) % 20, cardType, 0)
             
         //10点最大
         } else if pointComparision == 1{
-            return (true, (cards[0].point + cards[1].point + cards[2].point - 1) % 20)
+            return (true, (cards[0].point + cards[1].point + cards[2].point - 1) % 20, cardType, 0)
         }
-        return (false, 0)
+        return (false, 0, "", 0)
     }
     
     class ThreeCardPointCard{

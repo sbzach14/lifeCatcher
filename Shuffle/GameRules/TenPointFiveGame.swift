@@ -142,7 +142,7 @@ class TenPointFiveGame{
     //11 pointComparision
     //12 cardRankRule
     
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
         let rule  = GameManager.gameRules[3] as! TenPointFiveGameRule
         let dealNum = args[0]
         let dealType = args[1]
@@ -160,8 +160,8 @@ class TenPointFiveGame{
         
         
         var maxRank = 0
-        var winners: [Int] = []
-        var winnerRanks: [Int] = []
+        var returnPlayerInfos: [GameReturnPlayerInfo] = []
+
         var allPlayCards: [Player] = []
         var community = [Card]()
         if deck.count < TenPointFiveGame.getMinCardNum(playerNum: playerNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
@@ -239,7 +239,7 @@ class TenPointFiveGame{
         }
         
         for i in 0..<playerNum {
-            allPlayCards[i].evaluateFlag = TenPointFiveGameHandEvaluator(
+            (allPlayCards[i].evaluateFlag,allPlayCards[i].cardType, allPlayCards[i].isPair) = TenPointFiveGameHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules
             ).evalHand(cards: allPlayCards[i].playerCard, redJokerValueRange: redJokerValueRange,blackJokerValueRange: blackJokerValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, samePointComparision: samePointComparision,pointComparision: pointComparision, cardRankRule: cardRankRule)
@@ -253,8 +253,12 @@ class TenPointFiveGame{
         
         let sortedResultList =  resultList.sorted(by: {$0.rank > $1.rank })
         for result in sortedResultList {
-            winners.append(result.playerID)
-            winnerRanks.append(result.rank)
+            var currentReturnPlayerInfo = GameReturnPlayerInfo()
+            currentReturnPlayerInfo.playerID = result.playerID
+            currentReturnPlayerInfo.playerRank = result.rank
+            currentReturnPlayerInfo.playerCardsType = allPlayCards[result.playerID].cardType
+            currentReturnPlayerInfo.isPair = allPlayCards[result.playerID].isPair
+            returnPlayerInfos.append(currentReturnPlayerInfo)
         }
         
         var leftCards:[Int] = []
@@ -266,8 +270,7 @@ class TenPointFiveGame{
             leftCards = []
         }
         
-        print("winners \(winners)")
-        return (winners, leftCards, winnerRanks)
+        return (returnPlayerInfos, leftCards)
     }
 }
 
@@ -277,7 +280,7 @@ class TenPointFiveGameHandEvaluator{
     var suitRules: [Int]
     var samePointComparision = 0
     var pointComparision = 0
-    var rankRulesDic:[Int:([TenPointFiveCard]) -> (Bool, Int)] = [:]
+    var rankRulesDic:[Int:([TenPointFiveCard]) -> (Bool, Int, String, Int)] = [:]
     
     init(rankRules: [Int],
          suitRules: [Int]){
@@ -290,10 +293,12 @@ class TenPointFiveGameHandEvaluator{
         
     }
     
-    func evalHand(cards: [Card], redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange: Int, JValueRange: Int, samePointComparision: Int, pointComparision: Int, cardRankRule: Int)->Int{
+    func evalHand(cards: [Card], redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange: Int, JValueRange: Int, samePointComparision: Int, pointComparision: Int, cardRankRule: Int)->(Int, String, Int){
         
         self.samePointComparision = samePointComparision
         var score = 0
+        var maxCardType: String = ""
+        var maxIsPair: Int = 0
         
         //打印手牌
         print("手牌 \(GameManager.cardLabelDic[cards[0].cardIndex])  \(GameManager.cardLabelDic[cards[1].cardIndex])")
@@ -304,32 +309,35 @@ class TenPointFiveGameHandEvaluator{
         
         var i = self.rankRules.count + 1
         for ruleIndex in self.rankRules{
-            let (flag, rank) = self.rankRulesDic[ruleIndex]!([num1, num2])
+            let (flag, rank, cardType, isPair) = self.rankRulesDic[ruleIndex]!([num1, num2])
             i -= 1
             if flag == false{
                 continue
             } else {
                 score = (1 << (i + 10)) | rank
+                maxCardType = cardType
+                maxIsPair = isPair
                 print("牌型 \(ruleIndex) 分数 \(score)")
-                return score
+                return (score, maxCardType, maxIsPair)
             }
         }
 
-        return score
+        return (score, maxCardType, maxIsPair)
     }
     
-    func eval_TenPointFive(cards: [TenPointFiveCard]) -> (Bool, Int) {
+    func eval_TenPointFive(cards: [TenPointFiveCard]) -> (Bool, Int, String, Int) {
         if cards[0].point + cards[1].point == 21 {
-            return(true, cards[0].rank)
+            return(true, cards[0].rank, "10点半", 0)
         }
-        return (false, 0)
+        return (false, 0, "", 0)
     }
     
-    func eval_Points(cards: [TenPointFiveCard]) -> (Bool, Int){
+    func eval_Points(cards: [TenPointFiveCard]) -> (Bool, Int, String, Int){
         if pointComparision == 0{
-            return (true, (cards[0].point + cards[1].point) << 4 | cards[0].rank)
+            let cardType: String = String((cards[0].point + cards[1].point)) + "点"
+            return (true, (cards[0].point + cards[1].point) << 4 | cards[0].rank, cardType, 0)
         }
-        return (false, 0)
+        return (false, 0, "", 0)
     }
     
     class TenPointFiveCard{

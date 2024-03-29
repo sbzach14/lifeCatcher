@@ -57,11 +57,11 @@ class TinyNineGameRule : Rule{
 
 
 class TinyNineGame{
-    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
+    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
         print("Rank rules \(rankRules)")
         var deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let (winners, leftCards, winnerRanks) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (winners, leftCards, winnerRanks)
+        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winners, leftCards)
     }
     
     static func legalCheck(playerNum: Int) -> String{
@@ -122,7 +122,7 @@ class TinyNineGame{
     //5 blackJokerValueRange
     //6 samePointComparision
     
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
         let rule  = GameManager.gameRules[3] as! TinyNineGameRule
         let dealNum = args[0]
         let dealType = args[1]
@@ -134,12 +134,11 @@ class TinyNineGame{
         
         
         var maxRank = 0
-        var winners: [Int] = []
-        var winnerRanks: [Int] = []
         var allPlayCards: [Player] = []
         var community = [Card]()
+        var returnPlayerInfos: [GameReturnPlayerInfo] = []
         if deck.count < TinyNineGame.getMinCardNum(playerNum: playerNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
-            return ([], [],[])
+            return ([],[])
         }
         
         for _ in 0..<playerNum {
@@ -213,7 +212,7 @@ class TinyNineGame{
         }
         
         for i in 0..<playerNum {
-            allPlayCards[i].evaluateFlag = TinyNineGameHandEvaluator(
+            (allPlayCards[i].evaluateFlag, allPlayCards[i].cardType, allPlayCards[i].isPair) = TinyNineGameHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules
             ).evalHand(cards: allPlayCards[i].playerCard, redJokerValueRange: redJokerValueRange,blackJokerValueRange: blackJokerValueRange, samePointComparision: samePointComparision)
@@ -226,9 +225,16 @@ class TinyNineGame{
         }
         
         let sortedResultList =  resultList.sorted(by: {$0.rank > $1.rank })
+        
+        
+        
         for result in sortedResultList {
-            winners.append(result.playerID)
-            winnerRanks.append(result.rank)
+            var currentReturnPlayerInfo = GameReturnPlayerInfo()
+            currentReturnPlayerInfo.playerID = result.playerID
+            currentReturnPlayerInfo.playerRank = result.rank
+            currentReturnPlayerInfo.playerCardsType = allPlayCards[result.playerID].cardType
+            currentReturnPlayerInfo.isPair = allPlayCards[result.playerID].isPair
+            returnPlayerInfos.append(currentReturnPlayerInfo)
         }
         
         var leftCards:[Int] = []
@@ -240,8 +246,7 @@ class TinyNineGame{
             leftCards = []
         }
         
-        print("winners \(winners)")
-        return (winners, leftCards, winnerRanks)
+        return (returnPlayerInfos, leftCards)
     }
 }
 
@@ -252,7 +257,7 @@ class TinyNineGameHandEvaluator{
     var redJokerValueRange = 0
     var blackJokerValueRange = 0
     var samePointComparision = 0
-    var rankRulesDic:[Int:([Card]) -> (Bool, Int)] = [:]
+    var rankRulesDic:[Int:([Card]) -> (Bool, Int, String, Int)] = [:]
     
     init(rankRules: [Int],
          suitRules: [Int]){
@@ -266,7 +271,7 @@ class TinyNineGameHandEvaluator{
         
     }
     
-    func evalHand(cards: [Card], redJokerValueRange: Int, blackJokerValueRange: Int, samePointComparision: Int)->Int{
+    func evalHand(cards: [Card], redJokerValueRange: Int, blackJokerValueRange: Int, samePointComparision: Int)->(Int, String, Int){
         self.redJokerValueRange = redJokerValueRange
         self.blackJokerValueRange = blackJokerValueRange
         self.samePointComparision = samePointComparision
@@ -277,56 +282,58 @@ class TinyNineGameHandEvaluator{
         
         var i = self.rankRules.count + 1
         for ruleIndex in self.rankRules{
-            let (flag, rank) = self.rankRulesDic[ruleIndex]!(cards)
+            let (flag, rank, cardType, isPair) = self.rankRulesDic[ruleIndex]!(cards)
             i -= 1
             if flag == false{
                 continue
             } else {
                 score = (1 << (i + 10)) | rank
                 print("牌型 \(ruleIndex) 分数 \(score)")
-                return score
+                return (score, cardType, isPair)
             }
         }
 
-        return score
+        return (score, "", 0)
     }
     
-    func isPairKingPairAKingPlusA(cards: [Card]) -> (Bool, Int){
+    func isPairKingPairAKingPlusA(cards: [Card]) -> (Bool, Int, String, Int){
         if cards[0].rank > 13 && cards[1].rank > 13 {
-            return (true, 1)
+            return (true, 1, "对王", 1)
         }
         if cards[0].rank > 13 && cards[1].rank == 1 {
-            return (true, 1)
+            return (true, 1, "王加A", 0)
         }
         if cards[0].rank == 1 && cards[1].rank > 13 {
-            return (true, 1)
+            return (true, 1, "王加A", 0)
         }
         if cards[0].rank == 1 && cards[1].rank == 1{
-            return (true, 1)
+            return (true, 1, "对A", 1)
         }
         
-        return (false, 0)
+        return (false, 0, "", 0)
         
     }
     
-    func isPair(cards: [Card]) -> (Bool, Int){
+    func isPair(cards: [Card]) -> (Bool, Int, String, Int){
         if cards[0].rank == cards[1].rank {
-            return (true, cards[0].rank)
+            let cardType: String = "对" + GameManager.CardNumberReportDic[cards[0].rank]!
+            return (true, cards[0].rank, cardType, 1)
         }
-        return (false, 0)
+        return (false, 0, "", 0)
     }
     
-    func PointsCalculator(cards: [Card]) -> (Bool, Int){
+    func PointsCalculator(cards: [Card]) -> (Bool, Int, String, Int){
         let num1 = self.CardPointConvertor(card: cards[0])
         let num2 = self.CardPointConvertor(card: cards[1])
         let points = (num1 + num2) % 10
+        let cardType: String = String(points) + "点"
         if self.samePointComparision == 0{
             let rank = RankForMaxCard(cards: cards)
-            return (true, points << 6 | rank)
+            return (true, points << 6 | rank, cardType, 0)
         } else if self.samePointComparision == 1{
-            return (true, points << 6 | 1)
+            return (true, points << 6 | 1, cardType, 0)
         }
-        return (false, 0)
+        return (false, 0, "", 0)
     }
     
     func RankForMaxCard(cards: [Card]) -> Int{

@@ -183,12 +183,12 @@ class ThreeCardPokerGameRule : Rule{
 class ThreeCardPokerGame{
     
     
-    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int], [Int], [Int]) {
+    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo], [Int]) {
         
         var deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let (winners, leftCards,winnerRanks) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
+        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
         print("winners2 \(winners)")
-        return (winners, leftCards,winnerRanks)
+        return (winners, leftCards)
     }
     
     static func legalCheck(playerNum: Int, minRank: Int, handNum: Int, isHeadCard: Int, isRedJoker: Int, isBlackJoker: Int) -> String{
@@ -247,7 +247,7 @@ class ThreeCardPokerGame{
     }
     
     
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
         print("炸金花参数 \(args)")
         let rule = GameManager.gameRules[2] as! ThreeCardPokerGameRule
         let dealNum = args[0]
@@ -269,12 +269,13 @@ class ThreeCardPokerGame{
         
         
         var maxRank = 0
-        var winners: [Int] = []
-        var winnerRanks: [Int] = []
+        var returnPlayerInfos: [GameReturnPlayerInfo] = []
+
+
         var allPlayCards: [Player] = []
         var community = [Card]()
         if deck.count < ThreeCardPokerGame.getMinCardNum(playerNum: playerNum, handNum: handNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
-            return ([],[],[])
+            return ([],[])
         }
         
         for _ in 0..<playerNum {
@@ -355,7 +356,7 @@ class ThreeCardPokerGame{
         }
         if handNum == 3 {
             for i in 0..<playerNum {
-                allPlayCards[i].evaluateFlag = ThreeCardPokerGameHandEvaluator(
+                (allPlayCards[i].evaluateFlag, allPlayCards[i].cardType, allPlayCards[i].isPair) = ThreeCardPokerGameHandEvaluator(
                     isCompareSuit: isCompareSuit,
                     minRank: minRank,
                     isAce: isAce,
@@ -378,7 +379,7 @@ class ThreeCardPokerGame{
                 var allcards = Array(allPlayCards[i].playerCard)
                 var maxFlag = 0
                 for combination in allcards.combinations(ofCount: 3){
-                    allPlayCards[i].evaluateFlag = ThreeCardPokerGameHandEvaluator(
+                    (allPlayCards[i].evaluateFlag, allPlayCards[i].cardType, allPlayCards[i].isPair) = ThreeCardPokerGameHandEvaluator(
                         isCompareSuit: isCompareSuit,
                         minRank: minRank,
                         isAce: isAce,
@@ -403,7 +404,7 @@ class ThreeCardPokerGame{
             }
         }
         for i in 0..<playerNum {
-            allPlayCards[i].evaluateFlag = ThreeCardPokerGameHandEvaluator(
+            (allPlayCards[i].evaluateFlag, allPlayCards[i].cardType, allPlayCards[i].isPair) = ThreeCardPokerGameHandEvaluator(
                 isCompareSuit: isCompareSuit,
                 minRank: minRank,
                 isAce: isAce,
@@ -431,8 +432,12 @@ class ThreeCardPokerGame{
         let sortedResultList =  resultList.sorted(by: {$0.rank > $1.rank })
         
         for result in sortedResultList {
-            winners.append(result.playerID)
-            winnerRanks.append(result.rank)
+            var currentReturnPlayerInfo = GameReturnPlayerInfo()
+            currentReturnPlayerInfo.playerID = result.playerID
+            currentReturnPlayerInfo.playerRank = result.rank
+            currentReturnPlayerInfo.playerCardsType = allPlayCards[result.playerID].cardType
+            currentReturnPlayerInfo.isPair = allPlayCards[result.playerID].isPair
+            returnPlayerInfos.append(currentReturnPlayerInfo)
         }
         
         var leftCards: [Int] = []
@@ -442,8 +447,7 @@ class ThreeCardPokerGame{
         if leftCards.count < ThreeCardPokerGame.getMinCardNum(playerNum: playerNum, handNum: handNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
             leftCards = []
         }
-        print("winners \(winners)")
-        return (winners, leftCards, winnerRanks)
+        return (returnPlayerInfos, leftCards)
     }
 }
 
@@ -535,21 +539,25 @@ class ThreeCardPokerGameHandEvaluator {
         }
     }
     
-    func evalHand(cards: [Card])->Int{
+    func evalHand(cards: [Card])-> (Int, String, Int){
         
         var sortedCards = sortCards(cards: cards)
         var sortedString = ""
         var maxScore = 0
+        var maxCardType = ""
+        var maxIsPair = 0
         
         for sortedCards in sortedCards {
-            let score = calcHandInfoFlg(sortedCards: sortedCards)
+            let (score, cardType, isPair) = calcHandInfoFlg(sortedCards: sortedCards)
             if score > maxScore {
                 maxScore = score
+                maxCardType = cardType
+                maxIsPair = isPair
             }
         }
         print("maxScore \(maxScore)")
         
-        return maxScore
+        return (maxScore, maxCardType, maxIsPair)
     }
     
     func sortCards(cards: [Card]) -> [[Card]] {
@@ -621,10 +629,11 @@ class ThreeCardPokerGameHandEvaluator {
         return allCards
     }
     
-    func calcHandInfoFlg(sortedCards: [Card]) -> Int {
+    func calcHandInfoFlg(sortedCards: [Card]) -> (Int, String, Int) {
         var rankResult = 0
-        
-        var ruleDict: [Int: ([Card]) -> Int] = [
+        var cardType: String = ""
+        var isPair: Int = 0
+        var ruleDict: [Int: ([Card]) -> (Int, String, Int)] = [
             0  : self.eval_holecard,
             1  : self.eval_onepair,
             2  : self.eval_truepair,
@@ -643,7 +652,7 @@ class ThreeCardPokerGameHandEvaluator {
         
         for (index, ruleIndex) in rankRules.enumerated() {
             var rankFlag = 1 << (rankRules.count - index + 18)
-            rankResult = ruleDict[ruleIndex]!(sortedCards) // 假设 ruleDict 是一个规则函数的字典
+            (rankResult, cardType, isPair) = ruleDict[ruleIndex]!(sortedCards) // 假设 ruleDict 是一个规则函数的字典
             
             if (isCompareSuit == 0) {
                 rankResult >>= 6
@@ -657,13 +666,14 @@ class ThreeCardPokerGameHandEvaluator {
         }
 
         
-        return rankResult
+        return (rankResult, cardType, isPair)
     }
     
-    func eval_doubleJoker(_ cards: [Card]) -> Int {
+    func eval_doubleJoker(_ cards: [Card]) -> (Int, String, Int) {
         var rank: Int = 0
         var cnt: Int = 0
-        
+        var cardType: String = ""
+        var isPair: Int = 0
         for i in 0..<3 {
             if cards[i].rank == -1 {
                 cnt += 1
@@ -687,14 +697,19 @@ class ThreeCardPokerGameHandEvaluator {
                 rank = rank << 4 | cards[i].suit[0]
             }
         }
+        if rank > 0 {
+            cardType = "对王"
+            isPair = 1
+        }
         
-        return rank
+        return (rank, cardType, isPair)
     }
         
-    func eval_threecard(_ cards: [Card]) -> Int {
+    func eval_threecard(_ cards: [Card]) -> (Int, String, Int) {
         var rank: Int = 0
         var cnt: Int = 0
-        
+        var cardType: String = ""
+
         var targetRank = cards[0].rank
         if targetRank == -1 {
             targetRank = maxRank
@@ -716,12 +731,16 @@ class ThreeCardPokerGameHandEvaluator {
             }
         }
         
+        if rank > 0{
+            cardType = "三条" + GameManager.CardNumberReportDic[cards[0].originalRank]!
+
+        }
+
         
-        
-        return rank
+        return (rank, cardType, 0)
     }
 
-    func eval_235flush(cards: [Card]) -> Int {
+    func eval_235flush(cards: [Card]) -> (Int, String, Int) {
         var rank: Int = 0
         var cnt5: Int = 0
         var cnt3: Int = 0
@@ -763,10 +782,10 @@ class ThreeCardPokerGameHandEvaluator {
                 rank = rank << 2 | targetSuit
             }
         }
-        return rank
+        return (rank, "同花235", 0)
     }
 
-    func eval_235(cards: [Card]) -> Int {
+    func eval_235(cards: [Card]) -> (Int, String, Int) {
         var rank: Int = 0
         var cnt5: Int = 0
         var cnt3: Int = 0
@@ -793,10 +812,10 @@ class ThreeCardPokerGameHandEvaluator {
                 rank = rank << 2 | cards[i].suit[0]
             }
         }
-        return rank
+        return (rank, "235", 0)
     }
     
-    func eval_akjflush(cards: [Card]) -> Int {
+    func eval_akjflush(cards: [Card]) -> (Int,String,Int) {
         var rank: Int = 0
         var cntA: Int = 0
         var cntK: Int = 0
@@ -836,10 +855,10 @@ class ThreeCardPokerGameHandEvaluator {
                 rank = rank << 2 | targetSuit
             }
         }
-        return rank
+        return (rank, "同花AKJ", 0)
     }
     
-    func eval_akj(cards: [Card]) -> Int {
+    func eval_akj(cards: [Card]) -> (Int, String, Int) {
         var rank: Int = 0
         var cntA: Int = 0
         var cntK: Int = 0
@@ -866,10 +885,10 @@ class ThreeCardPokerGameHandEvaluator {
                 rank = rank << 2 | cards[i].suit[0]
             }
         }
-        return rank
+        return (rank, "AKJ", 0)
     }
     
-    func eval_threehead(cards: [Card]) -> Int {
+    func eval_threehead(cards: [Card]) -> (Int, String, Int) {
         var rank: Int = 0
         var cnt: Int = 0
 
@@ -894,14 +913,15 @@ class ThreeCardPokerGameHandEvaluator {
                 rank = rank << 2 | cards[i].suit[0]
             }
         }
-        return rank
+        return (rank, "三公", 0)
     }
     
-    func eval_straightflush(cards: [Card]) -> Int {
+    func eval_straightflush(cards: [Card]) -> (Int, String, Int) {
         var rank: Int = 0
         var cntC: Int = 0
         var straightHead: Int = -1
-
+        var cardType: String = ""
+        
         var rankList: [Int] = []
         for i in 0..<3 {
             if cards[i].rank == -1 {
@@ -971,16 +991,23 @@ class ThreeCardPokerGameHandEvaluator {
                 }
             }
         }
-        return rank
+        
+        if rank > 0 {
+            cardType = GameManager.CardNumberReportDic[cards[0].originalRank]! + "同花顺"
+        }
+        
+        
+        return (rank, cardType, 0)
     }
     
-    func eval_pairflush(cards: [Card]) -> Int {
+    func eval_pairflush(cards: [Card]) -> (Int, String, Int) {
         var rank: Int = 0
 
         var pairRank: Int = -1
         var singleRank: Int = -1
         var cntC: Int = 0
         var rankList: [Int] = []
+        var cardType: String = ""
         
         for i in 0..<3 {
             if cards[i].rank == -1 {
@@ -1003,9 +1030,11 @@ class ThreeCardPokerGameHandEvaluator {
             if rankList[0] == rankList[1] {
                 pairRank = rankList[0]
                 singleRank = rankList[2]
+                cardType = "对" +  GameManager.CardNumberReportDic[cards[0].originalRank]!
             } else if rankList[1] == rankList[2] {
                 pairRank = rankList[1]
                 singleRank = rankList[0]
+                cardType = "对" +  GameManager.CardNumberReportDic[cards[1].originalRank]!
             }
         }
 
@@ -1032,10 +1061,10 @@ class ThreeCardPokerGameHandEvaluator {
                 rank = rank << 2 | targetSuit
             }
         }
-        return rank
+        return (rank, cardType, 1)
     }
     
-    func eval_flush(cards: [Card]) -> Int {
+    func eval_flush(cards: [Card]) -> (Int, String, Int) {
         var rank: Int = 0
         var targetSuit: Int = -1
         var cntSuit: [Int] = [0, 0, 0, 0]
@@ -1076,10 +1105,10 @@ class ThreeCardPokerGameHandEvaluator {
                 rank = rank << 2 | targetSuit
             }
         }
-        return rank
+        return (rank, "同花对子", 1)
     }
 
-    func eval_straight(cards: [Card]) -> Int {
+    func eval_straight(cards: [Card]) -> (Int, String, Int) {
         var rank: Int = 0
         var cntC: Int = 0
         var straightHead: Int = -1
@@ -1158,17 +1187,22 @@ class ThreeCardPokerGameHandEvaluator {
                 rank = rank << 2 | suitList[i]
             }
         }
+        var cardType: String = ""
+        if rank > 0 {
+            cardType = GameManager.CardNumberReportDic[cards[0].originalRank]! + "顺子"
+        }
 
-        return rank
+        return (rank, cardType, 0)
     }
     
-    func eval_truepair(cards: [Card]) -> Int {
+    func eval_truepair(cards: [Card]) -> (Int, String, Int) {
         var rank: Int = 0
 
         var pairRank: Int = -1
         var singleRank: Int = -1
         var cntC: Int = 0
         var suitList: [Int] = []
+        var cardType: String = ""
 
         for i in 0..<3 {
             if cards[i].rank == -1 {
@@ -1215,12 +1249,14 @@ class ThreeCardPokerGameHandEvaluator {
                 suitList.append(cards[0].suit[0])
                 suitList.append(cards[0].suit[0])
                 suitList.append(cards[1].suit[0])
+                cardType = "对" + GameManager.CardNumberReportDic[cards[0].originalRank]!
             } else if cards[1].suit.contains(cards[2].suit[0]) {
                 pairRank = cards[1].rank
                 singleRank = cards[0].rank
                 suitList.append(cards[1].suit[0])
                 suitList.append(cards[1].suit[0])
                 suitList.append(cards[0].suit[0])
+                cardType = "对" + GameManager.CardNumberReportDic[cards[1].originalRank]!
             }
         } else {
             if cards[0].rank == cards[1].rank && cards[0].suit.contains(cards[1].suit[0]) {
@@ -1229,6 +1265,7 @@ class ThreeCardPokerGameHandEvaluator {
                 suitList.append(cards[0].suit[0])
                 suitList.append(cards[0].suit[0])
                 suitList.append(cards[2].suit[0])
+                cardType = "对" + GameManager.CardNumberReportDic[cards[0].originalRank]!
             }
 
             if cards[1].rank == cards[2].rank && cards[1].suit.contains(cards[2].suit[0]) {
@@ -1237,6 +1274,7 @@ class ThreeCardPokerGameHandEvaluator {
                 suitList.append(cards[1].suit[0])
                 suitList.append(cards[1].suit[0])
                 suitList.append(cards[0].suit[0])
+                cardType = "对" +  GameManager.CardNumberReportDic[cards[1].originalRank]!
             }
         }
 
@@ -1249,16 +1287,17 @@ class ThreeCardPokerGameHandEvaluator {
             }
         }
 
-        return rank
+        return (rank, cardType, 1)
     }
     
-    func eval_onepair(cards: [Card]) -> Int {
+    func eval_onepair(cards: [Card]) -> (Int, String, Int) {
         var rank: Int = 0
 
         var pairRank: Int = -1
         var singleRank: Int = -1
         var cntC: Int = 0
         var suitList: [Int] = []
+        var cardType: String = ""
 
         for i in 0..<3 {
             if cards[i].rank == -1 {
@@ -1291,12 +1330,14 @@ class ThreeCardPokerGameHandEvaluator {
                 suitList.append(cards[0].suit[0])
                 suitList.append(cards[1].suit[0])
                 suitList.append(cards[2].suit[0])
+                cardType = "对" + GameManager.CardNumberReportDic[cards[0].originalRank]!
             } else if cards[1].rank == cards[2].rank {
                 pairRank = cards[1].rank
                 singleRank = cards[0].rank
                 suitList.append(cards[1].suit[0])
                 suitList.append(cards[2].suit[0])
                 suitList.append(cards[0].suit[0])
+                cardType = "对" + GameManager.CardNumberReportDic[cards[1].originalRank]!
             }
         }
 
@@ -1309,10 +1350,10 @@ class ThreeCardPokerGameHandEvaluator {
             }
         }
 
-        return rank
+        return (rank, cardType, 1)
     }
 
-    func eval_holecard(cards: [Card]) -> Int {
+    func eval_holecard(cards: [Card]) -> (Int, String, Int) {
         var jokerList: [[Int]] = []
         var normalList: [[Int]] = []
         var rank: Int = 0
@@ -1363,7 +1404,7 @@ class ThreeCardPokerGameHandEvaluator {
             }
         }
 
-        return rank
+        return (rank, "单牌", 0)
     }
 
 }
