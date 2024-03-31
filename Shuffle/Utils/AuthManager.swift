@@ -38,11 +38,11 @@ class AuthManager {
         return nil
     }
     
-    static func hashWithSalt() -> String? {
+    static func hashWithSalt(input: String) -> String? {
         // 设置盐值
         let salt = "hellofromtheotherside"
         // 将盐值和getUniqueID获得的字符串组合成一个新字符串
-        let saltedInput = salt + (getUniqueID() ?? "")
+        let saltedInput = salt + input
         // 使用SHA-512哈希算法对新字符串进行哈希加密
         let hashedData = SHA512.hash(data: Data(saltedInput.utf8))
         // 将哈希值转换成字符串
@@ -51,8 +51,8 @@ class AuthManager {
         return hash
     }
     
-    static func authKey(input: String) -> Bool? {
-        guard let hash = hashWithSalt() else {
+    static func authKey(input: String, uniqueID: String) -> Bool? {
+        guard let hash = hashWithSalt(input: uniqueID) else {
             return nil
         }
         

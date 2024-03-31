@@ -9,7 +9,7 @@ struct MainContentView: View {
     var body: some View {
         ZStack {
             MyViewControllerWrapper(viewmodel: viewModel)
-            
+             
             if viewModel.isBlack {
                 ZStack {
                     Color.black
@@ -43,6 +43,7 @@ struct MainContentView: View {
         .onDisappear {
             viewModel.stopCamera()
         }
+        
     }
 }
 
@@ -133,6 +134,10 @@ class MyViewController: UIViewController {
             volumeViewSlider?.value = volume
             print("\(volumeViewSlider?.value ?? -100)")
         }
+    }
+    
+    override var prefersStatusBarHidden: Bool {
+        return true
     }
     
     
