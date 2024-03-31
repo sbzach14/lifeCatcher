@@ -551,7 +551,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                             self.speakText(input: 2)
                         }
                         
-                        else {
+                        else { 
                             var cutIndex = self.cardArray.firstIndex(of: cutCard)!
                             if self.cutMode == 1{
                                 //看底
@@ -793,38 +793,40 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
         
         sortedKeys = sortedKeys.filter { !deleteKeys.contains($0) }
+        
+        var endIndex = sortedKeys.count - 3
 
         
+        //TODO清理单侧结尾(连续多个none视作结尾）？
+        
+        
         //求出所有链路，链上数字confidence=100
-        for keyIndex in beginIndex..<sortedKeys.count - 3{
+        for keyIndex in beginIndex..<endIndex{
             let detectResultListIndex = sortedKeys[keyIndex]
             let nextDetectResultListIndex = sortedKeys[keyIndex+1]
             for numIndex in 0..<self.detectResultList[detectResultListIndex]!.count{
                 let nowNum = self.detectResultList[detectResultListIndex]![numIndex].cardIndex[0]
                 if nowNum != -1
                     && self.detectResultList[nextDetectResultListIndex]![numIndex].cardIndex[0] == nowNum{
-                    //if self.confidenceDic[nowNum] != 100 || self.detectResultList[detectResultListIndex][numIndex].nodeType != 0{
                     self.detectResultList[detectResultListIndex]![numIndex].nodeType += 1
                     self.detectResultList[nextDetectResultListIndex]![numIndex].nodeType += 2
-                    //}
                     self.confidenceDic[nowNum] = 100
                 }
             }
         }
         
-        //分析结果
         var leftSideCnt = 0
         var rightSideCnt = 0
         var longestIndex = -1
         var longestCnt = 0
         var currentCnt = 0
         
-        for keyIndex in beginIndex..<sortedKeys.count - 3{
+        for keyIndex in beginIndex..<endIndex{
             let detectResultListIndex = sortedKeys[keyIndex]
             for numIndex in 0..<self.detectResultList[detectResultListIndex]!.count{
                 let detectResultNode = self.detectResultList[detectResultListIndex]![numIndex]
                 
-                if detectResultNode.nodeType == 1 || detectResultNode.nodeType == 4{
+                if detectResultNode.nodeType == 1{
                     if numIndex == 0{
                         leftSideCnt += 1
                     }
@@ -833,15 +835,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     }
                 }
                 
-                if detectResultNode.nodeType == 4{
-                    currentCnt = 1
-                    
-                    if currentCnt > longestCnt{
-                        longestCnt = currentCnt
-                        longestIndex = detectResultNode.cardIndex[0]
-                    }
-                }
-                else if detectResultNode.nodeType == 1{
+                if detectResultNode.nodeType == 1{
                     currentCnt = 1
                 }
                 else if detectResultNode.nodeType == 2{
@@ -863,7 +857,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
         
         var isSingle = true
-        if leftSideCnt != 0 && rightSideCnt != 0{
+        if leftSideCnt > 0 && rightSideCnt > 0{
             isSingle = false
         }
         
@@ -878,7 +872,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         //如果两侧都有 则要找到两侧都是链的时候开始 即两侧都是3
         if !isSingle
         {
-            for keyIndex in beginIndex..<sortedKeys.count - 3{
+            for keyIndex in beginIndex..<endIndex{
                 let detectResultListIndex = sortedKeys[keyIndex]
                 if self.detectResultList[detectResultListIndex]![0].nodeType == 3
                     && self.detectResultList[detectResultListIndex]![1].nodeType == 3{
@@ -887,8 +881,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 }
             }
         }
-        
-        //todo 清理结尾
         
         //整理同一个数字的多条链路
         //整理两次
@@ -902,7 +894,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         var end = -1
                         var head = -1
                         
-                        for keyIndex in beginIndex..<sortedKeys.count - 3{
+                        for keyIndex in beginIndex..<endIndex{
                             let detectResultListIndex = sortedKeys[keyIndex]
                             let nowNum = self.detectResultList[detectResultListIndex]![numIndex].cardIndex[0]
                             if nowNum == key && self.detectResultList[detectResultListIndex]![numIndex].nodeType == 2{
@@ -913,7 +905,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                                         && end != -1{
                                 head = detectResultListIndex
                                 
-                                var isSameNum = head - end <= 5
+                                let isSameNum = head - end <= 5
                                 //                            var middleNum = self.detectResultList[end+1][numIndex].cardIndex[0]
                                 //                            for updateIndex in end+1...head-1{
                                 //                                if self.detectResultList[updateIndex][numIndex].cardIndex[0] != middleNum{
@@ -944,11 +936,38 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
         
+        
+        //TODO处理多链？
+    
+        
+        //检查是否有数字唯一链被删除
+        for key in self.confidenceDic.keys{
+            if self.confidenceDic[key] == 100{
+                var isChain = false
+                for keyIndex in beginIndex..<endIndex{
+                    let detectResultListIndex = sortedKeys[keyIndex]
+                    for numIndex in 0..<self.detectResultList[detectResultListIndex]!.count{
+                        let nowNum = self.detectResultList[detectResultListIndex]![numIndex].cardIndex[0]
+                        let nodeType = self.detectResultList[detectResultListIndex]![numIndex].nodeType
+                        if nowNum == key && nodeType == 3 {
+                            isChain = true
+                        }
+                    }
+                    if isChain{
+                        break
+                    }
+                }
+                if !isChain{
+                    self.confidenceDic[key] = 0
+                }
+            }
+        }
+        
         //找到所有不在链上但在单独节点的数字
         for key in self.confidenceDic.keys{
             if self.confidenceDic[key] == 0{
                 var nodeIndex : [Int] = []
-                for keyIndex in beginIndex..<sortedKeys.count - 3{
+                for keyIndex in beginIndex..<endIndex{
                     let detectResultListIndex = sortedKeys[keyIndex]
                     
                     for numIndex in 0..<self.detectResultList[detectResultListIndex]!.count{
@@ -967,7 +986,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
         
         //剩下的节点都是融合牌，可能是已有的牌之间融合，也有可能是已有的牌和未出现的牌融合
-        for keyIndex in beginIndex..<sortedKeys.count - 3{
+        for keyIndex in beginIndex..<endIndex{
             let detectResultListIndex = sortedKeys[keyIndex]
             let lastDetectResultListIndex = sortedKeys[keyIndex-1]
             let lastlastDetectResultListIndex = sortedKeys[keyIndex-2]
@@ -999,7 +1018,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
         
-        for keyIndex in beginIndex..<sortedKeys.count - 3{
+        for keyIndex in beginIndex..<endIndex{
             let detectResultListIndex = sortedKeys[keyIndex]
             for numIndex in 0..<self.detectResultList[detectResultListIndex]!.count{
                 let detectResultNode = self.detectResultList[detectResultListIndex]![numIndex]
@@ -1016,6 +1035,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
 
         
+        //分析结果
+        
         var lostNumCnt = 0
         for key in self.confidenceDic.keys{
             if self.confidenceDic[key] == 0{
@@ -1027,7 +1048,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         var detectCardArray : [Int] = []
         
         //插入牌堆
-        for keyIndex in beginIndex..<sortedKeys.count - 3{
+        for keyIndex in beginIndex..<endIndex{
             let detectResultListIndex = sortedKeys[keyIndex]
             let lastDetectResultListIndex = sortedKeys[keyIndex-1]
             let nextDetectResultListIndex = sortedKeys[keyIndex+1]
