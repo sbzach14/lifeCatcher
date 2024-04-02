@@ -842,6 +842,18 @@ class PokerBullGame {
                 }
             }
         }
+        //存储每位玩家手牌
+        for i in 0..<playerNum {
+            for bullCard in allPlayers[i].playerCard{
+                returnPlayerInfos[i].PlayerCards.append(Card(suit: [bullCard.suit], rank: bullCard.trueRank, cardIndex: bullCard.cardIndex))
+            }
+        }
+        //存储公牌
+        for i in 0..<playerNum {
+            for bullCard in community{
+                returnPlayerInfos[i].communityCard.append(Card(suit: [bullCard.suit], rank: bullCard.trueRank, cardIndex: bullCard.cardIndex))
+            }
+        }
         
 //        // 计算牌额大小
         if wayToDealCards == 0{

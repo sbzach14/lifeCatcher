@@ -159,14 +159,14 @@ class GameManager {
         return resultList
     }
     
-    static func selectGame(gameIndex: Int, inputCards: [Int], playerNum: Int, args : [Int], rankRules : [Int], suitRules: [Int],dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], calModeArgs: [Int], cutNumSetting: Int, cutNumRangeSetting: [Int], consecutiveReport: Int, minCardNum: Int) -> [[Int]] {
+    static func selectGame(gameIndex: Int, inputCards: [Int], playerNum: Int, args : [Int], rankRules : [Int], suitRules: [Int],dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], calModeArgs: [Int], cutNumSetting: Int, cutNumRangeSetting: [Int], consecutiveReport: Int, minCardNum: Int) -> ([[Int]], ReportManager.MultipleReportResultInfo) {
         var reportResult:[[Int]] = []
         //TODO dealType 0 正发，1 反发 搞清楚ui
         //cutNumSetting 点数设置
         //cutNumRangeSetting 打色范围 [下限，上限]
         //consecutiveReport 连报轮数 1，2，3，不洗牌接着玩
         //calModeArgs [target, targetPos]
-        //calmode 0不打色 1去色 2留色
+        //calmode 报法ID
         //target 0max 1min 2生死门
         //targetPos 这里变为0开始
         //dealNum 0 默认每轮发一张，1 自定义
@@ -200,186 +200,190 @@ class GameManager {
 //            13: ThreeCardPointGame.FindWinner(diyDealStatus:diyDealNum:inputCards:args:rankRules:suitRules:),
 //            14: TenPointFiveGame.FindWinner(diyDealStatus:diyDealNum:inputCards:args:rankRules:suitRules:)
         ]
-
-        // 检查 gameIndex 是否存在于字典中
-        if let gameFunction = gameFunctions[gameIndex] {
-            print("Selected Game: \(gameFunction)")
-            var currentCards = inputCards
-            switch calMode{
-            case 0://不打色
-                
-                for i in 0...consecutiveReport - 1{
-                    let (result, leftCards,winnerRanks) = gameFunction(diyDealStatus,diyDealNum, currentCards, newArgs, rankRules, suitRules)
-                    if result.count != 0 {
-                        //报最大
-                        if target == 0{
-                            
-                            reportResult.append(extractWinnerSet(inputWinners: result, inputWinnerRanks: winnerRanks, isWinner: true))
-                        }
-                        //报最小
-                        else if target == 1{
-                            reportResult.append(extractWinnerSet(inputWinners: result, inputWinnerRanks: winnerRanks, isWinner: false))
-                        }
-                        //剩下的牌组
-                        currentCards = leftCards
-                        if leftCards.count == 0 {
-                            print("剩余的牌不足")
-                            break
-                        }
-                    } else if result.count == 0{
-                        print("当前牌不足")
-                        break
-                    }
-                }
-            
-            case 1://去色
-                var currentConsecutiveReport = consecutiveReport
-                // 如果是生死门没有连报
-                if consecutiveReport > 1 && target == 2{
-                    currentConsecutiveReport = 1
-                }
-                for i in 0..<currentConsecutiveReport{
-                    var aliveTimes = 0
-                    var totalTimes = 0
-                    //遍历打色范围
-                    print("下一轮--------")
-                    for cardIndex in (cutNumRangeSetting[0] - 1)...(cutNumRangeSetting[1] - 1){
-                        let cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: currentCards[cardIndex])
-                        print("切第\(cardIndex + 1) 张 切到的牌是 \(GameManager.cardLabelDic[currentCards[cardIndex]]) 点数是 \(cardRank)")
-                        
-                        let newInputCards = Array(currentCards[(cardIndex+1)...])//去掉上面的牌
-                        var resultTargetPos:[Int] = []
-                        let (result, leftCards, winnerRanks) = gameFunction(diyDealStatus,diyDealNum, newInputCards, newArgs, rankRules, suitRules)
-                        if result.count != 0 {
-                            //报切几张目标位置最大
-                            if target == 0{
-                                resultTargetPos = extractWinnerSet(inputWinners: result, inputWinnerRanks: winnerRanks, isWinner: true)
-                            }
-                            //报切几张目标位置最小
-                            else if target == 1{
-                                resultTargetPos = extractWinnerSet(inputWinners: result, inputWinnerRanks: winnerRanks, isWinner: false)
-                            //报生死门
-                            } else if target == 2{
-                                resultTargetPos = extractWinnerSet(inputWinners: result, inputWinnerRanks: winnerRanks, isWinner: true)
-                            }
-                        } else if (result.isEmpty) {
-                            break
-                        }
-                        var resultPos:[Int] = []
-                        for resultTargetPo in resultTargetPos {
-                            resultPos.append((cardRank + resultTargetPo) % playerNum)
-                        }
-//                        let resultPos = (cardRank + resultTargetPos) % playerNum//起始发牌位置+目标输赢发牌位置
-                        print("切牌数字 \(cardRank) 计算结果位置 \(resultPos) 目标位置 \(targetPos)")
-                        if target == 0 || target == 1{
-                            if resultPos.contains(where: {$0 == targetPos}) {//targetPos 0 - playerNum-1
-                                print("切第\(cardIndex + 1)张最大/最小")
-                                reportResult.append([cardIndex])
-                                currentCards = leftCards
-                                break
-                            }
-                        } else {
-                            if resultPos.contains(where: {$0 == targetPos}){
-                                aliveTimes += 1
-                            }
-                            totalTimes += 1
-                        }
-                        
-                        if currentCards.count == 0 {
-                            break
-                        }
-                    }
-                    //生死门暂时没有连报
-                    if target == 2{
-                        reportResult.append([100 * aliveTimes / totalTimes])
-                    }
-                    if reportResult.count != i + 1{
-                        reportResult.append([])
-                    }
-                    if currentCards.count == 0{
-                        break
-                    }
-                }
-                
-                
-            case 2://留色
-                var currentConsecutiveReport = consecutiveReport
-                // 如果是生死门没有连报
-
-                if consecutiveReport > 1 && target == 2{
-                    currentConsecutiveReport = 1
-                }
-                for i in 0..<currentConsecutiveReport{
-                    var aliveTimes = 0
-                    var totalTimes = 0
-                    
-                    print("下一轮--------")
-                    
-
-                    for cardIndex in (cutNumRangeSetting[0] - 1)...(cutNumRangeSetting[1] - 1){
-                        let cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: currentCards[cardIndex])
-                        
-                        print("切第\(cardIndex + 1) 张 切到的牌是 \(GameManager.cardLabelDic[currentCards[cardIndex]]) 点数是 \(cardRank)")
-                        
-                        var resultTargetPos:[Int] = []
-                        let (result, leftCards, winnerRanks) = gameFunction(diyDealStatus, diyDealNum, currentCards, newArgs, rankRules, suitRules)
-                        if result.count != 0 {
-                            if target == 0{
-                                resultTargetPos = extractWinnerSet(inputWinners: result, inputWinnerRanks: winnerRanks, isWinner: true)
-                            }
-                            else if target == 1{
-                                resultTargetPos = extractWinnerSet(inputWinners: result, inputWinnerRanks: winnerRanks, isWinner: false)
-                            } else if target == 2{
-                                resultTargetPos = extractWinnerSet(inputWinners: result, inputWinnerRanks: winnerRanks, isWinner: true)
-                                
-                            }
-                        } else if result.isEmpty {
-                            break
-                        }
-                        var resultPos:[Int] = []
-                        for resultTargetPo in resultTargetPos {
-                            resultPos.append((cardRank + resultTargetPo) % playerNum)
-                        }
-//                        let resultPos = (cardRank + resultTargetPos) % playerNum//起始发牌位置+目标输赢发牌位置
-                        print("切牌数字 \(cardRank) 计算结果位置 \(resultPos) 目标位置 \(targetPos)")
-                        if target == 0 || target == 1 {
-                            if resultPos.contains(where: {$0 == targetPos}){
-                                print("切第\(cardIndex + 1)张最大/最小")
-                                reportResult.append([cardIndex])
-                                currentCards = leftCards
-                                break
-                            }
-                        } else {
-                            if resultPos.contains(where: {$0 == targetPos}){
-                                aliveTimes += 1
-                            }
-                            totalTimes += 1
-                        }
-                        if currentCards.count == 0 {
-                            break
-                        }
-                    }
-                    
-
-                    //生死门暂时没有连报
-                    if target == 2{
-                        reportResult.append([100 * aliveTimes / totalTimes])
-                    }
-                    if reportResult.count != i + 1{
-                        reportResult.append([])
-                    }
-                    if currentCards.count == 0 {
-                        break
-                    }
-                }
-            default:
-                print("calModeArgs 0 error")
-            }
-        } else {
-            print("Invalid gameIndex: \(gameIndex)")
-        }
         
-        return reportResult
+        let (reportResultString, multipleGameInfo) =  ReportManager.GameReporter(gameIndex: gameIndex, inputCards: inputCards, diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, newArgs: newArgs, rankRules: rankRules, suitRules: suitRules, reportID: calMode, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, targetPos: targetPos, coloringType: coloringType, consecutiveNum: consecutiveReport)
+        
+        print("播报结果: \(reportResultString)")
+        
+        
+
+//        // 检查 gameIndex 是否存在于字典中
+//        if let gameFunction = gameFunctions[gameIndex] {
+//            print("Selected Game: \(gameFunction)")
+//            var currentCards = inputCards
+//            switch calMode{
+//            case 0://不打色
+//
+//                for i in 0...consecutiveReport - 1{
+//                    let (result, leftCards,winnerRanks) = gameFunction(diyDealStatus,diyDealNum, currentCards, newArgs, rankRules, suitRules)
+//                    if result.count != 0 {
+//                        //报最大
+//                        if target == 0{
+//
+//                            reportResult.append(extractWinnerSet(inputWinners: result, inputWinnerRanks: winnerRanks, isWinner: true))
+//                        }
+//                        //报最小
+//                        else if target == 1{
+//                            reportResult.append(extractWinnerSet(inputWinners: result, inputWinnerRanks: winnerRanks, isWinner: false))
+//                        }
+//                        //剩下的牌组
+//                        currentCards = leftCards
+//                        if leftCards.count == 0 {
+//                            print("剩余的牌不足")
+//                            break
+//                        }
+//                    } else if result.count == 0{
+//                        print("当前牌不足")
+//                        break
+//                    }
+//                }
+//
+//            case 1://去色
+//                var currentConsecutiveReport = consecutiveReport
+//                // 如果是生死门没有连报
+//                if consecutiveReport > 1 && target == 2{
+//                    currentConsecutiveReport = 1
+//                }
+//                for i in 0..<currentConsecutiveReport{
+//                    var aliveTimes = 0
+//                    var totalTimes = 0
+//                    //遍历打色范围
+//                    print("下一轮--------")
+//                    for cardIndex in (cutNumRangeSetting[0] - 1)...(cutNumRangeSetting[1] - 1){
+//                        let cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: currentCards[cardIndex])
+//                        print("切第\(cardIndex + 1) 张 切到的牌是 \(GameManager.cardLabelDic[currentCards[cardIndex]]) 点数是 \(cardRank)")
+//
+//                        let newInputCards = Array(currentCards[(cardIndex+1)...])//去掉上面的牌
+//                        var resultTargetPos:[Int] = []
+//                        let (result, leftCards, winnerRanks) = gameFunction(diyDealStatus,diyDealNum, newInputCards, newArgs, rankRules, suitRules)
+//                        if result.count != 0 {
+//                            //报切几张目标位置最大
+//                            if target == 0{
+//                                resultTargetPos = extractWinnerSet(inputWinners: result, inputWinnerRanks: winnerRanks, isWinner: true)
+//                            }
+//                            //报切几张目标位置最小
+//                            else if target == 1{
+//                                resultTargetPos = extractWinnerSet(inputWinners: result, inputWinnerRanks: winnerRanks, isWinner: false)
+//                            //报生死门
+//                            } else if target == 2{
+//                                resultTargetPos = extractWinnerSet(inputWinners: result, inputWinnerRanks: winnerRanks, isWinner: true)
+//                            }
+//                        } else if (result.isEmpty) {
+//                            break
+//                        }
+//                        var resultPos:[Int] = []
+//                        for resultTargetPo in resultTargetPos {
+//                            resultPos.append((cardRank + resultTargetPo) % playerNum)
+//                        }
+//                        print("切牌数字 \(cardRank) 计算结果位置 \(resultPos) 目标位置 \(targetPos)")
+//                        if target == 0 || target == 1{
+//                            if resultPos.contains(where: {$0 == targetPos}) {//targetPos 0 - playerNum-1
+//                                print("切第\(cardIndex + 1)张最大/最小")
+//                                reportResult.append([cardIndex])
+//                                currentCards = leftCards
+//                                break
+//                            }
+//                        } else {
+//                            if resultPos.contains(where: {$0 == targetPos}){
+//                                aliveTimes += 1
+//                            }
+//                            totalTimes += 1
+//                        }
+//
+//                        if currentCards.count == 0 {
+//                            break
+//                        }
+//                    }
+//                    //生死门暂时没有连报
+//                    if target == 2{
+//                        reportResult.append([100 * aliveTimes / totalTimes])
+//                    }
+//                    if reportResult.count != i + 1{
+//                        reportResult.append([])
+//                    }
+//                    if currentCards.count == 0{
+//                        break
+//                    }
+//                }
+//
+//
+//            case 2://留色
+//                var currentConsecutiveReport = consecutiveReport
+//                // 如果是生死门没有连报
+//
+//                if consecutiveReport > 1 && target == 2{
+//                    currentConsecutiveReport = 1
+//                }
+//                for i in 0..<currentConsecutiveReport{
+//                    var aliveTimes = 0
+//                    var totalTimes = 0
+//
+//                    print("下一轮--------")
+//
+//
+//                    for cardIndex in (cutNumRangeSetting[0] - 1)...(cutNumRangeSetting[1] - 1){
+//                        let cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: currentCards[cardIndex])
+//
+//                        print("切第\(cardIndex + 1) 张 切到的牌是 \(GameManager.cardLabelDic[currentCards[cardIndex]]) 点数是 \(cardRank)")
+//
+//                        var resultTargetPos:[Int] = []
+//                        let (result, leftCards, winnerRanks) = gameFunction(diyDealStatus, diyDealNum, currentCards, newArgs, rankRules, suitRules)
+//                        if result.count != 0 {
+//                            if target == 0{
+//                                resultTargetPos = extractWinnerSet(inputWinners: result, inputWinnerRanks: winnerRanks, isWinner: true)
+//                            }
+//                            else if target == 1{
+//                                resultTargetPos = extractWinnerSet(inputWinners: result, inputWinnerRanks: winnerRanks, isWinner: false)
+//                            } else if target == 2{
+//                                resultTargetPos = extractWinnerSet(inputWinners: result, inputWinnerRanks: winnerRanks, isWinner: true)
+//
+//                            }
+//                        } else if result.isEmpty {
+//                            break
+//                        }
+//                        var resultPos:[Int] = []
+//                        for resultTargetPo in resultTargetPos {
+//                            resultPos.append((cardRank + resultTargetPo) % playerNum)
+//                        }
+//                        print("切牌数字 \(cardRank) 计算结果位置 \(resultPos) 目标位置 \(targetPos)")
+//                        if target == 0 || target == 1 {
+//                            if resultPos.contains(where: {$0 == targetPos}){
+//                                print("切第\(cardIndex + 1)张最大/最小")
+//                                reportResult.append([cardIndex])
+//                                currentCards = leftCards
+//                                break
+//                            }
+//                        } else {
+//                            if resultPos.contains(where: {$0 == targetPos}){
+//                                aliveTimes += 1
+//                            }
+//                            totalTimes += 1
+//                        }
+//                        if currentCards.count == 0 {
+//                            break
+//                        }
+//                    }
+//
+//
+//                    //生死门暂时没有连报
+//                    if target == 2{
+//                        reportResult.append([100 * aliveTimes / totalTimes])
+//                    }
+//                    if reportResult.count != i + 1{
+//                        reportResult.append([])
+//                    }
+//                    if currentCards.count == 0 {
+//                        break
+//                    }
+//                }
+//            default:
+//                print("calModeArgs 0 error")
+//            }
+//        } else {
+//            print("Invalid gameIndex: \(gameIndex)")
+//        }
+        
+        return (reportResult, multipleGameInfo)
     }
     
     static func getCheckedIndexes(rankRules: [RankRulesSate]) -> [Int] {
@@ -453,11 +457,12 @@ public class RuleManager{
     }
     //初始化预设好的报法
     static func LoadAllReportRules(){
+        print("报法初始化成功")
         allPreSetReportRules[0] = ReportClass.init(reportName: "[1]报最大", reportID: 0, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: -1, reportTarget: 0, cardsTransformation: -1, consecutiveReport: -1, positionToReport: -1, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
         allPreSetReportRules[1] = ReportClass.init(reportName: "[2]报最小", reportID: 1, rankReport: 3, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: -1, reportTarget: 0, cardsTransformation: -1, consecutiveReport: -1, positionToReport: -1, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
         allPreSetReportRules[2] = ReportClass.init(reportName: "[3]报最大次大", reportID: 2, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: -1, reportTarget: 0, cardsTransformation: -1, consecutiveReport: -1, positionToReport: -1, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
         allPreSetReportRules[3] = ReportClass.init(reportName: "[4]报最小次小", reportID: 3, rankReport: 4, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: -1, reportTarget: 0, cardsTransformation: -1, consecutiveReport: -1, positionToReport: -1, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[4] = ReportClass.init(reportName: "[5]报1大2大3大", reportID: 4, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: -1, reportTarget: 0, cardsTransformation: -1, consecutiveReport: -1, positionToReport: -1, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[4] = ReportClass.init(reportName: "[5]报1大2大3大", reportID: 4, rankReport: 2, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: -1, reportTarget: 0, cardsTransformation: -1, consecutiveReport: -1, positionToReport: -1, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
         allPreSetReportRules[5] = ReportClass.init(reportName: "[6]报活门", reportID: 5, rankReport: 0, aliveDeathReport: 0, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: -1, reportTarget: 0, cardsTransformation: -1, consecutiveReport: -1, positionToReport: -1, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
         allPreSetReportRules[6] = ReportClass.init(reportName: "[7]报活门半活门对子", reportID: 6, rankReport: 0, aliveDeathReport: 0, pairReport: 0, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: -1, reportTarget: 0, cardsTransformation: -1, consecutiveReport: -1, positionToReport: -1, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
         allPreSetReportRules[7] = ReportClass.init(reportName: "[8]报最大次大和生死门", reportID: 7, rankReport: 1, aliveDeathReport: 2, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: -1, reportTarget: 0, cardsTransformation: -1, consecutiveReport: -1, positionToReport: -1, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
@@ -474,7 +479,7 @@ public class RuleManager{
         allPreSetReportRules[18] = ReportClass.init(reportName: "[50]上10张打色留色保位置最大", reportID: 18, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 0, reportTarget: 1, cardsTransformation: 2, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
         allPreSetReportRules[19] = ReportClass.init(reportName: "[51]上10张打色留色保位置最大次大", reportID: 19, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 0, reportTarget: 1, cardsTransformation: 2, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
         allPreSetReportRules[20] = ReportClass.init(reportName: "[52]上10张打色留色保位置最小", reportID: 20, rankReport: 3, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 0, reportTarget: 1, cardsTransformation: 2, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[21] = ReportClass.init(reportName: "[53]上10张打色留色保位置最大", reportID: 21, rankReport: 4, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 0, reportTarget: 1, cardsTransformation: 2, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[21] = ReportClass.init(reportName: "[53]上10张打色留色保位置最小次小", reportID: 21, rankReport: 4, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 0, reportTarget: 1, cardsTransformation: 2, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
         allPreSetReportRules[22] = ReportClass.init(reportName: "[54]上10张打色去色全部+底为色保位置最大", reportID: 22, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 0, reportTarget: 1, cardsTransformation: 4, consecutiveReport: -1, positionToReport: 0, colorCardPos: 4, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
         allPreSetReportRules[23] = ReportClass.init(reportName: "[55]上10张打色去色全部保位置最大", reportID: 23, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 0, reportTarget: 1, cardsTransformation: 4, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
         allPreSetReportRules[24] = ReportClass.init(reportName: "[56]上10张打色去色全部保位置最大次大", reportID: 24, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 0, reportTarget: 1, cardsTransformation: 4, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
@@ -485,30 +490,30 @@ public class RuleManager{
         allPreSetReportRules[29] = ReportClass.init(reportName: "[62]上10张打色去色1张保位置最小", reportID: 29, rankReport: 3, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 0, reportTarget: 1, cardsTransformation: 5, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
         allPreSetReportRules[30] = ReportClass.init(reportName: "[63]上10张打色去色1张保位置最小次小", reportID: 30, rankReport: 4, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 0, reportTarget: 1, cardsTransformation: 5, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
         allPreSetReportRules[31] = ReportClass.init(reportName: "[64]上10张打色去色1张+提前去掉的牌为色保位置最大", reportID: 31, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 0, reportTarget: 1, cardsTransformation: 5, consecutiveReport: -1, positionToReport: 0, colorCardPos: 5, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[32] = ReportClass.init(reportName: "[66]上10张打色色牌先发保位置最大", reportID: 32, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 0, reportTarget: 1, cardsTransformation: 5, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[33] = ReportClass.init(reportName: "[67]上10张打色色牌先发保位置最大次大", reportID: 33, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 0, reportTarget: 1, cardsTransformation: 5, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[34] = ReportClass.init(reportName: "[68]上10张打色色牌先发保位置最小", reportID: 34, rankReport: 3, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 0, reportTarget: 1, cardsTransformation: 5, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[35] = ReportClass.init(reportName: "[69]上10张打色色牌先发保位置最小次小", reportID: 35, rankReport: 4, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 0, reportTarget: 1, cardsTransformation: 5, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[36] = ReportClass.init(reportName: "[70]上10张去牌报多轮位置最大次大次数最多", reportID: 36, rankReport: 2, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 4, reportTarget: 4, cardsTransformation: 13, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[37] = ReportClass.init(reportName: "[71]上10张去牌保位置最大", reportID: 37, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 4, reportTarget: 1, cardsTransformation: 13, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[38] = ReportClass.init(reportName: "[71_1]上10张去牌保位置最大对优先", reportID: 38, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 4, reportTarget: 1, cardsTransformation: 13, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[39] = ReportClass.init(reportName: "[72]上10张去牌保位置最大次大", reportID: 39, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 4, reportTarget: 1, cardsTransformation: 13, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[40] = ReportClass.init(reportName: "[73]上10张去牌保位置最小", reportID: 40, rankReport: 3, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 4, reportTarget: 1, cardsTransformation: 13, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[41] = ReportClass.init(reportName: "[74]上10张去牌保位置最小次小", reportID: 41, rankReport: 4, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 4, reportTarget: 1, cardsTransformation: 13, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[42] = ReportClass.init(reportName: "[75]上10张去牌保有活门报活门", reportID: 42, rankReport: 0, aliveDeathReport: 0, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 4, reportTarget: 1, cardsTransformation: 13, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[43] = ReportClass.init(reportName: "[76]上10张去牌保有活门报最大", reportID: 43, rankReport: 0, aliveDeathReport: 0, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 4, reportTarget: 1, cardsTransformation: 13, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[44] = ReportClass.init(reportName: "[77]上10张去牌多轮同点报最大次大生死门", reportID: 44, rankReport: 1, aliveDeathReport: 0, pairReport: -1, drawPointReport: 0, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 4, reportTarget: 1, cardsTransformation: 13, consecutiveReport: 1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[45] = ReportClass.init(reportName: "[78_1]上10张去牌多轮同点且无9点", reportID: 44, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: 0, ninePointReport: 0, pokerBullReport: -1, reportCutRange: 4, reportTarget: 1, cardsTransformation: 13, consecutiveReport: 2, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[46] = ReportClass.init(reportName: "[78]上10张去牌多轮同点且无对子", reportID: 46, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: 1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 4, reportTarget: 1, cardsTransformation: 13, consecutiveReport: 3, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[47] = ReportClass.init(reportName: "[79]上10张去牌面牌为色去色报位置最大次大次数最多", reportID: 47, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 4, reportTarget: 4, cardsTransformation: 13, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[48] = ReportClass.init(reportName: "[80]上10张去牌底为色保位置最大次大", reportID: 48, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 4, reportTarget: 1, cardsTransformation: 13, consecutiveReport: -1, positionToReport: 0, colorCardPos: 1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[49] = ReportClass.init(reportName: "[81]上10张去牌保位置最小无对子", reportID: 49, rankReport: 3, aliveDeathReport: 0, pairReport: 1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 4, reportTarget: 1, cardsTransformation: 3, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[50] = ReportClass.init(reportName: "[82]上10张去牌保34门有最大报最大", reportID: 50, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 3, reportTarget: 1, cardsTransformation: 4, consecutiveReport: -1, positionToReport: 3, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[51] = ReportClass.init(reportName: "[83]上10张去牌保34门有最大报最大次大", reportID: 51, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 3, reportTarget: 1, cardsTransformation: 4, consecutiveReport: -1, positionToReport: 3, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[52] = ReportClass.init(reportName: "[84]上10张抽面牌保位置最大", reportID: 52, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 3, reportTarget: 1, cardsTransformation: 4, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[53] = ReportClass.init(reportName: "[84_1]上10张抽面牌保位置最小", reportID: 53, rankReport: 3, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 3, reportTarget: 1, cardsTransformation: 4, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[54] = ReportClass.init(reportName: "[85]上10张去牌保多轮位置最大次数最多", reportID: 54, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 0, reportTarget: 1, cardsTransformation: 3, consecutiveReport: 0, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
-        allPreSetReportRules[55] = ReportClass.init(reportName: "[86]上10张去牌面为色色先发保位置最大次大", reportID: 55, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 3, reportTarget: 1, cardsTransformation: 3, consecutiveReport: -1, positionToReport: 0, colorCardPos: 9, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[32] = ReportClass.init(reportName: "[66]上10张打色色牌先发保位置最大", reportID: 32, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 0, reportTarget: 1, cardsTransformation: 6, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[33] = ReportClass.init(reportName: "[67]上10张打色色牌先发保位置最大次大", reportID: 33, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 0, reportTarget: 1, cardsTransformation: 6, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[34] = ReportClass.init(reportName: "[68]上10张打色色牌先发保位置最小", reportID: 34, rankReport: 3, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 0, reportTarget: 1, cardsTransformation: 6, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[35] = ReportClass.init(reportName: "[69]上10张打色色牌先发保位置最小次小", reportID: 35, rankReport: 4, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 0, reportTarget: 1, cardsTransformation: 6, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[36] = ReportClass.init(reportName: "[70]上10张去牌报多轮位置最大次大次数最多", reportID: 36, rankReport: 2, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 11, reportTarget: 4, cardsTransformation: 23, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[37] = ReportClass.init(reportName: "[71]上10张去牌保位置最大", reportID: 37, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 11, reportTarget: 1, cardsTransformation: 23, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[38] = ReportClass.init(reportName: "[71_1]上10张去牌保位置最大对优先", reportID: 38, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 11, reportTarget: 1, cardsTransformation: 23, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[39] = ReportClass.init(reportName: "[72]上10张去牌保位置最大次大", reportID: 39, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 11, reportTarget: 1, cardsTransformation: 23, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[40] = ReportClass.init(reportName: "[73]上10张去牌保位置最小", reportID: 40, rankReport: 3, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 11, reportTarget: 1, cardsTransformation: 23, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[41] = ReportClass.init(reportName: "[74]上10张去牌保位置最小次小", reportID: 41, rankReport: 4, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 11, reportTarget: 1, cardsTransformation: 23, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[42] = ReportClass.init(reportName: "[75]上10张去牌保有活门报活门", reportID: 42, rankReport: 0, aliveDeathReport: 0, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 11, reportTarget: 1, cardsTransformation: 23, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[43] = ReportClass.init(reportName: "[76]上10张去牌保有活门报最大", reportID: 43, rankReport: 0, aliveDeathReport: 0, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 11, reportTarget: 1, cardsTransformation: 23, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[44] = ReportClass.init(reportName: "[77]上10张去牌多轮同点报最大次大生死门", reportID: 44, rankReport: 1, aliveDeathReport: 0, pairReport: -1, drawPointReport: 0, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 11, reportTarget: 1, cardsTransformation: 23, consecutiveReport: 1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[45] = ReportClass.init(reportName: "[78_1]上10张去牌多轮同点且无9点", reportID: 44, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: 0, ninePointReport: 0, pokerBullReport: -1, reportCutRange: 11, reportTarget: 1, cardsTransformation: 23, consecutiveReport: 2, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[46] = ReportClass.init(reportName: "[78]上10张去牌多轮同点且无对子", reportID: 46, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: 1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 11, reportTarget: 1, cardsTransformation: 23, consecutiveReport: 3, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[47] = ReportClass.init(reportName: "[79]上10张去牌面牌为色去色报位置最大次大次数最多", reportID: 47, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 11, reportTarget: 4, cardsTransformation: 23, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[48] = ReportClass.init(reportName: "[80]上10张去牌底为色保位置最大次大", reportID: 48, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 11, reportTarget: 1, cardsTransformation: 23, consecutiveReport: -1, positionToReport: 0, colorCardPos: 1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[49] = ReportClass.init(reportName: "[81]上10张去牌保位置最小无对子", reportID: 49, rankReport: 3, aliveDeathReport: 0, pairReport: 1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 4, reportTarget: 1, cardsTransformation: 23, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[50] = ReportClass.init(reportName: "[82]上10张去牌保34门有最大报最大", reportID: 50, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 12, reportTarget: 3, cardsTransformation: 23, consecutiveReport: -1, positionToReport: 3, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[51] = ReportClass.init(reportName: "[83]上10张去牌保34门有最大次大最大", reportID: 51, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 12, reportTarget: 3, cardsTransformation: 23, consecutiveReport: -1, positionToReport: 3, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[52] = ReportClass.init(reportName: "[84]上10张抽面牌保位置最大", reportID: 52, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 11, reportTarget: 1, cardsTransformation: 23, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[53] = ReportClass.init(reportName: "[84_1]上10张抽面牌保位置最小", reportID: 53, rankReport: 3, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 11, reportTarget: 1, cardsTransformation: 23, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[54] = ReportClass.init(reportName: "[85]上10张去牌保多轮位置最大次数最多", reportID: 54, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 11, reportTarget: 1, cardsTransformation: 23, consecutiveReport: 0, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
+        allPreSetReportRules[55] = ReportClass.init(reportName: "[86]上10张去牌面为色色先发保位置最大次大", reportID: 55, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 11, reportTarget: 1, cardsTransformation: 23, consecutiveReport: -1, positionToReport: 0, colorCardPos: 9, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
         allPreSetReportRules[56] = ReportClass.init(reportName: "[87]上10张去牌面为色色先发保位置最大", reportID: 56, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 3, reportTarget: 1, cardsTransformation: 3, consecutiveReport: -1, positionToReport: 0, colorCardPos: 9, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
         allPreSetReportRules[57] = ReportClass.init(reportName: "[88]上10张去牌面为色色先发保位置最小", reportID: 57, rankReport: 3, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: -1, reportCutRange: 3, reportTarget: 1, cardsTransformation: 3, consecutiveReport: -1, positionToReport: 0, colorCardPos: 9, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
         allPreSetReportRules[58] = ReportClass.init(reportName: "[91]上10张去牌面为色色先发保无牛或最多一家有牛", reportID: 58, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1, pokerBullReport: 0, reportCutRange: 3, reportTarget: 1, cardsTransformation: 3, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1)
@@ -684,7 +689,7 @@ public class RuleManager{
             switch i{
             //德州预设规则
             case 0:
-//                标准
+                //德州扑克[701]
 //                isCompareSuit = 0
 //                isAceStraight = 1
 //                minRank = 0
@@ -698,8 +703,8 @@ public class RuleManager{
                 }
                 args = [0,1,0,1,2,0,0]
                 suitRules = [3,2,1,0]
-                rankRules = [11,10,9,8,7,6,5,4,3,2,1,0]
-                rankRuleChecked = [1,1,1,1,1,1,0,0,0,1,1,1]
+                rankRules = [11,10,9,8,7,6,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1,1]
                 allPreSetRules[i]![0]!.append(args)
                 allPreSetRules[i]![0]!.append(suitRules)
                 allPreSetRules[i]![0]!.append(rankRules)

@@ -7,8 +7,6 @@ import Foundation
 
 class ChickenBattleGameRule : Rule{
     
-    
-    
     override init(ruleIndex: Int, ruleName: String) {
         super.init(ruleIndex: ruleIndex, ruleName: ruleName)
         self.rankRules = [:]
@@ -163,8 +161,7 @@ class ChickenBattleGame{
                 }
             }
         }
-        
-        
+
         
         for i in 0..<playerNum {
             allPlayCards[i].evaluateFlag = ChickenBattleGameHandEvaluator(

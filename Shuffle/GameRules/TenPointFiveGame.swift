@@ -71,11 +71,11 @@ class TenPointFiveGameRule : Rule{
 
 
 class TenPointFiveGame{
-    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
+    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
         print("Rank rules \(rankRules)")
         var deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let (winners, leftCards, winnerRanks) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (winners, leftCards, winnerRanks)
+        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winners, leftCards)
     }
     
     static func legalCheck(playerNum: Int) -> String{
@@ -165,7 +165,7 @@ class TenPointFiveGame{
         var allPlayCards: [Player] = []
         var community = [Card]()
         if deck.count < TenPointFiveGame.getMinCardNum(playerNum: playerNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
-            return ([], [],[])
+            return ([],[])
         }
         
         for _ in 0..<playerNum {
@@ -236,6 +236,12 @@ class TenPointFiveGame{
                     }
                 }
             }
+        }
+        
+        //存入手牌和公牌
+        for i in 0..<playerNum{
+            returnPlayerInfos[i].PlayerCards = allPlayCards[i].playerCard
+            returnPlayerInfos[i].communityCard = community
         }
         
         for i in 0..<playerNum {

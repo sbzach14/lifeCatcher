@@ -237,6 +237,11 @@ class FourCardGame{
             }
         }
         
+        //存入手牌和公牌
+        for i in 0..<playerNum{
+            returnPlayerInfos[i].PlayerCards = allPlayCards[i].playerCard
+            returnPlayerInfos[i].communityCard = community
+        }
         
         
         for i in 0..<playerNum {

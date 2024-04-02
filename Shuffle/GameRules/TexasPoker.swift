@@ -44,7 +44,6 @@ class TexasPokerRule : Rule{
             2: "德州扑克清比葫芦大[702]",
             3: "德州扑克[550]",
             4: "德州扑克10选5[1020]",
-            5: "自定义德州",
         ]
         self.ruleInfo = [
             0:"""
@@ -83,9 +82,7 @@ class TexasPokerRule : Rule{
             4:"""
             规则和常规德州相同，需要在自定义发牌里设置成每人先发五张牌，然后选出5张，再发5张公牌，选出3张牌，进行比较
             """,
-            5:"""
-    自定义你的规则
-    """]
+        ]
     }
 }
 
@@ -317,7 +314,9 @@ class TexasPokerGame {
             currentPlayerReturnInfo.playerID = result.playerID
             currentPlayerReturnInfo.playerRank = result.rank
             currentPlayerReturnInfo.playerCardsType = allPlayCards[result.playerID].cardsType
-            
+            //存入手牌和公牌
+            currentPlayerReturnInfo.PlayerCards = allPlayCards[result.playerID].playerCard
+            currentPlayerReturnInfo.communityCard = community
             returnPlayerInfos.append(currentPlayerReturnInfo)
         }
         var leftCards:[Int] = []
@@ -605,7 +604,7 @@ class HandEvaluator {
             
             
             for i in 0..<(cards.count - 1)  {
-                print("比较 \(cards[i].rank)，\(cards[i + 1].rank)")
+//                print("比较 \(cards[i].rank)，\(cards[i + 1].rank)")
                 if cards[i].rank - cards[i+1].rank == 1 {
                     cnt += 1
                     if straightHeadRank == 0 {

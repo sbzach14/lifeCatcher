@@ -10,9 +10,9 @@ struct ReportSettingView: View {
         
     var filteredReportSettings: [Int] {
         if searchText.isEmpty {
-            return Array(generalRuleSetting.allReportSetting.keys).sorted()
+            return Array(ReportManager.allReportName.keys).sorted()
         } else {
-            return generalRuleSetting.allReportSetting.filter { $0.value.localizedCaseInsensitiveContains(searchText) }.map { $0.key }.sorted()
+            return ReportManager.allReportName.filter { $0.value.localizedCaseInsensitiveContains(searchText) }.map { $0.key }.sorted()
         }
     }
 
@@ -24,7 +24,7 @@ struct ReportSettingView: View {
             ScrollView{
                 VStack { // 垂直间距
                     HStack {
-                        Text("[\(reportSetting)] : " + generalRuleSetting.allReportSetting[reportSetting]!)
+                        Text(ReportManager.allReportName[reportSetting]!)
                             .foregroundColor(.green)
                             .lineLimit(nil) // 可以显示多行文本
                             .fixedSize(horizontal: false, vertical: true) // 允许垂直方向上的大小自适应
@@ -39,7 +39,7 @@ struct ReportSettingView: View {
                     ForEach(0..<filteredReportSettings.count, id: \.self) { index in
                             let currentIndex = filteredReportSettings[index]
                            HStack {
-                               Text("[\(currentIndex)] : " + generalRuleSetting.allReportSetting[currentIndex]!)
+                               Text(ReportManager.allReportName[currentIndex]!)
                                    .foregroundColor(.white)
                                    .lineLimit(nil) // 可以显示多行文本
                                    .fixedSize(horizontal: false, vertical: true) // 允许垂直方向上的大小自适应

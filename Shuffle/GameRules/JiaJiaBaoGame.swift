@@ -273,6 +273,8 @@ class JiaJiaBaoGame{
             
         }
         
+        
+        
 
         for i in 0..<playerNum {
             allPlayCards[i].evaluateFlag = JiaJiaBaoGameHandEvaluator(

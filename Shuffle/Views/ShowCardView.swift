@@ -21,7 +21,7 @@ struct ShowCardView: View {
                     }
                   
                     //TODO: 替换成viewmodel保存的计算结果
-                    let result = Array(0...3)
+                    let result = Array(0..<viewModel.multipleGamePlayerInfos.singleResultList.count)
                     
                     ForEach(result, id: \.self) { resultIndex in
                         VStack(spacing: 20){
@@ -42,16 +42,16 @@ struct ShowCardView: View {
                                 Spacer().frame(height: 40)
                                 
                                 //TODO: 替换成本轮色牌（若每轮相同则是本局色牌）没有则隐藏
-                                HStack{
+                                HStack {
                                     Text("色牌").font(.system(size: 25))
                                     
-                                    let colorCardIndex = 0
-                                    
-                                    CardIconView(index: colorCardIndex)
+                                    ForEach(viewModel.multipleGamePlayerInfos.singleResultList[resultIndex].ColorCards, id: \.self) { colorCardIndex in
+                                        CardIconView(index: colorCardIndex)
+                                    }
                                     
                                     Spacer()
-                                    
                                 }
+
                                 
                                 Spacer().frame(height: 20)
                                 
@@ -59,7 +59,7 @@ struct ShowCardView: View {
                                 HStack{
                                     Text("公牌").font(.system(size: 25))
                                     
-                                    let pubCardList = Array(0...5)
+                                    let pubCardList = viewModel.multipleGamePlayerInfos.singleResultList[resultIndex].community
                                     
                                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 25))]){
                                         
@@ -86,14 +86,16 @@ struct ShowCardView: View {
                                 }
                                 
                                 //TODO: 替换成位置数量
-                                let posList = Array(0...4)
+                                
+                                let rankList = viewModel.multipleGamePlayerInfos.singleResultList[resultIndex].PlayerReturnInfoList
+                                let posList = (0...rankList.count - 1)
                                 
                                 ForEach(posList, id: \.self) { posIndex in
                                     HStack{
                                         Text("\(posIndex)").frame(width: 60, alignment: .leading).font(.system(size: 25))
                                         
                                         //TODO: 替换成该位置玩家的排名
-                                        let rate = 2
+                                        let rate = rankList[posIndex].playerGameRank
                                         
                                         Text("\(rate)").frame(width: 60, alignment: .leading).font(.system(size: 25))
                                         
@@ -103,12 +105,12 @@ struct ShowCardView: View {
 //                                        Text(cardRank).frame(width: 45, alignment: .leading).font(.system(size: 25))
                                         
                                         //TODO: 替换成该位置玩家的手牌
-                                        let handCardList = Array(0...12)
+                                        let handCardList = Array(0...rankList[posIndex].PlayerCards.count - 1)
                                         
                                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 25))]){
                                             
                                             ForEach(handCardList, id: \.self) { handCardIndex in
-                                                CardIconView(index: handCardIndex)
+                                                CardIconView(index: rankList[posIndex].PlayerCards[handCardIndex].cardIndex)
                                             }
                                             
                                         }
@@ -151,8 +153,6 @@ struct ShowCardView: View {
                 }
             }
             .padding(.horizontal,10)
-            
-            
         }
     }
 }

@@ -211,6 +211,12 @@ class TinyNineGame{
             }
         }
         
+        //存入手牌和公牌
+        for i in 0..<playerNum{
+            returnPlayerInfos[i].PlayerCards = allPlayCards[i].playerCard
+            returnPlayerInfos[i].communityCard = community
+        }
+        
         for i in 0..<playerNum {
             (allPlayCards[i].evaluateFlag, allPlayCards[i].cardType, allPlayCards[i].isPair) = TinyNineGameHandEvaluator(
                 rankRules: rankRules,

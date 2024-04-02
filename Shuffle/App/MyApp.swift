@@ -65,6 +65,7 @@ struct MyApp: App {
         RuleManager.allUsersGameRule = RuleManager.loadGameRule()!
         //读取预设的游戏规则
         RuleManager.LoadAllPresetRules()
+        RuleManager.LoadAllReportRules()
         
     }
     

@@ -34,7 +34,7 @@ struct SelectRuleView: View {
                                 
                                 let cutMode = generalRuleSetting.allCutMode[rules[index].cutMode]!
                                 
-                                let reportSetting = "[\(rules[index].reportSetting)] : " + generalRuleSetting.allReportSetting[rules[index].reportSetting]!
+                                let reportSetting = ReportManager.allReportName[rules[index].reportSetting]!
                                 
                                 HStack(spacing: 20) {
                                     Text("方案\(index+1)")

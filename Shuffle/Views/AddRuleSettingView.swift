@@ -377,8 +377,8 @@ struct AddRuleSettingView: View{
                                     .foregroundColor(.white) // 左侧间距
                                 NavigationLink(destination:  ReportSettingView(reportSetting: $reportSetting)){
                                 
-                                    let text = generalRuleSetting.allReportSetting[reportSetting]!
-                                    Text("[\(reportSetting)] : " + text).frame(width: 180, height: 50, alignment: .trailing)
+                                    let text = ReportManager.allReportName[reportSetting]!
+                                    Text(text).frame(width: 180, height: 50, alignment: .trailing)
                                         .foregroundColor(.white).padding(.trailing,40)
                                         .multilineTextAlignment(.leading)
                                 }

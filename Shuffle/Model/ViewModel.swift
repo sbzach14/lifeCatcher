@@ -28,6 +28,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var cardArray :  [Int] = []
     @Published var winnerPlayer: [[Int]] = []
     @Published var winnerPlayerShow: String = ""
+    @Published var multipleGamePlayerInfos: ReportManager.MultipleReportResultInfo = ReportManager.MultipleReportResultInfo()
 
     let model = try! cardDetection_0327()
     let imageSize : [Int] = [640, 480]
@@ -1589,22 +1590,23 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         for i in self.allCardIndex{
             testArray.append(i)
         }
+        
         testArray.shuffle()
         self.cardArray = testArray
         
-        //computeWinnerPlayer()
+        computeWinnerPlayer()
     }
     
     //MARK: comupute winner
     func computeWinnerPlayer() {
         print("计算信息")
         
-        print("测试游戏：\(String(describing: generalRuleSetting.allGameType[ruleIndex])), 游戏人数 \((GameManager.gameRules[ruleIndex]?.playerNum[playerNum])!), args：\(args), 花色顺序：\(suitRules), 发牌定制: \(dealNum), 打色模式: \(coloringType) 正发反发: \(dealType),  自定义发牌类型和发牌数量：\(diyDealStatus), \(diyDealNum), 打色模式：\(calModeArgs[0]), 目标位置：\(calModeArgs[1]), 打色点数设置: \(cutNumSetting), 打色范围：\(cutNumRangeSetting[0])- \(cutNumRangeSetting[1]), 连报轮数：\(consecutiveReport)")
+        print("测试游戏：\(String(describing: generalRuleSetting.allGameType[ruleIndex])), 游戏人数 \((GameManager.gameRules[ruleIndex]?.playerNum[playerNum])!), args：\(args), 牌型顺序：\(rankRules) 花色顺序：\(suitRules), 发牌定制: \(dealNum), 打色模式: \(coloringType) 正发反发: \(dealType),  自定义发牌类型和发牌数量：\(diyDealStatus), \(diyDealNum), 打色模式：\(calModeArgs[0]), 目标位置：\(calModeArgs[1]), 打色点数设置: \(cutNumSetting), 打色范围：\(cutNumRangeSetting[0])- \(cutNumRangeSetting[1]), 连报轮数：\(consecutiveReport)")
         
         
         print("开始需要的最少牌数 \(minCardNum)")
         if cardArray.count >= minCardNum && cardArray.count > cutNumRangeSetting[0] && cardArray.count > cutNumRangeSetting[1] - minCardNum{
-            winnerPlayer = GameManager.selectGame(gameIndex: ruleIndex, inputCards: cardArray, playerNum: (GameManager.gameRules[ruleIndex]?.playerNum[playerNum])!, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, minCardNum: minCardNum)
+            (winnerPlayer, multipleGamePlayerInfos) = GameManager.selectGame(gameIndex: ruleIndex, inputCards: cardArray, playerNum: (GameManager.gameRules[ruleIndex]?.playerNum[playerNum])!, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, minCardNum: minCardNum)
             
             winnerPlayerShow = ""
             for winnerSet in winnerPlayer{
@@ -1633,7 +1635,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
     }
-
+    
     func speakText(input: [[Int]]) {
         let isSpeak = self.isHeadphonesConnected() == self.isMute
         
