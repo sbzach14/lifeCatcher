@@ -30,7 +30,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var winnerPlayerShow: String = ""
     @Published var multipleGamePlayerInfos: ReportManager.MultipleReportResultInfo = ReportManager.MultipleReportResultInfo()
 
-    let model = try! cardDetection_0327()
+    let model = try! cardDetection_0404_s_quantize()
     let imageSize : [Int] = [640, 480]
     var originSize : [Float] = [0,0]
     

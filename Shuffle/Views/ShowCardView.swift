@@ -88,34 +88,38 @@ struct ShowCardView: View {
                                 //TODO: 替换成位置数量
                                 
                                 let rankList = viewModel.multipleGamePlayerInfos.singleResultList[resultIndex].PlayerReturnInfoList
-                                let posList = (0...rankList.count - 1)
                                 
-                                ForEach(posList, id: \.self) { posIndex in
-                                    HStack{
-                                        Text("\(posIndex)").frame(width: 60, alignment: .leading).font(.system(size: 25))
-                                        
-                                        //TODO: 替换成该位置玩家的排名
-                                        let rate = rankList[posIndex].playerGameRank
-                                        
-                                        Text("\(rate)").frame(width: 60, alignment: .leading).font(.system(size: 25))
-                                        
-//                                        //TODO: 替换成该位置玩家的牌型
-//                                        let cardRank = "对子"
-//                                        
-//                                        Text(cardRank).frame(width: 45, alignment: .leading).font(.system(size: 25))
-                                        
-                                        //TODO: 替换成该位置玩家的手牌
-                                        let handCardList = Array(0...rankList[posIndex].PlayerCards.count - 1)
-                                        
-                                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 25))]){
+                                if rankList.count > 0 {
+                                    var posList = (0...rankList.count - 1)
+                                    ForEach(posList, id: \.self) { posIndex in
+                                        HStack{
+                                            Text("\(posIndex)").frame(width: 60, alignment: .leading).font(.system(size: 25))
                                             
-                                            ForEach(handCardList, id: \.self) { handCardIndex in
-                                                CardIconView(index: rankList[posIndex].PlayerCards[handCardIndex].cardIndex)
+                                            //TODO: 替换成该位置玩家的排名
+                                            let rate = rankList[posIndex].playerGameRank
+                                            
+                                            Text("\(rate)").frame(width: 60, alignment: .leading).font(.system(size: 25))
+                                            
+    //                                        //TODO: 替换成该位置玩家的牌型
+    //                                        let cardRank = "对子"
+    //
+    //                                        Text(cardRank).frame(width: 45, alignment: .leading).font(.system(size: 25))
+                                            
+                                            //TODO: 替换成该位置玩家的手牌
+                                            let handCardList = Array(0...rankList[posIndex].PlayerCards.count - 1)
+                                            
+                                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 25))]){
+                                                
+                                                ForEach(handCardList, id: \.self) { handCardIndex in
+                                                    CardIconView(index: rankList[posIndex].PlayerCards[handCardIndex].cardIndex)
+                                                }
+                                                
                                             }
-                                            
+                                            Spacer()
                                         }
-                                        Spacer()
-                                    }
+                                }
+                                
+                                
                                 }
 //                                Spacer().frame(height: 20)
                             }

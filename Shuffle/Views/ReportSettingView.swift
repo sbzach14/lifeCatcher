@@ -39,7 +39,7 @@ struct ReportSettingView: View {
                     ForEach(0..<filteredReportSettings.count, id: \.self) { index in
                             let currentIndex = filteredReportSettings[index]
                            HStack {
-                               Text(ReportManager.allReportName[currentIndex]!)
+                               Text(ReportManager.allReportName[currentIndex]! + "\n" + ReportManager.allReportInfo[currentIndex]!)
                                    .foregroundColor(.white)
                                    .lineLimit(nil) // 可以显示多行文本
                                    .fixedSize(horizontal: false, vertical: true) // 允许垂直方向上的大小自适应
