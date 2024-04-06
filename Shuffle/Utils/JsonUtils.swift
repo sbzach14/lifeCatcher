@@ -74,8 +74,9 @@ func createConfigJSON() {
         "isBlack": false,
         "isMute": false,
         "isActive": false,
-        "isBackCamera": false,
-        "isRemote": false
+        "isBackCamera": true,
+        "isRemote": false,
+        "isFast": true
     ]
     
     let configDict: [String: Any] = [

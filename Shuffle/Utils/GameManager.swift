@@ -159,7 +159,7 @@ class GameManager {
         return resultList
     }
     
-    static func selectGame(gameIndex: Int, inputCards: [Int], playerNum: Int, args : [Int], rankRules : [Int], suitRules: [Int],dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], calModeArgs: [Int], cutNumSetting: Int, cutNumRangeSetting: [Int], consecutiveReport: Int, minCardNum: Int) -> ([[Int]], ReportManager.MultipleReportResultInfo) {
+    static func selectGame(gameIndex: Int, inputCards: [Int], playerNum: Int, args : [Int], rankRules : [Int], suitRules: [Int],dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], calModeArgs: [Int], cutNumSetting: Int, cutNumRangeSetting: [Int], consecutiveReport: Int, minCardNum: Int, cutCardIndexArray: [Int]) -> ([[Int]], ReportManager.MultipleReportResultInfo) {
         var reportResult:[[Int]] = []
         //TODO dealType 0 正发，1 反发 搞清楚ui
         //cutNumSetting 点数设置
@@ -201,7 +201,7 @@ class GameManager {
 //            14: TenPointFiveGame.FindWinner(diyDealStatus:diyDealNum:inputCards:args:rankRules:suitRules:)
         ]
         
-        let (reportResultString, multipleGameInfo) =  ReportManager.GameReporter(gameIndex: gameIndex, inputCards: inputCards, diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, newArgs: newArgs, rankRules: rankRules, suitRules: suitRules, reportID: calMode, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, targetPos: targetPos, coloringType: coloringType, consecutiveNum: consecutiveReport)
+        let (reportResultString, multipleGameInfo) =  ReportManager.GameReporter(gameIndex: gameIndex, inputCards: inputCards, cutCardIndexList: cutCardIndexArray, diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, newArgs: newArgs, rankRules: rankRules, suitRules: suitRules, reportID: calMode, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, targetPos: targetPos, coloringType: coloringType, consecutiveNum: consecutiveReport)
         
         print("播报结果: \(reportResultString)")
         

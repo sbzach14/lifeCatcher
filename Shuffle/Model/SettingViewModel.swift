@@ -4,8 +4,9 @@ import SwiftUI
 class SettingViewModel: ObservableObject {
     @Published var isBlack: Bool = false
     @Published var isMute: Bool = false
-    @Published var isBackCamera: Bool = false
+    @Published var isBackCamera: Bool = true
     @Published var isRemote: Bool = false
+    @Published var isFast: Bool = true
     @Published var isActive: Bool = false
     @Published var activeDate: String = ""
     @Published var uniqueID: String = ""
@@ -23,6 +24,7 @@ class SettingViewModel: ObservableObject {
             self.isMute = boolDict["isMute"]!
             self.isBackCamera = boolDict["isBackCamera"]!
             self.isRemote = boolDict["isRemote"]!
+            self.isFast = boolDict["isFast"]!
             self.isActive = boolDict["isActive"]!
             
             let intDict = configData["Int"] as! [String : Int]
@@ -35,8 +37,9 @@ class SettingViewModel: ObservableObject {
             // If config.json is not found or invalid, set default values
             self.isBlack = false
             self.isMute = false
-            self.isBackCamera = false
+            self.isBackCamera = true
             self.isRemote = false
+            self.isFast = true
             self.isActive = false
             
             self.volumeUp = 0
@@ -66,6 +69,7 @@ class SettingViewModel: ObservableObject {
                 "isMute": self.isMute,
                 "isBackCamera" : self.isBackCamera,
                 "isRemote" : self.isRemote,
+                "isFast": self.isFast,
                 "isActive": self.isActive
             ]
             
