@@ -10,7 +10,6 @@
 		181C969C2B5D51B00042006E /* Icon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 181C969B2B5D51B00042006E /* Icon.xcassets */; };
 		181C969E2B5D9DC90042006E /* SelectGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C969D2B5D9DC90042006E /* SelectGameView.swift */; };
 		181C96A02B5DB5980042006E /* success_tip.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 181C969F2B5DB5980042006E /* success_tip.mp3 */; };
-		181C96A22B5F86090042006E /* cardDetection_s_0123.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 181C96A12B5F86090042006E /* cardDetection_s_0123.mlmodel */; };
 		181C96A82B60DC180042006E /* ChickenBattleGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C96A72B60DC180042006E /* ChickenBattleGame.swift */; };
 		181C96AA2B60DD610042006E /* CardNineGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C96A92B60DD610042006E /* CardNineGame.swift */; };
 		181C96AC2B60E26A0042006E /* JiaJiaBaoGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C96AB2B60E26A0042006E /* JiaJiaBaoGame.swift */; };
@@ -24,12 +23,11 @@
 		18CA14D4284AC42C00F90372 /* MainContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C6284AC42C00F90372 /* MainContentView.swift */; };
 		18CA14D6284AC42C00F90372 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C8284AC42C00F90372 /* CameraView.swift */; };
 		18CA14DB284AC42C00F90372 /* MyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14D0284AC42C00F90372 /* MyApp.swift */; };
-		18CA14DC284AC42C00F90372 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14D1284AC42C00F90372 /* ContentView.swift */; };
+		18CA14DC284AC42C00F90372 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14D1284AC42C00F90372 /* AuthView.swift */; };
 		18D9CDEA2B84F7CE00A93684 /* ReportSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D9CDE92B84F7CE00A93684 /* ReportSettingView.swift */; };
+		18FFC40A2BB9587A00029B0D /* BlurDetector_origin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FFC4092BB9587900029B0D /* BlurDetector_origin.swift */; };
 		50053F84284ACAED00C86BF4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50053F81284ACAED00C86BF4 /* Assets.xcassets */; };
-		A809595A2BB5FB14009A2DB4 /* cardDetection_0327.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A80959592BB5FB14009A2DB4 /* cardDetection_0327.mlmodel */; };
-		A80959602BBFC6B0009A2DB4 /* cardDetection_0404_s.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A809595F2BBFC6B0009A2DB4 /* cardDetection_0404_s.mlmodel */; };
-		A80959622BBFC6B5009A2DB4 /* cardDetection_0404_s_quantize.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A80959612BBFC6B5009A2DB4 /* cardDetection_0404_s_quantize.mlmodel */; };
+		A80959642BBFE3C4009A2DB4 /* cardDetection_0405_n.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A80959632BBFE3C4009A2DB4 /* cardDetection_0405_n.mlmodel */; };
 		A809B3E22AE5126700F728A9 /* BaoziGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A809B3E12AE5126700F728A9 /* BaoziGame.swift */; };
 		A809B3E42AE5183400F728A9 /* BaoziGameRuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A809B3E32AE5183400F728A9 /* BaoziGameRuleSettingView.swift */; };
 		A80D65F82AFF75ED005B5E5E /* AddRuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A80D65F72AFF75ED005B5E5E /* AddRuleSettingView.swift */; };
@@ -40,7 +38,6 @@
 		A83853502ADA83F600346038 /* Icon_Repo.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A838534F2ADA83F600346038 /* Icon_Repo.xcassets */; };
 		A83853532ADA918000346038 /* CustomUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83853522ADA918000346038 /* CustomUI.swift */; };
 		A83DC67A2A22352C00EC8210 /* SelectRuleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83DC6792A22352C00EC8210 /* SelectRuleView.swift */; };
-		A875FED72B5D1601003D51C3 /* cardDetection_n_0121.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A875FED62B5D1601003D51C3 /* cardDetection_n_0121.mlmodel */; };
 		A87A82052B2EF66200B1B37B /* DealTypeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87A82042B2EF66200B1B37B /* DealTypeView.swift */; };
 		A887167F2A0623E500B7F2CD /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887167E2A0623E500B7F2CD /* AuthManager.swift */; };
 		A88716852A0F701500B7F2CD /* GameManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88716842A0F701500B7F2CD /* GameManager.swift */; };
@@ -86,7 +83,6 @@
 		B03B7B2D2A963C05006A0647 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B2C2A963C05006A0647 /* Card.swift */; };
 		B03B7B2F2A963C1B006A0647 /* utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B2E2A963C1B006A0647 /* utils.swift */; };
 		B03B7B532A98AD32006A0647 /* ShuffleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B522A98AD32006A0647 /* ShuffleTests.swift */; };
-		B058BE5D2B09F70E0078E792 /* BlurDetector_origin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058BE5C2B09F70E0078E792 /* BlurDetector_origin.swift */; };
 		B058BE5F2B09FFC20078E792 /* BlurDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058BE5E2B09FFC20078E792 /* BlurDetector.swift */; };
 		B058BE612B0A0D6F0078E792 /* TestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058BE602B0A0D6F0078E792 /* TestView.swift */; };
 /* End PBXBuildFile section */
@@ -105,7 +101,6 @@
 		181C969B2B5D51B00042006E /* Icon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Icon.xcassets; sourceTree = "<group>"; };
 		181C969D2B5D9DC90042006E /* SelectGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectGameView.swift; sourceTree = "<group>"; };
 		181C969F2B5DB5980042006E /* success_tip.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = success_tip.mp3; sourceTree = "<group>"; };
-		181C96A12B5F86090042006E /* cardDetection_s_0123.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection_s_0123.mlmodel; sourceTree = "<group>"; };
 		181C96A72B60DC180042006E /* ChickenBattleGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChickenBattleGame.swift; sourceTree = "<group>"; };
 		181C96A92B60DD610042006E /* CardNineGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardNineGame.swift; sourceTree = "<group>"; };
 		181C96AB2B60E26A0042006E /* JiaJiaBaoGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JiaJiaBaoGame.swift; sourceTree = "<group>"; };
@@ -120,16 +115,15 @@
 		18CA14C6284AC42C00F90372 /* MainContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MainContentView.swift; sourceTree = "<group>"; };
 		18CA14C8284AC42C00F90372 /* CameraView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		18CA14D0284AC42C00F90372 /* MyApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyApp.swift; sourceTree = "<group>"; };
-		18CA14D1284AC42C00F90372 /* ContentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		18CA14D1284AC42C00F90372 /* AuthView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		18D9CDE92B84F7CE00A93684 /* ReportSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportSettingView.swift; sourceTree = "<group>"; };
+		18FFC4092BB9587900029B0D /* BlurDetector_origin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlurDetector_origin.swift; sourceTree = "<group>"; };
 		50053F80284ACAED00C86BF4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50053F81284ACAED00C86BF4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		50053F82284ACAED00C86BF4 /* CountMyActions.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = CountMyActions.entitlements; sourceTree = "<group>"; };
 		5269731033A41881895B5A41 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A6748516A40E187B4F8ACFA3 /* SampleCode.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
-		A80959592BB5FB14009A2DB4 /* cardDetection_0327.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection_0327.mlmodel; sourceTree = "<group>"; };
-		A809595F2BBFC6B0009A2DB4 /* cardDetection_0404_s.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection_0404_s.mlmodel; sourceTree = "<group>"; };
-		A80959612BBFC6B5009A2DB4 /* cardDetection_0404_s_quantize.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection_0404_s_quantize.mlmodel; sourceTree = "<group>"; };
+		A80959632BBFE3C4009A2DB4 /* cardDetection_0405_n.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection_0405_n.mlmodel; sourceTree = "<group>"; };
 		A809B3E12AE5126700F728A9 /* BaoziGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaoziGame.swift; sourceTree = "<group>"; };
 		A809B3E32AE5183400F728A9 /* BaoziGameRuleSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaoziGameRuleSettingView.swift; sourceTree = "<group>"; };
 		A80D65F72AFF75ED005B5E5E /* AddRuleSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddRuleSettingView.swift; sourceTree = "<group>"; };
@@ -142,7 +136,6 @@
 		A838534F2ADA83F600346038 /* Icon_Repo.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Icon_Repo.xcassets; sourceTree = "<group>"; };
 		A83853522ADA918000346038 /* CustomUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomUI.swift; sourceTree = "<group>"; };
 		A83DC6792A22352C00EC8210 /* SelectRuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectRuleView.swift; sourceTree = "<group>"; };
-		A875FED62B5D1601003D51C3 /* cardDetection_n_0121.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection_n_0121.mlmodel; sourceTree = "<group>"; };
 		A87A82042B2EF66200B1B37B /* DealTypeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DealTypeView.swift; sourceTree = "<group>"; };
 		A887167E2A0623E500B7F2CD /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		A88716812A06413600B7F2CD /* DOC.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DOC.md; sourceTree = "<group>"; };
@@ -190,7 +183,6 @@
 		B03B7B2E2A963C1B006A0647 /* utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = utils.swift; sourceTree = "<group>"; };
 		B03B7B502A98AD32006A0647 /* ShuffleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShuffleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B03B7B522A98AD32006A0647 /* ShuffleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShuffleTests.swift; sourceTree = "<group>"; };
-		B058BE5C2B09F70E0078E792 /* BlurDetector_origin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurDetector_origin.swift; sourceTree = "<group>"; };
 		B058BE5E2B09FFC20078E792 /* BlurDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurDetector.swift; sourceTree = "<group>"; };
 		B058BE602B0A0D6F0078E792 /* TestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView.swift; sourceTree = "<group>"; };
 		F11ED84932036610B96BC234 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
@@ -305,7 +297,7 @@
 				50053F82284ACAED00C86BF4 /* CountMyActions.entitlements */,
 				50053F80284ACAED00C86BF4 /* Info.plist */,
 				18CA14D0284AC42C00F90372 /* MyApp.swift */,
-				18CA14D1284AC42C00F90372 /* ContentView.swift */,
+				18CA14D1284AC42C00F90372 /* AuthView.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -359,7 +351,7 @@
 				A8FBC7C12A3F0A5C00EDDFD7 /* CVUtils.swift */,
 				A88EFE0A2A7FC05900897243 /* JsonUtils.swift */,
 				A887B6512A8104BC009F488F /* TimeUtils.swift */,
-				B058BE5C2B09F70E0078E792 /* BlurDetector_origin.swift */,
+				18FFC4092BB9587900029B0D /* BlurDetector_origin.swift */,
 				B058BE5E2B09FFC20078E792 /* BlurDetector.swift */,
 				A88C71F32B945ABD001D8BD8 /* ReportClass.swift */,
 			);
@@ -408,11 +400,7 @@
 		A8FBC7BE2A3F057700EDDFD7 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				A875FED62B5D1601003D51C3 /* cardDetection_n_0121.mlmodel */,
-				A80959592BB5FB14009A2DB4 /* cardDetection_0327.mlmodel */,
-				A809595F2BBFC6B0009A2DB4 /* cardDetection_0404_s.mlmodel */,
-				A80959612BBFC6B5009A2DB4 /* cardDetection_0404_s_quantize.mlmodel */,
-				181C96A12B5F86090042006E /* cardDetection_s_0123.mlmodel */,
+				A80959632BBFE3C4009A2DB4 /* cardDetection_0405_n.mlmodel */,
 				A88EFE022A7E8ACC00897243 /* Resnet50FP16.mlmodel */,
 				181C969F2B5DB5980042006E /* success_tip.mp3 */,
 				18C892992B65118F009D37DC /* fail_tip.mp3 */,
@@ -609,7 +597,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A8E0E2E92AADF9240091FC1D /* NinePointFiveGame.swift in Sources */,
-				18CA14DC284AC42C00F90372 /* ContentView.swift in Sources */,
+				18CA14DC284AC42C00F90372 /* AuthView.swift in Sources */,
 				A887B6582A8511A4009F488F /* InfoView.swift in Sources */,
 				A8D0D9342A223D210061A90E /* TexasPokerRuleSettingView.swift in Sources */,
 				B03B7B2F2A963C1B006A0647 /* utils.swift in Sources */,
@@ -629,6 +617,7 @@
 				A8922FC02A6553FB00A7033E /* PokerBullSettingView.swift in Sources */,
 				B058BE5F2B09FFC20078E792 /* BlurDetector.swift in Sources */,
 				A812F9312A3DCD0800AA392F /* ThreeCardPokerGame.swift in Sources */,
+				18FFC40A2BB9587A00029B0D /* BlurDetector_origin.swift in Sources */,
 				A8E0E2EF2AAE00910091FC1D /* TwoEightGangGameRuleSettingView.swift in Sources */,
 				18CA14DB284AC42C00F90372 /* MyApp.swift in Sources */,
 				A88EFE092A7FAD1100897243 /* SettingViewModel.swift in Sources */,
@@ -639,23 +628,17 @@
 				181C96AA2B60DD610042006E /* CardNineGame.swift in Sources */,
 				A88C71F22B93570D001D8BD8 /* TenPointFiveGame.swift in Sources */,
 				181C96AC2B60E26A0042006E /* JiaJiaBaoGame.swift in Sources */,
-				A809595A2BB5FB14009A2DB4 /* cardDetection_0327.mlmodel in Sources */,
 				A8E0E2E52AADEF560091FC1D /* ThreeMenGame.swift in Sources */,
 				A887B64E2A7FDF56009F488F /* RecordHistoryViewModel.swift in Sources */,
 				B058BE612B0A0D6F0078E792 /* TestView.swift in Sources */,
 				18CA14D2284AC42C00F90372 /* ViewModel.swift in Sources */,
 				A88F20AE2A13A470005E4A27 /* PokerBull.swift in Sources */,
-				181C96A22B5F86090042006E /* cardDetection_s_0123.mlmodel in Sources */,
 				A8D0D9362A24A4C20061A90E /* TexasPoker.swift in Sources */,
-				A875FED72B5D1601003D51C3 /* cardDetection_n_0121.mlmodel in Sources */,
 				181C96A82B60DC180042006E /* ChickenBattleGame.swift in Sources */,
-				A80959622BBFC6B5009A2DB4 /* cardDetection_0404_s_quantize.mlmodel in Sources */,
-				B058BE5D2B09F70E0078E792 /* BlurDetector_origin.swift in Sources */,
 				A8FBC7C22A3F0A5C00EDDFD7 /* CVUtils.swift in Sources */,
 				A8EFFEB12B28766C00FC884F /* CutNumRangeSettingView.swift in Sources */,
 				A88C71F02B93101C001D8BD8 /* ThreeCardPointGame.swift in Sources */,
 				18CA14D3284AC42C00F90372 /* ShowCardView.swift in Sources */,
-				A80959602BBFC6B0009A2DB4 /* cardDetection_0404_s.mlmodel in Sources */,
 				A8E0E2F12AAE00B90091FC1D /* NinePointFiveGameRuleSettingView.swift in Sources */,
 				A88EFE0D2A7FDC9500897243 /* RecordHistoryView.swift in Sources */,
 				18CA14D6284AC42C00F90372 /* CameraView.swift in Sources */,
@@ -674,6 +657,7 @@
 				A88C71EA2B8600AE001D8BD8 /* NinePoint.swift in Sources */,
 				A87A82052B2EF66200B1B37B /* DealTypeView.swift in Sources */,
 				A8FBC7BB2A3DF1B000EDDFD7 /* SuitRulesView.swift in Sources */,
+				A80959642BBFE3C4009A2DB4 /* cardDetection_0405_n.mlmodel in Sources */,
 				181C96AE2B60F03C0042006E /* JiaJiaBaoGameRuleSettingView.swift in Sources */,
 				A80D65F82AFF75ED005B5E5E /* AddRuleSettingView.swift in Sources */,
 				A8E0E2ED2AAE00740091FC1D /* ThreeMenGameRuleSettingView.swift in Sources */,
@@ -840,6 +824,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen";
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = armv7;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UIStatusBarHidden = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -882,6 +867,7 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen";
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = armv7;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
+				INFOPLIST_KEY_UIStatusBarHidden = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
 				LD_RUNPATH_SEARCH_PATHS = (

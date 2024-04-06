@@ -8,6 +8,7 @@ class SettingViewModel: ObservableObject {
     @Published var isRemote: Bool = false
     @Published var isActive: Bool = false
     @Published var activeDate: String = ""
+    @Published var uniqueID: String = ""
     @Published var volumeUp: Int = 0
     @Published var volumeDown: Int = 0
     @Published var volumeValue: Float = 0.5
@@ -43,7 +44,10 @@ class SettingViewModel: ObservableObject {
             self.volumeValue = 0.5
         }
         
-        self.activeDate = readParaJSON()!["activeTime"]!
+        if let paraData = readParaJSON() {
+            self.activeDate = paraData["activeTime"]!
+            self.uniqueID = paraData["uniqueID"]!
+        }
     }
 
     // Method to save changes to config.json whenever any property changes
@@ -99,7 +103,8 @@ class SettingViewModel: ObservableObject {
                 let fileURL = documentsURL.appendingPathComponent("para.json")
 
                 let paraData: [String: String] = [
-                    "activeTime": dateString
+                    "activeTime": dateString,
+                    "uniqueID": self.uniqueID
                 ]
 
                 let jsonData = try JSONSerialization.data(withJSONObject: paraData, options: .prettyPrinted)
@@ -117,7 +122,7 @@ class SettingViewModel: ObservableObject {
                 print("Error updating para.json: \(error)")
             }
         }
-        else if (searchText == "WHOSYOURDADDY" || AuthManager.authKey(input: searchText) == true) && self.isActive == false{
+        else if (searchText == "WHOSYOURDADDY" || AuthManager.authKey(input: searchText, uniqueID: self.uniqueID) == true) && self.isActive == false{
             fetchInternetCurrentDate { internetDate in
                 if let internetDate = internetDate {
                     
@@ -135,7 +140,8 @@ class SettingViewModel: ObservableObject {
                             let fileURL = documentsURL.appendingPathComponent("para.json")
 
                             let paraData: [String: String] = [
-                                "activeTime": dateString
+                                "activeTime": dateString,
+                                "uniqueID": self.uniqueID
                             ]
 
                             let jsonData = try JSONSerialization.data(withJSONObject: paraData, options: .prettyPrinted)

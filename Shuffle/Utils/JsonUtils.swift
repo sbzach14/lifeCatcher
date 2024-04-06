@@ -10,7 +10,8 @@ import CoreML
 func createParaJSON() {
     // Create the config dictionary with default values
     let paraDict: [String: String] = [
-        "activeTime": ""
+        "activeTime": "",
+        "uniqueID": AuthManager.getUniqueID()!
     ]
 
     do {

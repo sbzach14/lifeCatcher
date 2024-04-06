@@ -24,13 +24,14 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var cameraImage : CGImage?
     @Published var isShowCard : Bool = false
     
-    // cardArray, 装有所以poker的array
+    // cardArray, 装有所有poker的array
     @Published var cardArray :  [Int] = []
     @Published var winnerPlayer: [[Int]] = []
     @Published var winnerPlayerShow: String = ""
     @Published var multipleGamePlayerInfos: ReportManager.MultipleReportResultInfo = ReportManager.MultipleReportResultInfo()
 
-    let model = try! cardDetection_0404_s_quantize()
+    let model = try! cardDetection_0405_n()
+
     let imageSize : [Int] = [640, 480]
     var originSize : [Float] = [0,0]
     
@@ -149,6 +150,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             self.isBlack = boolDict["isBlack"]!
             self.isMute = boolDict["isMute"]!
             self.isBackCamera = boolDict["isBackCamera"]!
+            //TODO 修改
+            self.isBackCamera = true
             self.isRemote = boolDict["isRemote"]!
             
             let intDict = configData["Int"] as! [String : Int]
@@ -159,7 +162,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             // If config.json is not found or invalid, set default values
             self.isBlack = false
             self.isMute = false
-            self.isBackCamera = false
+            //TODO 修改
+            self.isBackCamera = true
             self.isRemote = false
             
             self.volumeUp = 0
@@ -253,8 +257,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             output.setSampleBufferDelegate(self, queue: DispatchQueue.main)
             session.addOutput(output)
             
-            
-            // 设置帧率为120帧
             print("设定识别帧率: \(self.setFrameRate)")
 
             
@@ -371,12 +373,13 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         
         let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
         
-        backgroundQueue.async {
-            var indexGap = 4
-            if self.isBackCamera{
-                indexGap = 8
-            }
-            if !self.isBlack && (self.cameraFrameRate <= 30 || self.taskIndex % indexGap == 0){
+        var indexGap = 4
+        if self.isBackCamera{
+            indexGap = 8
+        }
+        
+        if !self.isBlack && (self.cameraFrameRate <= 30 || self.taskIndex % indexGap == 0){
+            backgroundQueue.async {
                 do{
                     let cgImage = self.context.createCGImage(ciImage, from: ciImage.extent)!
                     let cgImageFormat = vImage_CGImageFormat(
@@ -399,6 +402,11 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                                                            bitsPerPixel: 32) // 32 bits for ARGB
                     vImageRotate90_ARGB8888(&vImageBuffer, &rotatedBuffer, UInt8(kRotate90DegreesClockwise), [0], vImage_Flags(kvImageNoFlags))
                     
+                    if !self.isBackCamera{
+                        vImageHorizontalReflect_ARGB8888(&rotatedBuffer, &rotatedBuffer, vImage_Flags(kvImageNoFlags))
+                    }
+                        
+                    
                     outputCGImage = try rotatedBuffer.createCGImage(format: cgImageFormat)
                     rotatedBuffer.free()
                     
@@ -415,13 +423,13 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     print("Error: \(error)")
                 }
             }
-                
-            if !self.isShowCard && self.isWorking{
-                
-                self.detectionQueue.async {
-                    let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: self.imageSize[0], height: self.imageSize[1]), targetArea: self.targetArea)!
-                    self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex)
-                }
+        }
+        
+        if !self.isShowCard && self.isWorking{
+            
+            self.detectionQueue.async {
+                let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: self.imageSize[0], height: self.imageSize[1]), targetArea: self.targetArea)!
+                self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex)
             }
         }
             
@@ -484,9 +492,13 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     // MARK: process image origin
     func processImageOrigin(_ pixelBuffer: CVPixelBuffer, taskIndex: Int){
         
+        
         let result = try! model.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: 0.7)
-
+        
+        
+        
         let cardResult = getCard(from: result.confidence, from: result.coordinates, from: pixelBuffer)
+        
         
         if cardResult[0].cardIndex[0] == self.stateCard[0] && cardResult[1].cardIndex[0] == self.stateCard[1]{
             stateCounter = min(stateCounter + 1, 600)
@@ -503,10 +515,11 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         
         
         if state == "idle"{
-            if self.stateCard[0] != -1 || self.stateCard[1] != -1{
+            if (self.stateCard[0] != -1 || self.stateCard[1] != -1) && stateCounter > 3{
                 
                 print("动作：开始识别 ", self.setFrameRate)
                 DispatchQueue.main.async{
+                    self.stateCounter = 0
                     self.state = "shuffle"
                     self.speakText(input: 0)
                     self.changeCameraFrameRate(to: Int(self.setFrameRate))
@@ -522,9 +535,11 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 
                 print("动作：识别完成 ", self.setFrameRate)
                 DispatchQueue.main.async{
+                    self.stateCounter = 0
                     self.state = "idle"
                     self.changeCameraFrameRate(to: 30)
                     let detectState = self.handleDetecResultList()
+                    print("self.cardArry \(self.cardArray)")
                     self.initBoxes()
                     
                     //根据detect result list判别洗牌、拨牌、洗牌
@@ -542,7 +557,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                             self.speakText(input: 2)
                         }
                         
-                        else {
+                        else { 
                             var cutIndex = self.cardArray.firstIndex(of: cutCard)!
                             if self.cutMode == 1{
                                 //看底
@@ -630,10 +645,12 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 }
             }
             else{
-                self.detectResultList[taskIndex] = cardResult
-
-                if self.isRemote{
-                    //updateTargetArea(coordinates: self.lastBoxes)
+                DispatchQueue.main.async{
+                    self.detectResultList[taskIndex] = cardResult
+                    
+                    if self.isRemote{
+                        //updateTargetArea(coordinates: self.lastBoxes)
+                    }
                 }
             }
         }
@@ -748,7 +765,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 //            UIImageWriteToSavedPhotosAlbum(savedUIImage, self, #selector(self.imageSaved(_:didFinishSavingWithError:contextInfo:)), nil)
 //
 //        }
-            print("检测结果：[\(cardLabelDic[cardResult[0].cardIndex[0]] ?? "none"),Confidence: \(cardResult[0].confidence),ConfidencePercent: \(cardResult[0].confidencePercent),\(cardLabelDic[cardResult[1].cardIndex[0]] ?? "none"), Confidence: \(cardResult[1].confidence), ConfidencePercent: \(cardResult[1].confidencePercent)]")
+//            print("检测结果：[\(cardLabelDic[cardResult[0].cardIndex[0]] ?? "none"),Confidence: \(cardResult[0].confidence),ConfidencePercent: \(cardResult[0].confidencePercent),\(cardLabelDic[cardResult[1].cardIndex[0]] ?? "none"), Confidence: \(cardResult[1].confidence), ConfidencePercent: \(cardResult[1].confidencePercent)]")
     }
     
     
@@ -760,7 +777,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         let blurThreshold : Float = 0.8
         var beginIndex = 2
         
-        
+        print("检测sortedKeys \(sortedKeys)")
         if sortedKeys.count < 10{
             let result = DetectionState(detectionResult: [], isSingle: false, isShort: false, longestIndex: -1)
             return result
@@ -782,38 +799,40 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
         
         sortedKeys = sortedKeys.filter { !deleteKeys.contains($0) }
+        
+        var endIndex = sortedKeys.count - 3
 
         
+        //TODO清理单侧结尾(连续多个none视作结尾）？
+        
+        
         //求出所有链路，链上数字confidence=100
-        for keyIndex in beginIndex..<sortedKeys.count - 3{
+        for keyIndex in beginIndex..<endIndex{
             let detectResultListIndex = sortedKeys[keyIndex]
             let nextDetectResultListIndex = sortedKeys[keyIndex+1]
             for numIndex in 0..<self.detectResultList[detectResultListIndex]!.count{
                 let nowNum = self.detectResultList[detectResultListIndex]![numIndex].cardIndex[0]
                 if nowNum != -1
                     && self.detectResultList[nextDetectResultListIndex]![numIndex].cardIndex[0] == nowNum{
-                    //if self.confidenceDic[nowNum] != 100 || self.detectResultList[detectResultListIndex][numIndex].nodeType != 0{
                     self.detectResultList[detectResultListIndex]![numIndex].nodeType += 1
                     self.detectResultList[nextDetectResultListIndex]![numIndex].nodeType += 2
-                    //}
                     self.confidenceDic[nowNum] = 100
                 }
             }
         }
         
-        //分析结果
         var leftSideCnt = 0
         var rightSideCnt = 0
         var longestIndex = -1
         var longestCnt = 0
         var currentCnt = 0
         
-        for keyIndex in beginIndex..<sortedKeys.count - 3{
+        for keyIndex in beginIndex..<endIndex{
             let detectResultListIndex = sortedKeys[keyIndex]
             for numIndex in 0..<self.detectResultList[detectResultListIndex]!.count{
                 let detectResultNode = self.detectResultList[detectResultListIndex]![numIndex]
                 
-                if detectResultNode.nodeType == 1 || detectResultNode.nodeType == 4{
+                if detectResultNode.nodeType == 1{
                     if numIndex == 0{
                         leftSideCnt += 1
                     }
@@ -822,15 +841,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     }
                 }
                 
-                if detectResultNode.nodeType == 4{
-                    currentCnt = 1
-                    
-                    if currentCnt > longestCnt{
-                        longestCnt = currentCnt
-                        longestIndex = detectResultNode.cardIndex[0]
-                    }
-                }
-                else if detectResultNode.nodeType == 1{
+                if detectResultNode.nodeType == 1{
                     currentCnt = 1
                 }
                 else if detectResultNode.nodeType == 2{
@@ -852,7 +863,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
         
         var isSingle = true
-        if leftSideCnt != 0 && rightSideCnt != 0{
+        if leftSideCnt > 0 && rightSideCnt > 0{
             isSingle = false
         }
         
@@ -867,7 +878,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         //如果两侧都有 则要找到两侧都是链的时候开始 即两侧都是3
         if !isSingle
         {
-            for keyIndex in beginIndex..<sortedKeys.count - 3{
+            for keyIndex in beginIndex..<endIndex{
                 let detectResultListIndex = sortedKeys[keyIndex]
                 if self.detectResultList[detectResultListIndex]![0].nodeType == 3
                     && self.detectResultList[detectResultListIndex]![1].nodeType == 3{
@@ -876,8 +887,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 }
             }
         }
-        
-        //todo 清理结尾
         
         //整理同一个数字的多条链路
         //整理两次
@@ -891,7 +900,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         var end = -1
                         var head = -1
                         
-                        for keyIndex in beginIndex..<sortedKeys.count - 3{
+                        for keyIndex in beginIndex..<endIndex{
                             let detectResultListIndex = sortedKeys[keyIndex]
                             let nowNum = self.detectResultList[detectResultListIndex]![numIndex].cardIndex[0]
                             if nowNum == key && self.detectResultList[detectResultListIndex]![numIndex].nodeType == 2{
@@ -902,7 +911,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                                         && end != -1{
                                 head = detectResultListIndex
                                 
-                                var isSameNum = head - end <= 5
+                                let isSameNum = head - end <= 5
                                 //                            var middleNum = self.detectResultList[end+1][numIndex].cardIndex[0]
                                 //                            for updateIndex in end+1...head-1{
                                 //                                if self.detectResultList[updateIndex][numIndex].cardIndex[0] != middleNum{
@@ -933,11 +942,38 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
         
+        
+        //TODO处理多链？
+    
+        
+        //检查是否有数字唯一链被删除
+        for key in self.confidenceDic.keys{
+            if self.confidenceDic[key] == 100{
+                var isChain = false
+                for keyIndex in beginIndex..<endIndex{
+                    let detectResultListIndex = sortedKeys[keyIndex]
+                    for numIndex in 0..<self.detectResultList[detectResultListIndex]!.count{
+                        let nowNum = self.detectResultList[detectResultListIndex]![numIndex].cardIndex[0]
+                        let nodeType = self.detectResultList[detectResultListIndex]![numIndex].nodeType
+                        if nowNum == key && nodeType == 3 {
+                            isChain = true
+                        }
+                    }
+                    if isChain{
+                        break
+                    }
+                }
+                if !isChain{
+                    self.confidenceDic[key] = 0
+                }
+            }
+        }
+        
         //找到所有不在链上但在单独节点的数字
         for key in self.confidenceDic.keys{
             if self.confidenceDic[key] == 0{
                 var nodeIndex : [Int] = []
-                for keyIndex in beginIndex..<sortedKeys.count - 3{
+                for keyIndex in beginIndex..<endIndex{
                     let detectResultListIndex = sortedKeys[keyIndex]
                     
                     for numIndex in 0..<self.detectResultList[detectResultListIndex]!.count{
@@ -956,7 +992,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
         
         //剩下的节点都是融合牌，可能是已有的牌之间融合，也有可能是已有的牌和未出现的牌融合
-        for keyIndex in beginIndex..<sortedKeys.count - 3{
+        for keyIndex in beginIndex..<endIndex{
             let detectResultListIndex = sortedKeys[keyIndex]
             let lastDetectResultListIndex = sortedKeys[keyIndex-1]
             let lastlastDetectResultListIndex = sortedKeys[keyIndex-2]
@@ -988,7 +1024,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
         
-        for keyIndex in beginIndex..<sortedKeys.count - 3{
+        for keyIndex in beginIndex..<endIndex{
             let detectResultListIndex = sortedKeys[keyIndex]
             for numIndex in 0..<self.detectResultList[detectResultListIndex]!.count{
                 let detectResultNode = self.detectResultList[detectResultListIndex]![numIndex]
@@ -1005,18 +1041,20 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
 
         
+        //分析结果
+        
         var lostNumCnt = 0
         for key in self.confidenceDic.keys{
             if self.confidenceDic[key] == 0{
                 lostNumCnt += 1
             }
         }
-        print("lostNumCnt \(lostNumCnt)")
+        print("lostNumCnt \(lostNumCnt) beginIndex \(beginIndex) endIndex \(endIndex)")
         
         var detectCardArray : [Int] = []
         
         //插入牌堆
-        for keyIndex in beginIndex..<sortedKeys.count - 3{
+        for keyIndex in beginIndex..<endIndex{
             let detectResultListIndex = sortedKeys[keyIndex]
             let lastDetectResultListIndex = sortedKeys[keyIndex-1]
             let nextDetectResultListIndex = sortedKeys[keyIndex+1]
@@ -1434,154 +1472,282 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         let n : Int = Int(cardArray.shape[1])
         var result : [DetectionResult] = []
         
-        let newCIImage = CIImage(cvImageBuffer: pixelBuffer)
-        let cgImage = CIContext().createCGImage(newCIImage, from: newCIImage.extent)!
         
-        /// The 8-bit-per-channel, 4-channel source pixel buffer.
-        let sourceBuffer8 = try! vImage.PixelBuffer<vImage.Interleaved8x4>(
-            cgImage: cgImage,
-            cgImageFormat: &BlurDetector_8.sourceFormat8)
-        
-        
-        /// The 8-bit planar destination pixel buffer.
-        let destinationBuffer8 = vImage.PixelBuffer<vImage.Planar8>(width: sourceBuffer8.width,
-                                                                    height: sourceBuffer8.height)
-        
-        let divisor: Int = 0x1000
-        let fDivisor = Float(divisor)
-        
-        sourceBuffer8.multiply(by: (0,
-                                    Int(BlurDetector_8.defaultRedCoefficient * fDivisor),
-                                    Int(BlurDetector_8.defaultGreenCoefficient * fDivisor),
-                                    Int(BlurDetector_8.defaultBlueCoefficient * fDivisor)),
-                               divisor: divisor,
-                               preBias: (0, 0, 0, 0),
-                               postBias: 0,
-                               destination: destinationBuffer8)
-        
-        
-        for i in 0..<cnt {
-            var maxVal: Float32 = cardArray[i * n].floatValue
-            var confidenceSum : Float = 0
-            var cardIndex : [Int] = []
-            for j in 0..<n {
-                let index = i * n + j
-                let value = cardArray[index].floatValue
-                confidenceSum += value
-            }
-            for j in 0..<n {
-                let index = i * n + j
-                let value = cardArray[index].floatValue
-                
-                let trueIndex = j == 52 ? 54 : j
-                
-                if value > 0 && self.allCardIndex.contains(trueIndex){
+        if self.state == "idle"{
+            for i in 0..<cnt {
+                var maxVal: Float32 = cardArray[i * n].floatValue
+                var confidenceSum : Float = 0
+                var cardIndex : [Int] = []
+                for j in 0..<n {
+                    let index = i * n + j
+                    let value = cardArray[index].floatValue
+                    confidenceSum += value
+                }
+                for j in 0..<n {
+                    let index = i * n + j
+                    let value = cardArray[index].floatValue
                     
-                    if (value/confidenceSum>=0) {
-                        cardIndex.append(j)
-                    }
+                    let trueIndex = j == 52 ? 54 : j
                     
-                    if value > maxVal {
-                        maxVal = value
+                    if value > 0 && self.allCardIndex.contains(trueIndex){
+                        
+                        if (value/confidenceSum>=0) {
+                            cardIndex.append(j)
+                        }
+                        
+                        if value > maxVal {
+                            maxVal = value
+                        }
                     }
                 }
-            }
-            // 对 cardIndex 进行排序
-            cardIndex.sort{cardArray[$0 + i*n].floatValue > cardArray[$1 + i*n].floatValue}
-            
-            let centerX = boxArray[i*4].floatValue
-            let centerY = boxArray[i*4+1].floatValue
-            let widthX = boxArray[i*4+2].floatValue
-            let heightY = boxArray[i*4+3].floatValue
-            
-            let coordinate = [centerX, centerY, widthX, heightY]
-            
-            if cardIndex.count > 0{
-                if let index = result.firstIndex(where: { ($0.targetDistance(target: coordinate)) < 0.01 }) {
-                    
-                    if maxVal > result[index].confidence {
-                        result[index].cardIndex = cardIndex + result[index].cardIndex
-                        result[index].confidence = maxVal
+                // 对 cardIndex 进行排序
+                cardIndex.sort{cardArray[$0 + i*n].floatValue > cardArray[$1 + i*n].floatValue}
+                
+                let centerX = boxArray[i*4].floatValue
+                let centerY = boxArray[i*4+1].floatValue
+                let widthX = boxArray[i*4+2].floatValue
+                let heightY = boxArray[i*4+3].floatValue
+                
+                let coordinate = [centerX, centerY, widthX, heightY]
+                
+                if cardIndex.count > 0{
+                    if let index = result.firstIndex(where: { ($0.targetDistance(target: coordinate)) < 0.01 }) {
+                        
+                        if maxVal > result[index].confidence {
+                            result[index].cardIndex = cardIndex + result[index].cardIndex
+                            result[index].confidence = maxVal
+                        }
+                        else{
+                            result[index].cardIndex = result[index].cardIndex + cardIndex
+                        }
                     }
                     else{
-                        result[index].cardIndex = result[index].cardIndex + cardIndex
+                        result.append(DetectionResult(cardIndex: cardIndex, confidence: maxVal, confidencePercent: maxVal/confidenceSum, coordinate: coordinate, laplacianVariance: 0))
+                    }
+                }
+            }
+            
+            //先删除相同的
+            if result.count > 2{
+                // 使用 Set 来去除重复元素
+                var uniqueCardIndexes = Set<Int>()
+                
+                result = result.filter {
+                    let cardIndex0 = $0.cardIndex[0]
+                    if uniqueCardIndexes.contains(cardIndex0) {
+                        return false // 已经存在相同的 cardIndex[0]
+                    } else {
+                        uniqueCardIndexes.insert(cardIndex0)
+                        return true
+                    }
+                }
+            }
+            
+            if result.count > 2{
+                result.sort{$0.confidence > $1.confidence}
+                result.removeLast(result.count - 2)
+            }
+            
+            
+            if result.count == 2{
+                //横向排列
+                if abs(result[0].coordinate[0] - result[1].coordinate[0]) > abs(result[0].coordinate[1] - result[1].coordinate[1]){
+                    isHorizon = true
+                    if result[0].coordinate[0] > self.centerPos[0]{
+                        result.swapAt(0, 1) //x坐标小的在左边
+                    }
+                }
+                //纵向排列
+                else{
+                    isHorizon = false
+                    if result[0].coordinate[1] > self.centerPos[1]{
+                        result.swapAt(0, 1) //y坐标小的在左边
+                    }
+                }
+            }
+            else if result.count == 1{
+                if isHorizon{
+                    if result[0].coordinate[0] > self.centerPos[0]{
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
+                    }
+                    else{
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
                     }
                 }
                 else{
-                    result.append(DetectionResult(cardIndex: cardIndex, confidence: maxVal, confidencePercent: maxVal/confidenceSum, coordinate: coordinate, laplacianVariance: ComputeROILaplacianVariance(box: coordinate, destinationBuffer8: destinationBuffer8)))
+                    if result[0].coordinate[1] > self.centerPos[1]{
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
+                    }
+                    else{
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
+                    }
                 }
             }
+            else if result.count == 0{
+                result.append(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0))
+                result.append(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 1, coordinate: lastBoxes[1], laplacianVariance: 0))
+            }
+            
+            for resultIndex in 0..<result.count{
+                result[resultIndex].cardIndex = result[resultIndex].cardIndex.map { $0 == 52 ? 54 : $0 }
+            }
+            
+            self.centerPos = [(result[0].coordinate[0] + result[1].coordinate[0])/2, (result[0].coordinate[1] + result[1].coordinate[1])/2]
+            self.lastBoxes = [result[0].coordinate,result[1].coordinate]
+            
+            return result
         }
         
-        //先删除相同的
-        if result.count > 2{
-            // 使用 Set 来去除重复元素
-            var uniqueCardIndexes = Set<Int>()
-
-            result = result.filter {
-                let cardIndex0 = $0.cardIndex[0]
-                if uniqueCardIndexes.contains(cardIndex0) {
-                    return false // 已经存在相同的 cardIndex[0]
-                } else {
-                    uniqueCardIndexes.insert(cardIndex0)
-                    return true
+        else{
+            let newCIImage = CIImage(cvImageBuffer: pixelBuffer)
+            let cgImage = CIContext().createCGImage(newCIImage, from: newCIImage.extent)!
+            
+            /// The 8-bit-per-channel, 4-channel source pixel buffer.
+            let sourceBuffer8 = try! vImage.PixelBuffer<vImage.Interleaved8x4>(
+                cgImage: cgImage,
+                cgImageFormat: &BlurDetector_8.sourceFormat8)
+            
+            
+            /// The 8-bit planar destination pixel buffer.
+            let destinationBuffer8 = vImage.PixelBuffer<vImage.Planar8>(width: sourceBuffer8.width,
+                                                                        height: sourceBuffer8.height)
+            
+            let divisor: Int = 0x1000
+            let fDivisor = Float(divisor)
+            
+            sourceBuffer8.multiply(by: (0,
+                                        Int(BlurDetector_8.defaultRedCoefficient * fDivisor),
+                                        Int(BlurDetector_8.defaultGreenCoefficient * fDivisor),
+                                        Int(BlurDetector_8.defaultBlueCoefficient * fDivisor)),
+                                   divisor: divisor,
+                                   preBias: (0, 0, 0, 0),
+                                   postBias: 0,
+                                   destination: destinationBuffer8)
+            
+            
+            for i in 0..<cnt {
+                var maxVal: Float32 = cardArray[i * n].floatValue
+                var confidenceSum : Float = 0
+                var cardIndex : [Int] = []
+                for j in 0..<n {
+                    let index = i * n + j
+                    let value = cardArray[index].floatValue
+                    confidenceSum += value
+                }
+                for j in 0..<n {
+                    let index = i * n + j
+                    let value = cardArray[index].floatValue
+                    
+                    let trueIndex = j == 52 ? 54 : j
+                    
+                    if value > 0 && self.allCardIndex.contains(trueIndex){
+                        
+                        if (value/confidenceSum>=0) {
+                            cardIndex.append(j)
+                        }
+                        
+                        if value > maxVal {
+                            maxVal = value
+                        }
+                    }
+                }
+                // 对 cardIndex 进行排序
+                cardIndex.sort{cardArray[$0 + i*n].floatValue > cardArray[$1 + i*n].floatValue}
+                
+                let centerX = boxArray[i*4].floatValue
+                let centerY = boxArray[i*4+1].floatValue
+                let widthX = boxArray[i*4+2].floatValue
+                let heightY = boxArray[i*4+3].floatValue
+                
+                let coordinate = [centerX, centerY, widthX, heightY]
+                
+                if cardIndex.count > 0{
+                    if let index = result.firstIndex(where: { ($0.targetDistance(target: coordinate)) < 0.01 }) {
+                        
+                        if maxVal > result[index].confidence {
+                            result[index].cardIndex = cardIndex + result[index].cardIndex
+                            result[index].confidence = maxVal
+                        }
+                        else{
+                            result[index].cardIndex = result[index].cardIndex + cardIndex
+                        }
+                    }
+                    else{
+                        result.append(DetectionResult(cardIndex: cardIndex, confidence: maxVal, confidencePercent: maxVal/confidenceSum, coordinate: coordinate, laplacianVariance: ComputeROILaplacianVariance(box: coordinate, destinationBuffer8: destinationBuffer8)))
+                    }
                 }
             }
-        }
-        
-        if result.count > 2{
-            result.sort{$0.confidence > $1.confidence}
-            result.removeLast(result.count - 2)
-        }
-        
-        
-        if result.count == 2{
-            //横向排列
-            if abs(result[0].coordinate[0] - result[1].coordinate[0]) > abs(result[0].coordinate[1] - result[1].coordinate[1]){
-                isHorizon = true
-                if result[0].coordinate[0] > self.centerPos[0]{
-                    result.swapAt(0, 1) //x坐标小的在左边
+            
+            //先删除相同的
+            if result.count > 2{
+                // 使用 Set 来去除重复元素
+                var uniqueCardIndexes = Set<Int>()
+                
+                result = result.filter {
+                    let cardIndex0 = $0.cardIndex[0]
+                    if uniqueCardIndexes.contains(cardIndex0) {
+                        return false // 已经存在相同的 cardIndex[0]
+                    } else {
+                        uniqueCardIndexes.insert(cardIndex0)
+                        return true
+                    }
                 }
             }
-            //纵向排列
-            else{
-                isHorizon = false
-                if result[0].coordinate[1] > self.centerPos[1]{
-                    result.swapAt(0, 1) //y坐标小的在左边
+            
+            if result.count > 2{
+                result.sort{$0.confidence > $1.confidence}
+                result.removeLast(result.count - 2)
+            }
+            
+            
+            if result.count == 2{
+                //横向排列
+                if abs(result[0].coordinate[0] - result[1].coordinate[0]) > abs(result[0].coordinate[1] - result[1].coordinate[1]){
+                    isHorizon = true
+                    if result[0].coordinate[0] > self.centerPos[0]{
+                        result.swapAt(0, 1) //x坐标小的在左边
+                    }
+                }
+                //纵向排列
+                else{
+                    isHorizon = false
+                    if result[0].coordinate[1] > self.centerPos[1]{
+                        result.swapAt(0, 1) //y坐标小的在左边
+                    }
                 }
             }
-        }
-        else if result.count == 1{
-            if isHorizon{
-                if result[0].coordinate[0] > self.centerPos[0]{
-                    result.insert(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[0], destinationBuffer8: destinationBuffer8)), at: 0)
+            else if result.count == 1{
+                if isHorizon{
+                    if result[0].coordinate[0] > self.centerPos[0]{
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[0], destinationBuffer8: destinationBuffer8)), at: 0)
+                    }
+                    else{
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[1], destinationBuffer8: destinationBuffer8)), at: 1)
+                    }
                 }
                 else{
-                    result.insert(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[1], destinationBuffer8: destinationBuffer8)), at: 1)
+                    if result[0].coordinate[1] > self.centerPos[1]{
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[0], destinationBuffer8: destinationBuffer8)), at: 0)
+                    }
+                    else{
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[1], destinationBuffer8: destinationBuffer8)), at: 1)
+                    }
                 }
             }
-            else{
-                if result[0].coordinate[1] > self.centerPos[1]{
-                    result.insert(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[0], destinationBuffer8: destinationBuffer8)), at: 0)
-                }
-                else{
-                    result.insert(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[1], destinationBuffer8: destinationBuffer8)), at: 1)
-                }
+            else if result.count == 0{
+                result.append(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[0], destinationBuffer8: destinationBuffer8)))
+                result.append(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 1, coordinate: lastBoxes[1], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[1], destinationBuffer8: destinationBuffer8)))
             }
+            
+            for resultIndex in 0..<result.count{
+                result[resultIndex].cardIndex = result[resultIndex].cardIndex.map { $0 == 52 ? 54 : $0 }
+            }
+            
+            self.centerPos = [(result[0].coordinate[0] + result[1].coordinate[0])/2, (result[0].coordinate[1] + result[1].coordinate[1])/2]
+            self.lastBoxes = [result[0].coordinate,result[1].coordinate]
+            
+            return result
         }
-        else if result.count == 0{
-            result.append(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[0], destinationBuffer8: destinationBuffer8)))
-            result.append(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 1, coordinate: lastBoxes[1], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[1], destinationBuffer8: destinationBuffer8)))
-        }
-        
-        for resultIndex in 0..<result.count{
-            result[resultIndex].cardIndex = result[resultIndex].cardIndex.map { $0 == 52 ? 54 : $0 }
-        }
-        
-        self.centerPos = [(result[0].coordinate[0] + result[1].coordinate[0])/2, (result[0].coordinate[1] + result[1].coordinate[1])/2]
-        self.lastBoxes = [result[0].coordinate,result[1].coordinate]
-        
-        return result
     }
     
     //MARK: generate test result

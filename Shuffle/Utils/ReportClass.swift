@@ -124,6 +124,9 @@ struct ReportClass{
     //13，去色补不补看Y
     //14，固定第10张为色
     //15,下XY张打色
+    //16,指定牌去顶，底为色
+    //17，看牌为色
+    //18，看牌两次和为色
 
     var colorCardPos: Int = -1
     //0, 有指定牌，x花色 y数字
@@ -133,6 +136,7 @@ struct ReportClass{
     //1，报最大家牌，Y=10 点数，其他点数+花色
     var specifiedPlayerHand :Int = -1
     //0, 不同发牌，根据Y值决定
+    //1, 看手牌不同牌堆
     var differentDeal: Int = -1
     
     init(reportName: String, reportID: Int, rankReport: Int, aliveDeathReport: Int, pairReport: Int, drawPointReport: Int, ninePointReport: Int, pokerBullReport: Int, reportCutRange: Int, reportTarget: Int, cardsTransformation: Int, consecutiveReport: Int, positionToReport: Int, colorCardPos: Int, hasSpecialCard: Int, specifiedPlayerHand : Int, differentDeal: Int) {
@@ -385,19 +389,19 @@ class ReportManager{
             210: "[740]:报指定玩家手里牌*",
             211: "[741]:报玩家手里牌+照牌报后面4张单张*",
             212: "[745]:看切牌报上下部分牌张数*",
-            213: "[755]看色留色上10张去牌保位置最大",
-            214: "[758]:看色留色+色牌上X张为色报最大次大",
-            215: "[759]:看色留色2次打色保位置最大",
-            216: "[760]:看色留色报最大",
-            217: "[761]:看色留色报最大次大",
-            218: "[762]:看色留色报最小",
-            219: "[763]:看色留色报最小次小",
-            220: "[764]:看色留色报排名",
-            221: "[766]:看色牌去色全部报最大",
-            222: "[767]:看色牌去色全部报最大次大",
-            223: "[768]:看色牌去色全部报最小",
-            224: "[769]:看色牌去色全部报最小次小",
-            225: "[770]:看色牌去色全部报排名",
+            213: "[755]看色留色上10张去牌保位置最大*",
+            214: "[758]:看色留色+色牌上X张为色报最大次大*",
+            215: "[759]:看色留色2次打色保位置最大*",
+            216: "[760]:看色留色报最大*",
+            217: "[761]:看色留色报最大次大*",
+            218: "[762]:看色留色报最小*",
+            219: "[763]:看色留色报最小次小*",
+            220: "[764]:看色留色报排名*",
+            221: "[766]:看色牌去色全部报最大*",
+            222: "[767]:看色牌去色全部报最大次大*",
+            223: "[768]:看色牌去色全部报最小*",
+            224: "[769]:看色牌去色全部报最小次小*",
+            225: "[770]:看色牌去色全部报排名*",
             226: "[790]:固定第10张牌作色留色报最大",
             227: "[791]:固定第10张牌作色留色报最大...",
             228: "[793]:固定第10张牌作色留色报最小次小",
@@ -450,13 +454,13 @@ class ReportManager{
 有活门报活门，女声=活门，男声=半活门，有对子报对子。没有活门对子报 0.合成语音不支持连报
 """,
         7:"""
-报哪2家最大和哪个位置是活门，,合成语音不支持连报多轮.人数>4 :报1大2大+第1活门+第2活门
+报哪2家最大和哪个位置是活门,合成语音不支持连报多轮.人数>4 :报1大2大+第1活门+第2活门
 """,
         8:"""
 报最大次大，有活门报活门，女声=活门，男声=半活门=平点，有对子报对子
 """,
         9:"""
-报哪家最大和最大家是什么牌。Y=10报点数。 Y 不等于10:报点数和花色
+报哪家最大和最大家是什么牌。Y=10报点数。 Y不等于10:报点数和花色
 """,
         10:"""
 报各家大小排名，人数超过6家只报前6家
@@ -471,17 +475,18 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
 报:12不打2大平点对子1，表示第1家最大，第2家次大，不打色2可确保位置不拿最小，最大点数有平点，有1个对子。女声=没平点，男声=有平点。
 """,
         13:"""
-报在第几张牌处打色留色，再根据色牌点数去面牌，可保位置最大。比如报3，上面3张打色留色，色牌是5再去5张面牌，J是去掉11张打色范围有参数XY设定:默认X=1Y=10.表示在上10张内打色。修改为:X=5,Y-10表云在笔5张到第10张内打色
+报在第几张牌处打色留色，再根据色牌点数去面牌，可保位置最大。比如报3，上面3张打色留色，色牌是5再去5张面牌，J是去掉11张打色范围有参数XY设定:默认X=1Y=10.表示在上10张内打色。修改为:X=5,Y=10表云在第5张到第10张内打色
 """,
         14:"""
-报在第几张牌处打色留色，再根据色牌点数去面牌，可保位置最大次大。比如报3，上面3张打色留色，色牌是5再去5张面牌，J是去掉 11张打色范围有参数XY设定:默认X=1Y-10.表示在上10张内打色。修改为:X=5,Y=10表示在第5张到第10张内打色
+报在第几张牌处打色留色，再根据色牌点数去面牌，可保位置最大次大。比如报3，上面3张打色留色，色牌是5再去5张面牌，J是去掉11张
+打色范围有参数XY设定:默认X=1，Y=10.表示在上10张内打色。修改为:X=5,Y=10表示在第5张到第10张内打色
 """,
         15:"""
 报在第几张牌处打色，色牌和色牌上部分的牌补到底部，再根据色牌点数去面牌，可保位置最大。比如报3，上面3张打色去色全部，色牌是5再去5张面牌，J是去掉11张
 打色范围有参数XY设定:默让X=1,Y=10.表示在上10张内打色，修改为：X=5，Y=10表示在第5张到第10张内打色
 """,
         16:"""
-报在第几张牌处打色，色牌和色牌上部分的牌补到底部，再根据色牌点数去面牌，可保位置最大次大。比如报3，上面3张打色去色全部，色牌是5再去5张面牌，J是去掉11张。打色范围有参数xY设定:默认X=1Y=10.表示在上 10张内打色。修改为:X=5,Y=10 表示在第5张到第10张内打色
+报在第几张牌处打色，色牌和色牌上部分的牌补到底部，再根据色牌点数去面牌，可保位置最大次大。比如报3，上面3张打色去色全部，色牌是5再去5张面牌，J是去掉11张。打色范围有参数XY设定:默认X=1Y=10.表示在上 10张内打色。修改为:X=5,Y=10 表示在第5张到第10张内打色
 """,
         17:"""
 报5，如果第 5张点数是6点，发牌第1轮发6张，第2轮发10张。既根据色牌点数确定第轮发几张。
@@ -1333,31 +1338,33 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         let cardRank = cardIndex % 13
         let cardSuit = cardIndex / 13
         switch cutNumSetting{
-        //"点数打色, J = 11, Q = 12, K = 13, 王 = 1"
+        //"点数打色, J = 11, Q = 12, K = 13, 王 = 6"
         case 0:
             if cardIndex == 53 || cardIndex == 54{
-                newCardRank = 1
+                newCardRank = 6
                 
             } else {
                 newCardRank = cardRank + 1
             }
             break
-        //"点数打色, J = 1, Q = 2, K = 3，王 = 1"
+        //"点数打色, J = 1, Q = 2, K = 3，王 = 6"
         case 1:
             if cardIndex == 53 || cardIndex == 54{
-                newCardRank = 1
+                newCardRank = 6
             } else if cardRank >= 10{
-                newCardRank = cardRank % 10
+                newCardRank = (cardRank + 1) % 10
             } else {
                 newCardRank = cardRank + 1
             }
             break
-        //点数打色, J = 1, Q = 1, K = 1, 王 = 1
+        //点数打色, J = 1, Q = 2, K = 1, 王 = 1
         case 2:
             if cardIndex == 53 || cardIndex == 54{
                 newCardRank = 1
-            } else if cardRank >= 10{
+            } else if cardRank == 10 || cardRank == 12{
                 newCardRank = 1
+            } else if cardRank == 11 {
+                newCardRank = 2
             } else {
                 newCardRank = cardRank + 1
             }
@@ -1407,7 +1414,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         return resultList
     }
     
-    static func GetCardRank(reportRule:ReportClass, cutNumSetting: Int, cutNumRangeSetting: [Int], inputCards: [Int], cardIndex: Int, specialCardPos: Int) -> (Int, [Int]){
+    static func GetCardRank(reportRule:ReportClass, cutNumSetting: Int, cutNumRangeSetting: [Int], inputCards: [Int], cardIndex: Int, specialCardPos: Int, cutCardIndexList:[Int]) -> (Int, [Int]){
         //色点设置
         var cardRank: Int = 0
         var colorCardIndexList: [Int] = []
@@ -1486,6 +1493,17 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: inputCards[colorCardPos])
             colorCardIndexList.append(inputCards[colorCardPos])
             break
+        //17，看牌为色
+        case 17:
+            let length = cutCardIndexList.count
+            cardRank = cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: inputCards[cutCardIndexList[length - 1]])
+            colorCardIndexList.append(inputCards[length - 1])
+            break
+        //18，看牌两次和为色
+        case 18:
+            let length = cutCardIndexList.count
+            cardRank = (cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: inputCards[length - 1]) + cutRankConvert(cutNumSetting: cutNumSetting, cardIndex: inputCards[length - 2])) % 10
+            break
         default:
             break
         }
@@ -1549,7 +1567,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
     
     
     
-    static func GameReporter(gameIndex: Int, inputCards: [Int], diyDealStatus: [[Bool]], diyDealNum:[Int], newArgs: [Int], rankRules:[Int], suitRules:[Int], reportID: Int, cutNumSetting: Int, cutNumRangeSetting: [Int], targetPos: Int, coloringType: Int, consecutiveNum: Int) -> (String, MultipleReportResultInfo){
+    static func GameReporter(gameIndex: Int, inputCards: [Int], cutCardIndexList: [Int], diyDealStatus: [[Bool]], diyDealNum:[Int], newArgs: [Int], rankRules:[Int], suitRules:[Int], reportID: Int, cutNumSetting: Int, cutNumRangeSetting: [Int], targetPos: Int, coloringType: Int, consecutiveNum: Int) -> (String, MultipleReportResultInfo){
         
         let gameFunctions:[Int: ([[Bool]],[Int], [Int], [Int], [Int], [Int]) -> ([GameReturnPlayerInfo], [Int])] = [
             0: TexasPoker.FindWinner,
@@ -1571,6 +1589,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         let gameFunction = gameFunctions[gameIndex]
         //最后的report结果
         var reportResult = ""
+        var inputCards = inputCards
         
         var leftCards:[Int] = []
         let playerNum = newArgs[2]
@@ -1594,15 +1613,13 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         //装下总结果
         var multipleResultInfo = MultipleReportResultInfo()
         
-        
         for roundID in 1...consecutiveNum {
             
             if let reportRule = RuleManager.allPreSetReportRules[reportID]{
                 var currentResultInfo = SingleReportResultInfo()
-                
                 var cutList: [[Int]] = []
                 
-                //切牌范围
+                //切牌范围（遍历范围）
                 switch reportRule.reportCutRange{
                 //XY张
                 case 0:
@@ -1667,6 +1684,42 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     break
                 }
                 
+                //看手牌和不同发牌
+                
+                switch reportRule.differentDeal {
+                //0, 不同发牌，根据Y值决定
+                case 0:
+                    break
+                //1, 看手牌不同牌堆
+                case 1:
+                    for orderNum in 0...playerNum - 1{
+                        //正发
+                        if newArgs[1] == 0{
+                            //默认每轮发一张牌
+                            if newArgs[0] == 0{
+                                
+                                
+                            } else {
+                                var tempDiyDealNum: [Int] = []
+                                var tempDiyDealStatus :[[Bool]] = []
+                                for round in 0..<tempDiyDealNum.count {
+                                    if tempDiyDealStatus[round][0] != true {
+                                        tempDiyDealStatus.append(tempDiyDealStatus[round])
+                                    }
+                                }
+                            }
+                        //反发
+                        } else {
+                            
+                        }
+                    }
+                    break
+                default:
+                    break
+                }
+                
+                
+                
                 //有无指定牌
                 //指定牌的cardIndex
                 var specialCardIndex:Int = -1
@@ -1686,7 +1739,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         }
                     }
                     
-                    print("指定牌的cardIndex为 \(specialCardIndex) 位置")
+                    print("指定牌的cardIndex为 \(specialCardIndex) 位置（正面牌的位置）")
                     break
                 default:
                     break
@@ -1694,11 +1747,16 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 
                 currentResultInfo.specialCardPos = specialCardPos
                 
+                
                 var cutID = 0
                 for cutRange in cutList{
                     let cutRange1 = cutRange[0]
                     let cutRange2 = cutRange[1]
                     print("CUTID Start----------------------------------")
+                    var coloringInputCards = inputCards
+                    if coloringType == 1 {
+                         coloringInputCards = inputCards.reversed()
+                    }
                     for cardIndex in cutRange1...cutRange2{
                         print("LOG START-------------------------------------")
                         //检查是否超过了打色范围
@@ -1709,10 +1767,12 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         
                         var cardRank: Int = 0
                         var colorCardIndexList: [Int] = []
+                        //上
                         if cutID == 0{
-                            (cardRank, colorCardIndexList) = GetCardRank(reportRule: reportRule, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, inputCards: inputCards, cardIndex: cardIndex, specialCardPos: specialCardPos)
+                            (cardRank, colorCardIndexList) = GetCardRank(reportRule: reportRule, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, inputCards: coloringInputCards, cardIndex: cardIndex, specialCardPos: specialCardPos, cutCardIndexList: cutCardIndexList)
+                        //下
                         } else if cutID == 1{
-                            (cardRank, colorCardIndexList) = GetCardRank(reportRule: reportRule, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, inputCards: inputCards, cardIndex: inputCards.count - 1 - cardIndex, specialCardPos: specialCardPos)
+                            (cardRank, colorCardIndexList) = GetCardRank(reportRule: reportRule, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, inputCards: coloringInputCards, cardIndex: inputCards.count - 1 - cardIndex, specialCardPos: specialCardPos, cutCardIndexList: cutCardIndexList)
                         }
                         
                         
@@ -1722,50 +1782,56 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         switch reportRule.cardsTransformation{
                         //0，留色再根据色牌点数去牌
                         case 0:
-                            newInputCards = Array(inputCards[(cardRank)...])
+                            newInputCards = Array(coloringInputCards[(cardRank)...])
                             break
                         //1，去色再根据色牌点数去牌
                         case 1:
-                            newInputCards = Array(inputCards[(cardRank  + cardIndex + 1)...]) + Array(inputCards[0...cardIndex])
+                            newInputCards = Array(coloringInputCards[(cardRank  + cardIndex + 1)...]) + Array(coloringInputCards[0...cardIndex])
                             break
                         //2，留色
                         case 2:
-                            newInputCards = inputCards
+                            newInputCards = coloringInputCards
                             break
                         //3，去色
                         case 3:
-                            newInputCards = Array(inputCards[(cardIndex + 1)...])
+                            newInputCards = Array(coloringInputCards[(cardIndex + 1)...])
                             break
                         //4，去色补到底部
                         case 4:
-                            newInputCards = Array(inputCards[(cardIndex + 1)...]) + Array(inputCards[0...cardIndex])
+                            newInputCards = Array(coloringInputCards[(cardIndex + 1)...]) + Array(coloringInputCards[0...cardIndex])
                             break
                         //5，去掉色牌1张
                         case 5:
-                            newInputCards = inputCards
+                            newInputCards = coloringInputCards
                             newInputCards.remove(at: cardIndex)
                             break
                         //6，色牌先发
                         case 6:
-                            newInputCards = inputCards
-                            var colorCardIndex = newInputCards.remove(at: cardIndex)
-                            newInputCards = [colorCardIndex] + newInputCards
+                            var colorCardIndex = coloringInputCards.remove(at: cardIndex)
+                            //正发正面打色，反发反面打色
+                            if newArgs[1] == coloringType {
+                                newInputCards = [colorCardIndex] + coloringInputCards
+                            //正发反面打色，反发正面打色
+                            } else if newArgs[1] != coloringType {
+                                newInputCards = coloringInputCards + [colorCardIndex]
+                            }
+                            
                             break
                         //7，去掉面牌补到底，去掉底牌补到顶
                         case 7:
                             print("CutID \(cutID)")
                             if cutID == 0 {
                                 if cardIndex == 0{
-                                    newInputCards = inputCards
+                                    newInputCards = coloringInputCards
                                 } else {
-                                    newInputCards = Array(inputCards[cardIndex...]) + Array(inputCards[0...cardIndex - 1])
+                                    newInputCards = Array(coloringInputCards[cardIndex...]) + Array(coloringInputCards[0...cardIndex - 1])
                                 }
                             } else {
                                 if cardIndex == 0{
-                                    newInputCards = inputCards
+                                    newInputCards = coloringInputCards
                                 } else {
-                                    let length  = inputCards.count
-                                    newInputCards = Array(inputCards[length - cardIndex...length - 1])  + Array(inputCards[0...length - cardIndex - 1])
+                                    let length  = coloringInputCards.count
+                                    newInputCards = Array(coloringInputCards[length - cardIndex...length - 1])  + Array(coloringInputCards[0...length - cardIndex - 1])
                                 }
                             }
                         break
@@ -1773,79 +1839,113 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         case 8:
                             if cutID == 0{
                                 if cardIndex == 0 {
-                                    newInputCards = inputCards
+                                    //正发正面打色，反发反面打色
+                                    if newArgs[1] == coloringType {
+                                        newInputCards = coloringInputCards
+                                    //正发反面打色，反发正面打色
+                                    } else if newArgs[1] != coloringType {
+                                        newInputCards = coloringInputCards[1...] + [coloringInputCards[cardIndex]]
+                                    }
                                 } else {
-                                    newInputCards = [inputCards[cardIndex]] + Array(inputCards[0..<cardIndex]) +  Array(inputCards[(cardIndex + 1)...])
+                                    var colorCardIndex = coloringInputCards.remove(at: cardIndex)
+                                    if newArgs[1] == coloringType {
+                                        newInputCards = [colorCardIndex] + coloringInputCards
+                                    } else {
+                                        newInputCards = coloringInputCards + [colorCardIndex]
+                                    }
                                 }
                             } else {
                                 let length = inputCards.count
                                 if cardIndex == 0{
-                                    newInputCards = [inputCards[length - 1]] + Array(inputCards[0..<length - 1])
+                                    if newArgs[1] == coloringType {
+                                        newInputCards = [coloringInputCards[length - 1]] + Array(coloringInputCards[0..<length - 1])
+                                    } else {
+                                        newInputCards =  Array(coloringInputCards[0..<length - 1]) + [coloringInputCards[length - 1]]
+                            
+                                    }
+                                } else {
+                                    
+                                    if newArgs[1] == coloringType {
+                                        newInputCards = [coloringInputCards[length - 1 - cardIndex]] + Array(coloringInputCards[0..<length - 1 - cardIndex]) + Array(coloringInputCards[(length - cardIndex)...])
+                                    } else {
+                                        newInputCards =  Array(coloringInputCards[0..<length - 1 - cardIndex]) + Array(coloringInputCards[(length - cardIndex)...]) + [coloringInputCards[length - 1 - cardIndex]]
+                                    }
+                                    
                                 }
-                                newInputCards = [inputCards[length - 1 - cardIndex]] + Array(inputCards[0..<length - 1 - cardIndex]) + Array(inputCards[(length - cardIndex)...])
+                                
                             }
                             break
                         //9，上下XY张留色
                         case 9:
-                            newInputCards = Array(inputCards)
+                            newInputCards = Array(coloringInputCards)
                             break
                         //10，上下XY张去色1张
                         case 10:
-                            let length = inputCards.count
+                            let length = coloringInputCards.count
                             if cutID == 0{
                                 if cardIndex == 0{
-                                    newInputCards = Array(inputCards[(cardIndex + 1)...])
+                                    newInputCards = Array(coloringInputCards[(cardIndex + 1)...])
                                 } else {
-                                    newInputCards = Array(inputCards[0..<cardIndex]) + Array(inputCards[(cardIndex + 1)...])
+                                    newInputCards = Array(coloringInputCards[0..<cardIndex]) + Array(coloringInputCards[(cardIndex + 1)...])
                                 }
                             } else {
                                 if cardIndex == 0{
-                                    newInputCards = Array(inputCards[0..<(length - 1)])
+                                    newInputCards = Array(coloringInputCards[0..<(length - 1)])
                                 } else {
-                                    newInputCards = Array(inputCards[0..<(length - 1 - cardIndex)]) + Array(inputCards[(length - 1 - cardIndex + 1)...])
+                                    newInputCards = Array(coloringInputCards[0..<(length - 1 - cardIndex)]) + Array(coloringInputCards[(length - 1 - cardIndex + 1)...])
                                 }
                                 
                             }
                             break
                         //11，指定牌为底,切牌
                         case 11:
-                            if specialCardPos == inputCards.count - 1 {
-                                newInputCards = inputCards
+                            if specialCardPos == coloringInputCards.count - 1 {
+                                newInputCards = coloringInputCards
                             } else {
-                                newInputCards = Array(inputCards[(specialCardPos + 1)...]) + Array(inputCards[0...specialCardPos])
+                                newInputCards = Array(coloringInputCards[(specialCardPos + 1)...]) + Array(coloringInputCards[0...specialCardPos])
                             }
                             break
                         //12,指定牌为顶，切牌
                         case 12:
                             if specialCardPos == 0 {
-                                newInputCards = inputCards
+                                newInputCards = coloringInputCards
                             } else {
-                                newInputCards = Array(inputCards[specialCardPos...]) + Array(inputCards[0...specialCardPos - 1])
+                                newInputCards = Array(coloringInputCards[specialCardPos...]) + Array(coloringInputCards[0...specialCardPos - 1])
                             }
                             break
                         //13，去掉Y张面牌
                         case 13:
-                            newInputCards = Array(inputCards[cutNumRangeSetting[1]...])
+                            newInputCards = Array(coloringInputCards[cutNumRangeSetting[1]...])
                             break
                         //14，去掉Y张面牌，再根据面牌点数去牌
                         case 14:
-                            let YCardRank: Int = inputCards[cutNumRangeSetting[1]] % 13 + 1
-                            newInputCards = Array(inputCards[(cutNumRangeSetting[1] + YCardRank)...])
+                            let YCardRank: Int = coloringInputCards[cutNumRangeSetting[1]] % 13 + 1
+                            // TODO：如果是王的话 算几点
+                            
+                
+                            newInputCards = Array(coloringInputCards[(cutNumRangeSetting[1] + YCardRank)...])
                             break
                         //15，去掉面牌和底牌，点数相加几点就去掉面上几张牌
                         case 15:
-                            let AddCardRank = (inputCards[0] % 13 + 1 + inputCards[inputCards.count - 1] % 13 + 1) % 10
+                            let AddCardRank = (coloringInputCards[0] % 13 + 1 + coloringInputCards[coloringInputCards.count - 1] % 13 + 1) % 10
                                             
-                            newInputCards = Array(inputCards[(AddCardRank + 1)..<(inputCards.count  - 1)])
+                            newInputCards = Array(coloringInputCards[(AddCardRank + 1)..<(inputCards.count  - 1)])
                             break
                         //16，比第一张牌，从最大发
                         case 16:
                             //找出谁拿最大的牌
                             var maxRank: Int = 0
                             var maxIndex: Int = 0
+                            
+                            //正发反面打色，反发正面打色
+                            if newArgs[1] != coloringType {
+                                coloringInputCards = coloringInputCards.reversed()
+                            }
+                            
+                            
                             for playerID in 0..<playerNum{
                                 var compCardRank:Int
-                                if inputCards[playerID] == 53 {
+                                if coloringInputCards[playerID] == 53 {
                                     compCardRank = 14
                                 } else if inputCards[playerID] == 54 {
                                     compCardRank = 15
@@ -1861,26 +1961,37 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             print("最大家的位置 \(maxIndex) 最大牌 \(maxRank)")
                             var newPrefixArray: [Int] = []
                             for i in 0..<playerNum{
-                                newPrefixArray.append(inputCards[(maxIndex + i) % playerNum])
+                                newPrefixArray.append(coloringInputCards[(maxIndex + i) % playerNum])
                             }
                             
-                            print("旧的头部顺序 \(inputCards[0..<playerNum]) 新的头部顺序  \(newPrefixArray)")
+                            print("旧的头部顺序 \(coloringInputCards[0..<playerNum]) 新的头部顺序  \(newPrefixArray)")
                             
-                            newInputCards = newPrefixArray + inputCards[playerNum...]
+                            newInputCards = newPrefixArray + coloringInputCards[playerNum...]
+                            
+                            //正发反面打色，反发正面打色
+                            if newArgs[1] != coloringType {
+                                coloringInputCards = coloringInputCards.reversed()
+                            }
                             
                             break
                         //17，比第一张牌，从最小发
                         case 17:
                             var minRank: Int = 100
                             var minIndex: Int = 0
+                            
+                            //正发反面打色，反发正面打色
+                            if newArgs[1] != coloringType {
+                                coloringInputCards = coloringInputCards.reversed()
+                            }
+                            
                             for playerID in 0..<playerNum{
                                 var compCardRank:Int
-                                if inputCards[playerID] == 53 {
+                                if coloringInputCards[playerID] == 53 {
                                     compCardRank = 14
                                 } else if inputCards[playerID] == 54 {
                                     compCardRank = 15
                                 } else {
-                                    compCardRank = (inputCards[playerID] % 13 + 1)
+                                    compCardRank = (coloringInputCards[playerID] % 13 + 1)
                                 }
                                 
                                 if compCardRank < minRank {
@@ -1893,56 +2004,85 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
 
                             var newPrefixArray: [Int] = []
                             for i in 0..<playerNum{
-                                newPrefixArray.append(inputCards[(minIndex + i) % playerNum])
+                                newPrefixArray.append(coloringInputCards[(minIndex + i) % playerNum])
                             }
                             
-                            print("旧的头部顺序 \(inputCards[0..<playerNum]) 新的头部顺序  \(newPrefixArray)")
+                            print("旧的头部顺序 \(coloringInputCards[0..<playerNum]) 新的头部顺序  \(newPrefixArray)")
                             
-                            newInputCards = newPrefixArray + inputCards[playerNum...]
+                            newInputCards = newPrefixArray + coloringInputCards[playerNum...]
+                            
+                            //正发反面打色，反发正面打色
+                            if newArgs[1] != coloringType {
+                                newInputCards = newInputCards.reversed()
+                            }
+                            break
+                        //看手牌留色
+                        case 19:
+                            break
+                        //看手牌去色
+                        case 20:
                             break
                         //22，范围切牌去色
                         case 22:
-                            newInputCards = Array(inputCards[(cardIndex + 1)...]) + Array(inputCards[0...cardIndex])
+                            newInputCards = Array(coloringInputCards[(cardIndex + 1)...]) + Array(coloringInputCards[0...cardIndex])
                             newInputCards = Array(newInputCards[1...])
                             break
                         //去掉X-Y张面牌，去掉面牌（从0开始）
                         case 23:
-                            newInputCards = Array(inputCards[cardIndex...])
+                            newInputCards = Array(coloringInputCards[cardIndex...])
                             break
                         //去掉面牌补在下方，去掉面牌放到底部（从0开始）
                         case 24:
                             if cardIndex > 0 {
-                                newInputCards = Array(inputCards[cardIndex...] + inputCards[0...cardIndex - 1])
+                                newInputCards = Array(coloringInputCards[cardIndex...] + coloringInputCards[0...cardIndex - 1])
                             } else {
-                                newInputCards = Array(inputCards[cardIndex...])
+                                newInputCards = Array(coloringInputCards[cardIndex...])
                             }
                         //下XY张留色面牌移动到色牌下面
                         case 25:
-                            let colorCardPos = inputCards.count - 1 - cardIndex
+                            let colorCardPos = coloringInputCards.count - 1 - cardIndex
                             if cardIndex == 0{
-                                newInputCards = Array(inputCards[1...colorCardPos]) + [inputCards[0]]
+                                newInputCards = Array(coloringInputCards[1...colorCardPos]) + [coloringInputCards[0]]
                             } else {
-                                newInputCards = Array(inputCards[1...colorCardPos]) + [inputCards[0]] + Array(inputCards[(colorCardPos + 1)...])
+                                newInputCards = Array(coloringInputCards[1...colorCardPos]) + [coloringInputCards[0]] + Array(coloringInputCards[(colorCardPos + 1)...])
                                 
                             }
                         // 下XY张色先发
                         case 26:
-                            let colorCardPos = inputCards.count - 1 - cardIndex
+                            let colorCardPos = coloringInputCards.count - 1 - cardIndex
                             if cardIndex == 0{
-                                newInputCards = [inputCards[colorCardPos]] + Array(inputCards[0...colorCardPos - 1])
+                                //正发正面打色，反发反面打色
+                                if newArgs[1] == coloringType {
+                                    newInputCards = [coloringInputCards[colorCardPos]] + Array(coloringInputCards[0...colorCardPos - 1])
+                                //正发反面打色，正发反面打色
+                                } else {
+                                    newInputCards = Array(coloringInputCards[0...colorCardPos - 1]) + [coloringInputCards[colorCardPos]]
+                                }
+                                
                             } else {
-                                newInputCards = [inputCards[colorCardPos]] + Array(inputCards[0..<colorCardPos]) + Array(inputCards[(colorCardPos + 1)...])
+                                //正发正面打色，反发反面打色
+                                if newArgs[1] == coloringType {
+                                    newInputCards = [coloringInputCards[colorCardPos]] + Array(coloringInputCards[0..<colorCardPos]) + Array(coloringInputCards[(colorCardPos + 1)...])
+                                //正发反面打色，正发反面打色
+                                } else {
+                                    newInputCards = Array(coloringInputCards[0..<colorCardPos]) + Array(coloringInputCards[(colorCardPos + 1)...]) + [coloringInputCards[colorCardPos]]
+                                }
                             }
                         //指定牌上一张去色
                         case 27:
-                            newInputCards = Array(inputCards[specialCardPos...])
+                            newInputCards = Array(coloringInputCards[specialCardPos...])
                             break
                         //指定牌下一张去色
                         case 28:
-                            newInputCards = Array(inputCards[((specialCardPos + 1) % (inputCards.count))...])
+                            newInputCards = Array(coloringInputCards[((specialCardPos + 1) % (coloringInputCards.count))...])
+                            break
+                        //看手牌
+                        case 29:
+                            
+                            
                             break
                         default:
-                            newInputCards = inputCards
+                            newInputCards = coloringInputCards
                             break
                         }
                         
@@ -1965,6 +2105,11 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         //牛牛
                         var LeastOneBullBull: [Int] = []
 
+                        //反面打色
+                        if coloringType == 1 {
+                            newInputCards = newInputCards.reversed()
+                        }
+                        
                         let (winnersInfo, leftCards) = gameFunction!(diyDealStatus, diyDealNum, newInputCards, newArgs, rankRules, suitRules)
                         
                         // 输入的牌不够打

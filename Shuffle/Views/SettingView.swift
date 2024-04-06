@@ -52,33 +52,33 @@ struct SettingView: View {
                 ScrollView {
                     VStack()  {
                         
-                        HStack {
-                            Text("黑屏").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
-                            
-                            Toggle("", isOn: $viewModel.isBlack).toggleStyle(CustomToggleStyle())
-                                .frame(width: 160, height: 30, alignment: .trailing)
-                                .padding(.trailing,30) // 右侧间距
-                                .accentColor(.white)
-                        }
-                        Divider()
-                            .foregroundColor(.white)
-
-                        HStack {
-                            Text("后置相机")
-                                .foregroundColor(.white)
-                                .padding(.leading, 20)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-
-                            Toggle("", isOn: $viewModel.isBackCamera)
-                                .toggleStyle(CustomToggleStyle())
-                                .frame(width: 160, height: 30, alignment: .trailing)
-                                .padding(.trailing,30) // 右侧间距
-                                .accentColor(.white)
-                        }
-                        Divider()
-                            .foregroundColor(.white)
-                        
                         if(viewModel.isActive){
+//                            HStack {
+//                                Text("黑屏").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
+//
+//                                Toggle("", isOn: $viewModel.isBlack).toggleStyle(CustomToggleStyle())
+//                                    .frame(width: 160, height: 30, alignment: .trailing)
+//                                    .padding(.trailing,30) // 右侧间距
+//                                    .accentColor(.white)
+//                            }
+//                            Divider()
+//                                .foregroundColor(.white)
+
+//                            HStack {
+//                                Text("后置相机")
+//                                    .foregroundColor(.white)
+//                                    .padding(.leading, 20)
+//                                    .frame(maxWidth: .infinity, alignment: .leading)
+//
+//                                Toggle("", isOn: $viewModel.isBackCamera)
+//                                    .toggleStyle(CustomToggleStyle())
+//                                    .frame(width: 160, height: 30, alignment: .trailing)
+//                                    .padding(.trailing,30) // 右侧间距
+//                                    .accentColor(.white)
+//                            }
+//                            Divider()
+//                                .foregroundColor(.white)
+                            
                             HStack {
                                 Text("远距离模式")
                                     .foregroundColor(.white)
@@ -151,15 +151,14 @@ struct SettingView: View {
                         }
                         
                         NavigationLink(
-                            destination: InfoView(activeDate: viewModel.activeDate)
+                            destination: InfoView(activeDate: viewModel.activeDate, authKey: viewModel.uniqueID)
                         ) {
                             Text("信息")
                                 .foregroundColor(.white)
                                 .padding(.leading, 20)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        Divider()
-                        .colorInvert()
+                        Divider().foregroundColor(.white)
                         
                      }
                 }
