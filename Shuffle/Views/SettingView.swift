@@ -79,20 +79,35 @@ struct SettingView: View {
                             Divider()
                                 .foregroundColor(.white)
                             
-                            HStack {
-                                Text("远距离模式")
-                                    .foregroundColor(.white)
-                                    .padding(.leading, 20)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-
-                                Toggle("", isOn: $viewModel.isRemote)
-                                    .toggleStyle(CustomToggleStyle())
-                                    .frame(width: 160, height: 30, alignment: .trailing)
-                                    .padding(.trailing,30) // 右侧间距
-                                    .accentColor(.white)
-                            }
-                            Divider()
-                                .foregroundColor(.white)
+//                            HStack {
+//                                Text("快洗模式")
+//                                    .foregroundColor(.white)
+//                                    .padding(.leading, 20)
+//                                    .frame(maxWidth: .infinity, alignment: .leading)
+//
+//                                Toggle("", isOn: $viewModel.isFast)
+//                                    .toggleStyle(CustomToggleStyle())
+//                                    .frame(width: 160, height: 30, alignment: .trailing)
+//                                    .padding(.trailing,30) // 右侧间距
+//                                    .accentColor(.white)
+//                            }
+//                            Divider()
+//                                .foregroundColor(.white)
+//                            
+//                            HStack {
+//                                Text("远距离模式")
+//                                    .foregroundColor(.white)
+//                                    .padding(.leading, 20)
+//                                    .frame(maxWidth: .infinity, alignment: .leading)
+//
+//                                Toggle("", isOn: $viewModel.isRemote)
+//                                    .toggleStyle(CustomToggleStyle())
+//                                    .frame(width: 160, height: 30, alignment: .trailing)
+//                                    .padding(.trailing,30) // 右侧间距
+//                                    .accentColor(.white)
+//                            }
+//                            Divider()
+//                                .foregroundColor(.white)
                             
                             HStack {
                                 Text("耳机").foregroundColor(.white).padding(.leading, 20)
