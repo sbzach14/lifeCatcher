@@ -30,8 +30,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var winnerPlayerShow: String = ""
     @Published var multipleGamePlayerInfos: ReportManager.MultipleReportResultInfo = ReportManager.MultipleReportResultInfo()
 
-    let model = try! cardDetection_0405_n()
-
+    let fastModel = try! cardDetection_0405_n()
+    let slowModel = try! cardDetection_0405_n()
 
     var cutArray : [Int] = []
     
@@ -154,8 +154,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             self.isBlack = boolDict["isBlack"]!
             self.isMute = boolDict["isMute"]!
             self.isBackCamera = boolDict["isBackCamera"]!
-            //TODO 修改
-            self.isBackCamera = true
             self.isRemote = boolDict["isRemote"]!
             self.isFast = boolDict["isFast"]!
             
@@ -167,10 +165,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             // If config.json is not found or invalid, set default values
             self.isBlack = false
             self.isMute = false
-<<<<<<< HEAD
-            //TODO 修改
-=======
->>>>>>> 64be0906d650eaf887e6d8aaf01cbb7735d938ff
             self.isBackCamera = true
             self.isRemote = false
             self.isFast = true
@@ -194,11 +188,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
         
         self.isWorking = true
-        
-        let voices = AVSpeechSynthesisVoice.speechVoices()
-        for voice in voices {
-            print("Name: \(voice.name), Language: \(voice.language), Gender: \(voice.gender.rawValue)")
-        }
         
         setupAVCapture()
         startCamera()
@@ -696,13 +685,9 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         var beginIndex = 2
         let longHeadIndex = 10
         
-<<<<<<< HEAD
         print("检测sortedKeys \(sortedKeys)")
-        if sortedKeys.count < 10{
-=======
-        
+
         if sortedKeys.count <= 15{
->>>>>>> 64be0906d650eaf887e6d8aaf01cbb7735d938ff
             let result = DetectionState(detectionResult: [], isSingle: false, isShort: false, longestIndex: -1)
             return result
         }
@@ -1772,13 +1757,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
     }
-<<<<<<< HEAD
-    
-    func speakText(input: [[Int]]) {
-=======
 
     func speakText(input: [[SpeakResultStruct]]) {
->>>>>>> 64be0906d650eaf887e6d8aaf01cbb7735d938ff
         let isSpeak = self.isHeadphonesConnected() == self.isMute
         let chineseFemaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.siri_female_zh-CN_compact")
         let chineseMaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.siri_male_zh-CN_compact")
