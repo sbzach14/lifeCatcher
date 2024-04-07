@@ -460,31 +460,31 @@ struct AddRuleSettingView: View{
                             )
                             .frame(height: 50)
                             
-                            //报牌张数
-                            HStack
-                            {
-                                Image("icon_shufflemode")
-                                    .resizable()
-                                    .frame(width: 40, height: 40).padding(.leading, 20)
-                                Text("报牌张数")
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(.white) // 左侧间距
-                                Picker("reportNumber", selection: $reportNumber) {
-                                    ForEach(0...generalRuleSetting.maxReportNumber, id: \.self){
-                                        index in Text(String(index)).tag(index)
-                                    }
-                                }
-                                .pickerStyle(MenuPickerStyle())
-                                .frame(width: 160, height: 30, alignment: .trailing)
-                                .padding(.trailing,30) // 右侧间距
-                                .accentColor(.white)
-                                
-                            }.background(
-                                Image("list_bg") // 背景图片
-                                    .resizable()
-                                    .scaledToFill()
-                            )
-                            .frame(height: 50)
+//                            //报牌张数
+//                            HStack
+//                            {
+//                                Image("icon_shufflemode")
+//                                    .resizable()
+//                                    .frame(width: 40, height: 40).padding(.leading, 20)
+//                                Text("报牌张数")
+//                                    .frame(maxWidth: .infinity, alignment: .leading)
+//                                    .foregroundColor(.white) // 左侧间距
+//                                Picker("reportNumber", selection: $reportNumber) {
+//                                    ForEach(0...generalRuleSetting.maxReportNumber, id: \.self){
+//                                        index in Text(String(index)).tag(index)
+//                                    }
+//                                }
+//                                .pickerStyle(MenuPickerStyle())
+//                                .frame(width: 160, height: 30, alignment: .trailing)
+//                                .padding(.trailing,30) // 右侧间距
+//                                .accentColor(.white)
+//                                
+//                            }.background(
+//                                Image("list_bg") // 背景图片
+//                                    .resizable()
+//                                    .scaledToFill()
+//                            )
+//                            .frame(height: 50)
                         
                             //连报轮数
                             HStack

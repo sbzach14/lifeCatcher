@@ -17,8 +17,7 @@ struct MainMenuView: View {
                             VStack(alignment: .leading) {
                                 Text("开始记录")
                                     .foregroundColor(.white)
-                                Divider()
-                                    .colorInvert()
+                                Divider().colorInvert()
                             }
                             .padding()
                         }
@@ -28,8 +27,7 @@ struct MainMenuView: View {
                             VStack(alignment: .leading) {
                                 Text("记录历史")
                                     .foregroundColor(.white)
-                                Divider()
-                                    .colorInvert()
+                                Divider().colorInvert()
                             }
                             .padding()
                         }
@@ -39,8 +37,7 @@ struct MainMenuView: View {
                             VStack(alignment: .leading) {
                                 Text("设置")
                                     .foregroundColor(.white)
-                                Divider()
-                                    .colorInvert()
+                                Divider().colorInvert()
                             }
                             .padding()
                         }
@@ -51,8 +48,7 @@ struct MainMenuView: View {
 //                            VStack(alignment: .leading) {
 //                                Text("验证管理")
 //                                    .foregroundColor(.white)
-//                                Divider()
-//                                    .colorInvert()
+//                                Divider().colorInvert()
 //                            }
 //                            .padding()
 //                        }
