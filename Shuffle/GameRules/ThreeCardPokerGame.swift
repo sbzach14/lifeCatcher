@@ -224,9 +224,9 @@ class ThreeCardPokerGame{
         return result
     }
     
-    static func getMinCardNum(playerNum: Int, handNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+    static func getMinCardNum(playerNum: Int, handNum: Int, communityNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
         if dealType == 0 || dealType == 1{
-            return playerNum * handNum
+            return playerNum * handNum + communityNum
         } else {
             var minNum = 0
             for i in 0..<diyDealNum.count {
@@ -253,19 +253,20 @@ class ThreeCardPokerGame{
         let dealNum = args[0]
         let dealType = args[1]
         let playerNum = args[2]
-        let handNum = rule.handNum[args[3]]
-        let isCompareSuit = args[4]
-        let minRank = rule.minRank[args[5]]
-        let isAce = args[6]
-        let isAceStraight = args[7]
-        let isHeadCard = args[8]
-        let isRedJoker = args[9]
-        let redJokerSuit = args[10]
-        let redJokerRank = args[11]
-        let isBlackJoker = args[12]
-        let blackJokerSuit = args[13]
-        let blackJokerRank = args[14]
-        let isReverseHighCard = args[15]
+        let handNum = args[3]
+        let communityNum = args[4]
+        let isCompareSuit = args[5]
+        let minRank = rule.minRank[args[6]]
+        let isAce = args[7]
+        let isAceStraight = args[8]
+        let isHeadCard = args[9]
+        let isRedJoker = args[10]
+        let redJokerSuit = args[11]
+        let redJokerRank = args[12]
+        let isBlackJoker = args[13]
+        let blackJokerSuit = args[14]
+        let blackJokerRank = args[15]
+        let isReverseHighCard = args[16]
         
         
         var maxRank = 0
@@ -274,7 +275,7 @@ class ThreeCardPokerGame{
 
         var allPlayCards: [Player] = []
         var community = [Card]()
-        if deck.count < ThreeCardPokerGame.getMinCardNum(playerNum: playerNum, handNum: handNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+        if deck.count < ThreeCardPokerGame.getMinCardNum(playerNum: playerNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
             return ([],[])
         }
         
@@ -360,6 +361,7 @@ class ThreeCardPokerGame{
             }
             print("玩家 \(i) 手牌 \(playerCardStr)")
         }
+        
         if handNum == 3 {
             for i in 0..<playerNum {
                 (allPlayCards[i].evaluateFlag, allPlayCards[i].cardType, allPlayCards[i].isPair) = ThreeCardPokerGameHandEvaluator(
@@ -450,7 +452,7 @@ class ThreeCardPokerGame{
         for card in deck{
             leftCards.append(card.cardIndex)
         }
-        if leftCards.count < ThreeCardPokerGame.getMinCardNum(playerNum: playerNum, handNum: handNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+        if leftCards.count < ThreeCardPokerGame.getMinCardNum(playerNum: playerNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
             leftCards = []
         }
         return (returnPlayerInfos, leftCards)

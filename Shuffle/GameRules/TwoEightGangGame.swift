@@ -177,10 +177,10 @@ class TwoEightGangGame{
         return result
     }
     
-    static func getMinCardNum(playerNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+    static func getMinCardNum(playerNum: Int,handNum: Int, communityNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
         
         if dealType == 0 || dealType == 1{
-            return playerNum * 2
+            return playerNum * handNum + communityNum
         } else {
             var minNum = 0
             for i in 0..<diyDealNum.count {
@@ -214,12 +214,14 @@ class TwoEightGangGame{
         let dealNum = args[0]
         let dealType = args[1]
         let playerNum = args[2]
-        let samePointComparision = args[3]
-        let isCompareSuit = args[4]
-        let KValueRange = args[5]
-        let QValueRange = args[6]
-        let JValueRange = args[7]
-        let pointComparision = args[8]
+        let handNum = args[3]
+        let communityNum = args[4]
+        let samePointComparision = args[4]
+        let isCompareSuit = args[5]
+        let KValueRange = args[6]
+        let QValueRange = args[7]
+        let JValueRange = args[8]
+        let pointComparision = args[9]
         
         
         var maxRank = 0
@@ -227,7 +229,7 @@ class TwoEightGangGame{
 
         var allPlayCards: [Player] = []
         var community = [Card]()
-        if deck.count < TwoEightGangGame.getMinCardNum(playerNum: playerNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+        if deck.count < TwoEightGangGame.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
             return ([],[])
         }
         
@@ -337,7 +339,7 @@ class TwoEightGangGame{
             leftCards.append(card.cardIndex)
         }
         
-        if leftCards.count < TwoEightGangGame.getMinCardNum(playerNum: playerNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+        if leftCards.count < TwoEightGangGame.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
             leftCards = []
         }
         

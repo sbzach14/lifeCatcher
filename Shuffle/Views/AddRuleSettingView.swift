@@ -678,43 +678,43 @@ struct AddRuleSettingView: View{
         switch gameType {
         case 0:
             let selectedRule = GameManager.gameRules[gameType] as! TexasPokerRule
-            minCardNum = TexasPoker.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: selectedRule.handNum[args[3]], communityNum: selectedRule.communityNum[args[4]], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            minCardNum = TexasPoker.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 1:
             let selectedRule = GameManager.gameRules[gameType] as! PokerBullRule
-            minCardNum = PokerBull.GetMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: selectedRule.handNum[args[1]], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            minCardNum = PokerBull.GetMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
         case 2:
             let selectedRule = GameManager.gameRules[gameType] as! ThreeCardPokerGameRule
-            minCardNum = ThreeCardPokerGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: selectedRule.handNum[args[0]], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            minCardNum = ThreeCardPokerGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 3:
             let selectedRule = GameManager.gameRules[gameType] as! TinyNineGameRule
-            minCardNum = TinyNineGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            minCardNum = TinyNineGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 4:
             let selectedRule = GameManager.gameRules[gameType]
             as! ThreeMenGameRule
-            minCardNum = ThreeMenGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            minCardNum = ThreeMenGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 5:
             let selectedRule = GameManager.gameRules[gameType] as! TwoEightGangGameRule
-            minCardNum = TwoEightGangGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            minCardNum = TwoEightGangGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 6:
             let selectedRule = GameManager.gameRules[gameType] as! NinePointFiveGameRule
-            minCardNum = NinePointFiveGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            minCardNum = NinePointFiveGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 7:
             let selectedRule = GameManager.gameRules[gameType] as!
             BaoziGameRule
-            minCardNum = BaoziGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            minCardNum = BaoziGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 8:
             let selectedRule = GameManager.gameRules[gameType] as! JiaJiaBaoGameRule
-            minCardNum = JiaJiaBaoGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus, handNum: Int(selectedRule.handNum[args[7]]!)!)
+            minCardNum = JiaJiaBaoGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus, handNum: Int(selectedRule.handNum[args[7]]!)!)
         case 9:
             let selectedRule = GameManager.gameRules[gameType] as! CardNineGameRule
-            minCardNum = CardNineGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus, handNum: 2)
+            minCardNum = CardNineGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
         default:
             print("GameType error")
         }
@@ -731,7 +731,7 @@ struct AddRuleSettingView: View{
         //德州
         case 0:
             let selectedRule = GameManager.gameRules[gameType] as! TexasPokerRule
-            alertMessage = TexasPoker.legalCheck(playerNum: selectedRule.playerNum[playerNum], minRank: selectedRule.minRank[args[2]], handUseType: args[5], handUseNum: selectedRule.handUseNum[args[6]], handNum: selectedRule.handNum[args[3]], communityNum: selectedRule.communityNum[args[4]])
+            alertMessage = TexasPoker.legalCheck(playerNum: selectedRule.playerNum[playerNum], minRank: selectedRule.minRank[args[2]], handUseType: args[5], handUseNum: selectedRule.handUseNum[args[6]], handNum: args[0], communityNum: args[1])
             break
         default:
             break

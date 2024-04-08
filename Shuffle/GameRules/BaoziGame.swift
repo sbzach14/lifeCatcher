@@ -288,10 +288,10 @@ class BaoziGame{
         return result
     }
     
-    static func getMinCardNum(playerNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+    static func getMinCardNum(playerNum: Int, handNum: Int, communityNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
         
         if dealType == 0 || dealType == 1{
-            return playerNum * 2
+            return playerNum * handNum + communityNum
         } else {
             var minNum = 0
             for i in 0..<diyDealNum.count {
@@ -327,22 +327,24 @@ class BaoziGame{
         let dealNum = args[0]
         let dealType = args[1]
         let playerNum = args[2]
-        let KValueRange = args[3]
-        let QValueRange = args[4]
-        let JValueRange = args[5]
-        let JokerValueRange = args[6]
-        let samePointComparision = args[7]
-        let pointComparision = args[8]
-        let cardRank = args[9]
-        let pairRank = args[10]
-        let AValueRange = args[11]
+        let handNum = args[3]
+        let communityNum = args[4]
+        let KValueRange = args[5]
+        let QValueRange = args[6]
+        let JValueRange = args[7]
+        let JokerValueRange = args[8]
+        let samePointComparision = args[9]
+        let pointComparision = args[10]
+        let cardRank = args[11]
+        let pairRank = args[12]
+        let AValueRange = args[13]
         
         var maxRank = 0
         var returnPlayerInfos: [GameReturnPlayerInfo] = []
 
         var allPlayCards: [Player] = []
         var community = [Card]()
-        if deck.count < self.getMinCardNum(playerNum: playerNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
+        if deck.count < self.getMinCardNum(playerNum: playerNum, handNum: handNum, communityNum: communityNum, dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
             return ([], [])
         }
         
@@ -453,7 +455,7 @@ class BaoziGame{
         for card in deck{
             leftCards.append(card.cardIndex)
         }
-        if leftCards.count < self.getMinCardNum(playerNum: playerNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
+        if leftCards.count < self.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
             leftCards = []
         }
         

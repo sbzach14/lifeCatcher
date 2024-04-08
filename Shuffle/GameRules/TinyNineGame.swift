@@ -90,10 +90,10 @@ class TinyNineGame{
         return result
     }
     
-    static func getMinCardNum(playerNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+    static func getMinCardNum(playerNum: Int, handNum: Int, communityNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
         
         if dealType == 0 || dealType == 1{
-            return playerNum * 2
+            return playerNum * handNum + communityNum
         } else {
             var minNum = 0
             for i in 0..<diyDealNum.count {
@@ -127,17 +127,18 @@ class TinyNineGame{
         let dealNum = args[0]
         let dealType = args[1]
         let playerNum = args[2]
-        let handNum = rule.handNum[args[3]]
-        let redJokerValueRange = args[4]
-        let blackJokerValueRange = args[5]
-        let samePointComparision = args[6]
+        let handNum = args[3]
+        let communityNum = args[4]
+        let redJokerValueRange = args[5]
+        let blackJokerValueRange = args[6]
+        let samePointComparision = args[7]
         
         
         var maxRank = 0
         var allPlayCards: [Player] = []
         var community = [Card]()
         var returnPlayerInfos: [GameReturnPlayerInfo] = []
-        if deck.count < TinyNineGame.getMinCardNum(playerNum: playerNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
+        if deck.count < TinyNineGame.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
             return ([],[])
         }
         
@@ -248,7 +249,7 @@ class TinyNineGame{
             leftCards.append(card.cardIndex)
         }
         
-        if leftCards.count < self.getMinCardNum(playerNum: playerNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus) {
+        if leftCards.count < self.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus) {
             leftCards = []
         }
         

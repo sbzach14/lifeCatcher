@@ -136,10 +136,10 @@ class JiaJiaBaoGame{
         return result
     }
     
-    static func getMinCardNum(playerNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], handNum: Int) -> Int{
+    static func getMinCardNum(playerNum: Int, handNum: Int, communityNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
         
         if dealType == 0 || dealType == 1{
-            return playerNum * handNum
+            return playerNum * handNum + communityNum
         } else {
             var minNum = 0
             for i in 0..<diyDealNum.count {
@@ -179,15 +179,16 @@ class JiaJiaBaoGame{
         let dealNum = args[0]
         let dealType = args[1]
         let playerNum = args[2]
-        let samePointComparision = args[3]
-        let CardRankList = args[4]
-        let redJokerValueRange = args[5]
-        let blackJokerValueRange = args[6]
-        let KValueRange = args[7]
-        let QValueRange = args[8]
-        let JValueRange = args[9]
-        let handNum :Int = Int(rule.handNum[args[10]]!)!
-        let isCompareSuit = args[11]
+        let handNum = args[3]
+        let communityNum = args[4]
+        let samePointComparision = args[5]
+        let CardRankList = args[6]
+        let redJokerValueRange = args[7]
+        let blackJokerValueRange = args[8]
+        let KValueRange = args[9]
+        let QValueRange = args[10]
+        let JValueRange = args[11]
+        let isCompareSuit = args[12]
         
 
         
@@ -196,7 +197,7 @@ class JiaJiaBaoGame{
         var winnerRanks: [Int] = []
         var allPlayCards: [Player] = []
         var community = [Card]()
-        if deck.count < self.getMinCardNum(playerNum: playerNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, handNum: handNum){
+        if deck.count < self.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
             return ([], [], [])
         }
         
@@ -300,7 +301,7 @@ class JiaJiaBaoGame{
         for card in deck{
             leftCards.append(card.cardIndex)
         }
-        if leftCards.count < JiaJiaBaoGame.getMinCardNum(playerNum: playerNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, handNum: handNum){
+        if leftCards.count < JiaJiaBaoGame.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
             leftCards = []
         }
         print("winners \(winners)")

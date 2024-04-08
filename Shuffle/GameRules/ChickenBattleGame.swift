@@ -62,10 +62,10 @@ class ChickenBattleGame{
         return result
     }
     
-    static func getMinCardNum(playerNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+    static func getMinCardNum(playerNum: Int, handNum: Int, communityNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
         
         if dealType == 0 || dealType == 1{
-            return playerNum * 2
+            return playerNum * handNum + communityNum
         } else {
             var minNum = 0
             for i in 0..<diyDealNum.count {
@@ -95,6 +95,8 @@ class ChickenBattleGame{
         let dealType = args[0]
         let diyDealType = args[1]
         let playerNum = args[2]
+        let handNum = args[3]
+        let communityNum = args[4]
 
         
         var maxRank = 0
@@ -102,7 +104,7 @@ class ChickenBattleGame{
         var winnerRanks: [Int] = []
         var allPlayCards: [Player] = []
         var community = [Card]()
-        if deck.count < self.getMinCardNum(playerNum: playerNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
+        if deck.count < self.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
             return ([], [], [])
         }
         
@@ -187,7 +189,7 @@ class ChickenBattleGame{
         for card in deck{
             leftCards.append(card.cardIndex)
         }
-        if leftCards.count < NinePointFiveGame.getMinCardNum(playerNum: playerNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+        if leftCards.count < NinePointFiveGame.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
             leftCards = []
         }
         print("winners \(winners)")

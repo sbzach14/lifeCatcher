@@ -221,10 +221,10 @@ class ThreeMenGame{
         return result
     }
     
-    static func getMinCardNum(playerNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+    static func getMinCardNum(playerNum: Int,handNum: Int, communityNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
         
         if dealType == 0 || dealType == 1{
-            return playerNum * 3
+            return playerNum * handNum + communityNum
         } else {
             var minNum = 0
             for i in 0..<diyDealNum.count {
@@ -259,19 +259,21 @@ class ThreeMenGame{
         let dealNum = args[0]
         let dealType = args[1]
         let playerNum = args[2]
-        let pointPointComparision = args[3]
-        let samePointComparision = args[4]
-        let isAAsMan = args[5]
-        let isCompareSuit = args[6]
-        let threeCardComparision = args[7]
-        let mixManComparision = args[8]
+        let handNum = args[3]
+        let communityNum = args[4]
+        let pointPointComparision = args[5]
+        let samePointComparision = args[6]
+        let isAAsMan = args[7]
+        let isCompareSuit = args[8]
+        let threeCardComparision = args[9]
+        let mixManComparision = args[10]
         
         var maxRank = 0
         var returnPlayerInfos: [GameReturnPlayerInfo] = []
 
         var allPlayCards: [Player] = []
         var community = [Card]()
-        if deck.count < ThreeMenGame.getMinCardNum(playerNum: playerNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
+        if deck.count < ThreeMenGame.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
             return ([],[])
         }
         
@@ -379,7 +381,7 @@ class ThreeMenGame{
             leftCards.append(card.cardIndex)
         }
         
-        if leftCards.count < ThreeMenGame.getMinCardNum(playerNum: playerNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus) {
+        if leftCards.count < ThreeMenGame.getMinCardNum(playerNum: playerNum, handNum: handNum, communityNum: communityNum,dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus) {
             leftCards = []
         }
         

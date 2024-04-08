@@ -12,8 +12,8 @@ class TexasPokerRule : Rule{
         1: "是"
     ]
     let minRank: [Int] = [2,3,4,5,6,7,8,9]
-    let handNum: [Int] = [1,2,3,4,5]
-    let communityNum: [Int] = [0,3,5]
+    let handNum: Int = 0
+    let communityNum: Int = 0
     let handUseType: [Int: String] = [
         0: "无限制",
         1: "必须用n张",
@@ -204,13 +204,11 @@ class TexasPokerGame {
         let dealType = args[0]
         let diyDealType = args[1]
         let playerNum = args[2]
-        
-        //TODO 按照rulesettingview里的内容修改
-        let isCompareSuit = args[3] == 1
-        let isAceStraight = args[4] == 1
-        let minRank = rule.minRank[args[5]]
-        let handNum = rule.handNum[args[6]]
-        let communityNum = rule.communityNum[args[7]]
+        let handNum = args[3]
+        let communityNum = args[4]
+        let isCompareSuit = args[5] == 1
+        let isAceStraight = args[6] == 1
+        let minRank = rule.minRank[args[7]]
         let handUseType = args[8]
         let handUseNum = rule.handUseNum[args[9]]
         

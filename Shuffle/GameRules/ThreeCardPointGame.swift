@@ -145,10 +145,10 @@ class ThreeCardPointGame{
         return result
     }
     
-    static func getMinCardNum(playerNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+    static func getMinCardNum(playerNum: Int, handNum: Int, communityNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
         
         if dealType == 0 || dealType == 1{
-            return playerNum * 3
+            return playerNum * handNum + communityNum
         } else {
             var minNum = 0
             for i in 0..<diyDealNum.count {
@@ -187,15 +187,16 @@ class ThreeCardPointGame{
         let dealNum = args[0]
         let dealType = args[1]
         let playerNum = args[2]
-        let handNum = rule.handNum[args[3]]
-        let redJokerValueRange = args[4]
-        let blackJokerValueRange = args[5]
-        let KValueRange = args[6]
-        let QValueRange = args[7]
-        let JValueRange = args[8]
-        let samePointComparision = args[9]
-        let isCompareSuit = args[10]
-        let pointComparision = args[11]
+        let handNum = args[3]
+        let communityNum = args[4]
+        let redJokerValueRange = args[5]
+        let blackJokerValueRange = args[6]
+        let KValueRange = args[7]
+        let QValueRange = args[8]
+        let JValueRange = args[9]
+        let samePointComparision = args[10]
+        let isCompareSuit = args[11]
+        let pointComparision = args[12]
         
         
         var maxRank = 0
@@ -203,7 +204,7 @@ class ThreeCardPointGame{
 
         var allPlayCards: [Player] = []
         var community = [Card]()
-        if deck.count < ThreeCardPointGame.getMinCardNum(playerNum: playerNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
+        if deck.count < ThreeCardPointGame.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
             return ([],[])
         }
         
@@ -311,7 +312,7 @@ class ThreeCardPointGame{
             leftCards.append(card.cardIndex)
         }
         
-        if leftCards.count < self.getMinCardNum(playerNum: playerNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus) {
+        if leftCards.count < self.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus) {
             leftCards = []
         }
         

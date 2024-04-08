@@ -14,16 +14,9 @@ class PokerBullRule : Rule{
     
     
     //TODO: 加入总牌数量来限制规则的选择，当前为所有规则都能选择
-    let cardsNum : [Int] = [
-        20,//1-10 不分黑红
-        32,//4，6，7，8，10全选，2，5，9，J，Q各选两张，王一张，3一张
-        36,//1-9
-        40,//1-10
-        42,//1-10，加两个王
-        52,//1-k
-        54//1-k, 大小王
-    ]
-    let handNum :[Int] = [3,5,10]
+    let CommunityNum : Int = 0
+    let handNum :Int = 0
+    
     let wayToDeal:[Int:String] = [
         0:"一人发一张牌",
         ]
@@ -409,10 +402,10 @@ class PokerBull{
         return result
     }
     
-    static func GetMinCardNum(playerNum: Int, handNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+    static func GetMinCardNum(playerNum: Int, handNum: Int, communityNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
         
         if dealType == 0 || dealType == 1{
-            return playerNum * handNum
+            return playerNum * handNum + communityNum
         } else {
             var minNum = 0
             for i in 0..<diyDealNum.count {
@@ -750,8 +743,8 @@ class PokerBullGame {
         let dealNum = args[0]
         let dealType = args[1]
         let playerNum = args[2]
-        let cardsNum = rule.cardsNum[args[3]]
-        let handNum = rule.handNum[args[4]]
+        let communityNum = args[4]
+        let handNum = args[3]
         //0 否，1 是
         let noSuit = args[5]
         let wayToDealCards = args[6]
@@ -775,7 +768,7 @@ class PokerBullGame {
         var community = [PokerBullCard]()
         var returnPlayerInfos: [GameReturnPlayerInfo] = []
         
-        if deck.count < PokerBull.GetMinCardNum(playerNum: playerNum, handNum: handNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+        if deck.count < PokerBull.GetMinCardNum(playerNum: playerNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
             return ([], [])
         }
         
@@ -878,7 +871,7 @@ class PokerBullGame {
             leftCards.append(leftCard.cardIndex)
         }
         
-        if leftCards.count < PokerBull.GetMinCardNum(playerNum: playerNum, handNum: handNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+        if leftCards.count < PokerBull.GetMinCardNum(playerNum: playerNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
             leftCards = []
         }
         var sortedPlayers = allPlayers.sorted{$0.evaluateFlag > $1.evaluateFlag}

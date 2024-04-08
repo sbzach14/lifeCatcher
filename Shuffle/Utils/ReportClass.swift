@@ -136,7 +136,8 @@ struct ReportClass{
     //1，报最大家牌，Y=10 点数，其他点数+花色
     var specifiedPlayerHand :Int = -1
     //0, 不同发牌，根据Y值决定
-    //1, 看手牌不同牌堆
+    //1, 看手牌报下轮
+    //2，看手牌从第一轮开始报
     var differentDeal: Int = -1
     
     init(reportName: String, reportID: Int, rankReport: Int, aliveDeathReport: Int, pairReport: Int, drawPointReport: Int, ninePointReport: Int, pokerBullReport: Int, reportCutRange: Int, reportTarget: Int, cardsTransformation: Int, consecutiveReport: Int, positionToReport: Int, colorCardPos: Int, hasSpecialCard: Int, specifiedPlayerHand : Int, differentDeal: Int) {
@@ -1510,6 +1511,15 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         
         return (cardRank, colorCardIndexList)
     }
+    static func searchCardPos(inputCards: [Int], cardIndex: Int) -> Int{
+        
+        for pos in 0..<inputCards.count {
+            if inputCards[pos] == cardIndex {
+                return pos
+            }
+        }
+        return -1
+    }
     
     
     struct SingleReportResultInfo{
@@ -1586,10 +1596,18 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             13: ThreeCardPointGame.FindWinner(diyDealStatus:diyDealNum:inputCards:args:rankRules:suitRules:),
             14: TenPointFiveGame.FindWinner(diyDealStatus:diyDealNum:inputCards:args:rankRules:suitRules:)
         ]
+        
+        let minCardFunctions: [Int: (Int, Int, Int, Int,[Int], [[Bool]]) -> Int] = [:]
+        
         let gameFunction = gameFunctions[gameIndex]
+        let gameMinCardFunction = minCardFunctions[gameIndex]
+        
         //最后的report结果
         var reportResult = ""
         var inputCards = inputCards
+        
+        //一轮最少牌
+        
         
         var leftCards:[Int] = []
         let playerNum = newArgs[2]
@@ -1613,11 +1631,39 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         //装下总结果
         var multipleResultInfo = MultipleReportResultInfo()
         
+        //获得一轮最少的牌数(TODO handNum, communityNum)
+        let handNum = 2
+        let communityNum = 5
+        let minCardNum = gameMinCardFunction!(playerNum, handNum, communityNum, newArgs[0], diyDealNum, diyDealStatus)
+        
         for roundID in 1...consecutiveNum {
             
             if let reportRule = RuleManager.allPreSetReportRules[reportID]{
                 var currentResultInfo = SingleReportResultInfo()
                 var cutList: [[Int]] = []
+                
+                //TODO 是否切牌的位置，看手牌，切牌留色，切牌去色
+                //看手牌
+                if cutCardIndexList.count > 0 {
+                    if reportRule.differentDeal == 1 || reportRule.differentDeal == 2{
+                        let handCardIndex = cutCardIndexList[cutCardIndexList.count - 1]
+                        let pos = searchCardPos(inputCards: inputCards, cardIndex: handCardIndex)
+                        if pos == inputCards.count - 1 {
+                            inputCards = [inputCards[pos]] + Array(inputCards[0..<pos])
+                        } else if pos != 0 {
+                            inputCards = Array(inputCards[pos...]) + Array(inputCards[0...(pos - 1)])
+                        }
+                    } else if reportRule.reportID == 215{
+                        if cutCardIndexList.count < 2 {
+                            return ("", multipleResultInfo)
+                        }
+                    //普通切牌
+                    } else {
+                        let cutCardIndex = cutCardIndexList[cutCardIndexList.count - 1]
+                        let pos = searchCardPos(inputCards: inputCards, cardIndex: cutCardIndex)
+                        inputCards = Array(inputCards[(pos + 1)...]) + Array(inputCards[0...pos])
+                    }
+                }
                 
                 //切牌范围（遍历范围）
                 switch reportRule.reportCutRange{
@@ -1684,35 +1730,83 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     break
                 }
                 
-                //看手牌和不同发牌
                 
+                //看手牌的牌型
+                var lookHandCards: [[Int]] = []
+                //看手牌和不同发牌
                 switch reportRule.differentDeal {
                 //0, 不同发牌，根据Y值决定
                 case 0:
                     break
-                //1, 看手牌不同牌堆
+                //1, 看手牌报下轮，传入下一轮牌堆
                 case 1:
-                    for orderNum in 0...playerNum - 1{
+                    for orderNum in 1...playerNum{
+                        let length = inputCards.count
+                        let prePlayerNum = orderNum - 1
                         //正发
                         if newArgs[1] == 0{
+                            var originalCards: [Int] = []
+                            //默认每轮发一张牌
+                            if newArgs[0] == 0{
+                                if prePlayerNum == 0 {
+                                    originalCards = inputCards
+                                } else {
+                                    originalCards = Array(inputCards[(length - prePlayerNum)...]) +  Array(inputCards[0...(length - 1 - prePlayerNum)])
+                                }
+                                originalCards = Array(originalCards[minCardNum...])
+                                lookHandCards.append(originalCards)
+                            } else {
+                                var dealedCardsNum: Int = 0
+                                for i in 0...diyDealStatus.count - 1{
+                                    if diyDealStatus[i][0] == true {
+                                        dealedCardsNum += orderNum - 1
+                                        break
+                                    } else if diyDealStatus[i][1] == true {
+                                        dealedCardsNum += diyDealNum[i]
+                                    } else if diyDealStatus[i][2] == true {
+                                        dealedCardsNum += diyDealNum[i]
+                                    }
+                                }
+                                if dealedCardsNum == 0 {
+                                    originalCards = inputCards
+                                } else {
+                                    originalCards = Array(inputCards[(length - dealedCardsNum)...]) + Array(inputCards[0..<length - dealedCardsNum])
+                                }
+                                originalCards = Array(originalCards[minCardNum...])
+                                lookHandCards.append(originalCards)
+                            }
+                            //反发
+                        } else {
+                            var originalCards: [Int] = []
                             //默认每轮发一张牌
                             if newArgs[0] == 0{
                                 
+                                originalCards = Array(inputCards[(prePlayerNum + 1)...]) + inputCards[0..<(prePlayerNum + 1)]
                                 
+                                originalCards = Array(originalCards[minCardNum...])
+                                lookHandCards.append(originalCards)
                             } else {
-                                var tempDiyDealNum: [Int] = []
-                                var tempDiyDealStatus :[[Bool]] = []
-                                for round in 0..<tempDiyDealNum.count {
-                                    if tempDiyDealStatus[round][0] != true {
-                                        tempDiyDealStatus.append(tempDiyDealStatus[round])
+                                var dealedCardsNum: Int = 0
+                                for i in 0...diyDealStatus.count - 1{
+                                    if diyDealStatus[i][0] == true {
+                                        dealedCardsNum += orderNum - 1
+                                        break
+                                    } else if diyDealStatus[i][1] == true {
+                                        dealedCardsNum += diyDealNum[i]
+                                    } else if diyDealStatus[i][2] == true {
+                                        dealedCardsNum += diyDealNum[i]
                                     }
                                 }
+                                originalCards = Array(inputCards[(dealedCardsNum + 1)...]) + Array(inputCards[0..<dealedCardsNum + 1])
+                                originalCards = Array(originalCards[0..<length - minCardNum])
+                                lookHandCards.append(originalCards)
                             }
-                        //反发
-                        } else {
-                            
                         }
                     }
+                    break
+                //看手牌比第一张牌从最大牌继续发
+                case 3:
+                    
                     break
                 default:
                     break
@@ -1753,12 +1847,17 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     let cutRange1 = cutRange[0]
                     let cutRange2 = cutRange[1]
                     print("CUTID Start----------------------------------")
-                    var coloringInputCards = inputCards
-                    if coloringType == 1 {
-                         coloringInputCards = inputCards.reversed()
-                    }
+                    
                     for cardIndex in cutRange1...cutRange2{
                         print("LOG START-------------------------------------")
+                        
+                        var coloringInputCards = inputCards
+                        if coloringType == 1 {
+                             coloringInputCards = inputCards.reversed()
+                        } else if reportRule.differentDeal == 1 || reportRule.differentDeal == 2 {
+                            coloringInputCards = lookHandCards[cardIndex]
+                        }
+                        
                         //检查是否超过了打色范围
                         if cardIndex > inputCards.count - 1{
                             print("打色超过了牌堆范围")
@@ -1767,6 +1866,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         
                         var cardRank: Int = 0
                         var colorCardIndexList: [Int] = []
+                        
                         //上
                         if cutID == 0{
                             (cardRank, colorCardIndexList) = GetCardRank(reportRule: reportRule, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, inputCards: coloringInputCards, cardIndex: cardIndex, specialCardPos: specialCardPos, cutCardIndexList: cutCardIndexList)
@@ -1920,9 +2020,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         //14，去掉Y张面牌，再根据面牌点数去牌
                         case 14:
                             let YCardRank: Int = coloringInputCards[cutNumRangeSetting[1]] % 13 + 1
-                            // TODO：如果是王的话 算几点
-                            
-                
                             newInputCards = Array(coloringInputCards[(cutNumRangeSetting[1] + YCardRank)...])
                             break
                         //15，去掉面牌和底牌，点数相加几点就去掉面上几张牌
@@ -2018,9 +2115,12 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             break
                         //看手牌留色
                         case 19:
+                            newInputCards = lookHandCards[cardIndex]
                             break
                         //看手牌去色
                         case 20:
+                            newInputCards = lookHandCards[cardIndex]
+                            newInputCards = Array(newInputCards[1...])
                             break
                         //22，范围切牌去色
                         case 22:
