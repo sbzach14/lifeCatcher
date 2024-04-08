@@ -4,10 +4,11 @@ import MediaPlayer
 struct MainContentView: View {
     var saveRuleIndex : Int
     @StateObject var viewModel = ViewModel()
-    
+    @State var isNavigateToShowCardView = false
+    @State var isAVCaptureActive = false
     
     var body: some View {
-        ZStack {
+        ZStack(alignment: .bottomLeading) {
             MyViewControllerWrapper(viewmodel: viewModel)
              
             if viewModel.isBlack {
@@ -25,35 +26,53 @@ struct MainContentView: View {
                 }
                 .navigationBarBackButtonHidden(true)
             } else {
-                ZStack {
-                    ShowCardView().environmentObject(viewModel)
+                Button {
+                    viewModel.isShowCard = true
+                    self.isNavigateToShowCardView = true
+                } label: {
+                    Label("ShowCard", systemImage: "magnifyingglass")
+                        .foregroundColor(.blue)
+                        .labelStyle(.iconOnly)
+                        .bubbleBackground()
                 }
-                .background {
-                    if let image = viewModel.cameraImage {
-                        CameraView(cameraImage: image)
-                            .ignoresSafeArea()
-                    }
-                }
+                .background(NavigationLink(destination: ShowCardView().environmentObject(viewModel),
+                                            isActive: $isNavigateToShowCardView,
+                                            label: EmptyView.init).hidden()
+                )
+                .padding()
             }
+            
+            Spacer()
         }
         .onAppear {
-            viewModel.initialize(saveRuleIndex : saveRuleIndex)
+            if !self.isAVCaptureActive && self.saveRuleIndex != -1{
+                viewModel.initialize(saveRuleIndex: saveRuleIndex)
+            }
+            self.isAVCaptureActive = true
+            viewModel.isWorking = true
+            viewModel.isShowCard = false
+            viewModel.startCamera()
             
         }
         .onDisappear {
             viewModel.stopCamera()
         }
-        
+        .toolbarBackground(.hidden)
+        .navigationTitle("")
+        .background {
+            if let image = viewModel.cameraImage {
+                CameraView(cameraImage: image)
+                    .ignoresSafeArea()
+            }
+        }
     }
 }
 
-
-
-//struct MainContentView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        MainContentView(ruleIndex: 0, args: [0, 0, 1, 0, 1, 2, 0, 0], rankRules: [1,2,3], suitRules: [3,2,1,0], allCardIndex: Array(0...51))
-//    }
-//}
+struct MainContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        MainContentView(saveRuleIndex: -1)
+    }
+}
 
 struct MyViewControllerWrapper: UIViewControllerRepresentable {
     
@@ -75,7 +94,7 @@ class MyViewController: UIViewController {
     var viewModel: ViewModel?
     var lastVolumeNotificationSequenceNumber: Int = -1
     var currentVolume: Float = -1
-    let volumeView = MPVolumeView(frame: CGRect.zero)
+    let volumeView = MPVolumeView(frame: CGRect(x: -1000, y: -1000, width: 1, height: 1))
     var lastVolumeChangeTime: Date = Date() // 添加一个变量来跟踪上次音量变化的时间
     let minVolumeChangeInterval: TimeInterval = 0.2 // 设置最小触发间隔时间，单位为秒
     var isFirst: Bool = true

@@ -22,24 +22,22 @@ struct InfoView: View {
                     Text("版本:1.0").padding()
                         .foregroundColor(.white)
                     
-                    Divider()
-                        .foregroundColor(.white)
+                    Divider().colorInvert()
                     
                     Text("序列号:" + authKey).textSelection(.enabled).padding()
                         .foregroundColor(.white)
                     
-                    Divider()
-                        .foregroundColor(.white)
+                    Divider().colorInvert()
                     
                     Text("激活日期:" + activeDate).padding()
                         .foregroundColor(.white)
                     
-                    Divider()
-                        .foregroundColor(.white)
+                    Divider().colorInvert()
                     
                     Text("声明:本软件的使用范围仅限于日常生活图像识别与记录用途，使用本程序造成的任何后果及责任由使用者承担，本公司不承担因用户或代理商在非允许使用范围内使用或销售而导致的任何后果及相关责任。").padding()
                         .foregroundColor(.white)
                     
+                    Divider().colorInvert()
                 }
             }
         }

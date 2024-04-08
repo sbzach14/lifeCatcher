@@ -53,31 +53,29 @@ struct SettingView: View {
                     VStack()  {
                         
                         if(viewModel.isActive){
-//                            HStack {
-//                                Text("黑屏").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
-//
-//                                Toggle("", isOn: $viewModel.isBlack).toggleStyle(CustomToggleStyle())
-//                                    .frame(width: 160, height: 30, alignment: .trailing)
-//                                    .padding(.trailing,30) // 右侧间距
-//                                    .accentColor(.white)
-//                            }
-//                            Divider()
-//                                .foregroundColor(.white)
+                            HStack {
+                                Text("黑屏").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
 
-//                            HStack {
-//                                Text("后置相机")
-//                                    .foregroundColor(.white)
-//                                    .padding(.leading, 20)
-//                                    .frame(maxWidth: .infinity, alignment: .leading)
-//
-//                                Toggle("", isOn: $viewModel.isBackCamera)
-//                                    .toggleStyle(CustomToggleStyle())
-//                                    .frame(width: 160, height: 30, alignment: .trailing)
-//                                    .padding(.trailing,30) // 右侧间距
-//                                    .accentColor(.white)
-//                            }
-//                            Divider()
-//                                .foregroundColor(.white)
+                                Toggle("", isOn: $viewModel.isBlack).toggleStyle(CustomToggleStyle())
+                                    .frame(width: 160, height: 30, alignment: .trailing)
+                                    .padding(.trailing,30) // 右侧间距
+                                    .accentColor(.white)
+                            }
+                            Divider().colorInvert()
+
+                            HStack {
+                                Text("后置相机")
+                                    .foregroundColor(.white)
+                                    .padding(.leading, 20)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                                Toggle("", isOn: $viewModel.isBackCamera)
+                                    .toggleStyle(CustomToggleStyle())
+                                    .frame(width: 160, height: 30, alignment: .trailing)
+                                    .padding(.trailing,30) // 右侧间距
+                                    .accentColor(.white)
+                            }
+                            Divider().colorInvert()
                             
 //                            HStack {
 //                                Text("快洗模式")
@@ -91,8 +89,7 @@ struct SettingView: View {
 //                                    .padding(.trailing,30) // 右侧间距
 //                                    .accentColor(.white)
 //                            }
-//                            Divider()
-//                                .foregroundColor(.white)
+//                            Divider().colorInvert()
 //                            
 //                            HStack {
 //                                Text("远距离模式")
@@ -106,8 +103,7 @@ struct SettingView: View {
 //                                    .padding(.trailing,30) // 右侧间距
 //                                    .accentColor(.white)
 //                            }
-//                            Divider()
-//                                .foregroundColor(.white)
+//                            Divider().colorInvert()
                             
                             HStack {
                                 Text("耳机").foregroundColor(.white).padding(.leading, 20)
@@ -118,8 +114,7 @@ struct SettingView: View {
                                     .padding(.trailing,30) // 右侧间距
                                     .accentColor(.white)
                             }
-                            Divider()
-                                .foregroundColor(.white)
+                            Divider().colorInvert()
                             
                             HStack {
                                 Text("音量上键功能").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
@@ -134,8 +129,7 @@ struct SettingView: View {
                                 .padding(.trailing,30) // 右侧间距
                                 .accentColor(.white)
                             }
-                            Divider()
-                                .foregroundColor(.white)
+                            Divider().colorInvert()
                             
                             HStack {
                                 Text("音量下键功能").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
@@ -150,8 +144,7 @@ struct SettingView: View {
                                 .padding(.trailing,30) // 右侧间距
                                 .accentColor(.white)
                             }
-                            Divider()
-                                .foregroundColor(.white)
+                            Divider().colorInvert()
                             
                             HStack {
                                 Text("音量大小").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
@@ -161,8 +154,7 @@ struct SettingView: View {
                                     .padding(.trailing,30) // 右侧间距
                                     .accentColor(.white)
                             }
-                            Divider()
-                                .foregroundColor(.white)
+                            Divider().colorInvert()
                         }
                         
                         NavigationLink(
@@ -173,7 +165,7 @@ struct SettingView: View {
                                 .padding(.leading, 20)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
-                        Divider().foregroundColor(.white)
+                        Divider().colorInvert()
                         
                      }
                 }

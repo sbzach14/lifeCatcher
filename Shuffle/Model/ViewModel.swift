@@ -29,11 +29,11 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var winnerPlayer: [[Int]] = []
     @Published var winnerPlayerShow: String = ""
     @Published var multipleGamePlayerInfos: ReportManager.MultipleReportResultInfo = ReportManager.MultipleReportResultInfo()
-
+    @Published var cutArray : [Int] = []
+    @Published var cutShowArray : [Int] = []
+    
     let fastModel = try! cardDetection_0405_n()
     let slowModel = try! cardDetection_0405_n()
-
-    var cutArray : [Int] = []
     
     let imageSize : [Int] = [640, 480]
     var originSize : [Float] = [0,0]
@@ -190,7 +190,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         self.isWorking = true
         
         setupAVCapture()
-        startCamera()
 
 //      规则测试代码
 //        print("calArgs \(calModeArgs[1])")
@@ -229,6 +228,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         winnerPlayer = []
         winnerPlayerShow = ""
         cutArray = []
+        cutShowArray = []
     }
     
     private func initBoxes(){
@@ -305,6 +305,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     
     func startCamera() {
         session.startRunning()
+        changeCameraFrameRate(to: 30)
         print("开启相机")
     }
     
@@ -565,7 +566,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     if detectState.isShort && self.cutMode != 0{
                         //切牌
                         let cutCard = detectState.longestIndex;
-                        self.cutArray.append(cutCard)
+                        
                         
                         if !self.cardArray.contains(cutCard){
                             errorFlag = true
@@ -588,15 +589,14 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                             }
                             else if self.cutMode == 3{
                                 //切牌
+                                self.cutArray.append(cutCard)
                             }
                             else if self.cutMode == 4{
-                                //看手 假设切牌后手牌在牌堆第一张（等于看顶），在报法代码中计算在2、3、4的情况
-                                cutIndex -= 1
-                                if cutIndex < 0{
-                                    cutIndex = self.cardArray.count - 1
-                                }
-                                self.cutCardArray(index: cutIndex)
+                                //看手
+                                self.cutArray.append(cutCard)
                             }
+                            
+                            self.cutShowArray.append(cutCard)
                             self.speakText(input: 1)
                         }
                     }
@@ -1716,6 +1716,32 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         testArray.shuffle()
         self.cardArray = testArray
         
+        self.cutArray = []
+        self.cutShowArray = []
+        let cutCard : Int = self.cardArray.randomElement()!
+        var cutIndex = self.cardArray.firstIndex(of: cutCard)!
+        if self.cutMode == 1{
+            //看底
+            self.cutCardArray(index: cutIndex)
+        }
+        else if self.cutMode == 2{
+            //看顶
+            cutIndex -= 1
+            if cutIndex < 0{
+                cutIndex = self.cardArray.count - 1
+            }
+            self.cutCardArray(index: cutIndex)
+        }
+        else if self.cutMode == 3{
+            //切牌
+            self.cutArray.append(cutCard)
+        }
+        else if self.cutMode == 4{
+            //看手
+            self.cutArray.append(cutCard)
+        }
+        self.cutShowArray.append(cutCard)
+        
         computeWinnerPlayer()
     }
     
@@ -1915,7 +1941,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     private func loadSaveRule(saveRuleIndex: Int){
         self.selectedSaveIndex = saveRuleIndex
         let rules = RuleManager.allUsersGameRule[self.selectedSaveIndex]
-        
         self.ruleIndex = rules.gameType
         self.playerNum = rules.playerNum
         self.dealNum = rules.dealNum
@@ -1937,6 +1962,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         self.suitRules = rules.suitRanks
         self.rankRules = rules.rankRules
         self.minCardNum = rules.minCardNum
+        print("self.rankRules \(self.rankRules)")
     }
 }
 
