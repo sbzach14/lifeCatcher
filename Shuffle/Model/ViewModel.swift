@@ -30,6 +30,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var winnerPlayerShow: String = ""
     @Published var multipleGamePlayerInfos: ReportManager.MultipleReportResultInfo = ReportManager.MultipleReportResultInfo()
     @Published var cutArray : [Int] = []
+    @Published var cutShowArray : [Int] = []
     
     let fastModel = try! cardDetection_0405_n()
     let slowModel = try! cardDetection_0405_n()
@@ -227,6 +228,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         winnerPlayer = []
         winnerPlayerShow = ""
         cutArray = []
+        cutShowArray = []
     }
     
     private func initBoxes(){
@@ -593,6 +595,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                                 //看手
                                 self.cutArray.append(cutCard)
                             }
+                            
+                            self.cutShowArray.append(cutCard)
                             self.speakText(input: 1)
                         }
                     }
@@ -1713,6 +1717,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         self.cardArray = testArray
         
         self.cutArray = []
+        self.cutShowArray = []
         let cutCard : Int = self.cardArray.randomElement()!
         var cutIndex = self.cardArray.firstIndex(of: cutCard)!
         if self.cutMode == 1{
@@ -1735,6 +1740,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             //看手
             self.cutArray.append(cutCard)
         }
+        self.cutShowArray.append(cutCard)
         
         computeWinnerPlayer()
     }

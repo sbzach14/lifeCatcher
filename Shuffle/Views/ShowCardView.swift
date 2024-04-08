@@ -14,80 +14,78 @@ struct ShowCardView: View {
         VStack(alignment: .leading) {
             
             ScrollView {
+                
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 30))]) {
                     ForEach(viewModel.cardArray, id: \.self) { index in
                         CardIconView(index: index)
                     }
                 }.padding()
+                
+                Divider().colorInvert()
               
                 //TODO: 替换成viewmodel保存的计算结果
                 let result = Array(0..<viewModel.multipleGamePlayerInfos.singleResultList.count)
                 
                 ForEach(result, id: \.self) { resultIndex in
-                    VStack(spacing: 15){
+                    VStack(spacing: 0){
                         
                         VStack(spacing: 15){
                             
-                            Divider().colorInvert()
-                            
                             HStack{
-                                Text("轮次").font(.system(size: 30)).foregroundColor(.white)
-                                Text("\(resultIndex+1)").font(.system(size: 30)).foregroundColor(.white)
+                                
+                                Text("轮次").font(.system(size: 20)).foregroundColor(.white).bold()
+                                Text("\(resultIndex+1)").font(.system(size: 20)).foregroundColor(.white)
                                 Spacer()
+                                
                             }
                             
                             HStack{
                                 //TODO: 替换成本轮切牌（若每轮相同则是本局切牌）没有则隐藏
-                                if viewModel.cutArray.count > 0{
+                                if viewModel.cutShowArray.count > 0{
                                     
-                                    Text("切牌").font(.system(size: 20)).foregroundColor(.white)
+                                    Text("切牌").font(.system(size: 20)).foregroundColor(.white).bold()
                                     
-                                    ForEach(viewModel.cutArray, id: \.self) { cutCardIndex in
-                                        CardIconView(index: cutCardIndex)
-                                    }
-                                    
-                                    Spacer()
+                                    CardIconView(index: viewModel.cutShowArray[viewModel.cutShowArray.count - 1])
                                 }
                                 
                                 
                                 //TODO: 替换成本轮色牌（若每轮相同则是本局色牌）没有则隐藏
                                 if viewModel.multipleGamePlayerInfos.singleResultList[resultIndex].ColorCards.count > 0{
                                     
-                                    Text("色牌").font(.system(size: 20)).foregroundColor(.white)
+                                    Text("色牌").font(.system(size: 20)).foregroundColor(.white).bold()
                                     
                                     ForEach(viewModel.multipleGamePlayerInfos.singleResultList[resultIndex].ColorCards, id: \.self) { colorCardIndex in
                                         CardIconView(index: colorCardIndex)
                                     }
-                                    
-                                    Spacer()
                                 }
                                 
+                                Spacer()
                             }
-                             
+                            
                             HStack{
                                 //TODO: 替换成本轮公牌（若每轮相同则是本局公牌）没有则隐藏
                                 if viewModel.multipleGamePlayerInfos.singleResultList[resultIndex].community.count > 0{
                                     
-                                    Text("公牌").font(.system(size: 20)).foregroundColor(.white)
+                                    Text("公牌").font(.system(size: 20)).foregroundColor(.white).bold()
                                     
                                     let pubCardList = viewModel.multipleGamePlayerInfos.singleResultList[resultIndex].community
                                     
                                     ForEach(pubCardList, id: \.self) { pubCardIndex in
                                         CardIconView(index: pubCardIndex)
                                     }
-                                    
-                                    Spacer()
                                 }
+                                
+                                Spacer()
                             }
                             
                             HStack{
-                                Text("位置").frame(width: 60, alignment: .leading).font(.system(size: 20)).foregroundColor(.white)
+                                Text("位置").frame(width: 60, alignment: .leading).font(.system(size: 20)).foregroundColor(.white).bold()
                                 
-                                Text("排名").frame(width: 60, alignment: .leading).font(.system(size: 20)).foregroundColor(.white)
+                                Text("排名").frame(width: 60, alignment: .leading).font(.system(size: 20)).foregroundColor(.white).bold()
                                 
-                                Text("牌型").frame(width: 60, alignment: .leading).font(.system(size: 20)).foregroundColor(.white)
+                                Text("牌型").frame(width: 60, alignment: .leading).font(.system(size: 20)).foregroundColor(.white).bold()
                                 
-                                Text("手牌").frame(width: 60, alignment: .leading).font(.system(size: 20)).foregroundColor(.white)
+                                Text("手牌").frame(width: 60, alignment: .leading).font(.system(size: 20)).foregroundColor(.white).bold()
                                 
                                 Spacer()
                             }
@@ -100,7 +98,7 @@ struct ShowCardView: View {
                                 var posList = (0...rankList.count - 1)
                                 ForEach(posList, id: \.self) { posIndex in
                                     HStack{
-                                        Text("\(posIndex)").frame(width: 60, alignment: .leading).font(.system(size: 20)).foregroundColor(.white)
+                                        Text("\(posIndex+1)").frame(width: 60, alignment: .leading).font(.system(size: 20)).foregroundColor(.white)
                                         
                                         //TODO: 替换成该位置玩家的排名
                                         let rate = rankList[posIndex].playerGameRank
@@ -126,10 +124,13 @@ struct ShowCardView: View {
                                     }
                                 }
                             }
+                            
+                            Divider().colorInvert()
                         }
+                        
                     }.padding()
                 }
-                Divider().colorInvert()
+                
             }
             
             Spacer()

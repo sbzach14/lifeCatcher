@@ -214,7 +214,7 @@ struct AddRuleSettingView: View{
                                 .resizable()
                                 .scaledToFill()
                         )
-                        .frame(height: 50)
+                        .frame(height: 45)
                         //游戏规则
                         HStack{
                             Image("icon_shufflemode")
@@ -247,7 +247,7 @@ struct AddRuleSettingView: View{
                                     .resizable()
                                     .scaledToFill()
                             )
-                            .frame(height: 50)
+                            .frame(height: 45)
                             
                             //人数设置
                             HStack{
@@ -275,7 +275,7 @@ struct AddRuleSettingView: View{
                                     .resizable()
                                     .scaledToFill()
                             )
-                            .frame(height: 50)
+                            .frame(height: 45)
                         
                         
                         
@@ -301,7 +301,7 @@ struct AddRuleSettingView: View{
                                     .resizable()
                                     .scaledToFill()
                             )
-                            .frame(height: 50)
+                            .frame(height: 45)
                             
                             HStack
                             {Image("icon_shufflemode")
@@ -325,7 +325,7 @@ struct AddRuleSettingView: View{
                                     .resizable()
                                     .scaledToFill()
                             )
-                            .frame(height: 50)
+                            .frame(height: 45)
                         
                         
                         
@@ -345,7 +345,7 @@ struct AddRuleSettingView: View{
                                     .resizable()
                                     .scaledToFill()
                             )
-                            .frame(height: 50)
+                            .frame(height: 45)
                             
                             HStack
                             {Image("icon_shufflemode")
@@ -364,7 +364,7 @@ struct AddRuleSettingView: View{
                                     .resizable()
                                     .scaledToFill()
                             )
-                            .frame(height: 50)
+                            .frame(height: 45)
                             
                             
                             //报法设置
@@ -387,7 +387,7 @@ struct AddRuleSettingView: View{
                                     .resizable()
                                     .scaledToFill()
                             )
-                            .frame(height: 50)
+                            .frame(height: 45)
                         
                         
                         
@@ -414,7 +414,7 @@ struct AddRuleSettingView: View{
                                 Image("list_bg") // 背景图片
                                     .resizable()
                                     .scaledToFill()
-                            ).frame(height: 50)
+                            ).frame(height: 45)
                             
                             //打色范围
                             HStack
@@ -432,7 +432,7 @@ struct AddRuleSettingView: View{
                                 Image("list_bg") // 背景图片
                                     .resizable()
                                     .scaledToFill()
-                            ).frame(height: 50)
+                            ).frame(height: 45)
                         }
                         
                         Group{
@@ -458,7 +458,7 @@ struct AddRuleSettingView: View{
                                     .resizable()
                                     .scaledToFill()
                             )
-                            .frame(height: 50)
+                            .frame(height: 45)
                             
 //                            //报牌张数
 //                            HStack
@@ -484,7 +484,7 @@ struct AddRuleSettingView: View{
 //                                    .resizable()
 //                                    .scaledToFill()
 //                            )
-//                            .frame(height: 50)
+//                            .frame(height: 45)
                         
                             //连报轮数
                             HStack
@@ -510,7 +510,7 @@ struct AddRuleSettingView: View{
                                     .resizable()
                                     .scaledToFill()
                             )
-                            .frame(height: 50)
+                            .frame(height: 45)
                         }
                     }
                 }
