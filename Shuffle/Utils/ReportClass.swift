@@ -1660,7 +1660,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     } else if reportRule.reportID == 215{
                         if cutCardIndexList.count < 2 {
                             return ("", multipleResultInfo)
-                        } else {
                         }
                     //普通切牌, 看色去色
                     } else {
