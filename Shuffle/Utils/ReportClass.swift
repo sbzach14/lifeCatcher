@@ -1556,6 +1556,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         var community: [Int] = []
         //无牛或最多一家牛
         var NoBullOrMaxOneBull: Int = 0
+        //返回的切牌后的数组
+        var returnCardArray: [Int] = []
         
     }
     
@@ -1643,8 +1645,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 var cutList: [[Int]] = []
                 
                 //TODO 是否切牌的位置，看手牌，切牌留色，切牌去色
-                //看手牌
+                
                 if cutCardIndexList.count > 0 {
+                    //看手牌
                     if reportRule.differentDeal == 1 || reportRule.differentDeal == 2{
                         let handCardIndex = cutCardIndexList[cutCardIndexList.count - 1]
                         let pos = searchCardPos(inputCards: inputCards, cardIndex: handCardIndex)
@@ -1653,17 +1656,21 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         } else if pos != 0 {
                             inputCards = Array(inputCards[pos...]) + Array(inputCards[0...(pos - 1)])
                         }
+                    //看色两次
                     } else if reportRule.reportID == 215{
                         if cutCardIndexList.count < 2 {
                             return ("", multipleResultInfo)
+                        } else {
                         }
-                    //普通切牌
+                    //普通切牌, 看色去色
                     } else {
                         let cutCardIndex = cutCardIndexList[cutCardIndexList.count - 1]
                         let pos = searchCardPos(inputCards: inputCards, cardIndex: cutCardIndex)
                         inputCards = Array(inputCards[(pos + 1)...]) + Array(inputCards[0...pos])
                     }
                 }
+                
+                currentResultInfo.returnCardArray = inputCards
                 
                 //切牌范围（遍历范围）
                 switch reportRule.reportCutRange{
