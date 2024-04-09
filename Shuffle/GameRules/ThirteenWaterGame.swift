@@ -54,7 +54,7 @@ class ThirteenWaterGame{
     
     static func legalCheck(playerNum: Int) -> String{
         var errMessage : String = ""
-        if(playerNum * 2 > 52)
+        if(playerNum * 13 > 52)
         {
             errMessage = "需要牌数量超出牌堆总数，请重新设置！"
         }
@@ -105,14 +105,6 @@ class ThirteenWaterGame{
     //2 playerNum
     //3 handNum
     //4 communityNum
-    //5 redJokerValueRange
-    //6 blackJokerValueRange
-    //7 KValueRange
-    //8 QValueRange
-    //9 JValueRange
-    //10 pointComparision
-    //11 samePointComparision
-    //10 cardRankRule
 
 
     
