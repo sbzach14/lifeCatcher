@@ -307,6 +307,7 @@ class TexasPokerGame {
             resultList.append(ResultStruct(playerID: i, rank: rank))
         }
         let sortedResultList =  resultList.sorted(by: {$0.rank > $1.rank })
+        
         for result in sortedResultList {
             var currentPlayerReturnInfo: GameReturnPlayerInfo = GameReturnPlayerInfo()
             currentPlayerReturnInfo.playerID = result.playerID

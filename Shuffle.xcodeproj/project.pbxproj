@@ -28,6 +28,7 @@
 		18FFC40A2BB9587A00029B0D /* BlurDetector_origin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FFC4092BB9587900029B0D /* BlurDetector_origin.swift */; };
 		50053F84284ACAED00C86BF4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50053F81284ACAED00C86BF4 /* Assets.xcassets */; };
 		A80959642BBFE3C4009A2DB4 /* cardDetection_0405_n.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A80959632BBFE3C4009A2DB4 /* cardDetection_0405_n.mlmodel */; };
+		A80959662BC52AB2009A2DB4 /* ThirteenWaterGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A80959652BC52AB1009A2DB4 /* ThirteenWaterGame.swift */; };
 		A809B3E22AE5126700F728A9 /* BaoziGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A809B3E12AE5126700F728A9 /* BaoziGame.swift */; };
 		A809B3E42AE5183400F728A9 /* BaoziGameRuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A809B3E32AE5183400F728A9 /* BaoziGameRuleSettingView.swift */; };
 		A80D65F82AFF75ED005B5E5E /* AddRuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A80D65F72AFF75ED005B5E5E /* AddRuleSettingView.swift */; };
@@ -124,6 +125,7 @@
 		5269731033A41881895B5A41 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A6748516A40E187B4F8ACFA3 /* SampleCode.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
 		A80959632BBFE3C4009A2DB4 /* cardDetection_0405_n.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection_0405_n.mlmodel; sourceTree = "<group>"; };
+		A80959652BC52AB1009A2DB4 /* ThirteenWaterGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirteenWaterGame.swift; sourceTree = "<group>"; };
 		A809B3E12AE5126700F728A9 /* BaoziGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaoziGame.swift; sourceTree = "<group>"; };
 		A809B3E32AE5183400F728A9 /* BaoziGameRuleSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaoziGameRuleSettingView.swift; sourceTree = "<group>"; };
 		A80D65F72AFF75ED005B5E5E /* AddRuleSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddRuleSettingView.swift; sourceTree = "<group>"; };
@@ -378,6 +380,7 @@
 				A88C71ED2B8B3824001D8BD8 /* TwoCardGame.swift */,
 				A88C71EF2B93101C001D8BD8 /* ThreeCardPointGame.swift */,
 				A88C71F12B93570D001D8BD8 /* TenPointFiveGame.swift */,
+				A80959652BC52AB1009A2DB4 /* ThirteenWaterGame.swift */,
 			);
 			path = GameRules;
 			sourceTree = "<group>";
@@ -612,6 +615,7 @@
 				A809B3E22AE5126700F728A9 /* BaoziGame.swift in Sources */,
 				A88EFE0B2A7FC05900897243 /* JsonUtils.swift in Sources */,
 				A88EFDC82A7D249C00897243 /* VisionObjectRecognitionView.swift in Sources */,
+				A80959662BC52AB2009A2DB4 /* ThirteenWaterGame.swift in Sources */,
 				A887B6522A8104BC009F488F /* TimeUtils.swift in Sources */,
 				A892C6002A765A0A003FA2B3 /* MainMenuView.swift in Sources */,
 				A8922FC02A6553FB00A7033E /* PokerBullSettingView.swift in Sources */,

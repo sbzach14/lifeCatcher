@@ -1,8 +1,15 @@
+//
+//  ThirteenWaterGame.swift
+//  Shuffle
+//
+//  Created by Zhangyi Chen on 4/9/24.
+//  Copyright © 2024 Apple. All rights reserved.
+//
 
 import Foundation
 
 
-class ChickenBattleGameRule : Rule{
+class ThirteenWaterGameRule : Rule{
     
     //此处填入需要的参数，因为rulesettingview没有了，主要作用是注释
     let redJokerValueRange:[Int:String] = [
@@ -34,7 +41,7 @@ class ChickenBattleGameRule : Rule{
 }
 
 
-class ChickenBattleGame{
+class ThirteenWaterGame{
     
     
     
@@ -200,7 +207,7 @@ class ChickenBattleGame{
         
         
         for i in 0..<playerNum {
-            (allPlayCards[i].evaluateFlag,allPlayCards[i].cardType, allPlayCards[i].isPair) = ChickenBattleGameHandEvaluator(
+            (allPlayCards[i].evaluateFlag,allPlayCards[i].cardType, allPlayCards[i].isPair) = ThirteenWaterGameHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules
             ).evalHand(cards: allPlayCards[i].playerCard, redJokerValueRange: redJokerValueRange)
@@ -229,17 +236,17 @@ class ChickenBattleGame{
         for card in deck{
             leftCards.append(card.cardIndex)
         }
-        if leftCards.count < ChickenBattleGame.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+        if leftCards.count < ThirteenWaterGame.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
             leftCards = []
         }
         return (returnPlayerInfos, leftCards)
     }
 }
 
-class ChickenBattleGameHandEvaluator{
+class ThirteenWaterGameHandEvaluator{
     var rankRules: [Int]
     var suitRules: [Int]
-    var ruleDict: [Int: ([ChickenBattleCard]) -> (Int, String, Int)] = [:]
+    var ruleDict: [Int: ([ThirteenWaterCard]) -> (Int, String, Int)] = [:]
     
     init(rankRules: [Int],
          suitRules: [Int]){
@@ -257,7 +264,7 @@ class ChickenBattleGameHandEvaluator{
     func evalHand(cards: [Card],redJokerValueRange: Int)->(Int, String, Int){
         var cards = cards
         
-        var numList:[ChickenBattleCard] = []
+        var numList:[ThirteenWaterCard] = []
         numList = numList.sorted(by: {$0.rank > $1.rank})
         
         var score = 0
@@ -284,7 +291,7 @@ class ChickenBattleGameHandEvaluator{
     //牌型函数
     // return (rank, 牌型, 是否是对子（十三水比鸡没有就全部0））
     //下面是例子
-    func eval_isPair(cards:[ChickenBattleCard]) -> (Int, String, Int){
+    func eval_isPair(cards:[ThirteenWaterCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank{
             let cardType: String = "对" + GameManager.CardNumberReportDic[cards[0].originalRank]!
             return (cards[0].rank, cardType, 1)
@@ -292,18 +299,18 @@ class ChickenBattleGameHandEvaluator{
         return (0, "", 0)
     }
     
-    func eval_isHighCard(cards: [ChickenBattleCard]) -> (Int, String, Int) {
+    func eval_isHighCard(cards: [ThirteenWaterCard]) -> (Int, String, Int) {
         let cardType: String = "高牌" + GameManager.CardNumberReportDic[cards[0].originalRank]!
         return (cards[0].rank, cardType, 0)
     }
     
-    func eval_isPoint(cards:[ChickenBattleCard]) -> (Int, String, Int) {
+    func eval_isPoint(cards:[ThirteenWaterCard]) -> (Int, String, Int) {
         let point = cards.reduce(0){$0 + $1.point} % 10
         let cardType: String = String(point) + "点"
         return (point + 1, cardType, 0)
     }
     
-    class ChickenBattleCard{
+    class ThirteenWaterCard{
         var rank: Int = 0
         var point: Int = 0
         var suit: Int = 0
@@ -311,7 +318,7 @@ class ChickenBattleGameHandEvaluator{
         var originalRank: Int = 0
         
         init(card: Card, redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange:Int, JValueRange:Int, cardRankRule: Int){
-            let rule = GameManager.gameRules[15] as! ChickenBattleGameRule
+            let rule = GameManager.gameRules[16] as! ThirteenWaterGameRule
             
             //....定义牌的大小点数花色
         }

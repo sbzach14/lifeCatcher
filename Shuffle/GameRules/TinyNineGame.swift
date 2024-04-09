@@ -241,6 +241,9 @@ class TinyNineGame{
             currentReturnPlayerInfo.playerRank = result.rank
             currentReturnPlayerInfo.playerCardsType = allPlayCards[result.playerID].cardType
             currentReturnPlayerInfo.isPair = allPlayCards[result.playerID].isPair
+            //存入手牌和公牌
+            currentReturnPlayerInfo.PlayerCards = allPlayCards[result.playerID].playerCard
+            currentReturnPlayerInfo.communityCard = community
             returnPlayerInfos.append(currentReturnPlayerInfo)
         }
         

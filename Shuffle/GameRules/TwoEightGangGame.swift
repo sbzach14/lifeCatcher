@@ -332,6 +332,8 @@ class TwoEightGangGame{
             currentReturnPlayerInfo.playerRank = result.rank
             currentReturnPlayerInfo.playerCardsType = allPlayCards[result.playerID].cardType
             currentReturnPlayerInfo.isPair = allPlayCards[result.playerID].isPair
+            currentReturnPlayerInfo.PlayerCards = allPlayCards[result.playerID].playerCard
+            currentReturnPlayerInfo.communityCard = community
             returnPlayerInfos.append(currentReturnPlayerInfo)
         }
         var leftCards:[Int] = []

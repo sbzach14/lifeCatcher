@@ -850,13 +850,8 @@ class PokerBullGame {
         
 //        // 计算牌额大小
         if wayToDealCards == 0{
-            if handNum == 5{
-                for player in allPlayers {
-                    player.evaluateHandCards(bullRules: bullRule, sameBullPointComparision: sameBullPointComparision, fiveLittleComparision: fiveLittleComparision, fiveLittleEqualToStraight: fiveLittleEqualToStraight, rankRules: rankRules, startIndex: 0)
-                }
-            } else if handNum == 10{
-                //TODO 根据报法来决定，返回值怎么写
-                
+            for player in allPlayers {
+                player.evaluateHandCards(bullRules: bullRule, sameBullPointComparision: sameBullPointComparision, fiveLittleComparision: fiveLittleComparision, fiveLittleEqualToStraight: fiveLittleEqualToStraight, rankRules: rankRules, startIndex: 0)
             }
         } else if wayToDealCards == 1{
             for player in allPlayers {
@@ -882,6 +877,16 @@ class PokerBullGame {
             currentPlayerReturnInfo.playerRank = player.evaluateFlag
             currentPlayerReturnInfo.playerCardsType = player.cardType
             currentPlayerReturnInfo.playerCardsSuit = ""
+            returnPlayerInfos.append(currentPlayerReturnInfo)
+            //存入手牌和公牌
+            for bullCard in player.playerCard {
+                currentPlayerReturnInfo.PlayerCards.append(Card(suit: [bullCard.suit], rank: bullCard.trueRank, cardIndex: bullCard.cardIndex))
+            }
+            
+            for bullCard in community {
+                currentPlayerReturnInfo.communityCard.append(Card(suit: [bullCard.suit], rank: bullCard.trueRank, cardIndex: bullCard.cardIndex))
+            }
+            
             returnPlayerInfos.append(currentPlayerReturnInfo)
         }
         

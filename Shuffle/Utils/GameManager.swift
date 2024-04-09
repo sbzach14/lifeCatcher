@@ -64,7 +64,9 @@ class GameManager {
         let rule12 = TwoCardGameRule(ruleIndex: 12, ruleName: "2张")
         let rule13 = ThreeCardPointGameRule(ruleIndex: 13, ruleName: "3张")
         let rule14 = TenPointFiveGameRule(ruleIndex: 14, ruleName: "10点半")
-        return [rule0.ruleIndex: rule0, rule1.ruleIndex: rule1, rule2.ruleIndex: rule2, rule3.ruleIndex: rule3, rule4.ruleIndex: rule4, rule5.ruleIndex: rule5, rule6.ruleIndex: rule6, rule7.ruleIndex: rule7, rule8.ruleIndex: rule8, rule9.ruleIndex: rule9,rule10.ruleIndex:rule10, rule11.ruleIndex: rule11,rule12.ruleIndex:rule12, rule13.ruleIndex:rule13, rule14.ruleIndex: rule14]
+        let rule15 = ChickenBattleGameRule(ruleIndex: 15, ruleName: "比鸡")
+        let rule16 = ThirteenWaterGameRule(ruleIndex: 16, ruleName: "十三水")
+        return [rule0.ruleIndex: rule0, rule1.ruleIndex: rule1, rule2.ruleIndex: rule2, rule3.ruleIndex: rule3, rule4.ruleIndex: rule4, rule5.ruleIndex: rule5, rule6.ruleIndex: rule6, rule7.ruleIndex: rule7, rule8.ruleIndex: rule8, rule9.ruleIndex: rule9,rule10.ruleIndex:rule10, rule11.ruleIndex: rule11,rule12.ruleIndex:rule12, rule13.ruleIndex:rule13, rule14.ruleIndex: rule14, rule15.ruleIndex: rule15, rule16.ruleIndex: rule16]
     }()
     
     static func cutRankConvert(cutNumSetting: Int, cardIndex: Int)->Int{
