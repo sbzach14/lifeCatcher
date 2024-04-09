@@ -135,7 +135,7 @@ class ThirteenWaterGame{
         var deck = deck
         // 发牌
         if dealNum == 0{
-            for _ in 0..<4{
+            for _ in 0..<handNum{
                 //正发
                 if dealType == 0{
                     for i in 0..<playerNum {
