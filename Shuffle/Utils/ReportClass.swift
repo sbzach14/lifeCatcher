@@ -1419,10 +1419,15 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         return resultList
     }
     
-    static func GetCardRank(reportRule:ReportClass, cutNumSetting: Int, cutNumRangeSetting: [Int], inputCards: [Int], cardIndex: Int, specialCardPos: Int, cutCardIndexList:[Int]) -> (Int, [Int]){
+    static func GetCardRank(reportRule:ReportClass, cutNumSetting: Int, cutNumRangeSetting: [Int], inputCards: [Int], cardIndex: Int, specialCardPos: Int, cutCardIndexList:[Int], upDownID: Int) -> (Int, [Int]){
         //色点设置
         var cardRank: Int = 0
+        var cardIndex: Int = cardIndex
         var colorCardIndexList: [Int] = []
+        //下x张打色
+        if upDownID == 1 {
+            cardIndex = inputCards.count - cardIndex - 1
+        }
         switch reportRule.colorCardPos {
             //面牌为色牌
         case 0:
@@ -1579,7 +1584,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
     
     
     
-    static func GameReporter(gameIndex: Int, inputCards: [Int], cutCardIndexList: [Int], diyDealStatus: [[Bool]], diyDealNum:[Int], newArgs: [Int], rankRules:[Int], suitRules:[Int], reportID: Int, cutNumSetting: Int, cutNumRangeSetting: [Int], targetPos: Int, coloringType: Int, consecutiveNum: Int) -> ([SpeakResultStruct], MultipleReportResultInfo){
+    static func GameReporter(gameIndex: Int, inputCards: [Int], cutCardIndexList: [Int], diyDealStatus: [[Bool]], diyDealNum:[Int], newArgs: [Int], rankRules:[Int], suitRules:[Int], reportID: Int, cutNumSetting: Int, cutNumRangeSetting: [Int], targetPos: Int, coloringType: Int, consecutiveNum: Int) -> ([SpeakResultStruct], MultipleReportResultInfo, [Int]){
         
         let gameFunctions:[Int: ([[Bool]],[Int], [Int], [Int], [Int], [Int]) -> ([GameReturnPlayerInfo], [Int])] = [
             0: TexasPoker.FindWinner,
@@ -1621,24 +1626,17 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         let gameMinCardFunction = minCardFunctions[gameIndex]
             
         var inputCards = inputCards
-        
-        //一轮最少牌
-        
-        
+                
+        //剩余的牌
         var leftCards:[Int] = []
+        //玩家数量
         let playerNum = newArgs[2]
-        
-        //一共多少家平点
-        var drawPointNum: Int = 0
-        //一共多少个对子
-        var totalPairNum: Int = 0
+
         //每个位置拿最大次数
         var playerWinTimesDic : [Int:Int] = [:]
         for id in 0..<playerNum {
             playerWinTimesDic[id] = 0
         }
-        //满足要求切牌位置集合
-        var cutPositionSet: [Int] = []
         //指定牌位置
         var specialCardPos: Int = -1
         //切每一张牌的目标玩家
@@ -1658,8 +1656,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 var currentResultInfo = SingleReportResultInfo()
                 var cutList: [[Int]] = []
                 
-                //TODO 是否切牌的位置，看手牌，切牌留色，切牌去色
-                
+                //是否切牌的位置，看手牌，切牌留色，切牌去色
                 if cutCardIndexList.count > 0 {
                     //看手牌
                     if reportRule.differentDeal == 1 || reportRule.differentDeal == 2{
@@ -1673,7 +1670,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     //看色两次
                     } else if reportRule.reportID == 215{
                         if cutCardIndexList.count < 2 {
-                            return ([], multipleResultInfo)
+                            return ([], multipleResultInfo, leftCards)
                         }
                     //普通切牌, 看色去色
                     } else {
@@ -1683,7 +1680,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     }
                 }
                 
+                
                 currentResultInfo.returnCardArray = inputCards
+                
                 
                 //切牌范围（遍历范围）
                 switch reportRule.reportCutRange{
@@ -1838,9 +1837,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         }
                     }
                     break
-                //看手牌比第一张牌从最大牌继续发
+                //TODO: 看手牌比第一张牌从最大牌继续发
                 case 3:
-                    
                     break
                 default:
                     break
@@ -1866,7 +1864,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             specialCardPos = cardIndex
                         }
                     }
-                    
                     print("指定牌的cardIndex为 \(specialCardIndex) 位置（正面牌的位置）")
                     break
                 default:
@@ -1875,12 +1872,11 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 
                 currentResultInfo.specialCardPos = specialCardPos
                 
-                
-                var cutID = 0
+                var upDownID = 0
                 for cutRange in cutList{
                     let cutRange1 = cutRange[0]
                     let cutRange2 = cutRange[1]
-                    print("CUTID Start----------------------------------")
+                    print("upDownID Start----------------------------------")
                     
                     for cardIndex in cutRange1...cutRange2{
                         print("LOG START-------------------------------------")
@@ -1905,13 +1901,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         var cardRank: Int = 0
                         var colorCardIndexList: [Int] = []
                         
-                        //上
-                        if cutID == 0{
-                            (cardRank, colorCardIndexList) = GetCardRank(reportRule: reportRule, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, inputCards: coloringInputCards, cardIndex: cardIndex, specialCardPos: specialCardPos, cutCardIndexList: cutCardIndexList)
-                        //下
-                        } else if cutID == 1{
-                            (cardRank, colorCardIndexList) = GetCardRank(reportRule: reportRule, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, inputCards: coloringInputCards, cardIndex: inputCards.count - 1 - cardIndex, specialCardPos: specialCardPos, cutCardIndexList: cutCardIndexList)
-                        }
+                        (cardRank, colorCardIndexList) = GetCardRank(reportRule: reportRule, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, inputCards: coloringInputCards, cardIndex: cardIndex, specialCardPos: specialCardPos, cutCardIndexList: cutCardIndexList, upDownID: upDownID)
+
                         
                         
                         print("打色点数 \(cardRank) CutRange \(cutRange)")
@@ -1957,8 +1948,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             break
                         //7，去掉面牌补到底，去掉底牌补到顶
                         case 7:
-                            print("CutID \(cutID)")
-                            if cutID == 0 {
+                            print("upDownID \(upDownID)")
+                            if upDownID == 0 {
                                 if cardIndex == 0{
                                     newInputCards = coloringInputCards
                                 } else {
@@ -1975,7 +1966,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         break
                         //8，上下XY张色牌先发
                         case 8:
-                            if cutID == 0{
+                            if upDownID == 0{
                                 if cardIndex == 0 {
                                     //正发正面打色，反发反面打色
                                     if newArgs[1] == coloringType {
@@ -2020,7 +2011,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         //10，上下XY张去色1张
                         case 10:
                             let length = coloringInputCards.count
-                            if cutID == 0{
+                            if upDownID == 0{
                                 if cardIndex == 0{
                                     newInputCards = Array(coloringInputCards[(cardIndex + 1)...])
                                 } else {
@@ -2229,17 +2220,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         var newCardRank = cardRank
                         //装所有目标位置
                         var resultTargetPos:[Int] = []
-                        //装活门
-                        var aliveTargetPos: [Int] = []
-                        //装对子
-                        var pairNum: Int = 0
-                        var NoPair: Int = 0
-                        //装9点
-                        var NoNinePoint: Int = 0
-                        //装平点
-                        var hasDrawPoint: Int = 0
-                        //牛牛
-                        var LeastOneBullBull: [Int] = []
 
                         //反面打色
                         if coloringType == 1 {
@@ -2248,10 +2228,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         
                         let (winnersInfo, leftCards) = gameFunction!(diyDealStatus, diyDealNum, newInputCards, newArgs, rankRules, suitRules)
                         
-                        // 输入的牌不够打
-                        if winnersInfo.count == 0 && leftCards.count == 0 {
-                            continue
-                        }
                         
                         if winnersInfo.count != 0 {
                             
@@ -2596,12 +2572,18 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         if reportTargetFlag == 1 {
                             break
                         }
+                        
+                        //剩余的牌不够用
+                        if leftCards.count == 0 {
+                            break
+                        }
                     }
                     
                     print("LOG END--------------------------------------")
-                    cutID += 1
+                    upDownID += 1
                     if cutList.count > 1 {
-                        if currentResultInfo.cardIndexToConfirmMaxMin.count < cutID {
+                        if currentResultInfo.cardIndexToConfirmMaxMin.count < upDownID {
+                            
                             print("\(currentResultInfo.cardIndexToConfirmMaxMin)...........\(currentResultInfo.cardIndexToConfirmAliveDeath)")
                             currentResultInfo.cardIndexToConfirmMaxMin.append(-1)
                             currentResultInfo.cardIndexToConfirmAliveDeath.append(-1)
@@ -2612,8 +2594,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         currentResultInfo.XorYMax.append(-1)
                     }
                 }
-                
-                
                 multipleResultInfo.singleResultList.append(currentResultInfo)
             }
         }
@@ -2622,7 +2602,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         //结果整合，把需要的元素填入结果整合的函数中，最后合成一段reportResult字符串
         let reportResult = reportStringGenerator(reportID: reportID, multipleReportResultInfo: multipleResultInfo, cutNumRangeSetting: cutNumRangeSetting, playerNum: playerNum)
         
-        return (reportResult, multipleResultInfo)
+        return (reportResult, multipleResultInfo, leftCards)
         
     }
     
