@@ -100,11 +100,11 @@ class JiaJiaBaoGame{
     
     
     
-    static func FindWinner(diyDealStatus:[[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
+    static func FindWinner(diyDealStatus:[[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
         
         var deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let (winners, leftCards, winnerRanks) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (winners, leftCards, winnerRanks)
+        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winners, leftCards)
     }
     
     static func legalCheck(playerNum: Int, handNum: Int) -> String{
@@ -174,7 +174,7 @@ class JiaJiaBaoGame{
     //11 isCompareSuit
 
     
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([Int],[Int],[Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
         let rule = GameManager.gameRules[8] as! JiaJiaBaoGameRule
         let dealNum = args[0]
         let dealType = args[1]
@@ -193,12 +193,13 @@ class JiaJiaBaoGame{
 
         
         var maxRank = 0
-        var winners: [Int] = []
-        var winnerRanks: [Int] = []
+
+        var returnPlayerInfos: [GameReturnPlayerInfo] = []
+
         var allPlayCards: [Player] = []
         var community = [Card]()
         if deck.count < self.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
-            return ([], [], [])
+            return ([], [])
         }
         
         for _ in 0..<playerNum {
@@ -285,17 +286,19 @@ class JiaJiaBaoGame{
         }
         
         
-        var resultList = [ResultStruct]()
-        for i in 0..<playerNum {
-            let rank = allPlayCards[i].evaluateFlag
-            resultList.append(ResultStruct(playerID: i, rank: rank))
+        for playerID in 0..<allPlayCards.count {
+            var currentReturnPlayerInfo = GameReturnPlayerInfo()
+            currentReturnPlayerInfo.playerID = playerID
+            currentReturnPlayerInfo.playerRank = allPlayCards[playerID].evaluateFlag
+            currentReturnPlayerInfo.playerCardsType = allPlayCards[playerID].cardType
+            currentReturnPlayerInfo.isPair = allPlayCards[playerID].isPair
+            currentReturnPlayerInfo.PlayerCards = allPlayCards[playerID].playerCard
+            currentReturnPlayerInfo.communityCard = community
+            returnPlayerInfos.append(currentReturnPlayerInfo)
         }
         
-        let sortedResultList =  resultList.sorted(by: {$0.rank > $1.rank })
-        for result in sortedResultList {
-            winners.append(result.playerID)
-            winnerRanks.append(result.rank)
-        }
+        //从大到小排序
+        returnPlayerInfos = returnPlayerInfos.sorted(by: {$0.playerRank > $1.playerRank})
         
         var leftCards:[Int] = []
         for card in deck{
@@ -304,8 +307,7 @@ class JiaJiaBaoGame{
         if leftCards.count < JiaJiaBaoGame.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
             leftCards = []
         }
-        print("winners \(winners)")
-        return (winners, leftCards, winnerRanks)
+        return (returnPlayerInfos, leftCards)
     }
 }
 

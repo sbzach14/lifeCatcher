@@ -392,23 +392,19 @@ class NinePointFiveGame{
         }
         
         
-        var resultList = [ResultStruct]()
-        for i in 0..<playerNum {
-            let rank = allPlayCards[i].evaluateFlag
-            resultList.append(ResultStruct(playerID: i, rank: rank))
-        }
-        
-        let sortedResultList =  resultList.sorted(by: {$0.rank > $1.rank })
-        for result in sortedResultList {
+        for playerID in 0..<allPlayCards.count {
             var currentReturnPlayerInfo = GameReturnPlayerInfo()
-            currentReturnPlayerInfo.playerID = result.playerID
-            currentReturnPlayerInfo.playerRank = result.rank
-            currentReturnPlayerInfo.playerCardsType = allPlayCards[result.playerID].cardType
-            currentReturnPlayerInfo.isPair = allPlayCards[result.playerID].isPair
-            currentReturnPlayerInfo.PlayerCards = allPlayCards[result.playerID].playerCard
+            currentReturnPlayerInfo.playerID = playerID
+            currentReturnPlayerInfo.playerRank = allPlayCards[playerID].evaluateFlag
+            currentReturnPlayerInfo.playerCardsType = allPlayCards[playerID].cardType
+            currentReturnPlayerInfo.isPair = allPlayCards[playerID].isPair
+            currentReturnPlayerInfo.PlayerCards = allPlayCards[playerID].playerCard
             currentReturnPlayerInfo.communityCard = community
             returnPlayerInfos.append(currentReturnPlayerInfo)
         }
+        
+        //从大到小排序
+        returnPlayerInfos = returnPlayerInfos.sorted(by: {$0.playerRank > $1.playerRank})
         
         var leftCards:[Int] = []
         for card in deck{

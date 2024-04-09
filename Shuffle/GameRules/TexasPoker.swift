@@ -176,7 +176,7 @@ class TexasPlayer {
     var evaluateFlag = 0
     var cardsType: String = ""
     var cardsSuit: String = ""
-    var isPair: String = ""
+    var isPair: Int = 0
     
     func insertCard(card: Card) {
         playerCard.append(card)
@@ -301,23 +301,19 @@ class TexasPokerGame {
             (allPlayCards[i].evaluateFlag, allPlayCards[i].cardsType) = HandEvaluator.evalHand(cards: allPlayCards[i].playerCard, community: community, isCompareSuit: isCompareSuit, isAceStraight: isAceStraight, minRank: minRank, handUseType: handUseType, handUseNum: handUseNum, rankRules: rankRules)
         }
         
-        var resultList = [ResultStruct]()
-        for i in 0..<playerNum {
-            let rank = allPlayCards[i].evaluateFlag
-            resultList.append(ResultStruct(playerID: i, rank: rank))
+        for playerID in 0..<allPlayCards.count {
+            var currentReturnPlayerInfo = GameReturnPlayerInfo()
+            currentReturnPlayerInfo.playerID = playerID
+            currentReturnPlayerInfo.playerRank = allPlayCards[playerID].evaluateFlag
+            currentReturnPlayerInfo.playerCardsType = allPlayCards[playerID].cardsType
+            currentReturnPlayerInfo.isPair = allPlayCards[playerID].isPair
+            currentReturnPlayerInfo.PlayerCards = allPlayCards[playerID].playerCard
+            currentReturnPlayerInfo.communityCard = community
+            returnPlayerInfos.append(currentReturnPlayerInfo)
         }
-        let sortedResultList =  resultList.sorted(by: {$0.rank > $1.rank })
         
-        for result in sortedResultList {
-            var currentPlayerReturnInfo: GameReturnPlayerInfo = GameReturnPlayerInfo()
-            currentPlayerReturnInfo.playerID = result.playerID
-            currentPlayerReturnInfo.playerRank = result.rank
-            currentPlayerReturnInfo.playerCardsType = allPlayCards[result.playerID].cardsType
-            //存入手牌和公牌
-            currentPlayerReturnInfo.PlayerCards = allPlayCards[result.playerID].playerCard
-            currentPlayerReturnInfo.communityCard = community
-            returnPlayerInfos.append(currentPlayerReturnInfo)
-        }
+        //从大到小排序
+        returnPlayerInfos = returnPlayerInfos.sorted(by: {$0.playerRank > $1.playerRank})
         var leftCards:[Int] = []
         for card in deck{
             leftCards.append(card.cardIndex)

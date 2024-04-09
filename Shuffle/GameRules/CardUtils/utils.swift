@@ -8,15 +8,15 @@
 
 import Foundation
 
-class ResultStruct{
-    var playerID:Int = 0
-    var rank:Int = 0
-    
-    init(playerID:Int, rank:Int){
-        self.playerID = playerID
-        self.rank = rank
-    }
-}
+//class ResultStruct{
+//    var playerID:Int = 0
+//    var rank:Int = 0
+//    
+//    init(playerID:Int, rank:Int){
+//        self.playerID = playerID
+//        self.rank = rank
+//    }
+//}
     
 func initDeck(initialCards: [Int], suitRules: [Int]) -> [Card] {
     var deckList = [Card]()
