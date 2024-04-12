@@ -562,7 +562,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     //2侧或1侧 长或短
                     
                     var errorFlag = false
-                    var reportFlag = true
                     
                     if detectState.isShort && self.cutMode != 0{
                         //切牌
@@ -614,9 +613,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                                 self.speakText(input: 2)
                             }
                         
-                        if self.cutMode == 1 || self.cutMode == 2 || self.cutMode == 4{
-                            reportFlag = false
-                        }
                     }
                     else if detectState.isSingle
                         && (self.shuffleMode == 1 || self.shuffleMode == 2 || self.shuffleMode == 3 || self.shuffleMode == 4){
@@ -641,9 +637,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                             self.speakText(input: 1)
                         }
                         
-                        if self.cutMode == 1 || self.cutMode == 2 || self.cutMode == 4{
-                            reportFlag = false
-                        }
                     }
                     else{
                         errorFlag = true
@@ -652,7 +645,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     
                     print("result  isShort:\(detectState.isShort)  isSingle:\(detectState.isSingle)  cardArray:\(self.cardArray)")
                     
-                    if !errorFlag && reportFlag{
+                    if !errorFlag{
                         //self.computeWinnerPlayer()
                     }
                 }
