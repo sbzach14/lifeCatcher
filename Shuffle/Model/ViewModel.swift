@@ -1757,6 +1757,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 //                }
 //                winnerPlayerShow += "/"
 //            }
+            self.cardArray = multipleGamePlayerInfos.returnCardArray
             
             speakText(input: multipleGamePlayerInfos.reportResult)
         }
