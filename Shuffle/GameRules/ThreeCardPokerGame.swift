@@ -107,8 +107,7 @@ class ThreeCardPokerGameRule : Rule{
             4: "金花4选3[420]",
             5: "金花A23[306]",
             6: "金花5选3[560]",
-            7: "金花6选3[610]",
-            8: "自定义"
+            7: "金花6选3[610]"
         ]
         self.ruleInfo = [
             0:"""
@@ -1031,11 +1030,11 @@ class ThreeCardPokerGameHandEvaluator {
             if rankList[0] == rankList[1] {
                 pairRank = rankList[0]
                 singleRank = rankList[2]
-                cardType = "对" +  GameManager.CardNumberReportDic[cards[0].originalRank]!
+                cardType = "同花对" +  GameManager.CardNumberReportDic[cards[0].originalRank]!
             } else if rankList[1] == rankList[2] {
                 pairRank = rankList[1]
                 singleRank = rankList[0]
-                cardType = "对" +  GameManager.CardNumberReportDic[cards[1].originalRank]!
+                cardType = "同花对" +  GameManager.CardNumberReportDic[cards[1].originalRank]!
             }
         }
 
@@ -1106,7 +1105,7 @@ class ThreeCardPokerGameHandEvaluator {
                 rank = rank << 2 | targetSuit
             }
         }
-        return (rank, "同花对子", 1)
+        return (rank, "同花", 0)
     }
 
     func eval_straight(cards: [Card]) -> (Int, String, Int) {
@@ -1250,14 +1249,14 @@ class ThreeCardPokerGameHandEvaluator {
                 suitList.append(cards[0].suit[0])
                 suitList.append(cards[0].suit[0])
                 suitList.append(cards[1].suit[0])
-                cardType = "对" + GameManager.CardNumberReportDic[cards[0].originalRank]!
+                cardType = "真对" + GameManager.CardNumberReportDic[cards[0].originalRank]!
             } else if cards[1].suit.contains(cards[2].suit[0]) {
                 pairRank = cards[1].rank
                 singleRank = cards[0].rank
                 suitList.append(cards[1].suit[0])
                 suitList.append(cards[1].suit[0])
                 suitList.append(cards[0].suit[0])
-                cardType = "对" + GameManager.CardNumberReportDic[cards[1].originalRank]!
+                cardType = "真对" + GameManager.CardNumberReportDic[cards[1].originalRank]!
             }
         } else {
             if cards[0].rank == cards[1].rank && cards[0].suit.contains(cards[1].suit[0]) {
@@ -1266,7 +1265,7 @@ class ThreeCardPokerGameHandEvaluator {
                 suitList.append(cards[0].suit[0])
                 suitList.append(cards[0].suit[0])
                 suitList.append(cards[2].suit[0])
-                cardType = "对" + GameManager.CardNumberReportDic[cards[0].originalRank]!
+                cardType = "真对" + GameManager.CardNumberReportDic[cards[0].originalRank]!
             }
 
             if cards[1].rank == cards[2].rank && cards[1].suit.contains(cards[2].suit[0]) {
@@ -1275,7 +1274,7 @@ class ThreeCardPokerGameHandEvaluator {
                 suitList.append(cards[1].suit[0])
                 suitList.append(cards[1].suit[0])
                 suitList.append(cards[0].suit[0])
-                cardType = "对" +  GameManager.CardNumberReportDic[cards[1].originalRank]!
+                cardType = "真对" +  GameManager.CardNumberReportDic[cards[1].originalRank]!
             }
         }
 
@@ -1288,7 +1287,7 @@ class ThreeCardPokerGameHandEvaluator {
             }
         }
 
-        return (rank, cardType, 1)
+        return (rank, cardType, 0)
     }
     
     func eval_onepair(cards: [Card]) -> (Int, String, Int) {
