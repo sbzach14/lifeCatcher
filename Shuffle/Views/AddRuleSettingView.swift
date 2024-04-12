@@ -20,7 +20,14 @@ class generalRuleSetting{
         6:"九点半",
         7:"宝子",
         8:"佳佳宝",
-        9:"牌九"
+        9:"牌九",
+        10:"九点",
+        11:"4张",
+        12:"2张",
+        13:"3张",
+        14:"10点半",
+        15:"比鸡",
+        16:"十三水"
     ]
     static let allShuffleMode: [Int:String] = [
         0:"洗牌",
@@ -127,6 +134,7 @@ struct AddRuleSettingView: View{
                     self.cardToUse.append(cardIndex)
                 }
             }
+            let temp = RuleManager.allPreSetRules
             self.args = RuleManager.allPreSetRules[self.gameType]![self.setting]![0]
             self.suitRules = RuleManager.allPreSetRules[self.gameType]![self.setting]![1]
             for rankIndex in 0...RuleManager.allPreSetRules[self.gameType]![self.setting]![2].count - 1 {
@@ -665,8 +673,31 @@ struct AddRuleSettingView: View{
             break
         case 8:
             allCardIndex = JiaJiaBaoGame.getAllCardIndex(setting: self.setting)
+            break
         case 9:
             allCardIndex = CardNineGame.getAllCardIndex(setting: self.setting)
+            break
+        case 10:
+            allCardIndex = NinePointGame.getAllCardIndex(setting: self.setting)
+            break
+        case 11:
+            allCardIndex = FourCardGame.getAllCardIndex(setting: self.setting)
+            break
+        case 12:
+            allCardIndex = TwoCardGame.getAllCardIndex(setting: self.setting)
+            break
+        case 13:
+            allCardIndex = ThreeCardPointGame.getAllCardIndex(setting: self.setting)
+            break
+        case 14:
+            allCardIndex = TenPointFiveGame.getAllCardIndex(setting: self.setting)
+            break
+        case 15:
+            allCardIndex = ChickenBattleGame.getAllCardIndex(setting: self.setting)
+            break
+        case 16:
+            allCardIndex = ThirteenWaterGame.getAllCardIndex(setting: self.setting)
+            break
         default:
             print("GameType error")
         }

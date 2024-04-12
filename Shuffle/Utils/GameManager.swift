@@ -185,23 +185,7 @@ class GameManager {
         
         // 定义一个字典，将游戏索引映射到游戏函数
         // 返回的result包括两个int数组，一个是按牌大小从大到小排序的玩家编号数组，一个是这一轮结束之后牌库里剩下的牌
-        let gameFunctions: [Int: ([[Bool]],[Int], [Int], [Int], [Int], [Int]) -> ([Int],[Int],[Int])] = [:
-//            0: TexasPoker.FindWinner,
-//            1: PokerBull.FindWinner,
-//            2: ThreeCardPokerGame.FindWinner,
-//            3: TinyNineGame.FindWinner,
-//            4: ThreeMenGame.FindWinner,
-//            5: TwoEightGangGame.FindWinner,
-//            6: NinePointFiveGame.FindWinner,
-//            7: BaoziGame.FindWinner,
-//            8: JiaJiaBaoGame.FindWinner,
-//            9: CardNineGame.FindWinner,
-//            10: NinePointGame.FindWinner,
-//            11: FourCardGame.FindWinner(diyDealStatus:diyDealNum:inputCards:args:rankRules:suitRules:),
-//            12: TwoCardGame.FindWinner(diyDealStatus:diyDealNum:inputCards:args:rankRules:suitRules:),
-//            13: ThreeCardPointGame.FindWinner(diyDealStatus:diyDealNum:inputCards:args:rankRules:suitRules:),
-//            14: TenPointFiveGame.FindWinner(diyDealStatus:diyDealNum:inputCards:args:rankRules:suitRules:)
-        ]
+
         
         let (multipleGameInfo, leftCards) =  ReportManager.GameReporter(gameIndex: gameIndex, inputCards: inputCards, cutCardIndexList: cutCardIndexArray, diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, newArgs: newArgs, rankRules: rankRules, suitRules: suitRules, reportID: calMode, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, targetPos: targetPos, coloringType: coloringType, consecutiveNum: consecutiveReport)
         
@@ -3189,7 +3173,195 @@ public class RuleManager{
             
 //            比鸡
             case 15:
+                let rule = GameManager.gameRules[i] as! ChickenBattleGameRule
+                for j in 0...rule.setting.count - 1{
+                    allPreSetRules[i]![j] = []
+                }
+//                0: "比鸡比道数[902]",
+                var handNum = 9
+                var communityNum = 0
+                var winCondition = 1
+                var AStraightMin = 0
+                var jokerChangeSetting = 0
+                var jokerThreeCardSetting = 0
+
+                args = [handNum, communityNum, winCondition, AStraightMin, jokerChangeSetting, jokerThreeCardSetting]
+                suitRules = [3,2,1,0]
+                rankRules = [5,4,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1]
+                allPreSetRules[i]![0]!.append(args)
+                allPreSetRules[i]![0]!.append(suitRules)
+                allPreSetRules[i]![0]!.append(rankRules)
+                allPreSetRules[i]![0]!.append(rankRuleChecked)
                 
+//                1: "比鸡百变尾墩大[903]",
+
+                handNum = 9
+                communityNum = 0
+                winCondition = 0
+                AStraightMin = 0
+                jokerChangeSetting = 1
+                jokerThreeCardSetting = 0
+
+                args = [handNum, communityNum, winCondition, AStraightMin, jokerChangeSetting, jokerThreeCardSetting]
+                suitRules = [3,2,1,0]
+                rankRules = [5,4,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1]
+                allPreSetRules[i]![1]!.append(args)
+                allPreSetRules[i]![1]!.append(suitRules)
+                allPreSetRules[i]![1]!.append(rankRules)
+                allPreSetRules[i]![1]!.append(rankRuleChecked)
+                
+//                2: "比鸡百变尾墩大4[904]",
+                
+                handNum = 9
+                communityNum = 0
+                winCondition = 0
+                AStraightMin = 0
+                jokerChangeSetting = 0
+                jokerThreeCardSetting = 0
+
+                args = [handNum, communityNum, winCondition, AStraightMin, jokerChangeSetting, jokerThreeCardSetting]
+                suitRules = [3,2,1,0]
+                rankRules = [5,4,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1]
+                allPreSetRules[i]![2]!.append(args)
+                allPreSetRules[i]![2]!.append(suitRules)
+                allPreSetRules[i]![2]!.append(rankRules)
+                allPreSetRules[i]![2]!.append(rankRuleChecked)
+//                3: "比鸡百变尾墩大5[905]",
+                handNum = 9
+                communityNum = 0
+                winCondition = 0
+                AStraightMin = 0
+                jokerChangeSetting = 0
+                jokerThreeCardSetting = 1
+
+                args = [handNum, communityNum, winCondition, AStraightMin, jokerChangeSetting, jokerThreeCardSetting]
+                suitRules = [3,2,1,0]
+                rankRules = [5,4,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1]
+                allPreSetRules[i]![3]!.append(args)
+                allPreSetRules[i]![3]!.append(suitRules)
+                allPreSetRules[i]![3]!.append(rankRules)
+                allPreSetRules[i]![3]!.append(rankRuleChecked)
+//                4: "比鸡百变尾墩大2[906]",
+                handNum = 9
+                communityNum = 0
+                winCondition = 0
+                AStraightMin = 0
+                jokerChangeSetting = 1
+                jokerThreeCardSetting = 1
+
+                args = [handNum, communityNum, winCondition, AStraightMin, jokerChangeSetting, jokerThreeCardSetting]
+                suitRules = [3,2,1,0]
+                rankRules = [5,4,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1]
+                allPreSetRules[i]![4]!.append(args)
+                allPreSetRules[i]![4]!.append(suitRules)
+                allPreSetRules[i]![4]!.append(rankRules)
+                allPreSetRules[i]![4]!.append(rankRuleChecked)
+//                5: "比鸡9张金花[907]",
+                
+                handNum = 9
+                communityNum = 0
+                winCondition = 2
+                AStraightMin = 0
+                jokerChangeSetting = 0
+                jokerThreeCardSetting = 0
+
+                args = [handNum, communityNum, winCondition, AStraightMin, jokerChangeSetting, jokerThreeCardSetting]
+                suitRules = [3,2,1,0]
+                rankRules = [5,4,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1]
+                allPreSetRules[i]![5]!.append(args)
+                allPreSetRules[i]![5]!.append(suitRules)
+                allPreSetRules[i]![5]!.append(rankRules)
+                allPreSetRules[i]![5]!.append(rankRuleChecked)
+                
+//                6: "比鸡比道数A23[908]",
+                handNum = 9
+                communityNum = 0
+                winCondition = 1
+                AStraightMin = 1
+                jokerChangeSetting = 0
+                jokerThreeCardSetting = 0
+
+                args = [handNum, communityNum, winCondition, AStraightMin, jokerChangeSetting, jokerThreeCardSetting]
+                suitRules = [3,2,1,0]
+                rankRules = [5,4,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1]
+                allPreSetRules[i]![6]!.append(args)
+                allPreSetRules[i]![6]!.append(suitRules)
+                allPreSetRules[i]![6]!.append(rankRules)
+                allPreSetRules[i]![6]!.append(rankRuleChecked)
+//                7: "比鸡9张金花A23[909",
+                handNum = 9
+                communityNum = 0
+                winCondition = 2
+                AStraightMin = 1
+                jokerChangeSetting = 0
+                jokerThreeCardSetting = 0
+
+                args = [handNum, communityNum, winCondition, AStraightMin, jokerChangeSetting, jokerThreeCardSetting]
+                suitRules = [3,2,1,0]
+                rankRules = [5,4,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1]
+                allPreSetRules[i]![7]!.append(args)
+                allPreSetRules[i]![7]!.append(suitRules)
+                allPreSetRules[i]![7]!.append(rankRules)
+                allPreSetRules[i]![7]!.append(rankRuleChecked)
+
+//                8: "比鸡9张百变金花[910]",
+                handNum = 9
+                communityNum = 0
+                winCondition = 2
+                AStraightMin = 0
+                jokerChangeSetting = 1
+                jokerThreeCardSetting = 1
+
+                args = [handNum, communityNum, winCondition, AStraightMin, jokerChangeSetting, jokerThreeCardSetting]
+                suitRules = [3,2,1,0]
+                rankRules = [5,4,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1]
+                allPreSetRules[i]![8]!.append(args)
+                allPreSetRules[i]![8]!.append(suitRules)
+                allPreSetRules[i]![8]!.append(rankRules)
+                allPreSetRules[i]![8]!.append(rankRuleChecked)
+//                9: "比鸡9张百变金花A23[...",
+                
+                handNum = 9
+                communityNum = 0
+                winCondition = 2
+                AStraightMin = 1
+                jokerChangeSetting = 1
+                jokerThreeCardSetting = 1
+
+                args = [handNum, communityNum, winCondition, AStraightMin, jokerChangeSetting, jokerThreeCardSetting]
+                suitRules = [3,2,1,0]
+                rankRules = [5,4,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1]
+                allPreSetRules[i]![9]!.append(args)
+                allPreSetRules[i]![9]!.append(suitRules)
+                allPreSetRules[i]![9]!.append(rankRules)
+                allPreSetRules[i]![9]!.append(rankRuleChecked)
+//                10: "比鸡百变尾墩大[912]",
+                handNum = 9
+                communityNum = 0
+                winCondition = 0
+                AStraightMin = 1
+                jokerChangeSetting = 2
+                jokerThreeCardSetting = 1
+
+                args = [handNum, communityNum, winCondition, AStraightMin, jokerChangeSetting, jokerThreeCardSetting]
+                suitRules = [3,2,1,0]
+                rankRules = [5,4,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1]
+                allPreSetRules[i]![10]!.append(args)
+                allPreSetRules[i]![10]!.append(suitRules)
+                allPreSetRules[i]![10]!.append(rankRules)
+                allPreSetRules[i]![10]!.append(rankRuleChecked)
+
                 break
                 
             //十三水

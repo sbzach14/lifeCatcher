@@ -1682,7 +1682,10 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             11: FourCardGame.getMinCardNum,
             12: TwoCardGame.getMinCardNum,
             13: ThreeCardPointGame.getMinCardNum,
-            14: TenPointFiveGame.getMinCardNum
+            14: TenPointFiveGame.getMinCardNum,
+            15: ChickenBattleGame.getMinCardNum,
+            16: ThirteenWaterGame.getMinCardNum,
+            
         ]
         
         let gameFunction = gameFunctions[gameIndex]
