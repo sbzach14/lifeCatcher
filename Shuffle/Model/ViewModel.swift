@@ -1030,9 +1030,10 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 
                 print("index ", detectResultListIndex,
                       cardLabelDic[nowNum0] ?? "none", detectResultNode0.nodeType, detectResultNode0.laplacianVariance, detectResultNode0.confidence, detectResultNode0.confidencePercent,
-                      cardLabelDic[nowNum1] ?? "none", detectResultNode0.nodeType, detectResultNode1.laplacianVariance, detectResultNode1.confidence, detectResultNode1.confidencePercent)
+                      cardLabelDic[nowNum1] ?? "none", detectResultNode1.nodeType, detectResultNode1.laplacianVariance, detectResultNode1.confidence, detectResultNode1.confidencePercent)
                 
-                if (nodeType0 == 2 || nodeType0 == 4) && (nodeType1 == 2 || nodeType1 == 4){
+                if (nodeType0 == 2 || nodeType0 == 4)
+                    && (nodeType1 == 2 || nodeType1 == 4){
                     
                     var leftLaplacianPercent : Float = 1
                     var rightLaplacianPercent : Float = 1
@@ -1128,7 +1129,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 
                 //单个插入
                 else{
-                    if nodeType0 == 4 || nodeType0 == 2{
+                    if (nodeType0 == 4 && !isSingle) || nodeType0 == 2{
                         
                         detectCardArray.insert(nowNum0, at: 0)
                         
@@ -1162,7 +1163,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 //                            detectCardArray.insert(nowNum0, at: 0)
 //                        }
                     }
-                    if nodeType1 == 4 || nodeType1 == 2{
+                    if (nodeType1 == 4 && !isSingle) || nodeType1 == 2{
                         
                         detectCardArray.insert(nowNum1, at: 0)
                         
@@ -1712,29 +1713,32 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         
         self.cutArray = []
         self.cutShowArray = []
-        let cutCard : Int = self.cardArray.randomElement()!
-        var cutIndex = self.cardArray.firstIndex(of: cutCard)!
-        if self.cutMode == 1{
-            //看底
-            self.cutCardArray(index: cutIndex)
-        }
-        else if self.cutMode == 2{
-            //看顶
-            cutIndex -= 1
-            if cutIndex < 0{
-                cutIndex = self.cardArray.count - 1
+        
+        if self.cutMode != 0{
+            let cutCard : Int = self.cardArray.randomElement()!
+            var cutIndex = self.cardArray.firstIndex(of: cutCard)!
+            if self.cutMode == 1{
+                //看底
+                self.cutCardArray(index: cutIndex)
             }
-            self.cutCardArray(index: cutIndex)
+            else if self.cutMode == 2{
+                //看顶
+                cutIndex -= 1
+                if cutIndex < 0{
+                    cutIndex = self.cardArray.count - 1
+                }
+                self.cutCardArray(index: cutIndex)
+            }
+            else if self.cutMode == 3{
+                //切牌
+                self.cutArray.append(cutCard)
+            }
+            else if self.cutMode == 4{
+                //看手
+                self.cutArray.append(cutCard)
+            }
+            self.cutShowArray.append(cutCard)
         }
-        else if self.cutMode == 3{
-            //切牌
-            self.cutArray.append(cutCard)
-        }
-        else if self.cutMode == 4{
-            //看手
-            self.cutArray.append(cutCard)
-        }
-        self.cutShowArray.append(cutCard)
         
         computeWinnerPlayer()
     }

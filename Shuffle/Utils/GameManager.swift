@@ -41,10 +41,10 @@ class GameManager {
     ]
     
     static var SuitReportDix: [Int: String] = [
-        0: "黑桃",
-        1: "红桃",
-        2: "梅花",
-        3: "方片"
+        3: "黑桃",
+        2: "红桃",
+        1: "梅花",
+        0: "方片"
     ]
     
     
@@ -3181,7 +3181,7 @@ public class RuleManager{
                 var handNum = 9
                 var communityNum = 0
                 var winCondition = 1
-                var AStraightMin = 0
+                var AStraightMin = 1
                 var jokerChangeSetting = 0
                 var jokerThreeCardSetting = 0
 
@@ -3199,7 +3199,7 @@ public class RuleManager{
                 handNum = 9
                 communityNum = 0
                 winCondition = 0
-                AStraightMin = 0
+                AStraightMin = 1
                 jokerChangeSetting = 1
                 jokerThreeCardSetting = 0
 
@@ -3217,7 +3217,7 @@ public class RuleManager{
                 handNum = 9
                 communityNum = 0
                 winCondition = 0
-                AStraightMin = 0
+                AStraightMin = 1
                 jokerChangeSetting = 0
                 jokerThreeCardSetting = 0
 
@@ -3233,7 +3233,7 @@ public class RuleManager{
                 handNum = 9
                 communityNum = 0
                 winCondition = 0
-                AStraightMin = 0
+                AStraightMin = 1
                 jokerChangeSetting = 0
                 jokerThreeCardSetting = 1
 
@@ -3249,7 +3249,7 @@ public class RuleManager{
                 handNum = 9
                 communityNum = 0
                 winCondition = 0
-                AStraightMin = 0
+                AStraightMin = 1
                 jokerChangeSetting = 1
                 jokerThreeCardSetting = 1
 
@@ -3266,7 +3266,7 @@ public class RuleManager{
                 handNum = 9
                 communityNum = 0
                 winCondition = 2
-                AStraightMin = 0
+                AStraightMin = 1
                 jokerChangeSetting = 0
                 jokerThreeCardSetting = 0
 
@@ -3283,7 +3283,7 @@ public class RuleManager{
                 handNum = 9
                 communityNum = 0
                 winCondition = 1
-                AStraightMin = 1
+                AStraightMin = 0
                 jokerChangeSetting = 0
                 jokerThreeCardSetting = 0
 
@@ -3299,7 +3299,7 @@ public class RuleManager{
                 handNum = 9
                 communityNum = 0
                 winCondition = 2
-                AStraightMin = 1
+                AStraightMin = 0
                 jokerChangeSetting = 0
                 jokerThreeCardSetting = 0
 
@@ -3316,7 +3316,7 @@ public class RuleManager{
                 handNum = 9
                 communityNum = 0
                 winCondition = 2
-                AStraightMin = 0
+                AStraightMin = 1
                 jokerChangeSetting = 1
                 jokerThreeCardSetting = 1
 
@@ -3375,7 +3375,7 @@ public class RuleManager{
                 var handNum = 13
                 var communityNum = 0
                 var winCondition = 0
-                var AStraightMin = 0
+                var AStraightMin = 1
                 var isDouble = 0
                 
                 args = [handNum, communityNum, winCondition, AStraightMin, isDouble]
@@ -3390,7 +3390,7 @@ public class RuleManager{
                 handNum = 13
                 communityNum = 0
                 winCondition = 1
-                AStraightMin = 0
+                AStraightMin = 1
                 isDouble = 1
 
                 args = [handNum, communityNum, winCondition, AStraightMin, isDouble]
@@ -3406,7 +3406,7 @@ public class RuleManager{
                 handNum = 13
                 communityNum = 0
                 winCondition = 0
-                AStraightMin = 0
+                AStraightMin = 1
                 isDouble = 0
 
                 args = [handNum, communityNum, winCondition, AStraightMin, isDouble]
@@ -3423,7 +3423,7 @@ public class RuleManager{
                 handNum = 13
                 communityNum = 0
                 winCondition = 1
-                AStraightMin = 0
+                AStraightMin = 1
                 isDouble = 0
 
                 args = [handNum, communityNum, winCondition, AStraightMin, isDouble]
@@ -3440,7 +3440,7 @@ public class RuleManager{
                 handNum = 13
                 communityNum = 0
                 winCondition = 1
-                AStraightMin = 0
+                AStraightMin = 1
                 isDouble = 0
                 
                 args = [handNum, communityNum, winCondition, AStraightMin, isDouble]
@@ -3456,7 +3456,7 @@ public class RuleManager{
                 handNum = 13
                 communityNum = 0
                 winCondition = 2
-                AStraightMin = 0
+                AStraightMin = 1
                 isDouble = 0
                 
                 args = [handNum, communityNum, winCondition, AStraightMin,isDouble]
@@ -3472,7 +3472,7 @@ public class RuleManager{
                 handNum = 13
                 communityNum = 0
                 winCondition = 1
-                AStraightMin = 1
+                AStraightMin = 0
                 isDouble = 0
                 
                 args = [handNum, communityNum, winCondition, AStraightMin, isDouble]
@@ -3487,7 +3487,7 @@ public class RuleManager{
                 handNum = 13
                 communityNum = 0
                 winCondition = 2
-                AStraightMin = 1
+                AStraightMin = 0
                 isDouble = 0
                 
                 args = [handNum, communityNum, winCondition, AStraightMin, isDouble]

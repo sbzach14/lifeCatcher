@@ -85,6 +85,9 @@ extension Array {
         for (index, element) in self.enumerated() {
             var reduced = self
             reduced.removeFirst(index + 1)
+            if reduced.count < count - 1{
+                break
+            }
             let subcombinations = reduced.combinations(ofCount: count - 1)
             for subcombination in subcombinations {
                 result.append([element] + subcombination)
