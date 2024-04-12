@@ -336,9 +336,11 @@ class ThirteenWaterGameHandEvaluator{
     var ruleDict: [Int: ([ThirteenWaterCard], Int) -> ([Int], [String], Int, [[Int]])] = [:]
     var AStraightMin: Int
     var turn: Int
+    
     init(rankRules: [Int],
          suitRules: [Int],
-         AStraightMin: Int, turn: Int){
+         AStraightMin: Int, 
+         turn: Int){
         self.rankRules = rankRules
         self.suitRules = suitRules
         self.AStraightMin = AStraightMin
@@ -433,9 +435,9 @@ class ThirteenWaterGameHandEvaluator{
                     usedCardIndexList.append(currentStraightUsedCardIndex)
                     
                     var rank = straightRankList[i] >> 2
-                    rank = rank << 2 | suit
+                    let cardType = "同花顺" + String(rank)
                     
-                    let cardType = "同花顺" + GameManager.SuitReportDix[suit]!
+                    rank = rank << 2 | suit
                     
                     rankList.append(rank)
                     cardTypeList.append(cardType)
@@ -600,7 +602,7 @@ class ThirteenWaterGameHandEvaluator{
                 }
                 var flushRank = cards[currentUsedCardIndex[0]].rank
                 if flushRank == 15{
-                    flushRank = 14
+                    flushRank = 0
                 }
                 
                 rank = rank << 4 | flushRank
@@ -630,7 +632,7 @@ class ThirteenWaterGameHandEvaluator{
         var length = 0
         for index in allIndex{
             let nowNum = cards[index].rank
-            if nowNum == -1{
+            if nowNum == 15{
                 jokerNum += 1
             }
             else if lastNum - nowNum - 1 > jokerNum{
@@ -716,7 +718,7 @@ class ThirteenWaterGameHandEvaluator{
                             headSuit = cards[currentCombination[cntC]].suit
                         }
                         else{
-                            headRank = 5
+                            headRank = 3
                             headSuit = cards[currentCombination[cntC]].suit
                         }
                     }
@@ -759,7 +761,9 @@ class ThirteenWaterGameHandEvaluator{
             if headRank != -1{
                 usedCardIndexList.append(currentCombination)
                 var rank = 0
-                
+                if headSuit == -1{
+                    headSuit = 0
+                }
                 rank = rank << 4 | headRank
                 rank = rank << 2 | headSuit
 
@@ -1012,7 +1016,7 @@ class ThirteenWaterGameHandEvaluator{
             }
         }
 
-        return ([rank], ["单牌"], 0, [usedCardIndexList])
+        return ([rank], ["单牌"+String(rank)], 0, [usedCardIndexList])
     }
     
     class ThirteenWaterCard{
