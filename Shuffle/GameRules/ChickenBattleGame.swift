@@ -298,7 +298,7 @@ class ChickenBattleGame{
                 var maxRank = 0
                 
                 for i in 0..<playerNum {
-                    let currentRank = playerRankList[i][0]
+                    let currentRank = playerRankList[i][turn]
                     if currentRank > maxRank{
                         maxRank = currentRank
                         maxPlayer = i
