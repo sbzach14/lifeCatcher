@@ -341,10 +341,10 @@ public class RuleManager{
         allPreSetReportRules[57] = ReportClass.init(reportName: "[88]上10张去牌面为色色先发保位置最小", reportID: 57, rankReport: 3, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 11, reportTarget: 1, cardsTransformation: 23, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1, reportFormation: -1)
         allPreSetReportRules[58] = ReportClass.init(reportName: "[91]上10张去牌保无牛或最多一家有牛", reportID: 58, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 11, reportTarget: 7, cardsTransformation: 23, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1, reportFormation: -1)
         allPreSetReportRules[59] = ReportClass.init(reportName: "[92]上10张去牌保至少一家牛牛", reportID: 59, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 11, reportTarget: 8, cardsTransformation: 23, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1, reportFormation: -1)
-        allPreSetReportRules[60] = ReportClass.init(reportName: "[94]上下5张去牌保1门最小有两家同点", reportID: 60, rankReport: 3, aliveDeathReport: -1, pairReport: -1, drawPointReport: 2, ninePointReport: -1,  reportCutRange: 1, reportTarget: 1, cardsTransformation: 7, consecutiveReport: -1, positionToReport: 2, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1, reportFormation: -1)
+        allPreSetReportRules[60] = ReportClass.init(reportName: "[94]上下5张去牌保1门最小有两家同点", reportID: 60, rankReport: 3, aliveDeathReport: -1, pairReport: -1, drawPointReport: 0, ninePointReport: -1,  reportCutRange: 1, reportTarget: 11, cardsTransformation: 7, consecutiveReport: -1, positionToReport: 2, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1, reportFormation: -1)
         allPreSetReportRules[61] = ReportClass.init(reportName: "[95]上下5张去牌保4门最大", reportID: 61, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 1, reportTarget: 1, cardsTransformation: 7, consecutiveReport: -1, positionToReport: 2, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1, reportFormation: -1)
-        allPreSetReportRules[62] = ReportClass.init(reportName: "[96]上下5张去牌保34门有最大报最大", reportID: 62, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 1, reportTarget: 1, cardsTransformation: 7, consecutiveReport: -1, positionToReport: 3, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1, reportFormation: -1)
-        allPreSetReportRules[63] = ReportClass.init(reportName: "[97]上下5张去牌保2门是活门报最大", reportID: 63, rankReport: 0, aliveDeathReport: -1, pairReport: 0, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 1, reportTarget: 5, cardsTransformation: 7, consecutiveReport: -1, positionToReport: 2, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1, reportFormation: -1)
+        allPreSetReportRules[62] = ReportClass.init(reportName: "[96]上下5张去牌保34门有最大报最大", reportID: 62, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 1, reportTarget: 3, cardsTransformation: 7, consecutiveReport: -1, positionToReport: 3, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1, reportFormation: -1)
+        allPreSetReportRules[63] = ReportClass.init(reportName: "[97]上下5张去牌保2门是活门报最大", reportID: 63, rankReport: 0, aliveDeathReport: 0, pairReport: 0, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 1, reportTarget: 5, cardsTransformation: 7, consecutiveReport: -1, positionToReport: 2, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1, reportFormation: -1)
         allPreSetReportRules[64] = ReportClass.init(reportName: "[98]上下5张打色色先发保位置最小", reportID: 64, rankReport: 3, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 5, reportTarget: 1, cardsTransformation: 8, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1, reportFormation: -1)
         allPreSetReportRules[65] = ReportClass.init(reportName: "[99]上下5张打色色先发保位置最大", reportID: 65, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 5, reportTarget: 1, cardsTransformation: 8, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1, reportFormation: -1)
         allPreSetReportRules[66] = ReportClass.init(reportName: "[100]上下5张打色留色保位置最大", reportID: 66, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 5, reportTarget: 1, cardsTransformation: 9, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1, reportFormation: -1)
@@ -360,7 +360,7 @@ public class RuleManager{
         allPreSetReportRules[76] = ReportClass.init(reportName: "[112]下10张打色留色面牌移动到色牌下面保位置最大", reportID: 76, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 2, reportTarget: 1, cardsTransformation: 25, consecutiveReport: -1, positionToReport: 0, colorCardPos: 15, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1, reportFormation: -1)
         allPreSetReportRules[77] = ReportClass.init(reportName: "[120]下10张打色色牌先发保位置最大次大", reportID: 77, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 2, reportTarget: 1, cardsTransformation: 26, consecutiveReport: -1, positionToReport: 0, colorCardPos: 15, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1, reportFormation: -1)
         allPreSetReportRules[78] = ReportClass.init(reportName: "[121]下10张打色色牌先发保位置最小次小", reportID: 78, rankReport: 4, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 2, reportTarget: 1, cardsTransformation: 26, consecutiveReport: -1, positionToReport: 0, colorCardPos: 15, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1, reportFormation: -1)
-        allPreSetReportRules[79] = ReportClass.init(reportName: "[130]看手牌报生死门", reportID: 79, rankReport: 0, aliveDeathReport: 1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 6, reportTarget: 0, cardsTransformation: 18, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1, reportFormation: -1)
+        allPreSetReportRules[79] = ReportClass.init(reportName: "[130]看手牌报生死门", reportID: 79, rankReport: 0, aliveDeathReport: 0, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 6, reportTarget: 0, cardsTransformation: 18, consecutiveReport: -1, positionToReport: 0, colorCardPos: 0, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: 1, reportFormation: -1)
         allPreSetReportRules[80] = ReportClass.init(reportName: "[131]看手牌报最大", reportID: 80, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 6, reportTarget: 0, cardsTransformation: 18, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1, reportFormation: -1)
         allPreSetReportRules[81] = ReportClass.init(reportName: "[132]看手牌报最大次大", reportID: 81, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 6, reportTarget: 0, cardsTransformation: 18, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1, reportFormation: -1)
         allPreSetReportRules[82] = ReportClass.init(reportName: "[133]看手牌报最大次大生死门", reportID: 82, rankReport: 1, aliveDeathReport: 0, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 6, reportTarget: 0, cardsTransformation: 18, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1, reportFormation: -1)
@@ -3186,6 +3186,139 @@ public class RuleManager{
                 allPreSetRules[i]![1]!.append(rankRuleChecked)
                 
                 break
+            
+//            比鸡
+            case 15:
+                
+                break
+                
+            //十三水
+            case 16:
+                let rule = GameManager.gameRules[i] as! ThirteenWaterGameRule
+                for j in 0...rule.setting.count - 1{
+                    allPreSetRules[i]![j] = []
+                }
+                
+//                0: "尾墩大13张[1302]",
+                var handNum = 13
+                var communityNum = 0
+                var winCondition = 0
+                var AStraightMin = 0
+
+                args = [handNum, communityNum, winCondition, AStraightMin]
+                suitRules = [3,2,1,0]
+                rankRules = [8,7,6,5,4,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![0]!.append(args)
+                allPreSetRules[i]![0]!.append(suitRules)
+                allPreSetRules[i]![0]!.append(rankRules)
+                allPreSetRules[i]![0]!.append(rankRuleChecked)
+//                1: "道数13张翻倍[1301]",
+                handNum = 13
+                communityNum = 0
+                winCondition = 1
+                AStraightMin = 0
+
+                args = [handNum, communityNum, winCondition, AStraightMin]
+                suitRules = [3,2,1,0]
+                rankRules = [8,7,6,5,4,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![1]!.append(args)
+                allPreSetRules[i]![1]!.append(suitRules)
+                allPreSetRules[i]![1]!.append(rankRules)
+                allPreSetRules[i]![1]!.append(rankRuleChecked)
+                
+//                2: "54张百变13张[1303]",
+                handNum = 13
+                communityNum = 0
+                winCondition = 0
+                AStraightMin = 0
+
+                args = [handNum, communityNum, winCondition, AStraightMin]
+                suitRules = [3,2,1,0]
+                rankRules = [8,7,6,5,4,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![2]!.append(args)
+                allPreSetRules[i]![2]!.append(suitRules)
+                allPreSetRules[i]![2]!.append(rankRules)
+                allPreSetRules[i]![2]!.append(rankRuleChecked)
+                
+//                3: "道数13张不翻倍[1300]",
+                
+                handNum = 13
+                communityNum = 0
+                winCondition = 1
+                AStraightMin = 0
+
+                args = [handNum, communityNum, winCondition, AStraightMin]
+                suitRules = [3,2,1,0]
+                rankRules = [8,7,6,5,4,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![3]!.append(args)
+                allPreSetRules[i]![3]!.append(suitRules)
+                allPreSetRules[i]![3]!.append(rankRules)
+                allPreSetRules[i]![3]!.append(rankRuleChecked)
+
+//                4: "道数13张不翻倍[1...",
+
+                handNum = 13
+                communityNum = 0
+                winCondition = 1
+                AStraightMin = 0
+                
+                args = [handNum, communityNum, winCondition, AStraightMin]
+                suitRules = [3,2,1,0]
+                rankRules = [8,7,6,5,4,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![4]!.append(args)
+                allPreSetRules[i]![4]!.append(suitRules)
+                allPreSetRules[i]![4]!.append(rankRules)
+                allPreSetRules[i]![4]!.append(rankRuleChecked)
+//                5: "道数13张比两道[1...",
+                
+                handNum = 13
+                communityNum = 0
+                winCondition = 2
+                AStraightMin = 0
+                
+                args = [handNum, communityNum, winCondition, AStraightMin]
+                suitRules = [3,2,1,0]
+                rankRules = [8,7,6,5,4,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![5]!.append(args)
+                allPreSetRules[i]![5]!.append(suitRules)
+                allPreSetRules[i]![5]!.append(rankRules)
+                allPreSetRules[i]![5]!.append(rankRuleChecked)
+                
+//                6: "道数13张不翻倍A2345二大",
+                handNum = 13
+                communityNum = 0
+                winCondition = 1
+                AStraightMin = 1
+                
+                args = [handNum, communityNum, winCondition, AStraightMin]
+                suitRules = [3,2,1,0]
+                rankRules = [8,7,6,5,4,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![6]!.append(args)
+                allPreSetRules[i]![6]!.append(suitRules)
+                allPreSetRules[i]![6]!.append(rankRules)
+                allPreSetRules[i]![6]!.append(rankRuleChecked)
+//                7: "道数13张比两道A2345二大",
+                handNum = 13
+                communityNum = 0
+                winCondition = 2
+                AStraightMin = 1
+                
+                args = [handNum, communityNum, winCondition, AStraightMin]
+                suitRules = [3,2,1,0]
+                rankRules = [8,7,6,5,4,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![7]!.append(args)
+                allPreSetRules[i]![7]!.append(suitRules)
+                allPreSetRules[i]![7]!.append(rankRules)
+                allPreSetRules[i]![7]!.append(rankRuleChecked)
+                
             default:
                 print("There is no preset rule for this game!!!!!")
                 break

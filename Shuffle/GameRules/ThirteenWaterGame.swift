@@ -38,10 +38,62 @@ class ThirteenWaterGameRule : Rule{
             0: "单牌"
         ]
         self.setting = [
-            0: "",
+            0: "尾墩大13张[1302]",
+            1: "道数13张翻倍[1301]",
+            2: "54张百变13张[1303]",
+            3: "道数13张不翻倍[1300]",
+            4: "道数13张不翻倍[1...",
+            5: "道数13张比两道[1...",
+            6: "道数13张不翻倍A2345二大",
+            7: "道数13张比两道A2345二大",
         ]
         self.ruleInfo = [
-            0: ""
+            0: """
+52张牌，每人13张
+1.清顺 >炸弹> 3带2>清一色>顺子>3不带>2对>1对
+2.保尾墩最大
+""",
+            1: """
+52张牌，每人13张
+1.清顺 >炸弹>3带2>清一色>顺子>3不带>2对>1对
+2.保总道数最大
+""",
+            2: """
+54张牌，每人13张.王百变
+1.清顺 >炸弹> 3带2>清一色>顺子>3不带>2对>1对
+2.保尾墩最大
+""",
+            3: """
+52张牌，每人13张
+1.清顺 >炸弹> 3带2>清一色>顺子>3不带>2对>1对
+2.保总道数最大。不翻倍
+""",
+            4: """
+52张牌，每人13张
+1.其他规则:
+1).清顺 >炸弹> 3带2 >清一色>顺子>3不带>2对>1对
+2).保总道数最大
+""",
+            5: """
+52张牌，每人13张
+1.清顺>炸弹>3带2>清一色>顺子>3不带>2对>1对
+2.和其他三家比，赢两道及三道最多一家为最大
+""",
+            6: """
+52张牌，每人13张
+1.其他规则:
+1).清顺 >炸弹> 3带2>清一色>顺子>3不带>2对>1对
+2).保总道数最大
+3)顺大小规则:
+AKQJ10>A2345>KQJ109>....>23456
+""",
+            7: """
+52张牌，每人13张
+1.清顺>炸弹>3带2>清一色>顺子>3不带>2对>1对
+2.和其他三家比，赢两道及三道最多一家为最大
+3.顺大小规则:
+AKQJ10>A2345>KQJ109>....>23456
+""",
         ]
         
         self.playerNum = [2,3,4]
@@ -54,7 +106,7 @@ class ThirteenWaterGame{
     
     static func FindWinner(diyDealStatus:[[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
         
-        var deck = initDeck(initialCards: inputCards, suitRules: suitRules)
+        let deck = initDeck(initialCards: inputCards, suitRules: suitRules)
         let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
         return (winners, leftCards)
     }
@@ -1021,8 +1073,6 @@ class ThirteenWaterGameHandEvaluator{
         var originRank : Int = 0
         
         init(card: Card){
-            let rule = GameManager.gameRules[16] as! ThirteenWaterGameRule
-            
             self.originRank = card.rank
             
             if card.rank == 14 || card.rank == 15{

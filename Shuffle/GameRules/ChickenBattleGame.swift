@@ -117,8 +117,6 @@ class ChickenBattleGame{
         let communityNum = args[4]
         let redJokerValueRange = args[5]
 
-
-        
         var maxRank = 0
         var returnPlayerInfos: [GameReturnPlayerInfo] = []
 
