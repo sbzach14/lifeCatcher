@@ -123,7 +123,7 @@ class TinyNineGame{
     //6 samePointComparision
     
     static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
-        let rule  = GameManager.gameRules[3] as! TinyNineGameRule
+
         let dealNum = args[0]
         let dealType = args[1]
         let playerNum = args[2]
@@ -134,7 +134,6 @@ class TinyNineGame{
         let samePointComparision = args[7]
         
         
-        var maxRank = 0
         var allPlayCards: [Player] = []
         var community = [Card]()
         var returnPlayerInfos: [GameReturnPlayerInfo] = []
@@ -210,12 +209,6 @@ class TinyNineGame{
                     }
                 }
             }
-        }
-        
-        //存入手牌和公牌
-        for i in 0..<playerNum{
-            returnPlayerInfos[i].PlayerCards = allPlayCards[i].playerCard
-            returnPlayerInfos[i].communityCard = community
         }
         
         for i in 0..<playerNum {

@@ -835,18 +835,6 @@ class PokerBullGame {
                 }
             }
         }
-        //存储每位玩家手牌
-        for i in 0..<playerNum {
-            for bullCard in allPlayers[i].playerCard{
-                returnPlayerInfos[i].PlayerCards.append(Card(suit: [bullCard.suit], rank: bullCard.trueRank, cardIndex: bullCard.cardIndex))
-            }
-        }
-        //存储公牌
-        for i in 0..<playerNum {
-            for bullCard in community{
-                returnPlayerInfos[i].communityCard.append(Card(suit: [bullCard.suit], rank: bullCard.trueRank, cardIndex: bullCard.cardIndex))
-            }
-        }
         
 //        // 计算牌额大小
         if wayToDealCards == 0{
@@ -869,7 +857,7 @@ class PokerBullGame {
         if leftCards.count < PokerBull.GetMinCardNum(playerNum: playerNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
             leftCards = []
         }
-        var sortedPlayers = allPlayers.sorted{$0.evaluateFlag > $1.evaluateFlag}
+        let sortedPlayers = allPlayers.sorted{$0.evaluateFlag > $1.evaluateFlag}
 
         for player in sortedPlayers{
             var currentPlayerReturnInfo = GameReturnPlayerInfo()
@@ -877,7 +865,6 @@ class PokerBullGame {
             currentPlayerReturnInfo.playerRank = player.evaluateFlag
             currentPlayerReturnInfo.playerCardsType = player.cardType
             currentPlayerReturnInfo.playerCardsSuit = ""
-            returnPlayerInfos.append(currentPlayerReturnInfo)
             //存入手牌和公牌
             for bullCard in player.playerCard {
                 currentPlayerReturnInfo.PlayerCards.append(Card(suit: [bullCard.suit], rank: bullCard.trueRank, cardIndex: bullCard.cardIndex))
@@ -888,7 +875,10 @@ class PokerBullGame {
             }
             
             returnPlayerInfos.append(currentPlayerReturnInfo)
+            print("每一个玩家手牌 \(currentPlayerReturnInfo.PlayerCards)")
         }
+        
+        
         
         return (returnPlayerInfos, leftCards)
     }

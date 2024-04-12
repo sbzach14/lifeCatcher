@@ -711,7 +711,7 @@ struct AddRuleSettingView: View{
             break
         case 8:
             let selectedRule = GameManager.gameRules[gameType] as! JiaJiaBaoGameRule
-            minCardNum = JiaJiaBaoGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus, handNum: Int(selectedRule.handNum[args[7]]!)!)
+            minCardNum = JiaJiaBaoGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
         case 9:
             let selectedRule = GameManager.gameRules[gameType] as! CardNineGameRule
             minCardNum = CardNineGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
@@ -742,26 +742,26 @@ struct AddRuleSettingView: View{
     private func destinationView(for index: Int) -> some View {
         
         switch index {
-        case 0:
-            return AnyView(TexasPokerRuleSettingView(args: self.$args, suitRules: self.$suitRules, rankRules: self.$rankRules))
-        case 1:
-            return AnyView(PokerBullSettingView(args: self.$args, suitRules: self.$suitRules, rankRules: self.$rankRules))
-        case 2:
-            return AnyView(ThreeCardPokerGameRuleSettingView(args: self.$args, suitRules: self.$suitRules, rankRules: self.$rankRules))
-        case 3:
-            return AnyView(TinyNineGameRuleSettingView(args: self.$args, suitRules: self.$suitRules, rankRules: self.$rankRules))
-        case 4:
-            return AnyView(ThreeMenGameRuleSettingView(args: self.$args, suitRules: self.$suitRules, rankRules: self.$rankRules))
-        case 5:
-            return AnyView(TwoEightGangGameRuleSettingView(args: self.$args, suitRules: self.$suitRules, rankRules: self.$rankRules))
-        case 6:
-            return AnyView(NinePointFiveGameRuleSettingView(args: self.$args, suitRules: self.$suitRules, rankRules: self.$rankRules))
-        case 7:
-            return AnyView(BaoziGameRuleSettingView(args: self.$args, suitRules: self.$suitRules, rankRules: self.$rankRules))
-        case 8:
-            return AnyView(JiaJiaBaoGameRuleSettingView(args: self.$args, suitRules: self.$suitRules, rankRules: self.$rankRules))
-        case 9:
-            return AnyView(CardNineGameRuleSettingView(args: self.$args, suitRules: self.$suitRules, rankRules: self.$rankRules))
+//        case 0:
+//            return AnyView(TexasPokerRuleSettingView(args: self.$args, suitRules: self.$suitRules, rankRules: self.$rankRules))
+//        case 1:
+//            return AnyView(PokerBullSettingView(args: self.$args, suitRules: self.$suitRules, rankRules: self.$rankRules))
+//        case 2:
+//            return AnyView(ThreeCardPokerGameRuleSettingView(args: self.$args, suitRules: self.$suitRules, rankRules: self.$rankRules))
+//        case 3:
+//            return AnyView(TinyNineGameRuleSettingView(args: self.$args, suitRules: self.$suitRules, rankRules: self.$rankRules))
+//        case 4:
+//            return AnyView(ThreeMenGameRuleSettingView(args: self.$args, suitRules: self.$suitRules, rankRules: self.$rankRules))
+//        case 5:
+//            return AnyView(TwoEightGangGameRuleSettingView(args: self.$args, suitRules: self.$suitRules, rankRules: self.$rankRules))
+//        case 6:
+//            return AnyView(NinePointFiveGameRuleSettingView(args: self.$args, suitRules: self.$suitRules, rankRules: self.$rankRules))
+//        case 7:
+//            return AnyView(BaoziGameRuleSettingView(args: self.$args, suitRules: self.$suitRules, rankRules: self.$rankRules))
+//        case 8:
+//            return AnyView(JiaJiaBaoGameRuleSettingView(args: self.$args, suitRules: self.$suitRules, rankRules: self.$rankRules))
+//        case 9:
+//            return AnyView(CardNineGameRuleSettingView(args: self.$args, suitRules: self.$suitRules, rankRules: self.$rankRules))
         default:
             return AnyView(EmptyView())
         }

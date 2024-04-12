@@ -26,9 +26,10 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     
     // cardArray, 装有所有poker的array
     @Published var cardArray :  [Int] = []
-    @Published var winnerPlayer: [[Int]] = []
+    @Published var winnerPlayer: [[SpeakResultStruct]] = []
     @Published var winnerPlayerShow: String = ""
     @Published var multipleGamePlayerInfos: ReportManager.MultipleReportResultInfo = ReportManager.MultipleReportResultInfo()
+    @Published var leftCards: [Int] = []
     @Published var cutArray : [Int] = []
     @Published var cutShowArray : [Int] = []
     
@@ -1754,17 +1755,17 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         
         print("开始需要的最少牌数 \(minCardNum)")
         if cardArray.count >= minCardNum && cardArray.count > cutNumRangeSetting[0] && cardArray.count > cutNumRangeSetting[1] - minCardNum{
-            (winnerPlayer, multipleGamePlayerInfos) = GameManager.selectGame(gameIndex: ruleIndex, inputCards: cardArray, playerNum: (GameManager.gameRules[ruleIndex]?.playerNum[playerNum])!, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, minCardNum: minCardNum, cutCardIndexArray: cutArray)
+            (multipleGamePlayerInfos, leftCards) = GameManager.selectGame(gameIndex: ruleIndex, inputCards: cardArray, playerNum: (GameManager.gameRules[ruleIndex]?.playerNum[playerNum])!, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, minCardNum: minCardNum, cutCardIndexArray: cutArray)
             
-            winnerPlayerShow = ""
-            for winnerSet in winnerPlayer{
-                for winner in winnerSet{
-                    winnerPlayerShow += String(winner + 1) + " "
-                }
-                winnerPlayerShow += "/"
-            }
+//            winnerPlayerShow = ""
+//            for winnerSet in winnerPlayer{
+//                for winner in winnerSet{
+//                    winnerPlayerShow += String(winner + 1) + " "
+//                }
+//                winnerPlayerShow += "/"
+//            }
             
-            //speakText(input: winnerPlayer)
+            speakText(input: multipleGamePlayerInfos.reportResult)
         }
     }
     

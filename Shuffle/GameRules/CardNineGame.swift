@@ -486,9 +486,7 @@ class CardNineGame{
             ).evalHand(cards: allPlayCards[i].playerCard, redJokerValueRange: redJokerValueRange,blackJokerValueRange: blackJokerValueRange,KValueRange: KValueRange,QValueRange: QValueRange,JValueRange: JValueRange, AValueRange: AValueRange,pointComparision: pointComparision,samePointComparision: samePointComparision, cardRankRule: cardRankRule, pairRank: pairRank)
         }
         
-        
-        //这里后面都不用改，最后按照牌的大小（evaluateflag）排序返回
-        
+                
         for playerID in 0..<allPlayCards.count {
             var currentReturnPlayerInfo = GameReturnPlayerInfo()
             currentReturnPlayerInfo.playerID = playerID
