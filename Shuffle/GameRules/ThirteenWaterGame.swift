@@ -23,6 +23,11 @@ class ThirteenWaterGameRule : Rule{
         1:"A2345第二大"
     ]
     
+    let isDouble:[Int:String] = [
+        0:"不翻倍",
+        1:"翻倍"
+    ]
+    
     override init(ruleIndex: Int, ruleName: String) {
         super.init(ruleIndex: ruleIndex, ruleName: ruleName)
         self.rankRules = [
@@ -42,10 +47,10 @@ class ThirteenWaterGameRule : Rule{
             1: "道数13张翻倍[1301]",
             2: "54张百变13张[1303]",
             3: "道数13张不翻倍[1300]",
-            4: "道数13张不翻倍[1...",
-            5: "道数13张比两道[1...",
-            6: "道数13张不翻倍A2345二大",
-            7: "道数13张比两道A2345二大",
+            4: "道数13张不翻倍[1304]",
+            5: "道数13张比两道[1305]",
+            6: "道数13张不翻倍A2345二大[1306]",
+            7: "道数13张比两道A2345二大[1307]",
         ]
         self.ruleInfo = [
             0: """
@@ -166,7 +171,7 @@ class ThirteenWaterGame{
     //4 communityNum
     //5 winCondition
     //6 AStraightMin
-
+    //7 isDouble
     
     static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
         let dealNum = args[0]
@@ -176,6 +181,7 @@ class ThirteenWaterGame{
         let communityNum = args[4]
         let winCondition = args[5]
         let AStraightMin = args[6]
+        let isDouble = args[7]
         
         var maxRank = 0
         var returnPlayerInfos: [GameReturnPlayerInfo] = []
@@ -314,16 +320,22 @@ class ThirteenWaterGame{
             for currentPlayer in 0..<playerNum {
                 for i in 0..<playerNum{
                     if currentPlayer != i{
+                        var winNum = 0
                         for turn in 0..<3{
                             if playerRankList[currentPlayer][turn] > playerRankList[i][turn]{
-                                allPlayCards[currentPlayer].evaluateFlag += 1
-                                allPlayCards[i].evaluateFlag -= 1
+                                winNum += 1
                             }
                             else if playerRankList[currentPlayer][turn] < playerRankList[i][turn]{
-                                allPlayCards[currentPlayer].evaluateFlag -= 1
-                                allPlayCards[i].evaluateFlag += 1
+                                winNum -= 1
                             }
                         }
+                        
+                        if isDouble == 1 && (winNum == 3 || winNum == -3){
+                            winNum *= 2
+                        }
+                        
+                        allPlayCards[i].evaluateFlag += winNum
+                            
                     }
                 }
             }
@@ -678,29 +690,6 @@ class ThirteenWaterGameHandEvaluator{
         
         
         var allIndex:[Int] = Array(0...cards.count-1)
-        var jokerNum = 0
-        var lastNum = cards[0].rank
-        var beginIndex = 0
-        var length = 0
-        for index in allIndex{
-            let nowNum = cards[index].rank
-            if nowNum == 15{
-                jokerNum += 1
-            }
-            else if lastNum - nowNum - 1 > jokerNum{
-                if length < needCardsNum{
-                    beginIndex = index + 1
-                }
-            }
-            else{
-                length += 1
-            }
-            
-            if length >= needCardsNum{
-                break
-            }
-        }
-        allIndex = Array(beginIndex...cards.count-1)
         
         let allCombinations = allIndex.combinations(ofCount: needCardsNum)
         for combination in allCombinations {

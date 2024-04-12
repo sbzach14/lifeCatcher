@@ -45,9 +45,9 @@ class ChickenBattleGameRule : Rule{
             4: "比鸡百变尾墩大2[906]",
             5: "比鸡9张金花[907]",
             6: "比鸡比道数A23[908]",
-            7: "比鸡9张金花A23[909",
+            7: "比鸡9张金花A23[909]",
             8: "比鸡9张百变金花[910]",
-            9: "比鸡9张百变金花A23[...",
+            9: "比鸡9张百变金花A23[911]",
             10: "比鸡百变尾墩大[912]",
         ]
         self.ruleInfo = [
@@ -727,30 +727,7 @@ class ChickenBattleGameHandEvaluator{
         
         
         var allIndex:[Int] = Array(0...cards.count-1)
-        var jokerNum = 0
-        var lastNum = cards[0].rank
-        var beginIndex = 0
-        var length = 0
-        for index in allIndex{
-            let nowNum = cards[index].rank
-            if nowNum == 15{
-                jokerNum += 1
-            }
-            else if lastNum - nowNum - 1 > jokerNum{
-                if length < 3{
-                    beginIndex = index + 1
-                }
-            }
-            else{
-                length += 1
-            }
-            
-            if length >= 3{
-                break
-            }
-        }
-        allIndex = Array(beginIndex...cards.count-1)
-        
+       
         let allCombinations = allIndex.combinations(ofCount: 3)
         for combination in allCombinations {
             var currentCombination = combination

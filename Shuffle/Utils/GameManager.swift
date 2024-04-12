@@ -3376,8 +3376,9 @@ public class RuleManager{
                 var communityNum = 0
                 var winCondition = 0
                 var AStraightMin = 0
-
-                args = [handNum, communityNum, winCondition, AStraightMin]
+                var isDouble = 0
+                
+                args = [handNum, communityNum, winCondition, AStraightMin, isDouble]
                 suitRules = [3,2,1,0]
                 rankRules = [8,7,6,5,4,3,2,1,0]
                 rankRuleChecked = [1,1,1,1,1,1,1,1,1]
@@ -3390,8 +3391,9 @@ public class RuleManager{
                 communityNum = 0
                 winCondition = 1
                 AStraightMin = 0
+                isDouble = 1
 
-                args = [handNum, communityNum, winCondition, AStraightMin]
+                args = [handNum, communityNum, winCondition, AStraightMin, isDouble]
                 suitRules = [3,2,1,0]
                 rankRules = [8,7,6,5,4,3,2,1,0]
                 rankRuleChecked = [1,1,1,1,1,1,1,1,1]
@@ -3405,8 +3407,9 @@ public class RuleManager{
                 communityNum = 0
                 winCondition = 0
                 AStraightMin = 0
+                isDouble = 0
 
-                args = [handNum, communityNum, winCondition, AStraightMin]
+                args = [handNum, communityNum, winCondition, AStraightMin, isDouble]
                 suitRules = [3,2,1,0]
                 rankRules = [8,7,6,5,4,3,2,1,0]
                 rankRuleChecked = [1,1,1,1,1,1,1,1,1]
@@ -3421,8 +3424,9 @@ public class RuleManager{
                 communityNum = 0
                 winCondition = 1
                 AStraightMin = 0
+                isDouble = 0
 
-                args = [handNum, communityNum, winCondition, AStraightMin]
+                args = [handNum, communityNum, winCondition, AStraightMin, isDouble]
                 suitRules = [3,2,1,0]
                 rankRules = [8,7,6,5,4,3,2,1,0]
                 rankRuleChecked = [1,1,1,1,1,1,1,1,1]
@@ -3431,14 +3435,15 @@ public class RuleManager{
                 allPreSetRules[i]![3]!.append(rankRules)
                 allPreSetRules[i]![3]!.append(rankRuleChecked)
 
-//                4: "道数13张不翻倍[1...",
+//                4: "道数13张不翻倍[1304]",
 
                 handNum = 13
                 communityNum = 0
                 winCondition = 1
                 AStraightMin = 0
+                isDouble = 0
                 
-                args = [handNum, communityNum, winCondition, AStraightMin]
+                args = [handNum, communityNum, winCondition, AStraightMin, isDouble]
                 suitRules = [3,2,1,0]
                 rankRules = [8,7,6,5,4,3,2,1,0]
                 rankRuleChecked = [1,1,1,1,1,1,1,1,1]
@@ -3446,14 +3451,15 @@ public class RuleManager{
                 allPreSetRules[i]![4]!.append(suitRules)
                 allPreSetRules[i]![4]!.append(rankRules)
                 allPreSetRules[i]![4]!.append(rankRuleChecked)
-//                5: "道数13张比两道[1...",
+//                5: "道数13张比两道[1305]",
                 
                 handNum = 13
                 communityNum = 0
                 winCondition = 2
                 AStraightMin = 0
+                isDouble = 0
                 
-                args = [handNum, communityNum, winCondition, AStraightMin]
+                args = [handNum, communityNum, winCondition, AStraightMin,isDouble]
                 suitRules = [3,2,1,0]
                 rankRules = [8,7,6,5,4,3,2,1,0]
                 rankRuleChecked = [1,1,1,1,1,1,1,1,1]
@@ -3462,13 +3468,14 @@ public class RuleManager{
                 allPreSetRules[i]![5]!.append(rankRules)
                 allPreSetRules[i]![5]!.append(rankRuleChecked)
                 
-//                6: "道数13张不翻倍A2345二大",
+//                6: "道数13张不翻倍A2345二大[1306]",
                 handNum = 13
                 communityNum = 0
                 winCondition = 1
                 AStraightMin = 1
+                isDouble = 0
                 
-                args = [handNum, communityNum, winCondition, AStraightMin]
+                args = [handNum, communityNum, winCondition, AStraightMin, isDouble]
                 suitRules = [3,2,1,0]
                 rankRules = [8,7,6,5,4,3,2,1,0]
                 rankRuleChecked = [1,1,1,1,1,1,1,1,1]
@@ -3476,13 +3483,14 @@ public class RuleManager{
                 allPreSetRules[i]![6]!.append(suitRules)
                 allPreSetRules[i]![6]!.append(rankRules)
                 allPreSetRules[i]![6]!.append(rankRuleChecked)
-//                7: "道数13张比两道A2345二大",
+//                7: "道数13张比两道A2345二大[1307]",
                 handNum = 13
                 communityNum = 0
                 winCondition = 2
                 AStraightMin = 1
+                isDouble = 0
                 
-                args = [handNum, communityNum, winCondition, AStraightMin]
+                args = [handNum, communityNum, winCondition, AStraightMin, isDouble]
                 suitRules = [3,2,1,0]
                 rankRules = [8,7,6,5,4,3,2,1,0]
                 rankRuleChecked = [1,1,1,1,1,1,1,1,1]
