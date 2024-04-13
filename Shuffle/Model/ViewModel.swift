@@ -218,7 +218,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     }
     
     private func initDetectResult(){
-        
         confidenceDic.removeAll()
         for key in self.allCardIndex {
             confidenceDic[key] = 0
@@ -506,7 +505,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         
         var confidenceThreshold = 0.7
         if self.state == "idle"{
-            confidenceThreshold = 0.85
+            confidenceThreshold = 0.8
         }
         else{
             confidenceThreshold = 0.7
@@ -560,7 +559,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     self.state = "idle"
                     self.changeCameraFrameRate(to: 30)
                     let detectState = self.handleDetecResultList()
-                    print("self.cardArry \(self.cardArray)")
                     self.initBoxes()
                     
                     //根据detect result list判别洗牌、拨牌、洗牌
@@ -571,7 +569,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     if detectState.isShort && self.cutMode != 0{
                         //切牌
                         let cutCard = detectState.longestIndex;
-                        
+                        print("切牌之前的牌库 \(self.cardArray)")
                         
                         if !self.cardArray.contains(cutCard){
                             errorFlag = true
@@ -652,7 +650,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     print("result  isShort:\(detectState.isShort)  isSingle:\(detectState.isSingle)  cardArray:\(self.cardArray)")
                     
                     if !errorFlag{
-                        //self.computeWinnerPlayer()
+                        self.computeWinnerPlayer()
                     }
                 }
             }
@@ -1752,13 +1750,12 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     //MARK: comupute winner
     func computeWinnerPlayer() {
         print("计算信息")
-        
+        print("切牌 \(self.cutArray)")
         print("测试游戏：\(String(describing: generalRuleSetting.allGameType[ruleIndex])), 游戏人数 \((GameManager.gameRules[ruleIndex]?.playerNum[playerNum])!), args：\(args), 牌型顺序：\(rankRules) 花色顺序：\(suitRules), 发牌定制: \(dealNum), 打色模式: \(coloringType) 正发反发: \(dealType),  自定义发牌类型和发牌数量：\(diyDealStatus), \(diyDealNum), 打色模式：\(calModeArgs[0]), 目标位置：\(calModeArgs[1]), 打色点数设置: \(cutNumSetting), 打色范围：\(cutNumRangeSetting[0])- \(cutNumRangeSetting[1]), 连报轮数：\(consecutiveReport)")
-        
-        
+                
         print("开始需要的最少牌数 \(minCardNum)")
         if cardArray.count >= minCardNum && cardArray.count > cutNumRangeSetting[0] && cardArray.count > cutNumRangeSetting[1] - minCardNum{
-            (multipleGamePlayerInfos, leftCards) = GameManager.selectGame(gameIndex: ruleIndex, inputCards: cardArray, playerNum: (GameManager.gameRules[ruleIndex]?.playerNum[playerNum])!, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, minCardNum: minCardNum, cutCardIndexArray: cutArray)
+            multipleGamePlayerInfos = GameManager.selectGame(gameIndex: ruleIndex, inputCards: cardArray, playerNum: (GameManager.gameRules[ruleIndex]?.playerNum[playerNum])!, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, minCardNum: minCardNum, cutCardIndexArray: cutArray)
             
 //            winnerPlayerShow = ""
 //            for winnerSet in winnerPlayer{
@@ -1768,6 +1765,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 //                winnerPlayerShow += "/"
 //            }
             self.cardArray = multipleGamePlayerInfos.returnCardArray
+            self.leftCards = multipleGamePlayerInfos.leftCards
             
             speakText(input: multipleGamePlayerInfos.reportResult)
         }
@@ -1800,7 +1798,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     print("播报的input \(reportResult)")
                     let speakString = reportResult.content
                     let speechUtterance = AVSpeechUtterance(string: speakString)
-                    speechUtterance.postUtteranceDelay = 0.3
+                    speechUtterance.postUtteranceDelay = 0.05
                     
                     if reportResult.voiceType == 0{
                         speechUtterance.voice = chineseMaleVoice
@@ -1810,7 +1808,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     }
                     
                     if reportIndex == 0{
-                        speechUtterance.preUtteranceDelay = 1
+                        speechUtterance.preUtteranceDelay = 0.2
                     }
                     speechSynthesizer.speak(speechUtterance)
                 }
@@ -1882,6 +1880,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
         else if self.volumeUp == 6{
             //TODO 报下一轮（下一次连报）
+            self.cardArray = self.leftCards
+            computeWinnerPlayer()
         }
     }
     
@@ -1933,6 +1933,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
         else if self.volumeDown == 6{
             //TODO 报下一轮（下一次连报）
+            self.cardArray = self.leftCards
+            computeWinnerPlayer()
         }
         else if self.volumeDown == 7{
             self.volumeUp += 1

@@ -60,10 +60,10 @@ class GameManager {
         let rule8 = JiaJiaBaoGameRule(ruleIndex: 8, ruleName: "佳佳宝")
         let rule9 = CardNineGameRule(ruleIndex: 9, ruleName: "牌九")
         let rule10 = NinePointGameRule(ruleIndex: 10, ruleName: "九点")
-        let rule11 = FourCardGameRule(ruleIndex: 11, ruleName: "4张")
-        let rule12 = TwoCardGameRule(ruleIndex: 12, ruleName: "2张")
-        let rule13 = ThreeCardPointGameRule(ruleIndex: 13, ruleName: "3张")
-        let rule14 = TenPointFiveGameRule(ruleIndex: 14, ruleName: "10点半")
+        let rule11 = FourCardGameRule(ruleIndex: 11, ruleName: "四张")
+        let rule12 = TwoCardGameRule(ruleIndex: 12, ruleName: "两张")
+        let rule13 = ThreeCardPointGameRule(ruleIndex: 13, ruleName: "三张")
+        let rule14 = TenPointFiveGameRule(ruleIndex: 14, ruleName: "十点半")
         let rule15 = ChickenBattleGameRule(ruleIndex: 15, ruleName: "比鸡")
         let rule16 = ThirteenWaterGameRule(ruleIndex: 16, ruleName: "十三水")
         return [rule0.ruleIndex: rule0, rule1.ruleIndex: rule1, rule2.ruleIndex: rule2, rule3.ruleIndex: rule3, rule4.ruleIndex: rule4, rule5.ruleIndex: rule5, rule6.ruleIndex: rule6, rule7.ruleIndex: rule7, rule8.ruleIndex: rule8, rule9.ruleIndex: rule9,rule10.ruleIndex:rule10, rule11.ruleIndex: rule11,rule12.ruleIndex:rule12, rule13.ruleIndex:rule13, rule14.ruleIndex: rule14, rule15.ruleIndex: rule15, rule16.ruleIndex: rule16]
@@ -161,7 +161,7 @@ class GameManager {
         return resultList
     }
     
-    static func selectGame(gameIndex: Int, inputCards: [Int], playerNum: Int, args : [Int], rankRules : [Int], suitRules: [Int],dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], calModeArgs: [Int], cutNumSetting: Int, cutNumRangeSetting: [Int], consecutiveReport: Int, minCardNum: Int, cutCardIndexArray: [Int]) -> (ReportManager.MultipleReportResultInfo, [Int]) {
+    static func selectGame(gameIndex: Int, inputCards: [Int], playerNum: Int, args : [Int], rankRules : [Int], suitRules: [Int],dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], calModeArgs: [Int], cutNumSetting: Int, cutNumRangeSetting: [Int], consecutiveReport: Int, minCardNum: Int, cutCardIndexArray: [Int]) -> ReportManager.MultipleReportResultInfo {
         var reportResult:[[Int]] = []
         //TODO dealType 0 正发，1 反发 搞清楚ui
         //cutNumSetting 点数设置
@@ -187,9 +187,9 @@ class GameManager {
         // 返回的result包括两个int数组，一个是按牌大小从大到小排序的玩家编号数组，一个是这一轮结束之后牌库里剩下的牌
 
         
-        let (multipleGameInfo, leftCards) =  ReportManager.GameReporter(gameIndex: gameIndex, inputCards: inputCards, cutCardIndexList: cutCardIndexArray, diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, newArgs: newArgs, rankRules: rankRules, suitRules: suitRules, reportID: calMode, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, targetPos: targetPos, coloringType: coloringType, consecutiveNum: consecutiveReport)
+        let multipleGameInfo =  ReportManager.GameReporter(gameIndex: gameIndex, inputCards: inputCards, cutCardIndexList: cutCardIndexArray, diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, newArgs: newArgs, rankRules: rankRules, suitRules: suitRules, reportID: calMode, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, targetPos: targetPos, coloringType: coloringType, consecutiveNum: consecutiveReport)
         
-        return (multipleGameInfo, leftCards)
+        return multipleGameInfo
     }
     
     static func getCheckedIndexes(rankRules: [RankRulesSate]) -> [Int] {

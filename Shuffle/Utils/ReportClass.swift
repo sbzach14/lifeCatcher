@@ -1585,6 +1585,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         var reportResult: [[SpeakResultStruct]] = []
         //返回的切牌后的数组
         var returnCardArray: [Int] = []
+        //反回多轮之后剩余的牌
+        var leftCards: [Int] = []
 
         
     }
@@ -1647,7 +1649,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
     }
     
     //[[SpeakResultStruct]]--> 每一轮的结果 [
-    static func GameReporter(gameIndex: Int, inputCards: [Int], cutCardIndexList: [Int], diyDealStatus: [[Bool]], diyDealNum:[Int], newArgs: [Int], rankRules:[Int], suitRules:[Int], reportID: Int, cutNumSetting: Int, cutNumRangeSetting: [Int], targetPos: Int, coloringType: Int, consecutiveNum: Int) -> (MultipleReportResultInfo, [Int]){
+    static func GameReporter(gameIndex: Int, inputCards: [Int], cutCardIndexList: [Int], diyDealStatus: [[Bool]], diyDealNum:[Int], newArgs: [Int], rankRules:[Int], suitRules:[Int], reportID: Int, cutNumSetting: Int, cutNumRangeSetting: [Int], targetPos: Int, coloringType: Int, consecutiveNum: Int) -> MultipleReportResultInfo{
         
         let gameFunctions:[Int: ([[Bool]],[Int], [Int], [Int], [Int], [Int]) -> ([GameReturnPlayerInfo], [Int])] = [
             0: TexasPoker.FindWinner,
@@ -1694,7 +1696,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         var inputCards = inputCards
                 
         //剩余的牌
-        var leftCards:[Int] = []
+        var leftCards:[Int] = inputCards
         //玩家数量
         let playerNum = newArgs[2]
 
@@ -1734,7 +1736,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             //看色两次
             } else if reportRule.reportID == 215{
                 if cutCardIndexList.count < 2 {
-                    return (multipleResultInfo, leftCards)
+                    multipleResultInfo.leftCards = leftCards
+                    return multipleResultInfo
                 }
             //普通切牌, 看色去色
             } else {
@@ -1749,6 +1752,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         
         for roundID in 1...consecutiveNum {
             
+                inputCards = leftCards
                 var currentResultInfo = SingleReportResultInfo()
                 var cutList: [[Int]] = []
                 var flyTwoCardSolution : [[FlyTwoCardsNode]] = []
@@ -1975,10 +1979,10 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         }
                         
                         //检查是否超过了打色范围
-                        if cardIndex > coloringInputCards.count - 1{
-                            print("打色超过了牌堆范围")
-                            break
-                        }
+//                        if cardIndex > coloringInputCards.count - 1{
+//                            print("打色超过了牌堆范围 \(cardIndex)")
+//                            break
+//                        }
                         
                         var cardRank: Int = 0
                         var colorCardIndexList: [Int] = []
@@ -2346,9 +2350,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             newInputCards = newInputCards.reversed()
                         }
                         
-                        let (winnersInfo, leftCards) = gameFunction!(diyDealStatus, diyDealNum, newInputCards, newArgs, rankRules, suitRules)
+                        let (winnersInfo, currentLeftCards) = gameFunction!(diyDealStatus, diyDealNum, newInputCards, newArgs, rankRules, suitRules)
                         
-                        
+                        leftCards = currentLeftCards
                         if winnersInfo.count != 0 {
                             
                             //重新按照playerID排序
@@ -2754,7 +2758,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             break
                         }
                     }
-                    
                     print("LOG END--------------------------------------")
                     upDownID += 1
                 }
@@ -2767,11 +2770,12 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         let reportResult = reportStringGenerator(reportID: reportID, multipleReportResultInfo: multipleResultInfo, cutNumRangeSetting: cutNumRangeSetting, playerNum: playerNum)
         
         multipleResultInfo.reportResult = reportResult
-        
+        multipleResultInfo.leftCards = leftCards
         PrintSpeakResult(speakStructArray: reportResult)
         
         
-        return (multipleResultInfo, leftCards)
+        
+        return (multipleResultInfo)
         
     }
     
