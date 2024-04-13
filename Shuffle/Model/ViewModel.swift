@@ -147,7 +147,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             self.laplacianDic[0][key] = 0
             self.laplacianDic[1][key] = 0
         }
-        self.initCardArray()
+        self.initShuffle()
+        self.initDetectResult()
         
         // Load data from config.json
         if let configData = readConfigJSON() {
@@ -216,18 +217,23 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 
     }
     
-    private func initCardArray(){
+    private func initDetectResult(){
         
         confidenceDic.removeAll()
         for key in self.allCardIndex {
             confidenceDic[key] = 0
         }
-        cardArray = []
+        
         stateCard = [-1, -1]
         detectResultList = [:]
         stateCounter = 0
         winnerPlayer = []
         winnerPlayerShow = ""
+        
+    }
+    
+    private func initShuffle(){
+        cardArray = []
         cutArray = []
         cutShowArray = []
     }
@@ -535,11 +541,10 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 
                 print("动作：开始识别 ", self.setFrameRate)
                 DispatchQueue.main.async{
-                    self.stateCounter = 0
                     self.state = "shuffle"
                     self.speakText(input: 0)
                     self.changeCameraFrameRate(to: Int(self.setFrameRate))
-                    self.initCardArray()
+                    self.initDetectResult()
                     if self.isRemote{
                         self.computeTargetArea(stateResult: self.lastBoxes)
                     }
@@ -617,6 +622,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     else if detectState.isSingle
                         && (self.shuffleMode == 1 || self.shuffleMode == 2 || self.shuffleMode == 3 || self.shuffleMode == 4){
                         
+                        self.initShuffle()
                         self.cardArray = detectState.detectionResult
                         
                         if(self.shuffleMode == 1 || self.shuffleMode == 3){
