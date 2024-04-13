@@ -12,8 +12,8 @@ class ChickenBattleGameRule : Rule{
     ]
     
     let AStraightMin:[Int:String] = [
-        0:"A23最小",
-        1:"A23第二大"
+        0:"A23第二大",
+        1:"A23最小",
     ]
     
     let jokerChangeSetting:[Int:String] = [
@@ -45,9 +45,9 @@ class ChickenBattleGameRule : Rule{
             4: "比鸡百变尾墩大2[906]",
             5: "比鸡9张金花[907]",
             6: "比鸡比道数A23[908]",
-            7: "比鸡9张金花A23[909",
+            7: "比鸡9张金花A23[909]",
             8: "比鸡9张百变金花[910]",
-            9: "比鸡9张百变金花A23[...",
+            9: "比鸡9张百变金花A23[911]",
             10: "比鸡百变尾墩大[912]",
         ]
         self.ruleInfo = [
@@ -132,7 +132,7 @@ class ChickenBattleGameRule : Rule{
 6)散牌:A最大2最小
 """,
             8: """
-牌数:52，不包括大小王
+牌数:54
 每人9张，分为三组，每组3张。3组分别比大小。单组最大为1分，单组不是最大为0分，三组积分最多为最大。大王可变任意红牌。小王可变任意黑牌
 1)豹子:3张同样大小的牌
 2)顺金:花色相同的顺子
@@ -142,7 +142,7 @@ class ChickenBattleGameRule : Rule{
 6)散牌:A最大2最小
 """,
             9:"""
-牌数:52，不包括大小王
+牌数:54
 每人9张，分为三组，每组3张。3组分别比大小。单组最大为1分，单组不是最大为0分，三组积分最多为最大。大王可变任意红牌。小王可变任意黑牌
 1)豹子:3张同样大小的牌
 2)顺金:花色相同的顺子
@@ -217,10 +217,10 @@ class ChickenBattleGame{
             result = Array(0...51)
             break
         case 8:
-            result = Array(0...51)
+            result = Array(0...51) + [53,54]
             break
         case 9:
-            result = Array(0...51)
+            result = Array(0...51) + [53,54]
             break
         case 10:
             result = Array(0...51) + [53,54]
@@ -362,35 +362,39 @@ class ChickenBattleGame{
         var playerRankList : [[Int]] = []
         
         for i in 0..<playerNum {
+            
+            var turn1Cards:[ChickenBattleGameCard] = []
+            for card in allPlayCards[i].playerCard {
+                turn1Cards.append(ChickenBattleGameCard(card: card, jokerChangeSetting: jokerChangeSetting))
+            }
+            turn1Cards = turn1Cards.sorted(by: {$0.rank > $1.rank})
+            
             let (rank1, cardtype1, isPair1, usedCardIndex1) = ChickenBattleGameHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules,
                 AStraightMin: AStraightMin,
-                jokerChangeSetting: jokerChangeSetting,
                 jokerThreeCardSetting: jokerThreeCardSetting
-            ).evalHand(cards: allPlayCards[i].playerCard)
+            ).evalHand(cards: turn1Cards)
             
             allPlayCards[i].evaluateFlag = rank1
             allPlayCards[i].cardType = cardtype1
             allPlayCards[i].isPair = isPair1
                 
-            var turn2Cards:[Card] = []
-            for cardIndex in 0..<allPlayCards[i].playerCard.count {
+            var turn2Cards:[ChickenBattleGameCard] = []
+            for cardIndex in 0..<turn1Cards.count {
                 if !usedCardIndex1.contains(cardIndex){
-                    turn2Cards.append(allPlayCards[i].playerCard[cardIndex])
+                    turn2Cards.append(turn1Cards[cardIndex])
                 }
             }
-                
+            
             let (rank2, cardtype2, isPair2, usedCardIndex2) = ChickenBattleGameHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules,
                 AStraightMin: AStraightMin,
-                jokerChangeSetting: jokerChangeSetting,
                 jokerThreeCardSetting: jokerThreeCardSetting
             ).evalHand(cards: turn2Cards)
-                
-                    
-            var turn3Cards:[Card] = []
+            
+            var turn3Cards:[ChickenBattleGameCard] = []
             for cardIndex in 0..<turn2Cards.count {
                 if !usedCardIndex2.contains(cardIndex){
                     turn3Cards.append(turn2Cards[cardIndex])
@@ -401,11 +405,11 @@ class ChickenBattleGame{
                 rankRules: rankRules,
                 suitRules: suitRules,
                 AStraightMin: AStraightMin,
-                jokerChangeSetting: jokerChangeSetting,
                 jokerThreeCardSetting: jokerThreeCardSetting
             ).evalHand(cards: turn3Cards)
             
             playerRankList.append([rank1, rank2, rank3])
+            print([cardtype1, cardtype2, cardtype3])
         }
         
         //尾墩
@@ -423,11 +427,9 @@ class ChickenBattleGame{
                         for turn in 0..<3{
                             if playerRankList[currentPlayer][turn] > playerRankList[i][turn]{
                                 allPlayCards[currentPlayer].evaluateFlag += 1
-                                allPlayCards[i].evaluateFlag -= 1
                             }
                             else if playerRankList[currentPlayer][turn] < playerRankList[i][turn]{
                                 allPlayCards[currentPlayer].evaluateFlag -= 1
-                                allPlayCards[i].evaluateFlag += 1
                             }
                         }
                     }
@@ -492,19 +494,16 @@ class ChickenBattleGameHandEvaluator{
     var suitRules: [Int]
     var ruleDict: [Int: ([ChickenBattleGameCard]) -> ([Int], [String], Int, [[Int]])] = [:]
     var AStraightMin: Int
-    var jokerChangeSetting: Int
     var jokerThreeCardSetting: Int
         
     init(rankRules: [Int],
          suitRules: [Int],
          AStraightMin: Int,
-         jokerChangeSetting: Int,
          jokerThreeCardSetting: Int){
         self.rankRules = rankRules
         self.suitRules = suitRules
         self.AStraightMin = AStraightMin
-        self.jokerChangeSetting = jokerChangeSetting
-        self.jokerThreeCardSetting = jokerChangeSetting
+        self.jokerThreeCardSetting = jokerThreeCardSetting
         
         self.ruleDict = [
             0:self.eval_holecard(cards:),
@@ -517,14 +516,7 @@ class ChickenBattleGameHandEvaluator{
     }
     
     //传入需要的参数
-    func evalHand(cards: [Card])->(Int, String, Int, [Int]){
-        var cards = cards
-        
-        var numList:[ChickenBattleGameCard] = []
-        for card in cards {
-            numList.append(ChickenBattleGameCard(card: card, jokerChangeSetting: self.jokerChangeSetting))
-        }
-        numList = numList.sorted(by: {$0.rank > $1.rank})
+    func evalHand(cards: [ChickenBattleGameCard])->(Int, String, Int, [Int]){
         
         var rank:Int = 0
         var cardType:String = ""
@@ -533,7 +525,7 @@ class ChickenBattleGameHandEvaluator{
         
         var i = self.ruleDict.count + 1
         for ruleIndex in self.rankRules{
-            let (rankList, cardTypeList, isPair, usedCardIndexList) = self.ruleDict[ruleIndex]!(numList)
+            let (rankList, cardTypeList, isPair, usedCardIndexList) = self.ruleDict[ruleIndex]!(cards)
             i -= 1
             
             if rankList.count == 0{
@@ -542,7 +534,7 @@ class ChickenBattleGameHandEvaluator{
             else {
                 let maxIndex = rankList.firstIndex(of: rankList.max() ?? 0)!
                 
-                rank = (1 << (i + 11)) | rankList[maxIndex]
+                rank = (1 << (i + 15)) | rankList[maxIndex]
                 cardType = cardTypeList[maxIndex]
                 usedCardIndex = usedCardIndexList[maxIndex]
                 
@@ -583,7 +575,7 @@ class ChickenBattleGameHandEvaluator{
         }
         else{
             for i in 0..<cards.count-2{
-                if cards[i].originRank == cards[i+1].originRank && cards[i].rank == cards[i+2].originRank{
+                if cards[i].originRank == cards[i+1].originRank && cards[i].originRank == cards[i+2].originRank{
                     usedCardIndexList.append([i,i+1,i+2])
                 }
             }
@@ -604,7 +596,7 @@ class ChickenBattleGameHandEvaluator{
                 rank = rank << 4 | threeCardRank
                 rank = rank << 2 | threeCardSuit
                 
-                let cardType = "豹子" + String(threeCardRank)
+                let cardType = "豹子" + GameManager.CardNumberReportDic[cards[currentUsedCardIndex[2]].originRank]!
                 
                 rankList.append(rank)
                 cardTypeList.append(cardType)
@@ -701,15 +693,18 @@ class ChickenBattleGameHandEvaluator{
                         break
                     }
                 }
-                var flushRank = cards[currentUsedCardIndex[0]].rank
-                if flushRank == 15{
-                    flushRank = 0
-                }
                 
-                rank = rank << 4 | flushRank
+                for c in currentUsedCardIndex {
+                    if cards[c].rank == 15{
+                        rank = rank << 4 | 0
+                    }
+                    else{
+                        rank = rank << 4 | cards[c].rank
+                    }
+                }
                 rank = rank << 2 | suit
                 
-                let cardType = "金花" + GameManager.SuitReportDix[suit]!
+                let cardType = "金花" + String(cards[currentUsedCardIndex[0]].rank)
                 
                 rankList.append(rank)
                 cardTypeList.append(cardType)
@@ -727,30 +722,7 @@ class ChickenBattleGameHandEvaluator{
         
         
         var allIndex:[Int] = Array(0...cards.count-1)
-        var jokerNum = 0
-        var lastNum = cards[0].rank
-        var beginIndex = 0
-        var length = 0
-        for index in allIndex{
-            let nowNum = cards[index].rank
-            if nowNum == 15{
-                jokerNum += 1
-            }
-            else if lastNum - nowNum - 1 > jokerNum{
-                if length < 3{
-                    beginIndex = index + 1
-                }
-            }
-            else{
-                length += 1
-            }
-            
-            if length >= 3{
-                break
-            }
-        }
-        allIndex = Array(beginIndex...cards.count-1)
-        
+       
         let allCombinations = allIndex.combinations(ofCount: 3)
         for combination in allCombinations {
             var currentCombination = combination
@@ -838,7 +810,7 @@ class ChickenBattleGameHandEvaluator{
                     }
                 }
                 
-                if gap > 0{
+                if gap >= 0{
                     let nowRank = cards[currentCombination[cntC]].rank
                     if nowRank == 14{
                         headRank = 15
@@ -917,7 +889,7 @@ class ChickenBattleGameHandEvaluator{
                 rank = rank << 2 | pairsuit
                 
                 
-                let cardType = "对" + String(pairRank)
+                let cardType = "对子" + GameManager.CardNumberReportDic[cards[currentUsedCardIndex[1]].originRank]!
                 
                 rankList.append(rank)
                 cardTypeList.append(cardType)
@@ -936,6 +908,7 @@ class ChickenBattleGameHandEvaluator{
         for i in 0..<cards.count-1{
             if cards[i].rank != 15{
                 usedCardIndexList.append(i)
+                break
             }
         }
         
@@ -956,55 +929,53 @@ class ChickenBattleGameHandEvaluator{
             rank = rank << 2 | suit
         }
 
-        return ([rank], ["单牌"+String(rank)], 0, [usedCardIndexList])
+        return ([rank], ["单牌"], 0, [usedCardIndexList])
     }
-    
-    class ChickenBattleGameCard{
-        var rank: Int = 0
-        var suit: Int = 0
-        var originRank : Int = 0
-        
-        init(card: Card, jokerChangeSetting: Int){
-            self.originRank = card.rank
-            
-            if card.rank == 14 {
-                if jokerChangeSetting == 0{
-                    self.rank = 15
-                    self.suit = -1
-                }
-                else if jokerChangeSetting == 1{
-                    self.rank = 15
-                    self.suit = -3
-                }
-                else if jokerChangeSetting == 2{
-                    self.rank = 3
-                    self.suit = -3
-                }
-            }
-            else if card.rank == 15 {
-                if jokerChangeSetting == 0{
-                    self.rank = 15
-                    self.suit = -1
-                }
-                else if jokerChangeSetting == 1{
-                    self.rank = 15
-                    self.suit = -2
-                }
-                else if jokerChangeSetting == 2{
-                    self.rank = 6
-                    self.suit = -2
-                }
-            }
-            else if card.rank == 1{
-                self.rank = 14
-                self.suit = card.suit[0]
-            }
-            else{
-                self.rank = card.rank
-                self.suit = card.suit[0]
-            }
-        }
-    }
-
 }
 
+class ChickenBattleGameCard{
+    var rank: Int = 0
+    var suit: Int = 0
+    var originRank : Int = 0
+    
+    init(card: Card, jokerChangeSetting: Int){
+        self.originRank = card.rank
+        
+        if card.rank == 14 {
+            if jokerChangeSetting == 0{
+                self.rank = 15
+                self.suit = -1
+            }
+            else if jokerChangeSetting == 1{
+                self.rank = 15
+                self.suit = -3
+            }
+            else if jokerChangeSetting == 2{
+                self.rank = 3
+                self.suit = -3
+            }
+        }
+        else if card.rank == 15 {
+            if jokerChangeSetting == 0{
+                self.rank = 15
+                self.suit = -1
+            }
+            else if jokerChangeSetting == 1{
+                self.rank = 15
+                self.suit = -2
+            }
+            else if jokerChangeSetting == 2{
+                self.rank = 6
+                self.suit = -2
+            }
+        }
+        else if card.rank == 1{
+            self.rank = 14
+            self.suit = card.suit[0]
+        }
+        else{
+            self.rank = card.rank
+            self.suit = card.suit[0]
+        }
+    }
+}

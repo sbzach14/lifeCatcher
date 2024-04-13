@@ -19,8 +19,14 @@ class ThirteenWaterGameRule : Rule{
     ]
     
     let AStraightMin:[Int:String] = [
-        0:"A2345最小",
-        1:"A2345第二大"
+        0:"A2345第二大",
+        1:"A2345最小"
+        
+    ]
+    
+    let isDouble:[Int:String] = [
+        0:"不翻倍",
+        1:"翻倍"
     ]
     
     override init(ruleIndex: Int, ruleName: String) {
@@ -42,10 +48,10 @@ class ThirteenWaterGameRule : Rule{
             1: "道数13张翻倍[1301]",
             2: "54张百变13张[1303]",
             3: "道数13张不翻倍[1300]",
-            4: "道数13张不翻倍[1...",
-            5: "道数13张比两道[1...",
-            6: "道数13张不翻倍A2345二大",
-            7: "道数13张比两道A2345二大",
+            4: "道数13张不翻倍[1304]",
+            5: "道数13张比两道[1305]",
+            6: "道数13张不翻倍A2345二大[1306]",
+            7: "道数13张比两道A2345二大[1307]",
         ]
         self.ruleInfo = [
             0: """
@@ -124,11 +130,11 @@ class ThirteenWaterGame{
     static func getAllCardIndex(setting: Int) -> [Int]{
         var result : [Int] = []
         switch setting {
-        case 0:
-            result = Array(0...51)
+        case 2:
+            result = Array(0...51) + [53,54]
             break
         default:
-            result = Array(0...51) + [53,54]
+            result = Array(0...51)
             break
         }
         
@@ -166,7 +172,7 @@ class ThirteenWaterGame{
     //4 communityNum
     //5 winCondition
     //6 AStraightMin
-
+    //7 isDouble
     
     static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
         let dealNum = args[0]
@@ -176,6 +182,7 @@ class ThirteenWaterGame{
         let communityNum = args[4]
         let winCondition = args[5]
         let AStraightMin = args[6]
+        let isDouble = args[7]
         
         var maxRank = 0
         var returnPlayerInfos: [GameReturnPlayerInfo] = []
@@ -256,24 +263,32 @@ class ThirteenWaterGame{
             }
         }
         
+        
         var playerRankList : [[Int]] = []
         
         for i in 0..<playerNum {
+            
+            var turn1Cards:[ThirteenWaterCard] = []
+            for card in allPlayCards[i].playerCard {
+                turn1Cards.append(ThirteenWaterCard(card: card))
+            }
+            turn1Cards = turn1Cards.sorted(by: {$0.rank > $1.rank})
+            
             let (rank1, cardtype1, isPair1, usedCardIndex1) = ThirteenWaterGameHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules,
                 AStraightMin: AStraightMin,
                 turn: 1
-            ).evalHand(cards: allPlayCards[i].playerCard)
+            ).evalHand(cards: turn1Cards)
             
             allPlayCards[i].evaluateFlag = rank1
             allPlayCards[i].cardType = cardtype1
             allPlayCards[i].isPair = isPair1
                 
-            var turn2Cards:[Card] = []
-            for cardIndex in 0..<allPlayCards[i].playerCard.count {
+            var turn2Cards:[ThirteenWaterCard] = []
+            for cardIndex in 0..<turn1Cards.count {
                 if !usedCardIndex1.contains(cardIndex){
-                    turn2Cards.append(allPlayCards[i].playerCard[cardIndex])
+                    turn2Cards.append(turn1Cards[cardIndex])
                 }
             }
                 
@@ -285,7 +300,7 @@ class ThirteenWaterGame{
             ).evalHand(cards: turn2Cards)
                 
                     
-            var turn3Cards:[Card] = []
+            var turn3Cards:[ThirteenWaterCard] = []
             for cardIndex in 0..<turn2Cards.count {
                 if !usedCardIndex2.contains(cardIndex){
                     turn3Cards.append(turn2Cards[cardIndex])
@@ -314,16 +329,22 @@ class ThirteenWaterGame{
             for currentPlayer in 0..<playerNum {
                 for i in 0..<playerNum{
                     if currentPlayer != i{
+                        var winNum = 0
                         for turn in 0..<3{
                             if playerRankList[currentPlayer][turn] > playerRankList[i][turn]{
-                                allPlayCards[currentPlayer].evaluateFlag += 1
-                                allPlayCards[i].evaluateFlag -= 1
+                                winNum += 1
                             }
                             else if playerRankList[currentPlayer][turn] < playerRankList[i][turn]{
-                                allPlayCards[currentPlayer].evaluateFlag -= 1
-                                allPlayCards[i].evaluateFlag += 1
+                                winNum -= 1
                             }
                         }
+                        
+                        if isDouble == 1 && (winNum == 3 || winNum == -3){
+                            winNum *= 2
+                        }
+                        
+                        allPlayCards[i].evaluateFlag += winNum
+                            
                     }
                 }
             }
@@ -336,17 +357,14 @@ class ThirteenWaterGame{
             for currentPlayer in 0..<playerNum {
                 for i in 0..<playerNum{
                     if currentPlayer != i{
+                        var winFlag = 0
                         for turn in 0..<3{
-                            var winFlag = 0
                             if playerRankList[currentPlayer][turn] > playerRankList[i][turn]{
                                 winFlag += 1
                             }
-                            else if playerRankList[currentPlayer][turn] < playerRankList[i][turn]{
-                                winFlag -= 1
-                            }
-                            if winFlag >= 2{
-                                allPlayCards[currentPlayer].evaluateFlag += 1
-                            }
+                        }
+                        if winFlag >= 2{
+                            allPlayCards[currentPlayer].evaluateFlag += 1
                         }
                     }
                 }
@@ -413,16 +431,7 @@ class ThirteenWaterGameHandEvaluator{
     }
     
     //传入需要的参数
-    func evalHand(cards: [Card])->(Int, String, Int, [Int]){
-        var cards = cards
-        
-        var numList:[ThirteenWaterCard] = []
-        for card in cards {
-            numList.append(ThirteenWaterCard(card: card))
-        }
-        numList = numList.sorted(by: {$0.rank > $1.rank})
-        
-        
+    func evalHand(cards: [ThirteenWaterCard])->(Int, String, Int, [Int]){
         var needCardNum = 5
         if turn == 3{
             needCardNum = 3
@@ -435,7 +444,7 @@ class ThirteenWaterGameHandEvaluator{
         
         var i = self.ruleDict.count + 1
         for ruleIndex in self.rankRules{
-            let (rankList, cardTypeList, isPair, usedCardIndexList) = self.ruleDict[ruleIndex]!(numList, needCardNum)
+            let (rankList, cardTypeList, isPair, usedCardIndexList) = self.ruleDict[ruleIndex]!(cards, needCardNum)
             i -= 1
             
             if rankList.count == 0{
@@ -444,7 +453,7 @@ class ThirteenWaterGameHandEvaluator{
             else {
                 let maxIndex = rankList.firstIndex(of: rankList.max() ?? 0)!
                 
-                rank = (1 << (i + 11)) | rankList[maxIndex]
+                rank = (1 << (i + 23)) | rankList[maxIndex]
                 cardType = cardTypeList[maxIndex]
                 usedCardIndex = usedCardIndexList[maxIndex]
                 
@@ -467,18 +476,20 @@ class ThirteenWaterGameHandEvaluator{
             
             for i in 0..<straightUsedCardIndexList.count{
                 let currentStraightUsedCardIndex = straightUsedCardIndexList[i]
-                var suit : Int = -1
+                
+                var suit = 3
+                for c in currentStraightUsedCardIndex {
+                    if cards[c].suit >= 0{
+                        suit = cards[c].suit
+                        break
+                    }
+                }
+                
                 var isFlush : Bool = true
                 for currentCardIndex in currentStraightUsedCardIndex{
                     let currentCard = cards[currentCardIndex]
                     
-                    if currentCard.suit == suit{
-                        continue
-                    }
-                    else if suit == -1{
-                        suit = currentCard.suit
-                    }
-                    else{
+                    if currentCard.suit != suit && currentCard.suit != -1{
                         isFlush = false
                         break
                     }
@@ -487,7 +498,11 @@ class ThirteenWaterGameHandEvaluator{
                     usedCardIndexList.append(currentStraightUsedCardIndex)
                     
                     var rank = straightRankList[i] >> 2
-                    let cardType = "同花顺" + String(rank)
+                    var cardType = "同花顺"
+                    for currentCardIndex in currentStraightUsedCardIndex{
+                        let currentCard = cards[currentCardIndex]
+                        cardType += String(currentCard.rank) + " "
+                    }
                     
                     rank = rank << 2 | suit
                     
@@ -544,7 +559,7 @@ class ThirteenWaterGameHandEvaluator{
                 rank = rank << 4 | fourCardRank
                 rank = rank << 2 | fourcardSuit
                 
-                let cardType = "炸弹" + String(fourCardRank)
+                let cardType = "炸弹" + GameManager.CardNumberReportDic[cards[currentUsedCardIndex[2]].originRank]!
                 
                 rankList.append(rank)
                 cardTypeList.append(cardType)
@@ -590,7 +605,7 @@ class ThirteenWaterGameHandEvaluator{
             for currentUsedCardIndex in usedCardIndexList{
                 var rank = 0
                 
-                var threecardRank = cards[currentUsedCardIndex[3]].rank
+                var threecardRank = cards[currentUsedCardIndex[2]].rank
                 var pairRank = cards[currentUsedCardIndex[4]].rank
                 var threecardSuit = cards[currentUsedCardIndex[0]].suit
                 var pairSuit = cards[currentUsedCardIndex[3]].suit
@@ -610,7 +625,7 @@ class ThirteenWaterGameHandEvaluator{
                 rank = rank << 2 | threecardSuit
                 rank = rank << 2 | pairSuit
                 
-                let cardType = "三带二" + String(threecardRank) + String(pairRank)
+                let cardType = "三带二" + GameManager.CardNumberReportDic[cards[currentUsedCardIndex[2]].originRank]!
                 
                 rankList.append(rank)
                 cardTypeList.append(cardType)
@@ -652,15 +667,18 @@ class ThirteenWaterGameHandEvaluator{
                         break
                     }
                 }
-                var flushRank = cards[currentUsedCardIndex[0]].rank
-                if flushRank == 15{
-                    flushRank = 0
-                }
                 
-                rank = rank << 4 | flushRank
+                for c in currentUsedCardIndex {
+                    if cards[c].rank == 15{
+                        rank = rank << 4 | 0
+                    }
+                    else{
+                        rank = rank << 4 | cards[c].rank
+                    }
+                }
                 rank = rank << 2 | suit
                 
-                let cardType = "同花" + GameManager.SuitReportDix[suit]!
+                let cardType = "同花" + GameManager.CardNumberReportDic[cards[currentUsedCardIndex[0]].originRank]!
                 
                 rankList.append(rank)
                 cardTypeList.append(cardType)
@@ -678,32 +696,10 @@ class ThirteenWaterGameHandEvaluator{
         
         
         var allIndex:[Int] = Array(0...cards.count-1)
-        var jokerNum = 0
-        var lastNum = cards[0].rank
-        var beginIndex = 0
-        var length = 0
-        for index in allIndex{
-            let nowNum = cards[index].rank
-            if nowNum == 15{
-                jokerNum += 1
-            }
-            else if lastNum - nowNum - 1 > jokerNum{
-                if length < needCardsNum{
-                    beginIndex = index + 1
-                }
-            }
-            else{
-                length += 1
-            }
-            
-            if length >= needCardsNum{
-                break
-            }
-        }
-        allIndex = Array(beginIndex...cards.count-1)
         
         let allCombinations = allIndex.combinations(ofCount: needCardsNum)
         for combination in allCombinations {
+            
             var currentCombination = combination
             currentCombination.sort(by: { index1, index2 in
                 return cards[index1].rank > cards[index2].rank
@@ -789,7 +785,7 @@ class ThirteenWaterGameHandEvaluator{
                     }
                 }
                 
-                if gap > 0{
+                if gap >= 0{
                     let nowRank = cards[currentCombination[cntC]].rank
                     if nowRank == 14{
                         headRank = 15
@@ -819,7 +815,11 @@ class ThirteenWaterGameHandEvaluator{
                 rank = rank << 4 | headRank
                 rank = rank << 2 | headSuit
 
-                let cardType = "顺子" + String(headRank)
+                var cardType = "顺子"
+                for currentCardIndex in currentCombination{
+                    let currentCard = cards[currentCardIndex]
+                    cardType += String(currentCard.rank) + " "
+                }
                 
                 rankList.append(rank)
                 cardTypeList.append(cardType)
@@ -871,7 +871,7 @@ class ThirteenWaterGameHandEvaluator{
                     rank = rank << 4 | threeCardRank
                     rank = rank << 2 | threeCardSuit
                     
-                    let cardType = "三条炸弹" + String(threeCardRank)
+                    let cardType = "三条炸弹" + GameManager.CardNumberReportDic[cards[currentUsedCardIndex[2]].originRank]!
                     
                     rankList.append(rank)
                     cardTypeList.append(cardType)
@@ -922,7 +922,7 @@ class ThirteenWaterGameHandEvaluator{
                 rank = rank << 4 | threeCardRank
                 rank = rank << 2 | threeCardSuit
                 
-                let cardType = "三条" + String(threeCardRank)
+                let cardType = "三条" + GameManager.CardNumberReportDic[cards[currentUsedCardIndex[2]].originRank]!
                 
                 rankList.append(rank)
                 cardTypeList.append(cardType)
@@ -991,7 +991,7 @@ class ThirteenWaterGameHandEvaluator{
                 rank = rank << 2 | firstPairSuit
                 
                 
-                let cardType = "两对" + String(firstPairRank) + String(secondPairRank)
+                let cardType = "两对" + GameManager.CardNumberReportDic[cards[currentUsedCardIndex[1]].originRank]! + GameManager.CardNumberReportDic[cards[currentUsedCardIndex[3]].originRank]!
                 
                 rankList.append(rank)
                 cardTypeList.append(cardType)
@@ -1039,7 +1039,7 @@ class ThirteenWaterGameHandEvaluator{
                 rank = rank << 2 | pairsuit
                 
                 
-                let cardType = "对" + String(pairRank)
+                let cardType = "对子" + GameManager.CardNumberReportDic[cards[currentUsedCardIndex[1]].originRank]!
                 
                 rankList.append(rank)
                 cardTypeList.append(cardType)
@@ -1068,31 +1068,29 @@ class ThirteenWaterGameHandEvaluator{
             }
         }
 
-        return ([rank], ["单牌"+String(rank)], 0, [usedCardIndexList])
+        return ([rank], ["单牌"], 0, [usedCardIndexList])
     }
-    
-    class ThirteenWaterCard{
-        var rank: Int = 0
-        var suit: Int = 0
-        var originRank : Int = 0
-        
-        init(card: Card){
-            self.originRank = card.rank
-            
-            if card.rank == 14 || card.rank == 15{
-                self.rank = 15
-                self.suit = -1
-            }
-            else if card.rank == 1{
-                self.rank = 14
-                self.suit = card.suit[0]
-            }
-            else{
-                self.rank = card.rank
-                self.suit = card.suit[0]
-            }
-        }
-    }
-
 }
 
+class ThirteenWaterCard{
+    var rank: Int = 0
+    var suit: Int = 0
+    var originRank : Int = 0
+    
+    init(card: Card){
+        self.originRank = card.rank
+        
+        if card.rank == 14 || card.rank == 15{
+            self.rank = 15
+            self.suit = -1
+        }
+        else if card.rank == 1{
+            self.rank = 14
+            self.suit = card.suit[0]
+        }
+        else{
+            self.rank = card.rank
+            self.suit = card.suit[0]
+        }
+    }
+}

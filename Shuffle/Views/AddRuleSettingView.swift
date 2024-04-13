@@ -204,8 +204,10 @@ struct AddRuleSettingView: View{
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(width: 160, height: 30, alignment: .trailing).padding(.trailing,30)
-                            .accentColor(.white).onChange(of: setting) { _ in
+                            .frame(width: 200, height: 30, alignment: .trailing).padding(.trailing,30)
+                            .multilineTextAlignment(.leading)
+                            .accentColor(.white)
+                            .onChange(of: setting) { _ in
                                 handleSettingChange(selectedRuleIndex: gameType)
                             }.background(){
                                 NavigationLink(
@@ -415,6 +417,7 @@ struct AddRuleSettingView: View{
                                 }
                                 .pickerStyle(MenuPickerStyle())
                                 .frame(width: 200, height: 30, alignment: .trailing)
+                                .multilineTextAlignment(.leading)
                                 .padding(.trailing,30) // 右侧间距
                                 .accentColor(.white)
                                 
