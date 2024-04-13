@@ -161,7 +161,7 @@ class GameManager {
         return resultList
     }
     
-    static func selectGame(gameIndex: Int, inputCards: [Int], playerNum: Int, args : [Int], rankRules : [Int], suitRules: [Int],dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], calModeArgs: [Int], cutNumSetting: Int, cutNumRangeSetting: [Int], consecutiveReport: Int, minCardNum: Int, cutCardIndexArray: [Int]) -> (ReportManager.MultipleReportResultInfo, [Int]) {
+    static func selectGame(gameIndex: Int, inputCards: [Int], playerNum: Int, args : [Int], rankRules : [Int], suitRules: [Int],dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], calModeArgs: [Int], cutNumSetting: Int, cutNumRangeSetting: [Int], consecutiveReport: Int, minCardNum: Int, cutCardIndexArray: [Int]) -> ReportManager.MultipleReportResultInfo {
         var reportResult:[[Int]] = []
         //TODO dealType 0 正发，1 反发 搞清楚ui
         //cutNumSetting 点数设置
@@ -187,9 +187,9 @@ class GameManager {
         // 返回的result包括两个int数组，一个是按牌大小从大到小排序的玩家编号数组，一个是这一轮结束之后牌库里剩下的牌
 
         
-        let (multipleGameInfo, leftCards) =  ReportManager.GameReporter(gameIndex: gameIndex, inputCards: inputCards, cutCardIndexList: cutCardIndexArray, diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, newArgs: newArgs, rankRules: rankRules, suitRules: suitRules, reportID: calMode, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, targetPos: targetPos, coloringType: coloringType, consecutiveNum: consecutiveReport)
+        let multipleGameInfo =  ReportManager.GameReporter(gameIndex: gameIndex, inputCards: inputCards, cutCardIndexList: cutCardIndexArray, diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, newArgs: newArgs, rankRules: rankRules, suitRules: suitRules, reportID: calMode, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, targetPos: targetPos, coloringType: coloringType, consecutiveNum: consecutiveReport)
         
-        return (multipleGameInfo, leftCards)
+        return multipleGameInfo
     }
     
     static func getCheckedIndexes(rankRules: [RankRulesSate]) -> [Int] {
