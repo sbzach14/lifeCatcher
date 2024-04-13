@@ -500,7 +500,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         
         var confidenceThreshold = 0.7
         if self.state == "idle"{
-            confidenceThreshold = 0.85
+            confidenceThreshold = 0.8
         }
         else{
             confidenceThreshold = 0.7
