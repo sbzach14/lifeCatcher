@@ -54,6 +54,9 @@ class CardNineGameRule : Rule{
     override init(ruleIndex: Int, ruleName: String) {
         super.init(ruleIndex: ruleIndex, ruleName: ruleName)
         self.rankRules = [
+            42:"对红1",
+            41:"王+9",
+            40:"同色对子",
             39:"红8+红J",
             38:"红2+7",
             37:"红Q+7",
@@ -96,24 +99,24 @@ class CardNineGameRule : Rule{
             0: "点数"
         ]
         self.setting = [
-            0: "杭州小牌九",
-            1: "温州牌九[260]",
-            2: "通用四张-牌九大牌九1[...",
+            0: "杭州小牌九*",
+            1: "温州牌九[260]*",
+            2: "通用四张-牌九大牌九1*",
             3: "52张小牌九[262]",
-            4: "宁波小牌九[263]",
-            5: "杭州牌九[264]",
-            6: "32张牌9[456]",
-            7: "湖南牌九[265]",
+            4: "宁波小牌九[263]*",
+            5: "杭州牌九[264]*",
+            6: "32张牌9[456]*",
+            7: "湖南牌九[265]*",
             8: "通用四张-32张牌九[416]",
             9: "山西牌九[268]",
-            10: "通用四张-54张大牌九[..",
+            10: "通用四张-54张大牌九",
             11: "34张小牌九[457]",
             12: "通用四张-32张牌九二[...",
-            13: "温州牌九黑大3[269]",
-            14: "南京牌九[261]",
+            13: "温州牌九黑大3[269]*",
+            14: "南京牌九[261]*",
             15: "32张牌九[266]",
             16: "山西牌九[269]",
-            17: "通用四张-杭州牌九[420]",
+            17: "通用四张-杭州牌九[420]*",
         ]
         self.ruleInfo = [
             0:"""
@@ -277,12 +280,12 @@ class CardNineGame{
         var result : [Int] = []
         switch setting {
         case 0:
-            result = [14,40,3,16,29,42,4,17,5,18,31,44,6,19,32,45,7,20,33,46,8,22,9,22,35,48,10,36,24,50,54,2]
+            result = [14,40,3,16,29,42,4,17,5,18,31,44,6,19,32,45,7,20,33,46,8,21,9,22,35,48,10,36,24,50,54,2]
         case 1:
             result = [24,50,17,43,21,47,14,40,23,49,53,54,3,16,29,42,5,18,31,44,6,19,32,45,7,20,33,46,9,22,35,48]
             break
         case 2:
-            result = [24,50,53,52,14,40,3,4,5,6,7,8,9,10,16,17,18,19,20,21,22,23,29,30,31,32,33,34,35,36,42,43,44,45,46,47,48,49,2,15,41]
+            result = [24,50,54,53,14,40,3,4,5,6,7,8,9,10,16,17,18,19,20,21,22,23,29,30,31,32,33,34,35,36,42,43,44,45,46,47,48,49,2,15,41]
             break
         case 3:
             result = Array(0...51)
@@ -563,6 +566,10 @@ class CardNineGameHandEvaluator{
             37:self.eval_RedQRedSeven(cards: ),
             38:self.eval_RedTwoRedSeven(cards: ),
             39:self.eval_RedEightRedJ(cards: ),
+            40:self.eval_isSameColorPair(cards:),
+            41:self.eval_isJokerPlusNine(cards:),
+            42:self.eval_isRedAPair(cards:),
+            
         ]
     }
     
@@ -600,6 +607,38 @@ class CardNineGameHandEvaluator{
     }
     
     //规则函数，返回(rank, cardType, isPair)
+    
+    func eval_isRedAPair(cards:[CardNineCard]) -> (Int, String, Int){
+        if cards[0].rank == cards[1].rank && cards[0].color == 1 && cards[1].color == 1 && cards[0].originalRank == 1{
+            return (1, "对红1", 1)
+        }
+        return (0, "", 0)
+    }
+    
+    
+    func eval_isJokerPlusNine(cards:[CardNineCard]) -> (Int, String, Int){
+        if cards[0].originalRank == 15 && cards[0].originalRank == 9{
+            return (1, "王 + 9", 1)
+        }
+        return (0, "", 0)
+    }
+    
+    
+    func eval_isSameColorPair(cards:[CardNineCard]) -> (Int, String, Int){
+        if cards[0].rank == cards[1].rank && cards[0].color == cards[1].color {
+            
+            var cardType: String = "对" + GameManager.CardNumberReportDic[cards[0].originalRank]!
+            
+            if self.pairRank == 0{
+                return (cards[0].rank, cardType, 1)
+            } else if self.pairRank == 1{
+                return (1, cardType, 1)
+            }
+        }
+        return (0, "", 0)
+    }
+    
+    
     func eval_RedEightRedJ(cards: [CardNineCard]) -> (Int, String, Int) {
         if cards[0].originalRank == 8 && cards[0].color == 1 && cards[1].originalRank == 11 && cards[1].color == 1{
             return (1, "红8红J", 0)

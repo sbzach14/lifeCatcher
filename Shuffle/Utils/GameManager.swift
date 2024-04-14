@@ -2429,15 +2429,15 @@ public class RuleManager{
                 QValueRange = 0
                 JValueRange = 0
                 pointComparision = 0
-                samePointComparision = 0
+                samePointComparision = 1
                 AValueRange = 0
                 pairRank = 0
                 cardRankRule = 0
                 
                 args = [handNum, communityNum,redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule]
                 suitRules = [3,2,1,0]
-                rankRules = [8,9,10,11,3,2,1,0]
-                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                rankRules = [14,15,4,11,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1]
                 allPreSetRules[i]![3]!.append(args)
                 allPreSetRules[i]![3]!.append(suitRules)
                 allPreSetRules[i]![3]!.append(rankRules)
@@ -2534,7 +2534,7 @@ public class RuleManager{
                 handNum = 2
                 communityNum = 0
                 redJokerValueRange = 0
-                blackJokerValueRange = 0
+                blackJokerValueRange = 1
                 KValueRange = 0
                 QValueRange = 0
                 JValueRange = 0
@@ -2542,12 +2542,12 @@ public class RuleManager{
                 samePointComparision = 0
                 AValueRange = 0
                 pairRank = 0
-                cardRankRule = 0
+                cardRankRule = 3
                 
                 args = [handNum, communityNum,redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule]
                 suitRules = [3,2,1,0]
-                rankRules = [8,9,10,11,3,2,1,0]
-                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                rankRules = [16,8,3,15,17,18,19,20,21,22,23,24,25,26,27,28,13,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
                 allPreSetRules[i]![8]!.append(args)
                 allPreSetRules[i]![8]!.append(suitRules)
                 allPreSetRules[i]![8]!.append(rankRules)
@@ -2562,14 +2562,14 @@ public class RuleManager{
                 JValueRange = 0
                 pointComparision = 0
                 samePointComparision = 0
-                AValueRange = 0
+                AValueRange = 1
                 pairRank = 0
                 cardRankRule = 0
                 
                 args = [handNum, communityNum,redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule]
                 suitRules = [3,2,1,0]
-                rankRules = [8,9,10,11,3,2,1,0]
-                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                rankRules = [10, 8, 9, 17, 18,29,30, 31,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1,1,1,1]
                 allPreSetRules[i]![9]!.append(args)
                 allPreSetRules[i]![9]!.append(suitRules)
                 allPreSetRules[i]![9]!.append(rankRules)
@@ -2577,20 +2577,20 @@ public class RuleManager{
 //                10: "通用四张-54张大牌九[..",
                 handNum = 2
                 communityNum = 0
-                redJokerValueRange = 0
-                blackJokerValueRange = 0
-                KValueRange = 0
-                QValueRange = 0
+                redJokerValueRange = 1
+                blackJokerValueRange = 2
+                KValueRange = 1
+                QValueRange = 1
                 JValueRange = 0
-                pointComparision = 0
+                pointComparision = 1
                 samePointComparision = 0
                 AValueRange = 0
-                pairRank = 0
+                pairRank = 1
                 cardRankRule = 0
                 
                 args = [handNum, communityNum,redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule]
                 suitRules = [3,2,1,0]
-                rankRules = [8,9,10,11,3,2,1,0]
+                rankRules = [16, 41, 40, 0]
                 rankRuleChecked = [1,1,1,1,1,1,1,1]
                 allPreSetRules[i]![10]!.append(args)
                 allPreSetRules[i]![10]!.append(suitRules)
@@ -2606,14 +2606,14 @@ public class RuleManager{
                 JValueRange = 0
                 pointComparision = 0
                 samePointComparision = 0
-                AValueRange = 0
+                AValueRange = 1
                 pairRank = 0
-                cardRankRule = 0
+                cardRankRule = 4
                 
                 args = [handNum, communityNum,redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule]
                 suitRules = [3,2,1,0]
-                rankRules = [8,9,10,11,3,2,1,0]
-                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                rankRules = [8,9,12,17,32,33,34,29,30,35,3,36,2,1,37,38,39,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
                 allPreSetRules[i]![11]!.append(args)
                 allPreSetRules[i]![11]!.append(suitRules)
                 allPreSetRules[i]![11]!.append(rankRules)
@@ -2622,7 +2622,7 @@ public class RuleManager{
                 handNum = 2
                 communityNum = 0
                 redJokerValueRange = 0
-                blackJokerValueRange = 0
+                blackJokerValueRange = 1
                 KValueRange = 0
                 QValueRange = 0
                 JValueRange = 0
@@ -2630,12 +2630,12 @@ public class RuleManager{
                 samePointComparision = 0
                 AValueRange = 0
                 pairRank = 0
-                cardRankRule = 0
+                cardRankRule = 5
                 
                 args = [handNum, communityNum,redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule]
                 suitRules = [3,2,1,0]
-                rankRules = [8,9,10,11,3,2,1,0]
-                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                rankRules = [16, 9, 3, 17, 18,19,20,21,42,23,24,25,26,27,28, 13, 2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
                 allPreSetRules[i]![12]!.append(args)
                 allPreSetRules[i]![12]!.append(suitRules)
                 allPreSetRules[i]![12]!.append(rankRules)
@@ -2644,7 +2644,7 @@ public class RuleManager{
                 handNum = 2
                 communityNum = 0
                 redJokerValueRange = 0
-                blackJokerValueRange = 0
+                blackJokerValueRange = 1
                 KValueRange = 0
                 QValueRange = 0
                 JValueRange = 0
@@ -2652,7 +2652,7 @@ public class RuleManager{
                 samePointComparision = 0
                 AValueRange = 0
                 pairRank = 0
-                cardRankRule = 0
+                cardRankRule = 3
                 
                 args = [handNum, communityNum,redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule]
                 suitRules = [3,2,1,0]
@@ -2700,8 +2700,8 @@ public class RuleManager{
                 
                 args = [handNum, communityNum,redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule]
                 suitRules = [3,2,1,0]
-                rankRules = [8,9,10,11,3,2,1,0]
-                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                rankRules = [16,8,3,15,17,18,19,20,21,22,23,24,25,26,27,28,13,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
                 allPreSetRules[i]![15]!.append(args)
                 allPreSetRules[i]![15]!.append(suitRules)
                 allPreSetRules[i]![15]!.append(rankRules)
@@ -2716,14 +2716,14 @@ public class RuleManager{
                 JValueRange = 0
                 pointComparision = 0
                 samePointComparision = 0
-                AValueRange = 0
+                AValueRange = 1
                 pairRank = 0
                 cardRankRule = 0
                 
                 args = [handNum, communityNum,redJokerValueRange, blackJokerValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, cardRankRule]
                 suitRules = [3,2,1,0]
-                rankRules = [8,9,10,11,3,2,1,0]
-                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                rankRules = [10, 8, 9, 17, 18,29,30, 31,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1,1,1,1]
                 allPreSetRules[i]![16]!.append(args)
                 allPreSetRules[i]![16]!.append(suitRules)
                 allPreSetRules[i]![16]!.append(rankRules)
