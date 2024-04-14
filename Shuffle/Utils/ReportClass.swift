@@ -1689,6 +1689,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             5: TwoEightGangGame.FindWinner,
             6: NinePointFiveGame.FindWinner,
             7: BaoziGame.FindWinner,
+            8: JiaJiaBaoGame.FindWinner,
+            9: CardNineGame.FindWinner,
             10: NinePointGame.FindWinner,
             11: FourCardGame.FindWinner(diyDealStatus:diyDealNum:inputCards:args:rankRules:suitRules:),
             12: TwoCardGame.FindWinner(diyDealStatus:diyDealNum:inputCards:args:rankRules:suitRules:),

@@ -416,7 +416,7 @@ class NinePointGameHandEvaluator{
             if rank == 0{
                 continue
             } else {
-                score = (1 << (i + 8)) | rank
+                score = (1 << (i + 9)) | rank
                 maxCardType = cardType
                 maxIsPair = isPair
                 print("牌型 \(ruleIndex) rank \(score)")
@@ -449,16 +449,20 @@ class NinePointGameHandEvaluator{
     }
     
     func eval_Point(cards: [NinePointCard]) -> (Int, String, Int){
-        var num1 = cards[0].point
-        var num2 = cards[1].point
-        var cardType: String = String((num1 + num2) % 10) + "点"
+        let num1 = cards[0].point
+        let num2 = cards[1].point
+        let point = (num1 + num2) % 10
+        let cardType: String = String((num1 + num2) % 10) + "点"
+        print("九点点数 \(cardType)")
+        
         if self.samePointComparision == 0{
-            return ((num1 + num2) % 10, cardType, 0)
+            return (point + 1, cardType, 0)
         } else if self.samePointComparision == 1{
-            return (((num1 + num2) % 10) << 4 | cards[0].rank, cardType, 0)
+            return ((point + 1) << 4 | cards[0].rank, cardType, 0)
         } else if self.samePointComparision == 2{
-            return (((num1 + num2) % 10) << 2 | (self.blackRedJudger(card: cards[0]) + self.blackRedJudger(card: cards[1])), cardType, 0)
+            return ((point + 1) << 2 | (self.blackRedJudger(card: cards[0]) + self.blackRedJudger(card: cards[1])), cardType, 0)
         }
+        
         return (0, cardType, 0)
     }
     
