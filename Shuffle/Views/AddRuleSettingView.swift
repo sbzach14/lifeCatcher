@@ -229,11 +229,8 @@ struct AddRuleSettingView: View{
                                 .foregroundColor(.white) // 左侧间距
                             Button(action: {
                                 // 点击按钮时，显示弹出窗口
-                                if self.setting != selectedRule!.setting.count - 1{
-                                    self.showRuleInfo = true
-                                } else{
-                                    self.isNavigateToGameSettingView = true
-                                }
+                                self.showRuleInfo = true
+
                             }) {
                                 Image("icon_next").resizable().frame(width: 30, height: 30)
                             }
