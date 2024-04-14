@@ -305,10 +305,13 @@ class TenPointFiveGameHandEvaluator{
         var num1 = TenPointFiveCard(card: cards[0], redJokerValueRange: redJokerValueRange, blackJokerValueRange: blackJokerValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, cardRankRule: cardRankRule)
         var num2 = TenPointFiveCard(card: cards[1], redJokerValueRange: redJokerValueRange, blackJokerValueRange: blackJokerValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, cardRankRule: cardRankRule)
         
+        var inputCards = [num1, num2]
+        inputCards = inputCards.sorted(by: {$0.rank >= $1.rank})
+        
         
         var i = self.rankRules.count + 1
         for ruleIndex in self.rankRules{
-            let (flag, rank, cardType, isPair) = self.rankRulesDic[ruleIndex]!([num1, num2])
+            let (flag, rank, cardType, isPair) = self.rankRulesDic[ruleIndex]!(inputCards)
             i -= 1
             if flag == false{
                 continue
@@ -331,10 +334,21 @@ class TenPointFiveGameHandEvaluator{
         return (false, 0, "", 0)
     }
     
+    
     func eval_Points(cards: [TenPointFiveCard]) -> (Bool, Int, String, Int){
         if pointComparision == 0{
-            let cardType: String = String((cards[0].point + cards[1].point)) + "点"
-            return (true, (cards[0].point + cards[1].point) << 4 | cards[0].rank, cardType, 0)
+            var point = (cards[0].point + cards[1].point) % 20
+            
+            if point == 0 {
+                point = 20
+            }
+            
+            var cardType: String = String(point / 2) + "点"
+            
+            if point % 2 == 1{
+                cardType += "半"
+            }
+            return (true, point << 4 | cards[0].rank, cardType, 0)
         }
         return (false, 0, "", 0)
     }
@@ -366,6 +380,7 @@ class TenPointFiveGameHandEvaluator{
                 self.rank = card.rank
 
             }
+            
             //initial point
             if card.rank == 15 {
                 self.point =  Int(rule.redJokerValueRange[redJokerValueRange]!)!
@@ -382,7 +397,7 @@ class TenPointFiveGameHandEvaluator{
             else if card.rank == 11 {
                 self.point = Int(rule.JValueRange[JValueRange]!)!
             }else {
-                self.point = card.rank
+                self.point = card.rank * 2
             }
         }
         

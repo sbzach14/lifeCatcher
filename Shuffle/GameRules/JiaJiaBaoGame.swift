@@ -274,12 +274,9 @@ class JiaJiaBaoGame{
         if handNum == 2{
             
         }
-        
-        
-        
 
         for i in 0..<playerNum {
-            allPlayCards[i].evaluateFlag = JiaJiaBaoGameHandEvaluator(
+            (allPlayCards[i].evaluateFlag, allPlayCards[i].cardType, allPlayCards[i].isPair) = JiaJiaBaoGameHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules
             ).evalHand(cards: allPlayCards[i].playerCard, redJokerValueRange: redJokerValueRange,blackJokerRange: blackJokerValueRange,KValueRange: KValueRange,QValueRange: QValueRange,JValueRange: JValueRange,samePointComparision: samePointComparision, cardRankList: CardRankList, isCompareSuit: isCompareSuit)
@@ -314,7 +311,7 @@ class JiaJiaBaoGame{
 class JiaJiaBaoGameHandEvaluator{
     var rankRules: [Int]
     var suitRules: [Int]
-    var ruleDict: [Int: ([JiaJiaBaoCard]) -> Int] = [:]
+    var ruleDict: [Int: ([JiaJiaBaoCard]) -> (Int, String, Int)] = [:]
     var samePointComparision: Int = 0
 
     
@@ -331,7 +328,7 @@ class JiaJiaBaoGameHandEvaluator{
         ]
     }
     
-    func evalHand(cards: [Card], redJokerValueRange: Int, blackJokerRange: Int, KValueRange: Int, QValueRange: Int, JValueRange: Int, samePointComparision: Int, cardRankList: Int, isCompareSuit: Int)->Int{
+    func evalHand(cards: [Card], redJokerValueRange: Int, blackJokerRange: Int, KValueRange: Int, QValueRange: Int, JValueRange: Int, samePointComparision: Int, cardRankList: Int, isCompareSuit: Int)->(Int, String, Int){
         var cards = cards
         self.samePointComparision = samePointComparision
         
@@ -350,52 +347,57 @@ class JiaJiaBaoGameHandEvaluator{
         var score = 0
         var i = self.ruleDict.count + 1
         for ruleIndex in self.rankRules{
-            let rank = self.ruleDict[ruleIndex]!(numList)
+            let (rank, cardType, isPair) = self.ruleDict[ruleIndex]!(numList)
             i -= 1
             if rank == 0{
                 continue
             } else {
                 score = (1 << (i + 12)) | rank
                 print("牌型 \(ruleIndex) rank \(score)")
+                return (score, cardType, isPair)
                 break
             }
         }
         
-        return score
+        return (score, "", 0)
     }
     
-    func eval_IsPairJoker(cards: [JiaJiaBaoCard]) -> Int {
+    func eval_IsPairJoker(cards: [JiaJiaBaoCard]) -> (Int, String, Int) {
         if cards[0].rank == 28 && cards[1].rank == 28 {
-            return 1
+            return (1, "对王", 1)
         }
-        return 0
+        return (0, "", 0)
     }
-    func eval_IsRedPair(cards: [JiaJiaBaoCard]) -> Int {
+    func eval_IsRedPair(cards: [JiaJiaBaoCard]) -> (Int, String, Int) {
         if cards[0].rank == cards[1].rank && cards[0].suit == 1{
-            return cards[0].rank
+            var cardType: String = "红对" + GameManager.CardNumberReportDic[cards[0].originalRank]!
+            return (cards[0].rank, cardType, 1)
         }
-        return 0
+        return (0, "", 0)
     }
-    func eval_IsBlackPair(cards: [JiaJiaBaoCard]) -> Int {
+    func eval_IsBlackPair(cards: [JiaJiaBaoCard]) -> (Int, String, Int) {
         if cards[0].rank == cards[1].rank && cards[0].suit == 0{
-            return cards[0].rank
+            var cardType: String = "黑对" + GameManager.CardNumberReportDic[cards[0].originalRank]!
+            return (cards[0].rank, cardType, 1)
         }
-        return 0
+        return (0, "", 0)
     } 
-    func eval_IsMixPair(cards: [JiaJiaBaoCard]) -> Int {
+    func eval_IsMixPair(cards: [JiaJiaBaoCard]) -> (Int, String, Int) {
         if cards[0].rank == cards[1].rank + 13 && cards[0].suit != cards[1].suit{
-            return cards[0].rank
+            var cardType: String = "混对" + GameManager.CardNumberReportDic[cards[0].originalRank]!
+            return (cards[0].rank, cardType, 1)
         }
-        return 0
+        return (0, "", 0)
     }
-    func eval_Points(cards: [JiaJiaBaoCard]) -> Int {
+    func eval_Points(cards: [JiaJiaBaoCard]) -> (Int, String, Int) {
         let point = (cards[0].point + cards[1].point) % 10
+        let cardType = String(point) + "点"
         switch self.samePointComparision {
         case 0:
-            return point << 6 | cards[0].rank
+            return ((point + 1) << 6 | cards[0].rank, cardType, 0)
             break
         default:
-            return point
+            return (point + 1, cardType, 0)
             break
         }
     }
@@ -406,6 +408,7 @@ class JiaJiaBaoGameHandEvaluator{
         var point: Int = 0
         var suit: Int = 0
         var cardIndex: Int = 0
+                var originalRank: Int = 0
         
         init(card: Card, redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange: Int, JValueRange: Int, CardRankList: Int, isCompareSuit: Int){
             let rule = GameManager.gameRules[8] as! JiaJiaBaoGameRule
@@ -437,6 +440,7 @@ class JiaJiaBaoGameHandEvaluator{
                 self.point = card.rank
             }
             //rank Initialization
+            self.originalRank = card.rank
             if CardRankList == 0{
                 //王 28
                 if card.rank == 15 || card.rank == 14 {

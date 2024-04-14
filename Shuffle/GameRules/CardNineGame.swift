@@ -480,7 +480,7 @@ class CardNineGame{
         
         
         for i in 0..<playerNum {
-            allPlayCards[i].evaluateFlag = CardNineGameHandEvaluator(
+            (allPlayCards[i].evaluateFlag, allPlayCards[i].cardType, allPlayCards[i].isPair) = CardNineGameHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules
             ).evalHand(cards: allPlayCards[i].playerCard, redJokerValueRange: redJokerValueRange,blackJokerValueRange: blackJokerValueRange,KValueRange: KValueRange,QValueRange: QValueRange,JValueRange: JValueRange, AValueRange: AValueRange,pointComparision: pointComparision,samePointComparision: samePointComparision, cardRankRule: cardRankRule, pairRank: pairRank)
@@ -515,7 +515,7 @@ class CardNineGame{
 class CardNineGameHandEvaluator{
     var rankRules: [Int]
     var suitRules: [Int]
-    var ruleDict: [Int: ([CardNineCard]) -> Int] = [:]
+    var ruleDict: [Int: ([CardNineCard]) -> (Int,String,Int)] = [:]
     var pointComparision:Int = 0
     var samePointComparision: Int = 0
     var pairRank: Int = 0
@@ -529,11 +529,46 @@ class CardNineGameHandEvaluator{
             1:self.eval_is2Plus8(cards:),
             2:self.eval_isQPlus8(cards:),
             3:self.eval_isQPlus9(cards:),
-            4:self.eval_isPair(cards:)
+            4:self.eval_isPair(cards:),
+            5:self.eval_isMixColorPair(cards: ),
+            6:self.eval_isBlackColorPair(cards: ),
+            7:self.eval_isRedColorPair(cards: ),
+            8:self.eval_isRedQPair(cards: ),
+            9:self.eval_isRedTwoPair(cards: ),
+            10:self.eval_BlackAandBlackThree(cards: ),
+            11:self.eval_isRedFivePair(cards: ),
+            12:self.eval_RedJokerandBlackThree(cards: ),
+            13:self.eval_isBlackFivePair(cards:),
+            14:self.eval_isQPair(cards: ),
+            15:self.eval_isTwoPair(cards: ),
+            16:self.eval_isJokerPair(cards: ),
+            17:self.eval_isRedEightPair(cards: ),
+            18:self.eval_isRedFourPair(cards: ),
+            19:self.eval_isRedTenPair(cards: ),
+            20:self.eval_isRedSixPair(cards: ),
+            21:self.eval_isBlackFourPair(cards: ),
+            22:self.eval_isBlackJPair(cards: ),
+            23:self.eval_isBlackTenPair(cards: ),
+            24:self.eval_isRedSevenPair(cards: ),
+            25:self.eval_isBlackSixPair(cards: ),
+            26:self.eval_isBlackNinePair(cards: ),
+            27:self.eval_isBlackEightPair(cards: ),
+            28:self.eval_isBlackSevenPair(cards: ),
+            29:self.eval_isBlackTenSixFourPair(cards: ),
+            30:self.eval_isRedJTenSevenSixPair(cards: ),
+            31:self.eval_isBlackNineEightSevenFivePair(cards: ),
+            32:self.eval_HeartThreeRedEight(cards: ),
+            33:self.eval_RedFiveRedJoker(cards: ),
+            34:self.eval_RedThreeBlackEight(cards: ),
+            35:self.eval_isRedNineFiveBlackEightSevenPair(cards: ),
+            36:self.eval_RedTwoRedNine(cards: ),
+            37:self.eval_RedQRedSeven(cards: ),
+            38:self.eval_RedTwoRedSeven(cards: ),
+            39:self.eval_RedEightRedJ(cards: ),
         ]
     }
     
-    func evalHand(cards: [Card],redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange:Int, JValueRange:Int, AValueRange: Int, pointComparision: Int, samePointComparision: Int, cardRankRule: Int, pairRank: Int)->Int{
+    func evalHand(cards: [Card],redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange:Int, JValueRange:Int, AValueRange: Int, pointComparision: Int, samePointComparision: Int, cardRankRule: Int, pairRank: Int)->(Int, String, Int){
         var cards = cards
         self.pointComparision = pointComparision
         self.samePointComparision = samePointComparision
@@ -551,340 +586,399 @@ class CardNineGameHandEvaluator{
         var score = 0
         var i = self.ruleDict.count + 1
         for ruleIndex in self.rankRules{
-            let rank = self.ruleDict[ruleIndex]!(numList)
+            let (rank, cardType, isPair) = self.ruleDict[ruleIndex]!(numList)
             i -= 1
             if rank == 0{
                 continue
             } else {
-                score = (1 << (i + 8)) | rank
+                score = (1 << (i + 10)) | rank
                 print("牌型 \(ruleIndex) rank \(score) i \(i)")
-
+                return (score, cardType, isPair)
                 break
             }
         }
         
-        return score
+        return (score, "", 0)
     }
     
-    func eval_RedEightRedJ(cards: [CardNineCard]) -> Int{
+    //规则函数，返回(rank, cardType, isPair)
+    func eval_RedEightRedJ(cards: [CardNineCard]) -> (Int, String, Int) {
         if cards[0].originalRank == 8 && cards[0].color == 1 && cards[1].originalRank == 11 && cards[1].color == 1{
-            return 1
+            return (1, "红8红J", 0)
         }
         if cards[0].originalRank == 11 && cards[0].color == 1 && cards[1].originalRank == 8 && cards[1].color == 1{
-            return 1
+            return (1, "红8红J", 0)
         }
-        return 0
+        return (1, "", 0)
     }
     
-    func eval_RedTwoRedSeven(cards: [CardNineCard]) -> Int{
+    func eval_RedTwoRedSeven(cards: [CardNineCard]) -> (Int, String, Int){
         if cards[0].originalRank == 2 && cards[0].color == 1 && cards[1].originalRank == 7 && cards[1].color == 1{
-            return 1
+            return (1, "红2红7", 0)
         }
         if cards[0].originalRank == 7 && cards[0].color == 1 && cards[1].originalRank == 2 && cards[1].color == 1{
-            return 1
+            return (1, "红8红J", 0)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_RedQRedSeven(cards: [CardNineCard]) -> Int{
+    func eval_RedQRedSeven(cards: [CardNineCard]) -> (Int, String, Int){
         if cards[0].originalRank == 12 && cards[0].color == 1 && cards[1].originalRank == 7 && cards[1].color == 1{
-            return 1
+            return (1, "红Q红7", 0)
         }
         if cards[0].originalRank == 7 && cards[0].color == 1 && cards[1].originalRank == 12 && cards[1].color == 1{
-            return 1
+            return (1, "红Q红7", 0)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_RedTwoRedNine(cards: [CardNineCard]) -> Int{
+    func eval_RedTwoRedNine(cards: [CardNineCard]) -> (Int, String, Int){
         if cards[0].originalRank == 2 && cards[0].color == 1 && cards[1].originalRank == 9 && cards[1].color == 1{
-            return 1
+            return (1, "红2红9", 0)
         }
         if cards[0].originalRank == 9 && cards[0].color == 1 && cards[1].originalRank == 2 && cards[1].color == 1{
-            return 1
+            return (1, "红2红9", 0)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isRedNineFiveBlackEightSevenPair(cards:[CardNineCard]) -> Int{
+    func eval_isRedNineFiveBlackEightSevenPair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank && cards[0].color == 1 && cards[1].color == 1 && (cards[0].originalRank == 9 || cards[0].originalRank == 5){
-            return 1
+            
+            var cardType: String = ""
+            
+            if cards[0].originalRank == 5{
+                cardType = "对红5"
+            } else if cards[0].originalRank == 9 {
+                cardType = "对红9"
+            }
+            
+            return (1, cardType, 1)
         }
         
         if cards[0].rank == cards[1].rank && cards[0].color == 0 && cards[1].color == 0 && (cards[0].originalRank == 8 || cards[0].originalRank == 7){
-            return 1
+            var cardType: String = ""
+            
+            if cards[0].originalRank == 7{
+                cardType = "对黑7"
+            } else if cards[0].originalRank == 8 {
+                cardType = "对黑8"
+            }
+            
+            return (1, cardType, 1)
         }
-        return 0
+        return (0,"",0)
     }
     
     
-    func eval_RedThreeBlackEight(cards: [CardNineCard]) -> Int{
+    func eval_RedThreeBlackEight(cards: [CardNineCard]) -> (Int,String, Int){
         if cards[0].originalRank == 3 && cards[0].color == 1 && cards[1].originalRank == 8 && cards[1].color == 0{
-            return 1
+            return (1, "红3 + 黑8", 0)
         }
         if cards[0].originalRank == 8 && cards[0].color == 0 && cards[1].originalRank == 3 && cards[1].color == 1{
-            return 1
+            return (1, "红3 + 黑8", 0)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_RedFiveRedJoker(cards: [CardNineCard]) -> Int{
+    func eval_RedFiveRedJoker(cards: [CardNineCard]) -> (Int, String, Int){
         if cards[0].originalRank == 15 && cards[1].originalRank == 5 && cards[1].color == 1{
-            return 1
+            return (1, "红5 + 大王", 0)
         }
         if cards[0].originalRank == 5 && cards[0].color == 1 && cards[1].originalRank == 15 {
-            return 1
+            return (1, "红5 + 大王", 0)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_HeartThreeRedEight(cards: [CardNineCard]) -> Int{
+    func eval_HeartThreeRedEight(cards: [CardNineCard]) -> (Int, String, Int){
         if (cards[0].originalRank == 8 && cards[0].color == 1) && (cards[1].originalRank == 3 && self.suitRules.firstIndex(of: cards[1].suit) == 1){
-            return 1
+            return (1, "红桃3 + 红8", 0)
         }
         
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isBlackNineEightSevenFivePair(cards:[CardNineCard]) -> Int{
+    func eval_isBlackNineEightSevenFivePair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank && cards[0].color == 0 && cards[1].color == 0 && (cards[0].originalRank == 9 || cards[0].originalRank == 8 || cards[0].originalRank == 7 || cards[0].originalRank == 5){
-            return 1
+            
+            if cards[0].originalRank == 9{
+                return (1, "对黑9", 1)
+            } else if cards[0].originalRank == 8 {
+                return (1, "对黑8", 1)
+            } else if cards[0].originalRank == 7 {
+                return (1, "对黑7", 1)
+            } else if cards[0].originalRank == 5 {
+                return (1, "对黑5", 1)
+            }
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isRedJTenSevenSixPair(cards:[CardNineCard]) -> Int{
+    func eval_isRedJTenSevenSixPair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank && cards[0].color == 1 && cards[1].color == 1 && (cards[0].originalRank == 11 || cards[0].originalRank == 10 || cards[0].originalRank == 7 || cards[0].originalRank == 6){
-            return 1
+            
+            if cards[0].originalRank == 11{
+                return (1, "对红J", 1)
+            } else if cards[0].originalRank == 10 {
+                return (1, "对红10", 1)
+            } else if cards[0].originalRank == 7 {
+                return (1, "对红7", 1)
+            } else if cards[0].originalRank == 6 {
+                return (1, "对红6", 1)
+            }
+            
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isBlackTenSixFivePair(cards:[CardNineCard]) -> Int{
+    func eval_isBlackTenSixFourPair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank && cards[0].color == 0 && cards[1].color == 0 && (cards[0].originalRank == 10 || cards[0].originalRank == 6 || cards[0].originalRank == 5){
-            return 1
+            
+            if cards[0].originalRank == 10{
+                return (1, "对黑10", 1)
+            } else if cards[0].originalRank == 6 {
+                return (1, "对黑6", 1)
+            } else if cards[0].originalRank == 4 {
+                return (1, "对黑4", 1)
+            }
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isBlackSevenPair(cards:[CardNineCard]) -> Int{
+    func eval_isBlackSevenPair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank && cards[0].color == 0 && cards[1].color == 0 && cards[0].originalRank == 7{
-            return 1
+            return (1, "对黑7", 1)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isBlackEightPair(cards:[CardNineCard]) -> Int{
+    func eval_isBlackEightPair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank && cards[0].color == 0 && cards[1].color == 0 && cards[0].originalRank == 8{
-            return 1
+            return (1, "对黑8", 1)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isBlackNinePair(cards:[CardNineCard]) -> Int{
+    func eval_isBlackNinePair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank && cards[0].color == 0 && cards[1].color == 0 && cards[0].originalRank == 9{
-            return 1
+            return (1, "对黑9", 1)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isBlackSixPair(cards:[CardNineCard]) -> Int{
+    func eval_isBlackSixPair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank && cards[0].color == 0 && cards[1].color == 0 && cards[0].originalRank == 6{
-            return 1
+            return (1, "对黑6", 1)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isRedSevenPair(cards:[CardNineCard]) -> Int{
+    func eval_isRedSevenPair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank && cards[0].color == 1 && cards[1].color == 1 && cards[0].originalRank == 7{
-            return 1
+            return (1, "对红7", 1)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isBlackTenPair(cards:[CardNineCard]) -> Int{
+    func eval_isBlackTenPair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank && cards[0].color == 0 && cards[1].color == 0 && cards[0].originalRank == 10{
-            return 1
+            return (1, "对黑10", 1)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isBlackJPair(cards:[CardNineCard]) -> Int{
+    func eval_isBlackJPair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank && cards[0].color == 0 && cards[1].color == 0 && cards[0].originalRank == 11{
-            return 1
+            return (1, "对黑J", 1)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isBlackFourPair(cards:[CardNineCard]) -> Int{
+    func eval_isBlackFourPair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank && cards[0].color == 0 && cards[1].color == 0 && cards[0].originalRank == 4{
-            return 1
+            return (1, "对黑4", 1)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isRedSixPair(cards:[CardNineCard]) -> Int{
+    func eval_isRedSixPair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank && cards[0].color == 1 && cards[1].color == 1 && cards[0].originalRank == 6{
-            return 1
+            return (1, "对红6", 1)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isRedTenPair(cards:[CardNineCard]) -> Int{
+    func eval_isRedTenPair(cards:[CardNineCard]) -> (Int, String,Int){
         if cards[0].rank == cards[1].rank && cards[0].color == 1 && cards[1].color == 1 && cards[0].originalRank == 10{
-            return 1
+            return (1, "对红10", 1)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isRedFourPair(cards:[CardNineCard]) -> Int{
+    func eval_isRedFourPair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank && cards[0].color == 1 && cards[1].color == 1 && cards[0].originalRank == 4{
-            return 1
+            return (1, "对红4", 1)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isRedEightPair(cards:[CardNineCard]) -> Int{
+    func eval_isRedEightPair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank && cards[0].color == 1 && cards[1].color == 1 && cards[0].originalRank == 8{
-            return 1
+            return (1, "对红8", 1)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isJokerPair(cards:[CardNineCard]) -> Int{
+    func eval_isJokerPair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].originalRank == 15 && cards[0].originalRank == 14{
-            return 1
+            return (1, "对王", 1)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isTwoPair(cards:[CardNineCard]) -> Int{
+    func eval_isTwoPair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank && cards[0].originalRank == 2{
-            return 1
+            return (1, "对2", 1)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isQPair(cards:[CardNineCard]) -> Int{
+    func eval_isQPair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank && cards[0].originalRank == 12{
-            return 1
+            return (1, "对Q", 1)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isBlackFivePair(cards:[CardNineCard]) -> Int{
+    func eval_isBlackFivePair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank && cards[0].color == 0 && cards[1].color == 0 && cards[0].originalRank == 5{
-            return 1
+            return (1, "对黑5", 1)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_RedJokerandBlackThree(cards: [CardNineCard]) -> Int{
+    func eval_RedJokerandBlackThree(cards: [CardNineCard]) -> (Int, String, Int){
         if cards[0].originalRank == 15 && cards[0].color == 0 && cards[1].originalRank == 3 && cards[1].color == 0{
-            return 1
+            return (1, "黑3+大王", 0)
         }
         if cards[0].originalRank == 3 && cards[0].color == 0 && cards[1].originalRank == 15 && cards[1].color == 0{
-            return 1
+            return (1, "黑3+大王", 0)
         }
-        return 0
+        return (0, "", 0)
         
     }
     
-    func eval_isRedFivePair(cards:[CardNineCard]) -> Int{
+    func eval_isRedFivePair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank && cards[0].color == 1 && cards[1].color == 1 && cards[0].originalRank == 5{
-            return 1
+            return (1, "对红5", 1)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_BlackAandBlackThree(cards: [CardNineCard]) -> Int{
+    func eval_BlackAandBlackThree(cards: [CardNineCard]) -> (Int, String, Int){
         if cards[0].originalRank == 1 && cards[0].color == 0 && cards[1].originalRank == 3 && cards[1].color == 0{
-            return 1
+            return (1, "黑A+黑3", 0)
         }
         if cards[0].originalRank == 3 && cards[0].color == 0 && cards[1].originalRank == 1 && cards[1].color == 0{
-            return 1
+            return (1, "黑A+黑3", 0)
         }
-        return 0
+        return (0, "", 0)
         
     }
-    func eval_isRedTwoPair(cards:[CardNineCard]) -> Int{
+    func eval_isRedTwoPair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank && cards[0].color == 1 && cards[1].color == 1 && cards[0].originalRank == 2{
-            return 1
+            return (1, "对红2", 1)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isRedQPair(cards:[CardNineCard]) -> Int{
+    func eval_isRedQPair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank && cards[0].color == 1 && cards[1].color == 1 && cards[0].originalRank == 12{
-            return 1
+            return (1, "对红Q", 1)
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isRedColorPair(cards:[CardNineCard]) -> Int{
+    func eval_isRedColorPair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank && cards[0].color == 1 && cards[1].color == 1 {
+            
+            var cardType: String = "红对" + GameManager.CardNumberReportDic[cards[0].originalRank]!
+            
             if self.pairRank == 0{
-                return cards[0].rank
+                return (cards[0].rank, cardType, 1)
             } else if self.pairRank == 1{
-                return 1
+                return (1, cardType, 1)
             }
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isBlackColorPair(cards:[CardNineCard]) -> Int{
+    func eval_isBlackColorPair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank && cards[0].color == 0 && cards[1].color == 0 {
+            
+            var cardType: String = "黑对" + GameManager.CardNumberReportDic[cards[0].originalRank]!
+            
             if self.pairRank == 0{
-                return cards[0].rank
+                return (cards[0].rank, cardType, 1)
             } else if self.pairRank == 1{
-                return 1
+                return (1, cardType, 1)
             }
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isMixColorPair(cards:[CardNineCard]) -> Int{
+    func eval_isMixColorPair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank && cards[0].color != cards[1].color {
+            
+            var cardType: String = "混对" + GameManager.CardNumberReportDic[cards[0].originalRank]!
+            
             if self.pairRank == 0{
-                return cards[0].rank
+                return (cards[0].rank, cardType, 1)
             } else if self.pairRank == 1{
-                return 1
+                return (1, cardType, 1)
             }
         }
-        return 0
+        return (0, "", 0)
     }
     
-    func eval_isPair(cards:[CardNineCard]) -> Int{
+    func eval_isPair(cards:[CardNineCard]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank{
+            
+            var cardType: String = "对" + GameManager.CardNumberReportDic[cards[0].originalRank]!
             if self.pairRank == 0{
-                return cards[0].rank
+                return (cards[0].rank, cardType, 1)
             } else if self.pairRank == 1{
-                return 1
+                return (1, cardType, 1)
             }
         }
-        return 0
+        return (0, "", 0)
     }
-    func eval_isQPlus9(cards: [CardNineCard]) -> Int {
+                                                      
+    func eval_isQPlus9(cards: [CardNineCard]) -> (Int, String, Int) {
         if cards[0].originalRank == 12 && cards[1].originalRank == 9{
-            return 1
+            return (1, "Q + 9", 0)
         }
-        return 0
+        return (0, "",  0)
     }
-    func eval_isQPlus8(cards: [CardNineCard]) -> Int {
+    func eval_isQPlus8(cards: [CardNineCard]) -> (Int, String, Int) {
         if cards[0].originalRank == 12 && cards[1].originalRank == 8{
-            return 1
+            return (1, "Q + 8", 0)
         }
-        return 0
+        return (0, "",  0)
     }
-    func eval_is2Plus8(cards: [CardNineCard]) -> Int {
+    func eval_is2Plus8(cards: [CardNineCard]) -> (Int, String, Int) {
         if cards[0].originalRank == 8 && cards[1].originalRank == 2{
-            return 1
+            return (1, "2 + 8", 0)
         }
-        return 0
+        return (0, "",  0)
     }
-    func eval_isPoint(cards:[CardNineCard]) -> Int {
+    func eval_isPoint(cards:[CardNineCard]) -> (Int, String, Int) {
         let point = (cards[0].point + cards[1].point) % 10
-        return point << 4 | cards[0].rank
+        
+        var cardType: String = String(point) + "点"
+        
+        return ((point + 1) << 4 | cards[0].rank, cardType, 0)
     }
     
     class CardNineCard{
