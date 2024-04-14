@@ -1,10 +1,4 @@
-//
-//  ThirteenWaterGame.swift
-//  Shuffle
-//
-//  Created by Zhangyi Chen on 4/9/24.
-//  Copyright © 2024 Apple. All rights reserved.
-//
+
 
 import Foundation
 

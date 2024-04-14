@@ -140,10 +140,7 @@ struct ShowCardView: View {
                 Button {
                     viewModel.generateTestResult()
                 } label: {
-                    Text("测试")
-                        .foregroundColor(.blue)
-                        .labelStyle(.iconOnly)
-                        .bubbleBackground()
+                    Image("icon_test").resizable().frame(width: 150, height: 60)
                 }
                 Spacer()
             }

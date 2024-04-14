@@ -3,8 +3,6 @@ import Foundation
 //import Python
 //import PythonKit
 
-//小九
-
 class ThreeCardPointGameRule : Rule{
     let handNum :[Int] = [2]
     let redJokerValueRange:[Int:String] = [
@@ -430,8 +428,5 @@ class ThreeCardPointGameHandEvaluator{
                 self.point = card.rank * 2
             }
         }
-        
     }
-    
-    
 }

@@ -2,8 +2,6 @@ import Foundation
 //import Python
 //import PythonKit
 
-//二八杠
-
 class TwoEightGangGameRule : Rule{
     let samePointComparision:[Int:String] = [
         0:"同点比最大牌",

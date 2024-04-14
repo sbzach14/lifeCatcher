@@ -3,8 +3,6 @@ import Foundation
 //import Python
 //import PythonKit
 
-//小九
-
 class TenPointFiveGameRule : Rule{
     let handNum :[Int] = [2]
     let redJokerValueRange:[Int:String] = [

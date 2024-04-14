@@ -1879,7 +1879,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
         else if self.volumeUp == 6{
-            //TODO 报下一轮（下一次连报）
             self.cardArray = self.leftCards
             computeWinnerPlayer()
         }
@@ -1932,7 +1931,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
         else if self.volumeDown == 6{
-            //TODO 报下一轮（下一次连报）
             self.cardArray = self.leftCards
             computeWinnerPlayer()
         }
