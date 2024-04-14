@@ -2343,6 +2343,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         case 28:
                             newInputCards = Array(coloringInputCards[((specialCardPos + 1) % (coloringInputCards.count))...])
                             break
+                        //去掉一张面牌
+                        case 29:
+                            newInputCards = Array(coloringInputCards[1...])
                         default:
                             newInputCards = coloringInputCards
                             break
