@@ -282,12 +282,12 @@ class ReportManager{
         90:"[149]:看手牌面为色去色报最大次大生死门*",
         91:"[200]:飞2张保位置最大",
         92: "[201]:飞2张保位置最小",
-            93: "[202]:飞2张打色留色保位置最大*",
-            94: "[203]:飞2张打色留色保位置最小*",
-            95: "[206]:飞2张打色去色1张保位置最大*",
-            96: "[207]:飞2张打色去色1张保位置最小*",
-            97: "[208]:飞2张打色色先发保位置最大*",
-            98: "[209]:飞2张打色色先发保位置最小*",
+            93: "[202]:飞2张打色留色保位置最大",
+            94: "[203]:飞2张打色留色保位置最小",
+            95: "[206]:飞2张打色去色1张保位置最大",
+            96: "[207]:飞2张打色去色1张保位置最小",
+            97: "[208]:飞2张打色色先发保位置最大",
+            98: "[209]:飞2张打色色先发保位置最小",
             99: "[211]:飞2张骰子打色保位置最大*",
             100: "[212]:飞2张面为色留色保位置最大*",
             101: "[213]:飞张面为色留色保位置最小*",
@@ -1753,6 +1753,10 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
 
         //是否切牌的位置，看手牌，切牌留色，切牌去色
         if cutCardIndexList.count > 0 {
+            
+            let cutCardIndex = cutCardIndexList[cutCardIndexList.count - 1]
+            let pos = searchCardPos(inputCards: inputCards, cardIndex: cutCardIndex)
+            
             //看手牌
             if reportRule.cutCardProcession == 0{
                 let handCardIndex = cutCardIndexList[cutCardIndexList.count - 1]
@@ -1773,9 +1777,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             //看色去色
             } else if reportRule.cutCardProcession == 3{
                 
-                let cutCardIndex = cutCardIndexList[cutCardIndexList.count - 1]
-                let pos = searchCardPos(inputCards: inputCards, cardIndex: cutCardIndex)
-                
                 if cutNumRangeSetting[1] == 1 {
                     inputCards = Array(inputCards[(pos + 1)...]) + Array(inputCards[0...pos])
                 } else {
@@ -1783,15 +1784,13 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 }
             //飞二张去色1张
             } else if reportRule.cutCardProcession == 4 {
-                let cutCardIndex = cutCardIndexList[cutCardIndexList.count - 1]
-                let pos = searchCardPos(inputCards: inputCards, cardIndex: cutCardIndex)
-                if pos == 0 {
-                    inputCards = Array(inputCards[1...])
-                } else if pos == inputCards.count - 1 {
-                    inputCards = Array(inputCards[0..<pos])
-                } else {
-                    inputCards = Array(inputCards[0..<pos]) + Array(inputCards[(pos + 1)...])
-                }
+                
+                inputCards.remove(at: pos)
+                
+            //飞2张色先发
+            } else if reportRule.cutCardProcession == 5 {
+                let colorCard = inputCards.remove(at: pos)
+                inputCards = [colorCard] + inputCards
                 
             //普通切牌
             } else {
