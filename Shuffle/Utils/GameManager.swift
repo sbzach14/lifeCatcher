@@ -372,7 +372,12 @@ public class RuleManager{
         
         allPreSetReportRules[98] =  ReportClass.init(reportName: "[209]:飞2张打色色先发保位置最小", reportID: 98, rankReport: 3, aliveDeathReport: 0, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 14, reportTarget: 1, cardsTransformation: 21, consecutiveReport: -1, positionToReport: 0, colorCardPos: 17, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: 4, reportFormation: -1, cutCardProcession: 5)
         
-        allPreSetReportRules[100] =  ReportClass.init(reportName: "[212]:飞2张面为色留色保位置最大", reportID: 100, rankReport: 3, aliveDeathReport: 0, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 14, reportTarget: 1, cardsTransformation: 21, consecutiveReport: -1, positionToReport: 0, colorCardPos: 17, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: 4, reportFormation: -1, cutCardProcession: 5)
+        allPreSetReportRules[100] =  ReportClass.init(reportName: "[212]:飞2张面为色留色保位置最大", reportID: 100, rankReport: 0, aliveDeathReport: 0, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 14, reportTarget: 1, cardsTransformation: 21, consecutiveReport: -1, positionToReport: 0, colorCardPos: 9, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: 4, reportFormation: -1, cutCardProcession: -1)
+        
+        allPreSetReportRules[101] =  ReportClass.init(reportName: "[213]:飞张面为色留色保位置最小", reportID: 101, rankReport: 3, aliveDeathReport: 0, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 14, reportTarget: 1, cardsTransformation: 21, consecutiveReport: -1, positionToReport: 0, colorCardPos: 9, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: 4, reportFormation: -1, cutCardProcession: -1)
+        
+        allPreSetReportRules[102] =  ReportClass.init(reportName: "[214]:飞2张面为色去色保位置最大", reportID: 102, rankReport: 0, aliveDeathReport: 0, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 14, reportTarget: 1, cardsTransformation: 21, consecutiveReport: -1, positionToReport: 0, colorCardPos: 9, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: 4, reportFormation: -1, cutCardProcession: -1)
+        
         
         //TODO : 91-107
         allPreSetReportRules[108] = ReportClass.init(reportName: "[284]:固定范围切牌报对子和同点数目", reportID: 108, rankReport: 0, aliveDeathReport: -1, pairReport: 2, drawPointReport: 2, ninePointReport: -1,  reportCutRange: 0, reportTarget: 0, cardsTransformation: 4, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1, reportFormation: -1, cutCardProcession: -1)
@@ -1224,7 +1229,7 @@ public class RuleManager{
                 isCompareSuit = 0
                 threeCardComparision = 0
                 args = [handNum, communityNum,pointComparision, samePointComparision, isAAsMan, isCompareSuit, threeCardComparision]
-                suitRules = [2,1,0]
+                suitRules = [3,2,1,0]
                 rankRules = [2,1,0]
                 rankRuleChecked = [1,1,1]
                 allPreSetRules[i]![1]!.append(args)
