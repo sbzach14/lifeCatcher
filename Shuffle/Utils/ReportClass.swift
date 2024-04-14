@@ -291,8 +291,8 @@ class ReportManager{
             99: "[211]:飞2张骰子打色保位置最大*",
             100: "[212]:飞2张面为色留色保位置最大",
             101: "[213]:飞2张面为色留色保位置最小",
-            102: "[214]:飞2张面为色去色保位置最大*",
-            103: "[215]:飞2张面为色去色保位置最小*",
+            102: "[214]:飞2张面为色去色保位置最大",
+            103: "[215]:飞2张面为色去色保位置最小",
             104: "[216]:飞2张底为色保位置最大*",
             105: "[217]:飞2张底为色保位置最小*",
             106: "[218]:飞2张底2张相加为色保位置最大*",
@@ -2343,6 +2343,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         case 28:
                             newInputCards = Array(coloringInputCards[((specialCardPos + 1) % (coloringInputCards.count))...])
                             break
+                        //去掉一张面牌
+                        case 29:
+                            newInputCards = Array(coloringInputCards[1...])
                         default:
                             newInputCards = coloringInputCards
                             break

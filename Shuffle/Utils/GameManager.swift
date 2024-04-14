@@ -376,7 +376,9 @@ public class RuleManager{
         
         allPreSetReportRules[101] =  ReportClass.init(reportName: "[213]:飞张面为色留色保位置最小", reportID: 101, rankReport: 3, aliveDeathReport: 0, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 14, reportTarget: 1, cardsTransformation: 21, consecutiveReport: -1, positionToReport: 0, colorCardPos: 9, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: 4, reportFormation: -1, cutCardProcession: -1)
         
-        allPreSetReportRules[102] =  ReportClass.init(reportName: "[214]:飞2张面为色去色保位置最大", reportID: 102, rankReport: 0, aliveDeathReport: 0, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 14, reportTarget: 1, cardsTransformation: 21, consecutiveReport: -1, positionToReport: 0, colorCardPos: 9, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: 4, reportFormation: -1, cutCardProcession: -1)
+        allPreSetReportRules[102] =  ReportClass.init(reportName: "[214]:飞2张面为色去色保位置最大", reportID: 102, rankReport: 0, aliveDeathReport: 0, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 14, reportTarget: 1, cardsTransformation: 29, consecutiveReport: -1, positionToReport: 0, colorCardPos: 9, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: 4, reportFormation: -1, cutCardProcession: -1)
+        
+        allPreSetReportRules[103] =  ReportClass.init(reportName: "[215]:飞2张面为色去色保位置最小", reportID: 103, rankReport: 3, aliveDeathReport: 0, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 14, reportTarget: 1, cardsTransformation: 29, consecutiveReport: -1, positionToReport: 0, colorCardPos: 9, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: 4, reportFormation: -1, cutCardProcession: -1)
         
         
         //TODO : 91-107
@@ -560,6 +562,67 @@ public class RuleManager{
                 allPreSetRules[i]![1]!.append(suitRules)
                 allPreSetRules[i]![1]!.append(rankRules)
                 allPreSetRules[i]![1]!.append(rankRuleChecked)
+                
+                //德州扑克清比葫芦大[702]
+//                handNum = 2
+//                communityNum = 5
+//                isCompareSuit = 0
+//                isAceStraight = 1
+//                minRank = 0
+//                handUseType = 0
+//                handUseNum = 0
+                
+                for j in 0...rule.setting.count - 1{
+                    allPreSetRules[i]![j] = []
+                }
+                args = [2,5,0,1,0,0,0]
+                suitRules = [3,2,1,0]
+                rankRules = [11,10,8,9,7,6,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![2]!.append(args)
+                allPreSetRules[i]![2]!.append(suitRules)
+                allPreSetRules[i]![2]!.append(rankRules)
+                allPreSetRules[i]![2]!.append(rankRuleChecked)
+//                德州扑克[550]
+//                handNum = 5
+//                communityNum = 0
+//                isCompareSuit = 0
+//                isAceStraight = 1
+//                minRank = 0
+//                handUseType = 0
+//                handUseNum = 0
+                for j in 0...rule.setting.count - 1{
+                    allPreSetRules[i]![j] = []
+                }
+                args = [5,0,0,1,0,0,0]
+                suitRules = [3,2,1,0]
+                rankRules = [11,10,9,8,7,6,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![3]!.append(args)
+                allPreSetRules[i]![3]!.append(suitRules)
+                allPreSetRules[i]![3]!.append(rankRules)
+                allPreSetRules[i]![3]!.append(rankRuleChecked)
+                
+//                德州扑克10选5[1020]
+//                handNum = 5
+//                communityNum = 5
+//                isCompareSuit = 0
+//                isAceStraight = 1
+//                minRank = 0
+//                handUseType = 0
+//                handUseNum = 0
+                for j in 0...rule.setting.count - 1{
+                    allPreSetRules[i]![j] = []
+                }
+                args = [5,5,0,1,0,0,0]
+                suitRules = [3,2,1,0]
+                rankRules = [11,10,9,8,7,6,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![4]!.append(args)
+                allPreSetRules[i]![4]!.append(suitRules)
+                allPreSetRules[i]![4]!.append(rankRules)
+                allPreSetRules[i]![4]!.append(rankRuleChecked)
+                
                 break
             //牛牛预设规则
             case 1:
@@ -1228,7 +1291,8 @@ public class RuleManager{
                 isAAsMan = 0
                 isCompareSuit = 0
                 threeCardComparision = 0
-                args = [handNum, communityNum,pointComparision, samePointComparision, isAAsMan, isCompareSuit, threeCardComparision]
+                mixManComparision = 0
+                args = [handNum, communityNum,pointComparision, samePointComparision, isAAsMan, isCompareSuit, threeCardComparision, mixManComparision]
                 suitRules = [3,2,1,0]
                 rankRules = [2,1,0]
                 rankRuleChecked = [1,1,1]
@@ -1814,7 +1878,7 @@ public class RuleManager{
                 args = [handNum, communityNum,redJokerValueRange, blackJokerValueRange, KValueRange,QValueRange, JValueRange, samePointComparision, isPairSameRank, pairRequirement]
                 suitRules = [3,2,1,0]
                 rankRules = [2,1,0]
-                rankRuleChecked = [1,1]
+                rankRuleChecked = [1,1,1]
                 allPreSetRules[i]![12]!.append(args)
                 allPreSetRules[i]![12]!.append(suitRules)
                 allPreSetRules[i]![12]!.append(rankRules)
@@ -2123,10 +2187,10 @@ public class RuleManager{
                 suitRules = [3,2,1,0]
                 rankRules = [5,0]
                 rankRuleChecked = [1,1]
-                allPreSetRules[i]![12]!.append(args)
-                allPreSetRules[i]![12]!.append(suitRules)
-                allPreSetRules[i]![12]!.append(rankRules)
-                allPreSetRules[i]![12]!.append(rankRuleChecked)
+                allPreSetRules[i]![13]!.append(args)
+                allPreSetRules[i]![13]!.append(suitRules)
+                allPreSetRules[i]![13]!.append(rankRules)
+                allPreSetRules[i]![13]!.append(rankRuleChecked)
 //                14: "江苏52张二八",
                 handNum = 2
                 communityNum = 0
