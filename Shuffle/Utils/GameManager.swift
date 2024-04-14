@@ -1126,10 +1126,10 @@ public class RuleManager{
                 suitRules = [3,2,1,0]
                 rankRules = [12, 6, 4, 3, 1, 0]
                 rankRuleChecked = [1,1,1,1,1,1]
-                allPreSetRules[i]![4]!.append(args)
-                allPreSetRules[i]![4]!.append(suitRules)
-                allPreSetRules[i]![4]!.append(rankRules)
-                allPreSetRules[i]![4]!.append(rankRuleChecked)
+                allPreSetRules[i]![6]!.append(args)
+                allPreSetRules[i]![6]!.append(suitRules)
+                allPreSetRules[i]![6]!.append(rankRules)
+                allPreSetRules[i]![6]!.append(rankRuleChecked)
 //                7: "金花6选3[610]",
                 handNum = 6
                 communityNum = 0
@@ -1150,10 +1150,10 @@ public class RuleManager{
                 suitRules = [3,2,1,0]
                 rankRules = [12, 6, 4, 3, 1, 0]
                 rankRuleChecked = [1,1,1,1,1,1]
-                allPreSetRules[i]![4]!.append(args)
-                allPreSetRules[i]![4]!.append(suitRules)
-                allPreSetRules[i]![4]!.append(rankRules)
-                allPreSetRules[i]![4]!.append(rankRuleChecked)
+                allPreSetRules[i]![7]!.append(args)
+                allPreSetRules[i]![7]!.append(suitRules)
+                allPreSetRules[i]![7]!.append(rankRules)
+                allPreSetRules[i]![7]!.append(rankRuleChecked)
                 break
             //小九
             case 3:
