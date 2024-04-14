@@ -183,7 +183,7 @@ class ThreeCardPointGame{
     //11 pointComparision
     
     static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
-        let rule  = GameManager.gameRules[3] as! ThreeCardPointGameRule
+        let rule  = GameManager.gameRules[13] as! ThreeCardPointGameRule
         let dealNum = args[0]
         let dealType = args[1]
         let playerNum = args[2]
