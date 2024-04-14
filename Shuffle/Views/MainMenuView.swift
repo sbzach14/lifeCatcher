@@ -55,7 +55,7 @@ struct MainMenuView: View {
                     }
                 }
             }
-            .navigationBarTitle(" ")
+            .navigationBarTitle("AAA")
             .background(
                 Image("bg")
                     .resizable()
