@@ -71,33 +71,33 @@ struct SettingView: View {
                                 }
                                 Divider().colorInvert()
                                 
-                                HStack {
-                                    Text("快洗模式")
-                                        .foregroundColor(.white)
-                                        .padding(.leading, 20)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-    
-                                    Toggle("", isOn: $viewModel.isFast)
-                                        .toggleStyle(CustomToggleStyle())
-                                        .frame(width: 160, height: 30, alignment: .trailing)
-                                        .padding(.trailing,30) // 右侧间距
-                                        .accentColor(.white)
-                                }
-                                Divider().colorInvert()
-    
-                                HStack {
-                                    Text("远距离模式")
-                                        .foregroundColor(.white)
-                                        .padding(.leading, 20)
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-    
-                                    Toggle("", isOn: $viewModel.isRemote)
-                                        .toggleStyle(CustomToggleStyle())
-                                        .frame(width: 160, height: 30, alignment: .trailing)
-                                        .padding(.trailing,30) // 右侧间距
-                                        .accentColor(.white)
-                                }
-                                Divider().colorInvert()
+//                                HStack {
+//                                    Text("快洗模式")
+//                                        .foregroundColor(.white)
+//                                        .padding(.leading, 20)
+//                                        .frame(maxWidth: .infinity, alignment: .leading)
+//    
+//                                    Toggle("", isOn: $viewModel.isFast)
+//                                        .toggleStyle(CustomToggleStyle())
+//                                        .frame(width: 160, height: 30, alignment: .trailing)
+//                                        .padding(.trailing,30) // 右侧间距
+//                                        .accentColor(.white)
+//                                }
+//                                Divider().colorInvert()
+//    
+//                                HStack {
+//                                    Text("远距离模式")
+//                                        .foregroundColor(.white)
+//                                        .padding(.leading, 20)
+//                                        .frame(maxWidth: .infinity, alignment: .leading)
+//    
+//                                    Toggle("", isOn: $viewModel.isRemote)
+//                                        .toggleStyle(CustomToggleStyle())
+//                                        .frame(width: 160, height: 30, alignment: .trailing)
+//                                        .padding(.trailing,30) // 右侧间距
+//                                        .accentColor(.white)
+//                                }
+//                                Divider().colorInvert()
                             }
                             
                             HStack {
