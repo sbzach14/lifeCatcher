@@ -542,7 +542,10 @@ class NinePointFiveGameHandEvaluator{
         
         rank = cards[0].point + cards[1].point
         rank = rank % 20
-        let cardType: String = String(rank / 2) + "点"
+        var cardType: String = String(rank / 2) + "点"
+        if rank % 2 == 1{
+            cardType += "半"
+        }
         if self.samePointComparision == 1{
             //两红
             if self.blackRedJudger(card: cards[0]) == self.blackRedJudger(card: cards[1]) && self.blackRedJudger(card: cards[0]) == 0{

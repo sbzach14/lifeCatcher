@@ -566,15 +566,19 @@ class BaoziGameHandEvaluator{
     func eval_Points(cards:[BaoziCard]) -> (Int, String, Int){
         var point = 0
         var mod = 0
+        var cardType = ""
         if self.QValueRange == 3 {
             mod = 20
             point = (cards[0].point + cards[1].point) % mod
+            cardType = String(point / 2) + "点"
+            if point % 2 == 1{
+                cardType += "半"
+            }
         } else {
             mod = 10
             point = (cards[0].point + cards[1].point) % mod
+            cardType = String(point) + "点"
         }
-        
-        var cardType: String = String(point) + "点"
         
         if self.pointComparision == 1 {
             point = (point + mod - 1) % mod
