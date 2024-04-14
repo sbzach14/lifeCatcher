@@ -143,7 +143,7 @@ class TenPointFiveGame{
     //12 cardRankRule
     
     static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
-        let rule  = GameManager.gameRules[3] as! TenPointFiveGameRule
+        let rule  = GameManager.gameRules[14] as! TenPointFiveGameRule
         let dealNum = args[0]
         let dealType = args[1]
         let playerNum = args[2]
