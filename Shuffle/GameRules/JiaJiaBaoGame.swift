@@ -3,7 +3,6 @@ import Foundation
 //import Python
 //import PythonKit
 
-//九点半
 
 class JiaJiaBaoGameRule : Rule{
     
@@ -57,9 +56,9 @@ class JiaJiaBaoGameRule : Rule{
         ]
         self.setting = [
             0: "通用54张佳佳宝[401]",
-            1: "通用54张佳佳宝，比四张（todo）[402]",
-            2: "通用四张，9点对子算点数（todo）",
-            3: "通用四张，54张佳佳宝1（todo）"
+            1: "通用54张佳佳宝，比四张[402]*",
+            2: "通用四张，9点对子算点数*",
+            3: "通用四张，54张佳佳宝1*"
         ]
         self.ruleInfo = [
             0:"""

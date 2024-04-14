@@ -571,10 +571,6 @@ public class RuleManager{
 //                minRank = 0
 //                handUseType = 0
 //                handUseNum = 0
-                
-                for j in 0...rule.setting.count - 1{
-                    allPreSetRules[i]![j] = []
-                }
                 args = [2,5,0,1,0,0,0]
                 suitRules = [3,2,1,0]
                 rankRules = [11,10,8,9,7,6,2,1,0]
@@ -591,9 +587,7 @@ public class RuleManager{
 //                minRank = 0
 //                handUseType = 0
 //                handUseNum = 0
-                for j in 0...rule.setting.count - 1{
-                    allPreSetRules[i]![j] = []
-                }
+
                 args = [5,0,0,1,0,0,0]
                 suitRules = [3,2,1,0]
                 rankRules = [11,10,9,8,7,6,2,1,0]
@@ -611,9 +605,7 @@ public class RuleManager{
 //                minRank = 0
 //                handUseType = 0
 //                handUseNum = 0
-                for j in 0...rule.setting.count - 1{
-                    allPreSetRules[i]![j] = []
-                }
+
                 args = [5,5,0,1,0,0,0]
                 suitRules = [3,2,1,0]
                 rankRules = [11,10,9,8,7,6,2,1,0]
@@ -2298,7 +2290,7 @@ public class RuleManager{
                 allPreSetRules[i]![0]!.append(rankRules)
                 allPreSetRules[i]![0]!.append(rankRuleChecked)
                 //通用54张佳佳宝，比四张
-                handNum = 4
+                handNum = 2
                 communityNum = 0
                 samePointComparision = 0
                 CardRankList = 0
@@ -2318,7 +2310,7 @@ public class RuleManager{
                 allPreSetRules[i]![1]!.append(rankRuleChecked)
                 
 //                2: "通用四张，9点对子算点数",
-                handNum = 4
+                handNum = 2
                 communityNum = 0
                 samePointComparision = 1
                 CardRankList = 1
@@ -2337,7 +2329,7 @@ public class RuleManager{
                 allPreSetRules[i]![2]!.append(rankRules)
                 allPreSetRules[i]![2]!.append(rankRuleChecked)
 //                3: "通用四张，54张佳佳宝1",
-                handNum = 4
+                handNum = 2
                 communityNum = 0
                 samePointComparision = 1
                 CardRankList = 1
