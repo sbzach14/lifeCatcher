@@ -1797,20 +1797,21 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 for (reportIndex, reportResult) in turnResult.enumerated() {
                     print("播报的input \(reportResult)")
                     let speakString = reportResult.content
-                    let speechUtterance = AVSpeechUtterance(string: speakString)
-                    speechUtterance.postUtteranceDelay = 0.05
-                    
-                    if reportResult.voiceType == 0{
-                        speechUtterance.voice = chineseMaleVoice
+                    if speakString != ""{
+                        let speechUtterance = AVSpeechUtterance(string: speakString)
+                        speechUtterance.postUtteranceDelay = 0.1
+                        if reportResult.voiceType == 0{
+                            speechUtterance.voice = chineseMaleVoice
+                        }
+                        if reportResult.voiceType == 1{
+                            speechUtterance.voice = chineseFemaleVoice
+                        }
+                        
+                        if reportIndex == 0{
+                            speechUtterance.preUtteranceDelay = 0.2
+                        }
+                        speechSynthesizer.speak(speechUtterance)
                     }
-                    if reportResult.voiceType == 1{
-                        speechUtterance.voice = chineseFemaleVoice
-                    }
-                    
-                    if reportIndex == 0{
-                        speechUtterance.preUtteranceDelay = 0.2
-                    }
-                    speechSynthesizer.speak(speechUtterance)
                 }
             }
         }

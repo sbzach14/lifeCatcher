@@ -123,16 +123,14 @@ class MyViewController: UIViewController {
         
         viewModel.viewController = self
         self.currentVolume = self.volumeValue
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(volumeChanged(_:)), name: NSNotification.Name(rawValue: "SystemVolumeDidChange"), object: nil)
-        
-        
+
         print("viewcontroller init")
 
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        NotificationCenter.default.addObserver(self, selector: #selector(volumeChanged(_:)), name: NSNotification.Name(rawValue: "SystemVolumeDidChange"), object: nil)
         setSystemVolume(volume: self.volumeValue)
     }
     
