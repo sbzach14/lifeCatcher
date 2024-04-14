@@ -1475,6 +1475,7 @@ class BullHandEvaluator {
                 }
             }
         }
+        
         let cardType = "牛" + String(bullRank)
         return (true, (bullRank << 18) | rank, cardType)
     }
@@ -2205,19 +2206,20 @@ class BullHandEvaluator {
         let mask = 0b111111111111111111
         let bullSecondRank = rank2 & mask
         let bullRank = (rank2 >> 18) << 1
-        
         let ironRank = (rank1 << 1) | 1
         
         var cardType = ""
         var rank = 0
         if bullRank > ironRank {
             rank = (bullRank << 18 | bullSecondRank)
-            cardType = cardType1
+            cardType = cardType2
             
         } else {
             rank = (ironRank << 18 | mask)
-            cardType = cardType2
+            cardType = cardType1
         }
+        
+        print("铁板牛 + 牛 铁板： \(cardType1) 牛 \(cardType2) 结果 \(cardType)")
         
         
         return (flag1 || flag2, rank, cardType)
