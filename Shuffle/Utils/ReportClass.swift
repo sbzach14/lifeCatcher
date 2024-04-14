@@ -1,10 +1,4 @@
-//
-//  ReportClass.swift
-//  Shuffle
-//
-//  Created by Zhangyi Chen on 3/3/24.
-//  Copyright © 2024 Apple. All rights reserved.
-//
+
 
 import Foundation
 

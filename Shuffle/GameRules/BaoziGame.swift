@@ -75,8 +75,7 @@ class BaoziGameRule : Rule{
             14: "江苏52张二八",
             15: "52张宝子对子算点数[216]",
             16: "54张宝子15[213]",
-            17: "宝子2张9点大[212]",
-            18: "自定义宝子"
+            17: "宝子2张9点大[212]"
         ]
         self.rankRules = [6:"同色对子",
                           5:"对子",
@@ -194,11 +193,7 @@ class BaoziGameRule : Rule{
             1）对王>对k>对Q>...对A，2张牌全黑或者全红才算对子，对黑>对红
             2）9点最大，0点最小，王=6点，K=3点，Q=2点，J=1点。
             3）同点比最大牌点数，点数一样比最大牌花色黑桃>红桃>梅花>方片，K最大A最小
-            """,
-            
-            18:"""
-    自定义你的规则
-    """,
+            """
         ]
         self.playerNum = [2,3,4,5,6,7,8,9,10]
 
@@ -571,15 +566,19 @@ class BaoziGameHandEvaluator{
     func eval_Points(cards:[BaoziCard]) -> (Int, String, Int){
         var point = 0
         var mod = 0
+        var cardType = ""
         if self.QValueRange == 3 {
             mod = 20
             point = (cards[0].point + cards[1].point) % mod
+            cardType = String(point / 2) + "点"
+            if point % 2 == 1{
+                cardType += "半"
+            }
         } else {
             mod = 10
             point = (cards[0].point + cards[1].point) % mod
+            cardType = String(point) + "点"
         }
-        
-        var cardType: String = String(point) + "点"
         
         if self.pointComparision == 1 {
             point = (point + mod - 1) % mod

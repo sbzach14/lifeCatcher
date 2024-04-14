@@ -3,7 +3,6 @@ import Foundation
 //import Python
 //import PythonKit
 
-//九点半
 
 class NinePointGameRule : Rule{
     

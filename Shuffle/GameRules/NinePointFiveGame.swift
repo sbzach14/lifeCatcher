@@ -3,7 +3,6 @@ import Foundation
 //import Python
 //import PythonKit
 
-//九点半
 
 class NinePointFiveGameRule : Rule{
     
@@ -74,8 +73,7 @@ class NinePointFiveGameRule : Rule{
             10:"安徽九点半[226]",
             11:"安徽九点半[235]",
             12:"江西九点半[237]",
-            13:"54张九点半[238]",
-            14: "自定义九点半",
+            13:"54张九点半[238]"
         ]
         self.ruleInfo = [
             0:"""
@@ -161,11 +159,7 @@ class NinePointFiveGameRule : Rule{
             扑克张数:54张不分花色,对子算点数
             1)九点半最大
             2)9点>8点半>8点>.....0点最小大小王，JKQ算半点
-            """,
-            14:"""
-    自定义你的规则
-    """,
-
+            """
         ]
         self.playerNum = [2,3,4,5,6,7,8,9,10]
 
@@ -547,7 +541,10 @@ class NinePointFiveGameHandEvaluator{
         
         rank = cards[0].point + cards[1].point
         rank = rank % 20
-        let cardType: String = String(rank / 2) + "点"
+        var cardType: String = String(rank / 2) + "点"
+        if rank % 2 == 1{
+            cardType += "半"
+        }
         if self.samePointComparision == 1{
             //两红
             if self.blackRedJudger(card: cards[0]) == self.blackRedJudger(card: cards[1]) && self.blackRedJudger(card: cards[0]) == 0{

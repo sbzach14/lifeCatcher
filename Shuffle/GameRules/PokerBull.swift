@@ -1,10 +1,3 @@
-//
-//  PokerBull.swift
-//  Shuffle
-//
-//  Created by Zhangyi Chen on 5/16/23.
-//  Copyright © 2023 Apple. All rights reserved.
-//
 
 import Foundation
 //import Python
@@ -178,8 +171,7 @@ class PokerBullRule : Rule{
             11: "斗牛4条3条[509]",
             12: "斗牛5大5小[510]",
             13: "斗牛-40张同点一样大[511]",
-            14: "斗牛-40张第二轮有公牌[512]",
-            15: "自定义斗牛"
+            14: "斗牛-40张第二轮有公牌[512]"
         ]
         self.ruleInfo = [
             0: """
@@ -303,10 +295,7 @@ class PokerBullRule : Rule{
             1.9版本:
             2个人玩玩4轮没有公牌，
             3个人玩3轮，第3轮每人两张去掉一张3张公牌
-            """,
-            15:"""
-    自定义你的规则
-    """
+            """
         ]
     }
 }

@@ -29,8 +29,7 @@ class TinyNineGameRule : Rule{
         super.init(ruleIndex: ruleIndex, ruleName: ruleName)
         self.setting = [
             0: "标准小九",
-            1: "湖南小九[255]",
-            2: "自定义小九"
+            1: "湖南小九[255]"
         ]
         
         self.rankRules = [2:"对王，对A，A加王",
@@ -49,9 +48,9 @@ class TinyNineGameRule : Rule{
 >A>K>Q>J>10>9>8>7>6>5>4>3>2
 
 """,
-     2:"请自定义你的规则"
         ]
-        self.playerNum = [2,3,4,5,6,7,8,9,10]    }
+        
+    }
 }
 
 

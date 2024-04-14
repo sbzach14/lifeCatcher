@@ -3,8 +3,6 @@ import Foundation
 //import Python
 //import PythonKit
 
-//九点半
-
 class FourCardGameRule : Rule{
     
     let redJokerValueRange:[Int:String] = [

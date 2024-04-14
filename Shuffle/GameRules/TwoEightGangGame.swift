@@ -2,8 +2,6 @@ import Foundation
 //import Python
 //import PythonKit
 
-//二八杠
-
 class TwoEightGangGameRule : Rule{
     let samePointComparision:[Int:String] = [
         0:"同点比最大牌",
@@ -52,8 +50,7 @@ class TwoEightGangGameRule : Rule{
             5: "江苏52张二八",
             6: "28杠28比对子大[244]",
             7: "28杠28比对子大[245]",
-            8: "28杠比花色[246]",
-            9: "自定义"
+            8: "28杠比花色[246]"
         ]
         self.ruleInfo = [
             0:"""
@@ -114,7 +111,6 @@ class TwoEightGangGameRule : Rule{
 3)9点>8点>7点>...>0点。同点比最大
 花色: ♠️>♥️>♣️>♦️
 """,
-            9:"自定义你的规则"
         ]
         self.playerNum = [2,3,4,5,6,7,8,9,10]
     }

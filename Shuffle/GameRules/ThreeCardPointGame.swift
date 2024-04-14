@@ -3,8 +3,6 @@ import Foundation
 //import Python
 //import PythonKit
 
-//小九
-
 class ThreeCardPointGameRule : Rule{
     let handNum :[Int] = [2]
     let redJokerValueRange:[Int:String] = [
@@ -381,7 +379,11 @@ class ThreeCardPointGameHandEvaluator{
     func eval_Points(cards: [ThreeCardPointCard]) -> (Bool, Int, String, Int){
         //9点最大
         var cardType: String = ""
-        cardType = String((cards[0].point + cards[1].point + cards[2].point) % 20) + "点"
+        let originpoint = cards[0].point + cards[1].point + cards[2].point
+        cardType = String(originpoint % 20 / 2) + "点"
+        if originpoint % 2 == 1{
+            cardType += "半"
+        }
         if self.pointComparision == 0{
             return(true, (cards[0].point + cards[1].point + cards[2].point) % 20, cardType, 0)
             
@@ -423,11 +425,8 @@ class ThreeCardPointGameHandEvaluator{
             else if card.rank == 11 {
                 self.point = Int(rule.JValueRange[JValueRange]!)!
             }else {
-                self.point = card.rank
+                self.point = card.rank * 2
             }
         }
-        
     }
-    
-    
 }

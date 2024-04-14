@@ -165,10 +165,7 @@ class ThreeCardPokerGameRule : Rule{
             4)顺子:花色不全相同的相连3张牌
             5)对子:对A...对2
             6)散牌:A最大2最小
-            """,
-            8:"""
-    自定义你的规则
-    """
+            """
         ]
         self.playerNum = [2,3,4,5,6,7,8]
 

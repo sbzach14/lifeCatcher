@@ -3,7 +3,6 @@ import Foundation
 //import Python
 //import PythonKit
 
-//九点半
 
 class JiaJiaBaoGameRule : Rule{
     
@@ -59,8 +58,7 @@ class JiaJiaBaoGameRule : Rule{
             0: "通用54张佳佳宝[401]",
             1: "通用54张佳佳宝，比四张[402]*",
             2: "通用四张，9点对子算点数*",
-            3: "通用四张，54张佳佳宝1*",
-            4: "自定义佳佳宝",
+            3: "通用四张，54张佳佳宝1*"
         ]
         self.ruleInfo = [
             0:"""
@@ -83,12 +81,7 @@ class JiaJiaBaoGameRule : Rule{
     对王最大>对A>对K...对2
     9点>8点>....0点最小
     3)王为1点，K为3点,Q为2点，J为1点。
-    """,
-            
-            4:"""
-    自定义你的规则
-    """,
-
+    """
         ]
         self.playerNum = [2,3,4,5,6,7,8,9,10]
 

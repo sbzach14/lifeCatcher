@@ -1,10 +1,4 @@
-////
-////  RuleSettingView.swift
-////  Shuffle
-////
-////  Created by Zhangyi Chen on 5/27/23.
-////  Copyright © 2023 Apple. All rights reserved.
-////
+
 //import SwiftUI
 //
 //struct TexasPokerRuleSettingView: View {
