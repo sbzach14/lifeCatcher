@@ -1781,6 +1781,18 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 } else {
                     inputCards = Array(inputCards[(pos + 1)...])
                 }
+            //飞二张去色1张
+            } else if reportRule.cutCardProcession == 4 {
+                let cutCardIndex = cutCardIndexList[cutCardIndexList.count - 1]
+                let pos = searchCardPos(inputCards: inputCards, cardIndex: cutCardIndex)
+                if pos == 0 {
+                    inputCards = Array(inputCards[1...])
+                } else if pos == inputCards.count - 1 {
+                    inputCards = Array(inputCards[0..<pos])
+                } else {
+                    inputCards = Array(inputCards[0..<pos]) + Array(inputCards[(pos + 1)...])
+                }
+                
             //普通切牌
             } else {
                 let cutCardIndex = cutCardIndexList[cutCardIndexList.count - 1]

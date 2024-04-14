@@ -183,7 +183,9 @@ class ThreeCardPointGame{
     //11 pointComparision
     
     static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
+
         let rule  = GameManager.gameRules[13] as! ThreeCardPointGameRule
+
         let dealNum = args[0]
         let dealType = args[1]
         let playerNum = args[2]
@@ -340,16 +342,13 @@ class ThreeCardPointGameHandEvaluator{
         var maxCardType: String = ""
         var maxIsPair: Int = 0
         
-        //打印手牌
-        print("手牌 \(GameManager.cardLabelDic[cards[0].cardIndex])  \(GameManager.cardLabelDic[cards[1].cardIndex])")
-        
         var num1 = ThreeCardPointCard(card: cards[0], redJokerValueRange: redJokerValueRange, blackJokerValueRange: blackJokerValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange)
         var num2 = ThreeCardPointCard(card: cards[1], redJokerValueRange: redJokerValueRange, blackJokerValueRange: blackJokerValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange)
-        
+        var num3 = ThreeCardPointCard(card: cards[2], redJokerValueRange: redJokerValueRange, blackJokerValueRange: blackJokerValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange)
         
         var i = self.rankRules.count + 1
         for ruleIndex in self.rankRules{
-            let (flag, rank, cardType, isPair) = self.rankRulesDic[ruleIndex]!([num1, num2])
+            let (flag, rank, cardType, isPair) = self.rankRulesDic[ruleIndex]!([num1, num2, num3])
             i -= 1
             if flag == false{
                 continue
