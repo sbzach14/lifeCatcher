@@ -382,7 +382,7 @@ class TenPointFiveGameHandEvaluator{
             else if card.rank == 11 {
                 self.point = Int(rule.JValueRange[JValueRange]!)!
             }else {
-                self.point = card.rank
+                self.point = card.rank * 2
             }
         }
         
