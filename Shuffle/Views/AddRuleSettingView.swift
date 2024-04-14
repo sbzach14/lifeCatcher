@@ -650,7 +650,7 @@ struct AddRuleSettingView: View{
             break
         case 2:
             let selectedRule = GameManager.gameRules[gameType] as! ThreeCardPokerGameRule
-            allCardIndex = ThreeCardPokerGame.getAllCardIndex(minRank: selectedRule.minRank[args[2]], isAce: args[3], isHeadCard: args[5], isRedJoker: args[6], isBlackJoker: args[9])
+            allCardIndex = ThreeCardPokerGame.getAllCardIndex(minRank: selectedRule.minRank[args[3]], isAce: args[4], isHeadCard: args[6], isRedJoker: args[7], isBlackJoker: args[10])
             break
         case 3:
             let selectedRule = GameManager.gameRules[gameType] as! TinyNineGameRule

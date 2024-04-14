@@ -368,7 +368,11 @@ public class RuleManager{
         
         allPreSetReportRules[96] =  ReportClass.init(reportName: "[207]飞2张打色去色1张保位置最小", reportID: 96, rankReport: 3, aliveDeathReport: 0, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 14, reportTarget: 1, cardsTransformation: 21, consecutiveReport: -1, positionToReport: 0, colorCardPos: 17, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: 4, reportFormation: -1, cutCardProcession: 4)
         
-        allPreSetReportRules[97] =  ReportClass.init(reportName: "[208]飞2张打色去色1张保位置最大", reportID: 97, rankReport: 3, aliveDeathReport: 0, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 14, reportTarget: 1, cardsTransformation: 21, consecutiveReport: -1, positionToReport: 0, colorCardPos: 17, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: 4, reportFormation: -1, cutCardProcession: 5)
+        allPreSetReportRules[97] =  ReportClass.init(reportName: "[208]:飞2张打色色先发保位置最大", reportID: 97, rankReport: 0, aliveDeathReport: 0, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 14, reportTarget: 1, cardsTransformation: 21, consecutiveReport: -1, positionToReport: 0, colorCardPos: 17, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: 4, reportFormation: -1, cutCardProcession: 5)
+        
+        allPreSetReportRules[98] =  ReportClass.init(reportName: "[209]:飞2张打色色先发保位置最小", reportID: 98, rankReport: 3, aliveDeathReport: 0, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 14, reportTarget: 1, cardsTransformation: 21, consecutiveReport: -1, positionToReport: 0, colorCardPos: 17, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: 4, reportFormation: -1, cutCardProcession: 5)
+        
+        allPreSetReportRules[100] =  ReportClass.init(reportName: "[212]:飞2张面为色留色保位置最大", reportID: 100, rankReport: 3, aliveDeathReport: 0, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 14, reportTarget: 1, cardsTransformation: 21, consecutiveReport: -1, positionToReport: 0, colorCardPos: 17, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: 4, reportFormation: -1, cutCardProcession: 5)
         
         //TODO : 91-107
         allPreSetReportRules[108] = ReportClass.init(reportName: "[284]:固定范围切牌报对子和同点数目", reportID: 108, rankReport: 0, aliveDeathReport: -1, pairReport: 2, drawPointReport: 2, ninePointReport: -1,  reportCutRange: 0, reportTarget: 0, cardsTransformation: 4, consecutiveReport: -1, positionToReport: 0, colorCardPos: -1, hasSpecialCard: -1, specifiedPlayerHand: -1, differentDeal: -1, reportFormation: -1, cutCardProcession: -1)
@@ -1122,10 +1126,10 @@ public class RuleManager{
                 suitRules = [3,2,1,0]
                 rankRules = [12, 6, 4, 3, 1, 0]
                 rankRuleChecked = [1,1,1,1,1,1]
-                allPreSetRules[i]![4]!.append(args)
-                allPreSetRules[i]![4]!.append(suitRules)
-                allPreSetRules[i]![4]!.append(rankRules)
-                allPreSetRules[i]![4]!.append(rankRuleChecked)
+                allPreSetRules[i]![6]!.append(args)
+                allPreSetRules[i]![6]!.append(suitRules)
+                allPreSetRules[i]![6]!.append(rankRules)
+                allPreSetRules[i]![6]!.append(rankRuleChecked)
 //                7: "金花6选3[610]",
                 handNum = 6
                 communityNum = 0
@@ -1146,10 +1150,10 @@ public class RuleManager{
                 suitRules = [3,2,1,0]
                 rankRules = [12, 6, 4, 3, 1, 0]
                 rankRuleChecked = [1,1,1,1,1,1]
-                allPreSetRules[i]![4]!.append(args)
-                allPreSetRules[i]![4]!.append(suitRules)
-                allPreSetRules[i]![4]!.append(rankRules)
-                allPreSetRules[i]![4]!.append(rankRuleChecked)
+                allPreSetRules[i]![7]!.append(args)
+                allPreSetRules[i]![7]!.append(suitRules)
+                allPreSetRules[i]![7]!.append(rankRules)
+                allPreSetRules[i]![7]!.append(rankRuleChecked)
                 break
             //小九
             case 3:
