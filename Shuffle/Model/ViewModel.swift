@@ -76,7 +76,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     public var suitRules : [Int] = [3,2,1,0]
     public var allCardIndex : [Int] = Array(0...51)
     public var minCardNum : Int = 0
-
+    
+    let idleRate = 60
     let context = CIContext()
     var taskImageArray : [String] = []
     
@@ -303,7 +304,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             // 获取当前帧率
             let videoFrameRate = format.videoSupportedFrameRateRanges.first!.maxFrameRate
             print("设定帧率: \(videoFrameRate)")
-            changeCameraFrameRate(to: 30)
+            changeCameraFrameRate(to: idleRate)
         } catch {
             print("配置前置摄像头时发生错误: \(error)")
         }
@@ -311,7 +312,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     
     func startCamera() {
         session.startRunning()
-        changeCameraFrameRate(to: 30)
+        changeCameraFrameRate(to: idleRate)
         print("开启相机")
     }
     
@@ -389,7 +390,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             indexGap = 8
         }
         
-        if !self.isBlack && (self.cameraFrameRate <= 30 || self.taskIndex % indexGap == 0){
+        if !self.isBlack && (self.cameraFrameRate <= idleRate || self.taskIndex % indexGap == 0){
             backgroundQueue.async {
                 do{
                     let cgImage = self.context.createCGImage(ciImage, from: ciImage.extent)!
@@ -503,12 +504,12 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     // MARK: process image origin
     func processImageOrigin(_ pixelBuffer: CVPixelBuffer, taskIndex: Int){
         
-        var confidenceThreshold = 0.7
+        var confidenceThreshold = 0.6
         if self.state == "idle"{
-            confidenceThreshold = 0.8
+            confidenceThreshold = 0.7
         }
         else{
-            confidenceThreshold = 0.7
+            confidenceThreshold = 0.1
         }
         
         var cardResult : [DetectionResult]
@@ -557,7 +558,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 DispatchQueue.main.async{
                     self.stateCounter = 0
                     self.state = "idle"
-                    self.changeCameraFrameRate(to: 30)
+                    self.changeCameraFrameRate(to: self.idleRate)
                     let detectState = self.handleDetecResultList()
                     self.initBoxes()
                     
