@@ -77,7 +77,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     public var allCardIndex : [Int] = Array(0...51)
     public var minCardNum : Int = 0
     
-    let idleRate = 60
+    let idleRate = 30
     let context = CIContext()
     var taskImageArray : [String] = []
     
@@ -236,6 +236,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         cardArray = []
         cutArray = []
         cutShowArray = []
+        self.leftCards = []
     }
     
     private func initBoxes(){
@@ -521,7 +522,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             let result = try! slowModel.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
             cardResult = getCard(from: result.confidence, from: result.coordinates, from: pixelBuffer)
         }
-        
+         
         if cardResult[0].cardIndex[0] == self.stateCard[0] && cardResult[1].cardIndex[0] == self.stateCard[1]{
             stateCounter = min(stateCounter + 1, 600)
         }
