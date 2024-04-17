@@ -8,11 +8,14 @@ class SettingViewModel: ObservableObject {
     @Published var isRemote: Bool = false
     @Published var isFast: Bool = true
     @Published var isActive: Bool = false
+    @Published var isAutoFocus: Bool = true
     @Published var activeDate: String = ""
     @Published var uniqueID: String = ""
     @Published var volumeUp: Int = 0
     @Published var volumeDown: Int = 0
     @Published var volumeValue: Float = 0.5
+    @Published var zoomFactor: Float = 0
+    @Published var focusFactor: Float = 1
     
     @Published var searchText : String = ""
 
@@ -26,6 +29,7 @@ class SettingViewModel: ObservableObject {
             self.isRemote = boolDict["isRemote"]!
             self.isFast = boolDict["isFast"]!
             self.isActive = boolDict["isActive"]!
+            self.isAutoFocus = boolDict["isAutoFocus"]!
             
             let intDict = configData["Int"] as! [String : Int]
             self.volumeUp = intDict["volumeUp"]!
@@ -33,18 +37,8 @@ class SettingViewModel: ObservableObject {
             
             let floatDict = configData["Float"] as! [String : Float]
             self.volumeValue = floatDict["volumeValue"]!
-        } else {
-            // If config.json is not found or invalid, set default values
-            self.isBlack = false
-            self.isMute = false
-            self.isBackCamera = true
-            self.isRemote = false
-            self.isFast = true
-            self.isActive = false
-            
-            self.volumeUp = 0
-            self.volumeDown = 0
-            self.volumeValue = 0.5
+            self.zoomFactor = floatDict["zoomFactor"]!
+            self.focusFactor = floatDict["focusFactor"]!
         }
         
         if let paraData = readParaJSON() {
@@ -70,7 +64,8 @@ class SettingViewModel: ObservableObject {
                 "isBackCamera" : self.isBackCamera,
                 "isRemote" : self.isRemote,
                 "isFast": self.isFast,
-                "isActive": self.isActive
+                "isActive": self.isActive,
+                "isAutoFocus": self.isAutoFocus
             ]
             
             let intDict : [String: Int] = [
@@ -79,7 +74,9 @@ class SettingViewModel: ObservableObject {
             ]
             
             let floatDict : [String: Float] = [
-                "volumeValue": self.volumeValue
+                "volumeValue": self.volumeValue,
+                "zoomFactor": self.zoomFactor,
+                "focusFactor": self.focusFactor
             ]
             
             let configData: [String: Any] = [

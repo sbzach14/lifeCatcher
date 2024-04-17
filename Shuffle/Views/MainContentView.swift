@@ -1,5 +1,6 @@
 import SwiftUI
 import MediaPlayer
+import Combine
 
 struct MainContentView: View {
     var saveRuleIndex : Int
@@ -26,22 +27,117 @@ struct MainContentView: View {
                 }
                 .navigationBarBackButtonHidden(true)
             } else {
-                Button {
-                    viewModel.isShowCard = true
-                    self.isNavigateToShowCardView = true
-                } label: {
-                    Label("ShowCard", systemImage: "magnifyingglass")
-                        .foregroundColor(.blue)
-                        .labelStyle(.iconOnly)
+                VStack{
+                    if viewModel.isCamereSetting{
+                        VStack{
+                            HStack {
+                                Text("后置相机")
+                                    .foregroundColor(.white)
+                                    .padding(.leading, 20)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                
+                                Toggle("", isOn: $viewModel.isBackCamera)
+                                    .toggleStyle(CustomToggleStyle())
+                                    .frame(width: 160, height: 30, alignment: .trailing)
+                                    .padding(.trailing,30) // 右侧间距
+                                    .accentColor(.white)
+                                    .onChange(of: viewModel.isBackCamera) {
+                                        newValue in
+                                        viewModel.stopCamera()
+                                        viewModel.setupAVCapture()
+                                        viewModel.startCamera()
+                                        viewModel.updateConfigJSON()
+                                    }
+                            }
+                            Divider().colorInvert()
+                            
+                            HStack {
+                                Text("缩放比例").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
+                                
+                                Slider(value: $viewModel.zoomFactor, in: 0...1, step: 0.02)
+                                    .frame(width: 160, height: 30, alignment: .trailing)
+                                    .padding(.trailing,30) // 右侧间距
+                                    .accentColor(.white)
+                                    .onChange(of: viewModel.zoomFactor) {
+                                        newValue in
+                                        viewModel.updateZoomFactor()
+                                        viewModel.updateConfigJSON()
+                                    }
+                            }
+                            Divider().colorInvert()
+                            
+                            HStack {
+                                Text("自动对焦")
+                                    .foregroundColor(.white)
+                                    .padding(.leading, 20)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                
+                                Toggle("", isOn: $viewModel.isAutoFocus)
+                                    .toggleStyle(CustomToggleStyle())
+                                    .frame(width: 160, height: 30, alignment: .trailing)
+                                    .padding(.trailing,30) // 右侧间距
+                                    .accentColor(.white)
+                                    .onChange(of: viewModel.isAutoFocus) {
+                                        newValue in
+                                        viewModel.updateFocusFactor()
+                                        viewModel.updateConfigJSON()
+                                    }
+                            }
+                            
+                            if !viewModel.isAutoFocus{
+                                Divider().colorInvert()
+                                HStack {
+                                    Text("焦距调节").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
+                                    
+                                    Slider(value: $viewModel.focusFactor, in: 0...1, step: 0.02)
+                                        .frame(width: 160, height: 30, alignment: .trailing)
+                                        .padding(.trailing,30) // 右侧间距
+                                        .accentColor(.white)
+                                        .onChange(of: viewModel.focusFactor) {
+                                            newValue in
+                                            viewModel.updateFocusFactor()
+                                            viewModel.updateConfigJSON()
+                                        }
+                                }
+                            }
+                        }
+                        .padding()
                         .bubbleBackground()
+                    }
+                    
+                    HStack{
+                        Button {
+                            viewModel.isShowCard = true
+                            self.isNavigateToShowCardView = true
+                        } label: {
+                            Label("ShowCard", systemImage: "magnifyingglass")
+                                .foregroundColor(.blue)
+                                .labelStyle(.iconOnly)
+                                .bubbleBackground()
+                                
+                        }
+                        .frame(width: 50, height: 50)
+                        .background(NavigationLink(destination: ShowCardView().environmentObject(viewModel),
+                                                   isActive: $isNavigateToShowCardView,
+                                                   label: EmptyView.init).hidden()
+                        )
+                        
+                        Spacer()
+                        
+                        Button {
+                            viewModel.isCamereSetting.toggle()
+                        } label: {
+                            Label("CameraSetting", systemImage: "camera")
+                                .foregroundColor(.blue)
+                                .labelStyle(.iconOnly)
+                                .bubbleBackground()
+                                
+                        }
+                        .frame(width: 50, height: 50)
+                    }
+                    .padding()
                 }
-                .background(NavigationLink(destination: ShowCardView().environmentObject(viewModel),
-                                            isActive: $isNavigateToShowCardView,
-                                            label: EmptyView.init).hidden()
-                )
-                .padding()
             }
-            
             Spacer()
         }
         .onAppear {
@@ -51,6 +147,7 @@ struct MainContentView: View {
             self.isAVCaptureActive = true
             viewModel.isWorking = true
             viewModel.isShowCard = false
+            viewModel.isCamereSetting = false
             viewModel.startCamera()
             
         }
@@ -87,7 +184,6 @@ struct MyViewControllerWrapper: UIViewControllerRepresentable {
         // 可选：在这里更新视图控制器的状态
     }
 }
-
 
 class MyViewController: UIViewController {
     
@@ -210,7 +306,6 @@ class MyViewController: UIViewController {
                 // 处理音量减少逻辑
                 viewModel?.handleVolumeDecrease()
             }
-            
             
         }
     }

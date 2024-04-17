@@ -23,6 +23,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     
     @Published var cameraImage : CGImage?
     @Published var isShowCard : Bool = false
+    @Published var isCamereSetting : Bool = false
     
     // cardArray, 装有所有poker的array
     @Published var cardArray :  [Int] = []
@@ -121,13 +122,21 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         46: "♦️8 ", 47: "♦️9 ", 48: "♦️10 ", 49: "♦️J ", 50: "♦️Q ", 51: "♦️K ", 52: "none", 53: "小王", 54: "大王"
     ]
     
-    var isBlack: Bool = false
-    var isMute: Bool = false
-    var isBackCamera: Bool = false
-    var isRemote: Bool = false
-    var isFast: Bool = true
-    var volumeUp: Int = 0
-    var volumeDown: Int = 0
+    @Published var isBlack: Bool = false
+    @Published var isMute: Bool = false
+    @Published var isBackCamera: Bool = true
+    @Published var isRemote: Bool = false
+    @Published var isFast: Bool = true
+    @Published var isActive: Bool = false
+    @Published var isAutoFocus: Bool = true
+    @Published var activeDate: String = ""
+    @Published var uniqueID: String = ""
+    @Published var volumeUp: Int = 0
+    @Published var volumeDown: Int = 0
+    @Published var volumeValue: Float = 0.5
+    @Published var zoomFactor: Float = 0
+    @Published var focusFactor: Float = 1
+    
     var setFrameRate: Float64 = 120.0
     var cameraFrameRate: Int = 0
     
@@ -137,6 +146,10 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     var isWorking: Bool = true
     
     var viewController: MyViewController?
+    
+    let chineseFemaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.siri_female_zh-CN_compact")
+    let chineseMaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.siri_male_zh-CN_compact")
+    
 
     func initialize(saveRuleIndex: Int) {
         
@@ -159,21 +172,17 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             self.isBackCamera = boolDict["isBackCamera"]!
             self.isRemote = boolDict["isRemote"]!
             self.isFast = boolDict["isFast"]!
+            self.isActive = boolDict["isActive"]!
+            self.isAutoFocus = boolDict["isAutoFocus"]!
             
             let intDict = configData["Int"] as! [String : Int]
             self.volumeUp = intDict["volumeUp"]!
             self.volumeDown = intDict["volumeDown"]!
             
-        } else {
-            // If config.json is not found or invalid, set default values
-            self.isBlack = false
-            self.isMute = false
-            self.isBackCamera = true
-            self.isRemote = false
-            self.isFast = true
-            
-            self.volumeUp = 0
-            self.volumeDown = 0
+            let floatDict = configData["Float"] as! [String : Float]
+            self.volumeValue = floatDict["volumeValue"]!
+            self.zoomFactor = floatDict["zoomFactor"]!
+            self.focusFactor = floatDict["focusFactor"]!
         }
         
         let startSoundURL = Bundle.main.url(forResource: "start_tip", withExtension: "mp3")
@@ -203,16 +212,16 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 //            //切断
 //            randomCardArray = Array(randomCardArray.prefix(35))
 //            self.cardArray = randomCardArray
-//            
+//
 //            self.cardArray = [4,18,32, 4,6,0, 0,12,10, 1,2,4, 4,17,30, 13,12,10, 1,15,4, 5,4,6, 18,30,6, 53,54,3, 53,4,5, 54,6,20, 53,4,0, 54,7,22, 8,32,41]
-//            
+//
 //            var cardString:String = "当前牌库："
 //            for cardIndex in cardArray{
 //                cardString += cardLabelDic[cardIndex]! + " "
 //            }
 //            print(cardArray)
 //            print(cardString)
-//            
+//
 //            self.computeWinnerPlayer()
 //        }
 
@@ -261,6 +270,17 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             self.captureDeviceInput = try AVCaptureDeviceInput(device: self.captureDevice)
             
             session.beginConfiguration()
+            
+            // 移除所有的输入
+            for input in session.inputs {
+                session.removeInput(input as! AVCaptureInput)
+            }
+
+            // 移除所有的输出
+            for output in session.outputs {
+                session.removeOutput(output as! AVCaptureOutput)
+            }
+            
             session.addInput(captureDeviceInput!)
             
             
@@ -290,15 +310,13 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 self.captureDevice.activeVideoMinFrameDuration = CMTime(value: 1, timescale: Int32(format.videoSupportedFrameRateRanges.first!.maxFrameRate))
                 self.captureDevice.activeVideoMaxFrameDuration = CMTime(value: 1, timescale: Int32(format.videoSupportedFrameRateRanges.first!.maxFrameRate))
                 
-                // 设置更短的曝光时间（更快的快门速度）
-                //let desiredExposureDuration: CMTime = CMTimeMake(value: 1, timescale: 200) // 1/1000 秒
-
-                //captureDevice.exposureMode = .continuousAutoExposure
-
                 self.captureDevice.unlockForConfiguration()
             } catch {
                 print("设置帧率时发生错误: \(error)")
             }
+            
+            updateFocusFactor()
+            updateZoomFactor()
             
             session.commitConfiguration()
             
@@ -308,6 +326,41 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             changeCameraFrameRate(to: idleRate)
         } catch {
             print("配置前置摄像头时发生错误: \(error)")
+        }
+    }
+    
+    
+    func updateZoomFactor(){
+        do{
+            try self.captureDevice.lockForConfiguration()
+            
+            let minzoomfactor = captureDevice.minAvailableVideoZoomFactor
+            self.captureDevice.videoZoomFactor = minzoomfactor + 3 * CGFloat(self.zoomFactor)
+            
+            self.captureDevice.unlockForConfiguration()
+        }
+        catch{
+            
+        }
+    }
+    
+    func updateFocusFactor(){
+        do{
+            try self.captureDevice.lockForConfiguration()
+            
+            if !self.isAutoFocus && self.captureDevice.isLockingFocusWithCustomLensPositionSupported{
+                self.captureDevice.focusMode = .locked
+                self.captureDevice.setFocusModeLocked(lensPosition: self.focusFactor)
+                print("对焦模式：手动对焦    设定焦距：", self.captureDevice.lensPosition)
+            }
+            else{
+                self.captureDevice.focusMode = .continuousAutoFocus
+                print("对焦模式：自动对焦")
+            }
+            self.captureDevice.unlockForConfiguration()
+        }
+        catch{
+            
         }
     }
     
@@ -358,13 +411,12 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         if deltaTime >= 1.0 {
             let frameRate = Double(frameCount) / deltaTime
             print("实时帧率\(frameRate)fps")
+            
             timestamp = currentTimestamp
             // 重置计数器
             frameCount = 0
             
         }
-        
-        
         
         if self.state != "idle"{
             self.taskIndex += 1
@@ -438,7 +490,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
         
-        if !self.isShowCard && self.isWorking{
+        if !self.isShowCard && !isCamereSetting && self.isWorking{
             
             self.detectionQueue.async {
                 let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: self.imageSize[0], height: self.imageSize[1]), targetArea: self.targetArea)!
@@ -578,7 +630,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                             self.speakText(input: 2)
                         }
                         
-                        else { 
+                        else {
                             var cutIndex = self.cardArray.firstIndex(of: cutCard)!
                             if self.cutMode == 1{
                                 //看底
@@ -837,10 +889,9 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         
         //整理同一个数字的多条链路
         //整理两次
-        for _ in 0..<2{
+        for _ in 0..<3{
             for key in self.confidenceDic.keys{
                 
-                var deleteFlag = false
                 if self.confidenceDic[key] == 100{
                     for numIndex in 0..<self.detectResultList[0]!.count{
                         
@@ -858,30 +909,32 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                                         && end != -1{
                                 head = detectResultListIndex
                                 
-                                let isSameNum = head - end <= 5
-                                //                            var middleNum = self.detectResultList[end+1][numIndex].cardIndex[0]
-                                //                            for updateIndex in end+1...head-1{
-                                //                                if self.detectResultList[updateIndex][numIndex].cardIndex[0] != middleNum{
-                                //                                    isSameNum = false
-                                //                                    break;
-                                //                                }
-                                //                            }
+                                let isClose = head - end <= 5
+
+                                var isSameNum = head - end <= 10
+                                var middleNum = -1
+                                for updateIndex in end+1...head-1{
+                                    let currentMiddleNum = self.detectResultList[updateIndex]![numIndex].cardIndex[0]
+                                    if currentMiddleNum != -1{
+                                        middleNum = currentMiddleNum
+                                        break
+                                    }
+                                }
+                                for updateIndex in end+1...head-1{
+                                    let currentMiddleNum = self.detectResultList[updateIndex]![numIndex].cardIndex[0]
+                                    if currentMiddleNum != -1 && currentMiddleNum != middleNum{
+                                        isSameNum = false
+                                        break
+                                    }
+                                }
                                 
-                                if isSameNum{
+                                if isClose || isSameNum{
                                     for updateIndex in end...head{
                                         self.detectResultList[updateIndex]![numIndex].cardIndex[0] = nowNum
                                         self.detectResultList[updateIndex]![numIndex].nodeType = 3
                                     }
                                     print("合并链 " + cardLabelDic[nowNum]!)
                                 }
-                                else{
-                                    deleteFlag = true
-                                    print("删除链 " + cardLabelDic[nowNum]!)
-                                }
-                            }
-                            
-                            if nowNum == key && deleteFlag{
-                                self.detectResultList[detectResultListIndex]![numIndex].nodeType = 0
                             }
                         }
                     }
@@ -889,9 +942,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
         
-        
-        //TODO处理多链？
-    
         
         //检查是否有数字唯一链被删除
         for key in self.confidenceDic.keys{
@@ -915,6 +965,36 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 }
             }
         }
+
+        //去除所有单独节点的cardindex中已有数字
+        for keyIndex in beginIndex..<endIndex{
+            let detectResultListIndex = sortedKeys[keyIndex]
+            for numIndex in 0..<self.detectResultList[detectResultListIndex]!.count{
+                let detectResultNode = self.detectResultList[detectResultListIndex]![numIndex]
+                
+                if detectResultNode.nodeType == 0
+                    && detectResultNode.cardIndex[0] != -1{
+                    
+                    var newCardIndex : [Int] = []
+                    var newConfidence : [Float] = []
+                    for i in 0..<detectResultNode.cardIndex.count{
+                        if self.confidenceDic[i] == 0{
+                            newCardIndex.append(detectResultNode.cardIndex[i])
+                            newConfidence.append(detectResultNode.confidence[i])
+                        }
+                    }
+
+                    if newCardIndex.count == 0{
+                        newCardIndex.append(-1)
+                        newConfidence.append(1)
+                        detectResultNode.nodeType = 5//所有可能的数字去除，标记为融合牌
+                    }
+
+                    detectResultNode.cardIndex = newCardIndex
+                    detectResultNode.confidence = newConfidence
+                }
+            }
+        }
         
         //找到所有不在链上但在单独节点的数字
         for key in self.confidenceDic.keys{
@@ -925,7 +1005,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     
                     for numIndex in 0..<self.detectResultList[detectResultListIndex]!.count{
                         let nowNum = self.detectResultList[detectResultListIndex]![numIndex].cardIndex[0]
-                        let confidence = self.detectResultList[detectResultListIndex]![numIndex].confidence
+                        let confidence = self.detectResultList[detectResultListIndex]![numIndex].confidence[0]
                         if nowNum == key && confidence > self.confidenceDic[nowNum]! {
                             self.confidenceDic[nowNum] = confidence
                             nodeIndex = [detectResultListIndex, numIndex]
@@ -937,8 +1017,61 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 }
             }
         }
+
+        //去除所有单独节点的cardindex中已有数字
+        for keyIndex in beginIndex..<endIndex{
+            let detectResultListIndex = sortedKeys[keyIndex]
+            for numIndex in 0..<self.detectResultList[detectResultListIndex]!.count{
+                let detectResultNode = self.detectResultList[detectResultListIndex]![numIndex]
+                
+                if detectResultNode.nodeType == 0
+                    && detectResultNode.cardIndex[0] != -1{
+                    
+                    var newCardIndex : [Int] = []
+                    var newConfidence : [Float] = []
+                    for i in 0..<detectResultNode.cardIndex.count{
+                        if self.confidenceDic[i] == 0{
+                            newCardIndex.append(detectResultNode.cardIndex[i])
+                            newConfidence.append(detectResultNode.confidence[i])
+                        }
+                    }
+
+                    if newCardIndex.count == 0{
+                        newCardIndex.append(-1)
+                        newConfidence.append(1)
+                        detectResultNode.nodeType = 5//所有可能的数字去除，标记为融合牌
+                    }
+
+                    detectResultNode.cardIndex = newCardIndex
+                    detectResultNode.confidence = newConfidence
+                }
+            }
+        }
+
+        //再找一次所有不在链上但在单独节点的数字
+        for key in self.confidenceDic.keys{
+            if self.confidenceDic[key] == 0{
+                var nodeIndex : [Int] = []
+                for keyIndex in beginIndex..<endIndex{
+                    let detectResultListIndex = sortedKeys[keyIndex]
+                    
+                    for numIndex in 0..<self.detectResultList[detectResultListIndex]!.count{
+                        let nowNum = self.detectResultList[detectResultListIndex]![numIndex].cardIndex[0]
+                        let confidence = self.detectResultList[detectResultListIndex]![numIndex].confidence[0]
+                        if nowNum == key && confidence > self.confidenceDic[nowNum]! {
+                            self.confidenceDic[nowNum] = confidence
+                            nodeIndex = [detectResultListIndex, numIndex]
+                            print("二次补牌：",cardLabelDic[nowNum])
+                        }
+                    }
+                }
+                if nodeIndex.count > 0{
+                    self.detectResultList[nodeIndex[0]]![nodeIndex[1]].nodeType = 4
+                }
+            }
+        }
         
-        //剩下的节点都是融合牌，可能是已有的牌之间融合，也有可能是已有的牌和未出现的牌融合
+        //判断融合牌是否是链尾
         for keyIndex in beginIndex..<endIndex{
             let detectResultListIndex = sortedKeys[keyIndex]
             let lastDetectResultListIndex = sortedKeys[keyIndex-1]
@@ -948,8 +1081,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 let lastDetectResultNode = self.detectResultList[lastDetectResultListIndex]![numIndex]
                 let lastlastDetectResultNode = self.detectResultList[lastlastDetectResultListIndex]![numIndex]
                 
-                if detectResultNode.nodeType == 0 
-                    && detectResultNode.cardIndex[0] != -1
+                if detectResultNode.nodeType == 5
                     && detectResultNode.laplacianVariance < lastDetectResultNode.laplacianVariance{
                     if lastDetectResultNode.nodeType == 2
                         && lastDetectResultNode.laplacianVariance / lastlastDetectResultNode.laplacianVariance > blurThreshold
@@ -965,12 +1097,13 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         lastDetectResultNode.nodeType = 1
                         detectResultNode.nodeType = 2
                         detectResultNode.cardIndex[0] = lastDetectResultNode.cardIndex[0]
-                        
                     }
                 }
             }
         }
         
+
+        //统计标准模糊度
         for keyIndex in beginIndex..<endIndex{
             let detectResultListIndex = sortedKeys[keyIndex]
             for numIndex in 0..<self.detectResultList[detectResultListIndex]!.count{
@@ -987,16 +1120,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
 
-        
-        //分析结果
-        
-        var lostNumCnt = 0
-        for key in self.confidenceDic.keys{
-            if self.confidenceDic[key] == 0{
-                lostNumCnt += 1
-            }
-        }
-        print("lostNumCnt \(lostNumCnt) beginIndex \(beginIndex) endIndex \(endIndex)")
+        var isRiffleCenter = self.shuffleMode == 2 || (self.shuffleMode == 4 && isSingle)
         
         var detectCardArray : [Int] = []
         
@@ -1135,27 +1259,27 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 
                 //单个插入
                 else{
-                    if (nodeType0 == 4 && !isSingle) || nodeType0 == 2{
+                    if (nodeType0 == 4 && !isRiffleCenter) || nodeType0 == 2{
                         
                         detectCardArray.insert(nowNum0, at: 0)
                         
 //                        //暂时不用：判断下一张是否才是真正队尾
 //                        var leftLaplacianPercent : Float = 1
-//                        
+//
 //                        if nodeType0 == 2{
 //                            leftLaplacianPercent = detectResultNode0.laplacianVariance / lastDetectResultNode0.laplacianVariance
 //                        }
 //                        else if nodeType0 == 4 && self.laplacianDic[0][nowNum0] != 0{
 //                            leftLaplacianPercent = detectResultNode0.laplacianVariance / self.laplacianDic[0][nowNum0]!
 //                        }
-//                        
+//
 //                        if leftLaplacianPercent > blurThreshold
 //                            && nextDetectResultNode0.nodeType == 0
 //                            && nextDetectResultNode1.nodeType == 2{
-//                            
+//
 //                            let nextLeftLaplacianPercent = nextDetectResultNode0.laplacianVariance / detectResultNode0.laplacianVariance
 //                            let nextRightLaplacianPercent = nextDetectResultNode1.laplacianVariance / detectResultNode1.laplacianVariance
-//                            
+//
 //                            if nextLeftLaplacianPercent < nextRightLaplacianPercent{
 //                                detectCardArray.insert(nowNum0, at: 0)
 //                            }
@@ -1169,27 +1293,27 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 //                            detectCardArray.insert(nowNum0, at: 0)
 //                        }
                     }
-                    if (nodeType1 == 4 && !isSingle) || nodeType1 == 2{
+                    if (nodeType1 == 4 && !isRiffleCenter) || nodeType1 == 2{
                         
                         detectCardArray.insert(nowNum1, at: 0)
                         
 //                        //暂时不用：判断下一张是否才是真正队尾
 //                        var rightLaplacianPercent : Float = 1
-//                        
+//
 //                        if nodeType1 == 2{
 //                            rightLaplacianPercent = detectResultNode1.laplacianVariance / lastDetectResultNode1.laplacianVariance
 //                        }
 //                        else if nodeType1 == 4 && self.laplacianDic[1][nowNum1] != 0{
 //                            rightLaplacianPercent = detectResultNode1.laplacianVariance / self.laplacianDic[1][nowNum1]!
 //                        }
-//                        
+//
 //                        if rightLaplacianPercent > blurThreshold
 //                            && nextDetectResultNode1.nodeType == 0
 //                            && nextDetectResultNode0.nodeType == 2{
-//                            
+//
 //                            let nextLeftLaplacianPercent = nextDetectResultNode0.laplacianVariance / detectResultNode0.laplacianVariance
 //                            let nextRightLaplacianPercent = nextDetectResultNode1.laplacianVariance / detectResultNode1.laplacianVariance
-//                            
+//
 //                            if nextLeftLaplacianPercent < nextRightLaplacianPercent{
 //                                detectCardArray.insert(nowNum0, at: 0)
 //                                detectCardArray.insert(nowNum1, at: 0)
@@ -1229,14 +1353,14 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     
 //    // MARK: compute targetArea
 //    func computeTargetArea(){
-//        
+//
 //        if self.isHorizon
 //        {
 //            let minX = self.originSize[0] * (self.lastBoxes[0][0] - self.lastBoxes[0][2] / 2)
 //            let maxX = self.originSize[0] * (self.lastBoxes[1][0] + self.lastBoxes[1][2] / 2)
 //            let minY = self.originSize[1] * min(self.lastBoxes[0][1] - self.lastBoxes[0][3] / 2, self.lastBoxes[1][1] - self.lastBoxes[1][3] / 2)
 //            let maxY = self.originSize[1] * max(self.lastBoxes[0][1] + self.lastBoxes[0][3] / 2, self.lastBoxes[1][1] + self.lastBoxes[1][3] / 2)
-//            
+//
 //            if minX + Float(self.imageSize[0]) >= self.originSize[0]{
 //                self.targetArea[0] = self.originSize[0] - Float(self.imageSize[0] / 2) - 1
 //                self.targetArea[2] = Float(self.imageSize[0])
@@ -1249,9 +1373,9 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 //                self.targetArea[0] = (maxX + minX) / 2
 //                self.targetArea[2] = max(maxX - minX + 100, Float(self.imageSize[0]))
 //            }
-//            
+//
 //            self.targetArea[3] = min(self.originSize[1] - 2, self.targetArea[2] / Float(self.imageSize[0]) * Float(self.imageSize[1]))
-//            
+//
 //            if self.targetArea[3] == self.originSize[1] - 2{
 //                self.targetArea[1] = self.originSize[1] / 2
 //            }
@@ -1270,7 +1394,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 //            let maxY = self.originSize[1] * (self.lastBoxes[1][1] + self.lastBoxes[1][3] / 2)
 //            let minX = self.originSize[0] * min(self.lastBoxes[0][0] - self.lastBoxes[0][2] / 2, self.lastBoxes[1][0] - self.lastBoxes[1][2] / 2)
 //            let maxX = self.originSize[0] * max(self.lastBoxes[0][0] + self.lastBoxes[0][2] / 2, self.lastBoxes[1][0] + self.lastBoxes[1][2] / 2)
-//            
+//
 //            if minY + Float(self.imageSize[0]) >= self.originSize[1]{
 //                self.targetArea[1] = self.originSize[1] - Float(self.imageSize[0] / 2) - 1
 //                self.targetArea[3] = Float(self.imageSize[0])
@@ -1283,9 +1407,9 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 //                self.targetArea[1] = (maxY + minY) / 2
 //                self.targetArea[3] = max(maxY - minY + 100, Float(self.imageSize[0]))
 //            }
-//            
+//
 //            self.targetArea[2] = min(self.originSize[0] - 2, self.targetArea[3] / Float(self.imageSize[0]) * Float(self.imageSize[1]))
-//            
+//
 //            if self.targetArea[2] == self.originSize[0] - 2{
 //                self.targetArea[0] = self.originSize[0] / 2
 //            }
@@ -1435,6 +1559,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 var maxVal: Float32 = cardArray[i * n].floatValue
                 var confidenceSum : Float = 0
                 var cardIndex : [Int] = []
+                var confidence : [Float] = []
                 for j in 0..<n {
                     let index = i * n + j
                     let value = cardArray[index].floatValue
@@ -1450,6 +1575,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         
                         if (value/confidenceSum>=0) {
                             cardIndex.append(j)
+                            confidence.append(value)
                         }
                         
                         if value > maxVal {
@@ -1459,6 +1585,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 }
                 // 对 cardIndex 进行排序
                 cardIndex.sort{cardArray[$0 + i*n].floatValue > cardArray[$1 + i*n].floatValue}
+                confidence.sort{ $0 > $1 }
                 
                 let centerX = boxArray[i*4].floatValue
                 let centerY = boxArray[i*4+1].floatValue
@@ -1470,16 +1597,17 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 if cardIndex.count > 0{
                     if let index = result.firstIndex(where: { ($0.targetDistance(target: coordinate)) < 0.01 }) {
                         
-                        if maxVal > result[index].confidence {
+                        if maxVal > result[index].confidence[0] {
                             result[index].cardIndex = cardIndex + result[index].cardIndex
-                            result[index].confidence = maxVal
+                            result[index].confidence = confidence + result[index].confidence
                         }
                         else{
                             result[index].cardIndex = result[index].cardIndex + cardIndex
+                            result[index].confidence = result[index].confidence + confidence
                         }
                     }
                     else{
-                        result.append(DetectionResult(cardIndex: cardIndex, confidence: maxVal, confidencePercent: maxVal/confidenceSum, coordinate: coordinate, laplacianVariance: 0))
+                        result.append(DetectionResult(cardIndex: cardIndex, confidence: confidence, confidencePercent: maxVal/confidenceSum, coordinate: coordinate, laplacianVariance: 0))
                     }
                 }
             }
@@ -1501,7 +1629,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
             
             if result.count > 2{
-                result.sort{$0.confidence > $1.confidence}
+                result.sort{$0.confidence[0] > $1.confidence[0]}
                 result.removeLast(result.count - 2)
             }
             
@@ -1525,24 +1653,24 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             else if result.count == 1{
                 if isHorizon{
                     if result[0].coordinate[0] > self.centerPos[0]{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
                     }
                     else{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
                     }
                 }
                 else{
                     if result[0].coordinate[1] > self.centerPos[1]{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
                     }
                     else{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
                     }
                 }
             }
             else if result.count == 0{
-                result.append(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0))
-                result.append(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 1, coordinate: lastBoxes[1], laplacianVariance: 0))
+                result.append(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0))
+                result.append(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0))
             }
             
             for resultIndex in 0..<result.count{
@@ -1586,6 +1714,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 var maxVal: Float32 = cardArray[i * n].floatValue
                 var confidenceSum : Float = 0
                 var cardIndex : [Int] = []
+                var confidence : [Float] = []
                 for j in 0..<n {
                     let index = i * n + j
                     let value = cardArray[index].floatValue
@@ -1601,6 +1730,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         
                         if (value/confidenceSum>=0) {
                             cardIndex.append(j)
+                            confidence.append(value)
                         }
                         
                         if value > maxVal {
@@ -1610,6 +1740,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 }
                 // 对 cardIndex 进行排序
                 cardIndex.sort{cardArray[$0 + i*n].floatValue > cardArray[$1 + i*n].floatValue}
+                confidence.sort{ $0 > $1 }
                 
                 let centerX = boxArray[i*4].floatValue
                 let centerY = boxArray[i*4+1].floatValue
@@ -1621,16 +1752,17 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 if cardIndex.count > 0{
                     if let index = result.firstIndex(where: { ($0.targetDistance(target: coordinate)) < 0.01 }) {
                         
-                        if maxVal > result[index].confidence {
+                        if maxVal > result[index].confidence[0] {
                             result[index].cardIndex = cardIndex + result[index].cardIndex
-                            result[index].confidence = maxVal
+                            result[index].confidence = confidence + result[index].confidence
                         }
                         else{
                             result[index].cardIndex = result[index].cardIndex + cardIndex
+                            result[index].confidence = result[index].confidence + confidence
                         }
                     }
                     else{
-                        result.append(DetectionResult(cardIndex: cardIndex, confidence: maxVal, confidencePercent: maxVal/confidenceSum, coordinate: coordinate, laplacianVariance: ComputeROILaplacianVariance(box: coordinate, destinationBuffer8: destinationBuffer8)))
+                        result.append(DetectionResult(cardIndex: cardIndex, confidence: confidence, confidencePercent: maxVal/confidenceSum, coordinate: coordinate, laplacianVariance: ComputeROILaplacianVariance(box: coordinate, destinationBuffer8: destinationBuffer8)))
                     }
                 }
             }
@@ -1652,7 +1784,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
             
             if result.count > 2{
-                result.sort{$0.confidence > $1.confidence}
+                result.sort{$0.confidence[0] > $1.confidence[0]}
                 result.removeLast(result.count - 2)
             }
             
@@ -1676,24 +1808,24 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             else if result.count == 1{
                 if isHorizon{
                     if result[0].coordinate[0] > self.centerPos[0]{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[0], destinationBuffer8: destinationBuffer8)), at: 0)
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[0], destinationBuffer8: destinationBuffer8)), at: 0)
                     }
                     else{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[1], destinationBuffer8: destinationBuffer8)), at: 1)
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[1], destinationBuffer8: destinationBuffer8)), at: 1)
                     }
                 }
                 else{
                     if result[0].coordinate[1] > self.centerPos[1]{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[0], destinationBuffer8: destinationBuffer8)), at: 0)
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[0], destinationBuffer8: destinationBuffer8)), at: 0)
                     }
                     else{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[1], destinationBuffer8: destinationBuffer8)), at: 1)
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[1], destinationBuffer8: destinationBuffer8)), at: 1)
                     }
                 }
             }
             else if result.count == 0{
-                result.append(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[0], destinationBuffer8: destinationBuffer8)))
-                result.append(DetectionResult(cardIndex: [-1], confidence: 0, confidencePercent: 1, coordinate: lastBoxes[1], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[1], destinationBuffer8: destinationBuffer8)))
+                result.append(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[0], destinationBuffer8: destinationBuffer8)))
+                result.append(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[1], destinationBuffer8: destinationBuffer8)))
             }
             
             for resultIndex in 0..<result.count{
@@ -1791,8 +1923,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 
     func speakText(input: [[SpeakResultStruct]]) {
         let isSpeak = self.isHeadphonesConnected() == self.isMute
-        let chineseFemaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.siri_female_zh-CN_compact")
-        let chineseMaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.siri_male_zh-CN_compact")
         
         if isSpeak{
             for (_, turnResult) in input.enumerated() {
@@ -1811,6 +1941,9 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         
                         if reportIndex == 0{
                             speechUtterance.preUtteranceDelay = 0.2
+                        }
+                        else{
+                            speechUtterance.preUtteranceDelay = 0
                         }
                         speechSynthesizer.speak(speechUtterance)
                     }
@@ -1972,18 +2105,59 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         self.minCardNum = rules.minCardNum
         print("self.rankRules \(self.rankRules)")
     }
+    
+    public func updateConfigJSON() {
+        do {
+            let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            let fileURL = documentsURL.appendingPathComponent("config.json")
+
+            let boolDict: [String: Bool] = [
+                "isBlack": self.isBlack,
+                "isMute": self.isMute,
+                "isBackCamera" : self.isBackCamera,
+                "isRemote" : self.isRemote,
+                "isFast": self.isFast,
+                "isActive": self.isActive,
+                "isAutoFocus": self.isAutoFocus
+            ]
+            
+            let intDict : [String: Int] = [
+                "volumeUp": self.volumeUp,
+                "volumeDown": self.volumeDown
+            ]
+            
+            let floatDict : [String: Float] = [
+                "volumeValue": self.volumeValue,
+                "zoomFactor": self.zoomFactor,
+                "focusFactor": self.focusFactor
+            ]
+            
+            let configData: [String: Any] = [
+                "Int": intDict,
+                "Float": floatDict,
+                "Bool": boolDict
+            ]
+
+            let jsonData = try JSONSerialization.data(withJSONObject: configData, options: .prettyPrinted)
+            try jsonData.write(to: fileURL)
+
+            print("config.json file updated successfully")
+        } catch {
+            print("Error updating config.json: \(error)")
+        }
+    }
 }
 
 
 class DetectionResult {
     var cardIndex : [Int]
-    var confidence : Float
+    var confidence : [Float]
     var confidencePercent : Float
     var coordinate : [Float]
-    var nodeType : Int //0未知 1链头 2链尾 3链体 4单个节点
+    var nodeType : Int //0未知 1链头 2链尾 3链体 4单个节点 5融合牌
     var laplacianVariance : Float
 
-    init(cardIndex: [Int], confidence: Float, confidencePercent: Float, coordinate: [Float], laplacianVariance: Float) {
+    init(cardIndex: [Int], confidence: [Float], confidencePercent: Float, coordinate: [Float], laplacianVariance: Float) {
         self.cardIndex = cardIndex
         self.confidence = confidence
         self.confidencePercent = confidencePercent
