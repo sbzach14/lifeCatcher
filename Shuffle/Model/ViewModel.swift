@@ -34,8 +34,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var cutArray : [Int] = []
     @Published var cutShowArray : [Int] = []
     
-    let fastModel = try! cardDetection_0405_n()
-    let slowModel = try! cardDetection_0405_n()
+    let fastModel = try! cardDetection_s_640()
+    let slowModel = try! cardDetection_s_640()
     
     let imageSize : [Int] = [640, 480]
     var originSize : [Float] = [0,0]
@@ -562,7 +562,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             confidenceThreshold = 0.7
         }
         else{
-            confidenceThreshold = 0.1
+            confidenceThreshold = 0.05
         }
         
         var cardResult : [DetectionResult]
@@ -967,34 +967,34 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
 
         //去除所有单独节点的cardindex中已有数字
-        for keyIndex in beginIndex..<endIndex{
-            let detectResultListIndex = sortedKeys[keyIndex]
-            for numIndex in 0..<self.detectResultList[detectResultListIndex]!.count{
-                let detectResultNode = self.detectResultList[detectResultListIndex]![numIndex]
-                
-                if detectResultNode.nodeType == 0
-                    && detectResultNode.cardIndex[0] != -1{
-                    
-                    var newCardIndex : [Int] = []
-                    var newConfidence : [Float] = []
-                    for i in 0..<detectResultNode.cardIndex.count{
-                        if self.confidenceDic[i] == 0{
-                            newCardIndex.append(detectResultNode.cardIndex[i])
-                            newConfidence.append(detectResultNode.confidence[i])
-                        }
-                    }
-
-                    if newCardIndex.count == 0{
-                        newCardIndex.append(-1)
-                        newConfidence.append(1)
-                        detectResultNode.nodeType = 5//所有可能的数字去除，标记为融合牌
-                    }
-
-                    detectResultNode.cardIndex = newCardIndex
-                    detectResultNode.confidence = newConfidence
-                }
-            }
-        }
+//        for keyIndex in beginIndex..<endIndex{
+//            let detectResultListIndex = sortedKeys[keyIndex]
+//            for numIndex in 0..<self.detectResultList[detectResultListIndex]!.count{
+//                let detectResultNode = self.detectResultList[detectResultListIndex]![numIndex]
+//
+//                if detectResultNode.nodeType == 0
+//                    && detectResultNode.cardIndex[0] != -1{
+//
+//                    var newCardIndex : [Int] = []
+//                    var newConfidence : [Float] = []
+//                    for i in 0..<detectResultNode.cardIndex.count{
+//                        if self.confidenceDic[i] == 0{
+//                            newCardIndex.append(detectResultNode.cardIndex[i])
+//                            newConfidence.append(detectResultNode.confidence[i])
+//                        }
+//                    }
+//
+//                    if newCardIndex.count == 0{
+//                        newCardIndex.append(-1)
+//                        newConfidence.append(1)
+//                        detectResultNode.nodeType = 5//所有可能的数字去除，标记为融合牌
+//                    }
+//
+//                    detectResultNode.cardIndex = newCardIndex
+//                    detectResultNode.confidence = newConfidence
+//                }
+//            }
+//        }
         
         //找到所有不在链上但在单独节点的数字
         for key in self.confidenceDic.keys{
@@ -1019,34 +1019,34 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
 
         //去除所有单独节点的cardindex中已有数字
-        for keyIndex in beginIndex..<endIndex{
-            let detectResultListIndex = sortedKeys[keyIndex]
-            for numIndex in 0..<self.detectResultList[detectResultListIndex]!.count{
-                let detectResultNode = self.detectResultList[detectResultListIndex]![numIndex]
-                
-                if detectResultNode.nodeType == 0
-                    && detectResultNode.cardIndex[0] != -1{
-                    
-                    var newCardIndex : [Int] = []
-                    var newConfidence : [Float] = []
-                    for i in 0..<detectResultNode.cardIndex.count{
-                        if self.confidenceDic[i] == 0{
-                            newCardIndex.append(detectResultNode.cardIndex[i])
-                            newConfidence.append(detectResultNode.confidence[i])
-                        }
-                    }
-
-                    if newCardIndex.count == 0{
-                        newCardIndex.append(-1)
-                        newConfidence.append(1)
-                        detectResultNode.nodeType = 5//所有可能的数字去除，标记为融合牌
-                    }
-
-                    detectResultNode.cardIndex = newCardIndex
-                    detectResultNode.confidence = newConfidence
-                }
-            }
-        }
+//        for keyIndex in beginIndex..<endIndex{
+//            let detectResultListIndex = sortedKeys[keyIndex]
+//            for numIndex in 0..<self.detectResultList[detectResultListIndex]!.count{
+//                let detectResultNode = self.detectResultList[detectResultListIndex]![numIndex]
+//
+//                if detectResultNode.nodeType == 0
+//                    && detectResultNode.cardIndex[0] != -1{
+//
+//                    var newCardIndex : [Int] = []
+//                    var newConfidence : [Float] = []
+//                    for i in 0..<detectResultNode.cardIndex.count{
+//                        if self.confidenceDic[i] == 0{
+//                            newCardIndex.append(detectResultNode.cardIndex[i])
+//                            newConfidence.append(detectResultNode.confidence[i])
+//                        }
+//                    }
+//
+//                    if newCardIndex.count == 0{
+//                        newCardIndex.append(-1)
+//                        newConfidence.append(1)
+//                        detectResultNode.nodeType = 5//所有可能的数字去除，标记为融合牌
+//                    }
+//
+//                    detectResultNode.cardIndex = newCardIndex
+//                    detectResultNode.confidence = newConfidence
+//                }
+//            }
+//        }
 
         //再找一次所有不在链上但在单独节点的数字
         for key in self.confidenceDic.keys{
@@ -1062,6 +1062,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                             self.confidenceDic[nowNum] = confidence
                             nodeIndex = [detectResultListIndex, numIndex]
                             print("二次补牌：",cardLabelDic[nowNum])
+                            
                         }
                     }
                 }
@@ -1133,6 +1134,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             if self.detectResultList[detectResultListIndex]!.count == 1{
                 let nowNum = self.detectResultList[detectResultListIndex]![0].cardIndex[0]
                 let nodeType = self.detectResultList[detectResultListIndex]![0].nodeType
+                
                 print("index ",detectResultListIndex," 牌 count = 1", cardLabelDic[nowNum], " ", nodeType)
 
                 if nodeType == 2 || nodeType == 4{
@@ -1157,6 +1159,10 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 let nodeType0 = self.detectResultList[detectResultListIndex]![0].nodeType
                 let nowNum1 = self.detectResultList[detectResultListIndex]![1].cardIndex[0]
                 let nodeType1 = self.detectResultList[detectResultListIndex]![1].nodeType
+                
+                if nodeType0 == 0  {
+                    
+                }
                 
                 print("index ", detectResultListIndex,
                       cardLabelDic[nowNum0] ?? "none", detectResultNode0.nodeType, detectResultNode0.laplacianVariance, detectResultNode0.confidence, detectResultNode0.confidencePercent,
