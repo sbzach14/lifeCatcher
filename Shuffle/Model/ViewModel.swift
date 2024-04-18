@@ -1158,9 +1158,17 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 let nowNum1 = self.detectResultList[detectResultListIndex]![1].cardIndex[0]
                 let nodeType1 = self.detectResultList[detectResultListIndex]![1].nodeType
                 
-                print("index ", detectResultListIndex,
-                      cardLabelDic[nowNum0] ?? "none", detectResultNode0.nodeType, detectResultNode0.laplacianVariance, detectResultNode0.confidence, detectResultNode0.confidencePercent,
-                      cardLabelDic[nowNum1] ?? "none", detectResultNode1.nodeType, detectResultNode1.laplacianVariance, detectResultNode1.confidence, detectResultNode1.confidencePercent)
+                
+                if detectResultNode0.nodeType == 0{
+                    for
+                    print("index left ", detectResultListIndex,
+                          cardLabelDic[nowNum0] ?? "none", detectResultNode0.nodeType, detectResultNode0.laplacianVariance, detectResultNode0.confidence, detectResultNode0.confidencePercent,
+                          cardLabelDic[nowNum1] ?? "none", detectResultNode1.nodeType, detectResultNode1.laplacianVariance, detectResultNode1.confidence, detectResultNode1.confidencePercent)
+                }
+                else{
+                    print("index left ", detectResultListIndex,
+                          cardLabelDic[nowNum0] ?? "none", detectResultNode0.nodeType, detectResultNode0.laplacianVariance, detectResultNode0.confidence[0])
+                }
                 
                 if (nodeType0 == 2 || nodeType0 == 4)
                     && (nodeType1 == 2 || nodeType1 == 4){
