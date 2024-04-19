@@ -34,8 +34,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var cutArray : [Int] = []
     @Published var cutShowArray : [Int] = []
     
-    let fastModel = try! cardDetection_0405_n()
-    let slowModel = try! cardDetection_0405_n()
+    let fastModel = try! cardDetection_0412()
+    let slowModel = try! cardDetection_0412()
     
     let imageSize : [Int] = [640, 480]
     var originSize : [Float] = [0,0]
@@ -562,7 +562,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             confidenceThreshold = 0.7
         }
         else{
-            confidenceThreshold = 0.1
+            confidenceThreshold = 0.05
         }
         
         var cardResult : [DetectionResult]
@@ -952,7 +952,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     for numIndex in 0..<self.detectResultList[detectResultListIndex]!.count{
                         let nowNum = self.detectResultList[detectResultListIndex]![numIndex].cardIndex[0]
                         let nodeType = self.detectResultList[detectResultListIndex]![numIndex].nodeType
-                        if nowNum == key && nodeType == 3 {
+                        if nowNum == key && nodeType == 1 {
                             isChain = true
                         }
                     }
@@ -971,10 +971,10 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             let detectResultListIndex = sortedKeys[keyIndex]
             for numIndex in 0..<self.detectResultList[detectResultListIndex]!.count{
                 let detectResultNode = self.detectResultList[detectResultListIndex]![numIndex]
-                
+
                 if detectResultNode.nodeType == 0
                     && detectResultNode.cardIndex[0] != -1{
-                    
+
                     var newCardIndex : [Int] = []
                     var newConfidence : [Float] = []
                     for i in 0..<detectResultNode.cardIndex.count{
@@ -1023,10 +1023,10 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             let detectResultListIndex = sortedKeys[keyIndex]
             for numIndex in 0..<self.detectResultList[detectResultListIndex]!.count{
                 let detectResultNode = self.detectResultList[detectResultListIndex]![numIndex]
-                
+
                 if detectResultNode.nodeType == 0
                     && detectResultNode.cardIndex[0] != -1{
-                    
+
                     var newCardIndex : [Int] = []
                     var newConfidence : [Float] = []
                     for i in 0..<detectResultNode.cardIndex.count{
@@ -1062,6 +1062,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                             self.confidenceDic[nowNum] = confidence
                             nodeIndex = [detectResultListIndex, numIndex]
                             print("二次补牌：",cardLabelDic[nowNum])
+                            
                         }
                     }
                 }
@@ -1120,9 +1121,13 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
 
-        var isRiffleCenter = self.shuffleMode == 2 || (self.shuffleMode == 4 && isSingle)
+        let isRiffleCenter = self.shuffleMode == 2 || (self.shuffleMode == 4 && isSingle)
         
         var detectCardArray : [Int] = []
+        
+        var noneCnt = 0
+        var headCnt = 0
+        var tailCnt = 0
         
         //插入牌堆
         for keyIndex in beginIndex..<endIndex{
@@ -1133,6 +1138,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             if self.detectResultList[detectResultListIndex]!.count == 1{
                 let nowNum = self.detectResultList[detectResultListIndex]![0].cardIndex[0]
                 let nodeType = self.detectResultList[detectResultListIndex]![0].nodeType
+                
                 print("index ",detectResultListIndex," 牌 count = 1", cardLabelDic[nowNum], " ", nodeType)
 
                 if nodeType == 2 || nodeType == 4{
@@ -1158,17 +1164,54 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 let nowNum1 = self.detectResultList[detectResultListIndex]![1].cardIndex[0]
                 let nodeType1 = self.detectResultList[detectResultListIndex]![1].nodeType
                 
+                print("index ", detectResultListIndex,
+                      cardLabelDic[nowNum0] ?? "none", detectResultNode0.nodeType, detectResultNode0.laplacianVariance, detectResultNode0.confidence[0], detectResultListIndex,
+                      cardLabelDic[nowNum1] ?? "none", detectResultNode1.nodeType, detectResultNode1.laplacianVariance, detectResultNode1.confidence[0])
                 
-                if detectResultNode0.nodeType == 0{
-                    for
-                    print("index left ", detectResultListIndex,
-                          cardLabelDic[nowNum0] ?? "none", detectResultNode0.nodeType, detectResultNode0.laplacianVariance, detectResultNode0.confidence, detectResultNode0.confidencePercent,
-                          cardLabelDic[nowNum1] ?? "none", detectResultNode1.nodeType, detectResultNode1.laplacianVariance, detectResultNode1.confidence, detectResultNode1.confidencePercent)
-                }
-                else{
-                    print("index left ", detectResultListIndex,
-                          cardLabelDic[nowNum0] ?? "none", detectResultNode0.nodeType, detectResultNode0.laplacianVariance, detectResultNode0.confidence[0])
-                }
+//                if nodeType0 == 0 && nowNum0 != -1{
+//                    noneCnt+=1
+//                    for index0 in 0..<detectResultNode0.cardIndex.count{
+//                        print("index left ", detectResultListIndex,
+//                              cardLabelDic[detectResultNode0.cardIndex[index0]] ?? "none", detectResultNode0.nodeType, detectResultNode0.laplacianVariance, detectResultNode0.confidence[index0])
+//                    }
+//                }
+//                else if nodeType0 == 1 && detectResultNode0.cardIndex.count > 1{
+//                    headCnt+=1
+//                    for index0 in 0..<detectResultNode0.cardIndex.count{
+//                        print("index left ", detectResultListIndex,
+//                              cardLabelDic[detectResultNode0.cardIndex[index0]] ?? "none", detectResultNode0.nodeType, detectResultNode0.laplacianVariance, detectResultNode0.confidence[index0])
+//                    }
+//                }
+//                else if nodeType0 == 2 && detectResultNode0.cardIndex.count > 1{
+//                    tailCnt+=1
+//                    for index0 in 0..<detectResultNode0.cardIndex.count{
+//                        print("index left ", detectResultListIndex,
+//                              cardLabelDic[detectResultNode0.cardIndex[index0]] ?? "none", detectResultNode0.nodeType, detectResultNode0.laplacianVariance, detectResultNode0.confidence[index0])
+//                    }
+//                }
+//                
+//                if nodeType1 == 0 && nowNum1 != -1{
+//                    noneCnt += 1
+//                    for index1 in 0..<detectResultNode1.cardIndex.count{
+//                        print("index right ", detectResultListIndex,
+//                              cardLabelDic[detectResultNode1.cardIndex[index1]] ?? "none", detectResultNode1.nodeType, detectResultNode1.laplacianVariance, detectResultNode1.confidence[index1])
+//                    }
+//                }
+//                else if nodeType1 == 1 && detectResultNode1.cardIndex.count > 1{
+//                    headCnt += 1
+//                    for index1 in 0..<detectResultNode1.cardIndex.count{
+//                        print("index right ", detectResultListIndex,
+//                              cardLabelDic[detectResultNode1.cardIndex[index1]] ?? "none", detectResultNode1.nodeType, detectResultNode1.laplacianVariance, detectResultNode1.confidence[index1])
+//                    }
+//                }
+//                else if nodeType1 == 2 && detectResultNode1.cardIndex.count > 1{
+//                    tailCnt += 1
+//                    for index1 in 0..<detectResultNode1.cardIndex.count{
+//                        print("index right ", detectResultListIndex,
+//                              cardLabelDic[detectResultNode1.cardIndex[index1]] ?? "none", detectResultNode1.nodeType, detectResultNode1.laplacianVariance, detectResultNode1.confidence[index1])
+//                    }
+//                }
+
                 
                 if (nodeType0 == 2 || nodeType0 == 4)
                     && (nodeType1 == 2 || nodeType1 == 4){
@@ -1338,6 +1381,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 }
             }
         }
+        
+        print("nonecnt:\(noneCnt)  headCnt:\(headCnt)  tailcnt:\(tailCnt)")
         
         //去除相同的牌
         var uniqueArray: [Int] = []
