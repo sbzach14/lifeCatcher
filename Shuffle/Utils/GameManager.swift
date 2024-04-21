@@ -162,7 +162,7 @@ class GameManager {
     }
     
     static func selectGame(gameIndex: Int, inputCards: [Int], playerNum: Int, args : [Int], rankRules : [Int], suitRules: [Int],dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], calModeArgs: [Int], cutNumSetting: Int, cutNumRangeSetting: [Int], consecutiveReport: Int, minCardNum: Int, cutCardIndexArray: [Int]) -> ReportManager.MultipleReportResultInfo {
-        var reportResult:[[Int]] = []
+        
         //TODO dealType 0 正发，1 反发 搞清楚ui
         //cutNumSetting 点数设置
         //cutNumRangeSetting 打色范围 [下限，上限]

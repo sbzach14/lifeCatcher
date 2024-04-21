@@ -123,7 +123,7 @@ struct SettingView: View {
                 }
             }
             .onDisappear{
-                viewModel.saveChanges()
+                viewModel.updateConfigJSON()
             }
             .background(
                 Image("bg")

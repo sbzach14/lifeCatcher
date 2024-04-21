@@ -212,7 +212,6 @@ class TexasPokerGame {
         let handUseType = args[8]
         let handUseNum = rule.handUseNum[args[9]]
         
-        var maxRank = 0
         var returnPlayerInfos: [GameReturnPlayerInfo] = []
 
         var allPlayCards = [TexasPlayer]()
@@ -358,7 +357,7 @@ class HandEvaluator {
         var cardCopy:[Card] = []
         var communityCopy:[Card] = []
         for card in cards {
-            var copy:Card = Card(suit: card.suit, rank: card.rank, cardIndex: card.cardIndex)
+            let copy:Card = Card(suit: card.suit, rank: card.rank, cardIndex: card.cardIndex)
             if copy.rank == 1 {
                 copy.rank = 14
             }
@@ -366,7 +365,7 @@ class HandEvaluator {
         }
         
         for card in community {
-            var copy:Card = Card(suit: card.suit, rank: card.rank, cardIndex: card.cardIndex)
+            let copy:Card = Card(suit: card.suit, rank: card.rank, cardIndex: card.cardIndex)
 
             if copy.rank == 1 {
                 copy.rank = 14

@@ -121,7 +121,7 @@ class TwoEightGangGameRule : Rule{
 class TwoEightGangGame{
     static func FindWinner(diyDealStatus: [[Bool]], diyDealNum: [Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
         
-        var deck = initDeck(initialCards: inputCards, suitRules: suitRules)
+        let deck = initDeck(initialCards: inputCards, suitRules: suitRules)
         let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
         return (winners, leftCards)
     }
@@ -220,7 +220,6 @@ class TwoEightGangGame{
         let pointComparision = args[9]
         
         
-        var maxRank = 0
         var returnPlayerInfos: [GameReturnPlayerInfo] = []
 
         var allPlayCards: [Player] = []
@@ -410,7 +409,7 @@ class TwoEightGangGameHandEvaluator{
     func eval_isPair(cards: [Card]) -> (Int, String, Int){
         if cards[0].rank == cards[1].rank {
             
-            var cardType: String = "对" + GameManager.CardNumberReportDic[cards[0].originalRank]!
+            let cardType: String = "对" + GameManager.CardNumberReportDic[cards[0].originalRank]!
             
             if self.samePointComparision == 1{
                 return (cards[0].rank << 2 | (self.blackRedJudger(card: cards[0]) + self.blackRedJudger(card: cards[1])), cardType, 1)
@@ -437,7 +436,7 @@ class TwoEightGangGameHandEvaluator{
     func eval_Points(cards: [Card]) -> (Int, String, Int){
         var num1 = self.PointsConvertor(card: cards[0])
         var num2 = self.PointsConvertor(card: cards[1])
-        var cardType: String = String((num1 + num2) % 10) + "点"
+        let cardType: String = String((num1 + num2) % 10) + "点"
         //0 最大 1 最小
         if self.pointComparision == 1 {
             num1 = (num1 + 10 - 1) % 10
