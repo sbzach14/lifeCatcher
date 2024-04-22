@@ -78,6 +78,9 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     public var allCardIndex : [Int] = Array(0...51)
     public var minCardNum : Int = 0
     
+    //测试用的定时器
+    public var ding: Int = 0
+    
     let idleRate = 30
     let context = CIContext()
     var taskImageArray : [String] = []
@@ -200,7 +203,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
         
         self.isWorking = true
-        
+
         setupAVCapture()
 
 //      规则测试代码
@@ -224,8 +227,48 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 //
 //            self.computeWinnerPlayer()
 //        }
+        
+        
 
     }
+    
+    private func TicTok(){
+        let timer = DispatchSource.makeTimerSource(queue: DispatchQueue.global())
+            timer.schedule(deadline: .now(), repeating: .seconds(10))
+            timer.setEventHandler {
+                // 每隔 15 秒执行一次
+                self.ding += 1
+                if self.ding == 2 {
+                    self.ding = 0
+                    self.changeCameraFrameRate(to: 240)
+                    self.TicTok2()
+                    print("帧率更新为240")
+                    timer.cancel()
+                }
+                
+            }
+            timer.resume()
+    }
+    
+    private func TicTok2(){
+        let timer = DispatchSource.makeTimerSource(queue: DispatchQueue.global())
+            timer.schedule(deadline: .now(), repeating: .seconds(3))
+        timer.setEventHandler {
+                // 每隔 3 秒执行一次
+                self.ding += 1
+                if self.ding == 2 {
+                    self.ding = 0
+                    self.changeCameraFrameRate(to: self.idleRate)
+                    self.TicTok()
+                    print("帧率更新为30")
+                    timer.cancel()
+                }
+            }
+            timer.resume()
+        
+    }
+    
+    
     
     private func initDetectResult(){
         confidenceDic.removeAll()
@@ -256,6 +299,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     }
 
     func setupAVCapture(){
+        
         if self.isBackCamera{
             self.captureDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
             self.setFrameRate = 240.0
@@ -327,6 +371,10 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         } catch {
             print("配置前置摄像头时发生错误: \(error)")
         }
+        
+        
+        //打开定时器
+        self.TicTok()
     }
     
     
@@ -401,6 +449,9 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     // AVCaptureVideoDataOutputSampleBufferDelegate 方法
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         
+        //断点1
+//        return
+        
         let currentTimestamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer).seconds
                 
         // 计算时间差
@@ -417,6 +468,9 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             frameCount = 0
             
         }
+        
+        //断点2
+//        return
         
         if self.state != "idle"{
             self.taskIndex += 1
@@ -490,16 +544,29 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
         
+        // 释放视频帧资源
+        CMSampleBufferInvalidate(sampleBuffer)
+        
+        //断点4
+//        return
+        
         if !self.isShowCard && !isCamereSetting && self.isWorking{
             
             self.detectionQueue.async {
+                
                 let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: self.imageSize[0], height: self.imageSize[1]), targetArea: self.targetArea)!
+            
+                //断点4
+//                return
+                
                 self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex)
             }
         }
             
-        // 释放视频帧资源
-        CMSampleBufferInvalidate(sampleBuffer)
+
+        
+        //断点3
+//        return
     }
     
 
@@ -568,7 +635,14 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         var cardResult : [DetectionResult]
         if self.isFast{
             let result = try! fastModel.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
+            
+            //断点5
+//            return
+            
             cardResult = getCard(from: result.confidence, from: result.coordinates, from: pixelBuffer)
+            
+            
+            //
         }
         else{
             let result = try! slowModel.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
