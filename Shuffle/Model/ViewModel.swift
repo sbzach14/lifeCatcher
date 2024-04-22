@@ -961,6 +961,23 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
         
+        if !isSingle{
+            endIndex = min(leftLastTail, rightLastTail) + 3
+            let detectResultListIndex = sortedKeys[endIndex-1]
+            if targetDetecResultList[detectResultListIndex]![0].nodeType == 3{
+                targetDetecResultList[detectResultListIndex]![0].nodeType = 2
+            }
+            else if targetDetecResultList[detectResultListIndex]![1].nodeType == 3{
+                targetDetecResultList[detectResultListIndex]![1].nodeType = 2
+            }
+            if targetDetecResultList[detectResultListIndex]![0].nodeType != 2{
+                targetDetecResultList[detectResultListIndex]![0].nodeType = 0
+            }
+            else if targetDetecResultList[detectResultListIndex]![1].nodeType != 2{
+                targetDetecResultList[detectResultListIndex]![1].nodeType = 0
+            }
+        }
+        
         if beginIndex >= endIndex{
             let result = DetectionState(detectionResult: [], isSingle: false, isShort: false, longestIndex: -1)
             return result
@@ -1024,6 +1041,16 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                                         targetDetecResultList[updateIndex]![numIndex].nodeType = 3
                                     }
                                     print("合并链 " + cardLabelDic[nowNum]!)
+                                }
+                                else{
+                                    for updateIndex in head..<endIndex{
+                                        if targetDetecResultList[updateIndex]![numIndex].cardIndex[0] == nowNum{
+                                            targetDetecResultList[updateIndex]![numIndex].nodeType = 0
+                                        }
+                                        else{
+                                            break
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -1162,36 +1189,36 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
         
-        //判断融合牌是否是链尾
-        for keyIndex in beginIndex..<endIndex{
-            let detectResultListIndex = sortedKeys[keyIndex]
-            let lastDetectResultListIndex = sortedKeys[keyIndex-1]
-            let lastlastDetectResultListIndex = sortedKeys[keyIndex-2]
-            for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
-                let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
-                let lastDetectResultNode = targetDetecResultList[lastDetectResultListIndex]![numIndex]
-                let lastlastDetectResultNode = targetDetecResultList[lastlastDetectResultListIndex]![numIndex]
-                
-                if detectResultNode.nodeType == 5
-                    && detectResultNode.laplacianVariance < lastDetectResultNode.laplacianVariance{
-                    if lastDetectResultNode.nodeType == 2
-                        && lastDetectResultNode.laplacianVariance / lastlastDetectResultNode.laplacianVariance > blurThreshold
-                        && detectResultNode.laplacianVariance / lastDetectResultNode.laplacianVariance < blurThreshold{
-                        print("变形 ", detectResultListIndex, cardLabelDic[detectResultNode.cardIndex[0]] ?? "none", cardLabelDic[lastDetectResultNode.cardIndex[0]] ?? "none")
-                        lastDetectResultNode.nodeType = 3
-                        detectResultNode.nodeType = 2
-                        detectResultNode.cardIndex[0] = lastDetectResultNode.cardIndex[0]
-                        
-                    }
-                    else if lastDetectResultNode.nodeType == 4{
-                        print("变形 ", detectResultListIndex, cardLabelDic[detectResultNode.cardIndex[0]] ?? "none", cardLabelDic[lastDetectResultNode.cardIndex[0]] ?? "none")
-                        lastDetectResultNode.nodeType = 1
-                        detectResultNode.nodeType = 2
-                        detectResultNode.cardIndex[0] = lastDetectResultNode.cardIndex[0]
-                    }
-                }
-            }
-        }
+//        //补充链尾
+//        for keyIndex in beginIndex..<endIndex{
+//            let detectResultListIndex = sortedKeys[keyIndex]
+//            let lastDetectResultListIndex = sortedKeys[keyIndex-1]
+//            let lastlastDetectResultListIndex = sortedKeys[keyIndex-2]
+//            for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
+//                let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
+//                let lastDetectResultNode = targetDetecResultList[lastDetectResultListIndex]![numIndex]
+//                let lastlastDetectResultNode = targetDetecResultList[lastlastDetectResultListIndex]![numIndex]
+//                
+//                if (detectResultNode.nodeType == 5 || detectResultNode.nodeType == 0)
+//                    && detectResultNode.laplacianVariance < lastDetectResultNode.laplacianVariance{
+//                    if lastDetectResultNode.nodeType == 2
+//                        && lastDetectResultNode.laplacianVariance / lastlastDetectResultNode.laplacianVariance > blurThreshold
+//                        && detectResultNode.laplacianVariance / lastDetectResultNode.laplacianVariance < blurThreshold{
+//                        print("变形 ", detectResultListIndex, cardLabelDic[detectResultNode.cardIndex[0]] ?? "none", cardLabelDic[lastDetectResultNode.cardIndex[0]] ?? "none")
+//                        lastDetectResultNode.nodeType = 3
+//                        detectResultNode.nodeType = 2
+//                        detectResultNode.cardIndex[0] = lastDetectResultNode.cardIndex[0]
+//                        
+//                    }
+//                    else if lastDetectResultNode.nodeType == 4{
+//                        print("变形 ", detectResultListIndex, cardLabelDic[detectResultNode.cardIndex[0]] ?? "none", cardLabelDic[lastDetectResultNode.cardIndex[0]] ?? "none")
+//                        lastDetectResultNode.nodeType = 1
+//                        detectResultNode.nodeType = 2
+//                        detectResultNode.cardIndex[0] = lastDetectResultNode.cardIndex[0]
+//                    }
+//                }
+//            }
+//        }
         
 
         //统计标准模糊度
@@ -1213,101 +1240,121 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         
         let isRiffleCenter = self.shuffleMode == 2 || (self.shuffleMode == 4 && isSingle)
         let isCut = isSingle && isShort
+        let addEndIndex = endIndex - 3
         
         //补牌
-//        if !isRiffleCenter && !isCut{
-//
-//            var lostNum = 0
-//            var addNum = 0
-//            //找所有遗漏的数字
-//            for key in confidenceDic.keys{
-//                if confidenceDic[key] == 0{
-//                    lostNum += 1
-//
-//                    if beginIndex < leftLastTail{
-//                        for keyIndex in beginIndex..<leftLastTail{
-//                            let detectResultListIndex = sortedKeys[keyIndex]
-//                            if targetDetecResultList[detectResultListIndex]!.count == 2{
-//                                let detectResultNode0 = targetDetecResultList[detectResultListIndex]![0]
-//                                if detectResultNode0.nodeType == 0{
-//                                    detectResultNode0.cardIndex[0] = key
-//                                    confidenceDic[key] = 1
-//                                    detectResultNode0.nodeType = 4
-//                                    break
-//                                }
-//                            }
-//                        }
-//
-//                        if confidenceDic[key] != 0{
-//                            continue
-//                        }
-//                    }
-//
-//                    if beginIndex < rightLastTail{
-//                        for keyIndex in beginIndex..<rightLastTail{
-//                            let detectResultListIndex = sortedKeys[keyIndex]
-//                            if targetDetecResultList[detectResultListIndex]!.count == 2{
-//                                let detectResultNode1 = targetDetecResultList[detectResultListIndex]![1]
-//                                if detectResultNode1.nodeType == 0{
-//                                    detectResultNode1.cardIndex[0] = key
-//                                    confidenceDic[key] = 1
-//                                    detectResultNode1.nodeType = 4
-//                                    break
-//                                }
-//                            }
-//                        }
-//
-//                        if confidenceDic[key] != 0{
-//                            continue
-//                        }
-//                    }
-//
-//                    if beginIndex < leftLastTail{
-//                        for keyIndex in beginIndex..<leftLastTail{
-//                            let detectResultListIndex = sortedKeys[keyIndex]
-//                            if targetDetecResultList[detectResultListIndex]!.count == 2{
-//                                let detectResultNode0 = targetDetecResultList[detectResultListIndex]![0]
-//                                if detectResultNode0.nodeType == 5{
-//                                    detectResultNode0.cardIndex[0] = key
-//                                    confidenceDic[key] = 1
-//                                    detectResultNode0.nodeType = 4
-//                                    break
-//                                }
-//                            }
-//                        }
-//
-//                        if confidenceDic[key] != 0{
-//                            continue
-//                        }
-//                    }
-//
-//                    if beginIndex < rightLastTail{
-//                        for keyIndex in beginIndex..<rightLastTail{
-//                            let detectResultListIndex = sortedKeys[keyIndex]
-//                            if targetDetecResultList[detectResultListIndex]!.count == 2{
-//                                let detectResultNode1 = targetDetecResultList[detectResultListIndex]![1]
-//                                if detectResultNode1.nodeType == 5{
-//                                    detectResultNode1.cardIndex[0] = key
-//                                    confidenceDic[key] = 1
-//                                    detectResultNode1.nodeType = 4
-//                                    break
-//                                }
-//                            }
-//                        }
-//
-//                        if confidenceDic[key] != 0{
-//                            continue
-//                        }
-//                    }
-//
-//                    if confidenceDic[key] != 0{
-//                        addNum += 1
-//                    }
-//                }
-//            }
-//
-//            print("缺牌数量:\(addNum)    补牌数量:\(lostNum)")
-//        }
+        if !isRiffleCenter && !isCut && beginIndex < addEndIndex{
+   
+            var lostNum = 0
+            var addNum = 0
+            //找所有遗漏的数字
+            
+            for key in confidenceDic.keys{
+                if confidenceDic[key] == 0{
+                    lostNum += 1
+                    
+                    for keyIndex in beginIndex..<addEndIndex{
+                        let detectResultListIndex = sortedKeys[keyIndex]
+                        for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
+                            let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
+                            let nextDetectResultNode = targetDetecResultList[detectResultListIndex + 1]![numIndex]
+                            if detectResultNode.nodeType == 5 && nextDetectResultNode.nodeType == 5{
+                                detectResultNode.cardIndex[0] = key
+                                nextDetectResultNode.cardIndex[0] = key
+                                detectResultNode.nodeType = 1
+                                nextDetectResultNode.nodeType = 2
+                                confidenceDic[key] = 1
+                                break
+                            }
+                        }
+                        
+                        if confidenceDic[key] != 0{
+                            break
+                        }
+                    }
+                    
+                    if confidenceDic[key] != 0{
+                        addNum += 1
+                        continue
+                    }
+                    
+                    for keyIndex in beginIndex..<addEndIndex{
+                        let detectResultListIndex = sortedKeys[keyIndex]
+                        for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
+                            let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
+                            let nextDetectResultNode = targetDetecResultList[detectResultListIndex + 1]![numIndex]
+                            if (detectResultNode.nodeType == 0 || nextDetectResultNode.nodeType == 5)
+                            && (detectResultNode.nodeType == 5 || nextDetectResultNode.nodeType == 0){
+                                detectResultNode.cardIndex[0] = key
+                                nextDetectResultNode.cardIndex[0] = key
+                                detectResultNode.nodeType = 1
+                                nextDetectResultNode.nodeType = 2
+                                confidenceDic[key] = 1
+                                break
+                            }
+                        }
+                        
+                        if confidenceDic[key] != 0{
+                            break
+                        }
+                    }
+                    
+                    if confidenceDic[key] != 0{
+                        addNum += 1
+                        continue
+                    }
+                    
+                    for keyIndex in beginIndex..<addEndIndex{
+                        let detectResultListIndex = sortedKeys[keyIndex]
+                        for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
+                            let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
+                            let nextDetectResultNode = targetDetecResultList[detectResultListIndex + 1]![numIndex]
+                            if detectResultNode.nodeType == 5{
+                                detectResultNode.cardIndex[0] = key
+                                detectResultNode.nodeType = 4
+                                confidenceDic[key] = 1
+                                break
+                            }
+                        }
+                        
+                        if confidenceDic[key] != 0{
+                            break
+                        }
+                    }
+                    
+                    if confidenceDic[key] != 0{
+                        addNum += 1
+                        continue
+                    }
+                    
+                    for keyIndex in beginIndex..<addEndIndex{
+                        let detectResultListIndex = sortedKeys[keyIndex]
+                        for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
+                            let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
+                            let nextDetectResultNode = targetDetecResultList[detectResultListIndex + 1]![numIndex]
+                            if detectResultNode.nodeType == 0{
+                                detectResultNode.cardIndex[0] = key
+                                detectResultNode.nodeType = 4
+                                confidenceDic[key] = 1
+                                break
+                            }
+                        }
+                        
+                        if confidenceDic[key] != 0{
+                            break
+                        }
+                    }
+                    
+                    if confidenceDic[key] != 0{
+                        addNum += 1
+                        continue
+                    }
+                }
+            }
+            
+            
+            print("缺牌数量:\(addNum)    补牌数量:\(lostNum)")
+        }
         
         var detectCardArray : [Int] = []
         
@@ -1365,8 +1412,27 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         rightLaplacianPercent = detectResultNode1.laplacianVariance / self.laplacianDic[1][nowNum1]!
                     }
                     
-                    
-                    if leftLaplacianPercent < blurThreshold && rightLaplacianPercent >= blurThreshold{
+                    if nextDetectResultNode0.nodeType == 5 && nextDetectResultNode1.nodeType != 5{
+                        print("左边下一张融合怪 右边先落下")
+                        detectCardArray.insert(nowNum1, at: 0)
+                        detectCardArray.insert(nowNum0, at: 0)
+                    }
+                    else if nextDetectResultNode0.nodeType != 5 && nextDetectResultNode1.nodeType == 5{
+                        print("右边下一张融合怪 左边先落下")
+                        detectCardArray.insert(nowNum0, at: 0)
+                        detectCardArray.insert(nowNum1, at: 0)
+                    }
+                    else if nextDetectResultNode0.nodeType == 0 && nextDetectResultNode1.nodeType != 0{
+                        print("左边下一张未识别 右边先落下")
+                        detectCardArray.insert(nowNum1, at: 0)
+                        detectCardArray.insert(nowNum0, at: 0)
+                    }
+                    else if nextDetectResultNode0.nodeType != 0 && nextDetectResultNode1.nodeType == 0{
+                        print("右边下一张未识别 左边先落下")
+                        detectCardArray.insert(nowNum0, at: 0)
+                        detectCardArray.insert(nowNum1, at: 0)
+                    }
+                    else if leftLaplacianPercent < blurThreshold && rightLaplacianPercent >= blurThreshold{
                         print("左边糊了")
                         detectCardArray.insert(nowNum0, at: 0)
                         detectCardArray.insert(nowNum1, at: 0)
@@ -1764,24 +1830,24 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             else if result.count == 1{
                 if isHorizon{
                     if result[0].coordinate[0] > self.centerPos[0]{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
                     }
                     else{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
                     }
                 }
                 else{
                     if result[0].coordinate[1] > self.centerPos[1]{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
                     }
                     else{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
                     }
                 }
             }
             else if result.count == 0{
-                result.append(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0))
-                result.append(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0))
+                result.append(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0))
+                result.append(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0))
             }
             
             for resultIndex in 0..<result.count{
@@ -1918,24 +1984,24 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             else if result.count == 1{
                 if isHorizon{
                     if result[0].coordinate[0] > self.centerPos[0]{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
                     }
                     else{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
                     }
                 }
                 else{
                     if result[0].coordinate[1] > self.centerPos[1]{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
                     }
                     else{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
                     }
                 }
             }
             else if result.count == 0{
-                result.append(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0))
-                result.append(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0))
+                result.append(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0))
+                result.append(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0))
             }
             
             
