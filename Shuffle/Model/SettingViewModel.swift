@@ -8,14 +8,14 @@ class SettingViewModel: ObservableObject {
     @Published var isRemote: Bool = false
     @Published var isFast: Bool = true
     @Published var isActive: Bool = false
-    @Published var isAutoFocus: Bool = true
+    @Published var isAutoFocus: Bool = false
     @Published var activeDate: String = ""
     @Published var uniqueID: String = ""
     @Published var volumeUp: Int = 0
     @Published var volumeDown: Int = 0
     @Published var volumeValue: Float = 0.5
-    @Published var zoomFactor: Float = 0
-    @Published var focusFactor: Float = 1
+    @Published var zoomFactor: Float = 0.2
+    @Published var focusFactor: Float = 0.5
     
     @Published var searchText : String = ""
 
@@ -45,11 +45,6 @@ class SettingViewModel: ObservableObject {
             self.activeDate = paraData["activeTime"]!
             self.uniqueID = paraData["uniqueID"]!
         }
-    }
-
-    // Method to save changes to config.json whenever any property changes
-    public func saveChanges() {
-        updateConfigJSON()
     }
     
     // Method to update the config.json file whenever any property changes

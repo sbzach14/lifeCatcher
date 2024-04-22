@@ -58,7 +58,7 @@ class TinyNineGameRule : Rule{
 class TinyNineGame{
     static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
         print("Rank rules \(rankRules)")
-        var deck = initDeck(initialCards: inputCards, suitRules: suitRules)
+        let deck = initDeck(initialCards: inputCards, suitRules: suitRules)
         let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
         return (winners, leftCards)
     }
@@ -271,8 +271,6 @@ class TinyNineGameHandEvaluator{
         self.samePointComparision = samePointComparision
         var score = 0
         
-        //打印手牌
-        print("手牌 \(GameManager.cardLabelDic[cards[0].cardIndex])  \(GameManager.cardLabelDic[cards[1].cardIndex])")
         
         var i = self.rankRules.count + 1
         for ruleIndex in self.rankRules{

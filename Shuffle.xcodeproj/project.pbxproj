@@ -88,7 +88,6 @@
 		B03B7B2F2A963C1B006A0647 /* utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B2E2A963C1B006A0647 /* utils.swift */; };
 		B03B7B532A98AD32006A0647 /* ShuffleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B522A98AD32006A0647 /* ShuffleTests.swift */; };
 		B058BE5F2B09FFC20078E792 /* BlurDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058BE5E2B09FFC20078E792 /* BlurDetector.swift */; };
-		B058BE612B0A0D6F0078E792 /* TestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058BE602B0A0D6F0078E792 /* TestView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -192,7 +191,6 @@
 		B03B7B502A98AD32006A0647 /* ShuffleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShuffleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B03B7B522A98AD32006A0647 /* ShuffleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShuffleTests.swift; sourceTree = "<group>"; };
 		B058BE5E2B09FFC20078E792 /* BlurDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurDetector.swift; sourceTree = "<group>"; };
-		B058BE602B0A0D6F0078E792 /* TestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView.swift; sourceTree = "<group>"; };
 		F11ED84932036610B96BC234 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -290,7 +288,6 @@
 				A887B6572A8511A4009F488F /* InfoView.swift */,
 				A8EFFEB02B28766C00FC884F /* CutNumRangeSettingView.swift */,
 				A87A82042B2EF66200B1B37B /* DealTypeView.swift */,
-				B058BE602B0A0D6F0078E792 /* TestView.swift */,
 				181C969D2B5D9DC90042006E /* SelectGameView.swift */,
 				184F40A62B60FE170001B3DC /* LoadingView.swift */,
 				18D9CDE92B84F7CE00A93684 /* ReportSettingView.swift */,
@@ -645,7 +642,6 @@
 				181C96AC2B60E26A0042006E /* JiaJiaBaoGame.swift in Sources */,
 				A8E0E2E52AADEF560091FC1D /* ThreeMenGame.swift in Sources */,
 				A887B64E2A7FDF56009F488F /* RecordHistoryViewModel.swift in Sources */,
-				B058BE612B0A0D6F0078E792 /* TestView.swift in Sources */,
 				18CA14D2284AC42C00F90372 /* ViewModel.swift in Sources */,
 				A88F20AE2A13A470005E4A27 /* PokerBull.swift in Sources */,
 				A8D0D9362A24A4C20061A90E /* TexasPoker.swift in Sources */,

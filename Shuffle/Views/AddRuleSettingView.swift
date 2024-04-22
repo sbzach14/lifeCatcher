@@ -128,7 +128,7 @@ struct AddRuleSettingView: View{
                     self.cardToUse.append(cardIndex)
                 }
             }
-            let temp = RuleManager.allPreSetRules
+           
             self.args = RuleManager.allPreSetRules[self.gameType]![self.setting]![0]
             self.suitRules = RuleManager.allPreSetRules[self.gameType]![self.setting]![1]
             for rankIndex in 0...RuleManager.allPreSetRules[self.gameType]![self.setting]![2].count - 1 {
@@ -636,7 +636,6 @@ struct AddRuleSettingView: View{
             allCardIndex = TexasPoker.getAllCardIndex(minRank: selectedRule.minRank[args[2]])
             break
         case 1:
-            let selectedRule = GameManager.gameRules[gameType] as! PokerBullRule
             allCardIndex = PokerBull.GetAllCardIndex(setting: self.setting)
             break
         case 2:
@@ -644,25 +643,18 @@ struct AddRuleSettingView: View{
             allCardIndex = ThreeCardPokerGame.getAllCardIndex(minRank: selectedRule.minRank[args[3]], isAce: args[4], isHeadCard: args[6], isRedJoker: args[7], isBlackJoker: args[10])
             break
         case 3:
-            let selectedRule = GameManager.gameRules[gameType] as! TinyNineGameRule
             allCardIndex = TinyNineGame.getAllCardIndex(setting: self.setting)
             break
         case 4:
-            let selectedRule = GameManager.gameRules[gameType]
-            as! ThreeMenGameRule
             allCardIndex = ThreeMenGame.getAllCardIndex(setting: self.setting)
             break
         case 5:
-            let selectedRule = GameManager.gameRules[gameType] as! TwoEightGangGameRule
             allCardIndex = TwoEightGangGame.getAllCardIndex(setting: self.setting)
             break
         case 6:
-            let selectedRule = GameManager.gameRules[gameType] as! NinePointFiveGameRule
             allCardIndex = NinePointFiveGame.getAllCardIndex(setting: self.setting)
             break
         case 7:
-            let selectedRule = GameManager.gameRules[gameType] as!
-            BaoziGameRule
             allCardIndex = BaoziGame.getAllCardIndex(setting: self.setting)
             break
         case 8:

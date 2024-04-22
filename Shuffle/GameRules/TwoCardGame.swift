@@ -78,7 +78,7 @@ class TwoCardGame{
     
     static func FindWinner(diyDealStatus:[[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
         
-        var deck = initDeck(initialCards: inputCards, suitRules: suitRules)
+        let deck = initDeck(initialCards: inputCards, suitRules: suitRules)
         let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
         return (winners, leftCards)
     }
@@ -166,7 +166,6 @@ class TwoCardGame{
         let cardRankRule = args[12]
 
         
-        var maxRank = 0
         var returnPlayerInfos: [GameReturnPlayerInfo] = []
 
         var allPlayCards: [Player] = []
