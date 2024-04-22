@@ -235,41 +235,41 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 
     }
     
-    private func TicTok(){
-        let timer = DispatchSource.makeTimerSource(queue: DispatchQueue.global())
-            timer.schedule(deadline: .now(), repeating: .seconds(10))
-            timer.setEventHandler {
-                // 每隔 15 秒执行一次
-                self.ding += 1
-                if self.ding == 2 {
-                    self.ding = 0
-                    self.changeCameraFrameRate(to: 240)
-                    self.TicTok2()
-                    print("帧率更新为240")
-                    timer.cancel()
-                }
-                
-            }
-            timer.resume()
-    }
-    
-    private func TicTok2(){
-        let timer = DispatchSource.makeTimerSource(queue: DispatchQueue.global())
-            timer.schedule(deadline: .now(), repeating: .seconds(3))
-        timer.setEventHandler {
-                // 每隔 3 秒执行一次
-                self.ding += 1
-                if self.ding == 2 {
-                    self.ding = 0
-                    self.changeCameraFrameRate(to: self.idleRate)
-                    self.TicTok()
-                    print("帧率更新为30")
-                    timer.cancel()
-                }
-            }
-            timer.resume()
-        
-    }
+//    private func TicTok(){
+//        let timer = DispatchSource.makeTimerSource(queue: DispatchQueue.global())
+//            timer.schedule(deadline: .now(), repeating: .seconds(10))
+//            timer.setEventHandler {
+//                // 每隔 15 秒执行一次
+//                self.ding += 1
+//                if self.ding == 2 {
+//                    self.ding = 0
+//                    self.changeCameraFrameRate(to: 240)
+//                    self.TicTok2()
+//                    print("帧率更新为240")
+//                    timer.cancel()
+//                }
+//
+//            }
+//            timer.resume()
+//    }
+//
+//    private func TicTok2(){
+//        let timer = DispatchSource.makeTimerSource(queue: DispatchQueue.global())
+//            timer.schedule(deadline: .now(), repeating: .seconds(3))
+//        timer.setEventHandler {
+//                // 每隔 3 秒执行一次
+//                self.ding += 1
+//                if self.ding == 2 {
+//                    self.ding = 0
+//                    self.changeCameraFrameRate(to: self.idleRate)
+//                    self.TicTok()
+//                    print("帧率更新为30")
+//                    timer.cancel()
+//                }
+//            }
+//            timer.resume()
+//
+//    }
     
     
     
@@ -378,7 +378,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         
         
         //打开定时器
-        self.TicTok()
+//        self.TicTok()
     }
     
     
@@ -632,7 +632,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             confidenceThreshold = 0.7
         }
         else{
-            confidenceThreshold = 0.1
+            confidenceThreshold = 0.05
         }
         
         var cardResult : [DetectionResult]
@@ -1215,99 +1215,99 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         let isCut = isSingle && isShort
         
         //补牌
-        if !isRiffleCenter && !isCut{
-            
-            var lostNum = 0
-            var addNum = 0
-            //找所有遗漏的数字
-            for key in confidenceDic.keys{
-                if confidenceDic[key] == 0{
-                    lostNum += 1
-                    
-                    if beginIndex < leftLastTail{
-                        for keyIndex in beginIndex..<leftLastTail{
-                            let detectResultListIndex = sortedKeys[keyIndex]
-                            if targetDetecResultList[detectResultListIndex]!.count == 2{
-                                let detectResultNode0 = targetDetecResultList[detectResultListIndex]![0]
-                                if detectResultNode0.nodeType == 0{
-                                    detectResultNode0.cardIndex[0] = key
-                                    confidenceDic[key] = 1
-                                    detectResultNode0.nodeType = 4
-                                    break
-                                }
-                            }
-                        }
-                        
-                        if confidenceDic[key] != 0{
-                            continue
-                        }
-                    }
-                    
-                    if beginIndex < rightLastTail{
-                        for keyIndex in beginIndex..<rightLastTail{
-                            let detectResultListIndex = sortedKeys[keyIndex]
-                            if targetDetecResultList[detectResultListIndex]!.count == 2{
-                                let detectResultNode1 = targetDetecResultList[detectResultListIndex]![1]
-                                if detectResultNode1.nodeType == 0{
-                                    detectResultNode1.cardIndex[0] = key
-                                    confidenceDic[key] = 1
-                                    detectResultNode1.nodeType = 4
-                                    break
-                                }
-                            }
-                        }
-                        
-                        if confidenceDic[key] != 0{
-                            continue
-                        }
-                    }
-                    
-                    if beginIndex < leftLastTail{
-                        for keyIndex in beginIndex..<leftLastTail{
-                            let detectResultListIndex = sortedKeys[keyIndex]
-                            if targetDetecResultList[detectResultListIndex]!.count == 2{
-                                let detectResultNode0 = targetDetecResultList[detectResultListIndex]![0]
-                                if detectResultNode0.nodeType == 5{
-                                    detectResultNode0.cardIndex[0] = key
-                                    confidenceDic[key] = 1
-                                    detectResultNode0.nodeType = 4
-                                    break
-                                }
-                            }
-                        }
-                        
-                        if confidenceDic[key] != 0{
-                            continue
-                        }
-                    }
-                    
-                    if beginIndex < rightLastTail{
-                        for keyIndex in beginIndex..<rightLastTail{
-                            let detectResultListIndex = sortedKeys[keyIndex]
-                            if targetDetecResultList[detectResultListIndex]!.count == 2{
-                                let detectResultNode1 = targetDetecResultList[detectResultListIndex]![1]
-                                if detectResultNode1.nodeType == 5{
-                                    detectResultNode1.cardIndex[0] = key
-                                    confidenceDic[key] = 1
-                                    detectResultNode1.nodeType = 4
-                                    break
-                                }
-                            }
-                        }
-                        
-                        if confidenceDic[key] != 0{
-                            continue
-                        }
-                    }
-                    
-                    if confidenceDic[key] != 0{
-                        addNum += 1
-                    }
-                }
-            }
-            
-            print("缺牌数量:\(addNum)    补牌数量:\(lostNum)")
-        }
+//        if !isRiffleCenter && !isCut{
+//
+//            var lostNum = 0
+//            var addNum = 0
+//            //找所有遗漏的数字
+//            for key in confidenceDic.keys{
+//                if confidenceDic[key] == 0{
+//                    lostNum += 1
+//
+//                    if beginIndex < leftLastTail{
+//                        for keyIndex in beginIndex..<leftLastTail{
+//                            let detectResultListIndex = sortedKeys[keyIndex]
+//                            if targetDetecResultList[detectResultListIndex]!.count == 2{
+//                                let detectResultNode0 = targetDetecResultList[detectResultListIndex]![0]
+//                                if detectResultNode0.nodeType == 0{
+//                                    detectResultNode0.cardIndex[0] = key
+//                                    confidenceDic[key] = 1
+//                                    detectResultNode0.nodeType = 4
+//                                    break
+//                                }
+//                            }
+//                        }
+//
+//                        if confidenceDic[key] != 0{
+//                            continue
+//                        }
+//                    }
+//
+//                    if beginIndex < rightLastTail{
+//                        for keyIndex in beginIndex..<rightLastTail{
+//                            let detectResultListIndex = sortedKeys[keyIndex]
+//                            if targetDetecResultList[detectResultListIndex]!.count == 2{
+//                                let detectResultNode1 = targetDetecResultList[detectResultListIndex]![1]
+//                                if detectResultNode1.nodeType == 0{
+//                                    detectResultNode1.cardIndex[0] = key
+//                                    confidenceDic[key] = 1
+//                                    detectResultNode1.nodeType = 4
+//                                    break
+//                                }
+//                            }
+//                        }
+//
+//                        if confidenceDic[key] != 0{
+//                            continue
+//                        }
+//                    }
+//
+//                    if beginIndex < leftLastTail{
+//                        for keyIndex in beginIndex..<leftLastTail{
+//                            let detectResultListIndex = sortedKeys[keyIndex]
+//                            if targetDetecResultList[detectResultListIndex]!.count == 2{
+//                                let detectResultNode0 = targetDetecResultList[detectResultListIndex]![0]
+//                                if detectResultNode0.nodeType == 5{
+//                                    detectResultNode0.cardIndex[0] = key
+//                                    confidenceDic[key] = 1
+//                                    detectResultNode0.nodeType = 4
+//                                    break
+//                                }
+//                            }
+//                        }
+//
+//                        if confidenceDic[key] != 0{
+//                            continue
+//                        }
+//                    }
+//
+//                    if beginIndex < rightLastTail{
+//                        for keyIndex in beginIndex..<rightLastTail{
+//                            let detectResultListIndex = sortedKeys[keyIndex]
+//                            if targetDetecResultList[detectResultListIndex]!.count == 2{
+//                                let detectResultNode1 = targetDetecResultList[detectResultListIndex]![1]
+//                                if detectResultNode1.nodeType == 5{
+//                                    detectResultNode1.cardIndex[0] = key
+//                                    confidenceDic[key] = 1
+//                                    detectResultNode1.nodeType = 4
+//                                    break
+//                                }
+//                            }
+//                        }
+//
+//                        if confidenceDic[key] != 0{
+//                            continue
+//                        }
+//                    }
+//
+//                    if confidenceDic[key] != 0{
+//                        addNum += 1
+//                    }
+//                }
+//            }
+//
+//            print("缺牌数量:\(addNum)    补牌数量:\(lostNum)")
+//        }
         
         var detectCardArray : [Int] = []
         
