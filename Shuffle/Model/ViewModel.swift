@@ -1796,7 +1796,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         }
                     }
                     else{
-                        result.append(DetectionResult(cardIndex: cardIndex, confidence: confidence, confidencePercent: maxVal/confidenceSum, coordinate: coordinate, laplacianVariance: ComputeROILaplacianVariance(box: coordinate, destinationBuffer8: destinationBuffer8)))
+                        result.append(DetectionResult(cardIndex: cardIndex, confidence: confidence, confidencePercent: maxVal/confidenceSum, coordinate: coordinate, laplacianVariance: 0))
                     }
                 }
             }
@@ -1842,25 +1842,27 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             else if result.count == 1{
                 if isHorizon{
                     if result[0].coordinate[0] > self.centerPos[0]{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[0], destinationBuffer8: destinationBuffer8)), at: 0)
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
                     }
                     else{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[1], destinationBuffer8: destinationBuffer8)), at: 1)
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
                     }
                 }
                 else{
                     if result[0].coordinate[1] > self.centerPos[1]{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[0], destinationBuffer8: destinationBuffer8)), at: 0)
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
                     }
                     else{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[1], destinationBuffer8: destinationBuffer8)), at: 1)
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
                     }
                 }
             }
             else if result.count == 0{
-                result.append(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[0], destinationBuffer8: destinationBuffer8)))
-                result.append(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: ComputeROILaplacianVariance(box: lastBoxes[1], destinationBuffer8: destinationBuffer8)))
+                result.append(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0))
+                result.append(DetectionResult(cardIndex: [-1], confidence: [1], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0))
             }
+            
+            
             
             for resultIndex in 0..<result.count{
                 result[resultIndex].cardIndex = result[resultIndex].cardIndex.map { $0 == 52 ? 54 : $0 }
@@ -1868,6 +1870,11 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             
             self.centerPos = [(result[0].coordinate[0] + result[1].coordinate[0])/2, (result[0].coordinate[1] + result[1].coordinate[1])/2]
             self.lastBoxes = [result[0].coordinate,result[1].coordinate]
+            
+            for resultIndex in 0..<result.count{
+                result[resultIndex].laplacianVariance = ComputeROILaplacianVariance(box: lastBoxes[resultIndex], destinationBuffer8: destinationBuffer8)
+            }
+            
             
             return result
         }
