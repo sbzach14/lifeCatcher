@@ -1665,7 +1665,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         var result : [DetectionResult] = []
         
         
-        if self.state == "idle1"{
+        if self.state == "idle"{
             for i in 0..<cnt {
                 var maxVal: Float32 = cardArray[i * n].floatValue
                 var confidenceSum : Float = 0
