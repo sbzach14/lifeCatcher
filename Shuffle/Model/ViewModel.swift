@@ -191,7 +191,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             self.focusFactor = floatDict["focusFactor"]!
         }
         
-        let startSoundURL = Bundle.main.url(forResource: "start_tip", withExtension: "mp3")
+        let startSoundURL = Bundle.main.url(forResource: "start_DetecBeep", withExtension: "mp3")
         let successSoundURL = Bundle.main.url(forResource: "success_tip", withExtension: "mp3")
         let failSoundURL = Bundle.main.url(forResource: "fail_tip", withExtension: "mp3")
         do {
@@ -1224,7 +1224,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 }
             }
             
-            if lostNum > 3{
+            if lostNum < 2{
                 for key in confidenceDic.keys{
                     if confidenceDic[key] == 0{
                         print("补牌：\(cardLabelDic[key]!)")

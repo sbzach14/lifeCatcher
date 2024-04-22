@@ -73,6 +73,7 @@
 		A8D0D9362A24A4C20061A90E /* TexasPoker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D0D9352A24A4C20061A90E /* TexasPoker.swift */; };
 		A8D0D9382A35D9970061A90E /* RankRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D0D9372A35D9970061A90E /* RankRulesView.swift */; };
 		A8D9FF032BD04A7E0081773C /* cardDetection_0418.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A8D9FF022BD04A7E0081773C /* cardDetection_0418.mlmodel */; };
+		A8D9FF072BD6E09C0081773C /* start_DetecBeep.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = A8D9FF062BD6E09C0081773C /* start_DetecBeep.mp3 */; };
 		A8E0E2E52AADEF560091FC1D /* ThreeMenGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8E0E2E42AADEF560091FC1D /* ThreeMenGame.swift */; };
 		A8E0E2E72AADF6E20091FC1D /* TwoEightGangGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8E0E2E62AADF6E20091FC1D /* TwoEightGangGame.swift */; };
 		A8E0E2E92AADF9240091FC1D /* NinePointFiveGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8E0E2E82AADF9240091FC1D /* NinePointFiveGame.swift */; };
@@ -175,6 +176,7 @@
 		A8D0D9352A24A4C20061A90E /* TexasPoker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TexasPoker.swift; sourceTree = "<group>"; };
 		A8D0D9372A35D9970061A90E /* RankRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankRulesView.swift; sourceTree = "<group>"; };
 		A8D9FF022BD04A7E0081773C /* cardDetection_0418.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection_0418.mlmodel; sourceTree = "<group>"; };
+		A8D9FF062BD6E09C0081773C /* start_DetecBeep.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = start_DetecBeep.mp3; sourceTree = "<group>"; };
 		A8E0E2E42AADEF560091FC1D /* ThreeMenGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeMenGame.swift; sourceTree = "<group>"; };
 		A8E0E2E62AADF6E20091FC1D /* TwoEightGangGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoEightGangGame.swift; sourceTree = "<group>"; };
 		A8E0E2E82AADF9240091FC1D /* NinePointFiveGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NinePointFiveGame.swift; sourceTree = "<group>"; };
@@ -412,6 +414,7 @@
 				1842C2882BCD2CD40076B191 /* cardDetection_s_640.mlmodel */,
 				A88EFE022A7E8ACC00897243 /* Resnet50FP16.mlmodel */,
 				181C969F2B5DB5980042006E /* success_tip.mp3 */,
+				A8D9FF062BD6E09C0081773C /* start_DetecBeep.mp3 */,
 				18C892992B65118F009D37DC /* fail_tip.mp3 */,
 				18C8929A2B65118F009D37DC /* start_tip.mp3 */,
 				A838534B2ADA7C0200346038 /* BackGround.xcassets */,
@@ -545,6 +548,7 @@
 				18C8929B2B65118F009D37DC /* fail_tip.mp3 in Resources */,
 				A88F209D2A10EB39005E4A27 /* python-stdlib in Resources */,
 				A83853502ADA83F600346038 /* Icon_Repo.xcassets in Resources */,
+				A8D9FF072BD6E09C0081773C /* start_DetecBeep.mp3 in Resources */,
 				A838534C2ADA7C0200346038 /* BackGround.xcassets in Resources */,
 				181C96A02B5DB5980042006E /* success_tip.mp3 in Resources */,
 				181C969C2B5D51B00042006E /* Icon.xcassets in Resources */,
