@@ -1588,7 +1588,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         var result : [DetectionResult] = []
         
         
-        if self.state == "idle"{
+        if self.state == "idle1"{
             for i in 0..<cnt {
                 var maxVal: Float32 = cardArray[i * n].floatValue
                 var confidenceSum : Float = 0
@@ -1717,7 +1717,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             return result
         }
         
-        else{
+        else if self.state == "idle"{
             let newCIImage = CIImage(cvImageBuffer: pixelBuffer)
             let cgImage = CIContext().createCGImage(newCIImage, from: newCIImage.extent)!
             
