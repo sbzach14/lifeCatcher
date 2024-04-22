@@ -1717,7 +1717,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             return result
         }
         
-        else if self.state == "idle"{
+        else{
             let newCIImage = CIImage(cvImageBuffer: pixelBuffer)
             let cgImage = CIContext().createCGImage(newCIImage, from: newCIImage.extent)!
             
