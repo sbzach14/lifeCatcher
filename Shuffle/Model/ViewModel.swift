@@ -446,42 +446,49 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         if !self.isBlack && (self.cameraFrameRate <= idleRate || self.taskIndex % indexGap == 0){
             backgroundQueue.async {
                 do{
-                    let cgImage = self.context.createCGImage(ciImage, from: ciImage.extent)!
-                    let cgImageFormat = vImage_CGImageFormat(
-                        bitsPerComponent: UInt32(cgImage.bitsPerComponent),
-                        bitsPerPixel: UInt32(cgImage.bitsPerPixel),
-                        colorSpace: Unmanaged.passUnretained(cgImage.colorSpace!),
-                        bitmapInfo: cgImage.bitmapInfo,
-                        version: 0,
-                        decode: nil,
-                        renderingIntent: cgImage.renderingIntent)
+//                    let cgImage = self.context.createCGImage(ciImage, from: ciImage.extent)!
+//                    let cgImageFormat = vImage_CGImageFormat(
+//                        bitsPerComponent: UInt32(cgImage.bitsPerComponent),
+//                        bitsPerPixel: UInt32(cgImage.bitsPerPixel),
+//                        colorSpace: Unmanaged.passUnretained(cgImage.colorSpace!),
+//                        bitmapInfo: cgImage.bitmapInfo,
+//                        version: 0,
+//                        decode: nil,
+//                        renderingIntent: cgImage.renderingIntent)
+//                    
+//                    // 创建 vImage_Buffer
+//                    var vImageBuffer = try vImage_Buffer(cgImage: cgImage)
+//                    
+//                    var outputCGImage : CGImage
+//                    
+//                    // 进行顺时针旋转90度
+//                    var rotatedBuffer = try! vImage_Buffer(width: Int(vImageBuffer.height),
+//                                                           height: Int(vImageBuffer.width),
+//                                                           bitsPerPixel: 32) // 32 bits for ARGB
+//                    vImageRotate90_ARGB8888(&vImageBuffer, &rotatedBuffer, UInt8(kRotate90DegreesClockwise), [0], vImage_Flags(kvImageNoFlags))
+//                    
+//                    if !self.isBackCamera{
+//                        vImageHorizontalReflect_ARGB8888(&rotatedBuffer, &rotatedBuffer, vImage_Flags(kvImageNoFlags))
+//                    }
+//                        
+//                    
+//                    outputCGImage = try rotatedBuffer.createCGImage(format: cgImageFormat)
+//                    rotatedBuffer.free()
+//                    vImageBuffer.free()
                     
-                    // 创建 vImage_Buffer
-                    var vImageBuffer = try vImage_Buffer(cgImage: cgImage)
+                    let rotationTransform = CGAffineTransform(rotationAngle: -.pi / 2)  // 顺时针旋转90度
+                    let rotatedImage = ciImage.transformed(by: rotationTransform)
                     
-                    var outputCGImage : CGImage
+                    let xOffset = ciImage.extent.size.height
+                    let translationTransform = CGAffineTransform(translationX: xOffset, y: CGFloat(0))
+                    let translatedImage = rotatedImage.transformed(by: translationTransform)
+                    let outputCGImage = self.context.createCGImage(translatedImage, from: translatedImage.extent)
                     
-                    // 进行顺时针旋转90度
-                    var rotatedBuffer = try! vImage_Buffer(width: Int(vImageBuffer.height),
-                                                           height: Int(vImageBuffer.width),
-                                                           bitsPerPixel: 32) // 32 bits for ARGB
-                    vImageRotate90_ARGB8888(&vImageBuffer, &rotatedBuffer, UInt8(kRotate90DegreesClockwise), [0], vImage_Flags(kvImageNoFlags))
-                    
-                    if !self.isBackCamera{
-                        vImageHorizontalReflect_ARGB8888(&rotatedBuffer, &rotatedBuffer, vImage_Flags(kvImageNoFlags))
-                    }
-                        
-                    
-                    outputCGImage = try rotatedBuffer.createCGImage(format: cgImageFormat)
-                    rotatedBuffer.free()
                     
                     
                     DispatchQueue.main.async {
                         self.cameraImage = outputCGImage
                     }
-                    
-                    
-                    vImageBuffer.free()
                 }
                 
                 catch{
@@ -1742,7 +1749,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                                    preBias: (0, 0, 0, 0),
                                    postBias: 0,
                                    destination: destinationBuffer8)
-            
             
             for i in 0..<cnt {
                 var maxVal: Float32 = cardArray[i * n].floatValue
