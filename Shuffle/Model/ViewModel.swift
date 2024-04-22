@@ -1259,16 +1259,21 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             print("缺牌数量:\(addNum)    补牌数量:\(lostNum)")
         }
         
-        //补充链尾
+        //补充链尾链头
         for keyIndex in beginIndex..<endIndex{
             let detectResultListIndex = sortedKeys[keyIndex]
             let lastDetectResultListIndex = sortedKeys[keyIndex-1]
             let lastlastDetectResultListIndex = sortedKeys[keyIndex-2]
+            let nextDetectResultListIndex = sortedKeys[keyIndex+1]
+            let nextnextDetectResultListIndex = sortedKeys[keyIndex+2]
+            
             for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
                 let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
                 let sideDetectResultNode = targetDetecResultList[detectResultListIndex]![1-numIndex]
                 let lastDetectResultNode = targetDetecResultList[lastDetectResultListIndex]![numIndex]
                 let lastlastDetectResultNode = targetDetecResultList[lastlastDetectResultListIndex]![numIndex]
+                let nextDetectResultNode = targetDetecResultList[nextDetectResultListIndex]![numIndex]
+                let nextnextDetectResultNode = targetDetecResultList[nextnextDetectResultListIndex]![numIndex]
                 
                 if (detectResultNode.nodeType == 5 || detectResultNode.nodeType == 0)
                     && sideDetectResultNode.nodeType == 2
@@ -1289,6 +1294,29 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         lastDetectResultNode.nodeType = 1
                         detectResultNode.nodeType = 2
                         detectResultNode.cardIndex[0] = lastDetectResultNode.cardIndex[0]
+                    }
+                    
+                }
+                
+                if (detectResultNode.nodeType == 5 || detectResultNode.nodeType == 0)
+                    && sideDetectResultNode.nodeType == 1
+                    && detectResultNode.laplacianVariance < nextDetectResultNode.laplacianVariance{
+                    
+                    if nextDetectResultNode.nodeType == 1
+                        && nextDetectResultNode.laplacianVariance / nextnextDetectResultNode.laplacianVariance > blurThreshold
+                        && detectResultNode.laplacianVariance / nextDetectResultNode.laplacianVariance < blurThreshold{
+                        print("变形 ", detectResultListIndex, cardLabelDic[detectResultNode.cardIndex[0]] ?? "none", cardLabelDic[nextDetectResultNode.cardIndex[0]] ?? "none")
+                        nextDetectResultNode.nodeType = 3
+                        detectResultNode.nodeType = 1
+                        detectResultNode.cardIndex[0] = nextDetectResultNode.cardIndex[0]
+                        
+                    }
+                    
+                    else if nextDetectResultNode.nodeType == 4{
+                        print("变形 ", detectResultListIndex, cardLabelDic[detectResultNode.cardIndex[0]] ?? "none", cardLabelDic[nextDetectResultNode.cardIndex[0]] ?? "none")
+                        nextDetectResultNode.nodeType = 2
+                        detectResultNode.nodeType = 1
+                        detectResultNode.cardIndex[0] = nextDetectResultNode.cardIndex[0]
                     }
                     
                 }
@@ -1371,7 +1399,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         detectCardArray.insert(nowNum0, at: 0)
                         detectCardArray.insert(nowNum1, at: 0)
                     }
-                    else if leftLaplacianPercent < blurThreshold && rightLaplacianPercent >= blurThreshold{
+                    if leftLaplacianPercent < blurThreshold && rightLaplacianPercent >= blurThreshold{
                         print("左边糊了")
                         detectCardArray.insert(nowNum0, at: 0)
                         detectCardArray.insert(nowNum1, at: 0)
