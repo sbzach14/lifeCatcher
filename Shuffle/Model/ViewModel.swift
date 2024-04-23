@@ -34,8 +34,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var cutArray : [Int] = []
     @Published var cutShowArray : [Int] = []
     
-    let fastModel = try! cardDetection_0418()
-    let slowModel = try! cardDetection_0418()
+    let fastModel = try! cardDetection_0422_scale_40()
+    let slowModel = try! cardDetection_0422_scale_40()
     
     var imageSize : [Float] = [853, 480]
     var originSize : [Float] = [1920, 1080]
@@ -1211,124 +1211,135 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         let isCut = isSingle && isShort
         let addEndIndex = endIndex - 3
         
+        var lostNum = 0
+        var addNum = 0
+        //找所有遗漏的数字
+        
+        for key in confidenceDic.keys{
+            if confidenceDic[key] == 0{
+                lostNum += 1
+            }
+        }
+        
         //补牌
-        if !isRiffleCenter && !isCut && beginIndex < addEndIndex{
-   
-            var lostNum = 0
-            var addNum = 0
-            //找所有遗漏的数字
+        if !isRiffleCenter && !isCut && beginIndex < addEndIndex && lostNum <= 3{
+            
+            var numIndexList : [Int] = []
+            if !isSingle{
+                numIndexList = [0, 1]
+            }
+            else if leftSideCnt > rightSideCnt{
+                numIndexList = [0]
+            }
+            else if rightSideCnt > leftSideCnt{
+                numIndexList = [1]
+            }
             
             for key in confidenceDic.keys{
                 if confidenceDic[key] == 0{
-                    lostNum += 1
-                }
-            }
-            
-            if lostNum < 4{
-                for key in confidenceDic.keys{
-                    if confidenceDic[key] == 0{
-                        print("补牌：\(cardLabelDic[key]!)")
-                        for keyIndex in beginIndex..<addEndIndex{
-                            let detectResultListIndex = sortedKeys[keyIndex]
-                            for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
-                                let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
-                                let nextDetectResultNode = targetDetecResultList[detectResultListIndex + 1]![numIndex]
-                                if detectResultNode.nodeType == 5 && nextDetectResultNode.nodeType == 5{
-                                    detectResultNode.cardIndex[0] = key
-                                    nextDetectResultNode.cardIndex[0] = key
-                                    detectResultNode.nodeType = 1
-                                    nextDetectResultNode.nodeType = 2
-                                    confidenceDic[key] = 1
-                                    break
-                                }
-                            }
-                            
-                            if confidenceDic[key] != 0{
+
+                    print("补牌：\(cardLabelDic[key]!)")
+                    for keyIndex in beginIndex..<addEndIndex{
+                        let detectResultListIndex = sortedKeys[keyIndex]
+                        for numIndex in numIndexList{
+                            let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
+                            let nextDetectResultNode = targetDetecResultList[detectResultListIndex + 1]![numIndex]
+                            if detectResultNode.nodeType == 5 && nextDetectResultNode.nodeType == 5{
+                                detectResultNode.cardIndex[0] = key
+                                nextDetectResultNode.cardIndex[0] = key
+                                detectResultNode.nodeType = 1
+                                nextDetectResultNode.nodeType = 2
+                                confidenceDic[key] = 1
                                 break
                             }
                         }
                         
                         if confidenceDic[key] != 0{
-                            addNum += 1
-                            continue
+                            break
                         }
-                        
-                        for keyIndex in beginIndex..<addEndIndex{
-                            let detectResultListIndex = sortedKeys[keyIndex]
-                            for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
-                                let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
-                                let nextDetectResultNode = targetDetecResultList[detectResultListIndex + 1]![numIndex]
-                                if (detectResultNode.nodeType == 0 || nextDetectResultNode.nodeType == 5)
-                                    && (detectResultNode.nodeType == 5 || nextDetectResultNode.nodeType == 0){
-                                    detectResultNode.cardIndex[0] = key
-                                    nextDetectResultNode.cardIndex[0] = key
-                                    detectResultNode.nodeType = 1
-                                    nextDetectResultNode.nodeType = 2
-                                    confidenceDic[key] = 1
-                                    break
-                                }
-                            }
-                            
-                            if confidenceDic[key] != 0{
+                    }
+                    
+                    if confidenceDic[key] != 0{
+                        addNum += 1
+                        continue
+                    }
+                    
+                    for keyIndex in beginIndex..<addEndIndex{
+                        let detectResultListIndex = sortedKeys[keyIndex]
+                        for numIndex in numIndexList{
+                            let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
+                            let nextDetectResultNode = targetDetecResultList[detectResultListIndex + 1]![numIndex]
+                            if (detectResultNode.nodeType == 0 || nextDetectResultNode.nodeType == 5)
+                                && (detectResultNode.nodeType == 5 || nextDetectResultNode.nodeType == 0){
+                                detectResultNode.cardIndex[0] = key
+                                nextDetectResultNode.cardIndex[0] = key
+                                detectResultNode.nodeType = 1
+                                nextDetectResultNode.nodeType = 2
+                                confidenceDic[key] = 1
                                 break
                             }
                         }
                         
                         if confidenceDic[key] != 0{
-                            addNum += 1
-                            continue
+                            break
                         }
-                        
-                        for keyIndex in beginIndex..<addEndIndex{
-                            let detectResultListIndex = sortedKeys[keyIndex]
-                            for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
-                                let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
-                                let nextDetectResultNode = targetDetecResultList[detectResultListIndex + 1]![numIndex]
-                                if detectResultNode.nodeType == 5{
-                                    detectResultNode.cardIndex[0] = key
-                                    detectResultNode.nodeType = 4
-                                    confidenceDic[key] = 1
-                                    break
-                                }
-                            }
-                            
-                            if confidenceDic[key] != 0{
+                    }
+                    
+                    if confidenceDic[key] != 0{
+                        addNum += 1
+                        continue
+                    }
+                    
+                    for keyIndex in beginIndex..<addEndIndex{
+                        let detectResultListIndex = sortedKeys[keyIndex]
+                        for numIndex in numIndexList{
+                            let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
+                            let nextDetectResultNode = targetDetecResultList[detectResultListIndex + 1]![numIndex]
+                            if detectResultNode.nodeType == 5{
+                                detectResultNode.cardIndex[0] = key
+                                detectResultNode.nodeType = 4
+                                confidenceDic[key] = 1
                                 break
                             }
                         }
                         
                         if confidenceDic[key] != 0{
-                            addNum += 1
-                            continue
+                            break
                         }
-                        
-                        for keyIndex in beginIndex..<addEndIndex{
-                            let detectResultListIndex = sortedKeys[keyIndex]
-                            for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
-                                let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
-                                let nextDetectResultNode = targetDetecResultList[detectResultListIndex + 1]![numIndex]
-                                if detectResultNode.nodeType == 0{
-                                    detectResultNode.cardIndex[0] = key
-                                    detectResultNode.nodeType = 4
-                                    confidenceDic[key] = 1
-                                    break
-                                }
-                            }
-                            
-                            if confidenceDic[key] != 0{
+                    }
+                    
+                    if confidenceDic[key] != 0{
+                        addNum += 1
+                        continue
+                    }
+                    
+                    for keyIndex in beginIndex..<addEndIndex{
+                        let detectResultListIndex = sortedKeys[keyIndex]
+                        for numIndex in numIndexList{
+                            let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
+                            let nextDetectResultNode = targetDetecResultList[detectResultListIndex + 1]![numIndex]
+                            if detectResultNode.nodeType == 0{
+                                detectResultNode.cardIndex[0] = key
+                                detectResultNode.nodeType = 4
+                                confidenceDic[key] = 1
                                 break
                             }
                         }
                         
                         if confidenceDic[key] != 0{
-                            addNum += 1
-                            continue
+                            break
                         }
+                    }
+                    
+                    if confidenceDic[key] != 0{
+                        addNum += 1
+                        continue
                     }
                 }
             }
-            print("缺牌数量:\(addNum)    补牌数量:\(lostNum)")
         }
+        
+        print("缺牌数量:\(addNum)    补牌数量:\(lostNum)")
         
         //补充链尾链头
         for keyIndex in beginIndex..<endIndex{
