@@ -1224,7 +1224,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 }
             }
             
-            if lostNum < 2{
+            if lostNum < 4{
                 for key in confidenceDic.keys{
                     if confidenceDic[key] == 0{
                         print("补牌：\(cardLabelDic[key]!)")
@@ -1470,7 +1470,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         detectCardArray.insert(nowNum0, at: 0)
                         detectCardArray.insert(nowNum1, at: 0)
                     }
-                    if leftLaplacianPercent < blurThreshold && rightLaplacianPercent >= blurThreshold{
+                    else if leftLaplacianPercent < blurThreshold && rightLaplacianPercent >= blurThreshold{
                         print("左边糊了")
                         detectCardArray.insert(nowNum0, at: 0)
                         detectCardArray.insert(nowNum1, at: 0)
