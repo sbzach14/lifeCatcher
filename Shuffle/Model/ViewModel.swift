@@ -34,8 +34,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var cutArray : [Int] = []
     @Published var cutShowArray : [Int] = []
     
-    let fastModel = try! cardDetection_0418()
-    let slowModel = try! cardDetection_0418()
+    let fastModel = try! cardDetection_0422_scale_40()
+    let slowModel = try! cardDetection_0422_scale_40()
     
     var imageSize : [Float] = [853, 480]
     var originSize : [Float] = [1920, 1080]

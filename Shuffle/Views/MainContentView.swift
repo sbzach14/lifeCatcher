@@ -36,6 +36,8 @@ struct MainContentView: View {
                                     .padding(.leading, 20)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                 
+                                Spacer()
+                                
                                 Toggle("", isOn: $viewModel.isBackCamera)
                                     .toggleStyle(CustomToggleStyle())
                                     .frame(width: 160, height: 30, alignment: .trailing)
@@ -54,6 +56,8 @@ struct MainContentView: View {
                             HStack {
                                 Text("缩放比例").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
                                 
+                                Spacer()
+                                
                                 Slider(value: $viewModel.zoomFactor, in: 0...1, step: 0.02)
                                     .frame(width: 160, height: 30, alignment: .trailing)
                                     .padding(.trailing,30) // 右侧间距
@@ -68,6 +72,8 @@ struct MainContentView: View {
                             
                             HStack {
                                 Text("焦距调节").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
+                                
+                                Spacer()
                                 
                                 Slider(value: $viewModel.focusFactor, in: 0...1, step: 0.02)
                                     .frame(width: 160, height: 30, alignment: .trailing)
