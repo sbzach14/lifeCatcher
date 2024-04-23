@@ -402,15 +402,18 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             print("focusFactor: \(focusFactor)")
             try self.captureDevice.lockForConfiguration()
             
-            if !self.isAutoFocus && self.captureDevice.isLockingFocusWithCustomLensPositionSupported{
+            
+            if !self.isAutoFocus && self.captureDevice.isFocusModeSupported(.locked){
                 self.captureDevice.focusMode = .locked
                 self.captureDevice.setFocusModeLocked(lensPosition: self.focusFactor)
-                print("对焦模式：手动对焦    设定焦距：", self.captureDevice.lensPosition)
+                print("对焦模式：手动对焦")
+                
             }
-            else{
+            else if self.captureDevice.isFocusModeSupported(.continuousAutoFocus){
                 self.captureDevice.focusMode = .continuousAutoFocus
                 print("对焦模式：自动对焦")
             }
+                    
             self.captureDevice.unlockForConfiguration()
         }
         catch{
@@ -757,8 +760,12 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         else{
                             self.speakText(input: 2)
                         }
-                        
-                        self.computeWinnerPlayer()
+                        if self.cutMode == 1 || self.cutMode == 2 || self.cutMode == 4{
+                            
+                        }
+                        else{
+                            self.computeWinnerPlayer()
+                        }
                     }
                     else if detectState.isSingle && !detectState.isShort
                         && (self.shuffleMode == 1 || self.shuffleMode == 2 || self.shuffleMode == 3 || self.shuffleMode == 4){
@@ -768,12 +775,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         
                         if(self.shuffleMode == 1 || self.shuffleMode == 3){
                             //拨到顶
-                            if self.cardArray.count == self.allCardIndex.count{
-                                self.speakText(input: 1)
-                            }
-                            else{
-                                self.speakText(input: 2)
-                            }
+                            self.speakText(input: 1)
                         }
                         
                         else if(self.shuffleMode == 2 || self.shuffleMode == 4){
@@ -784,7 +786,12 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                             self.speakText(input: 1)
                         }
                         
-                        self.computeWinnerPlayer()
+                        if self.cutMode == 1 || self.cutMode == 2 || self.cutMode == 4{
+                            
+                        }
+                        else{
+                            self.computeWinnerPlayer()
+                        }
                     }
                     
                     
@@ -1207,7 +1214,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
         
-        let isRiffleCenter = self.shuffleMode == 2 || (self.shuffleMode == 4 && isSingle)
+        let isRiffle = self.shuffleMode == 2 || self.shuffleMode == 3 || (self.shuffleMode == 4 && isSingle) || (self.shuffleMode == 5 && isSingle)
         let isCut = isSingle && isShort
         let addEndIndex = endIndex - 3
         
@@ -1222,7 +1229,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
         
         //补牌
-        if !isRiffleCenter && !isCut && beginIndex < addEndIndex && lostNum <= 3{
+        if !isRiffle && !isCut && beginIndex < addEndIndex && lostNum <= 3{
             
             var numIndexList : [Int] = []
             if !isSingle{
@@ -1556,7 +1563,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 
                 //单个插入
                 else{
-                    if (nodeType0 == 4 && !isRiffleCenter) || nodeType0 == 2{
+                    if (nodeType0 == 4 && !isRiffle) || nodeType0 == 2{
                         
                         detectCardArray.insert(nowNum0, at: 0)
                         
@@ -1590,7 +1597,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 //                            detectCardArray.insert(nowNum0, at: 0)
 //                        }
                     }
-                    if (nodeType1 == 4 && !isRiffleCenter) || nodeType1 == 2{
+                    if (nodeType1 == 4 && !isRiffle) || nodeType1 == 2{
                         
                         detectCardArray.insert(nowNum1, at: 0)
                         
