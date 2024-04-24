@@ -787,8 +787,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     //根据detect result list判别洗牌、拨牌、洗牌
                     //2侧或1侧 长或短
                     
-                    var errorFlag = false
-                    
                     if !detectState.isSingle && !detectState.isShort
                         && (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4){
                         //洗牌
