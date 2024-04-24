@@ -6,14 +6,49 @@ import MobileCoreServices
 import Foundation
 import Accelerate
 
+// 在CVPixelBuffer上绘制红色矩形框的函数
+func drawRectanglesOnPixelBuffer(pixelBuffer: CVPixelBuffer, rectList: [[Float]]) -> CVPixelBuffer?{
+    // 创建图形上下文
+    CVPixelBufferLockBaseAddress(pixelBuffer, CVPixelBufferLockFlags(rawValue: 0))
+    let baseAddress = CVPixelBufferGetBaseAddress(pixelBuffer)
+    let bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer)
+    let width = CVPixelBufferGetWidth(pixelBuffer)
+    let height = CVPixelBufferGetHeight(pixelBuffer)
+    let colorSpace = CGColorSpaceCreateDeviceRGB()
+    let bitmapInfo: UInt32 = CGImageAlphaInfo.noneSkipFirst.rawValue | CGBitmapInfo.byteOrder32Little.rawValue
+    guard let context = CGContext(data: baseAddress, width: width, height: height, bitsPerComponent: 8, bytesPerRow: bytesPerRow, space: colorSpace, bitmapInfo: bitmapInfo) else {
+        return nil
+    }
+    
+    // 设置绘制属性
+    context.setStrokeColor(UIColor.red.cgColor)
+    context.setLineWidth(2.0)
+    
+    for coor in rectList{
+        let x = Int((coor[0] - coor[2]/2)*Float(width))
+        let y = Int(((1 - coor[1]) - coor[3]/2)*Float(height))
+        let w = Int(coor[2]*Float(width))
+        let h = Int(coor[3]*Float(height))
+        
+        let firstRect = CGRect(x: x, y: y, width: w, height: h)
+        context.addRect(firstRect)
+        context.strokePath()
+    }
+    
+    CVPixelBufferUnlockBaseAddress(pixelBuffer, CVPixelBufferLockFlags(rawValue: 0))
+    
+    return pixelBuffer
+}
+
+
 //处理ciimage，输出合适大小的pixelbuffer供模型输入
 func createCVPixelBuffer(ciImage: CIImage, targetSize: CGSize, targetArea: [Float], isSavedImage: Bool = false) -> CVPixelBuffer? {
     
     // Extract target area from original image
-    let xCenter = CGFloat(targetArea[0])
-    let yCenter = ciImage.extent.height - CGFloat(targetArea[1])
-    let width = CGFloat(targetArea[2])
-    let height = CGFloat(targetArea[3])
+    let xCenter = CGFloat(targetArea[0]) * ciImage.extent.width
+    let yCenter = ciImage.extent.height - CGFloat(targetArea[1]) * ciImage.extent.height
+    let width = CGFloat(targetArea[2]) * ciImage.extent.width
+    let height = CGFloat(targetArea[3]) * ciImage.extent.height
     
     var croppedCIImage = ciImage
     

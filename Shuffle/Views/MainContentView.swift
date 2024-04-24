@@ -71,19 +71,43 @@ struct MainContentView: View {
                             Divider().colorInvert()
                             
                             HStack {
-                                Text("焦距调节").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
+                                Text("自动对焦").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
                                 
                                 Spacer()
                                 
-                                Slider(value: $viewModel.focusFactor, in: 0...1, step: 0.02)
-                                    .frame(width: 160, height: 30, alignment: .trailing)
-                                    .padding(.trailing,30) // 右侧间距
-                                    .accentColor(.white)
-                                    .onChange(of: viewModel.focusFactor) {
-                                        newValue in
-                                        viewModel.updateFocusFactor()
-                                        viewModel.updateConfigJSON()
-                                    }
+                                if viewModel.captureDevice.isFocusModeSupported(.locked){
+                                    Toggle("", isOn: $viewModel.isAutoFocus)
+                                        .toggleStyle(CustomToggleStyle())
+                                        .frame(width: 160, height: 30, alignment: .trailing)
+                                        .padding(.trailing,30) // 右侧间距
+                                        .accentColor(.white)
+                                        .onChange(of: viewModel.isAutoFocus) {
+                                            newValue in
+                                            viewModel.updateFocusFactor()
+                                            viewModel.updateConfigJSON()
+                                        }
+                                }
+                            }
+                            
+                            if !viewModel.isAutoFocus{
+                                
+                                Divider().colorInvert()
+                                
+                                HStack {
+                                    Text("焦距调节").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
+                                    
+                                    Spacer()
+                                    
+                                    Slider(value: $viewModel.focusFactor, in: 0...1, step: 0.02)
+                                        .frame(width: 160, height: 30, alignment: .trailing)
+                                        .padding(.trailing,30) // 右侧间距
+                                        .accentColor(.white)
+                                        .onChange(of: viewModel.focusFactor) {
+                                            newValue in
+                                            viewModel.updateFocusFactor()
+                                            viewModel.updateConfigJSON()
+                                        }
+                                }
                             }
                         }
                         .padding()

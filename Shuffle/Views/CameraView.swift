@@ -12,6 +12,7 @@ struct CameraView: View {
     let cameraImage: CGImage
 
     var body: some View {
+        //Image(cameraImage, scale: 2, label: Text("Camera"))
         Image(cameraImage, scale: 1.0, label: Text("Camera"))
             .resizable()
             .aspectRatio(contentMode: .fill)

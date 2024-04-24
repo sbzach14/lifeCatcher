@@ -68,8 +68,8 @@ func createConfigJSON() {
     
     let floatDict : [String: Float] = [
         "volumeValue": 0,
-        "zoomFactor": 0.2,
-        "focusFactor": 0.5
+        "zoomFactor": 0,
+        "focusFactor": 0.6
     ]
     
     let boolDict: [String: Bool] = [
@@ -77,9 +77,9 @@ func createConfigJSON() {
         "isMute": false,
         "isActive": false,
         "isBackCamera": true,
-        "isRemote": false,
+        "isRemote": true,
         "isFast": true,
-        "isAutoFocus": false
+        "isAutoFocus": true
     ]
     
     let configDict: [String: Any] = [
