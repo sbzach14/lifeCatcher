@@ -799,10 +799,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         else{
                             self.speakText(input: 2)
                         }
-                        if self.cutMode == 1 || self.cutMode == 2 || self.cutMode == 4{
-                            
-                        }
-                        else{
+                        
+                        if self.cutMode == 0 || self.cutMode == 3{
                             self.computeWinnerPlayer()
                         }
                     }
@@ -814,7 +812,12 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         
                         if(self.shuffleMode == 1 || self.shuffleMode == 3){
                             //拨到顶
-                            self.speakText(input: 1)
+                            if self.cardArray.count >= self.minCardNum{
+                                self.speakText(input: 1)
+                            }
+                            else{
+                                self.speakText(input: 2)
+                            }
                         }
                         
                         else if(self.shuffleMode == 2 || self.shuffleMode == 4){
@@ -822,13 +825,16 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                             if self.cardArray.count > 0{
                                 self.cardArray.remove(at: 0)
                             }
-                            self.speakText(input: 1)
+                            
+                            if self.cardArray.count >= self.minCardNum{
+                                self.speakText(input: 1)
+                            }
+                            else{
+                                self.speakText(input: 2)
+                            }
                         }
                         
-                        if self.cutMode == 1 || self.cutMode == 2 || self.cutMode == 4{
-                            
-                        }
-                        else{
+                        if self.cutMode == 0 || self.cutMode == 3{
                             self.computeWinnerPlayer()
                         }
                     }
@@ -1002,7 +1008,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
         
         var isShort = true
-        if leftSideCnt + rightSideCnt >= 20{
+        if leftSideCnt + rightSideCnt >= 10{
             isShort = false
         }
         
@@ -1278,8 +1284,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
         
-        let isRiffle = self.shuffleMode == 1 || self.shuffleMode == 2 || (self.shuffleMode == 3 && isSingle) || (self.shuffleMode == 4 && isSingle)
-        let isCut = isSingle && isShort
+        let isShuffle = (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4) && !isSingle && !isShort
         let addEndIndex = endIndex - 3
         
         var lostNum = 0
@@ -1293,18 +1298,9 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
         
         //补牌
-        if !isRiffle && !isCut && beginIndex < addEndIndex && lostNum <= 2{
+        if isShuffle && beginIndex < addEndIndex && lostNum <= 2{
             
-            var numIndexList : [Int] = []
-            if !isSingle{
-                numIndexList = [0, 1]
-            }
-            else if leftSideCnt > rightSideCnt{
-                numIndexList = [0]
-            }
-            else if rightSideCnt > leftSideCnt{
-                numIndexList = [1]
-            }
+            let numIndexList : [Int] = [0, 1]
             
             for key in confidenceDic.keys{
                 if confidenceDic[key] == 0{
@@ -1631,7 +1627,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 
                 //单个插入
                 else{
-                    if (nodeType0 == 4 && !isRiffle) || nodeType0 == 2{
+                    if (nodeType0 == 4 && isShuffle) || nodeType0 == 2{
                         
                         detectCardArray.insert(nowNum0, at: 0)
                         
@@ -1665,7 +1661,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 //                            detectCardArray.insert(nowNum0, at: 0)
 //                        }
                     }
-                    if (nodeType1 == 4 && !isRiffle) || nodeType1 == 2{
+                    if (nodeType1 == 4 && isShuffle) || nodeType1 == 2{
                         
                         detectCardArray.insert(nowNum1, at: 0)
                         
