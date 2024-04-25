@@ -81,6 +81,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     
     //测试用的定时器
     public var ding: Int = 0
+    public var ciimageQueue: [CIImage] = []
     
     let idleRate = 30
     let context = CIContext()
@@ -270,7 +271,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 //            timer.resume()
 //
 //    }
-    
+//
     
     
     private func initDetectResult(){
@@ -564,9 +565,14 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: self.inputSize[0], height: self.inputSize[1]), targetArea: self.targetArea)!
                 //断点4
 //                return
-                
+//                if self.state == "shuffle"{
+//                    self.saveImageOrigin(ciImage, taskIndex: myIndex)
+//                }
+
                 self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex)
             }
+            
+            
         }
             
 
@@ -597,7 +603,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 print("文件\(imageName)保存失败: \(error)")
             }
         }
-
     }
     
     @objc private func imageSaved(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeMutableRawPointer?) {
@@ -667,6 +672,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         
         self.stateCard[0] = cardResult[0].cardIndex[0]
         self.stateCard[1] = cardResult[1].cardIndex[0]
+
         
         
         if state == "idle"{
@@ -677,7 +683,10 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     self.state = "shuffle"
                     self.speakText(input: 0)
                     self.changeCameraFrameRate(to: Int(self.setFrameRate))
+                                        
+                    
                     self.initDetectResult()
+                    
                     if self.isRemote{
                         self.computeTargetArea(stateResult: self.lastBoxes)
                     }
@@ -772,6 +781,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         //拨牌
                         self.initShuffle()
                         self.cardArray = detectState.detectionResult
+ 
                         
                         if(self.shuffleMode == 1 || self.shuffleMode == 3){
                             //拨到顶
@@ -792,11 +802,15 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         else{
                             self.computeWinnerPlayer()
                         }
+
+
                     }
                     
                     
                     print("result  isShort:\(detectState.isShort)  isSingle:\(detectState.isSingle)  cardArray:\(self.cardArray)")
                 }
+                
+               
             }
             else{
                 DispatchQueue.main.async{

@@ -73,6 +73,7 @@
 		A8D0D9382A35D9970061A90E /* RankRulesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8D0D9372A35D9970061A90E /* RankRulesView.swift */; };
 		A8D9FF032BD04A7E0081773C /* cardDetection_0418.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A8D9FF022BD04A7E0081773C /* cardDetection_0418.mlmodel */; };
 		A8D9FF072BD6E09C0081773C /* start_DetecBeep.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = A8D9FF062BD6E09C0081773C /* start_DetecBeep.mp3 */; };
+		A8D9FF092BD7E0C20081773C /* yolov5nu.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A8D9FF082BD7E0C20081773C /* yolov5nu.mlmodel */; };
 		A8E0E2E52AADEF560091FC1D /* ThreeMenGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8E0E2E42AADEF560091FC1D /* ThreeMenGame.swift */; };
 		A8E0E2E72AADF6E20091FC1D /* TwoEightGangGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8E0E2E62AADF6E20091FC1D /* TwoEightGangGame.swift */; };
 		A8E0E2E92AADF9240091FC1D /* NinePointFiveGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8E0E2E82AADF9240091FC1D /* NinePointFiveGame.swift */; };
@@ -175,6 +176,7 @@
 		A8D0D9372A35D9970061A90E /* RankRulesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RankRulesView.swift; sourceTree = "<group>"; };
 		A8D9FF022BD04A7E0081773C /* cardDetection_0418.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection_0418.mlmodel; sourceTree = "<group>"; };
 		A8D9FF062BD6E09C0081773C /* start_DetecBeep.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = start_DetecBeep.mp3; sourceTree = "<group>"; };
+		A8D9FF082BD7E0C20081773C /* yolov5nu.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = yolov5nu.mlmodel; sourceTree = "<group>"; };
 		A8E0E2E42AADEF560091FC1D /* ThreeMenGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeMenGame.swift; sourceTree = "<group>"; };
 		A8E0E2E62AADF6E20091FC1D /* TwoEightGangGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TwoEightGangGame.swift; sourceTree = "<group>"; };
 		A8E0E2E82AADF9240091FC1D /* NinePointFiveGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NinePointFiveGame.swift; sourceTree = "<group>"; };
@@ -410,6 +412,7 @@
 				A80959672BC9A3CE009A2DB4 /* cardDetection_0412.mlmodel */,
 				18ABD7F42BD749F400D85962 /* cardDetection_0422_scale_40.mlmodel */,
 				A88EFE022A7E8ACC00897243 /* Resnet50FP16.mlmodel */,
+				A8D9FF082BD7E0C20081773C /* yolov5nu.mlmodel */,
 				181C969F2B5DB5980042006E /* success_tip.mp3 */,
 				A8D9FF062BD6E09C0081773C /* start_DetecBeep.mp3 */,
 				18C892992B65118F009D37DC /* fail_tip.mp3 */,
@@ -651,6 +654,7 @@
 				A8FBC7C22A3F0A5C00EDDFD7 /* CVUtils.swift in Sources */,
 				A8EFFEB12B28766C00FC884F /* CutNumRangeSettingView.swift in Sources */,
 				A88C71F02B93101C001D8BD8 /* ThreeCardPointGame.swift in Sources */,
+				A8D9FF092BD7E0C20081773C /* yolov5nu.mlmodel in Sources */,
 				18CA14D3284AC42C00F90372 /* ShowCardView.swift in Sources */,
 				A8E0E2F12AAE00B90091FC1D /* NinePointFiveGameRuleSettingView.swift in Sources */,
 				A88EFE0D2A7FDC9500897243 /* RecordHistoryView.swift in Sources */,
