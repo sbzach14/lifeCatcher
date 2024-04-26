@@ -53,7 +53,7 @@ func createCVPixelBuffer(ciImage: CIImage, targetSize: CGSize, targetArea: [Floa
     var croppedCIImage = ciImage
     
     if width != 0{
-        croppedCIImage = ciImage.cropped(to: CGRect(x: xCenter - width / 2, y: yCenter - height / 2, width: width, height: height))
+        //croppedCIImage = ciImage.cropped(to: CGRect(x: xCenter - width / 2, y: yCenter - height / 2, width: width, height: height))
     }
     
         
