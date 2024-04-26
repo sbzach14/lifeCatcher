@@ -14,6 +14,7 @@
 		181C96AA2B60DD610042006E /* CardNineGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C96A92B60DD610042006E /* CardNineGame.swift */; };
 		181C96AC2B60E26A0042006E /* JiaJiaBaoGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C96AB2B60E26A0042006E /* JiaJiaBaoGame.swift */; };
 		181C96AE2B60F03C0042006E /* JiaJiaBaoGameRuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C96AD2B60F03C0042006E /* JiaJiaBaoGameRuleSettingView.swift */; };
+		182038492BDC228700DF7303 /* n_no_cls_50_0427.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 182038482BDC228700DF7303 /* n_no_cls_50_0427.mlmodel */; };
 		184F40A72B60FE170001B3DC /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184F40A62B60FE170001B3DC /* LoadingView.swift */; };
 		184F40AB2B610EF50001B3DC /* CardNineRuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184F40AA2B610EF50001B3DC /* CardNineRuleSettingView.swift */; };
 		18ABD7F52BD749F400D85962 /* cardDetection_0422_scale_40.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 18ABD7F42BD749F400D85962 /* cardDetection_0422_scale_40.mlmodel */; };
@@ -108,6 +109,7 @@
 		181C96A92B60DD610042006E /* CardNineGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardNineGame.swift; sourceTree = "<group>"; };
 		181C96AB2B60E26A0042006E /* JiaJiaBaoGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JiaJiaBaoGame.swift; sourceTree = "<group>"; };
 		181C96AD2B60F03C0042006E /* JiaJiaBaoGameRuleSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JiaJiaBaoGameRuleSettingView.swift; sourceTree = "<group>"; };
+		182038482BDC228700DF7303 /* n_no_cls_50_0427.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = n_no_cls_50_0427.mlmodel; sourceTree = "<group>"; };
 		184F40A62B60FE170001B3DC /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		184F40AA2B610EF50001B3DC /* CardNineRuleSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardNineRuleSettingView.swift; sourceTree = "<group>"; };
 		18ABD7F42BD749F400D85962 /* cardDetection_0422_scale_40.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection_0422_scale_40.mlmodel; sourceTree = "<group>"; };
@@ -408,6 +410,7 @@
 			children = (
 				A8D9FF022BD04A7E0081773C /* cardDetection_0418.mlmodel */,
 				A80959672BC9A3CE009A2DB4 /* cardDetection_0412.mlmodel */,
+				182038482BDC228700DF7303 /* n_no_cls_50_0427.mlmodel */,
 				18ABD7F42BD749F400D85962 /* cardDetection_0422_scale_40.mlmodel */,
 				A88EFE022A7E8ACC00897243 /* Resnet50FP16.mlmodel */,
 				181C969F2B5DB5980042006E /* success_tip.mp3 */,
@@ -641,6 +644,7 @@
 				181C96AA2B60DD610042006E /* CardNineGame.swift in Sources */,
 				A88C71F22B93570D001D8BD8 /* TenPointFiveGame.swift in Sources */,
 				181C96AC2B60E26A0042006E /* JiaJiaBaoGame.swift in Sources */,
+				182038492BDC228700DF7303 /* n_no_cls_50_0427.mlmodel in Sources */,
 				A8E0E2E52AADEF560091FC1D /* ThreeMenGame.swift in Sources */,
 				A887B64E2A7FDF56009F488F /* RecordHistoryViewModel.swift in Sources */,
 				18ABD7F52BD749F400D85962 /* cardDetection_0422_scale_40.mlmodel in Sources */,

@@ -34,6 +34,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var cutArray : [Int] = []
     @Published var cutShowArray : [Int] = []
     
+    let detectModel = try! n_no_cls_50_0427()
     let fastModel = try! cardDetection_0422_scale_40()
     let slowModel = try! cardDetection_0422_scale_40()
     
@@ -518,33 +519,40 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 let isTargetArea = self.isTargetArea
                 let targetArea = Array(self.targetArea)
                 
-                let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: self.inputSize[0], height: self.inputSize[1]), targetArea: targetArea)!
-                
-                self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex, isTargetArea: isTargetArea, targetArea: targetArea)
-                
-                //target area show code
-                DispatchQueue.main.async {
-                    if (self.cameraFrameRate <= self.idleRate || self.taskIndex % indexGap == 0){
-                        var rectList : [[Float]] = []
-                        rectList.append(self.lastBoxes[0])
-                        rectList.append(self.lastBoxes[1])
-                        rectList.append(self.targetArea)
-                        let drawcvPixelBuffer = drawRectanglesOnPixelBuffer(pixelBuffer: cvPixelBuffer, rectList: rectList)!
-                        let outputciImage = CIImage(cvPixelBuffer: drawcvPixelBuffer)
-                        let rotationTransform = CGAffineTransform(rotationAngle: -.pi / 2)  // 顺时针旋转90度
-                        let rotatedImage = outputciImage.transformed(by: rotationTransform)
-    
-                        let xOffset = outputciImage.extent.size.height
-                        let translationTransform = CGAffineTransform(translationX: xOffset, y: CGFloat(0))
-                        let translatedImage = rotatedImage.transformed(by: translationTransform)
-                        let outputCGImage = self.context.createCGImage(translatedImage, from: translatedImage.extent)
-                        self.cameraImage = outputCGImage
-                    }
+                if isTargetArea{
+                    let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: self.inputSize[0], height: self.inputSize[1]), targetArea: targetArea)!
+                    
+                    self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex, isTargetArea: isTargetArea, targetArea: targetArea)
                 }
+                else{
+                    let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: 640, height: 640), targetArea: targetArea)!
+                    
+                    self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex, isTargetArea: isTargetArea, targetArea: targetArea)
+                }
+                
+//                //target area show code
+//                DispatchQueue.main.async {
+//                    if (self.cameraFrameRate <= self.idleRate || self.taskIndex % indexGap == 0){
+//                        var rectList : [[Float]] = []
+//                        rectList.append(self.lastBoxes[0])
+//                        rectList.append(self.lastBoxes[1])
+//                        rectList.append(self.targetArea)
+//                        let drawcvPixelBuffer = drawRectanglesOnPixelBuffer(pixelBuffer: cvPixelBuffer, rectList: rectList)!
+//                        let outputciImage = CIImage(cvPixelBuffer: drawcvPixelBuffer)
+//                        let rotationTransform = CGAffineTransform(rotationAngle: -.pi / 2)  // 顺时针旋转90度
+//                        let rotatedImage = outputciImage.transformed(by: rotationTransform)
+//    
+//                        let xOffset = outputciImage.extent.size.height
+//                        let translationTransform = CGAffineTransform(translationX: xOffset, y: CGFloat(0))
+//                        let translatedImage = rotatedImage.transformed(by: translationTransform)
+//                        let outputCGImage = self.context.createCGImage(translatedImage, from: translatedImage.extent)
+//                        self.cameraImage = outputCGImage
+//                    }
+//                }
             }
         }
         
-        if self.isBlack && (self.cameraFrameRate <= idleRate || self.taskIndex % indexGap == 0){
+        if !self.isBlack && (self.cameraFrameRate <= idleRate || self.taskIndex % indexGap == 0){
             backgroundQueue.async {
                 do{
 //                    let cgImage = self.context.createCGImage(ciImage, from: ciImage.extent)!
@@ -666,7 +674,12 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
         
         var cardResult : [DetectionResult]
-        if self.isFast{
+        if !isTargetArea && self.isRemote{
+            let result = try! detectModel.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
+
+            cardResult = getCard(from: result.confidence, from: result.coordinates, from: pixelBuffer, iscls: false)
+        }
+        else if self.isFast{
             let result = try! fastModel.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
 
             cardResult = getCard(from: result.confidence, from: result.coordinates, from: pixelBuffer)
@@ -891,9 +904,13 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         }
                     }
                     
-                    self.targetArea = self.computeTargetArea(stateResult: stateResult)
-                    //self.targetArea = self.updateTargetArea(coordinates: stateResult, targetArea: targetArea)
                     
+                    if self.isRemote{
+                        //show target area no crop
+                        //self.targetArea = self.computeTargetArea(stateResult: stateResult)
+                        
+                        self.targetArea = self.updateTargetArea(coordinates: stateResult, targetArea: targetArea)
+                    }
                 }
             }
         }
@@ -1746,11 +1763,11 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             var w = self.imageSize[0]
             var h = self.imageSize[1]
             
-            //洗牌 + 未切牌
+            //洗牌 + 未切牌 大框时全屏
             if !self.cutDone
                 && (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4)
                 && (originBoxes[0][2] + originBoxes[0][3]) > 0.2{
-                return [0,0,0,0]
+                return [0.5,0.5,1,1]
             }
             
             let minX = self.originSize[0] * (originBoxes[0][0] - originBoxes[0][2] / 2)
@@ -1913,7 +1930,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 
     // MARK: get card
     //返回检测到的目标类别，n当前设定为最多两个，后续可根据置信度进行排序输出或全部输出
-    func getCard(from cardArray: MLMultiArray, from boxArray : MLMultiArray, from pixelBuffer : CVPixelBuffer) -> [DetectionResult] {
+    func getCard(from cardArray: MLMultiArray, from boxArray : MLMultiArray, from pixelBuffer : CVPixelBuffer, iscls : Bool = true) -> [DetectionResult] {
         let cnt : Int = Int(cardArray.shape[0])
         let n : Int = Int(cardArray.shape[1])
         var result : [DetectionResult] = []
@@ -1936,7 +1953,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     
                     let trueIndex = j == 52 ? 54 : j
                     
-                    if value > 0 && self.allCardIndex.contains(trueIndex){
+                    if value > 0 && (self.allCardIndex.contains(trueIndex) || !iscls){
                         
                         if (value/confidenceSum>=0) {
                             cardIndex.append(j)
@@ -1978,7 +1995,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
             
             //先删除相同的
-            if result.count > 2{
+            if result.count > 2 && iscls{
                 // 使用 Set 来去除重复元素
                 var uniqueCardIndexes = Set<Int>()
                 
@@ -2090,7 +2107,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     
                     let trueIndex = j == 52 ? 54 : j
                     
-                    if value > 0 && self.allCardIndex.contains(trueIndex){
+                    if value > 0 && (self.allCardIndex.contains(trueIndex) || !iscls){
                         
                         if (value/confidenceSum>=0) {
                             cardIndex.append(j)
@@ -2132,7 +2149,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
             
             //先删除相同的
-            if result.count > 2{
+            if result.count > 2 && iscls{
                 // 使用 Set 来去除重复元素
                 var uniqueCardIndexes = Set<Int>()
                 
