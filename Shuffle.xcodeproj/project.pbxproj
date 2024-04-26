@@ -14,10 +14,6 @@
 		181C96AA2B60DD610042006E /* CardNineGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C96A92B60DD610042006E /* CardNineGame.swift */; };
 		181C96AC2B60E26A0042006E /* JiaJiaBaoGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C96AB2B60E26A0042006E /* JiaJiaBaoGame.swift */; };
 		181C96AE2B60F03C0042006E /* JiaJiaBaoGameRuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C96AD2B60F03C0042006E /* JiaJiaBaoGameRuleSettingView.swift */; };
-		182038412BD9FCB800DF7303 /* test_n_640.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 182038402BD9FCB800DF7303 /* test_n_640.mlmodel */; };
-		182038432BDA028700DF7303 /* test_s_640.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 182038422BDA028700DF7303 /* test_s_640.mlmodel */; };
-		182038452BDA080200DF7303 /* test_n_960.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 182038442BDA080200DF7303 /* test_n_960.mlmodel */; };
-		182038472BDA605B00DF7303 /* cardDetection_s_640_no_cls.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 182038462BDA605A00DF7303 /* cardDetection_s_640_no_cls.mlmodel */; };
 		184F40A72B60FE170001B3DC /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184F40A62B60FE170001B3DC /* LoadingView.swift */; };
 		184F40AB2B610EF50001B3DC /* CardNineRuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184F40AA2B610EF50001B3DC /* CardNineRuleSettingView.swift */; };
 		18ABD7F52BD749F400D85962 /* cardDetection_0422_scale_40.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 18ABD7F42BD749F400D85962 /* cardDetection_0422_scale_40.mlmodel */; };
@@ -112,10 +108,6 @@
 		181C96A92B60DD610042006E /* CardNineGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardNineGame.swift; sourceTree = "<group>"; };
 		181C96AB2B60E26A0042006E /* JiaJiaBaoGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JiaJiaBaoGame.swift; sourceTree = "<group>"; };
 		181C96AD2B60F03C0042006E /* JiaJiaBaoGameRuleSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JiaJiaBaoGameRuleSettingView.swift; sourceTree = "<group>"; };
-		182038402BD9FCB800DF7303 /* test_n_640.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = test_n_640.mlmodel; sourceTree = "<group>"; };
-		182038422BDA028700DF7303 /* test_s_640.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = test_s_640.mlmodel; sourceTree = "<group>"; };
-		182038442BDA080200DF7303 /* test_n_960.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = test_n_960.mlmodel; sourceTree = "<group>"; };
-		182038462BDA605A00DF7303 /* cardDetection_s_640_no_cls.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection_s_640_no_cls.mlmodel; sourceTree = "<group>"; };
 		184F40A62B60FE170001B3DC /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
 		184F40AA2B610EF50001B3DC /* CardNineRuleSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardNineRuleSettingView.swift; sourceTree = "<group>"; };
 		18ABD7F42BD749F400D85962 /* cardDetection_0422_scale_40.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection_0422_scale_40.mlmodel; sourceTree = "<group>"; };
@@ -416,11 +408,7 @@
 			children = (
 				A8D9FF022BD04A7E0081773C /* cardDetection_0418.mlmodel */,
 				A80959672BC9A3CE009A2DB4 /* cardDetection_0412.mlmodel */,
-				182038462BDA605A00DF7303 /* cardDetection_s_640_no_cls.mlmodel */,
 				18ABD7F42BD749F400D85962 /* cardDetection_0422_scale_40.mlmodel */,
-				182038402BD9FCB800DF7303 /* test_n_640.mlmodel */,
-				182038422BDA028700DF7303 /* test_s_640.mlmodel */,
-				182038442BDA080200DF7303 /* test_n_960.mlmodel */,
 				A88EFE022A7E8ACC00897243 /* Resnet50FP16.mlmodel */,
 				181C969F2B5DB5980042006E /* success_tip.mp3 */,
 				A8D9FF062BD6E09C0081773C /* start_DetecBeep.mp3 */,
@@ -626,7 +614,6 @@
 				B03B7B2F2A963C1B006A0647 /* utils.swift in Sources */,
 				A812F92F2A3DCBA500AA392F /* ThreeCardPokerGameRuleSettingView.swift in Sources */,
 				A809B3E42AE5183400F728A9 /* BaoziGameRuleSettingView.swift in Sources */,
-				182038412BD9FCB800DF7303 /* test_n_640.mlmodel in Sources */,
 				18D9CDEA2B84F7CE00A93684 /* ReportSettingView.swift in Sources */,
 				A83DC67A2A22352C00EC8210 /* SelectRuleView.swift in Sources */,
 				A88716852A0F701500B7F2CD /* GameManager.swift in Sources */,
@@ -661,7 +648,6 @@
 				A88F20AE2A13A470005E4A27 /* PokerBull.swift in Sources */,
 				A8D0D9362A24A4C20061A90E /* TexasPoker.swift in Sources */,
 				181C96A82B60DC180042006E /* ChickenBattleGame.swift in Sources */,
-				182038452BDA080200DF7303 /* test_n_960.mlmodel in Sources */,
 				A8FBC7C22A3F0A5C00EDDFD7 /* CVUtils.swift in Sources */,
 				A8EFFEB12B28766C00FC884F /* CutNumRangeSettingView.swift in Sources */,
 				A88C71F02B93101C001D8BD8 /* ThreeCardPointGame.swift in Sources */,
@@ -676,7 +662,6 @@
 				A83853532ADA918000346038 /* CustomUI.swift in Sources */,
 				A8E0E2E72AADF6E20091FC1D /* TwoEightGangGame.swift in Sources */,
 				A887B6502A7FE1AF009F488F /* ShowRecordHistoryView.swift in Sources */,
-				182038432BDA028700DF7303 /* test_s_640.mlmodel in Sources */,
 				A8D0D9382A35D9970061A90E /* RankRulesView.swift in Sources */,
 				A88EFDC42A7D217200897243 /* VisionObjectRecognitionViewModel.swift in Sources */,
 				A88EFE032A7E8ACD00897243 /* Resnet50FP16.mlmodel in Sources */,
@@ -686,7 +671,6 @@
 				A87A82052B2EF66200B1B37B /* DealTypeView.swift in Sources */,
 				A8FBC7BB2A3DF1B000EDDFD7 /* SuitRulesView.swift in Sources */,
 				181C96AE2B60F03C0042006E /* JiaJiaBaoGameRuleSettingView.swift in Sources */,
-				182038472BDA605B00DF7303 /* cardDetection_s_640_no_cls.mlmodel in Sources */,
 				A80D65F82AFF75ED005B5E5E /* AddRuleSettingView.swift in Sources */,
 				A8E0E2ED2AAE00740091FC1D /* ThreeMenGameRuleSettingView.swift in Sources */,
 			);
