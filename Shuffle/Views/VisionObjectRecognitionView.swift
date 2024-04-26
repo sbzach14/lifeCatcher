@@ -41,6 +41,8 @@ struct VisionObjectRecognitionView: View {
             .onDisappear {
                 viewModel.stopCamera()
             }
+            .toolbarBackground(.hidden)
+            .navigationTitle("")
     }
 }
 

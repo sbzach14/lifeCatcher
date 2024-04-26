@@ -99,6 +99,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     var lastBoxes : [[Float]] = [[0.3, 0.5, 0.05, 0.05], [0.7, 0.5, 0.05, 0.05]]
     var isHorizon : Bool = true
     var targetArea : [Float] = [0, 0, 0, 0]
+    var isTargetArea : Bool = false
     
     //显示帧率
     private var frameCount = 0
@@ -129,17 +130,17 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var isBlack: Bool = false
     @Published var isMute: Bool = false
     @Published var isBackCamera: Bool = true
-    @Published var isRemote: Bool = false
+    @Published var isRemote: Bool = true
     @Published var isFast: Bool = true
     @Published var isActive: Bool = false
-    @Published var isAutoFocus: Bool = false
+    @Published var isAutoFocus: Bool = true
     @Published var activeDate: String = ""
     @Published var uniqueID: String = ""
     @Published var volumeUp: Int = 0
     @Published var volumeDown: Int = 0
     @Published var volumeValue: Float = 0.5
-    @Published var zoomFactor: Float = 0.2
-    @Published var focusFactor: Float = 0.5
+    @Published var zoomFactor: Float = 0
+    @Published var focusFactor: Float = 0.6
     
     var setFrameRate: Float64 = 120.0
     var cameraFrameRate: Int = 0
@@ -155,21 +156,17 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     let chineseMaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.siri_male_zh-CN_compact")
     
     var cutDone : Bool = true
+    var firstCard : Bool = true
     var detectSet : Set<Int> = []
     
-
-    func initialize(saveRuleIndex: Int) {
+    override init(){
         
-        print("viewmodel init")
-        
-        self.loadSaveRule(saveRuleIndex: saveRuleIndex)
+        super.init()
         
         for key in self.allCardIndex {
             self.laplacianDic[0][key] = 0
             self.laplacianDic[1][key] = 0
         }
-        self.initShuffle()
-        self.initDetectResult()
         
         // Load data from config.json
         if let configData = readConfigJSON() {
@@ -209,6 +206,17 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         self.isWorking = true
 
         setupAVCapture()
+    }
+
+    func initialize(saveRuleIndex: Int) {
+        
+        print("viewmodel init")
+        
+        self.loadSaveRule(saveRuleIndex: saveRuleIndex)
+        self.initShuffle()
+        self.initDetectResult()
+        self.initBoxes()
+        
 
 //      规则测试代码
 //        print("calArgs \(calModeArgs[1])")
@@ -280,6 +288,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         winnerPlayer = []
         winnerPlayerShow = ""
         detectSet = []
+        firstCard = true
     }
     
     private func initShuffle(){
@@ -302,6 +311,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         targetArea = [0,0,0,0]
         imageSize[0] = min(originSize[0], 853 * (1 + self.zoomFactor * 2))
         imageSize[1] = min(originSize[1], 480 * (1 + self.zoomFactor * 2))
+        isTargetArea = false
     }
 
     func setupAVCapture(){
@@ -501,6 +511,40 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             indexGap = 8
         }
         
+        if !self.isShowCard && self.isWorking{
+            
+            self.detectionQueue.async {
+                
+                let isTargetArea = self.isTargetArea
+                let targetArea = Array(self.targetArea)
+                
+                let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: self.inputSize[0], height: self.inputSize[1]), targetArea: targetArea)!
+//                self.saveImageOrigin(ciImage, taskIndex: myIndex)
+                
+                self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex, isTargetArea: isTargetArea, targetArea: targetArea)
+                
+//                //target area show code
+//                DispatchQueue.main.async {
+//                    if (self.cameraFrameRate <= self.idleRate || self.taskIndex % indexGap == 0){
+//                        var rectList : [[Float]] = []
+//                        rectList.append(self.lastBoxes[0])
+//                        rectList.append(self.lastBoxes[1])
+//                        //rectList.append(self.targetArea)
+//                        let drawcvPixelBuffer = drawRectanglesOnPixelBuffer(pixelBuffer: cvPixelBuffer, rectList: rectList)!
+//                        let outputciImage = CIImage(cvPixelBuffer: drawcvPixelBuffer)
+//                        let rotationTransform = CGAffineTransform(rotationAngle: -.pi / 2)  // 顺时针旋转90度
+//                        let rotatedImage = outputciImage.transformed(by: rotationTransform)
+//    
+//                        let xOffset = outputciImage.extent.size.height
+//                        let translationTransform = CGAffineTransform(translationX: xOffset, y: CGFloat(0))
+//                        let translatedImage = rotatedImage.transformed(by: translationTransform)
+//                        let outputCGImage = self.context.createCGImage(translatedImage, from: translatedImage.extent)
+//                        self.cameraImage = outputCGImage
+//                    }
+//                }
+            }
+        }
+        
         if !self.isBlack && (self.cameraFrameRate <= idleRate || self.taskIndex % indexGap == 0){
             backgroundQueue.async {
                 do{
@@ -557,28 +601,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         
         // 释放视频帧资源
         CMSampleBufferInvalidate(sampleBuffer)
-        
-        if !self.isShowCard && !isCamereSetting && self.isWorking{
-            
-            self.detectionQueue.async {
 
-                let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: self.inputSize[0], height: self.inputSize[1]), targetArea: self.targetArea)!
-                //断点4
-//                return
-//                if self.state == "shuffle"{
-//                    self.saveImageOrigin(ciImage, taskIndex: myIndex)
-//                }
-
-                self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex)
-            }
-            
-            
-        }
-            
-
-        
-        //断点3
-//        return
     }
     
 
@@ -633,11 +656,11 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     }
     
     // MARK: process image origin
-    func processImageOrigin(_ pixelBuffer: CVPixelBuffer, taskIndex: Int){
+    func processImageOrigin(_ pixelBuffer: CVPixelBuffer, taskIndex: Int, isTargetArea: Bool, targetArea: [Float]){
         
         var confidenceThreshold = 0.6
         if self.state == "idle"{
-            confidenceThreshold = 0.7
+            confidenceThreshold = 0.5
         }
         else{
             confidenceThreshold = 0.05
@@ -646,14 +669,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         var cardResult : [DetectionResult]
         if self.isFast{
             let result = try! fastModel.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
-            
-            //断点5
-//            return
-            
+
             cardResult = getCard(from: result.confidence, from: result.coordinates, from: pixelBuffer)
-            
-            
-            //
         }
         else{
             let result = try! slowModel.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
@@ -663,9 +680,9 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         if cardResult[0].cardIndex[0] == self.stateCard[0] && cardResult[1].cardIndex[0] == self.stateCard[1]{
             stateCounter = min(stateCounter + 1, 600)
         }
-        else if self.isRemote && cardResult[0].cardIndex[0] != -1 && cardResult[1].cardIndex[0] != -1{
-            stateCounter = min(stateCounter + 1, 600)
-        }
+//        else if self.isRemote && cardResult[0].cardIndex[0] != -1 && cardResult[1].cardIndex[0] != -1{
+//            stateCounter = min(stateCounter + 1, 600)
+//        }
         else{
             stateCounter = 0
         }
@@ -674,13 +691,30 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         self.stateCard[1] = cardResult[1].cardIndex[0]
 
         
+        var detectNum = 0
+        if self.stateCard[0] != -1{
+            detectNum += 1
+        }
+        if self.stateCard[1] != -1{
+            detectNum += 1
+        }
+       
+        
+        
+        let isShuffle = detectNum == 2 && (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4)
+        let isRiffle = detectNum == 1 && (self.shuffleMode == 1 || self.shuffleMode == 2 || self.shuffleMode == 3 || self.shuffleMode == 4)
+        let isCut = detectNum == 1 && !self.cutDone && self.cardArray.count > 0
+        
+        print("检测数量 \(detectNum) stateCounter \(stateCounter) isShuffle \(isShuffle) isRiffle \(isRiffle) isCut \(isCut) shuffleMode \(shuffleMode)")
         
         if state == "idle"{
-            if (self.stateCard[0] != -1 || self.stateCard[1] != -1) && stateCounter >= 2{
+            if (isShuffle || isRiffle || isCut) && stateCounter >= 1{
                 
                 print("动作：开始识别 ", self.setFrameRate)
                 DispatchQueue.main.async{
-                    self.state = "shuffle"
+                    
+                    self.state = "detecting"//cut or riffle
+                    
                     self.speakText(input: 0)
                     self.changeCameraFrameRate(to: Int(self.setFrameRate))
                                         
@@ -688,61 +722,67 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     self.initDetectResult()
                     
                     if self.isRemote{
-                        self.computeTargetArea(stateResult: self.lastBoxes)
-                    }
-                    
-                    var cutCard = -1
-                    if self.stateCard[0] == -1{
-                        cutCard = self.stateCard[1]
-                    }
-                    else if self.stateCard[1] == -1{
-                        cutCard = self.stateCard[0]
-                    }
-                    if !self.cutDone && cutCard != -1 && self.cardArray.count > 0{
-                        //切牌
-                        print("切牌之前的牌库 \(self.cardArray)")
                         
-                        if !self.cardArray.contains(cutCard){
-                            //self.speakText(input: 2)
+                        var stateResult : [[Float]] = []
+                        if cardResult[0].cardIndex[0] != -1{
+                            stateResult.append(cardResult[0].coordinate)
+                        }
+                        if cardResult[1].cardIndex[0] != -1{
+                            stateResult.append(cardResult[1].coordinate)
                         }
                         
-                        else {
-                            var cutIndex = self.cardArray.firstIndex(of: cutCard)!
-                            if self.cutMode == 1{
-                                //看底
-                                self.cutCardArray(index: cutIndex)
-                                self.cutDone = true
+                        self.targetArea = self.computeTargetArea(stateResult: stateResult)
+                        self.isTargetArea = true
+                        
+                        if !self.cutDone && self.cardArray.count > 0{
+                            
+                            var cutCard = -1
+                            if cardResult[0].cardIndex[0] != -1{
+                                cutCard = cardResult[0].cardIndex[0]
                             }
-                            else if self.cutMode == 2{
-                                //看顶
-                                cutIndex -= 1
-                                if cutIndex < 0{
-                                    cutIndex = self.cardArray.count - 1
-                                }
-                                self.cutCardArray(index: cutIndex)
-                                self.cutDone = true
-                            }
-                            else if self.cutMode == 3{
-                                //连续切牌
-                                self.cutArray.append(cutCard)
-                            }
-                            else if self.cutMode == 4{
-                                //看手
-                                self.cutArray.append(cutCard)
-                                self.cutDone = true
+                            else if cardResult[1].cardIndex[0] != -1{
+                                cutCard = cardResult[1].cardIndex[0]
                             }
                             
-                            self.cutShowArray.append(cutCard)
-                            self.detectSet.insert(cutCard)
-                            //self.speakText(input: 1)
-                            self.computeWinnerPlayer()
+                            if self.cardArray.contains(cutCard){
+                                
+                                var cutIndex = self.cardArray.firstIndex(of: cutCard)!
+                                if self.cutMode == 1{
+                                    //看底
+                                    self.cutCardArray(index: cutIndex)
+                                    self.cutDone = true
+                                }
+                                else if self.cutMode == 2{
+                                    //看顶
+                                    cutIndex -= 1
+                                    if cutIndex < 0{
+                                        cutIndex = self.cardArray.count - 1
+                                    }
+                                    self.cutCardArray(index: cutIndex)
+                                    self.cutDone = true
+                                }
+                                else if self.cutMode == 3{
+                                    //连续切牌
+                                    self.cutArray.append(cutCard)
+                                }
+                                else if self.cutMode == 4{
+                                    //看手
+                                    self.cutArray.append(cutCard)
+                                    self.cutDone = true
+                                }
+                                
+                                self.cutShowArray.append(cutCard)
+                                self.detectSet.insert(cutCard)
+                                self.computeWinnerPlayer()
+                            }
                         }
                     }
+                    
                 }
             }
         }
-        else if state == "shuffle"{
-            if self.stateCard[0] == -1 && self.stateCard[1] == -1 && stateCounter >= 5{
+        else{
+            if detectNum == 0 && stateCounter >= 10{
 
                 print("动作：识别完成 ", self.setFrameRate)
                 DispatchQueue.main.async{
@@ -754,8 +794,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     
                     //根据detect result list判别洗牌、拨牌、洗牌
                     //2侧或1侧 长或短
-                    
-                    var errorFlag = false
                     
                     if !detectState.isSingle && !detectState.isShort
                         && (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4){
@@ -769,10 +807,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         else{
                             self.speakText(input: 2)
                         }
-                        if self.cutMode == 1 || self.cutMode == 2 || self.cutMode == 4{
-                            
-                        }
-                        else{
+                        
+                        if self.cutMode == 0 || self.cutMode == 3{
                             self.computeWinnerPlayer()
                         }
                     }
@@ -785,7 +821,12 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         
                         if(self.shuffleMode == 1 || self.shuffleMode == 3){
                             //拨到顶
-                            self.speakText(input: 1)
+                            if self.cardArray.count >= self.minCardNum{
+                                self.speakText(input: 1)
+                            }
+                            else{
+                                self.speakText(input: 2)
+                            }
                         }
                         
                         else if(self.shuffleMode == 2 || self.shuffleMode == 4){
@@ -793,31 +834,37 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                             if self.cardArray.count > 0{
                                 self.cardArray.remove(at: 0)
                             }
-                            self.speakText(input: 1)
+                            
+                            if self.cardArray.count >= self.minCardNum{
+                                self.speakText(input: 1)
+                            }
+                            else{
+                                self.speakText(input: 2)
+                            }
                         }
                         
-                        if self.cutMode == 1 || self.cutMode == 2 || self.cutMode == 4{
-                            
-                        }
-                        else{
+                        if self.cutMode == 0 || self.cutMode == 3{
                             self.computeWinnerPlayer()
                         }
 
 
                     }
-                    
-                    
+ 
                     print("result  isShort:\(detectState.isShort)  isSingle:\(detectState.isSingle)  cardArray:\(self.cardArray)")
                 }
                 
                
             }
-            else{
+            else if (self.isRemote && isTargetArea) || !self.isRemote{
                 DispatchQueue.main.async{
-                    self.detectResultList[taskIndex] = cardResult
                     
-                    //check cut or shuffle
-                    if self.detectSet.count > 5{
+                    if isShuffle{
+                        self.state = "shuffle"
+                    }
+                    
+                    //check cut or shuffle/riffle
+                    if self.detectSet.count > 10 || isShuffle{
+                        print("切牌停止 \(self.detectSet)")
                         self.detectSet = []
                         self.speechSynthesizer.stopSpeaking(at: .immediate)
                     }
@@ -826,9 +873,27 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         self.detectSet.insert(cardResult[1].cardIndex[0])
                     }
                     
-                    if self.isRemote{
-                        //updateTargetArea(coordinates: self.lastBoxes)
+                    
+                    self.detectResultList[taskIndex] = cardResult
+                    
+                    var stateResult : [[Float]] = []
+                    
+                    if self.state == "shuffle"{
+                        stateResult.append(cardResult[0].coordinate)
+                        stateResult.append(cardResult[1].coordinate)
                     }
+                    else{
+                        if cardResult[0].cardIndex[0] != -1{
+                            stateResult.append(cardResult[0].coordinate)
+                        }
+                        if cardResult[1].cardIndex[0] != -1{
+                            stateResult.append(cardResult[1].coordinate)
+                        }
+                    }
+                    
+                    //self.targetArea = self.computeTargetArea(stateResult: stateResult)
+                    self.targetArea = self.updateTargetArea(coordinates: stateResult, targetArea: targetArea)
+                    
                 }
             }
         }
@@ -934,7 +999,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     }
                     if numIndex == 1{
                         if rightFirstHead == -1 && keyIndex > longHeadIndex{
-                            rightLastTail = keyIndex
+                            rightFirstHead = keyIndex
                         }
                     }
                 }
@@ -956,7 +1021,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
         
         var isShort = true
-        if leftSideCnt + rightSideCnt > 10{
+        if leftSideCnt + rightSideCnt >= 10{
             isShort = false
         }
         
@@ -1021,7 +1086,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             for key in confidenceDic.keys{
                 
                 if confidenceDic[key] == 100{
-                    for numIndex in 0..<targetDetecResultList[0]!.count{
+                    for numIndex in 0..<2{
                         
                         var end = -1
                         var head = -1
@@ -1030,26 +1095,28 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                             let detectResultListIndex = sortedKeys[keyIndex]
                             let nowNum = targetDetecResultList[detectResultListIndex]![numIndex].cardIndex[0]
                             if nowNum == key && targetDetecResultList[detectResultListIndex]![numIndex].nodeType == 2{
-                                end = detectResultListIndex
+                                end = keyIndex
                             }
                             else if nowNum == key
                                         && targetDetecResultList[detectResultListIndex]![numIndex].nodeType == 1
                                         && end != -1{
-                                head = detectResultListIndex
+                                head = keyIndex
                                 
                                 let isClose = head - end <= 5
 
                                 var isSameNum = head - end <= 10
                                 var middleNum = -1
                                 for updateIndex in end+1...head-1{
-                                    let currentMiddleNum = targetDetecResultList[updateIndex]![numIndex].cardIndex[0]
+                                    let updateNodeIndex = sortedKeys[updateIndex]
+                                    let currentMiddleNum = targetDetecResultList[updateNodeIndex]![numIndex].cardIndex[0]
                                     if currentMiddleNum != -1{
                                         middleNum = currentMiddleNum
                                         break
                                     }
                                 }
                                 for updateIndex in end+1...head-1{
-                                    let currentMiddleNum = targetDetecResultList[updateIndex]![numIndex].cardIndex[0]
+                                    let updateNodeIndex = sortedKeys[updateIndex]
+                                    let currentMiddleNum = targetDetecResultList[updateNodeIndex]![numIndex].cardIndex[0]
                                     if currentMiddleNum != -1 && currentMiddleNum != middleNum{
                                         isSameNum = false
                                         break
@@ -1058,15 +1125,17 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                                 
                                 if isClose || isSameNum{
                                     for updateIndex in end...head{
-                                        targetDetecResultList[updateIndex]![numIndex].cardIndex[0] = nowNum
-                                        targetDetecResultList[updateIndex]![numIndex].nodeType = 3
+                                        let updateNodeIndex = sortedKeys[updateIndex]
+                                        targetDetecResultList[updateNodeIndex]![numIndex].cardIndex[0] = nowNum
+                                        targetDetecResultList[updateNodeIndex]![numIndex].nodeType = 3
                                     }
                                     print("合并链 " + cardLabelDic[nowNum]!)
                                 }
                                 else{
                                     for updateIndex in head..<endIndex{
-                                        if targetDetecResultList[updateIndex]![numIndex].cardIndex[0] == nowNum{
-                                            targetDetecResultList[updateIndex]![numIndex].nodeType = 0
+                                        let updateNodeIndex = sortedKeys[updateIndex]
+                                        if targetDetecResultList[updateNodeIndex]![numIndex].cardIndex[0] == nowNum{
+                                            targetDetecResultList[updateNodeIndex]![numIndex].nodeType = 0
                                         }
                                         else{
                                             break
@@ -1228,8 +1297,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
         
-        let isRiffle = self.shuffleMode == 2 || self.shuffleMode == 3 || (self.shuffleMode == 4 && isSingle) || (self.shuffleMode == 5 && isSingle)
-        let isCut = isSingle && isShort
+        let isShuffle = (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4) && !isSingle && !isShort
         let addEndIndex = endIndex - 3
         
         var lostNum = 0
@@ -1243,18 +1311,9 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
         
         //补牌
-        if !isRiffle && !isCut && beginIndex < addEndIndex && lostNum <= 3{
+        if isShuffle && beginIndex < addEndIndex && lostNum <= 2{
             
-            var numIndexList : [Int] = []
-            if !isSingle{
-                numIndexList = [0, 1]
-            }
-            else if leftSideCnt > rightSideCnt{
-                numIndexList = [0]
-            }
-            else if rightSideCnt > leftSideCnt{
-                numIndexList = [1]
-            }
+            let numIndexList : [Int] = [0, 1]
             
             for key in confidenceDic.keys{
                 if confidenceDic[key] == 0{
@@ -1262,9 +1321,10 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     print("补牌：\(cardLabelDic[key]!)")
                     for keyIndex in beginIndex..<addEndIndex{
                         let detectResultListIndex = sortedKeys[keyIndex]
+                        let nextDetectResultListIndex = sortedKeys[keyIndex+1]
                         for numIndex in numIndexList{
                             let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
-                            let nextDetectResultNode = targetDetecResultList[detectResultListIndex + 1]![numIndex]
+                            let nextDetectResultNode = targetDetecResultList[nextDetectResultListIndex]![numIndex]
                             if detectResultNode.nodeType == 5 && nextDetectResultNode.nodeType == 5{
                                 detectResultNode.cardIndex[0] = key
                                 nextDetectResultNode.cardIndex[0] = key
@@ -1287,9 +1347,10 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     
                     for keyIndex in beginIndex..<addEndIndex{
                         let detectResultListIndex = sortedKeys[keyIndex]
+                        let nextDetectResultListIndex = sortedKeys[keyIndex+1]
                         for numIndex in numIndexList{
                             let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
-                            let nextDetectResultNode = targetDetecResultList[detectResultListIndex + 1]![numIndex]
+                            let nextDetectResultNode = targetDetecResultList[nextDetectResultListIndex]![numIndex]
                             if (detectResultNode.nodeType == 0 || nextDetectResultNode.nodeType == 5)
                                 && (detectResultNode.nodeType == 5 || nextDetectResultNode.nodeType == 0){
                                 detectResultNode.cardIndex[0] = key
@@ -1313,9 +1374,10 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     
                     for keyIndex in beginIndex..<addEndIndex{
                         let detectResultListIndex = sortedKeys[keyIndex]
+                        let nextDetectResultListIndex = sortedKeys[keyIndex+1]
                         for numIndex in numIndexList{
                             let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
-                            let nextDetectResultNode = targetDetecResultList[detectResultListIndex + 1]![numIndex]
+                            let nextDetectResultNode = targetDetecResultList[nextDetectResultListIndex]![numIndex]
                             if detectResultNode.nodeType == 5{
                                 detectResultNode.cardIndex[0] = key
                                 detectResultNode.nodeType = 4
@@ -1336,9 +1398,10 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     
                     for keyIndex in beginIndex..<addEndIndex{
                         let detectResultListIndex = sortedKeys[keyIndex]
+                        let nextDetectResultListIndex = sortedKeys[keyIndex+1]
                         for numIndex in numIndexList{
                             let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
-                            let nextDetectResultNode = targetDetecResultList[detectResultListIndex + 1]![numIndex]
+                            let nextDetectResultNode = targetDetecResultList[nextDetectResultListIndex]![numIndex]
                             if detectResultNode.nodeType == 0{
                                 detectResultNode.cardIndex[0] = key
                                 detectResultNode.nodeType = 4
@@ -1360,7 +1423,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
         
-        print("缺牌数量:\(addNum)    补牌数量:\(lostNum)")
+        print("缺牌数量:\(lostNum)    补牌数量:\(addNum)")
         
         //补充链尾链头
         for keyIndex in beginIndex..<endIndex{
@@ -1577,7 +1640,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 
                 //单个插入
                 else{
-                    if (nodeType0 == 4 && !isRiffle) || nodeType0 == 2{
+                    if (nodeType0 == 4 && isShuffle) || nodeType0 == 2{
                         
                         detectCardArray.insert(nowNum0, at: 0)
                         
@@ -1611,7 +1674,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 //                            detectCardArray.insert(nowNum0, at: 0)
 //                        }
                     }
-                    if (nodeType1 == 4 && !isRiffle) || nodeType1 == 2{
+                    if (nodeType1 == 4 && isShuffle) || nodeType1 == 2{
                         
                         detectCardArray.insert(nowNum1, at: 0)
                         
@@ -1673,124 +1736,169 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 
     
     // MARK: compute targetArea
-    func computeTargetArea(stateResult: [[Float]]){
+    func computeTargetArea(stateResult: [[Float]])-> [Float]{
         
         var originBoxes = stateResult
+        var targetArea:[Float] = [0,0,0,0]
         
-        
-        if self.isHorizon
-        {
-            if originBoxes[0][0] > originBoxes[1][0]{
-                originBoxes.swapAt(0, 1)
-            }
+        if originBoxes.count == 1{
             
             let minX = self.originSize[0] * (originBoxes[0][0] - originBoxes[0][2] / 2)
-            let maxX = self.originSize[0] * (originBoxes[1][0] + originBoxes[1][2] / 2)
-            let minY = self.originSize[1] * min(originBoxes[0][1] - originBoxes[0][3] / 2, originBoxes[1][1] - originBoxes[1][3] / 2)
-            let maxY = self.originSize[1] * max(originBoxes[0][1] + originBoxes[0][3] / 2, originBoxes[1][1] + originBoxes[1][3] / 2)
-            
-            if minX + Float(self.imageSize[0]) >= self.originSize[0]{
-                self.targetArea[0] = self.originSize[0] - Float(self.imageSize[0] / 2) - 1
-                self.targetArea[2] = Float(self.imageSize[0])
-            }
-            else if maxX - Float(self.imageSize[0]) <= 0{
-                self.targetArea[0] = Float(self.imageSize[0] / 2) + 1
-                self.targetArea[2] = Float(self.imageSize[0])
-            }
-            else{
-                self.targetArea[0] = (maxX + minX) / 2
-                self.targetArea[2] = max(maxX - minX + 100, Float(self.imageSize[0]))
-            }
-            
-            self.targetArea[3] = min(self.originSize[1] - 2, self.targetArea[2] / Float(self.imageSize[0]) * Float(self.imageSize[1]))
-            
-            if self.targetArea[3] == self.originSize[1] - 2{
-                self.targetArea[1] = self.originSize[1] / 2
-            }
-            else if minY + self.targetArea[3] >= self.originSize[1]{
-                self.targetArea[1] = self.originSize[1] - self.targetArea[3] / 2 - 1
-            }
-            else if maxY - self.targetArea[3] <= 0{
-                self.targetArea[1] = self.targetArea[3] / 2 + 1
-            }
-            else{
-                self.targetArea[1] = (maxY + minY) / 2
-            }
-            
-        }
-        else{
-            
-            if originBoxes[0][1] > originBoxes[1][1]{
-                originBoxes.swapAt(0, 1)
-            }
-            
+            let maxX = self.originSize[0] * (originBoxes[0][0] + originBoxes[0][2] / 2)
             let minY = self.originSize[1] * (originBoxes[0][1] - originBoxes[0][3] / 2)
-            let maxY = self.originSize[1] * (originBoxes[1][1] + originBoxes[1][3] / 2)
-            let minX = self.originSize[0] * min(originBoxes[0][0] - originBoxes[0][2] / 2, originBoxes[1][0] - originBoxes[1][2] / 2)
-            let maxX = self.originSize[0] * max(originBoxes[0][0] + originBoxes[0][2] / 2, originBoxes[1][0] + originBoxes[1][2] / 2)
+            let maxY = self.originSize[1] * (originBoxes[0][1] + originBoxes[0][3] / 2)
             
-            if minY + Float(self.imageSize[0]) >= self.originSize[1]{
-                self.targetArea[1] = self.originSize[1] - Float(self.imageSize[0] / 2) - 1
-                self.targetArea[3] = Float(self.imageSize[0])
+            if maxX + Float(self.imageSize[0])/2 >= self.originSize[0]{
+                targetArea[0] = self.originSize[0] - Float(self.imageSize[0] / 2) - 2
+                targetArea[2] = Float(self.imageSize[0])
             }
-            else if maxY - Float(self.imageSize[0]) <= 0{
-                self.targetArea[1] = Float(self.imageSize[0] / 2) + 1
-                self.targetArea[3] = Float(self.imageSize[0])
+            else if minX - Float(self.imageSize[0])/2 <= 0{
+                targetArea[0] = Float(self.imageSize[0] / 2) + 2
+                targetArea[2] = Float(self.imageSize[0])
             }
             else{
-                self.targetArea[1] = (maxY + minY) / 2
-                self.targetArea[3] = max(maxY - minY + 100, Float(self.imageSize[0]))
+                targetArea[0] = (maxX + minX) / 2
+                targetArea[2] = max(maxX - minX + 20, Float(self.imageSize[0]))
             }
             
-            self.targetArea[2] = min(self.originSize[0] - 2, self.targetArea[3] / Float(self.imageSize[0]) * Float(self.imageSize[1]))
-            
-            if self.targetArea[2] == self.originSize[0] - 2{
-                self.targetArea[0] = self.originSize[0] / 2
+            if maxY + Float(self.imageSize[1])/2 >= self.originSize[1]{
+                targetArea[1] = self.originSize[1] - Float(self.imageSize[1] / 2) - 2
+                targetArea[3] = Float(self.imageSize[1])
             }
-            else if minX + self.targetArea[2] >= self.originSize[0]{
-                self.targetArea[0] = self.originSize[0] - self.targetArea[2] / 2 - 1
-            }
-            else if maxX - self.targetArea[2] <= 0{
-                self.targetArea[0] = self.targetArea[2] / 2 + 1
+            else if minY - Float(self.imageSize[1])/2 <= 0{
+                targetArea[1] = Float(self.imageSize[1] / 2) + 2
+                targetArea[3] = Float(self.imageSize[1])
             }
             else{
-                self.targetArea[0] = (maxX + minX) / 2
+                targetArea[1] = (maxY + minY) / 2
+                targetArea[3] = max(maxY - minY + 20, Float(self.imageSize[1]))
             }
         }
+        else if originBoxes.count == 2{
+            if self.isHorizon
+            {
+                if originBoxes[0][0] > originBoxes[1][0]{
+                    originBoxes.swapAt(0, 1)
+                }
+                
+                let minX = self.originSize[0] * (originBoxes[0][0] - originBoxes[0][2] / 2)
+                let maxX = self.originSize[0] * (originBoxes[1][0] + originBoxes[1][2] / 2)
+                let minY = self.originSize[1] * min(originBoxes[0][1] - originBoxes[0][3] / 2, originBoxes[1][1] - originBoxes[1][3] / 2)
+                let maxY = self.originSize[1] * max(originBoxes[0][1] + originBoxes[0][3] / 2, originBoxes[1][1] + originBoxes[1][3] / 2)
+                
+                if minX + Float(self.imageSize[0]) >= self.originSize[0]{
+                    targetArea[0] = self.originSize[0] - Float(self.imageSize[0] / 2) - 2
+                    targetArea[2] = Float(self.imageSize[0])
+                }
+                else if maxX - Float(self.imageSize[0]) <= 0{
+                    targetArea[0] = Float(self.imageSize[0] / 2) + 2
+                    targetArea[2] = Float(self.imageSize[0])
+                }
+                else{
+                    targetArea[0] = (maxX + minX) / 2
+                    targetArea[2] = max(maxX - minX + 20, Float(self.imageSize[0]))
+                }
+                
+                targetArea[3] = min(self.originSize[1] - 2, targetArea[2] / Float(self.imageSize[0]) * Float(self.imageSize[1]))
+                
+                let centerY = (maxY + minY) / 2
+                
+                if targetArea[3] == self.originSize[1] - 2{
+                    targetArea[1] = self.originSize[1] / 2
+                }
+                else if centerY + targetArea[3] / 2 >= self.originSize[1]{
+                    targetArea[1] = self.originSize[1] - targetArea[3] / 2 - 2
+                }
+                else if centerY - targetArea[3] / 2 <= 0{
+                    targetArea[1] = targetArea[3] / 2 + 2
+                }
+                else{
+                    targetArea[1] = centerY
+                }
+                
+            }
+            else{
+                
+                if originBoxes[0][1] > originBoxes[1][1]{
+                    originBoxes.swapAt(0, 1)
+                }
+                
+                let minY = self.originSize[1] * (originBoxes[0][1] - originBoxes[0][3] / 2)
+                let maxY = self.originSize[1] * (originBoxes[1][1] + originBoxes[1][3] / 2)
+                let minX = self.originSize[0] * min(originBoxes[0][0] - originBoxes[0][2] / 2, originBoxes[1][0] - originBoxes[1][2] / 2)
+                let maxX = self.originSize[0] * max(originBoxes[0][0] + originBoxes[0][2] / 2, originBoxes[1][0] + originBoxes[1][2] / 2)
+                
+                if minY + Float(self.imageSize[1]) >= self.originSize[1]{
+                    targetArea[1] = self.originSize[1] - Float(self.imageSize[1] / 2) - 2
+                    targetArea[3] = Float(self.imageSize[1])
+                }
+                else if maxY - Float(self.imageSize[1]) <= 0{
+                    targetArea[1] = Float(self.imageSize[1] / 2) + 2
+                    targetArea[3] = Float(self.imageSize[1])
+                }
+                else{
+                    targetArea[1] = (maxY + minY) / 2
+                    targetArea[3] = max(maxY - minY + 20, Float(self.imageSize[1]))
+                }
+                
+                targetArea[2] = min(self.originSize[0] - 2, targetArea[3] / Float(self.imageSize[1]) * Float(self.imageSize[0]))
+                
+                let centerX = (maxX + minX) / 2
+                
+                if targetArea[2] == self.originSize[0] - 2{
+                    targetArea[0] = self.originSize[0] / 2
+                }
+                else if centerX + targetArea[2] / 2 >= self.originSize[0]{
+                    targetArea[0] = self.originSize[0] - targetArea[2] / 2 - 2
+                }
+                else if centerX - targetArea[2] / 2 <= 0{
+                    targetArea[0] = targetArea[2] / 2 + 2
+                }
+                else{
+                    targetArea[0] = (maxX + minX) / 2
+                }
+            
+            }
+        }
+        
+        
+        targetArea[0] /= originSize[0]
+        targetArea[1] /= originSize[1]
+        targetArea[2] /= originSize[0]
+        targetArea[3] /= originSize[1]
+        
+        return targetArea
     }
     
     // MARK: update targetArea
-    func updateTargetArea(coordinates:[[Float]]){
-        if self.isHorizon{
-            let targetX = self.targetArea[0]
-            let targetY = self.targetArea[1]
-            let targetW = self.targetArea[2]
-            let targetH = self.targetArea[3]
-            let x0 = (coordinates[0][0] * targetW + targetX - targetW / 2) / originSize[0]
-            let y0 = (coordinates[0][1] * targetH + targetY - targetH / 2) / originSize[1]
-            let w0 = (coordinates[0][2] * targetW) / originSize[0]
-            let h0 = (coordinates[0][3] * targetH) / originSize[1]
-            let x1 = (coordinates[1][0] * targetW + targetX - targetW / 2) / originSize[0]
-            let y1 = (coordinates[1][1] * targetH + targetY - targetH / 2) / originSize[1]
-            let w1 = (coordinates[1][2] * targetW) / originSize[0]
-            let h1 = (coordinates[1][3] * targetH) / originSize[1]
-            computeTargetArea(stateResult: [[x0,y0,w0,h0],[x1,y1,w1,h1]])
+    func updateTargetArea(coordinates:[[Float]], targetArea:[Float]) -> [Float]{
+        let targetX = targetArea[0] * self.originSize[0]
+        let targetY = targetArea[1] * self.originSize[1]
+        let targetW = targetArea[2] * self.originSize[0]
+        let targetH = targetArea[3] * self.originSize[1]
+        
+        var stateResult : [[Float]] = []
+        
+        if targetW != 0{
+            for coordinate in coordinates {
+                let x = (coordinate[0] * targetW + targetX - targetW / 2) / originSize[0]
+                let y = (coordinate[1] * targetH + targetY - targetH / 2) / originSize[1]
+                let w = (coordinate[2] * targetW) / originSize[0]
+                let h = (coordinate[3] * targetH) / originSize[1]
+                stateResult.append([x,y,w,h])
+            }
         }
         else{
-            let targetX = self.targetArea[0]
-            let targetY = self.targetArea[1]
-            let targetW = self.targetArea[2]
-            let targetH = self.targetArea[3]
-            let x0 = ((1 - coordinates[0][1]) * targetW + targetX - targetW / 2) / originSize[0]
-            let y0 = (coordinates[0][0] * targetH + targetY - targetH / 2) / originSize[1]
-            let w0 = (coordinates[0][3] * targetW) / originSize[0]
-            let h0 = (coordinates[0][2] * targetH) / originSize[1]
-            let x1 = ((1 - coordinates[1][1]) * targetW + targetX - targetW / 2) / originSize[0]
-            let y1 = (coordinates[1][0] * targetH + targetY - targetH / 2) / originSize[1]
-            let w1 = (coordinates[1][3] * targetW) / originSize[0]
-            let h1 = (coordinates[1][2] * targetH) / originSize[1]
-            computeTargetArea(stateResult: [[x0,y0,w0,h0],[x1,y1,w1,h1]])
+            for coordinate in coordinates {
+                let x = coordinate[0]
+                let y = coordinate[1]
+                let w = coordinate[2]
+                let h = coordinate[3]
+                stateResult.append([x,y,w,h])
+            }
         }
+        
+        return computeTargetArea(stateResult: stateResult)
     }
 
     // MARK: get card
@@ -1842,7 +1950,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 let coordinate = [centerX, centerY, widthX, heightY]
                 
                 if cardIndex.count > 0{
-                    if let index = result.firstIndex(where: { ($0.targetDistance(target: coordinate)) < 0.01 }) {
+                    if let index = result.firstIndex(where: { ($0.targetDistance(target: coordinate)) < 0.05 }) {
                         
                         if maxVal > result[index].confidence[0] {
                             result[index].cardIndex = cardIndex + result[index].cardIndex
@@ -1996,7 +2104,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 let coordinate = [centerX, centerY, widthX, heightY]
                 
                 if cardIndex.count > 0{
-                    if let index = result.firstIndex(where: { ($0.targetDistance(target: coordinate)) < 0.01 }) {
+                    if let index = result.firstIndex(where: { ($0.targetDistance(target: coordinate)) < 0.05 }) {
                         
                         if maxVal > result[index].confidence[0] {
                             result[index].cardIndex = cardIndex + result[index].cardIndex
@@ -2155,7 +2263,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         let isSpeak = self.isHeadphonesConnected() == self.isMute
         
         if isSpeak{
-            speechSynthesizer.stopSpeaking(at: .immediate)
             if input == 0{
                 self.startAudioPlayer?.play()
             }
@@ -2172,7 +2279,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         let isSpeak = self.isHeadphonesConnected() == self.isMute
         
         if isSpeak{
-            speechSynthesizer.stopSpeaking(at: .immediate)
             for (_, turnResult) in input.enumerated() {
                 for (reportIndex, reportResult) in turnResult.enumerated() {
                     print("播报的input \(reportResult)")
@@ -2204,7 +2310,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         let isSpeak = self.isHeadphonesConnected() == self.isMute
         if isSpeak{
             let speechUtterance = AVSpeechUtterance(string: input)
-            speechSynthesizer.stopSpeaking(at: .immediate)
             speechSynthesizer.speak(speechUtterance)
         }
     }

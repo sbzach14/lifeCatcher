@@ -5,17 +5,17 @@ class SettingViewModel: ObservableObject {
     @Published var isBlack: Bool = false
     @Published var isMute: Bool = false
     @Published var isBackCamera: Bool = true
-    @Published var isRemote: Bool = false
+    @Published var isRemote: Bool = true
     @Published var isFast: Bool = true
     @Published var isActive: Bool = false
-    @Published var isAutoFocus: Bool = false
+    @Published var isAutoFocus: Bool = true
     @Published var activeDate: String = ""
     @Published var uniqueID: String = ""
     @Published var volumeUp: Int = 0
     @Published var volumeDown: Int = 0
     @Published var volumeValue: Float = 0.5
-    @Published var zoomFactor: Float = 0.2
-    @Published var focusFactor: Float = 0.5
+    @Published var zoomFactor: Float = 0
+    @Published var focusFactor: Float = 0.6
     
     @Published var searchText : String = ""
 

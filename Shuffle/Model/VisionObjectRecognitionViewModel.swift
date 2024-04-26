@@ -31,13 +31,41 @@ class VisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVid
         var videoDevice: AVCaptureDevice
         
         videoDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)!
+        var setFrameRate:Float64 = 240
         
+        for format in videoDevice.formats {
+            // 获取支持的帧率范围
+            for range in format.videoSupportedFrameRateRanges {
+                // 检查是否支持 240 帧
+                if range.maxFrameRate >= 240 {
+                    // 获取支持的图像尺寸
+                    let dimensions = CMVideoFormatDescriptionGetDimensions(format.formatDescription)
+                    print(dimensions)
+                }
+            }
+        }
+        
+        guard let format = videoDevice.formats.first(where: { format in
+            let ranges = format.videoSupportedFrameRateRanges
+            let dimensions = CMVideoFormatDescriptionGetDimensions(format.formatDescription)
+            return dimensions.width == 1920
+                && ranges.contains { range in
+                return range.maxFrameRate >= setFrameRate
+            }
+        }) else {
+            print("不支持\(setFrameRate)帧的摄像头格式")
+            return
+        }
         do {
             try videoDevice.lockForConfiguration()
             // 设置帧率为 30 帧
-            videoDevice.activeFormat = videoDevice.formats.first!
+            videoDevice.activeFormat = format
             videoDevice.activeVideoMinFrameDuration = CMTime(value: 1, timescale: 30)
             videoDevice.activeVideoMaxFrameDuration = CMTime(value: 1, timescale: 30)
+            
+            let dimension = CMVideoFormatDescriptionGetDimensions(videoDevice.activeFormat.formatDescription)
+            print(dimension.width, dimension.height)
+            
             videoDevice.unlockForConfiguration()
         } catch {
             print("设置帧率时发生错误: \(error)")

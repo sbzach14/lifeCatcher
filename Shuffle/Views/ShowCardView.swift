@@ -15,7 +15,7 @@ struct ShowCardView: View {
             
             ScrollView {
                 
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 30))]) {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 27))]) {
                     ForEach(viewModel.cardArray, id: \.self) { index in
                         CardIconView(index: index)
                     }
@@ -113,7 +113,7 @@ struct ShowCardView: View {
                                         //TODO: 替换成该位置玩家的手牌
                                         let handCardList = Array(0...rankList[posIndex].PlayerCards.count - 1)
                                         
-                                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 30))]){
+                                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 27))]){
                                             
                                             ForEach(handCardList, id: \.self) { handCardIndex in
                                                 CardIconView(index: rankList[posIndex].PlayerCards[handCardIndex].cardIndex)
@@ -171,7 +171,7 @@ struct CardIconView: View{
                 .aspectRatio(contentMode: .fit)
                 .cornerRadius(5)
                 .shadow(radius: 2)
-                .frame(width: 30, height: 30)
+                .frame(width: 27, height: 27)
             Text(GameManager.cardLabelDic[index]!)
                 .font(.system(size: 10)).foregroundColor(Color.black)
         }
