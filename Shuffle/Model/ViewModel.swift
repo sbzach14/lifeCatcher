@@ -53,8 +53,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     let backgroundQueue = DispatchQueue(label: "actionQueue", attributes: .concurrent)
     let saveImageQueue = DispatchQueue(label: "saveImageQueue", qos: .userInteractive, attributes: .concurrent)
     let detectionQueue = DispatchQueue(label: "detectionQueue", attributes: .concurrent)
-    let serialQueue = DispatchQueue(label: "com.example.speechSynthesisQueue")
-            
     
     let lock = NSLock()
     
@@ -115,8 +113,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     private var stateCounter : Int = 0
     private var stateCard : [Int] = [-1, -1]
     
-    private var speechSynthesizer = AVSpeechSynthesizer()
-    
     private var laplacianDic: [[Int:Float]] = [[:],[:]]
     
     let cardLabelDic : [Int:String] = [
@@ -153,6 +149,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     
     var viewController: MyViewController?
     
+    let speechPerformer = SpeechPerformer()
     let chineseFemaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.siri_female_zh-CN_compact")
     let chineseMaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.siri_male_zh-CN_compact")
     
@@ -906,7 +903,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     if self.detectSet.count > 10 || isShuffle{
                         print("切牌停止: \(self.detectSet)")
                         self.detectSet = []
-                        self.speechSynthesizer.stopSpeaking(at: .immediate)
                     }
                     else if self.detectSet.count > 0{
                         self.detectSet.insert(cardResult[0].cardIndex[0])
@@ -2339,7 +2335,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         if isSpeak{
             for (_, turnResult) in input.enumerated() {
                 for (reportIndex, reportResult) in turnResult.enumerated() {
-                    print("播报的input \(reportResult.content)")
                     let speakString = reportResult.content
                     if !speakString.isEmpty{
                         let speechUtterance = AVSpeechUtterance(string: speakString)
@@ -2357,7 +2352,11 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         else{
                             speechUtterance.preUtteranceDelay = 0
                         }
-                        self.speechSynthesizer.speak(speechUtterance)
+                        
+                        
+                        print("播报的input \(reportResult.content)")
+                        
+                        self.speechPerformer.performSpeechSynthesis(utterance: speechUtterance)
                     }
                 }
             }
@@ -2368,7 +2367,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         let isSpeak = self.isHeadphonesConnected() == self.isMute
         if isSpeak{
             let speechUtterance = AVSpeechUtterance(string: input)
-            self.speechSynthesizer.speak(speechUtterance)
+            self.speechPerformer.performSpeechSynthesis(utterance: speechUtterance)
         }
     }
 
@@ -2656,3 +2655,36 @@ class SpeakResultStruct{
         self.content = content
     }
 }
+
+
+class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
+    let synthesizer = AVSpeechSynthesizer() // Your AVSpeechSynthesizer instance
+    private let lock = NSLock()
+    private var isPlaying = false
+
+    override init() {
+        super.init()
+        synthesizer.delegate = self
+    }
+
+    func performSpeechSynthesis(utterance: AVSpeechUtterance) {
+        lock.lock()
+        guard !isPlaying else {
+            lock.unlock()
+            return
+        }
+
+        isPlaying = true
+        lock.unlock()
+
+        synthesizer.speak(utterance)
+    }
+
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        lock.lock()
+        isPlaying = false
+        lock.unlock()
+        // Perform any action you want after speech synthesis finishes
+    }
+}
+
