@@ -34,6 +34,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var cutArray : [Int] = []
     @Published var cutShowArray : [Int] = []
     
+    let detectModel = try! n_no_cls_50_0427()
     let fastModel = try! cardDetection_0422_scale_40()
     let slowModel = try! cardDetection_0422_scale_40()
     
@@ -162,12 +163,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     override init(){
         
         super.init()
-        
-        for key in self.allCardIndex {
-            self.laplacianDic[0][key] = 0
-            self.laplacianDic[1][key] = 0
-        }
-        
+              
         // Load data from config.json
         if let configData = readConfigJSON() {
             let boolDict = configData["Bool"] as! [String : Bool]
@@ -216,6 +212,12 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         self.initShuffle()
         self.initDetectResult()
         self.initBoxes()
+        
+        self.laplacianDic = [[:],[:]]
+        for key in self.allCardIndex {
+            self.laplacianDic[0][key] = 0
+            self.laplacianDic[1][key] = 0
+        }
         
 
 //      规则测试代码
@@ -518,18 +520,24 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 let isTargetArea = self.isTargetArea
                 let targetArea = Array(self.targetArea)
                 
-                let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: self.inputSize[0], height: self.inputSize[1]), targetArea: targetArea)!
-//                self.saveImageOrigin(ciImage, taskIndex: myIndex)
-                
-                self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex, isTargetArea: isTargetArea, targetArea: targetArea)
-                
+
+                if isTargetArea{
+                    let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: self.inputSize[0], height: self.inputSize[1]), targetArea: targetArea)!
+                    
+                    self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex, isTargetArea: isTargetArea, targetArea: targetArea)
+                }
+                else{
+                    let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: 640, height: 640), targetArea: targetArea)!
+                    
+                    self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex, isTargetArea: isTargetArea, targetArea: targetArea)
+                }
 //                //target area show code
 //                DispatchQueue.main.async {
 //                    if (self.cameraFrameRate <= self.idleRate || self.taskIndex % indexGap == 0){
 //                        var rectList : [[Float]] = []
 //                        rectList.append(self.lastBoxes[0])
 //                        rectList.append(self.lastBoxes[1])
-//                        //rectList.append(self.targetArea)
+//                        rectList.append(self.targetArea)
 //                        let drawcvPixelBuffer = drawRectanglesOnPixelBuffer(pixelBuffer: cvPixelBuffer, rectList: rectList)!
 //                        let outputciImage = CIImage(cvPixelBuffer: drawcvPixelBuffer)
 //                        let rotationTransform = CGAffineTransform(rotationAngle: -.pi / 2)  // 顺时针旋转90度
@@ -658,7 +666,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     // MARK: process image origin
     func processImageOrigin(_ pixelBuffer: CVPixelBuffer, taskIndex: Int, isTargetArea: Bool, targetArea: [Float]){
         
-        var confidenceThreshold = 0.6
+        var confidenceThreshold = 0.7
         if self.state == "idle"{
             confidenceThreshold = 0.5
         }
@@ -667,7 +675,12 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
         
         var cardResult : [DetectionResult]
-        if self.isFast{
+        if !isTargetArea && self.isRemote{
+            let result = try! detectModel.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
+
+            cardResult = getCard(from: result.confidence, from: result.coordinates, from: pixelBuffer, iscls: false)
+        }
+        else if self.isFast{
             let result = try! fastModel.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
 
             cardResult = getCard(from: result.confidence, from: result.coordinates, from: pixelBuffer)
@@ -680,9 +693,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         if cardResult[0].cardIndex[0] == self.stateCard[0] && cardResult[1].cardIndex[0] == self.stateCard[1]{
             stateCounter = min(stateCounter + 1, 600)
         }
-//        else if self.isRemote && cardResult[0].cardIndex[0] != -1 && cardResult[1].cardIndex[0] != -1{
-//            stateCounter = min(stateCounter + 1, 600)
-//        }
+
         else{
             stateCounter = 0
         }
@@ -692,10 +703,10 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 
         
         var detectNum = 0
-        if self.stateCard[0] != -1{
+        if cardResult[0].cardIndex[0] != -1{
             detectNum += 1
         }
-        if self.stateCard[1] != -1{
+        if cardResult[1].cardIndex[0] != -1{
             detectNum += 1
         }
        
@@ -734,48 +745,63 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         self.targetArea = self.computeTargetArea(stateResult: stateResult)
                         self.isTargetArea = true
                         
-                        if !self.cutDone && self.cardArray.count > 0{
-                            
-                            var cutCard = -1
-                            if cardResult[0].cardIndex[0] != -1{
-                                cutCard = cardResult[0].cardIndex[0]
-                            }
-                            else if cardResult[1].cardIndex[0] != -1{
-                                cutCard = cardResult[1].cardIndex[0]
-                            }
-                            
-                            if self.cardArray.contains(cutCard){
-                                
-                                var cutIndex = self.cardArray.firstIndex(of: cutCard)!
-                                if self.cutMode == 1{
-                                    //看底
-                                    self.cutCardArray(index: cutIndex)
-                                    self.cutDone = true
-                                }
-                                else if self.cutMode == 2{
-                                    //看顶
-                                    cutIndex -= 1
-                                    if cutIndex < 0{
-                                        cutIndex = self.cardArray.count - 1
-                                    }
-                                    self.cutCardArray(index: cutIndex)
-                                    self.cutDone = true
-                                }
-                                else if self.cutMode == 3{
-                                    //连续切牌
-                                    self.cutArray.append(cutCard)
-                                }
-                                else if self.cutMode == 4{
-                                    //看手
-                                    self.cutArray.append(cutCard)
-                                    self.cutDone = true
-                                }
-                                
-                                self.cutShowArray.append(cutCard)
-                                self.detectSet.insert(cutCard)
-                                self.computeWinnerPlayer()
-                            }
+                        //detect target area -> new cardResult to cut
+                        
+                        let cut_ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+                        let cvPixelBuffer_cut = createCVPixelBuffer(ciImage: cut_ciImage, targetSize: CGSize(width: self.inputSize[0], height: self.inputSize[1]), targetArea: self.targetArea)!
+                        if self.isFast{
+                            let cut_result = try! self.fastModel.prediction(image: cvPixelBuffer_cut, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
+                            cardResult = self.getCard(from: cut_result.confidence, from: cut_result.coordinates, from: cvPixelBuffer_cut)
                         }
+                        else{
+                            let cut_result = try! self.slowModel.prediction(image: cvPixelBuffer_cut, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
+                            cardResult = self.getCard(from: cut_result.confidence, from: cut_result.coordinates, from: cvPixelBuffer_cut)
+                        }
+                    }
+                    
+                    
+                    if !self.cutDone && self.cardArray.count > 0{
+                        
+                        var cutCard = -1
+                        if cardResult[0].cardIndex[0] != -1{
+                            cutCard = cardResult[0].cardIndex[0]
+                        }
+                        else if cardResult[1].cardIndex[0] != -1{
+                            cutCard = cardResult[1].cardIndex[0]
+                        }
+                        
+                        if self.cardArray.contains(cutCard){
+                            
+                            var cutIndex = self.cardArray.firstIndex(of: cutCard)!
+                            if self.cutMode == 1{
+                                //看底
+                                self.cutCardArray(index: cutIndex)
+                                self.cutDone = true
+                            }
+                            else if self.cutMode == 2{
+                                //看顶
+                                cutIndex -= 1
+                                if cutIndex < 0{
+                                    cutIndex = self.cardArray.count - 1
+                                }
+                                self.cutCardArray(index: cutIndex)
+                                self.cutDone = true
+                            }
+                            else if self.cutMode == 3{
+                                //连续切牌
+                                self.cutArray.append(cutCard)
+                            }
+                            else if self.cutMode == 4{
+                                //看手
+                                self.cutArray.append(cutCard)
+                                self.cutDone = true
+                            }
+                            
+                            self.cutShowArray.append(cutCard)
+                            self.detectSet.insert(cutCard)
+                            self.computeWinnerPlayer()
+                        }
+                        
                     }
                     
                 }
@@ -891,9 +917,13 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         }
                     }
                     
-                    //self.targetArea = self.computeTargetArea(stateResult: stateResult)
-                    self.targetArea = self.updateTargetArea(coordinates: stateResult, targetArea: targetArea)
                     
+                    if self.isRemote{
+                        //show target area no crop
+                        //self.targetArea = self.computeTargetArea(stateResult: stateResult)
+                        
+                        self.targetArea = self.updateTargetArea(coordinates: stateResult, targetArea: targetArea)
+                    }
                 }
             }
         }
@@ -1743,6 +1773,16 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         
         if originBoxes.count == 1{
             
+            var w = self.imageSize[0]
+            var h = self.imageSize[1]
+            
+            //洗牌 + 未切牌 大框时全屏
+            if !self.cutDone
+                && (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4)
+                && (originBoxes[0][2] + originBoxes[0][3]) > 0.2{
+                return [0.5,0.5,1,1]
+            }
+            
             let minX = self.originSize[0] * (originBoxes[0][0] - originBoxes[0][2] / 2)
             let maxX = self.originSize[0] * (originBoxes[0][0] + originBoxes[0][2] / 2)
             let minY = self.originSize[1] * (originBoxes[0][1] - originBoxes[0][3] / 2)
@@ -1903,7 +1943,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 
     // MARK: get card
     //返回检测到的目标类别，n当前设定为最多两个，后续可根据置信度进行排序输出或全部输出
-    func getCard(from cardArray: MLMultiArray, from boxArray : MLMultiArray, from pixelBuffer : CVPixelBuffer) -> [DetectionResult] {
+    func getCard(from cardArray: MLMultiArray, from boxArray : MLMultiArray, from pixelBuffer : CVPixelBuffer, iscls : Bool = true) -> [DetectionResult] {
         let cnt : Int = Int(cardArray.shape[0])
         let n : Int = Int(cardArray.shape[1])
         var result : [DetectionResult] = []
@@ -1926,7 +1966,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     
                     let trueIndex = j == 52 ? 54 : j
                     
-                    if value > 0 && self.allCardIndex.contains(trueIndex){
+                    if value > 0 && (self.allCardIndex.contains(trueIndex) || !iscls){
                         
                         if (value/confidenceSum>=0) {
                             cardIndex.append(j)
@@ -1950,7 +1990,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 let coordinate = [centerX, centerY, widthX, heightY]
                 
                 if cardIndex.count > 0{
-                    if let index = result.firstIndex(where: { ($0.targetDistance(target: coordinate)) < 0.05 }) {
+                    if let index = result.firstIndex(where: { ($0.targetDistance(target: coordinate)) < 0.01 }) {
                         
                         if maxVal > result[index].confidence[0] {
                             result[index].cardIndex = cardIndex + result[index].cardIndex
@@ -1968,7 +2008,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
             
             //先删除相同的
-            if result.count > 2{
+            if result.count > 2 && iscls{
                 // 使用 Set 来去除重复元素
                 var uniqueCardIndexes = Set<Int>()
                 
@@ -2080,7 +2120,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     
                     let trueIndex = j == 52 ? 54 : j
                     
-                    if value > 0 && self.allCardIndex.contains(trueIndex){
+                    if value > 0 && (self.allCardIndex.contains(trueIndex) || !iscls){
                         
                         if (value/confidenceSum>=0) {
                             cardIndex.append(j)
@@ -2104,7 +2144,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 let coordinate = [centerX, centerY, widthX, heightY]
                 
                 if cardIndex.count > 0{
-                    if let index = result.firstIndex(where: { ($0.targetDistance(target: coordinate)) < 0.05 }) {
+                    if let index = result.firstIndex(where: { ($0.targetDistance(target: coordinate)) < 0.01 }) {
                         
                         if maxVal > result[index].confidence[0] {
                             result[index].cardIndex = cardIndex + result[index].cardIndex
@@ -2122,7 +2162,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
             
             //先删除相同的
-            if result.count > 2{
+            if result.count > 2 && iscls{
                 // 使用 Set 来去除重复元素
                 var uniqueCardIndexes = Set<Int>()
                 
@@ -2333,6 +2373,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             if self.playerNum >= playNumList.count{
                 self.playerNum = 0
             }
+            self.minCardNum = GameGetMinCardNum()
             speakText(input: "人数" + String(selectedRule.playerNum[self.playerNum]))
         }
         else if self.volumeUp == 2{
@@ -2385,6 +2426,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             if self.playerNum < 0{
                 self.playerNum = playNumList.count - 1
             }
+            self.minCardNum = GameGetMinCardNum()
             speakText(input: "人数" + String(selectedRule.playerNum[self.playerNum]))
         }
         else if self.volumeDown == 2{
@@ -2457,7 +2499,55 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         self.suitRules = rules.suitRanks
         self.rankRules = rules.rankRules
         self.minCardNum = rules.minCardNum
-        print("self.rankRules \(self.rankRules)")
+    }
+    
+    private func GameGetMinCardNum()-> Int{
+        var minCardNum:Int = 0
+        let gameType = ruleIndex
+        switch gameType {
+        case 0:
+            let selectedRule = GameManager.gameRules[gameType] as! TexasPokerRule
+            minCardNum = TexasPoker.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 1:
+            let selectedRule = GameManager.gameRules[gameType] as! PokerBullRule
+            minCardNum = PokerBull.GetMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+        case 2:
+            let selectedRule = GameManager.gameRules[gameType] as! ThreeCardPokerGameRule
+            minCardNum = ThreeCardPokerGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 3:
+            let selectedRule = GameManager.gameRules[gameType] as! TinyNineGameRule
+            minCardNum = TinyNineGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 4:
+            let selectedRule = GameManager.gameRules[gameType]
+            as! ThreeMenGameRule
+            minCardNum = ThreeMenGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 5:
+            let selectedRule = GameManager.gameRules[gameType] as! TwoEightGangGameRule
+            minCardNum = TwoEightGangGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 6:
+            let selectedRule = GameManager.gameRules[gameType] as! NinePointFiveGameRule
+            minCardNum = NinePointFiveGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 7:
+            let selectedRule = GameManager.gameRules[gameType] as!
+            BaoziGameRule
+            minCardNum = BaoziGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 8:
+            let selectedRule = GameManager.gameRules[gameType] as! JiaJiaBaoGameRule
+            minCardNum = JiaJiaBaoGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+        case 9:
+            let selectedRule = GameManager.gameRules[gameType] as! CardNineGameRule
+            minCardNum = CardNineGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+        default:
+            print("GameType error")
+        }
+        return minCardNum
     }
     
     public func updateConfigJSON() {
