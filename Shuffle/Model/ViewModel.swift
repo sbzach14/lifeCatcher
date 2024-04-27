@@ -38,9 +38,11 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     let fastModel = try! cardDetection_0422_scale_40()
     let slowModel = try! cardDetection_0422_scale_40()
     
-    var imageSize : [Float] = [853, 480]
-    var originSize : [Float] = [1920, 1080]
-    var inputSize : [Int] = [640, 480]
+    var imageSize : [Float] = [853, 480] //target area 截图大小
+    var originImageSize : [Float] = [853, 480] //target area 原始截图大小
+    var originSize : [Float] = [1920, 1080] //相机图像大小
+    var inputSize : [Int] = [640, 480] //分类尺寸
+    var detectSize : [Int] = [64, 640] //检测尺寸
     
     var startAudioPlayer: AVAudioPlayer?
     var successAudioPlayer: AVAudioPlayer?
@@ -144,7 +146,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     
     var setFrameRate: Float64 = 120.0
     var cameraFrameRate: Int = 0
-    
+    let maxZoomScale: Float = 3
     
     var testCVPixelBuffer : CVPixelBuffer?
     var selectedSaveIndex : Int = 0
@@ -310,8 +312,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         lastBoxes = [[0.1, 0.5, 0.05, 0.05], [0.9, 0.5, 0.05, 0.05]]
         isHorizon = true
         targetArea = [0,0,0,0]
-        imageSize[0] = min(originSize[0], 853 * (1 + self.zoomFactor * 2))
-        imageSize[1] = min(originSize[1], 480 * (1 + self.zoomFactor * 2))
+        imageSize[0] = min(originSize[0], originImageSize[0] * (1 + self.zoomFactor * self.maxZoomScale))
+        imageSize[1] = min(originSize[1], originImageSize[1] * (1 + self.zoomFactor * self.maxZoomScale))
         isTargetArea = false
     }
 
@@ -396,11 +398,11 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     
     func updateZoomFactor(){
         do{
-            print("zoomFactor: \(zoomFactor)")
+            print("zoomFactor: \(zoomFactor), minZoomFactor: \(captureDevice.minAvailableVideoZoomFactor)")
             try self.captureDevice.lockForConfiguration()
             
             let minzoomfactor = captureDevice.minAvailableVideoZoomFactor
-            self.captureDevice.videoZoomFactor = minzoomfactor + 3 * CGFloat(self.zoomFactor)
+            self.captureDevice.videoZoomFactor = minzoomfactor + CGFloat(self.maxZoomScale * self.zoomFactor)
             
             self.captureDevice.unlockForConfiguration()
         }
@@ -519,13 +521,15 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 let isTargetArea = self.isTargetArea
                 let targetArea = Array(self.targetArea)
                 
+                
+                //to delete
                 if isTargetArea{
                     let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: self.inputSize[0], height: self.inputSize[1]), targetArea: targetArea)!
                     
                     self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex, isTargetArea: isTargetArea, targetArea: targetArea)
                 }
                 else{
-                    let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: 640, height: 640), targetArea: targetArea)!
+                    let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: self.detectSize[0], height: self.detectSize[1]), targetArea: targetArea)!
                     
                     self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex, isTargetArea: isTargetArea, targetArea: targetArea)
                 }
@@ -1033,12 +1037,12 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         }
         
         var isSingle = true
-        if leftSideCnt > 1 && rightSideCnt > 1{
+        if leftSideCnt > 5 && rightSideCnt > 5{
             isSingle = false
         }
         
         var isShort = true
-        if leftSideCnt + rightSideCnt >= 10{
+        if leftSideCnt + rightSideCnt > 10{
             isShort = false
         }
         
@@ -1064,6 +1068,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
         
+        //处理链尾 截断长尾部分
         if !isSingle{
             endIndex = min(leftLastTail, rightLastTail) + 3
             let detectResultListIndex = sortedKeys[endIndex-1]
@@ -1086,7 +1091,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             return result
         }
         
-        //为链添加置信度
+        //为有链的数字添加置信度
         for keyIndex in beginIndex..<endIndex{
             let detectResultListIndex = sortedKeys[keyIndex]
             for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
@@ -1296,19 +1301,22 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             }
         }
         
+        let isCut = isShort && isSingle
 
-        //统计标准模糊度
-        for keyIndex in beginIndex..<endIndex{
-            let detectResultListIndex = sortedKeys[keyIndex]
-            for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
-                let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
-                if detectResultNode.nodeType == 3{
-                    if self.laplacianDic[numIndex][detectResultNode.cardIndex[0]] == 0{
-                        self.laplacianDic[numIndex][detectResultNode.cardIndex[0]] = detectResultNode.laplacianVariance
-                    }
-                    else{
-                        self.laplacianDic[numIndex][detectResultNode.cardIndex[0]]! += detectResultNode.laplacianVariance
-                        self.laplacianDic[numIndex][detectResultNode.cardIndex[0]]! /= 2
+        //统计标准模糊度(非切牌下）
+        if !isCut{
+            for keyIndex in beginIndex..<endIndex{
+                let detectResultListIndex = sortedKeys[keyIndex]
+                for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
+                    let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
+                    if detectResultNode.nodeType == 3{
+                        if self.laplacianDic[numIndex][detectResultNode.cardIndex[0]] == 0{
+                            self.laplacianDic[numIndex][detectResultNode.cardIndex[0]] = detectResultNode.laplacianVariance
+                        }
+                        else{
+                            self.laplacianDic[numIndex][detectResultNode.cardIndex[0]]! += detectResultNode.laplacianVariance
+                            self.laplacianDic[numIndex][detectResultNode.cardIndex[0]]! /= 2
+                        }
                     }
                 }
             }
