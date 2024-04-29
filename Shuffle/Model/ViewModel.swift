@@ -81,6 +81,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     
     //测试用的定时器
     public var ding: Int = 0
+    public var ciimageQueue: [CIImage] = []
     
     let idleRate = 30
     let context = CIContext()
@@ -278,7 +279,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 //            timer.resume()
 //
 //    }
-    
+//
     
     
     private func initDetectResult(){
@@ -523,7 +524,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     
                     self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex, isTargetArea: isTargetArea, targetArea: targetArea)
                 }
-                
 //                //target area show code
 //                DispatchQueue.main.async {
 //                    if (self.cameraFrameRate <= self.idleRate || self.taskIndex % indexGap == 0){
@@ -602,6 +602,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         
         // 释放视频帧资源
         CMSampleBufferInvalidate(sampleBuffer)
+
     }
     
 
@@ -626,7 +627,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 print("文件\(imageName)保存失败: \(error)")
             }
         }
-
     }
     
     @objc private func imageSaved(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeMutableRawPointer?) {
@@ -661,7 +661,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         
         var confidenceThreshold = 0.7
         if self.state == "idle"{
-            confidenceThreshold = 0.7
+            confidenceThreshold = 0.5
         }
         else{
             confidenceThreshold = 0.05
@@ -686,12 +686,14 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         if cardResult[0].cardIndex[0] == self.stateCard[0] && cardResult[1].cardIndex[0] == self.stateCard[1]{
             stateCounter = min(stateCounter + 1, 600)
         }
+
         else{
             stateCounter = 0
         }
         
         self.stateCard[0] = cardResult[0].cardIndex[0]
         self.stateCard[1] = cardResult[1].cardIndex[0]
+
         
         var detectNum = 0
         if cardResult[0].cardIndex[0] != -1{
@@ -700,6 +702,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         if cardResult[1].cardIndex[0] != -1{
             detectNum += 1
         }
+       
+        
         
         let isShuffle = detectNum == 2 && (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4)
         let isRiffle = detectNum == 1 && (self.shuffleMode == 1 || self.shuffleMode == 2 || self.shuffleMode == 3 || self.shuffleMode == 4)
@@ -856,6 +860,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         //拨牌
                         self.initShuffle()
                         self.cardArray = detectState.detectionResult
+ 
                         
                         if(self.shuffleMode == 1 || self.shuffleMode == 3){
                             //拨到顶
@@ -884,6 +889,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         if self.cutMode == 0 || self.cutMode == 3{
                             self.computeWinnerPlayer()
                         }
+
+
                     }
                     
                     print("result  isShort:\(detectState.isShort)  isSingle:\(detectState.isSingle)  cardArray:\(self.cardArray)")
@@ -2558,9 +2565,39 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         case 8:
             let selectedRule = GameManager.gameRules[gameType] as! JiaJiaBaoGameRule
             minCardNum = JiaJiaBaoGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
         case 9:
             let selectedRule = GameManager.gameRules[gameType] as! CardNineGameRule
             minCardNum = CardNineGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 10:
+            let selectedRule = GameManager.gameRules[gameType] as! NinePointGameRule
+            minCardNum = NinePointGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 11:
+            let selectedRule = GameManager.gameRules[gameType] as! FourCardGameRule
+            minCardNum = FourCardGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 12:
+            let selectedRule = GameManager.gameRules[gameType] as! TwoCardGameRule
+            minCardNum = TwoCardGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 13:
+            let selectedRule = GameManager.gameRules[gameType] as! ThreeCardPointGameRule
+            minCardNum = ThreeCardPointGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 14:
+            let selectedRule = GameManager.gameRules[gameType] as! TenPointFiveGameRule
+            minCardNum = TenPointFiveGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 15:
+            let selectedRule = GameManager.gameRules[gameType] as! ChickenBattleGameRule
+            minCardNum = ChickenBattleGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 16:
+            let selectedRule = GameManager.gameRules[gameType] as! ThirteenWaterGameRule
+            minCardNum = ThirteenWaterGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
         default:
             print("GameType error")
         }
