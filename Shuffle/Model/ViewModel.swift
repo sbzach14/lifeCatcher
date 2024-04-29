@@ -34,15 +34,15 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var cutArray : [Int] = []
     @Published var cutShowArray : [Int] = []
     
-    let detectModel = try! n_no_cls_50_0427()
-    let fastModel = try! cardDetection_0422_scale_40()
-    let slowModel = try! cardDetection_0422_scale_40()
+    let detectModel = try! n_960_nocls_50()
+    let fastModel = try! n_640_cls_50()
+    let slowModel = try! n_640_cls_50()
     
-    var imageSize : [Float] = [853, 480] //target area 截图大小
-    var originImageSize : [Float] = [853, 480] //target area 原始截图大小
+    var imageSize : [Float] = [1137, 640] //target area 截图大小
+    var originImageSize : [Float] = [1137, 640] //target area 原始截图大小
     var originSize : [Float] = [1920, 1080] //相机图像大小
-    var inputSize : [Int] = [640, 480] //分类尺寸
-    var detectSize : [Int] = [640, 640] //检测尺寸
+    var inputSize : [Int] = [640, 640] //分类尺寸
+    var detectSize : [Int] = [960, 960] //检测尺寸
     
     var startAudioPlayer: AVAudioPlayer?
     var successAudioPlayer: AVAudioPlayer?
