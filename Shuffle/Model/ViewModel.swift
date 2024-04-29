@@ -34,15 +34,16 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var cutArray : [Int] = []
     @Published var cutShowArray : [Int] = []
     
-    let detectModel = try! n_960_nocls_50()
-    let fastModel = try! n_640_cls_50()
-    let slowModel = try! n_640_cls_50()
+    let detectModel = try! n_640_nocls_50()
+    let fastModel = try! n_640_cls_30()
+    let slowModel = try! stable_model()
     
-    var imageSize : [Float] = [1137, 640] //target area 截图大小
+    var imageSize : [Float] = [853, 480] //target area 截图大小
     var originImageSize : [Float] = [1137, 640] //target area 原始截图大小
+    //var originImageSize : [Float] = [853, 480] //target area 原始截图大小
     var originSize : [Float] = [1920, 1080] //相机图像大小
     var inputSize : [Int] = [640, 640] //分类尺寸
-    var detectSize : [Int] = [960, 960] //检测尺寸
+    var detectSize : [Int] = [640, 640] //检测尺寸
     
     var startAudioPlayer: AVAudioPlayer?
     var successAudioPlayer: AVAudioPlayer?
@@ -908,7 +909,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     
                     //check cut or shuffle/riffle
                     if self.detectSet.count > 10 || isShuffle{
-                        print("切牌停止: \(self.detectSet)")
+                        //print("切牌停止: \(self.detectSet)")
                         self.detectSet = []
                     }
                     else if self.detectSet.count > 0{
@@ -1096,7 +1097,9 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         
         //处理链尾 截断长尾部分
         if !isSingle{
-            endIndex = min(leftLastTail, rightLastTail) + 3
+            let min_endIndex = min(leftLastTail, rightLastTail) + 3
+            let max_endIndex = max(leftLastTail, rightLastTail) - 1
+            endIndex = max(min_endIndex, max_endIndex)
             let detectResultListIndex = sortedKeys[endIndex-1]
             if targetDetecResultList[detectResultListIndex]![0].nodeType == 3{
                 targetDetecResultList[detectResultListIndex]![0].nodeType = 2
@@ -1316,8 +1319,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         if nowNum == key && confidence > confidenceDic[nowNum]! {
                             confidenceDic[nowNum] = confidence
                             nodeIndex = [detectResultListIndex, numIndex]
-                            print("二次补牌：\(cardLabelDic[nowNum]!)")
-                            
                         }
                     }
                 }
@@ -1574,190 +1575,141 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 print("index ", detectResultListIndex,
                       cardLabelDic[nowNum0] ?? "none", detectResultNode0.nodeType, detectResultNode0.laplacianVariance, detectResultNode0.confidence[0], detectResultListIndex,
                       cardLabelDic[nowNum1] ?? "none", detectResultNode1.nodeType, detectResultNode1.laplacianVariance, detectResultNode1.confidence[0])
-                               
-                if (nodeType0 == 2 || nodeType0 == 4)
-                    && (nodeType1 == 2 || nodeType1 == 4){
-                    
-                    var leftLaplacianPercent : Float = 1
-                    var rightLaplacianPercent : Float = 1
-                    
-                    if nodeType0 == 2{
-                        leftLaplacianPercent = detectResultNode0.laplacianVariance / lastDetectResultNode0.laplacianVariance
-                    }
-                    else if nodeType0 == 4 && self.laplacianDic[0][nowNum0] != 0{
-                        leftLaplacianPercent = detectResultNode0.laplacianVariance / self.laplacianDic[0][nowNum0]!
-                    }
-                    
-                    
-                    if nodeType1 == 2{
-                        rightLaplacianPercent = detectResultNode1.laplacianVariance / lastDetectResultNode1.laplacianVariance
-                    }
-                    else if nodeType1 == 4 && self.laplacianDic[1][nowNum1] != 0{
-                        rightLaplacianPercent = detectResultNode1.laplacianVariance / self.laplacianDic[1][nowNum1]!
-                    }
-                    
-                    if nextDetectResultNode0.nodeType == 5 && nextDetectResultNode1.nodeType != 5{
-                        print("左边下一张融合怪 右边先落下")
-                        detectCardArray.insert(nowNum1, at: 0)
-                        detectCardArray.insert(nowNum0, at: 0)
-                    }
-                    else if nextDetectResultNode0.nodeType != 5 && nextDetectResultNode1.nodeType == 5{
-                        print("右边下一张融合怪 左边先落下")
-                        detectCardArray.insert(nowNum0, at: 0)
-                        detectCardArray.insert(nowNum1, at: 0)
-                    }
-                    else if nextDetectResultNode0.nodeType == 0 && nextDetectResultNode1.nodeType != 0{
-                        print("左边下一张未识别 右边先落下")
-                        detectCardArray.insert(nowNum1, at: 0)
-                        detectCardArray.insert(nowNum0, at: 0)
-                    }
-                    else if nextDetectResultNode0.nodeType != 0 && nextDetectResultNode1.nodeType == 0{
-                        print("右边下一张未识别 左边先落下")
-                        detectCardArray.insert(nowNum0, at: 0)
-                        detectCardArray.insert(nowNum1, at: 0)
-                    }
-                    else if leftLaplacianPercent < blurThreshold && rightLaplacianPercent >= blurThreshold{
-                        print("左边糊了")
-                        detectCardArray.insert(nowNum0, at: 0)
-                        detectCardArray.insert(nowNum1, at: 0)
-                    }
-                    else if rightLaplacianPercent < blurThreshold && leftLaplacianPercent >= blurThreshold{
-                        print("右边糊了")
-                        detectCardArray.insert(nowNum1, at: 0)
-                        detectCardArray.insert(nowNum0, at: 0)
+                if isSingle{
+                    if leftSideCnt > rightSideCnt{
+                        if nodeType0 == 2{
+                            detectCardArray.insert(nowNum0, at: 0)
+                        }
                     }
                     else{
-                        var leftNextLaplacianPercent : Float = 1
-                        var rightNextLaplacianPercent : Float = 1
-                        
-                        if nextDetectResultNode0.nodeType == 1{
-                            leftNextLaplacianPercent = nextDetectResultNode0.laplacianVariance / nextnextDetectResultNode0.laplacianVariance
-                        }
-                        else if nextDetectResultNode0.nodeType == 0{
-                            leftNextLaplacianPercent = nextDetectResultNode0.laplacianVariance / nextnextDetectResultNode0.laplacianVariance
-                        }
-                        else if nextDetectResultNode0.nodeType == 4 && self.laplacianDic[0][nextDetectResultNode0.cardIndex[0]] != 0{
-                            leftNextLaplacianPercent = nextDetectResultNode0.laplacianVariance / self.laplacianDic[0][nextDetectResultNode0.cardIndex[0]]!
-                        }
-                        
-                        if nextDetectResultNode1.nodeType == 1{
-                            rightNextLaplacianPercent = nextDetectResultNode1.laplacianVariance / nextnextDetectResultNode1.laplacianVariance
-                        }
-                        else if nextDetectResultNode1.nodeType == 0{
-                            rightNextLaplacianPercent = nextDetectResultNode1.laplacianVariance / nextnextDetectResultNode1.laplacianVariance
-                        }
-                        else if nextDetectResultNode1.nodeType == 4 && self.laplacianDic[1][nextDetectResultNode1.cardIndex[0]] != 0{
-                            rightNextLaplacianPercent = nextDetectResultNode1.laplacianVariance / self.laplacianDic[1][nextDetectResultNode1.cardIndex[0]]!
-                        }
-                        
-                        if leftNextLaplacianPercent < blurThreshold && rightNextLaplacianPercent >= blurThreshold{
-                            print("下一张左边糊了")
-                            detectCardArray.insert(nowNum1, at: 0)
-                            detectCardArray.insert(nowNum0, at: 0)
-                        }
-                        else if rightNextLaplacianPercent < blurThreshold && leftNextLaplacianPercent >= blurThreshold{
-                            print("下一张右边糊了")
-                            detectCardArray.insert(nowNum0, at: 0)
+                        if nodeType1 == 2{
                             detectCardArray.insert(nowNum1, at: 0)
                         }
-                        //上一张和下一张两边都不模糊 直接比较上一张两边模糊程度
-                        else if leftLaplacianPercent < blurThreshold && rightLaplacianPercent < blurThreshold{
-                            if leftLaplacianPercent < rightLaplacianPercent{
-                                print("左边更糊")
-                                detectCardArray.insert(nowNum0, at: 0)
-                                detectCardArray.insert(nowNum1, at: 0)
-                            }
-                            else{
-                                print("右边更糊")
-                                detectCardArray.insert(nowNum1, at: 0)
-                                detectCardArray.insert(nowNum0, at: 0)
-                            }
-                        }
-                        else{
-                            if leftNextLaplacianPercent < rightNextLaplacianPercent{
-                                print("下一张左边更糊")
-                                detectCardArray.insert(nowNum1, at: 0)
-                                detectCardArray.insert(nowNum0, at: 0)
-                            }
-                            else{
-                                print("下一张右边更糊")
-                                detectCardArray.insert(nowNum0, at: 0)
-                                detectCardArray.insert(nowNum1, at: 0)
-                            }
-                        }
-                        
                     }
                 }
-
-                //单个插入
                 else{
-                    if (nodeType0 == 4 && (isShuffle || detectResultNode0.confidence[0] >= 0.5)) || nodeType0 == 2{
+                    if (nodeType0 == 2 || nodeType0 == 4)
+                        && (nodeType1 == 2 || nodeType1 == 4){
                         
-                        detectCardArray.insert(nowNum0, at: 0)
+                        var leftLaplacianPercent : Float = 1
+                        var rightLaplacianPercent : Float = 1
                         
-//                        //暂时不用：判断下一张是否才是真正队尾
-//                        var leftLaplacianPercent : Float = 1
-//
-//                        if nodeType0 == 2{
-//                            leftLaplacianPercent = detectResultNode0.laplacianVariance / lastDetectResultNode0.laplacianVariance
-//                        }
-//                        else if nodeType0 == 4 && self.laplacianDic[0][nowNum0] != 0{
-//                            leftLaplacianPercent = detectResultNode0.laplacianVariance / self.laplacianDic[0][nowNum0]!
-//                        }
-//
-//                        if leftLaplacianPercent > blurThreshold
-//                            && nextDetectResultNode0.nodeType == 0
-//                            && nextDetectResultNode1.nodeType == 2{
-//
-//                            let nextLeftLaplacianPercent = nextDetectResultNode0.laplacianVariance / detectResultNode0.laplacianVariance
-//                            let nextRightLaplacianPercent = nextDetectResultNode1.laplacianVariance / detectResultNode1.laplacianVariance
-//
-//                            if nextLeftLaplacianPercent < nextRightLaplacianPercent{
-//                                detectCardArray.insert(nowNum0, at: 0)
-//                            }
-//                            else{
-//                                detectCardArray.insert(nowNum1, at: 0)
-//                                detectCardArray.insert(nowNum0, at: 0)
-//                                nextDetectResultNode1.nodeType = 0
-//                            }
-//                        }
-//                        else{
-//                            detectCardArray.insert(nowNum0, at: 0)
-//                        }
+                        if nodeType0 == 2{
+                            leftLaplacianPercent = detectResultNode0.laplacianVariance / lastDetectResultNode0.laplacianVariance
+                        }
+                        else if nodeType0 == 4 && self.laplacianDic[0][nowNum0] != 0{
+                            leftLaplacianPercent = detectResultNode0.laplacianVariance / self.laplacianDic[0][nowNum0]!
+                        }
+                        
+                        
+                        if nodeType1 == 2{
+                            rightLaplacianPercent = detectResultNode1.laplacianVariance / lastDetectResultNode1.laplacianVariance
+                        }
+                        else if nodeType1 == 4 && self.laplacianDic[1][nowNum1] != 0{
+                            rightLaplacianPercent = detectResultNode1.laplacianVariance / self.laplacianDic[1][nowNum1]!
+                        }
+                        
+                        if nextDetectResultNode0.nodeType == 5 && nextDetectResultNode1.nodeType != 5{
+                            print("左边下一张融合怪 右边先落下")
+                            detectCardArray.insert(nowNum1, at: 0)
+                            detectCardArray.insert(nowNum0, at: 0)
+                        }
+                        else if nextDetectResultNode0.nodeType != 5 && nextDetectResultNode1.nodeType == 5{
+                            print("右边下一张融合怪 左边先落下")
+                            detectCardArray.insert(nowNum0, at: 0)
+                            detectCardArray.insert(nowNum1, at: 0)
+                        }
+                        else if nextDetectResultNode0.nodeType == 0 && nextDetectResultNode1.nodeType != 0{
+                            print("左边下一张未识别 右边先落下")
+                            detectCardArray.insert(nowNum1, at: 0)
+                            detectCardArray.insert(nowNum0, at: 0)
+                        }
+                        else if nextDetectResultNode0.nodeType != 0 && nextDetectResultNode1.nodeType == 0{
+                            print("右边下一张未识别 左边先落下")
+                            detectCardArray.insert(nowNum0, at: 0)
+                            detectCardArray.insert(nowNum1, at: 0)
+                        }
+                        else if leftLaplacianPercent < blurThreshold && rightLaplacianPercent >= blurThreshold{
+                            print("左边糊了")
+                            detectCardArray.insert(nowNum0, at: 0)
+                            detectCardArray.insert(nowNum1, at: 0)
+                        }
+                        else if rightLaplacianPercent < blurThreshold && leftLaplacianPercent >= blurThreshold{
+                            print("右边糊了")
+                            detectCardArray.insert(nowNum1, at: 0)
+                            detectCardArray.insert(nowNum0, at: 0)
+                        }
+                        else{
+                            var leftNextLaplacianPercent : Float = 1
+                            var rightNextLaplacianPercent : Float = 1
+                            
+                            if nextDetectResultNode0.nodeType == 1{
+                                leftNextLaplacianPercent = nextDetectResultNode0.laplacianVariance / nextnextDetectResultNode0.laplacianVariance
+                            }
+                            else if nextDetectResultNode0.nodeType == 0{
+                                leftNextLaplacianPercent = nextDetectResultNode0.laplacianVariance / nextnextDetectResultNode0.laplacianVariance
+                            }
+                            else if nextDetectResultNode0.nodeType == 4 && self.laplacianDic[0][nextDetectResultNode0.cardIndex[0]] != 0{
+                                leftNextLaplacianPercent = nextDetectResultNode0.laplacianVariance / self.laplacianDic[0][nextDetectResultNode0.cardIndex[0]]!
+                            }
+                            
+                            if nextDetectResultNode1.nodeType == 1{
+                                rightNextLaplacianPercent = nextDetectResultNode1.laplacianVariance / nextnextDetectResultNode1.laplacianVariance
+                            }
+                            else if nextDetectResultNode1.nodeType == 0{
+                                rightNextLaplacianPercent = nextDetectResultNode1.laplacianVariance / nextnextDetectResultNode1.laplacianVariance
+                            }
+                            else if nextDetectResultNode1.nodeType == 4 && self.laplacianDic[1][nextDetectResultNode1.cardIndex[0]] != 0{
+                                rightNextLaplacianPercent = nextDetectResultNode1.laplacianVariance / self.laplacianDic[1][nextDetectResultNode1.cardIndex[0]]!
+                            }
+                            
+                            if leftNextLaplacianPercent < blurThreshold && rightNextLaplacianPercent >= blurThreshold{
+                                print("下一张左边糊了")
+                                detectCardArray.insert(nowNum1, at: 0)
+                                detectCardArray.insert(nowNum0, at: 0)
+                            }
+                            else if rightNextLaplacianPercent < blurThreshold && leftNextLaplacianPercent >= blurThreshold{
+                                print("下一张右边糊了")
+                                detectCardArray.insert(nowNum0, at: 0)
+                                detectCardArray.insert(nowNum1, at: 0)
+                            }
+                            //上一张和下一张两边都不模糊 直接比较上一张两边模糊程度
+                            else if leftLaplacianPercent < blurThreshold && rightLaplacianPercent < blurThreshold{
+                                if leftLaplacianPercent < rightLaplacianPercent{
+                                    print("左边更糊")
+                                    detectCardArray.insert(nowNum0, at: 0)
+                                    detectCardArray.insert(nowNum1, at: 0)
+                                }
+                                else{
+                                    print("右边更糊")
+                                    detectCardArray.insert(nowNum1, at: 0)
+                                    detectCardArray.insert(nowNum0, at: 0)
+                                }
+                            }
+                            else{
+                                if leftNextLaplacianPercent < rightNextLaplacianPercent{
+                                    print("下一张左边更糊")
+                                    detectCardArray.insert(nowNum1, at: 0)
+                                    detectCardArray.insert(nowNum0, at: 0)
+                                }
+                                else{
+                                    print("下一张右边更糊")
+                                    detectCardArray.insert(nowNum0, at: 0)
+                                    detectCardArray.insert(nowNum1, at: 0)
+                                }
+                            }
+                            
+                        }
                     }
-                    if (nodeType1 == 4 && (isShuffle || detectResultNode1.confidence[0] >= 0.5)) || nodeType1 == 2{
-                        
-                        detectCardArray.insert(nowNum1, at: 0)
-                        
-//                        //暂时不用：判断下一张是否才是真正队尾
-//                        var rightLaplacianPercent : Float = 1
-//
-//                        if nodeType1 == 2{
-//                            rightLaplacianPercent = detectResultNode1.laplacianVariance / lastDetectResultNode1.laplacianVariance
-//                        }
-//                        else if nodeType1 == 4 && self.laplacianDic[1][nowNum1] != 0{
-//                            rightLaplacianPercent = detectResultNode1.laplacianVariance / self.laplacianDic[1][nowNum1]!
-//                        }
-//
-//                        if rightLaplacianPercent > blurThreshold
-//                            && nextDetectResultNode1.nodeType == 0
-//                            && nextDetectResultNode0.nodeType == 2{
-//
-//                            let nextLeftLaplacianPercent = nextDetectResultNode0.laplacianVariance / detectResultNode0.laplacianVariance
-//                            let nextRightLaplacianPercent = nextDetectResultNode1.laplacianVariance / detectResultNode1.laplacianVariance
-//
-//                            if nextLeftLaplacianPercent < nextRightLaplacianPercent{
-//                                detectCardArray.insert(nowNum0, at: 0)
-//                                detectCardArray.insert(nowNum1, at: 0)
-//                                nextDetectResultNode0.nodeType = 0
-//                            }
-//                            else{
-//                                detectCardArray.insert(nowNum1, at: 0)
-//                            }
-//                        }
-//                        else{
-//                            detectCardArray.insert(nowNum1, at: 0)
-//                        }
+                    
+                    //单个插入
+                    else{
+                        if nodeType0 == 4 || nodeType0 == 2{
+                            detectCardArray.insert(nowNum0, at: 0)
+                        }
+                        if nodeType1 == 4 || nodeType1 == 2{
+                            detectCardArray.insert(nowNum1, at: 0)
+                        }
                     }
                 }
             }
