@@ -1691,7 +1691,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 
                 //单个插入
                 else{
-                    if (nodeType0 == 4 && isShuffle) || nodeType0 == 2{
+                    if (nodeType0 == 4 && (isShuffle || detectResultNode0.confidence[0] >= 0.7)) || nodeType0 == 2{
                         
                         detectCardArray.insert(nowNum0, at: 0)
                         
@@ -1725,7 +1725,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
 //                            detectCardArray.insert(nowNum0, at: 0)
 //                        }
                     }
-                    if (nodeType1 == 4 && isShuffle) || nodeType1 == 2{
+                    if (nodeType1 == 4 && (isShuffle || detectResultNode1.confidence[0] >= 0.7)) || nodeType1 == 2{
                         
                         detectCardArray.insert(nowNum1, at: 0)
                         
