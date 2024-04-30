@@ -133,23 +133,26 @@ extension CIImage {
             let originAr = self.extent.size.width / self.extent.size.height
             let targetAr = size.width / size.height
             
-            if (originAr > 1 && targetAr > 1) || (originAr < 1 && targetAr < 1){
-                let scaleX = size.width / self.extent.size.width
-                let scaleY = size.height / self.extent.size.height
-                return self.transformed(by: CGAffineTransform(scaleX: scaleX, y: scaleY))
-            }
-            
-            else{
-                let rotationTransform = CGAffineTransform(rotationAngle: -.pi / 2)  // 顺时针旋转90度
-                let rotatedImage = self.transformed(by: rotationTransform)
-                
-                let xOffset = self.extent.size.height
-                let translationTransform = CGAffineTransform(translationX: xOffset, y: CGFloat(0))
-                let translatedImage = rotatedImage.transformed(by: translationTransform)
-                let scaleX = size.width / translatedImage.extent.size.width
-                let scaleY = size.height / translatedImage.extent.size.height
-                return translatedImage.transformed(by: CGAffineTransform(scaleX: scaleX, y: scaleY))
-            }
+            let scaleX = size.width / self.extent.size.width
+            let scaleY = size.height / self.extent.size.height
+            return self.transformed(by: CGAffineTransform(scaleX: scaleX, y: scaleY))
+//            if (originAr >= 1 && targetAr >= 1) || (originAr <= 1 && targetAr <= 1){
+//                let scaleX = size.width / self.extent.size.width
+//                let scaleY = size.height / self.extent.size.height
+//                return self.transformed(by: CGAffineTransform(scaleX: scaleX, y: scaleY))
+//            }
+//            
+//            else{
+//                let rotationTransform = CGAffineTransform(rotationAngle: -.pi / 2)  // 顺时针旋转90度
+//                let rotatedImage = self.transformed(by: rotationTransform)
+//                
+//                let xOffset = self.extent.size.height
+//                let translationTransform = CGAffineTransform(translationX: xOffset, y: CGFloat(0))
+//                let translatedImage = rotatedImage.transformed(by: translationTransform)
+//                let scaleX = size.width / translatedImage.extent.size.width
+//                let scaleY = size.height / translatedImage.extent.size.height
+//                return translatedImage.transformed(by: CGAffineTransform(scaleX: scaleX, y: scaleY))
+//            }
         }
     }
 }

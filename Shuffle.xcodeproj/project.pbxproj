@@ -18,6 +18,9 @@
 		184F40AB2B610EF50001B3DC /* CardNineRuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184F40AA2B610EF50001B3DC /* CardNineRuleSettingView.swift */; };
 		189C3BE92BDFFFA5007EB67E /* n_640_cls_50.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 189C3BE72BDFFFA4007EB67E /* n_640_cls_50.mlmodel */; };
 		189C3BEA2BDFFFA5007EB67E /* n_960_nocls_50.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 189C3BE82BDFFFA5007EB67E /* n_960_nocls_50.mlmodel */; };
+		189C3BEC2BE0104A007EB67E /* n_640_nocls_50.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 189C3BEB2BE0104A007EB67E /* n_640_nocls_50.mlmodel */; };
+		189C3BEE2BE01787007EB67E /* stable_model.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 189C3BED2BE01787007EB67E /* stable_model.mlmodel */; };
+		189C3BF02BE01D5A007EB67E /* n_640_cls_30.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 189C3BEF2BE01D5A007EB67E /* n_640_cls_30.mlmodel */; };
 		18C8929B2B65118F009D37DC /* fail_tip.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18C892992B65118F009D37DC /* fail_tip.mp3 */; };
 		18C8929C2B65118F009D37DC /* start_tip.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18C8929A2B65118F009D37DC /* start_tip.mp3 */; };
 		18CA14D2284AC42C00F90372 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C3284AC42C00F90372 /* ViewModel.swift */; };
@@ -111,6 +114,9 @@
 		184F40AA2B610EF50001B3DC /* CardNineRuleSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardNineRuleSettingView.swift; sourceTree = "<group>"; };
 		189C3BE72BDFFFA4007EB67E /* n_640_cls_50.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = n_640_cls_50.mlmodel; sourceTree = "<group>"; };
 		189C3BE82BDFFFA5007EB67E /* n_960_nocls_50.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = n_960_nocls_50.mlmodel; sourceTree = "<group>"; };
+		189C3BEB2BE0104A007EB67E /* n_640_nocls_50.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = n_640_nocls_50.mlmodel; sourceTree = "<group>"; };
+		189C3BED2BE01787007EB67E /* stable_model.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = stable_model.mlmodel; sourceTree = "<group>"; };
+		189C3BEF2BE01D5A007EB67E /* n_640_cls_30.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = n_640_cls_30.mlmodel; sourceTree = "<group>"; };
 		18C892992B65118F009D37DC /* fail_tip.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = fail_tip.mp3; sourceTree = "<group>"; };
 		18C8929A2B65118F009D37DC /* start_tip.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = start_tip.mp3; sourceTree = "<group>"; };
 		18CA1477284ABEC600F90372 /* Shuffle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Shuffle.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -405,8 +411,11 @@
 			isa = PBXGroup;
 			children = (
 				A88EFE022A7E8ACC00897243 /* Resnet50FP16.mlmodel */,
+				189C3BEF2BE01D5A007EB67E /* n_640_cls_30.mlmodel */,
 				189C3BE72BDFFFA4007EB67E /* n_640_cls_50.mlmodel */,
+				189C3BEB2BE0104A007EB67E /* n_640_nocls_50.mlmodel */,
 				189C3BE82BDFFFA5007EB67E /* n_960_nocls_50.mlmodel */,
+				189C3BED2BE01787007EB67E /* stable_model.mlmodel */,
 				181C969F2B5DB5980042006E /* success_tip.mp3 */,
 				A8D9FF062BD6E09C0081773C /* start_DetecBeep.mp3 */,
 				18C892992B65118F009D37DC /* fail_tip.mp3 */,
@@ -441,6 +450,7 @@
 			children = (
 				A83853452ABEDE0900346038 /* cardDetection.mlmodel */,
 				A83853462ABEDE0900346038 /* cardDetection_quantilized.mlmodel */,
+				A8D9FF082BD7E0C20081773C /* yolov5nu.mlmodel */,
 			);
 			name = "Recovered References";
 			sourceTree = "<group>";
@@ -642,6 +652,7 @@
 				A88F20AE2A13A470005E4A27 /* PokerBull.swift in Sources */,
 				A8D0D9362A24A4C20061A90E /* TexasPoker.swift in Sources */,
 				181C96A82B60DC180042006E /* ChickenBattleGame.swift in Sources */,
+				189C3BEE2BE01787007EB67E /* stable_model.mlmodel in Sources */,
 				A8FBC7C22A3F0A5C00EDDFD7 /* CVUtils.swift in Sources */,
 				A8EFFEB12B28766C00FC884F /* CutNumRangeSettingView.swift in Sources */,
 				A88C71F02B93101C001D8BD8 /* ThreeCardPointGame.swift in Sources */,
@@ -657,6 +668,7 @@
 				A8E0E2E72AADF6E20091FC1D /* TwoEightGangGame.swift in Sources */,
 				A887B6502A7FE1AF009F488F /* ShowRecordHistoryView.swift in Sources */,
 				A8D0D9382A35D9970061A90E /* RankRulesView.swift in Sources */,
+				189C3BEC2BE0104A007EB67E /* n_640_nocls_50.mlmodel in Sources */,
 				189C3BEA2BDFFFA5007EB67E /* n_960_nocls_50.mlmodel in Sources */,
 				A88EFDC42A7D217200897243 /* VisionObjectRecognitionViewModel.swift in Sources */,
 				A88EFE032A7E8ACD00897243 /* Resnet50FP16.mlmodel in Sources */,
@@ -664,6 +676,7 @@
 				A8E0E2EB2AAE00620091FC1D /* TinyNineGameRuleSettingView.swift in Sources */,
 				A88C71EA2B8600AE001D8BD8 /* NinePoint.swift in Sources */,
 				A87A82052B2EF66200B1B37B /* DealTypeView.swift in Sources */,
+				189C3BF02BE01D5A007EB67E /* n_640_cls_30.mlmodel in Sources */,
 				189C3BE92BDFFFA5007EB67E /* n_640_cls_50.mlmodel in Sources */,
 				A8FBC7BB2A3DF1B000EDDFD7 /* SuitRulesView.swift in Sources */,
 				181C96AE2B60F03C0042006E /* JiaJiaBaoGameRuleSettingView.swift in Sources */,
