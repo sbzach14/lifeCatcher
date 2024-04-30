@@ -38,7 +38,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     let fastModel = try! n_640_cls_30()
     let slowModel = try! stable_model()
     
-    var imageSize : [Float] = [853, 480] //target area 截图大小
+    var imageSize : [Float] = [1137, 640] //target area 截图大小
     var originImageSize : [Float] = [1137, 640] //target area 原始截图大小
     //var originImageSize : [Float] = [853, 480] //target area 原始截图大小
     var originSize : [Float] = [1920, 1080] //相机图像大小
@@ -1963,7 +1963,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 let coordinate = [centerX, centerY, widthX, heightY]
                 
                 if cardIndex.count > 0{
-                    if let index = result.firstIndex(where: { ($0.targetDistance(target: coordinate)) < 0.01 }) {
+                    if let index = result.firstIndex(where: { ($0.targetDistance(target: coordinate)) < coordinate[2] && ($0.targetDistance(target: coordinate)) < coordinate[3]}) {
                         
                         if maxVal > result[index].confidence[0] {
                             result[index].cardIndex = cardIndex + result[index].cardIndex
@@ -2117,7 +2117,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 let coordinate = [centerX, centerY, widthX, heightY]
                 
                 if cardIndex.count > 0{
-                    if let index = result.firstIndex(where: { ($0.targetDistance(target: coordinate)) < 0.01 }) {
+                    if let index = result.firstIndex(where: {($0.targetDistance(target: coordinate)) < coordinate[2] && ($0.targetDistance(target: coordinate)) < coordinate[3]}) {
                         
                         if maxVal > result[index].confidence[0] {
                             result[index].cardIndex = cardIndex + result[index].cardIndex
