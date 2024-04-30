@@ -667,6 +667,10 @@ UI TODO 比鸡 九点 四张 两张 三张 十点半 十三水
 
 牌九参数规则
 
+Could not determine generated file paths for CoreML code generation: The command `(cd /Users/naldochen/shuffle && /Users/naldochen/Downloads/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/coremlc generate /Users/naldochen/shuffle/yolov5nu.mlmodel /Users/naldochen/Library/Developer/Xcode/DerivedData/Shuffle-cvyjggrvjgmoglcvyeahiighhhea/Build/Intermediates.noindex/Shuffle.build/Debug-iphoneos/Shuffle.build/DerivedSources/CoreMLGenerated/yolov5nu --dry-run yes --deployment-target 16.0 --sdkroot /Users/naldochen/Downloads/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS16.4.sdk --platform ios --output-partial-info-plist /Users/naldochen/Library/Developer/Xcode/DerivedData/Shuffle-cvyjggrvjgmoglcvyeahiighhhea/Build/Intermediates.noindex/Shuffle.build/Debug-iphoneos/Shuffle.build/yolov5nu-CoreMLPartialInfo.plist --container bundle-resources --language Swift --swift-version 5.0)` exited with status 1. The command's standard error was:
+
+coremlc: error: Model does not exist at file:///Users/naldochen/shuffle/yolov5nu.mlmodel
+
 
 
 

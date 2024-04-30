@@ -1963,7 +1963,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 let coordinate = [centerX, centerY, widthX, heightY]
                 
                 if cardIndex.count > 0{
-                    if let index = result.firstIndex(where: { ($0.targetDistance(target: coordinate)) < 0.01 }) {
+                    if let index = result.firstIndex(where: { ($0.targetDistance(target: coordinate)) < coordinate[2] && ($0.targetDistance(target: coordinate)) < coordinate[3]}) {
                         
                         if maxVal > result[index].confidence[0] {
                             result[index].cardIndex = cardIndex + result[index].cardIndex
@@ -2117,7 +2117,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 let coordinate = [centerX, centerY, widthX, heightY]
                 
                 if cardIndex.count > 0{
-                    if let index = result.firstIndex(where: { ($0.targetDistance(target: coordinate)) < 0.01 }) {
+                    if let index = result.firstIndex(where: {($0.targetDistance(target: coordinate)) < coordinate[2] && ($0.targetDistance(target: coordinate)) < coordinate[3]}) {
                         
                         if maxVal > result[index].confidence[0] {
                             result[index].cardIndex = cardIndex + result[index].cardIndex
