@@ -55,7 +55,7 @@ struct MainMenuView: View {
                     }
                 }
             }
-            .navigationBarTitle("盘古")
+            .navigationBarTitle("AAAA")
             .background(
                 Image("bg")
                     .resizable()

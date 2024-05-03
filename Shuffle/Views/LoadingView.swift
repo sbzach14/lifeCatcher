@@ -13,7 +13,7 @@ struct LoadingView: View {
         VStack{
             Spacer().frame(height: 250)
             HStack{
-                Image("Logo")
+//                Image("Logo")
             }
             Spacer()
         }.background(Image("bg").resizable().scaledToFill()).edgesIgnoringSafeArea(.all)
