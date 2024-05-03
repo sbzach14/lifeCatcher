@@ -15,7 +15,7 @@ class SettingViewModel: ObservableObject {
     @Published var volumeDown: Int = 0
     @Published var volumeValue: Float = 0.5
     @Published var zoomFactor: Float = 0
-    @Published var focusFactor: Float = 0.6
+    @Published var focusFactor: Float = 0.55
     
     @Published var searchText : String = ""
 

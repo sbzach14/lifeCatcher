@@ -139,7 +139,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var volumeDown: Int = 0
     @Published var volumeValue: Float = 0.5
     @Published var zoomFactor: Float = 0
-    @Published var focusFactor: Float = 0.6
+    @Published var focusFactor: Float = 0.55
     
     var setFrameRate: Float64 = 120.0
     var cameraFrameRate: Int = 0
