@@ -66,7 +66,11 @@ class generalRuleSetting{
     static let allVoiceReport:[Int:String] = [
         0:"无",
         1:"有"
+    ]
     
+    static let allResultReportType:[Int:String] = [
+        0:"无",
+        1:"识别任意牌报下一轮"
     ]
 }
 
@@ -108,6 +112,7 @@ struct AddRuleSettingView: View{
     @State private var playerNumList:[Int] = [2,3,4,5,6,7,8]
     @State private var currentNum: Int = 2
     @State private var minCardNum:Int = 0
+    @State private var resultReportType: Int = 0
     
     private func SetUpAll(){
         print("init success")
@@ -169,6 +174,7 @@ struct AddRuleSettingView: View{
                 self.rankRules.append(RankRulesSate(index: rules.rankRules[i], isChecked: (rules.rankRuleChecked[i] != 0)))
             }
             self.minCardNum = minCardNum
+            self.resultReportType = rules.resultReportType
         }
         
         
@@ -513,6 +519,32 @@ struct AddRuleSettingView: View{
                                     .scaledToFill()
                             )
                             .frame(height: 45)
+                            
+                            //连报轮数
+                            HStack
+                            {
+                                Image("icon_shufflemode")
+                                    .resizable()
+                                    .frame(width: 40, height: 40).padding(.leading, 20)
+                                Text("结果播报")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .foregroundColor(.white) // 左侧间距
+                                Picker("reportResultType", selection: $resultReportType) {
+                                    ForEach(0...generalRuleSetting.allResultReportType.count - 1, id: \.self){
+                                        index in Text(generalRuleSetting.allResultReportType[index]!).tag(index)
+                                    }
+                                }
+                                .pickerStyle(MenuPickerStyle())
+                                .frame(width: 200, height: 30, alignment: .trailing)
+                                .padding(.trailing,30) // 右侧间距
+                                .accentColor(.white)
+                                
+                            }.background(
+                                Image("list_bg") // 背景图片
+                                    .resizable()
+                                    .scaledToFill()
+                            )
+                            .frame(height: 45)
                         }
                     }
                 }
@@ -585,7 +617,7 @@ struct AddRuleSettingView: View{
                 rankRuleToAddChecked.append(0)
             }
         }
-        let ruleToAdd = GameRule(RuleName: selectedRule!.setting[setting]!, gameType: gameType, setting: setting, dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, playerNum: playerNum, shuffleMode: shuffleMode, cutMode: cutMode,  cardToUse: cardToUse, cutNumSetting: cutNumSetting, reportSetting: reportSetting, cutNumRangeSetting: cutNumRangeSetting, positionSetting: positionSetting, consecutiveReport: consecutiveReport, reportNumber: reportNumber, voiceReport: voiceReport, args: args, suitRanks: suitRules, rankRules: rankRulesToAdd, rankRuleChecked: rankRuleToAddChecked, minCardNum: minCardNum)
+        let ruleToAdd = GameRule(RuleName: selectedRule!.setting[setting]!, gameType: gameType, setting: setting, dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, playerNum: playerNum, shuffleMode: shuffleMode, cutMode: cutMode,  cardToUse: cardToUse, cutNumSetting: cutNumSetting, reportSetting: reportSetting, cutNumRangeSetting: cutNumRangeSetting, positionSetting: positionSetting, consecutiveReport: consecutiveReport, reportNumber: reportNumber, voiceReport: voiceReport, args: args, suitRanks: suitRules, rankRules: rankRulesToAdd, rankRuleChecked: rankRuleToAddChecked, minCardNum: minCardNum, resultReportType: resultReportType)
         if _selectedSaveIndex == -1{
             RuleManager.allUsersGameRule.append(ruleToAdd)
             _selectedSaveIndex = RuleManager.allUsersGameRule.count - 1

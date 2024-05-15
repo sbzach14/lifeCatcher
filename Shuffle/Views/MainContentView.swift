@@ -33,15 +33,13 @@ struct MainContentView: View {
                             HStack {
                                 Text("后置相机")
                                     .foregroundColor(.white)
-                                    .padding(.leading, 20)
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                 
                                 Spacer()
                                 
                                 Toggle("", isOn: $viewModel.isBackCamera)
                                     .toggleStyle(CustomToggleStyle())
-                                    .frame(width: 160, height: 30, alignment: .trailing)
-                                    .padding(.trailing,30) // 右侧间距
+                                    .frame(width: 200, height: 30, alignment: .trailing)
                                     .accentColor(.white)
                                     .onChange(of: viewModel.isBackCamera) {
                                         newValue in
@@ -54,13 +52,12 @@ struct MainContentView: View {
                             Divider().colorInvert()
                             
                             HStack {
-                                Text("缩放比例").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
+                                Text("缩放:\(String(format: "%.2f", viewModel.zoomFactor))").foregroundColor(.white).frame(maxWidth: .infinity, alignment: .leading)
                                 
                                 Spacer()
                                 
-                                Slider(value: $viewModel.zoomFactor, in: 0...1, step: 0.02)
-                                    .frame(width: 160, height: 30, alignment: .trailing)
-                                    .padding(.trailing,30) // 右侧间距
+                                Slider(value: $viewModel.zoomFactor, in: 0...1, step: 0.01)
+                                    .frame(width: 200, height: 30, alignment: .trailing)
                                     .accentColor(.white)
                                     .onChange(of: viewModel.zoomFactor) {
                                         newValue in
@@ -71,15 +68,14 @@ struct MainContentView: View {
                             Divider().colorInvert()
                             
                             HStack {
-                                Text("自动对焦").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
+                                Text("自动对焦").foregroundColor(.white).frame(maxWidth: .infinity, alignment: .leading)
                                 
                                 Spacer()
                                 
                                 if viewModel.captureDevice.isFocusModeSupported(.locked){
                                     Toggle("", isOn: $viewModel.isAutoFocus)
                                         .toggleStyle(CustomToggleStyle())
-                                        .frame(width: 160, height: 30, alignment: .trailing)
-                                        .padding(.trailing,30) // 右侧间距
+                                        .frame(width: 200, height: 30, alignment: .trailing)
                                         .accentColor(.white)
                                         .onChange(of: viewModel.isAutoFocus) {
                                             newValue in
@@ -94,13 +90,12 @@ struct MainContentView: View {
                                 Divider().colorInvert()
                                 
                                 HStack {
-                                    Text("焦距调节").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
+                                    Text("焦距:\(String(format: "%.2f", viewModel.focusFactor))").foregroundColor(.white).frame(maxWidth: .infinity, alignment: .leading)
                                     
                                     Spacer()
                                     
-                                    Slider(value: $viewModel.focusFactor, in: 0...1, step: 0.02)
-                                        .frame(width: 160, height: 30, alignment: .trailing)
-                                        .padding(.trailing,30) // 右侧间距
+                                    Slider(value: $viewModel.focusFactor, in: 0...1, step: 0.01)
+                                        .frame(width: 200, height: 30, alignment: .trailing)
                                         .accentColor(.white)
                                         .onChange(of: viewModel.focusFactor) {
                                             newValue in
