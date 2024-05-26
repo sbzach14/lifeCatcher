@@ -35,9 +35,9 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     @Published var cutArray : [Int] = []
     @Published var cutShowArray : [Int] = []
     
-    let detectModel = try! n_640_nocls_50()
-    let fastModel = try! n_640_cls_30()
-    let slowModel = try! stable_model()
+    let detectModel = try! blur_detect_0526()
+    let fastModel = try! blur_aug_0517()
+    let slowModel = try! blur_aug_0517()
     
     var imageSize : [Float] = [1137, 640] //target area 截图大小
     var originImageSize : [Float] = [1137, 640] //target area 原始截图大小
@@ -710,6 +710,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         
         let isShuffle = detectNum == 2 && (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4)
         let isRiffle = detectNum == 1 && (self.shuffleMode == 1 || self.shuffleMode == 2 || self.shuffleMode == 3 || self.shuffleMode == 4)
+        print("detectNum \(detectNum) self.cutDone \(self.cutDone) self.resultReportType \(self.resultReportType) self.cardArray \(self.cardArray.count)")
         let isCut = detectNum != 0 && (!self.cutDone || self.resultReportType == 1) && self.cardArray.count > 0
         
         DispatchQueue.main.async{
@@ -779,17 +780,17 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                     else if cardResult[1].cardIndex[0] != -1{
                         detectCard = cardResult[1].cardIndex[0]
                     }
-                    
+//                    print("self.detectNeedToCut \(self.detectNeedToCut) isCut \(isCut)")
                     if self.detectNeedToCut
                         && isCut
                         && (detectNum == 1 || (detectNum == 2 && cardResult[0].cardIndex[0] == cardResult[1].cardIndex[0])){
-                        
-                        if self.usedCards.contains(detectCard){
+                        print("当前使用的牌 \(self.usedCards)")
+                        if self.usedCards.contains(detectCard) &&  self.resultReportType == 1 {
                             print("识别:\(detectCard)")
                             self.computeNextRound()
                             self.detectNeedToCut = false
                         }
-                        else if self.cardArray.contains(detectCard){
+                        else if self.cardArray.contains(detectCard) && !self.cutDone {
                             print("切牌:\(detectCard)")
                             
                             var cutIndex = self.cardArray.firstIndex(of: detectCard)!
@@ -1965,7 +1966,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 let coordinate = [centerX, centerY, widthX, heightY]
                 
                 if cardIndex.count > 0{
-                    if let index = result.firstIndex(where: { ($0.targetDistance(target: coordinate)) < coordinate[2] && ($0.targetDistance(target: coordinate)) < coordinate[3]}) {
+                    if let index = result.firstIndex(where: {(abs($0.coordinate[0] - coordinate[0]) < $0.coordinate[2] / 2 || abs($0.coordinate[0] - coordinate[0]) < coordinate[2] / 2) && (abs($0.coordinate[1] - coordinate[1]) < $0.coordinate[3] / 2 || abs($0.coordinate[1] - coordinate[1]) < coordinate[3] / 2)}) {
                         
                         if maxVal > result[index].confidence[0] {
                             result[index].cardIndex = cardIndex + result[index].cardIndex
@@ -2119,7 +2120,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                 let coordinate = [centerX, centerY, widthX, heightY]
                 
                 if cardIndex.count > 0{
-                    if let index = result.firstIndex(where: {($0.targetDistance(target: coordinate)) < coordinate[2] && ($0.targetDistance(target: coordinate)) < coordinate[3]}) {
+                    if let index = result.firstIndex(where: {(abs($0.coordinate[0] - coordinate[0]) < $0.coordinate[2] / 2 || abs($0.coordinate[0] - coordinate[0]) < coordinate[2] / 2) && (abs($0.coordinate[1] - coordinate[1]) < $0.coordinate[3] / 2 || abs($0.coordinate[1] - coordinate[1]) < coordinate[3] / 2)}) {
                         
                         if maxVal > result[index].confidence[0] {
                             result[index].cardIndex = cardIndex + result[index].cardIndex
@@ -2268,7 +2269,8 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
             multipleGamePlayerInfos = GameManager.selectGame(gameIndex: ruleIndex, inputCards: cardArray, playerNum: (GameManager.gameRules[ruleIndex]?.playerNum[playerNum])!, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, minCardNum: minCardNum, cutCardIndexArray: cutArray)
             
             self.cardArray = multipleGamePlayerInfos.returnCardArray
-            
+            print("剩下的牌 \(multipleGamePlayerInfos.leftCards)")
+
             speakText(input: multipleGamePlayerInfos.reportResult)
         }
     }
@@ -2278,13 +2280,22 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         //将GameManager中代码移动到这里 根据现在的cardArray 分离成两个数组 将当前连报n轮的牌添加usedCards中 剩余的牌作为leftCards
         //self.leftCards =..
         //self.usedCards =..
+        if self.cardArray.count >= self.minCardNum && self.cardArray.count > self.cutNumRangeSetting[0] && self.cardArray.count > self.cutNumRangeSetting[1] - self.minCardNum{
+            self.leftCards = multipleGamePlayerInfos.leftCards
+            let usedNum = self.cardArray.count - self.leftCards.count
+            self.usedCards = Array(self.cardArray[0...(usedNum - 1)])
+            print("所有用过的牌 \(self.usedCards) 剩下的牌 \(self.leftCards) cardArray \(self.cardArray)")
+        }
     }
     
     //计算下一轮结果
     func computeNextRound(){
-        self.cardArray = self.leftCards
-        computeWinnerPlayer()
-        computeCards()
+        print("计算下一轮")
+        if (self.leftCards.count > 0){
+            self.cardArray = self.leftCards
+            computeWinnerPlayer()
+            self.computeCards()
+        }
     }
     
     func speakText(input: Int){
