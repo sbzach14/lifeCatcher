@@ -857,8 +857,10 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         
                         if self.cutMode == 0 || self.cutMode == 3{
                             self.computeWinnerPlayer()
+                            self.computeCards()
+
                         }
-                        self.computeCards()
+                        
                     }
                     else if detectState.isSingle && !detectState.isShort
                                 && (self.shuffleMode == 1 || self.shuffleMode == 2 || self.shuffleMode == 3 || self.shuffleMode == 4){
@@ -893,8 +895,9 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
                         
                         if self.cutMode == 0 || self.cutMode == 3{
                             self.computeWinnerPlayer()
+                            self.computeCards()
+
                         }
-                        self.computeCards()
                     }
                     
                     print("result  isShort:\(detectState.isShort)  isSingle:\(detectState.isSingle)  cardArray:\(self.cardArray)")
