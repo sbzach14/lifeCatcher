@@ -31,13 +31,14 @@
 		18CA14DC284AC42C00F90372 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14D1284AC42C00F90372 /* AuthView.swift */; };
 		18D9CDEA2B84F7CE00A93684 /* ReportSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D9CDE92B84F7CE00A93684 /* ReportSettingView.swift */; };
 		18FFC40A2BB9587A00029B0D /* BlurDetector_origin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FFC4092BB9587900029B0D /* BlurDetector_origin.swift */; };
-		50053F84284ACAED00C86BF4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 50053F81284ACAED00C86BF4 /* Assets.xcassets */; };
 		A80959662BC52AB2009A2DB4 /* ThirteenWaterGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A80959652BC52AB1009A2DB4 /* ThirteenWaterGame.swift */; };
 		A809B3E22AE5126700F728A9 /* BaoziGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A809B3E12AE5126700F728A9 /* BaoziGame.swift */; };
 		A809B3E42AE5183400F728A9 /* BaoziGameRuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A809B3E32AE5183400F728A9 /* BaoziGameRuleSettingView.swift */; };
 		A80D65F82AFF75ED005B5E5E /* AddRuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A80D65F72AFF75ED005B5E5E /* AddRuleSettingView.swift */; };
 		A812F92F2A3DCBA500AA392F /* ThreeCardPokerGameRuleSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A812F92E2A3DCBA500AA392F /* ThreeCardPokerGameRuleSettingView.swift */; };
 		A812F9312A3DCD0800AA392F /* ThreeCardPokerGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A812F9302A3DCD0800AA392F /* ThreeCardPokerGame.swift */; };
+		A82088902C0BB9E000268013 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A820888F2C0BB9E000268013 /* Assets.xcassets */; };
+		A82088952C0C5D8800268013 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = A82088942C0C5D8800268013 /* AsyncAlgorithms */; };
 		A838534C2ADA7C0200346038 /* BackGround.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A838534B2ADA7C0200346038 /* BackGround.xcassets */; };
 		A838534E2ADA7D7100346038 /* GameClass.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A838534D2ADA7D7100346038 /* GameClass.xcassets */; };
 		A83853502ADA83F600346038 /* Icon_Repo.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A838534F2ADA83F600346038 /* Icon_Repo.xcassets */; };
@@ -49,7 +50,6 @@
 		A887B64E2A7FDF56009F488F /* RecordHistoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B64D2A7FDF56009F488F /* RecordHistoryViewModel.swift */; };
 		A887B6502A7FE1AF009F488F /* ShowRecordHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B64F2A7FE1AF009F488F /* ShowRecordHistoryView.swift */; };
 		A887B6522A8104BC009F488F /* TimeUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B6512A8104BC009F488F /* TimeUtils.swift */; };
-		A887B6562A81370F009F488F /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = A887B6552A81370F009F488F /* AsyncAlgorithms */; };
 		A887B6582A8511A4009F488F /* InfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B6572A8511A4009F488F /* InfoView.swift */; };
 		A88C71EA2B8600AE001D8BD8 /* NinePoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88C71E92B8600AE001D8BD8 /* NinePoint.swift */; };
 		A88C71EC2B8B261A001D8BD8 /* FourCardGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88C71EB2B8B261A001D8BD8 /* FourCardGame.swift */; };
@@ -90,19 +90,8 @@
 		A8FBC7C22A3F0A5C00EDDFD7 /* CVUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8FBC7C12A3F0A5C00EDDFD7 /* CVUtils.swift */; };
 		B03B7B2D2A963C05006A0647 /* Card.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B2C2A963C05006A0647 /* Card.swift */; };
 		B03B7B2F2A963C1B006A0647 /* utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B2E2A963C1B006A0647 /* utils.swift */; };
-		B03B7B532A98AD32006A0647 /* ShuffleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B03B7B522A98AD32006A0647 /* ShuffleTests.swift */; };
 		B058BE5F2B09FFC20078E792 /* BlurDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058BE5E2B09FFC20078E792 /* BlurDetector.swift */; };
 /* End PBXBuildFile section */
-
-/* Begin PBXContainerItemProxy section */
-		B03B7B542A98AD32006A0647 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 18CA146F284ABEC600F90372 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 18CA1476284ABEC600F90372;
-			remoteInfo = Shuffle;
-		};
-/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		181C969B2B5D51B00042006E /* Icon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Icon.xcassets; sourceTree = "<group>"; };
@@ -131,8 +120,6 @@
 		18D9CDE92B84F7CE00A93684 /* ReportSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportSettingView.swift; sourceTree = "<group>"; };
 		18FFC4092BB9587900029B0D /* BlurDetector_origin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlurDetector_origin.swift; sourceTree = "<group>"; };
 		50053F80284ACAED00C86BF4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		50053F81284ACAED00C86BF4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		50053F82284ACAED00C86BF4 /* CountMyActions.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = CountMyActions.entitlements; sourceTree = "<group>"; };
 		5269731033A41881895B5A41 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A6748516A40E187B4F8ACFA3 /* SampleCode.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
 		A80959652BC52AB1009A2DB4 /* ThirteenWaterGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirteenWaterGame.swift; sourceTree = "<group>"; };
@@ -141,6 +128,7 @@
 		A80D65F72AFF75ED005B5E5E /* AddRuleSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddRuleSettingView.swift; sourceTree = "<group>"; };
 		A812F92E2A3DCBA500AA392F /* ThreeCardPokerGameRuleSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeCardPokerGameRuleSettingView.swift; sourceTree = "<group>"; };
 		A812F9302A3DCD0800AA392F /* ThreeCardPokerGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeCardPokerGame.swift; sourceTree = "<group>"; };
+		A820888F2C0BB9E000268013 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = Shuffle/App/Assets.xcassets; sourceTree = SOURCE_ROOT; };
 		A83853452ABEDE0900346038 /* cardDetection.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection.mlmodel; sourceTree = "<group>"; };
 		A83853462ABEDE0900346038 /* cardDetection_quantilized.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection_quantilized.mlmodel; sourceTree = "<group>"; };
 		A838534B2ADA7C0200346038 /* BackGround.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = BackGround.xcassets; sourceTree = "<group>"; };
@@ -196,7 +184,6 @@
 		A8FBC7C12A3F0A5C00EDDFD7 /* CVUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CVUtils.swift; sourceTree = "<group>"; };
 		B03B7B2C2A963C05006A0647 /* Card.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Card.swift; sourceTree = "<group>"; };
 		B03B7B2E2A963C1B006A0647 /* utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = utils.swift; sourceTree = "<group>"; };
-		B03B7B502A98AD32006A0647 /* ShuffleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShuffleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B03B7B522A98AD32006A0647 /* ShuffleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShuffleTests.swift; sourceTree = "<group>"; };
 		B058BE5E2B09FFC20078E792 /* BlurDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurDetector.swift; sourceTree = "<group>"; };
 		F11ED84932036610B96BC234 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
@@ -209,14 +196,7 @@
 			files = (
 				A88F209F2A10EB4D005E4A27 /* Python.xcframework in Frameworks */,
 				A88F20A12A10EBC6005E4A27 /* SystemConfiguration.framework in Frameworks */,
-				A887B6562A81370F009F488F /* AsyncAlgorithms in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		B03B7B4D2A98AD32006A0647 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
+				A82088952C0C5D8800268013 /* AsyncAlgorithms in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -245,7 +225,6 @@
 			isa = PBXGroup;
 			children = (
 				18CA1477284ABEC600F90372 /* Shuffle.app */,
-				B03B7B502A98AD32006A0647 /* ShuffleTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -306,9 +285,8 @@
 		18CA14CF284AC42C00F90372 /* App */ = {
 			isa = PBXGroup;
 			children = (
-				50053F81284ACAED00C86BF4 /* Assets.xcassets */,
-				50053F82284ACAED00C86BF4 /* CountMyActions.entitlements */,
 				50053F80284ACAED00C86BF4 /* Info.plist */,
+				A820888F2C0BB9E000268013 /* Assets.xcassets */,
 				18CA14D0284AC42C00F90372 /* MyApp.swift */,
 				18CA14D1284AC42C00F90372 /* AuthView.swift */,
 			);
@@ -479,29 +457,11 @@
 			);
 			name = Shuffle;
 			packageProductDependencies = (
-				A887B6552A81370F009F488F /* AsyncAlgorithms */,
+				A82088942C0C5D8800268013 /* AsyncAlgorithms */,
 			);
 			productName = CountMyActions;
 			productReference = 18CA1477284ABEC600F90372 /* Shuffle.app */;
 			productType = "com.apple.product-type.application";
-		};
-		B03B7B4F2A98AD32006A0647 /* ShuffleTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = B03B7B562A98AD32006A0647 /* Build configuration list for PBXNativeTarget "ShuffleTests" */;
-			buildPhases = (
-				B03B7B4C2A98AD32006A0647 /* Sources */,
-				B03B7B4D2A98AD32006A0647 /* Frameworks */,
-				B03B7B4E2A98AD32006A0647 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				B03B7B552A98AD32006A0647 /* PBXTargetDependency */,
-			);
-			name = ShuffleTests;
-			productName = ShuffleTests;
-			productReference = B03B7B502A98AD32006A0647 /* ShuffleTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -518,10 +478,6 @@
 					18CA1476284ABEC600F90372 = {
 						CreatedOnToolsVersion = 14.0;
 					};
-					B03B7B4F2A98AD32006A0647 = {
-						CreatedOnToolsVersion = 14.3.1;
-						TestTargetID = 18CA1476284ABEC600F90372;
-					};
 				};
 			};
 			buildConfigurationList = 18CA1472284ABEC600F90372 /* Build configuration list for PBXProject "Shuffle" */;
@@ -535,14 +491,13 @@
 			);
 			mainGroup = 18CA146E284ABEC600F90372;
 			packageReferences = (
-				18CA1489284ABF8C00F90372 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
+				A82088912C0C5D6400268013 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
 			);
 			productRefGroup = 18CA1478284ABEC600F90372 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				18CA1476284ABEC600F90372 /* Shuffle */,
-				B03B7B4F2A98AD32006A0647 /* ShuffleTests */,
 			);
 		};
 /* End PBXProject section */
@@ -552,23 +507,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				50053F84284ACAED00C86BF4 /* Assets.xcassets in Resources */,
 				A838534E2ADA7D7100346038 /* GameClass.xcassets in Resources */,
 				18C8929B2B65118F009D37DC /* fail_tip.mp3 in Resources */,
 				A88F209D2A10EB39005E4A27 /* python-stdlib in Resources */,
 				A83853502ADA83F600346038 /* Icon_Repo.xcassets in Resources */,
+				A82088902C0BB9E000268013 /* Assets.xcassets in Resources */,
 				A8D9FF072BD6E09C0081773C /* start_DetecBeep.mp3 in Resources */,
 				A838534C2ADA7C0200346038 /* BackGround.xcassets in Resources */,
 				181C96A02B5DB5980042006E /* success_tip.mp3 in Resources */,
 				181C969C2B5D51B00042006E /* Icon.xcassets in Resources */,
 				18C8929C2B65118F009D37DC /* start_tip.mp3 in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		B03B7B4E2A98AD32006A0647 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -692,23 +640,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		B03B7B4C2A98AD32006A0647 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				B03B7B532A98AD32006A0647 /* ShuffleTests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
-
-/* Begin PBXTargetDependency section */
-		B03B7B552A98AD32006A0647 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 18CA1476284ABEC600F90372 /* Shuffle */;
-			targetProxy = B03B7B542A98AD32006A0647 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		18CA1483284ABEC700F90372 /* Debug */ = {
@@ -833,12 +765,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Shuffle/Shuffle.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"Shuffle/App\"";
-				DEVELOPMENT_TEAM = FYQ8UYQL3M;
+				DEVELOPMENT_ASSET_PATHS = Shuffle/App/Assets.xcassets;
+				DEVELOPMENT_TEAM = 9ZQUFT987F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Shuffle/App/Info.plist;
@@ -849,7 +782,7 @@
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "This app uses speech recognition to return result";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen";
+				INFOPLIST_KEY_UILaunchStoryboardName = /Users/naldochen/Downloads/8666610_plus_square_icon.png;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = armv7;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
@@ -861,7 +794,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-shuffle--SAMPLE-CODE-DISAMBIGUATOR-";
+				PRODUCT_BUNDLE_IDENTIFIER = com.shuffle.JimeiApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -876,12 +809,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = Shuffle/Shuffle.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"Shuffle/App\"";
-				DEVELOPMENT_TEAM = FYQ8UYQL3M;
+				DEVELOPMENT_ASSET_PATHS = Shuffle/App/Assets.xcassets;
+				DEVELOPMENT_TEAM = 9ZQUFT987F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Shuffle/App/Info.plist;
@@ -892,7 +826,7 @@
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "This app uses speech recognition to return result";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen";
+				INFOPLIST_KEY_UILaunchStoryboardName = /Users/naldochen/Downloads/8666610_plus_square_icon.png;
 				INFOPLIST_KEY_UIRequiredDeviceCapabilities = armv7;
 				INFOPLIST_KEY_UIRequiresFullScreen = YES;
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
@@ -904,54 +838,12 @@
 				);
 				MARKETING_VERSION = 1.0;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-shuffle--SAMPLE-CODE-DISAMBIGUATOR-";
+				PRODUCT_BUNDLE_IDENTIFIER = com.shuffle.JimeiDistribution;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		B03B7B572A98AD32006A0647 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = FYQ8UYQL3M;
-				ENABLE_TESTABILITY = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.apple.ShuffleTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Shuffle.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Shuffle";
-			};
-			name = Debug;
-		};
-		B03B7B582A98AD32006A0647 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = FYQ8UYQL3M;
-				ENABLE_TESTABILITY = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.example.apple.ShuffleTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Shuffle.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Shuffle";
 			};
 			name = Release;
 		};
@@ -976,32 +868,23 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B03B7B562A98AD32006A0647 /* Build configuration list for PBXNativeTarget "ShuffleTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				B03B7B572A98AD32006A0647 /* Debug */,
-				B03B7B582A98AD32006A0647 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		18CA1489284ABF8C00F90372 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */ = {
+		A82088912C0C5D6400268013 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-async-algorithms";
+			repositoryURL = "https://github.com/apple/swift-async-algorithms.git";
 			requirement = {
 				kind = exactVersion;
-				version = 0.0.1;
+				version = 1.0.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		A887B6552A81370F009F488F /* AsyncAlgorithms */ = {
+		A82088942C0C5D8800268013 /* AsyncAlgorithms */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 18CA1489284ABF8C00F90372 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
+			package = A82088912C0C5D6400268013 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
 			productName = AsyncAlgorithms;
 		};
 /* End XCSwiftPackageProductDependency section */

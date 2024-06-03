@@ -2321,35 +2321,34 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         let isSpeak = self.isHeadphonesConnected() == self.isMute
         
         if isSpeak{
-            for repeatIndex in 0..<2{
-                for (turnIndex, turnResult) in input.enumerated() {
-                    for (reportIndex, reportResult) in turnResult.enumerated() {
-                        let speakString = reportResult.content
-                        if !speakString.isEmpty{
-                            let speechUtterance = AVSpeechUtterance(string: speakString)
-                            speechUtterance.postUtteranceDelay = 0.1
-                            if reportResult.voiceType == 0{
-                                speechUtterance.voice = chineseMaleVoice
-                            }
-                            if reportResult.voiceType == 1{
-                                speechUtterance.voice = chineseFemaleVoice
-                            }
-                            
-                            //                        if reportIndex == 0 && turnIndex == 0 {
-                            //                            speechUtterance.preUtteranceDelay = 0.05
-                            //                        }
-                            //                        else{
-                            //                            speechUtterance.preUtteranceDelay = 0
-                            //                        }
-                            
-                            
-                            print("播报的input \(reportResult.content)")
-                            
-                            self.speechPerformer.performSpeechSynthesis(utterance: speechUtterance)
+            for (turnIndex, turnResult) in input.enumerated() {
+                for (reportIndex, reportResult) in turnResult.enumerated() {
+                    let speakString = reportResult.content + " " + reportResult.content
+                    if !speakString.isEmpty{
+                        let speechUtterance = AVSpeechUtterance(string: speakString)
+                        speechUtterance.postUtteranceDelay = 0.1
+                        if reportResult.voiceType == 0{
+                            speechUtterance.voice = chineseMaleVoice
                         }
+                        if reportResult.voiceType == 1{
+                            speechUtterance.voice = chineseFemaleVoice
+                        }
+                        
+                        //                        if reportIndex == 0 && turnIndex == 0 {
+                        //                            speechUtterance.preUtteranceDelay = 0.05
+                        //                        }
+                        //                        else{
+                        //                            speechUtterance.preUtteranceDelay = 0
+                        //                        }
+                        
+                        
+                        print("播报的input \(reportResult.content)")
+                        
+                        self.speechPerformer.performSpeechSynthesis(utterance: speechUtterance)
                     }
                 }
             }
+            
         }
     }
     
