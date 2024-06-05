@@ -1,7 +1,6 @@
 
 import Foundation
-//import Python
-//import PythonKit
+
 
 class TenPointFiveGameRule : Rule{
     let handNum :[Int] = [2]

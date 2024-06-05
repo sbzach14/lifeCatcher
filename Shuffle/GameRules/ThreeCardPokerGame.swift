@@ -1,7 +1,5 @@
 
 import Foundation
-//import Python
-//import PythonKit
 
 class ThreeCardPokerGameRule : Rule{
     

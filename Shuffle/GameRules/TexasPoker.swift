@@ -93,11 +93,6 @@ class TexasPoker{
     static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo], [Int]) {
         
         
-//        let json = Python.import("json")
-//
-//        let pythonObject =  json.TexasPokerGame.calResult(inputCards, args, rankRules, suitRules)
-//        // 使用 map() 函数将 PythonList 转换为 Int 数组
-//        let intArray = Array<Int>(pythonObject)!
         print("Array")
         var inputString : String = ""
         for i in 0..<inputCards.count{

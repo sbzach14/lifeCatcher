@@ -1,6 +1,5 @@
 import Foundation
-//import Python
-//import PythonKit
+
 
 class TwoEightGangGameRule : Rule{
     let samePointComparision:[Int:String] = [

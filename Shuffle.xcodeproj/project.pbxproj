@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 56;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -60,8 +60,6 @@
 		A88EFE092A7FAD1100897243 /* SettingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFE082A7FAD1100897243 /* SettingViewModel.swift */; };
 		A88EFE0B2A7FC05900897243 /* JsonUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFE0A2A7FC05900897243 /* JsonUtils.swift */; };
 		A88EFE0D2A7FDC9500897243 /* RecordHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFE0C2A7FDC9500897243 /* RecordHistoryView.swift */; };
-		A88F209D2A10EB39005E4A27 /* python-stdlib in Resources */ = {isa = PBXBuildFile; fileRef = A88F209C2A10EB39005E4A27 /* python-stdlib */; };
-		A88F209F2A10EB4D005E4A27 /* Python.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = A88F209E2A10EB4D005E4A27 /* Python.xcframework */; };
 		A88F20A12A10EBC6005E4A27 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A88F20A02A10EBC6005E4A27 /* SystemConfiguration.framework */; };
 		A88F20AE2A13A470005E4A27 /* PokerBull.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88F20AD2A13A470005E4A27 /* PokerBull.swift */; };
 		A88F20B02A1DEE63005E4A27 /* TinyNineGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88F20AF2A1DEE63005E4A27 /* TinyNineGame.swift */; };
@@ -143,8 +141,6 @@
 		A88EFE082A7FAD1100897243 /* SettingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewModel.swift; sourceTree = "<group>"; };
 		A88EFE0A2A7FC05900897243 /* JsonUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonUtils.swift; sourceTree = "<group>"; };
 		A88EFE0C2A7FDC9500897243 /* RecordHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordHistoryView.swift; sourceTree = "<group>"; };
-		A88F209C2A10EB39005E4A27 /* python-stdlib */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "python-stdlib"; sourceTree = "<group>"; };
-		A88F209E2A10EB4D005E4A27 /* Python.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = Python.xcframework; sourceTree = "<group>"; };
 		A88F20A02A10EBC6005E4A27 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		A88F20AD2A13A470005E4A27 /* PokerBull.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokerBull.swift; sourceTree = "<group>"; };
 		A88F20AF2A1DEE63005E4A27 /* TinyNineGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TinyNineGame.swift; sourceTree = "<group>"; };
@@ -174,7 +170,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A88F209F2A10EB4D005E4A27 /* Python.xcframework in Frameworks */,
 				A88F20A12A10EBC6005E4A27 /* SystemConfiguration.framework in Frameworks */,
 				A82088952C0C5D8800268013 /* AsyncAlgorithms in Frameworks */,
 			);
@@ -189,8 +184,6 @@
 				A88F20922A0F9BA0005E4A27 /* Packages */,
 				A88716812A06413600B7F2CD /* DOC.md */,
 				5269731033A41881895B5A41 /* README.md */,
-				A88F209E2A10EB4D005E4A27 /* Python.xcframework */,
-				A88F209C2A10EB39005E4A27 /* python-stdlib */,
 				18CA1479284ABEC600F90372 /* Shuffle */,
 				B03B7B512A98AD32006A0647 /* ShuffleTests */,
 				18CA1478284ABEC600F90372 /* Products */,
@@ -410,7 +403,6 @@
 				18CA1473284ABEC600F90372 /* Sources */,
 				18CA1474284ABEC600F90372 /* Frameworks */,
 				18CA1475284ABEC600F90372 /* Resources */,
-				A88F20A42A10FB0C005E4A27 /* ShellScript */,
 				A88716802A063EEF00B7F2CD /* Run Script */,
 			);
 			buildRules = (
@@ -443,7 +435,7 @@
 				};
 			};
 			buildConfigurationList = 18CA1472284ABEC600F90372 /* Build configuration list for PBXProject "Shuffle" */;
-			compatibilityVersion = "Xcode 14.0";
+			compatibilityVersion = "Xcode 15.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -471,7 +463,6 @@
 			files = (
 				A838534E2ADA7D7100346038 /* GameClass.xcassets in Resources */,
 				18C8929B2B65118F009D37DC /* fail_tip.mp3 in Resources */,
-				A88F209D2A10EB39005E4A27 /* python-stdlib in Resources */,
 				A83853502ADA83F600346038 /* Icon_Repo.xcassets in Resources */,
 				A82088902C0BB9E000268013 /* Assets.xcassets in Resources */,
 				A8D9FF072BD6E09C0081773C /* start_DetecBeep.mp3 in Resources */,
@@ -501,25 +492,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\ncd \"${TARGET_BUILD_DIR}/${PRODUCT_NAME}.app\"\nupx -9 \"${TARGET_NAME}\"\n";
-		};
-		A88F20A42A10FB0C005E4A27 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\n#!/bin/bash\nset -e\n\necho \"Signing as $EXPANDED_CODE_SIGN_IDENTITY_NAME ($EXPANDED_CODE_SIGN_IDENTITY)\"\n\nfind \"$CODESIGNING_FOLDER_PATH/python-stdlib/lib-dynload\" -name \"*.so\" -exec /usr/bin/codesign --force --sign \"$EXPANDED_CODE_SIGN_IDENTITY\" -o runtime --timestamp=none --preserve-metadata=identifier,entitlements,flags --generate-entitlement-der {} \\;\n\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\ncd \"${TARGET_BUILD_DIR}/${PRODUCT_NAME}.app\"\nif [ \"$PLATFORM_NAME\" == \"iphoneos\" ]; then\n    upx -9 \"${TARGET_NAME}\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -630,6 +603,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_ON_DEMAND_RESOURCES = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -692,6 +666,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_ON_DEMAND_RESOURCES = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -740,6 +715,7 @@
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -749,9 +725,13 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.shuffle.JimeiApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -784,6 +764,7 @@
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -793,9 +774,13 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.shuffle.JimeiDistribution;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

@@ -1,7 +1,6 @@
 
 import Foundation
-//import Python
-//import PythonKit
+
 
 class PokerBullRule : Rule{
     
@@ -312,11 +311,6 @@ class PokerBull{
             46: "♦️8 ", 47: "♦️9 ", 48: "♦️10 ", 49: "♦️J ", 50: "♦️Q ", 51: "♦️K ", 52: "none", 53: "小王", 54: "大王"
         ]
 
-//        let json = Python.import("json")
-//
-//        let pythonObject =  json.PokerBullGame.calResult(inputCards, args, rankRules, suitRules)
-        // 使用 map() 函数将 PythonList 转换为 Int 数组
-//        let intArray = Array<Int>(pythonObject)!
         print("Array")
         var inputString : String = ""
         for i in 0..<inputCards.count{
@@ -875,8 +869,7 @@ class PokerBullGame {
     // Rest of the PokerBullGame class translation...
 }
 
-// Define your Card, RankRules, Init_deck, and Player classes here
-// These classes are referenced in the translated code but not provided in your original Python snippet.
+
 
 class BullHandEvaluator {
 

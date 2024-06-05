@@ -1,8 +1,0 @@
-module Python {
-
-    umbrella header "Python.h"
-
-    export *
-
-    link "Python"
-}
