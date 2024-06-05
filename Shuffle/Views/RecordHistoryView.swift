@@ -5,16 +5,16 @@ import SwiftUI
 struct RecordHistoryView: View {
     @State private var searchText = ""
     @State private var selectedRuleIndex: Int? = nil
-    @State private var isNav = false
     @StateObject private var viewModel = RecordHistoryViewModel()
     
     var body: some View {
-        VStack {
-            NavigationLink(destination: SelectRuleView(), isActive: $isNav) {
-            }
-            .hidden()
+        
+        VStack{
+            Spacer()
+            
             ScrollView {
                 VStack(spacing: 0) {
+                    Divider().colorInvert()
                     ForEach(viewModel.recordHistoryData.keys.sorted(), id: \.self) { key in
                         if let value = viewModel.recordHistoryData[key]?.count {
                             if value > 0{
@@ -37,18 +37,16 @@ struct RecordHistoryView: View {
                         }
                     }
                 }
-            }.padding()
-            
-            Spacer()
-            
-        }.background(Image("bg").resizable().scaledToFill())
-        .navigationBarTitle("历史记录")
-        .onAppear {
-            // Show the navigation bar when this view appears
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                isNav = viewModel.isActive
             }
-        }
+    }
+    .background(
+        Image("bg")
+            .resizable()
+            .scaledToFill()
+    )
+    .navigationBarTitle("历史记录")
+        
+            
     }
 }
 

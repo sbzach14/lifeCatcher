@@ -28,25 +28,11 @@ struct SettingView: View {
     @StateObject var viewModel = SettingViewModel()
     
     
-    var body: some View {
+    var body: some View {     
             VStack{
-                SearchBar(searchText: $viewModel.searchText)
-                    .onAppear {
-                        NotificationCenter.default.addObserver(forName: UIResponder.keyboardDidHideNotification, object: nil, queue: .main) { notification in
-                            // Handle the "Return" button pressed event here
-                            // For example, you can call a method in your ViewModel
-                            viewModel.onReturnKeyPressed()
-                        }
-                    }
-                    .onDisappear {
-                        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardDidHideNotification, object: nil)
-                    }
 
                 ScrollView {
                     VStack()  {
-                        
-                        if(viewModel.isActive){
-                            
                             HStack {
                                 Text("黑屏").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
 
@@ -108,18 +94,6 @@ struct SettingView: View {
                             }
                             Divider().colorInvert()
                         }
-                        
-                        NavigationLink(
-                            destination: InfoView(activeDate: viewModel.activeDate, authKey: viewModel.uniqueID)
-                        ) {
-                            Text("信息")
-                                .foregroundColor(.white)
-                                .padding(.leading, 20)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        Divider().colorInvert()
-                        
-                     }
                 }
             }
             .onDisappear{

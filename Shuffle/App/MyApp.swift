@@ -3,8 +3,7 @@ import AVFoundation
 
 @main
 struct MyApp: App {
-    @State private var showMainMenu = false
-
+    
     init(){
         // 创建导航栏外观样式
         let appearance = UINavigationBarAppearance()
@@ -21,20 +20,9 @@ struct MyApp: App {
     
     var body: some Scene {
         WindowGroup {
-            if self.showMainMenu == true{
-                MainMenuView().onAppear {
+            MainMenuView().onAppear {
                     requestPermissions()
                     initFile()
-                    timeCheck()
-                }
-            } else {
-                LoadingView().onAppear {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        withAnimation(Animation.linear(duration: 0.5)) {
-                            self.showMainMenu = true
-                        }
-                    }
-                }
             }
         }
     }
@@ -69,41 +57,6 @@ struct MyApp: App {
         
     }
     
-    public func timeCheck(){
-        
-        fetchInternetCurrentDate { internetDate in
-            
-            let activeTimeString = readParaJSON()!["activeTime"]
-            
-            if let internetDate = internetDate {
-                if activeTimeString == "TEMP"{
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 5 * 60) {
-                        UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            exit(0)
-                        }
-                    }
-                }
-                else if activeTimeString != ""{
-                    // 格式化日期字符串为 Date 对象
-                    let dateFormatter = DateFormatter()
-                    dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-                    let activeTime = dateFormatter.date(from: activeTimeString!)
-                        
-                    if TimeLimitations(activeDate: activeTime!, nowDate: internetDate){
-                        print("有效期内")
-                    }
-                    else{
-                        print("已过期")
-                        exit(0)
-                    }
-                }
-            } else {
-                print("无法获取互联网当前日期")
-                exit(0)
-            }
-        }
-    }
+    
 }
-
 

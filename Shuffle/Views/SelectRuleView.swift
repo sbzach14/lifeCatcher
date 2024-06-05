@@ -95,7 +95,7 @@ struct SelectRuleView: View {
                 .resizable()
                 .scaledToFill()
             
-        ).navigationTitle("选择规则").onAppear(){
+        ).navigationTitle("游戏设置").onAppear(){
             self.rules = RuleManager.allUsersGameRule
         }
     }

@@ -3,14 +3,26 @@
 import SwiftUI
 
 struct InfoView: View {
-    @State private var searchText = ""
-    
-    var activeDate: String
-    var authKey: String
-    
+    @StateObject var viewModel = SettingViewModel()
+
     var body: some View {
         VStack{
-            SearchBar(searchText: $searchText)
+            SearchBar(searchText: $viewModel.searchText)
+                .onAppear {
+                    NotificationCenter.default.addObserver(forName: UIResponder.keyboardDidHideNotification, object: nil, queue: .main) { notification in
+                        // Handle the "Return" button pressed event here
+                        // For example, you can call a method in your ViewModel
+                        viewModel.onReturnKeyPressed()
+                    }
+                }
+                .onDisappear {
+                    NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardDidHideNotification, object: nil)
+                }
+            
+            NavigationLink(destination: PanguMainMenuView(), isActive: $viewModel.isLogin) {
+            }
+            .hidden()
+            
             ScrollView {
                 VStack(alignment: .leading, spacing: 0)  {
                     Text("版本:1.0").padding()
@@ -18,12 +30,12 @@ struct InfoView: View {
                     
                     Divider().colorInvert()
                     
-                    Text("序列号:" + authKey).textSelection(.enabled).padding()
+                    Text("序列号:" + viewModel.uniqueID).textSelection(.enabled).padding()
                         .foregroundColor(.white)
                     
                     Divider().colorInvert()
                     
-                    Text("激活日期:" + activeDate).padding()
+                    Text("激活日期:" + viewModel.activeDate).padding()
                         .foregroundColor(.white)
                     
                     Divider().colorInvert()
@@ -46,6 +58,6 @@ struct InfoView: View {
 
 struct InfoView_Previews: PreviewProvider {
     static var previews: some View {
-        InfoView(activeDate: "Now", authKey: "")
+        InfoView()
     }
 }

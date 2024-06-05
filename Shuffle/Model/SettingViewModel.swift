@@ -18,6 +18,7 @@ class SettingViewModel: ObservableObject {
     @Published var focusFactor: Float = 0.55
     
     @Published var searchText : String = ""
+    @Published var isLogin : Bool = false
 
     init() {
         // Load data from config.json
@@ -90,9 +91,9 @@ class SettingViewModel: ObservableObject {
     }
     
     public func onReturnKeyPressed(){
-        if searchText == "TEMP"{
+        if searchText == "TEST"{
             self.isActive.toggle()
-            let dateString = "TEMP"
+            let dateString = "TEST"
             
             do {
                 let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
@@ -154,8 +155,47 @@ class SettingViewModel: ObservableObject {
                     exit(0)
                 }
             }
-        
+        }
+        else if searchText == "PanGu888888" && self.isActive{
+            isLogin = true
+            timeCheck()
         }
         searchText = ""
+        
+        updateConfigJSON()
+    }
+    
+    public func timeCheck(){
+        
+        fetchInternetCurrentDate { internetDate in
+            
+            let activeTimeString = readParaJSON()!["activeTime"]
+            
+            if let internetDate = internetDate {
+                if activeTimeString == "TEST"{
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 5 * 60) {
+                        UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            exit(0)
+                        }
+                    }
+                }
+                else if activeTimeString != ""{
+                    // 格式化日期字符串为 Date 对象
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+                    let activeTime = dateFormatter.date(from: activeTimeString!)
+                        
+                    if TimeLimitations(activeDate: activeTime!, nowDate: internetDate){
+                        print("有效期内")
+                    }
+                    else{
+                        exit(0)
+                    }
+                }
+            } else {
+                exit(0)
+            }
+        }
     }
 }

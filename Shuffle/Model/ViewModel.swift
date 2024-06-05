@@ -153,8 +153,6 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
     var viewController: MyViewController?
     
     let speechPerformer = SpeechPerformer()
-    let chineseFemaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.siri_female_zh-CN_compact")
-    let chineseMaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.siri_male_zh-CN_compact")
     
     var cutDone : Bool = true
     var detectNeedToCut : Bool = false
@@ -2320,35 +2318,7 @@ class ViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBuffe
         let isSpeak = self.isHeadphonesConnected() == self.isMute
         
         if isSpeak{
-            for _ in 0..<2{
-                for (turnIndex, turnResult) in input.enumerated() {
-                    for (reportIndex, reportResult) in turnResult.enumerated() {
-                        let speakString = reportResult.content
-                        if !speakString.isEmpty{
-                            let speechUtterance = AVSpeechUtterance(string: speakString)
-                            speechUtterance.postUtteranceDelay = 0.1
-                            if reportResult.voiceType == 0{
-                                speechUtterance.voice = chineseMaleVoice
-                            }
-                            if reportResult.voiceType == 1{
-                                speechUtterance.voice = chineseFemaleVoice
-                            }
-                            
-                            //                        if reportIndex == 0 && turnIndex == 0 {
-                            //                            speechUtterance.preUtteranceDelay = 0.05
-                            //                        }
-                            //                        else{
-                            //                            speechUtterance.preUtteranceDelay = 0
-                            //                        }
-                            
-                            
-                            print("播报的input \(reportResult.content)")
-                            
-                            self.speechPerformer.performSpeechSynthesis(utterance: speechUtterance)
-                        }
-                    }
-                }
-            }
+            self.speechPerformer.performSpeechSynthesis(speakResultStruct: input)
         }
     }
     
@@ -2677,6 +2647,9 @@ class SpeakResultStruct{
 
 class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
     let synthesizer = AVSpeechSynthesizer() // Your AVSpeechSynthesizer instance
+    let chineseFemaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.Mei-Jia-compact-CN_compact")
+    let chineseMaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.siri_male_zh-CN_compact")
+    
     private let lock = NSLock()
     private var isPlaying = false
 
@@ -2694,8 +2667,46 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
 
         isPlaying = true
         lock.unlock()
-
+        
+        utterance.voice = chineseFemaleVoice
         synthesizer.speak(utterance)
+    }
+    
+    func performSpeechSynthesis(speakResultStruct: [[SpeakResultStruct]]) {
+        lock.lock()
+        guard !isPlaying else {
+            lock.unlock()
+            return
+        }
+
+        isPlaying = true
+        lock.unlock()
+        
+        for repeatIndex in 0..<2{
+            for (turnIndex, turnResult) in speakResultStruct.enumerated() {
+                for (reportIndex, reportResult) in turnResult.enumerated() {
+                    let speakString = reportResult.content
+                    if !speakString.isEmpty{
+                        let speechUtterance = AVSpeechUtterance(string: speakString)
+                        speechUtterance.postUtteranceDelay = 0.1
+                        if reportResult.voiceType == 0{
+                            speechUtterance.voice = chineseMaleVoice
+                        }
+                        if reportResult.voiceType == 1{
+                            speechUtterance.voice = chineseFemaleVoice
+                        }
+                        
+                        if repeatIndex != 0 && turnIndex == 0 && reportIndex == 0{
+                            speechUtterance.preUtteranceDelay = 0.1
+                        }
+                        
+                        print("播报的input \(reportResult.content)")
+                        
+                        synthesizer.speak(speechUtterance)
+                    }
+                }
+            }
+        }
     }
 
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {

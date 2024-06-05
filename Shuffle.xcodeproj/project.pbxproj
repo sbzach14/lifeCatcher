@@ -13,12 +13,6 @@
 		181C96A82B60DC180042006E /* ChickenBattleGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C96A72B60DC180042006E /* ChickenBattleGame.swift */; };
 		181C96AA2B60DD610042006E /* CardNineGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C96A92B60DD610042006E /* CardNineGame.swift */; };
 		181C96AC2B60E26A0042006E /* JiaJiaBaoGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 181C96AB2B60E26A0042006E /* JiaJiaBaoGame.swift */; };
-		184F40A72B60FE170001B3DC /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 184F40A62B60FE170001B3DC /* LoadingView.swift */; };
-		189C3BE92BDFFFA5007EB67E /* n_640_cls_50.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 189C3BE72BDFFFA4007EB67E /* n_640_cls_50.mlmodel */; };
-		189C3BEA2BDFFFA5007EB67E /* n_960_nocls_50.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 189C3BE82BDFFFA5007EB67E /* n_960_nocls_50.mlmodel */; };
-		189C3BEC2BE0104A007EB67E /* n_640_nocls_50.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 189C3BEB2BE0104A007EB67E /* n_640_nocls_50.mlmodel */; };
-		189C3BEE2BE01787007EB67E /* stable_model.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 189C3BED2BE01787007EB67E /* stable_model.mlmodel */; };
-		189C3BF02BE01D5A007EB67E /* n_640_cls_30.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 189C3BEF2BE01D5A007EB67E /* n_640_cls_30.mlmodel */; };
 		18C8929B2B65118F009D37DC /* fail_tip.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18C892992B65118F009D37DC /* fail_tip.mp3 */; };
 		18C8929C2B65118F009D37DC /* start_tip.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 18C8929A2B65118F009D37DC /* start_tip.mp3 */; };
 		18CA14D2284AC42C00F90372 /* ViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14C3284AC42C00F90372 /* ViewModel.swift */; };
@@ -28,6 +22,8 @@
 		18CA14DB284AC42C00F90372 /* MyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14D0284AC42C00F90372 /* MyApp.swift */; };
 		18CA14DC284AC42C00F90372 /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14D1284AC42C00F90372 /* AuthView.swift */; };
 		18D9CDEA2B84F7CE00A93684 /* ReportSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18D9CDE92B84F7CE00A93684 /* ReportSettingView.swift */; };
+		18F6C0C32C10A685007BEAEC /* RecordHistoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F6C0C22C10A685007BEAEC /* RecordHistoryViewModel.swift */; };
+		18F6C0C52C10A9E4007BEAEC /* PanguMainMenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F6C0C42C10A9E4007BEAEC /* PanguMainMenuView.swift */; };
 		18FFC40A2BB9587A00029B0D /* BlurDetector_origin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FFC4092BB9587900029B0D /* BlurDetector_origin.swift */; };
 		A80959662BC52AB2009A2DB4 /* ThirteenWaterGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A80959652BC52AB1009A2DB4 /* ThirteenWaterGame.swift */; };
 		A809B3E22AE5126700F728A9 /* BaoziGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = A809B3E12AE5126700F728A9 /* BaoziGame.swift */; };
@@ -43,7 +39,6 @@
 		A87A82052B2EF66200B1B37B /* DealTypeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87A82042B2EF66200B1B37B /* DealTypeView.swift */; };
 		A887167F2A0623E500B7F2CD /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887167E2A0623E500B7F2CD /* AuthManager.swift */; };
 		A88716852A0F701500B7F2CD /* GameManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88716842A0F701500B7F2CD /* GameManager.swift */; };
-		A887B64E2A7FDF56009F488F /* RecordHistoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B64D2A7FDF56009F488F /* RecordHistoryViewModel.swift */; };
 		A887B6502A7FE1AF009F488F /* ShowRecordHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B64F2A7FE1AF009F488F /* ShowRecordHistoryView.swift */; };
 		A887B6522A8104BC009F488F /* TimeUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B6512A8104BC009F488F /* TimeUtils.swift */; };
 		A887B6582A8511A4009F488F /* InfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B6572A8511A4009F488F /* InfoView.swift */; };
@@ -88,12 +83,6 @@
 		181C96A72B60DC180042006E /* ChickenBattleGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChickenBattleGame.swift; sourceTree = "<group>"; };
 		181C96A92B60DD610042006E /* CardNineGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardNineGame.swift; sourceTree = "<group>"; };
 		181C96AB2B60E26A0042006E /* JiaJiaBaoGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JiaJiaBaoGame.swift; sourceTree = "<group>"; };
-		184F40A62B60FE170001B3DC /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
-		189C3BE72BDFFFA4007EB67E /* n_640_cls_50.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = n_640_cls_50.mlmodel; sourceTree = "<group>"; };
-		189C3BE82BDFFFA5007EB67E /* n_960_nocls_50.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = n_960_nocls_50.mlmodel; sourceTree = "<group>"; };
-		189C3BEB2BE0104A007EB67E /* n_640_nocls_50.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = n_640_nocls_50.mlmodel; sourceTree = "<group>"; };
-		189C3BED2BE01787007EB67E /* stable_model.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = stable_model.mlmodel; sourceTree = "<group>"; };
-		189C3BEF2BE01D5A007EB67E /* n_640_cls_30.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = n_640_cls_30.mlmodel; sourceTree = "<group>"; };
 		18C892992B65118F009D37DC /* fail_tip.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = fail_tip.mp3; sourceTree = "<group>"; };
 		18C8929A2B65118F009D37DC /* start_tip.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = start_tip.mp3; sourceTree = "<group>"; };
 		18CA1477284ABEC600F90372 /* Shuffle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Shuffle.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -104,17 +93,15 @@
 		18CA14D0284AC42C00F90372 /* MyApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MyApp.swift; sourceTree = "<group>"; };
 		18CA14D1284AC42C00F90372 /* AuthView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		18D9CDE92B84F7CE00A93684 /* ReportSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportSettingView.swift; sourceTree = "<group>"; };
+		18F6C0C22C10A685007BEAEC /* RecordHistoryViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RecordHistoryViewModel.swift; sourceTree = "<group>"; };
+		18F6C0C42C10A9E4007BEAEC /* PanguMainMenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PanguMainMenuView.swift; sourceTree = "<group>"; };
 		18FFC4092BB9587900029B0D /* BlurDetector_origin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BlurDetector_origin.swift; sourceTree = "<group>"; };
 		50053F80284ACAED00C86BF4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		5269731033A41881895B5A41 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		A6748516A40E187B4F8ACFA3 /* SampleCode.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
 		A80959652BC52AB1009A2DB4 /* ThirteenWaterGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThirteenWaterGame.swift; sourceTree = "<group>"; };
 		A809B3E12AE5126700F728A9 /* BaoziGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaoziGame.swift; sourceTree = "<group>"; };
 		A80D65F72AFF75ED005B5E5E /* AddRuleSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddRuleSettingView.swift; sourceTree = "<group>"; };
 		A812F9302A3DCD0800AA392F /* ThreeCardPokerGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThreeCardPokerGame.swift; sourceTree = "<group>"; };
 		A820888F2C0BB9E000268013 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = Shuffle/App/Assets.xcassets; sourceTree = SOURCE_ROOT; };
-		A83853452ABEDE0900346038 /* cardDetection.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection.mlmodel; sourceTree = "<group>"; };
-		A83853462ABEDE0900346038 /* cardDetection_quantilized.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cardDetection_quantilized.mlmodel; sourceTree = "<group>"; };
 		A838534B2ADA7C0200346038 /* BackGround.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = BackGround.xcassets; sourceTree = "<group>"; };
 		A838534D2ADA7D7100346038 /* GameClass.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = GameClass.xcassets; sourceTree = "<group>"; };
 		A838534F2ADA83F600346038 /* Icon_Repo.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Icon_Repo.xcassets; sourceTree = "<group>"; };
@@ -122,9 +109,7 @@
 		A83DC6792A22352C00EC8210 /* SelectRuleView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectRuleView.swift; sourceTree = "<group>"; };
 		A87A82042B2EF66200B1B37B /* DealTypeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DealTypeView.swift; sourceTree = "<group>"; };
 		A887167E2A0623E500B7F2CD /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
-		A88716812A06413600B7F2CD /* DOC.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = DOC.md; sourceTree = "<group>"; };
 		A88716842A0F701500B7F2CD /* GameManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameManager.swift; sourceTree = "<group>"; };
-		A887B64D2A7FDF56009F488F /* RecordHistoryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordHistoryViewModel.swift; sourceTree = "<group>"; };
 		A887B64F2A7FE1AF009F488F /* ShowRecordHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowRecordHistoryView.swift; sourceTree = "<group>"; };
 		A887B6512A8104BC009F488F /* TimeUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeUtils.swift; sourceTree = "<group>"; };
 		A887B6572A8511A4009F488F /* InfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoView.swift; sourceTree = "<group>"; };
@@ -182,15 +167,12 @@
 			isa = PBXGroup;
 			children = (
 				A88F20922A0F9BA0005E4A27 /* Packages */,
-				A88716812A06413600B7F2CD /* DOC.md */,
-				5269731033A41881895B5A41 /* README.md */,
 				18CA1479284ABEC600F90372 /* Shuffle */,
 				B03B7B512A98AD32006A0647 /* ShuffleTests */,
 				18CA1478284ABEC600F90372 /* Products */,
 				6F1A40C356DDD7B853F4B7B0 /* Configuration */,
 				8FCAE36708347D80E3093CD0 /* LICENSE */,
 				A88F20962A0FB582005E4A27 /* Frameworks */,
-				B0E55D922ABF118C004027AA /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -221,9 +203,9 @@
 			isa = PBXGroup;
 			children = (
 				A88EFDC12A7D217100897243 /* VisionObjectRecognitionViewModel.swift */,
+				18F6C0C22C10A685007BEAEC /* RecordHistoryViewModel.swift */,
 				18CA14C3284AC42C00F90372 /* ViewModel.swift */,
 				A88EFE082A7FAD1100897243 /* SettingViewModel.swift */,
-				A887B64D2A7FDF56009F488F /* RecordHistoryViewModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -241,6 +223,7 @@
 				A8D0D9372A35D9970061A90E /* RankRulesView.swift */,
 				A8FBC7BA2A3DF1B000EDDFD7 /* SuitRulesView.swift */,
 				A88EFE062A7FA95A00897243 /* SettingView.swift */,
+				18F6C0C42C10A9E4007BEAEC /* PanguMainMenuView.swift */,
 				A88EFE0C2A7FDC9500897243 /* RecordHistoryView.swift */,
 				A892C5FF2A765A0A003FA2B3 /* MainMenuView.swift */,
 				A887B64F2A7FE1AF009F488F /* ShowRecordHistoryView.swift */,
@@ -248,7 +231,6 @@
 				A8EFFEB02B28766C00FC884F /* CutNumRangeSettingView.swift */,
 				A87A82042B2EF66200B1B37B /* DealTypeView.swift */,
 				181C969D2B5D9DC90042006E /* SelectGameView.swift */,
-				184F40A62B60FE170001B3DC /* LoadingView.swift */,
 				18D9CDE92B84F7CE00A93684 /* ReportSettingView.swift */,
 			);
 			path = Views;
@@ -268,7 +250,6 @@
 		6F1A40C356DDD7B853F4B7B0 /* Configuration */ = {
 			isa = PBXGroup;
 			children = (
-				A6748516A40E187B4F8ACFA3 /* SampleCode.xcconfig */,
 			);
 			name = Configuration;
 			sourceTree = "<group>";
@@ -348,13 +329,8 @@
 			isa = PBXGroup;
 			children = (
 				A88EFE022A7E8ACC00897243 /* Resnet50FP16.mlmodel */,
-				189C3BEF2BE01D5A007EB67E /* n_640_cls_30.mlmodel */,
-				189C3BE72BDFFFA4007EB67E /* n_640_cls_50.mlmodel */,
-				189C3BEB2BE0104A007EB67E /* n_640_nocls_50.mlmodel */,
-				189C3BE82BDFFFA5007EB67E /* n_960_nocls_50.mlmodel */,
 				A88F8A0E2C0308A80053CF25 /* blur_detect_0526.mlmodel */,
 				A88F8A082BFA361B0053CF25 /* blur_aug_0517.mlmodel */,
-				189C3BED2BE01787007EB67E /* stable_model.mlmodel */,
 				181C969F2B5DB5980042006E /* success_tip.mp3 */,
 				A8D9FF062BD6E09C0081773C /* start_DetecBeep.mp3 */,
 				18C892992B65118F009D37DC /* fail_tip.mp3 */,
@@ -384,15 +360,6 @@
 			path = ShuffleTests;
 			sourceTree = "<group>";
 		};
-		B0E55D922ABF118C004027AA /* Recovered References */ = {
-			isa = PBXGroup;
-			children = (
-				A83853452ABEDE0900346038 /* cardDetection.mlmodel */,
-				A83853462ABEDE0900346038 /* cardDetection_quantilized.mlmodel */,
-			);
-			name = "Recovered References";
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -403,7 +370,6 @@
 				18CA1473284ABEC600F90372 /* Sources */,
 				18CA1474284ABEC600F90372 /* Frameworks */,
 				18CA1475284ABEC600F90372 /* Resources */,
-				A88716802A063EEF00B7F2CD /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -475,33 +441,13 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		A88716802A063EEF00B7F2CD /* Run Script */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 8;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Run Script";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 1;
-			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\ncd \"${TARGET_BUILD_DIR}/${PRODUCT_NAME}.app\"\nif [ \"$PLATFORM_NAME\" == \"iphoneos\" ]; then\n    upx -9 \"${TARGET_NAME}\"\nfi\n";
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		18CA1473284ABEC600F90372 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				A8E0E2E92AADF9240091FC1D /* NinePointFiveGame.swift in Sources */,
+				18F6C0C32C10A685007BEAEC /* RecordHistoryViewModel.swift in Sources */,
 				18CA14DC284AC42C00F90372 /* AuthView.swift in Sources */,
 				A887B6582A8511A4009F488F /* InfoView.swift in Sources */,
 				B03B7B2F2A963C1B006A0647 /* utils.swift in Sources */,
@@ -525,22 +471,20 @@
 				A88C71F42B945ABD001D8BD8 /* ReportClass.swift in Sources */,
 				B03B7B2D2A963C05006A0647 /* Card.swift in Sources */,
 				181C969E2B5D9DC90042006E /* SelectGameView.swift in Sources */,
-				184F40A72B60FE170001B3DC /* LoadingView.swift in Sources */,
 				181C96AA2B60DD610042006E /* CardNineGame.swift in Sources */,
 				A88C71F22B93570D001D8BD8 /* TenPointFiveGame.swift in Sources */,
 				181C96AC2B60E26A0042006E /* JiaJiaBaoGame.swift in Sources */,
 				A8E0E2E52AADEF560091FC1D /* ThreeMenGame.swift in Sources */,
-				A887B64E2A7FDF56009F488F /* RecordHistoryViewModel.swift in Sources */,
 				18CA14D2284AC42C00F90372 /* ViewModel.swift in Sources */,
 				A88F8A092BFA361B0053CF25 /* blur_aug_0517.mlmodel in Sources */,
 				A88F20AE2A13A470005E4A27 /* PokerBull.swift in Sources */,
 				A8D0D9362A24A4C20061A90E /* TexasPoker.swift in Sources */,
 				181C96A82B60DC180042006E /* ChickenBattleGame.swift in Sources */,
-				189C3BEE2BE01787007EB67E /* stable_model.mlmodel in Sources */,
 				A8FBC7C22A3F0A5C00EDDFD7 /* CVUtils.swift in Sources */,
 				A8EFFEB12B28766C00FC884F /* CutNumRangeSettingView.swift in Sources */,
 				A88C71F02B93101C001D8BD8 /* ThreeCardPointGame.swift in Sources */,
 				18CA14D3284AC42C00F90372 /* ShowCardView.swift in Sources */,
+				18F6C0C52C10A9E4007BEAEC /* PanguMainMenuView.swift in Sources */,
 				A88EFE0D2A7FDC9500897243 /* RecordHistoryView.swift in Sources */,
 				18CA14D6284AC42C00F90372 /* CameraView.swift in Sources */,
 				A88EFE072A7FA95A00897243 /* SettingView.swift in Sources */,
@@ -551,15 +495,11 @@
 				A8E0E2E72AADF6E20091FC1D /* TwoEightGangGame.swift in Sources */,
 				A887B6502A7FE1AF009F488F /* ShowRecordHistoryView.swift in Sources */,
 				A8D0D9382A35D9970061A90E /* RankRulesView.swift in Sources */,
-				189C3BEC2BE0104A007EB67E /* n_640_nocls_50.mlmodel in Sources */,
-				189C3BEA2BDFFFA5007EB67E /* n_960_nocls_50.mlmodel in Sources */,
 				A88EFDC42A7D217200897243 /* VisionObjectRecognitionViewModel.swift in Sources */,
 				A88EFE032A7E8ACD00897243 /* Resnet50FP16.mlmodel in Sources */,
 				A8EFFEAF2B25BF8900FC884F /* UsingCardsSettingView.swift in Sources */,
 				A88C71EA2B8600AE001D8BD8 /* NinePoint.swift in Sources */,
 				A87A82052B2EF66200B1B37B /* DealTypeView.swift in Sources */,
-				189C3BF02BE01D5A007EB67E /* n_640_cls_30.mlmodel in Sources */,
-				189C3BE92BDFFFA5007EB67E /* n_640_cls_50.mlmodel in Sources */,
 				A8FBC7BB2A3DF1B000EDDFD7 /* SuitRulesView.swift in Sources */,
 				A80D65F82AFF75ED005B5E5E /* AddRuleSettingView.swift in Sources */,
 			);
@@ -570,7 +510,6 @@
 /* Begin XCBuildConfiguration section */
 		18CA1483284ABEC700F90372 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A6748516A40E187B4F8ACFA3 /* SampleCode.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -632,7 +571,6 @@
 		};
 		18CA1484284ABEC700F90372 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A6748516A40E187B4F8ACFA3 /* SampleCode.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -688,7 +626,6 @@
 		};
 		18CA1486284ABEC700F90372 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A6748516A40E187B4F8ACFA3 /* SampleCode.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -702,7 +639,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Shuffle/App/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_CFBundleDisplayName = Jimei;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
 				INFOPLIST_KEY_NSCameraUsageDescription = "This app uses the camera to capture input for images";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "";
@@ -715,7 +653,7 @@
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -737,7 +675,6 @@
 		};
 		18CA1487284ABEC700F90372 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A6748516A40E187B4F8ACFA3 /* SampleCode.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -751,7 +688,8 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Shuffle/App/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "";
+				INFOPLIST_KEY_CFBundleDisplayName = Jimei;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
 				INFOPLIST_KEY_NSCameraUsageDescription = "This app uses the camera to capture input for images";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "";
@@ -764,7 +702,7 @@
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

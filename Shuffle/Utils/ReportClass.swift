@@ -2915,7 +2915,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             
             for resultInfo in multipleReportResultInfo.singleResultList{
                 var reportString = ""
-                let voiceType = 0
+                let voiceType = 1
                 var currentReportStruct: [SpeakResultStruct] = []
                 
                 for playerID in resultInfo.targetPlayerList[0] {
@@ -2949,7 +2949,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         case 7:
             for resultInfo in multipleReportResultInfo.singleResultList{
                 var reportString = ""
-                let voiceType = 0
+                let voiceType = 1
                 var currentResult : [SpeakResultStruct] = []
                 for playerID in resultInfo.targetPlayerList[0] {
                     reportString = String(playerID + 1)
@@ -2975,7 +2975,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         case 9:
             for resultInfo in multipleReportResultInfo.singleResultList{
                 var reportString = ""
-                let voiceType = 0
+                let voiceType = 1
                 var currentSpeakStruct: [SpeakResultStruct] = []
                 for playerID in resultInfo.targetPlayerList[0] {
                     reportString = String(playerID + 1) + " "
@@ -2991,7 +2991,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         case 10:
             for resultInfo in multipleReportResultInfo.singleResultList{
                 var reportString: String = ""
-                var voiceType = 0
+                let voiceType = 1
                 var currentSpeakStruct: [SpeakResultStruct] = []
                 for playerID in resultInfo.targetPlayerList[0] {
                     reportString = String(playerID)
@@ -3045,7 +3045,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             for resultInfo in multipleReportResultInfo.singleResultList{
                 var currentSpeakStruct: [SpeakResultStruct] = []
                 for subArray in resultInfo.cardIndexToConfirmMaxMin {
-                    var voiceType:Int = 0
+                    var voiceType:Int = 1
                     var reportString: String = ""
                     for cardIndex in subArray {
                         reportString += String(cardIndex)
@@ -3171,7 +3171,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
 //            47:"[79]:上10张去牌面为色去色保位置最大次大次数最多",
 //            54:"[85]:上10张去牌保多轮位置最大次数最多*",
         case 47,54:
-            var voiceType: Int = 0
+            let voiceType: Int = 1
             var reportString: String = ""
             reportString += String(multipleReportResultInfo.cardIndexForMultipleRound) + " "
             reportString += multipleReportResultInfo.winRoundIndex.reduce("") { $0 + "\($1)" }
@@ -3187,7 +3187,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             for resultInfo in multipleReportResultInfo.singleResultList{
                 var currentSpeakStruct :[SpeakResultStruct] = []
                 for i in 0..<resultInfo.cardIndexToConfirmMaxMin.count - 1 {
-                    var voiceType: Int = 0
+                    let voiceType: Int = 1
                     var reportString: String = ""
                     for j in 0..<resultInfo.cardIndexToConfirmMaxMin[i].count {
                         reportString += String(resultInfo.cardIndexToConfirmMaxMin[i][j])
@@ -3356,7 +3356,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
 //                107: "[221]:飞2张打色留色再看底保位置最大*",
         case 91...107:
             for resultInfo in multipleReportResultInfo.singleResultList{
-                var voiceType: Int = 0
+                let voiceType: Int = 0
                 var reportString: String = ""
                 var currentSpeakStruct: [SpeakResultStruct] = []
                 for flyTwoCardNode in resultInfo.flyTwoCardSolution{

@@ -3,11 +3,11 @@
 import SwiftUI
 
 struct MainMenuView: View {
-    @State private var searchText = ""
     
     var body: some View {
         NavigationView {
             VStack{
+                Spacer()
                 
                 ScrollView {
                     VStack(spacing: 0) {
@@ -25,42 +25,32 @@ struct MainMenuView: View {
                             destination: RecordHistoryView()
                         ) {
                             VStack(alignment: .leading) {
-                                Text("记录历史")
+                                Text("历史记录")
                                     .foregroundColor(.white)
                                 Divider().colorInvert()
                             }
                             .padding()
                         }
                         NavigationLink(
-                            destination: SettingView()
+                            destination: InfoView()
                         ) {
                             VStack(alignment: .leading) {
-                                Text("设置")
+                                Text("信息")
                                     .foregroundColor(.white)
                                 Divider().colorInvert()
                             }
                             .padding()
                         }
-                        
-//                        NavigationLink(
-//                            destination: AuthView()
-//                        ) {
-//                            VStack(alignment: .leading) {
-//                                Text("验证管理")
-//                                    .foregroundColor(.white)
-//                                Divider().colorInvert()
-//                            }
-//                            .padding()
-//                        }
                     }
                 }
             }
-            .navigationBarTitle("AAAA")
             .background(
                 Image("bg")
                     .resizable()
                     .scaledToFill()
             )
+            .navigationBarTitle("集美")
+            
             
         }
     }
