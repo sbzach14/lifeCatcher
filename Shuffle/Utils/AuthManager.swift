@@ -40,7 +40,7 @@ class AuthManager {
     
     static func hashWithSalt(input: String) -> String? {
         // 设置盐值
-        let salt = "hellofromtheotherside"
+        let salt = "~Hello!From@The#Other$Side%"
         // 将盐值和getUniqueID获得的字符串组合成一个新字符串
         let saltedInput = salt + input
         // 使用SHA-512哈希算法对新字符串进行哈希加密

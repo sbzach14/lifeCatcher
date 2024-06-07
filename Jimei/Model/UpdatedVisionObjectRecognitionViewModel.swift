@@ -1,0 +1,2445 @@
+import SwiftUI
+import CreateMLComponents
+import AsyncAlgorithms
+import AVFoundation
+import CoreMedia
+import MobileCoreServices
+import Foundation
+
+import Vision
+import Foundation
+import CoreML
+import Photos
+import Accelerate
+import AudioToolbox
+import MediaPlayer
+
+
+/// - Tag: ViewModel
+class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBufferDelegate, AVAudioPlayerDelegate {
+    
+    @Published var cameraImage : CGImage?
+    @Published var isShowCard : Bool = false
+    @Published var isCamereSetting : Bool = false
+    
+    @Published var cardArray :  [Int] = []
+    @Published var winnerPlayer: [[SpeakResultStruct]] = []
+    @Published var winnerPlayerShow: String = ""
+    @Published var multipleGamePlayerInfos: ReportManager.MultipleReportResultInfo = ReportManager.MultipleReportResultInfo()
+    @Published var leftCards: [Int] = []
+    @Published var usedCards: [Int] = []
+    @Published var cutArray : [Int] = []
+    @Published var cutShowArray : [Int] = []
+    
+    let detectModel = try! detect_01()
+    let fastModel = try! cls_01()
+    let slowModel = try! cls_01()
+    
+    var imageSize : [Float] = [1137, 640] //target area 截图大小
+    var originImageSize : [Float] = [1137, 640] //target area 原始截图大小
+    //var originImageSize : [Float] = [853, 480] //target area 原始截图大小
+    var originSize : [Float] = [1920, 1080] //相机图像大小
+    var inputSize : [Int] = [640, 640] //分类尺寸
+    var detectSize : [Int] = [640, 640] //检测尺寸
+    
+    var startAudioPlayer: AVAudioPlayer?
+    var successAudioPlayer: AVAudioPlayer?
+    var failAudioPlayer: AVAudioPlayer?
+    private let commandCenter = MPRemoteCommandCenter.shared()
+    
+    // 创建一个后台队列
+    let backgroundQueue = DispatchQueue(label: "actionQueue", attributes: .concurrent)
+    let saveImageQueue = DispatchQueue(label: "saveImageQueue", qos: .userInteractive, attributes: .concurrent)
+    let detectionQueue = DispatchQueue(label: "detectionQueue", attributes: .concurrent)
+    
+    let lock = NSLock()
+    
+
+    public var state : String = "idle"
+    public var shuffleMode : Int = 0
+    public var cutMode : Int = 0
+    public var playerNum: Int = 0
+    public var dealNum: Int = 0
+    public var coloringType: Int = 0
+    public var dealType: Int = 0
+    public var diyDealNum: [Int] = []
+    public var diyDealStatus: [[Bool]] = []
+    public var calModeArgs : [Int] = [0, 0, 1]
+    public var cutNumSetting: Int = 0
+    public var cutNumRangeSetting: [Int] = [2,10]
+    public var consecutiveReport: Int = 0
+    public var reportNumber: Int = 0
+    public var voiceReport: Int = 0
+    public var ruleIndex : Int = 0
+    public var args : [Int] = []
+    public var rankRules : [Int] = []
+    public var suitRules : [Int] = [3,2,1,0]
+    public var allCardIndex : [Int] = Array(0...51)
+    public var minCardNum : Int = 0
+    public var resultReportType : Int = 0
+    
+    //测试用的定时器
+    public var ding: Int = 0
+    public var ciimageQueue: [CIImage] = []
+    
+    let idleRate = 30
+    let context = CIContext()
+    var taskImageArray : [String] = []
+    
+    var isSavedImage : Bool = true
+    var saveCount: Int = -1
+    var saveFlag: Bool = false
+    var isEmptyFrame : Bool = true
+    var taskIndex : Int = 0
+    var currentTask: Int = 0
+    
+    var detectResultList : [Int : [DetectionResult]] = [:]
+    var centerPos : [Float] = [0.5, 0.5]
+    var lastBoxes : [[Float]] = [[0.3, 0.5, 0.05, 0.05], [0.7, 0.5, 0.05, 0.05]]
+    var isHorizon : Bool = true
+    var targetArea : [Float] = [0, 0, 0, 0]
+    var isTargetArea : Bool = false
+    
+    //显示帧率
+    private var frameCount = 0
+    private var timestamp: Double = 0
+    private var frameRateLabel: UILabel! // 用于显示帧率的标签
+    
+    var captureDevice: AVCaptureDevice!
+    var captureDeviceInput: AVCaptureDeviceInput!
+    let session = AVCaptureSession()
+    private var requests = [VNRequest]()
+    
+    private var stateCounter : Int = 0
+    private var stateCard : [Int] = [-1, -1]
+    
+    private var laplacianDic: [[Int:Float]] = [[:],[:]]
+    
+    let cardLabelDic : [Int:String] = [
+        0: "♠️A ", 1: "♠️2", 2: "♠️3", 3: "♠️4", 4: "♠️5 ", 5: "♠️6 ", 6: "♠️7 ", 7: "♠️8 ", 8: "♠️9 ", 9: "♠️10 ",
+        10: "♠️J ", 11: "♠️Q ", 12: "♠️K ", 13: "♥️A ", 14: "♥️2 ", 15: "♥️3 ", 16: "♥️4 ", 17: "♥️5 ", 18: "♥️6 ",
+        19: "♥️7 ", 20: "♥️8 ", 21: "♥️9 ", 22: "♥️10 ", 23: "♥️J ", 24: "♥️Q ", 25: "♥️K ", 26: "♣️A ", 27: "♣️2 ",
+        28: "♣️3 ", 29: "♣️4 ", 30: "♣️5 ", 31: "♣️6 ", 32: "♣️7 ", 33: "♣️8 ", 34: "♣️9 ", 35: "♣️10 ", 36: "♣️J ",
+        37: "♣️Q ", 38: "♣️K ", 39: "♦️A ", 40: "♦️2 ", 41: "♦️3 ", 42: "♦️4 ", 43: "♦️5 ", 44: "♦️6", 45: "♦️7",
+        46: "♦️8 ", 47: "♦️9 ", 48: "♦️10 ", 49: "♦️J ", 50: "♦️Q ", 51: "♦️K ", 52: "none", 53: "小王", 54: "大王"
+    ]
+    
+    @Published var isBlack: Bool = false
+    @Published var isMute: Bool = false
+    @Published var isBackCamera: Bool = true
+    @Published var isRemote: Bool = true
+    @Published var isFast: Bool = true
+    @Published var isActive: Bool = false
+    @Published var isAutoFocus: Bool = true
+    @Published var activeDate: String = ""
+    @Published var uniqueID: String = ""
+    @Published var volumeUp: Int = 0
+    @Published var volumeDown: Int = 0
+    @Published var volumeValue: Float = 0.5
+    @Published var zoomFactor: Float = 0
+    @Published var focusFactor: Float = 0.55
+    
+    var setFrameRate: Float64 = 120.0
+    var cameraFrameRate: Int = 0
+    let maxZoomScale: Float = 3
+    
+    var testCVPixelBuffer : CVPixelBuffer?
+    var selectedSaveIndex : Int = 0
+    var isWorking: Bool = true
+    
+    var viewController: MyViewController?
+    
+    let speechPerformer = SpeechPerformer()
+    
+    var cutDone : Bool = true
+    var detectNeedToCut : Bool = false
+    var detectSet : Set<Int> = []
+    
+    override init(isSettingDone: Bool){
+        
+        super.init()
+              
+        // Load data from config.json
+        if let configData = readConfigJSON() {
+            let boolDict = configData["Bool"] as! [String : Bool]
+            self.isBlack = boolDict["isBlack"]!
+            self.isMute = boolDict["isMute"]!
+            self.isBackCamera = boolDict["isBackCamera"]!
+            self.isRemote = boolDict["isRemote"]!
+            self.isFast = boolDict["isFast"]!
+            self.isActive = boolDict["isActive"]!
+            self.isAutoFocus = boolDict["isAutoFocus"]!
+            
+            let intDict = configData["Int"] as! [String : Int]
+            self.volumeUp = intDict["volumeUp"]!
+            self.volumeDown = intDict["volumeDown"]!
+            
+            let floatDict = configData["Float"] as! [String : Float]
+            self.volumeValue = floatDict["volumeValue"]!
+            self.zoomFactor = floatDict["zoomFactor"]!
+            self.focusFactor = floatDict["focusFactor"]!
+        }
+        
+        let startSoundURL = Bundle.main.url(forResource: "start_DetecBeep", withExtension: "mp3")
+        let successSoundURL = Bundle.main.url(forResource: "success_tip", withExtension: "mp3")
+        let failSoundURL = Bundle.main.url(forResource: "fail_tip", withExtension: "mp3")
+        do {
+            startAudioPlayer = try AVAudioPlayer(contentsOf: startSoundURL!)
+            startAudioPlayer?.delegate = self
+            successAudioPlayer = try AVAudioPlayer(contentsOf: successSoundURL!)
+            successAudioPlayer?.delegate = self
+            failAudioPlayer = try AVAudioPlayer(contentsOf: failSoundURL!)
+            failAudioPlayer?.delegate = self
+        } catch {
+            print("Error playing sound: \(error.localizedDescription)")
+        }
+        
+        self.isWorking = true
+        
+        if !isSettingDone{
+            setupAVCapture()
+        }
+    }
+
+    func initialize(saveRuleIndex: Int) {
+        
+        self.loadSaveRule(saveRuleIndex: saveRuleIndex)
+        self.initShuffle()
+        self.initDetectResult()
+        self.initBoxes()
+        
+        self.laplacianDic = [[:],[:]]
+        for key in self.allCardIndex {
+            self.laplacianDic[0][key] = 0
+            self.laplacianDic[1][key] = 0
+        }
+    }
+
+    private func initDetectResult(){
+        detectResultList = [:]
+        stateCounter = 0
+        winnerPlayer = []
+        winnerPlayerShow = ""
+        detectSet = []
+        detectNeedToCut = false
+    }
+    
+    private func initShuffle(){
+        cardArray = []
+        cutArray = []
+        cutShowArray = []
+        self.leftCards = []
+        self.usedCards = []
+        if self.cutMode != 0{
+            self.cutDone = false
+        }
+        else{
+            self.cutDone = true
+        }
+    }
+    
+    private func initBoxes(){
+        centerPos = [0.5, 0.5]
+        lastBoxes = [[0.1, 0.5, 0.05, 0.05], [0.9, 0.5, 0.05, 0.05]]
+        isHorizon = true
+        targetArea = [0,0,0,0]
+        imageSize[0] = min(originSize[0], originImageSize[0] * (1 + self.zoomFactor * self.maxZoomScale))
+        imageSize[1] = min(originSize[1], originImageSize[1] * (1 + self.zoomFactor * self.maxZoomScale))
+        isTargetArea = false
+    }
+
+    func setupAVCapture(){
+        
+        if self.isBackCamera{
+            self.captureDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back)
+            self.setFrameRate = 240.0
+        }
+        else{
+            self.captureDevice = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front)
+            self.setFrameRate = 120.0
+        }
+        
+
+        do {
+            self.captureDeviceInput = try AVCaptureDeviceInput(device: self.captureDevice)
+            
+            session.beginConfiguration()
+            
+            // 移除所有的输入
+            for input in session.inputs {
+                session.removeInput(input)
+            }
+
+            // 移除所有的输出
+            for output in session.outputs {
+                session.removeOutput(output)
+            }
+            
+            session.addInput(captureDeviceInput!)
+            
+            
+            let output = AVCaptureVideoDataOutput()
+            output.videoSettings = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
+            output.setSampleBufferDelegate(self, queue: DispatchQueue.main)
+            session.addOutput(output)
+            
+            guard let format = self.captureDevice.formats.first(where: { format in
+                let ranges = format.videoSupportedFrameRateRanges
+                let dimensions = CMVideoFormatDescriptionGetDimensions(format.formatDescription)
+                return dimensions.width == 1920
+                    && ranges.contains { range in
+                    return range.maxFrameRate >= self.setFrameRate
+                }
+            }) else {
+                print("不支持\(setFrameRate)帧的摄像头格式")
+                return
+            }
+            do {
+                try self.captureDevice.lockForConfiguration()
+                self.captureDevice.activeFormat = format
+                self.captureDevice.activeVideoMinFrameDuration = CMTime(value: 1, timescale: Int32(format.videoSupportedFrameRateRanges.first!.maxFrameRate))
+                self.captureDevice.activeVideoMaxFrameDuration = CMTime(value: 1, timescale: Int32(format.videoSupportedFrameRateRanges.first!.maxFrameRate))
+                
+                self.captureDevice.unlockForConfiguration()
+            } catch {
+                print("设置帧率时发生错误: \(error)")
+            }
+            
+            updateFocusFactor()
+            updateZoomFactor()
+            
+            session.commitConfiguration()
+            
+            // 获取当前帧率
+            let videoFrameRate = format.videoSupportedFrameRateRanges.first!.maxFrameRate
+            print("设定帧率: \(videoFrameRate)")
+            changeCameraFrameRate(to: idleRate)
+        } catch {
+            print("配置前置摄像头时发生错误: \(error)")
+        }
+    }
+    
+    
+    func updateZoomFactor(){
+        do{
+            print("zoomFactor: \(zoomFactor), minZoomFactor: \(captureDevice.minAvailableVideoZoomFactor)")
+            try self.captureDevice.lockForConfiguration()
+            
+            let minzoomfactor = captureDevice.minAvailableVideoZoomFactor
+            self.captureDevice.videoZoomFactor = minzoomfactor + CGFloat(self.maxZoomScale * self.zoomFactor)
+            
+            self.captureDevice.unlockForConfiguration()
+        }
+        catch{
+            
+        }
+    }
+    
+    func updateFocusFactor(){
+        do{
+            print("focusFactor: \(focusFactor)")
+            try self.captureDevice.lockForConfiguration()
+            
+            
+            if !self.isAutoFocus && self.captureDevice.isFocusModeSupported(.locked){
+                self.captureDevice.focusMode = .locked
+                self.captureDevice.setFocusModeLocked(lensPosition: self.focusFactor)
+                print("对焦模式：手动对焦")
+                
+            }
+            else if self.captureDevice.isFocusModeSupported(.continuousAutoFocus){
+                self.captureDevice.focusMode = .continuousAutoFocus
+                print("对焦模式：自动对焦")
+            }
+                    
+            self.captureDevice.unlockForConfiguration()
+        }
+        catch{
+            
+        }
+    }
+    
+    func startCamera() {
+        session.startRunning()
+        changeCameraFrameRate(to: idleRate)
+        print("开启相机")
+    }
+    
+    func stopCamera() {
+        session.stopRunning()
+        print("关闭相机")
+    }
+    
+    func changeCameraFrameRate(to frameRate: Int) {
+        guard let device = captureDevice else {
+            print("相机设备未初始化")
+            return
+        }
+        
+        do{
+            try device.lockForConfiguration()
+            let format = device.activeFormat
+            device.activeVideoMinFrameDuration = CMTime(value: 1, timescale: Int32(frameRate))
+            device.activeVideoMaxFrameDuration = CMTime(value: 1, timescale: Int32(frameRate))
+            device.unlockForConfiguration()
+            cameraFrameRate = frameRate
+            print("设置帧率为: \(frameRate)")
+        }catch {
+            print("设置帧率时发生错误: \(error)")
+        }
+
+            
+    }
+    
+
+    // MARK: capture output
+    // AVCaptureVideoDataOutputSampleBufferDelegate 方法
+    func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+      
+        let currentTimestamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer).seconds
+                
+        // 计算时间差
+        let deltaTime = currentTimestamp - self.timestamp
+        frameCount += 1
+        // 更新时间戳
+        // 每秒更新一次帧率
+        if deltaTime >= 1.0 {
+            let frameRate = Double(frameCount) / deltaTime
+            print("实时帧率\(frameRate)fps")
+            
+            timestamp = currentTimestamp
+            // 重置计数器
+            frameCount = 0
+            
+        }
+  
+        if self.state != "idle"{
+            self.taskIndex += 1
+        }
+        else{
+            self.taskIndex = -1
+        }
+        
+        let myIndex = self.taskIndex
+        
+        // 处理视频帧数据
+        let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!
+      
+        let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+        
+        var indexGap = 4
+        if self.isBackCamera{
+            indexGap = 8
+        }
+        
+        let isTargetArea = self.isTargetArea
+        var targetArea = Array(self.targetArea)
+        
+        if !self.isShowCard && self.isWorking{
+            
+            self.detectionQueue.async {
+                
+                if targetArea.count == 4{
+                    if isTargetArea{
+                        let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: self.inputSize[0], height: self.inputSize[1]), targetArea: targetArea)!
+                        
+                        self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex, isTargetArea: isTargetArea, targetArea: targetArea)
+                    }
+                    else{
+                        let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: self.detectSize[0], height: self.detectSize[1]), targetArea: targetArea)!
+                        
+                        self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex, isTargetArea: isTargetArea, targetArea: targetArea)
+                    }
+                }
+            }
+        }
+        
+        if !self.isBlack && (self.cameraFrameRate <= idleRate || self.taskIndex % indexGap == 0){
+            backgroundQueue.async {
+                do{
+                    let rotationTransform = CGAffineTransform(rotationAngle: -.pi / 2)  // 顺时针旋转90度
+                    let rotatedImage = ciImage.transformed(by: rotationTransform)
+                    
+                    let xOffset = ciImage.extent.size.height
+                    let translationTransform = CGAffineTransform(translationX: xOffset, y: CGFloat(0))
+                    let translatedImage = rotatedImage.transformed(by: translationTransform)
+                    let outputCGImage = self.context.createCGImage(translatedImage, from: translatedImage.extent)
+
+                    DispatchQueue.main.async {
+                        self.cameraImage = outputCGImage
+                    }
+                }
+                
+                catch{
+                    print("Error: \(error)")
+                }
+            }
+        }
+        
+        // 释放视频帧资源
+        CMSampleBufferInvalidate(sampleBuffer)
+
+    }
+ 
+    func processImageOrigin(_ pixelBuffer: CVPixelBuffer, taskIndex: Int, isTargetArea: Bool, targetArea: [Float]){
+        
+        var confidenceThreshold = 0.5
+        if self.state == "idle"{
+            confidenceThreshold = 0.5
+        }
+        else{
+            confidenceThreshold = 0.05
+        }
+        
+        var cardResult : [DetectionResult]
+        if !isTargetArea && self.isRemote{
+            let result = try! detectModel.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
+
+            cardResult = getCard(from: result.confidence, from: result.coordinates, from: pixelBuffer, iscls: false)
+        }
+        else if self.isFast{
+            let result = try! fastModel.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
+
+            cardResult = getCard(from: result.confidence, from: result.coordinates, from: pixelBuffer)
+        }
+        else{
+            let result = try! slowModel.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
+            cardResult = getCard(from: result.confidence, from: result.coordinates, from: pixelBuffer)
+        }
+         
+        if cardResult[0].cardIndex[0] == self.stateCard[0] && cardResult[1].cardIndex[0] == self.stateCard[1]{
+            stateCounter = min(stateCounter + 1, 600)
+        }
+        else{
+            stateCounter = 0
+        }
+        
+        self.stateCard[0] = cardResult[0].cardIndex[0]
+        self.stateCard[1] = cardResult[1].cardIndex[0]
+
+        
+        var detectNum = 0
+        if cardResult[0].cardIndex[0] != -1{
+            detectNum += 1
+        }
+        if cardResult[1].cardIndex[0] != -1{
+            detectNum += 1
+        }
+       
+        
+        
+        let isShuffle = detectNum == 2 && (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4)
+        let isRiffle = detectNum == 1 && (self.shuffleMode == 1 || self.shuffleMode == 2 || self.shuffleMode == 3 || self.shuffleMode == 4)
+        let isCut = detectNum != 0 && (!self.cutDone || self.resultReportType == 1) && self.cardArray.count > 0
+        
+        DispatchQueue.main.async{
+            if self.state == "idle"{
+                if (isShuffle || isRiffle || isCut) && self.stateCounter >= 1{
+                    self.stateCounter = 0
+                    self.state = "detecting"//cut or riffle
+                    self.speakText(input: 0)
+                    self.changeCameraFrameRate(to: Int(self.setFrameRate))
+                    
+                    var stateResult : [[Float]] = []
+                    if cardResult[0].cardIndex[0] != -1{
+                        stateResult.append(cardResult[0].coordinate)
+                    }
+                    if cardResult[1].cardIndex[0] != -1{
+                        stateResult.append(cardResult[1].coordinate)
+                    }
+                    
+                    if self.isRemote{
+                        self.targetArea = self.computeTargetArea(stateResult: stateResult)
+                        self.isTargetArea = true
+                    }
+                    
+                    if isCut{
+                        self.detectNeedToCut = true
+                    }
+                }
+            }
+        
+            if self.state != "idle"{
+                
+                self.detectionQueue.async{
+                    //未进入区域的帧 crop
+                    if self.isRemote && !isTargetArea && self.isTargetArea{
+                        
+                        var stateResult : [[Float]] = []
+                        if cardResult[0].cardIndex[0] != -1{
+                            stateResult.append(cardResult[0].coordinate)
+                        }
+                        if cardResult[1].cardIndex[0] != -1{
+                            stateResult.append(cardResult[1].coordinate)
+                        }
+                        
+                        let newTargetArea = self.computeTargetArea(stateResult: stateResult)
+                        
+                        let cut_ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+                        let cvPixelBuffer_cut = createCVPixelBuffer(ciImage: cut_ciImage, targetSize: CGSize(width: self.inputSize[0], height: self.inputSize[1]), targetArea: newTargetArea)!
+                        if self.isFast{
+                            let cut_result = try! self.fastModel.prediction(image: cvPixelBuffer_cut, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
+                            cardResult = self.getCard(from: cut_result.confidence, from: cut_result.coordinates, from: cvPixelBuffer_cut)
+                        }
+                        else{
+                            let cut_result = try! self.slowModel.prediction(image: cvPixelBuffer_cut, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
+                            cardResult = self.getCard(from: cut_result.confidence, from: cut_result.coordinates, from: cvPixelBuffer_cut)
+                        }
+                        
+                        self.targetArea = newTargetArea
+                    }
+                    
+                    var detectCard = -1
+                    if cardResult[0].cardIndex[0] != -1{
+                        detectCard = cardResult[0].cardIndex[0]
+                    }
+                    else if cardResult[1].cardIndex[0] != -1{
+                        detectCard = cardResult[1].cardIndex[0]
+                    }
+
+                    if self.detectNeedToCut
+                        && isCut
+                        && (detectNum == 1 || (detectNum == 2 && cardResult[0].cardIndex[0] == cardResult[1].cardIndex[0])){
+                        if self.usedCards.contains(detectCard) &&  self.resultReportType == 1 {
+                            self.computeNextRound()
+                            self.detectNeedToCut = false
+                        }
+                        else if self.cardArray.contains(detectCard) && !self.cutDone {
+                            
+                            var cutIndex = self.cardArray.firstIndex(of: detectCard)!
+                            if self.cutMode == 1{
+                                //看底
+                                self.cutCardArray(index: cutIndex)
+                                self.cutDone = true
+                            }
+                            else if self.cutMode == 2{
+                                //看顶
+                                cutIndex -= 1
+                                if cutIndex < 0{
+                                    cutIndex = self.cardArray.count - 1
+                                }
+                                self.cutCardArray(index: cutIndex)
+                                self.cutDone = true
+                            }
+                            else if self.cutMode == 3{
+                                //连续切牌
+                                self.cutArray.append(detectCard)
+                            }
+                            else if self.cutMode == 4{
+                                //看手
+                                self.cutArray.append(detectCard)
+                                self.cutDone = true
+                            }
+                            
+                            self.detectNeedToCut = false
+                            self.cutShowArray.append(detectCard)
+                            self.detectSet.insert(detectCard)
+                            self.computeWinnerPlayer()
+                            self.computeCards()
+                        }
+                    }
+                }
+                
+                if detectNum == 0 && self.stateCounter >= 5{
+                    
+                    self.stateCounter = 0
+                    self.state = "idle"
+                    self.changeCameraFrameRate(to: self.idleRate)
+                    let detectState = self.handleDetecResultList(targetDetecResultList: self.detectResultList)
+                    self.initBoxes()
+                    self.initDetectResult()
+                    
+                    if !detectState.isSingle && !detectState.isShort
+                        && (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4){
+                        //洗牌
+                        self.initShuffle()
+                        self.cardArray = detectState.detectionResult
+                        
+                        if self.cardArray.count == self.allCardIndex.count{
+                            self.speakText(input: 1)
+                        }
+                        else{
+                            self.speakText(input: 2)
+                        }
+                        
+                        if self.cutMode == 0 || self.cutMode == 3{
+                            self.computeWinnerPlayer()
+                            self.computeCards()
+
+                        }
+                        
+                    }
+                    else if detectState.isSingle && !detectState.isShort
+                                && (self.shuffleMode == 1 || self.shuffleMode == 2 || self.shuffleMode == 3 || self.shuffleMode == 4){
+                        //拨牌
+                        self.initShuffle()
+                        self.cardArray = detectState.detectionResult
+ 
+                        
+                        if(self.shuffleMode == 1 || self.shuffleMode == 3){
+                            //拨到顶
+                            if self.cardArray.count >= self.minCardNum{
+                                self.speakText(input: 1)
+                            }
+                            else{
+                                self.speakText(input: 2)
+                            }
+                        }
+                        
+                        else if(self.shuffleMode == 2 || self.shuffleMode == 4){
+                            //拨中间
+                            if self.cardArray.count > 0{
+                                self.cardArray.remove(at: 0)
+                            }
+                            
+                            if self.cardArray.count >= self.minCardNum{
+                                self.speakText(input: 1)
+                            }
+                            else{
+                                self.speakText(input: 2)
+                            }
+                        }
+                        
+                        if self.cutMode == 0 || self.cutMode == 3{
+                            self.computeWinnerPlayer()
+                            self.computeCards()
+
+                        }
+                    }
+                }
+                
+                //识别过程
+                else if taskIndex >= 0{
+                    let shuffleCheck = cardResult[0].cardIndex[0] != cardResult[1].cardIndex[0]
+                    && cardResult[0].cardIndex[0] != -1
+                    && cardResult[1].cardIndex[0] != -1
+                    
+                    if isShuffle && shuffleCheck{
+                        self.state = "shuffle"
+                    }
+                    
+                    if self.detectSet.count > 10 || isShuffle{
+                        self.detectSet = []
+                    }
+                    else if self.detectSet.count > 0{
+                        self.detectSet.insert(cardResult[0].cardIndex[0])
+                        self.detectSet.insert(cardResult[1].cardIndex[0])
+                    }
+                    
+                    
+                    self.detectResultList[taskIndex] = cardResult
+                    
+                    var stateResult : [[Float]] = []
+                    
+                    if self.state == "shuffle"{
+                        stateResult.append(cardResult[0].coordinate)
+                        stateResult.append(cardResult[1].coordinate)
+                    }
+                    else{
+                        if cardResult[0].cardIndex[0] != -1{
+                            stateResult.append(cardResult[0].coordinate)
+                        }
+                        if cardResult[1].cardIndex[0] != -1{
+                            stateResult.append(cardResult[1].coordinate)
+                        }
+                    }
+                    
+                    
+                    if self.isRemote{
+                        //show target area no crop
+                        //self.targetArea = self.computeTargetArea(stateResult: stateResult)
+                        
+                        self.targetArea = self.updateTargetArea(coordinates: stateResult, targetArea: targetArea)
+                    }
+                }
+            }
+        }
+    }
+    
+    
+    // MARK: handle result list
+    func handleDetecResultList(targetDetecResultList: [Int : [DetectionResult]]) -> DetectionState{
+        
+        var confidenceDic : [Int:Float] = [:]
+        for key in self.allCardIndex {
+            confidenceDic[key] = 0
+        }
+        
+        var sortedKeys = targetDetecResultList.keys.sorted()
+        let blurThreshold : Float = 0.8
+        let longHeadIndex = 10
+        
+        print("检测sortedKeys \(sortedKeys)")
+
+        if sortedKeys.count <= 1{
+            let result = DetectionState(detectionResult: [], isSingle: true, isShort: true, longestIndex: -1)
+            return result
+        }
+        
+        var longestIndex: Int = -1
+        
+        var deleteKeys:[Int] = []
+        //去除重复帧
+        for keyIndex in 0..<sortedKeys.count-1{
+            let detectResultListIndex = sortedKeys[keyIndex]
+            let nextDetectResultListIndex = sortedKeys[keyIndex+1]
+            for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
+                let nowLaplacian = targetDetecResultList[detectResultListIndex]![numIndex].laplacianVariance
+                let nextLaplacian = targetDetecResultList[nextDetectResultListIndex]![numIndex].laplacianVariance
+                
+                if abs(nowLaplacian - nextLaplacian) <= 0.000000001{
+                    deleteKeys.append(detectResultListIndex)
+                }
+            }
+        }
+        
+        sortedKeys = sortedKeys.filter { !deleteKeys.contains($0) }
+        
+        var beginIndex = 2
+        var endIndex = sortedKeys.count-3
+        
+        if beginIndex >= endIndex{
+            let result = DetectionState(detectionResult: [], isSingle: true, isShort: true, longestIndex: -1)
+            return result
+        }
+        
+        for keyIndex in beginIndex..<endIndex{
+            let detectResultListIndex = sortedKeys[keyIndex]
+            let nextDetectResultListIndex = sortedKeys[keyIndex+1]
+            for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
+                let nowNum = targetDetecResultList[detectResultListIndex]![numIndex].cardIndex[0]
+                if nowNum != -1
+                    && targetDetecResultList[nextDetectResultListIndex]![numIndex].cardIndex[0] == nowNum{
+                    targetDetecResultList[detectResultListIndex]![numIndex].nodeType += 1
+                    targetDetecResultList[nextDetectResultListIndex]![numIndex].nodeType += 2
+                }
+            }
+        }
+        
+        var leftSideCnt = 0
+        var rightSideCnt = 0
+        var leftFirstHead = -1
+        var rightFirstHead = -1
+        var leftLastTail = -1
+        var rightLastTail = -1
+        
+        for keyIndex in beginIndex..<endIndex{
+            let detectResultListIndex = sortedKeys[keyIndex]
+            for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
+                let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
+                
+                if detectResultNode.nodeType == 1{
+                    if numIndex == 0{
+                        leftSideCnt += 1
+                    }
+                    else{
+                        rightSideCnt += 1
+                    }
+                }
+                
+                if detectResultNode.nodeType == 3{
+                    if numIndex == 0{
+                        if leftFirstHead == -1 && keyIndex > longHeadIndex{
+                            leftFirstHead = keyIndex
+                        }
+                    }
+                    if numIndex == 1{
+                        if rightFirstHead == -1 && keyIndex > longHeadIndex{
+                            rightFirstHead = keyIndex
+                        }
+                    }
+                }
+                
+                if detectResultNode.nodeType == 2{
+                    if numIndex == 0{
+                        leftLastTail = keyIndex
+                    }
+                    if numIndex == 1{
+                        rightLastTail = keyIndex
+                    }
+                }
+            }
+        }
+        
+        var isSingle = true
+        if leftSideCnt > 5 && rightSideCnt > 5{
+            isSingle = false
+        }
+        
+        var isShort = true
+        if leftSideCnt + rightSideCnt > 10{
+            isShort = false
+        }
+        
+        if !isShort{
+            //如果两侧都有 则要找到两侧都是链的时候开始 即两侧都是3
+            if !isSingle
+            {
+                beginIndex = longHeadIndex
+                for keyIndex in beginIndex..<endIndex{
+                    let detectResultListIndex = sortedKeys[keyIndex]
+                    if targetDetecResultList[detectResultListIndex]![0].nodeType == 3
+                        && targetDetecResultList[detectResultListIndex]![1].nodeType == 3{
+                        beginIndex = keyIndex
+                        break
+                    }
+                }
+            }
+            else if leftSideCnt > rightSideCnt && leftFirstHead != -1{
+                beginIndex = leftFirstHead
+            }
+            else if leftSideCnt < rightSideCnt && rightFirstHead != -1{
+                beginIndex = rightFirstHead
+            }
+        }
+        
+        if !isSingle{
+            let min_endIndex = min(leftLastTail, rightLastTail) + 3
+            let max_endIndex = max(leftLastTail, rightLastTail) - 1
+            endIndex = max(min_endIndex, max_endIndex)
+            let detectResultListIndex = sortedKeys[endIndex-1]
+            if targetDetecResultList[detectResultListIndex]![0].nodeType == 3{
+                targetDetecResultList[detectResultListIndex]![0].nodeType = 2
+            }
+            else if targetDetecResultList[detectResultListIndex]![1].nodeType == 3{
+                targetDetecResultList[detectResultListIndex]![1].nodeType = 2
+            }
+            if targetDetecResultList[detectResultListIndex]![0].nodeType != 2{
+                targetDetecResultList[detectResultListIndex]![0].nodeType = 0
+            }
+            else if targetDetecResultList[detectResultListIndex]![1].nodeType != 2{
+                targetDetecResultList[detectResultListIndex]![1].nodeType = 0
+            }
+        }
+        
+        if beginIndex >= endIndex{
+            let result = DetectionState(detectionResult: [], isSingle: false, isShort: false, longestIndex: -1)
+            return result
+        }
+        
+        for keyIndex in beginIndex..<endIndex{
+            let detectResultListIndex = sortedKeys[keyIndex]
+            for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
+                let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
+                if detectResultNode.nodeType == 1{
+                    confidenceDic[detectResultNode.cardIndex[0]] = 100
+                }
+            }
+        }
+        
+        for _ in 0..<3{
+            for key in confidenceDic.keys{
+                
+                if confidenceDic[key] == 100{
+                    for numIndex in 0..<2{
+                        
+                        var end = -1
+                        var head = -1
+                        
+                        for keyIndex in beginIndex..<endIndex{
+                            let detectResultListIndex = sortedKeys[keyIndex]
+                            let nowNum = targetDetecResultList[detectResultListIndex]![numIndex].cardIndex[0]
+                            if nowNum == key && targetDetecResultList[detectResultListIndex]![numIndex].nodeType == 2{
+                                end = keyIndex
+                            }
+                            else if nowNum == key
+                                        && targetDetecResultList[detectResultListIndex]![numIndex].nodeType == 1
+                                        && end != -1{
+                                head = keyIndex
+                                
+                                let isClose = head - end <= 5
+
+                                var isSameNum = head - end <= 10
+                                var middleNum = -1
+                                for updateIndex in end+1...head-1{
+                                    let updateNodeIndex = sortedKeys[updateIndex]
+                                    let currentMiddleNum = targetDetecResultList[updateNodeIndex]![numIndex].cardIndex[0]
+                                    if currentMiddleNum != -1{
+                                        middleNum = currentMiddleNum
+                                        break
+                                    }
+                                }
+                                for updateIndex in end+1...head-1{
+                                    let updateNodeIndex = sortedKeys[updateIndex]
+                                    let currentMiddleNum = targetDetecResultList[updateNodeIndex]![numIndex].cardIndex[0]
+                                    if currentMiddleNum != -1 && currentMiddleNum != middleNum{
+                                        isSameNum = false
+                                        break
+                                    }
+                                }
+                                
+                                if isClose || isSameNum{
+                                    for updateIndex in end...head{
+                                        let updateNodeIndex = sortedKeys[updateIndex]
+                                        targetDetecResultList[updateNodeIndex]![numIndex].cardIndex[0] = nowNum
+                                        targetDetecResultList[updateNodeIndex]![numIndex].nodeType = 3
+                                    }
+                                }
+                                else{
+                                    for updateIndex in head..<endIndex{
+                                        let updateNodeIndex = sortedKeys[updateIndex]
+                                        if targetDetecResultList[updateNodeIndex]![numIndex].cardIndex[0] == nowNum{
+                                            targetDetecResultList[updateNodeIndex]![numIndex].nodeType = 0
+                                        }
+                                        else{
+                                            break
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        for key in confidenceDic.keys{
+            if confidenceDic[key] == 100{
+                var isChain = false
+                for keyIndex in beginIndex..<endIndex{
+                    let detectResultListIndex = sortedKeys[keyIndex]
+                    for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
+                        let nowNum = targetDetecResultList[detectResultListIndex]![numIndex].cardIndex[0]
+                        let nodeType = targetDetecResultList[detectResultListIndex]![numIndex].nodeType
+                        if nowNum == key && nodeType == 1 {
+                            isChain = true
+                        }
+                    }
+                    if isChain{
+                        break
+                    }
+                }
+                if !isChain{
+                    confidenceDic[key] = 0
+                }
+            }
+        }
+
+        for keyIndex in beginIndex..<endIndex{
+            let detectResultListIndex = sortedKeys[keyIndex]
+            for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
+                let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
+
+                if detectResultNode.nodeType == 0
+                    && detectResultNode.cardIndex[0] != -1{
+
+                    var newCardIndex : [Int] = []
+                    var newConfidence : [Float] = []
+                    for i in 0..<detectResultNode.cardIndex.count{
+                        if confidenceDic[i] == 0{
+                            newCardIndex.append(detectResultNode.cardIndex[i])
+                            newConfidence.append(detectResultNode.confidence[i])
+                        }
+                    }
+
+                    if newCardIndex.count == 0{
+                        newCardIndex.append(-1)
+                        newConfidence.append(1)
+                        detectResultNode.nodeType = 5
+                    }
+
+                    detectResultNode.cardIndex = newCardIndex
+                    detectResultNode.confidence = newConfidence
+                }
+            }
+        }
+        
+        for key in confidenceDic.keys{
+            if confidenceDic[key] == 0{
+                var nodeIndex : [Int] = []
+                for keyIndex in beginIndex..<endIndex{
+                    let detectResultListIndex = sortedKeys[keyIndex]
+                    
+                    for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
+                        let nowNum = targetDetecResultList[detectResultListIndex]![numIndex].cardIndex[0]
+                        let confidence = targetDetecResultList[detectResultListIndex]![numIndex].confidence[0]
+                        if nowNum == key && confidence > confidenceDic[nowNum]! {
+                            confidenceDic[nowNum] = confidence
+                            nodeIndex = [detectResultListIndex, numIndex]
+                        }
+                    }
+                }
+                if nodeIndex.count > 0{
+                    targetDetecResultList[nodeIndex[0]]![nodeIndex[1]].nodeType = 4
+                }
+            }
+        }
+
+        for keyIndex in beginIndex..<endIndex{
+            let detectResultListIndex = sortedKeys[keyIndex]
+            for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
+                let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
+
+                if detectResultNode.nodeType == 0
+                    && detectResultNode.cardIndex[0] != -1{
+
+                    var newCardIndex : [Int] = []
+                    var newConfidence : [Float] = []
+                    for i in 0..<detectResultNode.cardIndex.count{
+                        if confidenceDic[i] == 0{
+                            newCardIndex.append(detectResultNode.cardIndex[i])
+                            newConfidence.append(detectResultNode.confidence[i])
+                        }
+                    }
+
+                    if newCardIndex.count == 0{
+                        newCardIndex.append(-1)
+                        newConfidence.append(1)
+                        detectResultNode.nodeType = 5//所有可能的数字去除，标记为融合牌
+                    }
+
+                    detectResultNode.cardIndex = newCardIndex
+                    detectResultNode.confidence = newConfidence
+                }
+            }
+        }
+
+        for key in confidenceDic.keys{
+            if confidenceDic[key] == 0{
+                var nodeIndex : [Int] = []
+                for keyIndex in beginIndex..<endIndex{
+                    let detectResultListIndex = sortedKeys[keyIndex]
+                    
+                    for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
+                        let nowNum = targetDetecResultList[detectResultListIndex]![numIndex].cardIndex[0]
+                        let confidence = targetDetecResultList[detectResultListIndex]![numIndex].confidence[0]
+                        if nowNum == key && confidence > confidenceDic[nowNum]! {
+                            confidenceDic[nowNum] = confidence
+                            nodeIndex = [detectResultListIndex, numIndex]
+                        }
+                    }
+                }
+                if nodeIndex.count > 0{
+                    targetDetecResultList[nodeIndex[0]]![nodeIndex[1]].nodeType = 4
+                }
+            }
+        }
+        
+        let isCut = isShort && isSingle
+
+        //统计标准模糊度(非切牌下）
+        if !isCut{
+            for keyIndex in beginIndex..<endIndex{
+                let detectResultListIndex = sortedKeys[keyIndex]
+                for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
+                    let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
+                    if detectResultNode.nodeType == 3{
+                        if self.laplacianDic[numIndex][detectResultNode.cardIndex[0]] == 0{
+                            self.laplacianDic[numIndex][detectResultNode.cardIndex[0]] = detectResultNode.laplacianVariance
+                        }
+                        else{
+                            self.laplacianDic[numIndex][detectResultNode.cardIndex[0]]! += detectResultNode.laplacianVariance
+                            self.laplacianDic[numIndex][detectResultNode.cardIndex[0]]! /= 2
+                        }
+                    }
+                }
+            }
+        }
+        
+        let isShuffle = (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4) && !isSingle && !isShort
+        let addEndIndex = endIndex - 3
+        
+        var lostNum = 0
+        var addNum = 0
+        
+        for key in confidenceDic.keys{
+            if confidenceDic[key] == 0{
+                lostNum += 1
+            }
+        }
+        
+        if isShuffle && beginIndex < addEndIndex && lostNum <= 2{
+            
+            let numIndexList : [Int] = [0, 1]
+            
+            for key in confidenceDic.keys{
+                if confidenceDic[key] == 0{
+
+                    for keyIndex in beginIndex..<addEndIndex{
+                        let detectResultListIndex = sortedKeys[keyIndex]
+                        let nextDetectResultListIndex = sortedKeys[keyIndex+1]
+                        for numIndex in numIndexList{
+                            let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
+                            let nextDetectResultNode = targetDetecResultList[nextDetectResultListIndex]![numIndex]
+                            if detectResultNode.nodeType == 5 && nextDetectResultNode.nodeType == 5{
+                                detectResultNode.cardIndex[0] = key
+                                nextDetectResultNode.cardIndex[0] = key
+                                detectResultNode.nodeType = 1
+                                nextDetectResultNode.nodeType = 2
+                                confidenceDic[key] = 1
+                                break
+                            }
+                        }
+                        
+                        if confidenceDic[key] != 0{
+                            break
+                        }
+                    }
+                    
+                    if confidenceDic[key] != 0{
+                        addNum += 1
+                        continue
+                    }
+                    
+                    for keyIndex in beginIndex..<addEndIndex{
+                        let detectResultListIndex = sortedKeys[keyIndex]
+                        let nextDetectResultListIndex = sortedKeys[keyIndex+1]
+                        for numIndex in numIndexList{
+                            let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
+                            let nextDetectResultNode = targetDetecResultList[nextDetectResultListIndex]![numIndex]
+                            if (detectResultNode.nodeType == 0 || nextDetectResultNode.nodeType == 5)
+                                && (detectResultNode.nodeType == 5 || nextDetectResultNode.nodeType == 0){
+                                detectResultNode.cardIndex[0] = key
+                                nextDetectResultNode.cardIndex[0] = key
+                                detectResultNode.nodeType = 1
+                                nextDetectResultNode.nodeType = 2
+                                confidenceDic[key] = 1
+                                break
+                            }
+                        }
+                        
+                        if confidenceDic[key] != 0{
+                            break
+                        }
+                    }
+                    
+                    if confidenceDic[key] != 0{
+                        addNum += 1
+                        continue
+                    }
+                    
+                    for keyIndex in beginIndex..<addEndIndex{
+                        let detectResultListIndex = sortedKeys[keyIndex]
+                        let nextDetectResultListIndex = sortedKeys[keyIndex+1]
+                        for numIndex in numIndexList{
+                            let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
+                            let nextDetectResultNode = targetDetecResultList[nextDetectResultListIndex]![numIndex]
+                            if detectResultNode.nodeType == 5{
+                                detectResultNode.cardIndex[0] = key
+                                detectResultNode.nodeType = 4
+                                confidenceDic[key] = 1
+                                break
+                            }
+                        }
+                        
+                        if confidenceDic[key] != 0{
+                            break
+                        }
+                    }
+                    
+                    if confidenceDic[key] != 0{
+                        addNum += 1
+                        continue
+                    }
+                    
+                    for keyIndex in beginIndex..<addEndIndex{
+                        let detectResultListIndex = sortedKeys[keyIndex]
+                        let nextDetectResultListIndex = sortedKeys[keyIndex+1]
+                        for numIndex in numIndexList{
+                            let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
+                            let nextDetectResultNode = targetDetecResultList[nextDetectResultListIndex]![numIndex]
+                            if detectResultNode.nodeType == 0{
+                                detectResultNode.cardIndex[0] = key
+                                detectResultNode.nodeType = 4
+                                confidenceDic[key] = 1
+                                break
+                            }
+                        }
+                        
+                        if confidenceDic[key] != 0{
+                            break
+                        }
+                    }
+                    
+                    if confidenceDic[key] != 0{
+                        addNum += 1
+                        continue
+                    }
+                }
+            }
+        }
+        
+        for keyIndex in beginIndex..<endIndex{
+            let detectResultListIndex = sortedKeys[keyIndex]
+            let lastDetectResultListIndex = sortedKeys[keyIndex-1]
+            let lastlastDetectResultListIndex = sortedKeys[keyIndex-2]
+            let nextDetectResultListIndex = sortedKeys[keyIndex+1]
+            let nextnextDetectResultListIndex = sortedKeys[keyIndex+2]
+            
+            for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
+                let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
+                let sideDetectResultNode = targetDetecResultList[detectResultListIndex]![1-numIndex]
+                let lastDetectResultNode = targetDetecResultList[lastDetectResultListIndex]![numIndex]
+                let lastlastDetectResultNode = targetDetecResultList[lastlastDetectResultListIndex]![numIndex]
+                let nextDetectResultNode = targetDetecResultList[nextDetectResultListIndex]![numIndex]
+                let nextnextDetectResultNode = targetDetecResultList[nextnextDetectResultListIndex]![numIndex]
+                
+                if (detectResultNode.nodeType == 5 || detectResultNode.nodeType == 0)
+                    && sideDetectResultNode.nodeType == 2
+                    && detectResultNode.laplacianVariance < lastDetectResultNode.laplacianVariance{
+                    
+                    if lastDetectResultNode.nodeType == 2
+                        && lastDetectResultNode.laplacianVariance / lastlastDetectResultNode.laplacianVariance > blurThreshold
+                        && detectResultNode.laplacianVariance / lastDetectResultNode.laplacianVariance < blurThreshold{
+                        lastDetectResultNode.nodeType = 3
+                        detectResultNode.nodeType = 2
+                        detectResultNode.cardIndex[0] = lastDetectResultNode.cardIndex[0]
+                        
+                    }
+                    
+                    else if lastDetectResultNode.nodeType == 4{
+                        lastDetectResultNode.nodeType = 1
+                        detectResultNode.nodeType = 2
+                        detectResultNode.cardIndex[0] = lastDetectResultNode.cardIndex[0]
+                    }
+                    
+                }
+                
+                if (detectResultNode.nodeType == 5 || detectResultNode.nodeType == 0)
+                    && sideDetectResultNode.nodeType == 1
+                    && detectResultNode.laplacianVariance < nextDetectResultNode.laplacianVariance{
+                    
+                    if nextDetectResultNode.nodeType == 1
+                        && nextDetectResultNode.laplacianVariance / nextnextDetectResultNode.laplacianVariance > blurThreshold
+                        && detectResultNode.laplacianVariance / nextDetectResultNode.laplacianVariance < blurThreshold{
+                        nextDetectResultNode.nodeType = 3
+                        detectResultNode.nodeType = 1
+                        detectResultNode.cardIndex[0] = nextDetectResultNode.cardIndex[0]
+                        
+                    }
+                    
+                    else if nextDetectResultNode.nodeType == 4{
+                        nextDetectResultNode.nodeType = 2
+                        detectResultNode.nodeType = 1
+                        detectResultNode.cardIndex[0] = nextDetectResultNode.cardIndex[0]
+                    }
+                    
+                }
+            }
+        }
+        
+        var detectCardArray : [Int] = []
+        
+        var noneCnt = 0
+        var headCnt = 0
+        var tailCnt = 0
+        
+        for keyIndex in beginIndex..<endIndex{
+            let detectResultListIndex = sortedKeys[keyIndex]
+            let lastDetectResultListIndex = sortedKeys[keyIndex-1]
+            let nextDetectResultListIndex = sortedKeys[keyIndex+1]
+            let nextnextDetectResultListIndex = sortedKeys[keyIndex+2]
+            if targetDetecResultList[detectResultListIndex]!.count == 2{
+                
+                let detectResultNode0 = targetDetecResultList[detectResultListIndex]![0]
+                let detectResultNode1 = targetDetecResultList[detectResultListIndex]![1]
+                
+                let lastDetectResultNode0 = targetDetecResultList[lastDetectResultListIndex]![0]
+                let lastDetectResultNode1 = targetDetecResultList[lastDetectResultListIndex]![1]
+                
+                let nextDetectResultNode0 = targetDetecResultList[nextDetectResultListIndex]![0]
+                let nextDetectResultNode1 = targetDetecResultList[nextDetectResultListIndex]![1]
+                
+                let nextnextDetectResultNode0 = targetDetecResultList[nextnextDetectResultListIndex]![0]
+                let nextnextDetectResultNode1 = targetDetecResultList[nextnextDetectResultListIndex]![1]
+                    
+                let nowNum0 = targetDetecResultList[detectResultListIndex]![0].cardIndex[0]
+                let nodeType0 = targetDetecResultList[detectResultListIndex]![0].nodeType
+                let nowNum1 = targetDetecResultList[detectResultListIndex]![1].cardIndex[0]
+                let nodeType1 = targetDetecResultList[detectResultListIndex]![1].nodeType
+                
+                if isSingle{
+                    if leftSideCnt > rightSideCnt{
+                        if nodeType0 == 2{
+                            detectCardArray.insert(nowNum0, at: 0)
+                        }
+                    }
+                    else{
+                        if nodeType1 == 2{
+                            detectCardArray.insert(nowNum1, at: 0)
+                        }
+                    }
+                }
+                else{
+                    if (nodeType0 == 2 || nodeType0 == 4)
+                        && (nodeType1 == 2 || nodeType1 == 4){
+                        
+                        var leftLaplacianPercent : Float = 1
+                        var rightLaplacianPercent : Float = 1
+                        
+                        if nodeType0 == 2{
+                            leftLaplacianPercent = detectResultNode0.laplacianVariance / lastDetectResultNode0.laplacianVariance
+                        }
+                        else if nodeType0 == 4 && self.laplacianDic[0][nowNum0] != 0{
+                            leftLaplacianPercent = detectResultNode0.laplacianVariance / self.laplacianDic[0][nowNum0]!
+                        }
+                        
+                        
+                        if nodeType1 == 2{
+                            rightLaplacianPercent = detectResultNode1.laplacianVariance / lastDetectResultNode1.laplacianVariance
+                        }
+                        else if nodeType1 == 4 && self.laplacianDic[1][nowNum1] != 0{
+                            rightLaplacianPercent = detectResultNode1.laplacianVariance / self.laplacianDic[1][nowNum1]!
+                        }
+                        
+                        if nextDetectResultNode0.nodeType == 5 && nextDetectResultNode1.nodeType != 5{
+                            detectCardArray.insert(nowNum1, at: 0)
+                            detectCardArray.insert(nowNum0, at: 0)
+                        }
+                        else if nextDetectResultNode0.nodeType != 5 && nextDetectResultNode1.nodeType == 5{
+                            detectCardArray.insert(nowNum0, at: 0)
+                            detectCardArray.insert(nowNum1, at: 0)
+                        }
+                        else if nextDetectResultNode0.nodeType == 0 && nextDetectResultNode1.nodeType != 0{
+                            detectCardArray.insert(nowNum1, at: 0)
+                            detectCardArray.insert(nowNum0, at: 0)
+                        }
+                        else if nextDetectResultNode0.nodeType != 0 && nextDetectResultNode1.nodeType == 0{
+                            detectCardArray.insert(nowNum0, at: 0)
+                            detectCardArray.insert(nowNum1, at: 0)
+                        }
+                        else if leftLaplacianPercent < blurThreshold && rightLaplacianPercent >= blurThreshold{
+                            detectCardArray.insert(nowNum0, at: 0)
+                            detectCardArray.insert(nowNum1, at: 0)
+                        }
+                        else if rightLaplacianPercent < blurThreshold && leftLaplacianPercent >= blurThreshold{
+                            detectCardArray.insert(nowNum1, at: 0)
+                            detectCardArray.insert(nowNum0, at: 0)
+                        }
+                        else{
+                            var leftNextLaplacianPercent : Float = 1
+                            var rightNextLaplacianPercent : Float = 1
+                            
+                            if nextDetectResultNode0.nodeType == 1{
+                                leftNextLaplacianPercent = nextDetectResultNode0.laplacianVariance / nextnextDetectResultNode0.laplacianVariance
+                            }
+                            else if nextDetectResultNode0.nodeType == 0{
+                                leftNextLaplacianPercent = nextDetectResultNode0.laplacianVariance / nextnextDetectResultNode0.laplacianVariance
+                            }
+                            else if nextDetectResultNode0.nodeType == 4 && self.laplacianDic[0][nextDetectResultNode0.cardIndex[0]] != 0{
+                                leftNextLaplacianPercent = nextDetectResultNode0.laplacianVariance / self.laplacianDic[0][nextDetectResultNode0.cardIndex[0]]!
+                            }
+                            
+                            if nextDetectResultNode1.nodeType == 1{
+                                rightNextLaplacianPercent = nextDetectResultNode1.laplacianVariance / nextnextDetectResultNode1.laplacianVariance
+                            }
+                            else if nextDetectResultNode1.nodeType == 0{
+                                rightNextLaplacianPercent = nextDetectResultNode1.laplacianVariance / nextnextDetectResultNode1.laplacianVariance
+                            }
+                            else if nextDetectResultNode1.nodeType == 4 && self.laplacianDic[1][nextDetectResultNode1.cardIndex[0]] != 0{
+                                rightNextLaplacianPercent = nextDetectResultNode1.laplacianVariance / self.laplacianDic[1][nextDetectResultNode1.cardIndex[0]]!
+                            }
+                            
+                            if leftNextLaplacianPercent < blurThreshold && rightNextLaplacianPercent >= blurThreshold{
+                                detectCardArray.insert(nowNum1, at: 0)
+                                detectCardArray.insert(nowNum0, at: 0)
+                            }
+                            else if rightNextLaplacianPercent < blurThreshold && leftNextLaplacianPercent >= blurThreshold{
+                                detectCardArray.insert(nowNum0, at: 0)
+                                detectCardArray.insert(nowNum1, at: 0)
+                            }
+                            //上一张和下一张两边都不模糊 直接比较上一张两边模糊程度
+                            else if leftLaplacianPercent < blurThreshold && rightLaplacianPercent < blurThreshold{
+                                if leftLaplacianPercent < rightLaplacianPercent{
+                                    detectCardArray.insert(nowNum0, at: 0)
+                                    detectCardArray.insert(nowNum1, at: 0)
+                                }
+                                else{
+                                    detectCardArray.insert(nowNum1, at: 0)
+                                    detectCardArray.insert(nowNum0, at: 0)
+                                }
+                            }
+                            else{
+                                if leftNextLaplacianPercent < rightNextLaplacianPercent{
+                                    detectCardArray.insert(nowNum1, at: 0)
+                                    detectCardArray.insert(nowNum0, at: 0)
+                                }
+                                else{
+                                    detectCardArray.insert(nowNum0, at: 0)
+                                    detectCardArray.insert(nowNum1, at: 0)
+                                }
+                            }
+                            
+                        }
+                    }
+                    
+                    else{
+                        if nodeType0 == 4 || nodeType0 == 2{
+                            detectCardArray.insert(nowNum0, at: 0)
+                        }
+                        if nodeType1 == 4 || nodeType1 == 2{
+                            detectCardArray.insert(nowNum1, at: 0)
+                        }
+                    }
+                }
+            }
+        }
+        
+        var uniqueArray: [Int] = []
+        for card in detectCardArray {
+            if !uniqueArray.contains(card) {
+                uniqueArray.append(card)
+            }
+        }
+        
+        let result = DetectionState(detectionResult: uniqueArray, isSingle: isSingle, isShort: isShort, longestIndex: longestIndex)
+        return result
+    }
+    
+    func cutCardArray(index : Int){
+        if index < cardArray.count - 1{
+            let elementsToMove = cardArray[(index+1)...]
+            cardArray.removeSubrange((index+1)...)
+            cardArray.insert(contentsOf: elementsToMove, at: 0)
+        }
+    }
+
+    
+    // MARK: compute targetArea
+    func computeTargetArea(stateResult: [[Float]])-> [Float]{
+        
+        var originBoxes = stateResult
+        var targetArea:[Float] = [0,0,0,0]
+        
+        if originBoxes.count == 1{
+            
+            var w = self.imageSize[0]
+            var h = self.imageSize[1]
+            
+            if !self.cutDone
+                && (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4)
+                && (originBoxes[0][2] + originBoxes[0][3]) > 0.2{
+                return [0.5,0.5,1,1]
+            }
+            
+            let minX = self.originSize[0] * (originBoxes[0][0] - originBoxes[0][2] / 2)
+            let maxX = self.originSize[0] * (originBoxes[0][0] + originBoxes[0][2] / 2)
+            let minY = self.originSize[1] * (originBoxes[0][1] - originBoxes[0][3] / 2)
+            let maxY = self.originSize[1] * (originBoxes[0][1] + originBoxes[0][3] / 2)
+            
+            if maxX + Float(self.imageSize[0])/2 >= self.originSize[0]{
+                targetArea[0] = self.originSize[0] - Float(self.imageSize[0] / 2) - 2
+                targetArea[2] = Float(self.imageSize[0])
+            }
+            else if minX - Float(self.imageSize[0])/2 <= 0{
+                targetArea[0] = Float(self.imageSize[0] / 2) + 2
+                targetArea[2] = Float(self.imageSize[0])
+            }
+            else{
+                targetArea[0] = (maxX + minX) / 2
+                targetArea[2] = max(maxX - minX + 20, Float(self.imageSize[0]))
+            }
+            
+            if maxY + Float(self.imageSize[1])/2 >= self.originSize[1]{
+                targetArea[1] = self.originSize[1] - Float(self.imageSize[1] / 2) - 2
+                targetArea[3] = Float(self.imageSize[1])
+            }
+            else if minY - Float(self.imageSize[1])/2 <= 0{
+                targetArea[1] = Float(self.imageSize[1] / 2) + 2
+                targetArea[3] = Float(self.imageSize[1])
+            }
+            else{
+                targetArea[1] = (maxY + minY) / 2
+                targetArea[3] = max(maxY - minY + 20, Float(self.imageSize[1]))
+            }
+        }
+        else if originBoxes.count == 2{
+            if self.isHorizon
+            {
+                if originBoxes[0][0] > originBoxes[1][0]{
+                    originBoxes.swapAt(0, 1)
+                }
+                
+                let minX = self.originSize[0] * (originBoxes[0][0] - originBoxes[0][2] / 2)
+                let maxX = self.originSize[0] * (originBoxes[1][0] + originBoxes[1][2] / 2)
+                let minY = self.originSize[1] * min(originBoxes[0][1] - originBoxes[0][3] / 2, originBoxes[1][1] - originBoxes[1][3] / 2)
+                let maxY = self.originSize[1] * max(originBoxes[0][1] + originBoxes[0][3] / 2, originBoxes[1][1] + originBoxes[1][3] / 2)
+                
+                if minX + Float(self.imageSize[0]) >= self.originSize[0]{
+                    targetArea[0] = self.originSize[0] - Float(self.imageSize[0] / 2) - 2
+                    targetArea[2] = Float(self.imageSize[0])
+                }
+                else if maxX - Float(self.imageSize[0]) <= 0{
+                    targetArea[0] = Float(self.imageSize[0] / 2) + 2
+                    targetArea[2] = Float(self.imageSize[0])
+                }
+                else{
+                    targetArea[0] = (maxX + minX) / 2
+                    targetArea[2] = max(maxX - minX + 20, Float(self.imageSize[0]))
+                }
+                
+                targetArea[3] = min(self.originSize[1] - 2, targetArea[2] / Float(self.imageSize[0]) * Float(self.imageSize[1]))
+                
+                let centerY = (maxY + minY) / 2
+                
+                if targetArea[3] == self.originSize[1] - 2{
+                    targetArea[1] = self.originSize[1] / 2
+                }
+                else if centerY + targetArea[3] / 2 >= self.originSize[1]{
+                    targetArea[1] = self.originSize[1] - targetArea[3] / 2 - 2
+                }
+                else if centerY - targetArea[3] / 2 <= 0{
+                    targetArea[1] = targetArea[3] / 2 + 2
+                }
+                else{
+                    targetArea[1] = centerY
+                }
+                
+            }
+            else{
+                
+                if originBoxes[0][1] > originBoxes[1][1]{
+                    originBoxes.swapAt(0, 1)
+                }
+                
+                let minY = self.originSize[1] * (originBoxes[0][1] - originBoxes[0][3] / 2)
+                let maxY = self.originSize[1] * (originBoxes[1][1] + originBoxes[1][3] / 2)
+                let minX = self.originSize[0] * min(originBoxes[0][0] - originBoxes[0][2] / 2, originBoxes[1][0] - originBoxes[1][2] / 2)
+                let maxX = self.originSize[0] * max(originBoxes[0][0] + originBoxes[0][2] / 2, originBoxes[1][0] + originBoxes[1][2] / 2)
+                
+                if minY + Float(self.imageSize[1]) >= self.originSize[1]{
+                    targetArea[1] = self.originSize[1] - Float(self.imageSize[1] / 2) - 2
+                    targetArea[3] = Float(self.imageSize[1])
+                }
+                else if maxY - Float(self.imageSize[1]) <= 0{
+                    targetArea[1] = Float(self.imageSize[1] / 2) + 2
+                    targetArea[3] = Float(self.imageSize[1])
+                }
+                else{
+                    targetArea[1] = (maxY + minY) / 2
+                    targetArea[3] = max(maxY - minY + 20, Float(self.imageSize[1]))
+                }
+                
+                targetArea[2] = min(self.originSize[0] - 2, targetArea[3] / Float(self.imageSize[1]) * Float(self.imageSize[0]))
+                
+                let centerX = (maxX + minX) / 2
+                
+                if targetArea[2] == self.originSize[0] - 2{
+                    targetArea[0] = self.originSize[0] / 2
+                }
+                else if centerX + targetArea[2] / 2 >= self.originSize[0]{
+                    targetArea[0] = self.originSize[0] - targetArea[2] / 2 - 2
+                }
+                else if centerX - targetArea[2] / 2 <= 0{
+                    targetArea[0] = targetArea[2] / 2 + 2
+                }
+                else{
+                    targetArea[0] = (maxX + minX) / 2
+                }
+            
+            }
+        }
+        
+        
+        targetArea[0] /= originSize[0]
+        targetArea[1] /= originSize[1]
+        targetArea[2] /= originSize[0]
+        targetArea[3] /= originSize[1]
+        
+        return targetArea
+    }
+    
+    func updateTargetArea(coordinates:[[Float]], targetArea:[Float]) -> [Float]{
+        let targetX = targetArea[0] * self.originSize[0]
+        let targetY = targetArea[1] * self.originSize[1]
+        let targetW = targetArea[2] * self.originSize[0]
+        let targetH = targetArea[3] * self.originSize[1]
+        
+        var stateResult : [[Float]] = []
+        
+        if targetW != 0{
+            for coordinate in coordinates {
+                let x = (coordinate[0] * targetW + targetX - targetW / 2) / originSize[0]
+                let y = (coordinate[1] * targetH + targetY - targetH / 2) / originSize[1]
+                let w = (coordinate[2] * targetW) / originSize[0]
+                let h = (coordinate[3] * targetH) / originSize[1]
+                stateResult.append([x,y,w,h])
+            }
+        }
+        else{
+            for coordinate in coordinates {
+                let x = coordinate[0]
+                let y = coordinate[1]
+                let w = coordinate[2]
+                let h = coordinate[3]
+                stateResult.append([x,y,w,h])
+            }
+        }
+        
+        return computeTargetArea(stateResult: stateResult)
+    }
+
+    func getCard(from cardArray: MLMultiArray, from boxArray : MLMultiArray, from pixelBuffer : CVPixelBuffer, iscls : Bool = true) -> [DetectionResult] {
+        let cnt : Int = Int(cardArray.shape[0])
+        let n : Int = Int(cardArray.shape[1])
+        var result : [DetectionResult] = []
+        
+        
+        if self.state == "idle"{
+            for i in 0..<cnt {
+                var maxVal: Float32 = cardArray[i * n].floatValue
+                var confidenceSum : Float = 0
+                var cardIndex : [Int] = []
+                var confidence : [Float] = []
+                for j in 0..<n {
+                    let index = i * n + j
+                    let value = cardArray[index].floatValue
+                    confidenceSum += value
+                }
+                for j in 0..<n {
+                    let index = i * n + j
+                    let value = cardArray[index].floatValue
+                    
+                    let trueIndex = j == 52 ? 54 : j
+                    
+                    if value > 0 && (self.allCardIndex.contains(trueIndex) || !iscls){
+                        
+                        if (value/confidenceSum>=0) {
+                            cardIndex.append(j)
+                            confidence.append(value)
+                        }
+                        
+                        if value > maxVal {
+                            maxVal = value
+                        }
+                    }
+                }
+                
+                cardIndex.sort{cardArray[$0 + i*n].floatValue > cardArray[$1 + i*n].floatValue}
+                confidence.sort{ $0 > $1 }
+                
+                let centerX = boxArray[i*4].floatValue
+                let centerY = boxArray[i*4+1].floatValue
+                let widthX = boxArray[i*4+2].floatValue
+                let heightY = boxArray[i*4+3].floatValue
+                
+                let coordinate = [centerX, centerY, widthX, heightY]
+                
+                if cardIndex.count > 0{
+                    if let index = result.firstIndex(where: {(abs($0.coordinate[0] - coordinate[0]) < $0.coordinate[2] / 2 || abs($0.coordinate[0] - coordinate[0]) < coordinate[2] / 2) && (abs($0.coordinate[1] - coordinate[1]) < $0.coordinate[3] / 2 || abs($0.coordinate[1] - coordinate[1]) < coordinate[3] / 2)}) {
+                        
+                        if maxVal > result[index].confidence[0] {
+                            result[index].cardIndex = cardIndex + result[index].cardIndex
+                            result[index].confidence = confidence + result[index].confidence
+                        }
+                        else{
+                            result[index].cardIndex = result[index].cardIndex + cardIndex
+                            result[index].confidence = result[index].confidence + confidence
+                        }
+                    }
+                    else{
+                        result.append(DetectionResult(cardIndex: cardIndex, confidence: confidence, confidencePercent: maxVal/confidenceSum, coordinate: coordinate, laplacianVariance: 0))
+                    }
+                }
+            }
+            
+            if result.count > 2 && iscls{
+                var uniqueCardIndexes = Set<Int>()
+                
+                result = result.filter {
+                    let cardIndex0 = $0.cardIndex[0]
+                    if uniqueCardIndexes.contains(cardIndex0) {
+                        return false
+                    } else {
+                        uniqueCardIndexes.insert(cardIndex0)
+                        return true
+                    }
+                }
+            }
+            
+            if result.count > 2{
+                result.sort{$0.confidence[0] > $1.confidence[0]}
+                result.removeLast(result.count - 2)
+            }
+            
+            
+            if result.count == 2{
+                if abs(result[0].coordinate[0] - result[1].coordinate[0]) > abs(result[0].coordinate[1] - result[1].coordinate[1]){
+                    isHorizon = true
+                    if result[0].coordinate[0] > self.centerPos[0]{
+                        result.swapAt(0, 1)
+                    }
+                }
+                else{
+                    isHorizon = false
+                    if result[0].coordinate[1] > self.centerPos[1]{
+                        result.swapAt(0, 1)
+                    }
+                }
+            }
+            else if result.count == 1{
+                if isHorizon{
+                    if result[0].coordinate[0] > self.centerPos[0]{
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
+                    }
+                    else{
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
+                    }
+                }
+                else{
+                    if result[0].coordinate[1] > self.centerPos[1]{
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
+                    }
+                    else{
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
+                    }
+                }
+            }
+            else if result.count == 0{
+                result.append(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0))
+                result.append(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0))
+            }
+            
+            for resultIndex in 0..<result.count{
+                result[resultIndex].cardIndex = result[resultIndex].cardIndex.map { $0 == 52 ? 54 : $0 }
+            }
+            
+            self.centerPos = [(result[0].coordinate[0] + result[1].coordinate[0])/2, (result[0].coordinate[1] + result[1].coordinate[1])/2]
+            self.lastBoxes = [result[0].coordinate,result[1].coordinate]
+            
+            return result
+        }
+        
+        else{
+            let newCIImage = CIImage(cvImageBuffer: pixelBuffer)
+            let cgImage = CIContext().createCGImage(newCIImage, from: newCIImage.extent)!
+            
+            /// The 8-bit-per-channel, 4-channel source pixel buffer.
+            let sourceBuffer8 = try! vImage.PixelBuffer<vImage.Interleaved8x4>(
+                cgImage: cgImage,
+                cgImageFormat: &BlurDetector_8.sourceFormat8)
+            
+            
+            /// The 8-bit planar destination pixel buffer.
+            let destinationBuffer8 = vImage.PixelBuffer<vImage.Planar8>(width: sourceBuffer8.width,
+                                                                        height: sourceBuffer8.height)
+            
+            let divisor: Int = 0x1000
+            let fDivisor = Float(divisor)
+            
+            sourceBuffer8.multiply(by: (0,
+                                        Int(BlurDetector_8.defaultRedCoefficient * fDivisor),
+                                        Int(BlurDetector_8.defaultGreenCoefficient * fDivisor),
+                                        Int(BlurDetector_8.defaultBlueCoefficient * fDivisor)),
+                                   divisor: divisor,
+                                   preBias: (0, 0, 0, 0),
+                                   postBias: 0,
+                                   destination: destinationBuffer8)
+            
+            for i in 0..<cnt {
+                var maxVal: Float32 = cardArray[i * n].floatValue
+                var confidenceSum : Float = 0
+                var cardIndex : [Int] = []
+                var confidence : [Float] = []
+                for j in 0..<n {
+                    let index = i * n + j
+                    let value = cardArray[index].floatValue
+                    confidenceSum += value
+                }
+                for j in 0..<n {
+                    let index = i * n + j
+                    let value = cardArray[index].floatValue
+                    
+                    let trueIndex = j == 52 ? 54 : j
+                    
+                    if value > 0 && (self.allCardIndex.contains(trueIndex) || !iscls){
+                        
+                        if (value/confidenceSum>=0) {
+                            cardIndex.append(j)
+                            confidence.append(value)
+                        }
+                        
+                        if value > maxVal {
+                            maxVal = value
+                        }
+                    }
+                }
+                
+                cardIndex.sort{cardArray[$0 + i*n].floatValue > cardArray[$1 + i*n].floatValue}
+                confidence.sort{ $0 > $1 }
+                
+                let centerX = boxArray[i*4].floatValue
+                let centerY = boxArray[i*4+1].floatValue
+                let widthX = boxArray[i*4+2].floatValue
+                let heightY = boxArray[i*4+3].floatValue
+                
+                let coordinate = [centerX, centerY, widthX, heightY]
+                
+                if cardIndex.count > 0{
+                    if let index = result.firstIndex(where: {(abs($0.coordinate[0] - coordinate[0]) < $0.coordinate[2] / 2 || abs($0.coordinate[0] - coordinate[0]) < coordinate[2] / 2) && (abs($0.coordinate[1] - coordinate[1]) < $0.coordinate[3] / 2 || abs($0.coordinate[1] - coordinate[1]) < coordinate[3] / 2)}) {
+                        
+                        if maxVal > result[index].confidence[0] {
+                            result[index].cardIndex = cardIndex + result[index].cardIndex
+                            result[index].confidence = confidence + result[index].confidence
+                        }
+                        else{
+                            result[index].cardIndex = result[index].cardIndex + cardIndex
+                            result[index].confidence = result[index].confidence + confidence
+                        }
+                    }
+                    else{
+                        result.append(DetectionResult(cardIndex: cardIndex, confidence: confidence, confidencePercent: maxVal/confidenceSum, coordinate: coordinate, laplacianVariance: 0))
+                    }
+                }
+            }
+            
+            if result.count > 2 && iscls{
+                var uniqueCardIndexes = Set<Int>()
+                
+                result = result.filter {
+                    let cardIndex0 = $0.cardIndex[0]
+                    if uniqueCardIndexes.contains(cardIndex0) {
+                        return false
+                    } else {
+                        uniqueCardIndexes.insert(cardIndex0)
+                        return true
+                    }
+                }
+            }
+            
+            if result.count > 2{
+                result.sort{$0.confidence[0] > $1.confidence[0]}
+                result.removeLast(result.count - 2)
+            }
+            
+            
+            if result.count == 2{
+                //横向排列
+                if abs(result[0].coordinate[0] - result[1].coordinate[0]) > abs(result[0].coordinate[1] - result[1].coordinate[1]){
+                    isHorizon = true
+                    if result[0].coordinate[0] > self.centerPos[0]{
+                        result.swapAt(0, 1)
+                    }
+                }
+                //纵向排列
+                else{
+                    isHorizon = false
+                    if result[0].coordinate[1] > self.centerPos[1]{
+                        result.swapAt(0, 1)
+                    }
+                }
+            }
+            else if result.count == 1{
+                if isHorizon{
+                    if result[0].coordinate[0] > self.centerPos[0]{
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
+                    }
+                    else{
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
+                    }
+                }
+                else{
+                    if result[0].coordinate[1] > self.centerPos[1]{
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
+                    }
+                    else{
+                        result.insert(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
+                    }
+                }
+            }
+            else if result.count == 0{
+                result.append(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0))
+                result.append(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0))
+            }
+            
+            
+            
+            for resultIndex in 0..<result.count{
+                result[resultIndex].cardIndex = result[resultIndex].cardIndex.map { $0 == 52 ? 54 : $0 }
+            }
+            
+            self.centerPos = [(result[0].coordinate[0] + result[1].coordinate[0])/2, (result[0].coordinate[1] + result[1].coordinate[1])/2]
+            self.lastBoxes = [result[0].coordinate,result[1].coordinate]
+            
+            for resultIndex in 0..<result.count{
+                result[resultIndex].laplacianVariance = ComputeROILaplacianVariance(box: lastBoxes[resultIndex], destinationBuffer8: destinationBuffer8)
+            }
+            
+            
+            return result
+        }
+    }
+    
+    //MARK: generate test result
+    func generateTestResult(){
+        var testArray:[Int] = []
+        for i in self.allCardIndex{
+            testArray.append(i)
+        }
+        
+        testArray.shuffle()
+        self.cardArray = testArray
+        
+        self.cutArray = []
+        self.cutShowArray = []
+        
+        if self.cutMode != 0{
+            let cutCard : Int = self.cardArray.randomElement()!
+            var cutIndex = self.cardArray.firstIndex(of: cutCard)!
+            if self.cutMode == 1{
+                self.cutCardArray(index: cutIndex)
+            }
+            else if self.cutMode == 2{
+                cutIndex -= 1
+                if cutIndex < 0{
+                    cutIndex = self.cardArray.count - 1
+                }
+                self.cutCardArray(index: cutIndex)
+            }
+            else if self.cutMode == 3{
+                self.cutArray.append(cutCard)
+            }
+            else if self.cutMode == 4{
+                self.cutArray.append(cutCard)
+            }
+            self.cutShowArray.append(cutCard)
+        }
+        
+        computeWinnerPlayer()
+    }
+    
+    func computeWinnerPlayer() {
+        if cardArray.count >= minCardNum && cardArray.count > cutNumRangeSetting[0] && cardArray.count > cutNumRangeSetting[1] - minCardNum{
+            multipleGamePlayerInfos = GameManager.selectGame(gameIndex: ruleIndex, inputCards: cardArray, playerNum: (GameManager.gameRules[ruleIndex]?.playerNum[playerNum])!, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, minCardNum: minCardNum, cutCardIndexArray: cutArray)
+            
+            self.cardArray = multipleGamePlayerInfos.returnCardArray
+            
+            speakText(input: multipleGamePlayerInfos.reportResult)
+        }
+    }
+    
+    func computeCards(){
+        if self.cardArray.count >= self.minCardNum && self.cardArray.count > self.cutNumRangeSetting[0] && self.cardArray.count > self.cutNumRangeSetting[1] - self.minCardNum{
+            self.leftCards = multipleGamePlayerInfos.leftCards
+            let usedNum = self.cardArray.count - self.leftCards.count
+            self.usedCards = Array(self.cardArray[0...(usedNum - 1)])
+        }
+    }
+    
+    func computeNextRound(){
+        if (self.leftCards.count > 0){
+            self.cardArray = self.leftCards
+            computeWinnerPlayer()
+            self.computeCards()
+        }
+    }
+    
+    func speakText(input: Int){
+        let isSpeak = self.isHeadphonesConnected() == self.isMute
+        
+        if isSpeak{
+            if input == 0{
+                self.startAudioPlayer?.play()
+            }
+            else if input == 1{
+                self.successAudioPlayer?.play()
+            }
+            else if input == 2{
+                self.failAudioPlayer?.play()
+            }
+        }
+    }
+
+    func speakText(input: [[SpeakResultStruct]]) {
+        let isSpeak = self.isHeadphonesConnected() == self.isMute
+        
+        if isSpeak{
+            self.speechPerformer.performSpeechSynthesis(speakResultStruct: input)
+        }
+    }
+    
+    func speakText(input: String){
+        let isSpeak = self.isHeadphonesConnected() == self.isMute
+        if isSpeak{
+            let speechUtterance = AVSpeechUtterance(string: input)
+            self.speechPerformer.performSpeechSynthesis(utterance: speechUtterance)
+        }
+    }
+
+    
+    func isHeadphonesConnected() -> Bool {
+        let currentRoute = AVAudioSession.sharedInstance().currentRoute
+        let connectedBluetoothHeadphones = currentRoute.outputs.contains { $0.portType == .bluetoothA2DP }
+        return connectedBluetoothHeadphones
+    }
+    
+    
+    public func handleVolumeIncrease() {
+        
+        let selectedRule = GameManager.gameRules[ruleIndex]!
+        
+        // 处理音量增加事件的逻辑
+        if self.volumeUp == 1{
+            let playNumList = selectedRule.playerNum
+            self.playerNum += 1
+            if self.playerNum >= playNumList.count{
+                self.playerNum = 0
+            }
+            self.minCardNum = GameGetMinCardNum()
+            speakText(input: "人数" + String(selectedRule.playerNum[self.playerNum]))
+        }
+        else if self.volumeUp == 2{
+            let currentNum = selectedRule.playerNum[self.playerNum]
+            var positionSetting = self.calModeArgs[1] + 1
+            if positionSetting >= currentNum{
+                positionSetting = 0
+            }
+            self.calModeArgs[1] = positionSetting
+            speakText(input: "位置" + String(positionSetting+1))
+        }
+        else if self.volumeUp == 3{
+            self.shuffleMode += 1
+            if self.shuffleMode >= generalRuleSetting.allShuffleMode.count{
+                self.shuffleMode = 0
+            }
+            speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode]!)
+        }
+        else if self.volumeUp == 4{
+            self.selectedSaveIndex += 1
+            if self.selectedSaveIndex >= RuleManager.allUsersGameRule.count{
+                self.selectedSaveIndex = 0
+            }
+            loadSaveRule(saveRuleIndex: self.selectedSaveIndex)
+            speakText(input: "方案" + String(self.selectedSaveIndex+1))
+        }
+        else if self.volumeUp == 5{
+            isWorking.toggle()
+            if isWorking{
+                speakText(input: "开始")
+            }
+            else{
+                speakText(input: "暂停")
+            }
+        }
+        else if self.volumeUp == 6{
+            computeNextRound()
+        }
+    }
+    
+    public func handleVolumeDecrease() {
+        // 处理音量减少事件的逻辑
+        
+        let selectedRule = GameManager.gameRules[ruleIndex]!
+        
+        if self.volumeDown == 1{
+            let playNumList = selectedRule.playerNum
+            self.playerNum -= 1
+            if self.playerNum < 0{
+                self.playerNum = playNumList.count - 1
+            }
+            self.minCardNum = GameGetMinCardNum()
+            speakText(input: "人数" + String(selectedRule.playerNum[self.playerNum]))
+        }
+        else if self.volumeDown == 2{
+            let currentNum = selectedRule.playerNum[self.playerNum]
+            var positionSetting = self.calModeArgs[1] - 1
+            if positionSetting < 0{
+                positionSetting = currentNum - 1
+            }
+            self.calModeArgs[1] = positionSetting
+            speakText(input: "位置" + String(positionSetting+1))
+        }
+        else if self.volumeDown == 3{
+            self.shuffleMode -= 1
+            if self.shuffleMode < 0{
+                self.shuffleMode = generalRuleSetting.allShuffleMode.count - 1
+            }
+            speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode]!)
+        }
+        else if self.volumeDown == 4{
+            self.selectedSaveIndex -= 1
+            if self.selectedSaveIndex < 0{
+                self.selectedSaveIndex = RuleManager.allUsersGameRule.count - 1
+            }
+            loadSaveRule(saveRuleIndex: self.selectedSaveIndex)
+            speakText(input: "方案" + String(self.selectedSaveIndex+1))
+        }
+        else if self.volumeDown == 5{
+            isWorking.toggle()
+            if isWorking{
+                speakText(input: "开始")
+            }
+            else{
+                speakText(input: "暂停")
+            }
+        }
+        else if self.volumeDown == 6{
+            computeNextRound()
+        }
+        else if self.volumeDown == 7{
+            self.volumeUp += 1
+            if self.volumeUp >= volumeSetting.volumeUpDict.count{
+                self.volumeUp = 0
+            }
+            speakText(input: volumeSetting.volumeUpDict[self.volumeUp]!)
+        }
+    }
+    
+    private func loadSaveRule(saveRuleIndex: Int){
+        self.selectedSaveIndex = saveRuleIndex
+        let rules = RuleManager.allUsersGameRule[self.selectedSaveIndex]
+        self.ruleIndex = rules.gameType
+        self.playerNum = rules.playerNum
+        self.dealNum = rules.dealNum
+        self.coloringType = rules.coloringType
+        self.cutMode = rules.cutMode
+        self.dealType = rules.dealType
+        self.diyDealNum = rules.diyDealNum
+        self.diyDealStatus = rules.diyDealStatus
+        self.playerNum = rules.playerNum
+        self.shuffleMode = rules.shuffleMode
+        self.allCardIndex = rules.cardToUse
+        self.cutNumSetting = rules.cutNumSetting
+        self.cutNumRangeSetting = rules.cutNumRangeSetting
+        self.calModeArgs = [rules.reportSetting, rules.positionSetting]
+        self.consecutiveReport = rules.consecutiveReport
+        self.reportNumber = rules.reportNumber
+        self.voiceReport = rules.voiceReport
+        self.args = rules.args
+        self.suitRules = rules.suitRanks
+        self.rankRules = rules.rankRules
+        self.minCardNum = rules.minCardNum
+        self.resultReportType = rules.resultReportType
+    }
+    
+    private func GameGetMinCardNum()-> Int{
+        var minCardNum:Int = 0
+        let gameType = ruleIndex
+        switch gameType {
+        case 0:
+            let selectedRule = GameManager.gameRules[gameType] as! TexasPokerRule
+            minCardNum = TexasPoker.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 1:
+            let selectedRule = GameManager.gameRules[gameType] as! PokerBullRule
+            minCardNum = PokerBull.GetMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+        case 2:
+            let selectedRule = GameManager.gameRules[gameType] as! ThreeCardPokerGameRule
+            minCardNum = ThreeCardPokerGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 3:
+            let selectedRule = GameManager.gameRules[gameType] as! TinyNineGameRule
+            minCardNum = TinyNineGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 4:
+            let selectedRule = GameManager.gameRules[gameType]
+            as! ThreeMenGameRule
+            minCardNum = ThreeMenGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 5:
+            let selectedRule = GameManager.gameRules[gameType] as! TwoEightGangGameRule
+            minCardNum = TwoEightGangGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 6:
+            let selectedRule = GameManager.gameRules[gameType] as! NinePointFiveGameRule
+            minCardNum = NinePointFiveGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 7:
+            let selectedRule = GameManager.gameRules[gameType] as!
+            BaoziGameRule
+            minCardNum = BaoziGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 8:
+            let selectedRule = GameManager.gameRules[gameType] as! JiaJiaBaoGameRule
+            minCardNum = JiaJiaBaoGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 9:
+            let selectedRule = GameManager.gameRules[gameType] as! CardNineGameRule
+            minCardNum = CardNineGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 10:
+            let selectedRule = GameManager.gameRules[gameType] as! NinePointGameRule
+            minCardNum = NinePointGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 11:
+            let selectedRule = GameManager.gameRules[gameType] as! FourCardGameRule
+            minCardNum = FourCardGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 12:
+            let selectedRule = GameManager.gameRules[gameType] as! TwoCardGameRule
+            minCardNum = TwoCardGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 13:
+            let selectedRule = GameManager.gameRules[gameType] as! ThreeCardPointGameRule
+            minCardNum = ThreeCardPointGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 14:
+            let selectedRule = GameManager.gameRules[gameType] as! TenPointFiveGameRule
+            minCardNum = TenPointFiveGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 15:
+            let selectedRule = GameManager.gameRules[gameType] as! ChickenBattleGameRule
+            minCardNum = ChickenBattleGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        case 16:
+            let selectedRule = GameManager.gameRules[gameType] as! ThirteenWaterGameRule
+            minCardNum = ThirteenWaterGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            break
+        default:
+            print("GameType error")
+        }
+        return minCardNum
+    }
+    
+    public func updateConfigJSON() {
+        do {
+            let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+            let fileURL = documentsURL.appendingPathComponent("config.json")
+
+            let boolDict: [String: Bool] = [
+                "isBlack": self.isBlack,
+                "isMute": self.isMute,
+                "isBackCamera" : self.isBackCamera,
+                "isRemote" : self.isRemote,
+                "isFast": self.isFast,
+                "isActive": self.isActive,
+                "isAutoFocus": self.isAutoFocus
+            ]
+            
+            let intDict : [String: Int] = [
+                "volumeUp": self.volumeUp,
+                "volumeDown": self.volumeDown
+            ]
+            
+            let floatDict : [String: Float] = [
+                "volumeValue": self.volumeValue,
+                "zoomFactor": self.zoomFactor,
+                "focusFactor": self.focusFactor
+            ]
+            
+            let configData: [String: Any] = [
+                "Int": intDict,
+                "Float": floatDict,
+                "Bool": boolDict
+            ]
+
+            let jsonData = try JSONSerialization.data(withJSONObject: configData, options: .prettyPrinted)
+            try jsonData.write(to: fileURL)
+
+            print("config.json file updated successfully")
+        } catch {
+            print("Error updating config.json: \(error)")
+        }
+    }
+}
+
+
+class DetectionResult {
+    var cardIndex : [Int]
+    var confidence : [Float]
+    var confidencePercent : Float
+    var coordinate : [Float]
+    var nodeType : Int
+    var laplacianVariance : Float
+
+    init(cardIndex: [Int], confidence: [Float], confidencePercent: Float, coordinate: [Float], laplacianVariance: Float) {
+        self.cardIndex = cardIndex
+        self.confidence = confidence
+        self.confidencePercent = confidencePercent
+        self.coordinate = coordinate
+        self.nodeType = 0
+        self.laplacianVariance = laplacianVariance
+    }
+    
+    func targetDistance(target: [Float]) -> Float{
+        return (coordinate[0] - target[0]) * (coordinate[0] - target[0]) + (coordinate[1] - target[1]) * (coordinate[1] - target[1])
+    }
+}
+
+class DetectionState{
+    var detectionResult : [Int]
+    var isSingle : Bool
+    var isShort : Bool
+    var longestIndex : Int
+    
+    init(detectionResult: [Int], isSingle: Bool, isShort: Bool, longestIndex: Int) {
+        self.detectionResult = detectionResult
+        self.isSingle = isSingle
+        self.isShort = isShort
+        self.longestIndex = longestIndex
+    }
+}
+
+class SpeakResultStruct{
+    var voiceType : Int
+    var content : String
+    
+    init(voiceType: Int, content: String) {
+        self.voiceType = voiceType
+        self.content = content
+    }
+}
+
+
+class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
+    let synthesizer = AVSpeechSynthesizer() // Your AVSpeechSynthesizer instance
+    let chineseFemaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.Mei-Jia-compact-CN_compact")
+    let chineseMaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.siri_male_zh-CN_compact")
+    
+    private let lock = NSLock()
+    private var isPlaying = false
+
+    override init() {
+        super.init()
+        synthesizer.delegate = self
+    }
+
+    func performSpeechSynthesis(utterance: AVSpeechUtterance) {
+        lock.lock()
+        guard !isPlaying else {
+            lock.unlock()
+            return
+        }
+
+        isPlaying = true
+        lock.unlock()
+        
+        utterance.voice = chineseFemaleVoice
+        synthesizer.speak(utterance)
+    }
+    
+    func performSpeechSynthesis(speakResultStruct: [[SpeakResultStruct]]) {
+        lock.lock()
+        guard !isPlaying else {
+            lock.unlock()
+            return
+        }
+
+        isPlaying = true
+        lock.unlock()
+        
+        for repeatIndex in 0..<2{
+            for (turnIndex, turnResult) in speakResultStruct.enumerated() {
+                for (reportIndex, reportResult) in turnResult.enumerated() {
+                    let speakString = reportResult.content
+                    if !speakString.isEmpty{
+                        let speechUtterance = AVSpeechUtterance(string: speakString)
+                        speechUtterance.postUtteranceDelay = 0.1
+                        if reportResult.voiceType == 0{
+                            speechUtterance.voice = chineseMaleVoice
+                        }
+                        if reportResult.voiceType == 1{
+                            speechUtterance.voice = chineseFemaleVoice
+                        }
+                        
+                        if repeatIndex != 0 && turnIndex == 0 && reportIndex == 0{
+                            speechUtterance.preUtteranceDelay = 0.1
+                        }
+                        
+                        print("播报的input \(reportResult.content)")
+                        
+                        synthesizer.speak(speechUtterance)
+                    }
+                }
+            }
+        }
+    }
+
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        lock.lock()
+        isPlaying = false
+        lock.unlock()
+        // Perform any action you want after speech synthesis finishes
+    }
+}
+
