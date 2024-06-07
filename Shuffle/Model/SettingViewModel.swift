@@ -17,7 +17,6 @@ class SettingViewModel: ObservableObject {
     @Published var zoomFactor: Float = 0
     @Published var focusFactor: Float = 0.55
     
-    @Published var searchText : String = ""
     @Published var isLogin : Bool = false
 
     init() {
@@ -90,10 +89,10 @@ class SettingViewModel: ObservableObject {
         }
     }
     
-    public func onReturnKeyPressed(){
-        if searchText == "TEST"{
+    public func onReturnKeyPressed(searchText: String){
+        if searchText == "^PanGu&TEST*"{
             self.isActive.toggle()
-            let dateString = "TEST"
+            let dateString = "测试版"
             
             do {
                 let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
@@ -106,7 +105,7 @@ class SettingViewModel: ObservableObject {
 
                 let jsonData = try JSONSerialization.data(withJSONObject: paraData, options: .prettyPrinted)
                 try jsonData.write(to: fileURL)
-
+                
                 print("para.json file updated successfully")
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 5 * 60) {
@@ -119,7 +118,7 @@ class SettingViewModel: ObservableObject {
                 print("Error updating para.json: \(error)")
             }
         }
-        else if (searchText == "WHOSYOURDADDY" || AuthManager.authKey(input: searchText, uniqueID: self.uniqueID) == true) && self.isActive == false{
+        else if AuthManager.authKey(input: searchText, uniqueID: self.uniqueID) == true && self.isActive == false{
             fetchInternetCurrentDate { internetDate in
                 if let internetDate = internetDate {
                     
@@ -160,7 +159,6 @@ class SettingViewModel: ObservableObject {
             isLogin = true
             timeCheck()
         }
-        searchText = ""
         
         updateConfigJSON()
     }
@@ -172,7 +170,7 @@ class SettingViewModel: ObservableObject {
             let activeTimeString = readParaJSON()!["activeTime"]
             
             if let internetDate = internetDate {
-                if activeTimeString == "TEST"{
+                if activeTimeString == "测试版"{
                     DispatchQueue.main.asyncAfter(deadline: .now() + 5 * 60) {
                         UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {

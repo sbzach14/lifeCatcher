@@ -15,13 +15,29 @@ class VisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVid
     private var requests = [VNRequest]()
     @Published var detectedObjects: [DetectedObject] = []
     @Published var cameraImage : CGImage?
-    
+    @Published var showAlert: Bool = false
     private var speechSynthesizer = AVSpeechSynthesizer()
     
     func initialize(){
-        setupAVCapture()
-        setupVision()
-        startCaptureSession()
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized:
+            setupAVCapture()
+            setupVision()
+            startCaptureSession()
+        @unknown default:
+            AVCaptureDevice.requestAccess(for: .video) { granted in
+                DispatchQueue.main.async {
+                    if granted {
+                        self.setupAVCapture()
+                        self.setupVision()
+                        self.startCaptureSession()
+                    } else {
+                        self.showAlert = true
+                    }
+                }
+            }
+        }
+        
     }
     
     // MARK: - Public Methods
@@ -262,6 +278,7 @@ class VisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVid
     
     func speakText(input: String){
         let speechUtterance = AVSpeechUtterance(string: input)
+        speechSynthesizer.stopSpeaking(at: .immediate)
         speechSynthesizer.speak(speechUtterance)
     }
         

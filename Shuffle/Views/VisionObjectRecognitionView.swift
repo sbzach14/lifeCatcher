@@ -41,6 +41,15 @@ struct VisionObjectRecognitionView: View {
             .onDisappear {
                 viewModel.stopCamera()
             }
+            .alert(isPresented: $viewModel.showAlert) {
+                Alert(
+                    title: Text("相机权限被拒绝"),
+                    message: Text("请在设置中启用相机权限以使用此功能。"),
+                    dismissButton: .default(Text("确定")) {
+                        exit(0)
+                    }
+                )
+            }
             .toolbarBackground(.hidden)
             .navigationTitle("")
     }
