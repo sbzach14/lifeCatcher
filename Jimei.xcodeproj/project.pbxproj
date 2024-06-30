@@ -10,14 +10,14 @@
 		187A45452C2DA26100BB055C /* success_tip.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 187A45422C2DA25E00BB055C /* success_tip.mp3 */; };
 		187A45462C2DA26100BB055C /* start_DetecBeep.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 187A45432C2DA25F00BB055C /* start_DetecBeep.mp3 */; };
 		187A45472C2DA26100BB055C /* fail_tip.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 187A45442C2DA26100BB055C /* fail_tip.mp3 */; };
+		187A45502C31BBB400BB055C /* ReportClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187A454E2C31BBB400BB055C /* ReportClass.swift */; };
+		187A45512C31BBB400BB055C /* ClassifierSettingArgs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187A454F2C31BBB400BB055C /* ClassifierSettingArgs.swift */; };
 		18A7A5172C14E2EB0020138E /* cls_01.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 18A7A5142C14E2E80020138E /* cls_01.mlmodel */; };
 		18A7A5192C14E2EB0020138E /* detect_01.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 18A7A5162C14E2EB0020138E /* detect_01.mlmodel */; };
 		18A7A51D2C14E5A50020138E /* Icon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 18A7A51C2C14E5A50020138E /* Icon.xcassets */; };
 		18C98CC62C14F57000A8CD49 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 18C98CC52C14F57000A8CD49 /* AsyncAlgorithms */; };
 		18C98CDF2C14F8C100A8CD49 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = 18C98CDE2C14F8C100A8CD49 /* Collections */; };
 		18C98CE52C15893200A8CD49 /* DeprecatedComponentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C98CE42C15893200A8CD49 /* DeprecatedComponentView.swift */; };
-		18C98CE72C158B9500A8CD49 /* ClassifierSettingArgs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C98CE62C158B9500A8CD49 /* ClassifierSettingArgs.swift */; };
-		18C98CE92C158DE800A8CD49 /* ReportClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C98CE82C158DE800A8CD49 /* ReportClass.swift */; };
 		18C98D072C158F7B00A8CD49 /* ClassifierUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C98CEB2C158F7B00A8CD49 /* ClassifierUtils.swift */; };
 		18C98D0B2C158F7B00A8CD49 /* BZ.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C98CF12C158F7B00A8CD49 /* BZ.swift */; };
 		18C98D0C2C158F7B00A8CD49 /* CN.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C98CF22C158F7B00A8CD49 /* CN.swift */; };
@@ -64,12 +64,12 @@
 		187A45422C2DA25E00BB055C /* success_tip.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = success_tip.mp3; sourceTree = "<group>"; };
 		187A45432C2DA25F00BB055C /* start_DetecBeep.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = start_DetecBeep.mp3; sourceTree = "<group>"; };
 		187A45442C2DA26100BB055C /* fail_tip.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = fail_tip.mp3; sourceTree = "<group>"; };
+		187A454E2C31BBB400BB055C /* ReportClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReportClass.swift; sourceTree = "<group>"; };
+		187A454F2C31BBB400BB055C /* ClassifierSettingArgs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClassifierSettingArgs.swift; sourceTree = "<group>"; };
 		18A7A5142C14E2E80020138E /* cls_01.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_01.mlmodel; sourceTree = "<group>"; };
 		18A7A5162C14E2EB0020138E /* detect_01.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = detect_01.mlmodel; sourceTree = "<group>"; };
 		18A7A51C2C14E5A50020138E /* Icon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Icon.xcassets; sourceTree = "<group>"; };
 		18C98CE42C15893200A8CD49 /* DeprecatedComponentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeprecatedComponentView.swift; sourceTree = "<group>"; };
-		18C98CE62C158B9500A8CD49 /* ClassifierSettingArgs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ClassifierSettingArgs.swift; path = ../../../Jimei_v2/Shuffle/Utils/ClassifierSettingArgs.swift; sourceTree = "<group>"; };
-		18C98CE82C158DE800A8CD49 /* ReportClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ReportClass.swift; path = ../../../Jimei_v2/Shuffle/Utils/ReportClass.swift; sourceTree = "<group>"; };
 		18C98CEB2C158F7B00A8CD49 /* ClassifierUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClassifierUtils.swift; sourceTree = "<group>"; };
 		18C98CF12C158F7B00A8CD49 /* BZ.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BZ.swift; sourceTree = "<group>"; };
 		18C98CF22C158F7B00A8CD49 /* CN.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CN.swift; sourceTree = "<group>"; };
@@ -157,8 +157,7 @@
 				18C98D022C158F7B00A8CD49 /* TC.swift */,
 				18C98D032C158F7B00A8CD49 /* TEG.swift */,
 			);
-			name = StatisticPackage;
-			path = Utils/StatisticPackage;
+			path = StatisticPackage;
 			sourceTree = "<group>";
 		};
 		18CA146E284ABEC600F90372 = {
@@ -260,8 +259,8 @@
 			children = (
 				18C98CEB2C158F7B00A8CD49 /* ClassifierUtils.swift */,
 				A887167E2A0623E500B7F2CD /* AuthManager.swift */,
-				18C98CE62C158B9500A8CD49 /* ClassifierSettingArgs.swift */,
-				18C98CE82C158DE800A8CD49 /* ReportClass.swift */,
+				187A454F2C31BBB400BB055C /* ClassifierSettingArgs.swift */,
+				187A454E2C31BBB400BB055C /* ReportClass.swift */,
 				A8FBC7C12A3F0A5C00EDDFD7 /* CVUtils.swift */,
 				A88EFE0A2A7FC05900897243 /* JsonUtils.swift */,
 				A887B6512A8104BC009F488F /* TimeUtils.swift */,
@@ -381,12 +380,11 @@
 			files = (
 				18A7A5172C14E2EB0020138E /* cls_01.mlmodel in Sources */,
 				18F6C0C32C10A685007BEAEC /* RecordHistoryViewModel.swift in Sources */,
+				187A45502C31BBB400BB055C /* ReportClass.swift in Sources */,
 				18C98D0B2C158F7B00A8CD49 /* BZ.swift in Sources */,
 				A887B6582A8511A4009F488F /* InfoView.swift in Sources */,
-				18C98CE92C158DE800A8CD49 /* ReportClass.swift in Sources */,
 				18C98D122C158F7B00A8CD49 /* PB.swift in Sources */,
 				18C98D192C158F7B00A8CD49 /* ZJH.swift in Sources */,
-				18C98CE72C158B9500A8CD49 /* ClassifierSettingArgs.swift in Sources */,
 				A887167F2A0623E500B7F2CD /* AuthManager.swift in Sources */,
 				18C98D1A2C158F7B00A8CD49 /* TM.swift in Sources */,
 				A88EFE0B2A7FC05900897243 /* JsonUtils.swift in Sources */,
@@ -395,6 +393,7 @@
 				18C98D172C158F7B00A8CD49 /* TW.swift in Sources */,
 				18C98D1D2C158F7B00A8CD49 /* TEG.swift in Sources */,
 				A88EFDC82A7D249C00897243 /* VisionObjectRecognitionView.swift in Sources */,
+				187A45512C31BBB400BB055C /* ClassifierSettingArgs.swift in Sources */,
 				18C98D0E2C158F7B00A8CD49 /* FC.swift in Sources */,
 				18A7A5192C14E2EB0020138E /* detect_01.mlmodel in Sources */,
 				A887B6522A8104BC009F488F /* TimeUtils.swift in Sources */,
