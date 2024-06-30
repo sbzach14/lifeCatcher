@@ -1,7 +1,7 @@
 
 import Foundation
 
-class ThreeCardPokerGameRule : Rule{
+class ZJHStatisticRule : Rule{
     
     let handNum: [Int] = [3,4,5,6,7,8,9,10,11,12]
     let minRank: [Int] = [2,3,4,5,6,7,8,9,10]
@@ -20,23 +20,23 @@ class ThreeCardPokerGameRule : Rule{
         2: "最大顺",
         3: "第二大顺"
     ]
-    let isHeadCard: [Int: String] = [
+    let isHeadSingleFeature: [Int: String] = [
         0: "否",
         1: "是"
     ]
-    let isReverseHighCard: [Int: String] = [
+    let isReverseHighSingleFeature: [Int: String] = [
         0: "否",
         1: "是"
     ]
-    let isRedJoker: [Int: String] = [
+    let isRedspecialfeature: [Int: String] = [
         0: "否",
         1: "是"
     ]
-    let redJokerSuit: [Int: String] = [
+    let redspecialfeatureSuit: [Int: String] = [
         0: "任意",
         1: "红色"
     ]
-    let redJokerRank: [Int: String] = [
+    let redspecialfeatureRank: [Int: String] = [
         14: "任意牌",
         13: "K",
         12: "Q",
@@ -53,15 +53,15 @@ class ThreeCardPokerGameRule : Rule{
         1: "A",
         0: "0",
     ]
-    let isBlackJoker: [Int: String] = [
+    let isBlackspecialfeature: [Int: String] = [
         0: "否",
         1: "是"
     ]
-    let blackJokerSuit: [Int: String] = [
+    let blackspecialfeatureSuit: [Int: String] = [
         0: "任意",
         1: "红色"
     ]
-    let blackJokerRank: [Int: String] = [
+    let blackspecialfeatureRank: [Int: String] = [
         14: "任意牌",
         13: "K",
         12: "Q",
@@ -165,7 +165,7 @@ class ThreeCardPokerGameRule : Rule{
             6)散牌:A最大2最小
             """
         ]
-        self.playerNum = [2,3,4,5,6,7,8]
+        self.rcNum = [2,3,4,5,6,7,8]
 
     }
 }
@@ -174,33 +174,33 @@ class ThreeCardPokerGameRule : Rule{
 
 
 //炸金花
-class ThreeCardPokerGame{
+class ZJHStatistic{
     
     
-    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo], [Int]) {
+    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputSingleFeatures:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([StatisticReturnRCInfo], [Int]) {
         
-        var deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (winners, leftCards)
+        var FeatureList = initFeatureList(initialSingleFeatures: inputSingleFeatures, suitRules: suitRules)
+        let (winners, leftSingleFeatures) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, FeatureList: FeatureList, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winners, leftSingleFeatures)
     }
     
-    static func legalCheck(playerNum: Int, minRank: Int, handNum: Int, isHeadCard: Int, isRedJoker: Int, isBlackJoker: Int) -> String{
+    static func legalCheck(rcNum: Int, minRank: Int, handNum: Int, isHeadSingleFeature: Int, isRedspecialfeature: Int, isBlackspecialfeature: Int) -> String{
         var errMessage : String = ""
-        if(playerNum * handNum > 52 - (minRank - 2) * 4 - isHeadCard * 12 + isRedJoker + isBlackJoker)
+        if(rcNum * handNum > 52 - (minRank - 2) * 4 - isHeadSingleFeature * 12 + isRedspecialfeature + isBlackspecialfeature)
         {
             errMessage = "需要牌数量超出牌堆总数，请重新设置！"
         }
         return errMessage
     }
     
-    static func getAllCardIndex(minRank: Int, isAce: Int, isHeadCard: Int, isRedJoker: Int, isBlackJoker: Int) -> [Int]{
+    static func getAllSingleFeatureIndex(minRank: Int, isAce: Int, isHeadSingleFeature: Int, isRedspecialfeature: Int, isBlackspecialfeature: Int) -> [Int]{
         var result : [Int] = []
         for i in 0...3{
             for rank in 0...12{
                 if rank == 0 && isAce != 0{
                     result.append(rank + i * 13)
                 }
-                else if (rank >= 10 || rank <= 12) && isHeadCard == 1{
+                else if (rank >= 10 || rank <= 12) && isHeadSingleFeature == 1{
                     result.append(rank + i * 13)
                 }
                 else if rank >= minRank - 1{
@@ -208,25 +208,25 @@ class ThreeCardPokerGame{
                 }
             }
         }
-        if isBlackJoker == 1{
+        if isBlackspecialfeature == 1{
             result.append(53)
         }
-        if isRedJoker == 1{
+        if isRedspecialfeature == 1{
             result.append(54)
         }
         return result
     }
     
-    static func getMinCardNum(playerNum: Int, handNum: Int, communityNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+    static func getMinSingleFeatureNum(rcNum: Int, handNum: Int, communityNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
         if dealType == 0 || dealType == 1{
-            return playerNum * handNum + communityNum
+            return rcNum * handNum + communityNum
         } else {
             var minNum = 0
             for i in 0..<diyDealNum.count {
                 let num = diyDealNum[i]
                 //派牌
                 if diyDealStatus[i][0] == true {
-                    minNum += playerNum * num
+                    minNum += rcNum * num
                 //公牌
                 } else if diyDealStatus[i][1] == true {
                     minNum += num
@@ -240,100 +240,100 @@ class ThreeCardPokerGame{
     }
     
     
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
-        let rule = ClassifierSettingArgs.targetSetting[2] as! ThreeCardPokerGameRule
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], FeatureList: [SingleFeature], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([StatisticReturnRCInfo],[Int]) {
+        let rule = ClassifierSettingArgs.targetSetting[2] as! ZJHStatisticRule
         let dealNum = args[0]
         let dealType = args[1]
-        let playerNum = args[2]
+        let rcNum = args[2]
         let handNum = args[3]
         let communityNum = args[4]
         let isCompareSuit = args[5]
         let minRank = rule.minRank[args[6]]
         let isAce = args[7]
         let isAceStraight = args[8]
-        let isHeadCard = args[9]
-        let isRedJoker = args[10]
-        let redJokerSuit = args[11]
-        let redJokerRank = args[12]
-        let isBlackJoker = args[13]
-        let blackJokerSuit = args[14]
-        let blackJokerRank = args[15]
-        let isReverseHighCard = args[16]
+        let isHeadSingleFeature = args[9]
+        let isRedspecialfeature = args[10]
+        let redspecialfeatureSuit = args[11]
+        let redspecialfeatureRank = args[12]
+        let isBlackspecialfeature = args[13]
+        let blackspecialfeatureSuit = args[14]
+        let blackspecialfeatureRank = args[15]
+        let isReverseHighSingleFeature = args[16]
         
         
         var maxRank = 0
-        var returnPlayerInfos: [GameReturnPlayerInfo] = []
+        var returnRCInfos: [StatisticReturnRCInfo] = []
 
 
-        var allPlayCards: [Player] = []
-        var community = [Card]()
-        if deck.count < ThreeCardPokerGame.getMinCardNum(playerNum: playerNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+        var allPlaySingleFeatures: [RC] = []
+        var community = [SingleFeature]()
+        if FeatureList.count < ZJHStatistic.getMinSingleFeatureNum(rcNum: rcNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
             return ([],[])
         }
         
-        for _ in 0..<playerNum {
-            allPlayCards.append(Player())
+        for _ in 0..<rcNum {
+            allPlaySingleFeatures.append(RC())
         }
         
-        var deck = deck
+        var FeatureList = FeatureList
         // 发牌
         if dealNum == 0{
             for _ in 0..<handNum{
                 //正发
                 if dealType == 0{
-                    for i in 0..<playerNum {
-                        allPlayCards[i].insertCard(card: deck.removeFirst())
+                    for i in 0..<rcNum {
+                        allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeFirst())
                     }
                 //反发
                 } else if dealType == 1 {
-                    for i in 0..<playerNum {
-                        allPlayCards[i].insertCard(card: deck.removeLast())
+                    for i in 0..<rcNum {
+                        allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeLast())
                     }
                 }
             }
             
         } else {
             for actionIndex in 0...diyDealStatus.count - 1{
-                let cardNum = diyDealNum[actionIndex]
+                let singlefeatureNum = diyDealNum[actionIndex]
                 let action = diyDealStatus[actionIndex]
                 //派牌
                 if action[0] == true{
                     //正发
                     if dealType == 0{
-                        for i in 0..<playerNum {
-                            for _ in 0..<cardNum{
-                                allPlayCards[i].insertCard(card: deck.removeFirst())
+                        for i in 0..<rcNum {
+                            for _ in 0..<singlefeatureNum{
+                                allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeFirst())
                             }
                         }
                     //反发
                     } else if dealType == 1{
-                        for i in 0..<playerNum {
-                            for _ in 0..<cardNum{
-                                allPlayCards[i].insertCard(card: deck.removeLast())
+                        for i in 0..<rcNum {
+                            for _ in 0..<singlefeatureNum{
+                                allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeLast())
                             }
                         }
                     }
                 //公牌
                 } else if action[1] == true {
                     if dealType == 0{
-                        for _ in 0..<cardNum{
-                            community.append(deck.removeFirst())
+                        for _ in 0..<singlefeatureNum{
+                            community.append(FeatureList.removeFirst())
                         }
                     } else if dealType == 1{
-                        for _ in 0..<cardNum{
-                            community.append(deck.removeLast())
+                        for _ in 0..<singlefeatureNum{
+                            community.append(FeatureList.removeLast())
                         }
                     }
                     
                 //去牌
                 } else if action[2] == true {
                     if dealType == 0 {
-                        for _ in 0..<cardNum{
-                            deck.removeFirst()
+                        for _ in 0..<singlefeatureNum{
+                            FeatureList.removeFirst()
                         }
                     } else if dealType == 1{
-                        for _ in 0..<cardNum{
-                            deck.removeLast()
+                        for _ in 0..<singlefeatureNum{
+                            FeatureList.removeLast()
                         }
                     }
                 }
@@ -342,119 +342,119 @@ class ThreeCardPokerGame{
         
 
         
-        for i in 0..<playerNum{
-            var playerCardStr = ""
-            for card in allPlayCards[i].playerCard{
-                playerCardStr += ClassifierSettingArgs.cardLabelDic[card.cardIndex]! + " "
+        for i in 0..<rcNum{
+            var rcSingleFeatureStr = ""
+            for singlefeature in allPlaySingleFeatures[i].rcSingleFeature{
+                rcSingleFeatureStr += ClassifierSettingArgs.singlefeatureLabelDic[singlefeature.singlefeatureIndex]! + " "
             }
         }
         
         if handNum == 3 {
-            for i in 0..<playerNum {
-                (allPlayCards[i].evaluateFlag, allPlayCards[i].cardType, allPlayCards[i].isPair) = ThreeCardPokerGameHandEvaluator(
+            for i in 0..<rcNum {
+                (allPlaySingleFeatures[i].evaluateFlag, allPlaySingleFeatures[i].singlefeatureType, allPlaySingleFeatures[i].isPair) = ZJHStatisticHandEvaluator(
                     isCompareSuit: isCompareSuit,
                     minRank: minRank,
                     isAce: isAce,
                     isAceStraight: isAceStraight,
-                    isHeadCard: isHeadCard,
-                    isRedJoker: isRedJoker,
-                    redJokerSuit: redJokerSuit,
-                    redJokerRank: redJokerRank,
-                    isBlackJoker: isBlackJoker,
-                    blackJokerSuit: blackJokerSuit,
-                    blackJokerRank: blackJokerRank,
-                    isReverseHighCard: isReverseHighCard,
+                    isHeadSingleFeature: isHeadSingleFeature,
+                    isRedspecialfeature: isRedspecialfeature,
+                    redspecialfeatureSuit: redspecialfeatureSuit,
+                    redspecialfeatureRank: redspecialfeatureRank,
+                    isBlackspecialfeature: isBlackspecialfeature,
+                    blackspecialfeatureSuit: blackspecialfeatureSuit,
+                    blackspecialfeatureRank: blackspecialfeatureRank,
+                    isReverseHighSingleFeature: isReverseHighSingleFeature,
                     rankRules: rankRules,
                     suitRules: suitRules
-                ).evalHand(cards: allPlayCards[i].playerCard)
+                ).evalHand(singlefeatures: allPlaySingleFeatures[i].rcSingleFeature)
             }
         } else if handNum > 3{
-            for i in 0..<playerNum {
-                var allcards = Array(allPlayCards[i].playerCard)
+            for i in 0..<rcNum {
+                var allsinglefeatures = Array(allPlaySingleFeatures[i].rcSingleFeature)
                 var maxFlag = 0
-                for combination in allcards.combinations(ofCount: 3){
-                    (allPlayCards[i].evaluateFlag, allPlayCards[i].cardType, allPlayCards[i].isPair) = ThreeCardPokerGameHandEvaluator(
+                for combination in allsinglefeatures.combinations(ofCount: 3){
+                    (allPlaySingleFeatures[i].evaluateFlag, allPlaySingleFeatures[i].singlefeatureType, allPlaySingleFeatures[i].isPair) = ZJHStatisticHandEvaluator(
                         isCompareSuit: isCompareSuit,
                         minRank: minRank,
                         isAce: isAce,
                         isAceStraight: isAceStraight,
-                        isHeadCard: isHeadCard,
-                        isRedJoker: isRedJoker,
-                        redJokerSuit: redJokerSuit,
-                        redJokerRank: redJokerRank,
-                        isBlackJoker: isBlackJoker,
-                        blackJokerSuit: blackJokerSuit,
-                        blackJokerRank: blackJokerRank,
-                        isReverseHighCard: isReverseHighCard,
+                        isHeadSingleFeature: isHeadSingleFeature,
+                        isRedspecialfeature: isRedspecialfeature,
+                        redspecialfeatureSuit: redspecialfeatureSuit,
+                        redspecialfeatureRank: redspecialfeatureRank,
+                        isBlackspecialfeature: isBlackspecialfeature,
+                        blackspecialfeatureSuit: blackspecialfeatureSuit,
+                        blackspecialfeatureRank: blackspecialfeatureRank,
+                        isReverseHighSingleFeature: isReverseHighSingleFeature,
                         rankRules: rankRules,
                         suitRules: suitRules
-                    ).evalHand(cards: combination)
-                    if maxFlag < allPlayCards[i].evaluateFlag {
-                        maxFlag = allPlayCards[i].evaluateFlag
+                    ).evalHand(singlefeatures: combination)
+                    if maxFlag < allPlaySingleFeatures[i].evaluateFlag {
+                        maxFlag = allPlaySingleFeatures[i].evaluateFlag
                     }
                 }
-                allPlayCards[i].evaluateFlag = maxFlag
+                allPlaySingleFeatures[i].evaluateFlag = maxFlag
             }
         }
-        for i in 0..<playerNum {
-            (allPlayCards[i].evaluateFlag, allPlayCards[i].cardType, allPlayCards[i].isPair) = ThreeCardPokerGameHandEvaluator(
+        for i in 0..<rcNum {
+            (allPlaySingleFeatures[i].evaluateFlag, allPlaySingleFeatures[i].singlefeatureType, allPlaySingleFeatures[i].isPair) = ZJHStatisticHandEvaluator(
                 isCompareSuit: isCompareSuit,
                 minRank: minRank,
                 isAce: isAce,
                 isAceStraight: isAceStraight,
-                isHeadCard: isHeadCard,
-                isRedJoker: isRedJoker,
-                redJokerSuit: redJokerSuit,
-                redJokerRank: redJokerRank,
-                isBlackJoker: isBlackJoker,
-                blackJokerSuit: blackJokerSuit,
-                blackJokerRank: blackJokerRank,
-                isReverseHighCard: isReverseHighCard,
+                isHeadSingleFeature: isHeadSingleFeature,
+                isRedspecialfeature: isRedspecialfeature,
+                redspecialfeatureSuit: redspecialfeatureSuit,
+                redspecialfeatureRank: redspecialfeatureRank,
+                isBlackspecialfeature: isBlackspecialfeature,
+                blackspecialfeatureSuit: blackspecialfeatureSuit,
+                blackspecialfeatureRank: blackspecialfeatureRank,
+                isReverseHighSingleFeature: isReverseHighSingleFeature,
                 rankRules: rankRules,
                 suitRules: suitRules
-            ).evalHand(cards: allPlayCards[i].playerCard)
+            ).evalHand(singlefeatures: allPlaySingleFeatures[i].rcSingleFeature)
         }
         
-        for playerID in 0..<allPlayCards.count {
-            var currentReturnPlayerInfo = GameReturnPlayerInfo()
-            currentReturnPlayerInfo.playerID = playerID
-            currentReturnPlayerInfo.playerRank = allPlayCards[playerID].evaluateFlag
-            currentReturnPlayerInfo.playerCardsType = allPlayCards[playerID].cardType
-            currentReturnPlayerInfo.isPair = allPlayCards[playerID].isPair
-            currentReturnPlayerInfo.PlayerCards = allPlayCards[playerID].playerCard
-            currentReturnPlayerInfo.communityCard = community
-            returnPlayerInfos.append(currentReturnPlayerInfo)
+        for rcID in 0..<allPlaySingleFeatures.count {
+            var currentReturnRCInfo = StatisticReturnRCInfo()
+            currentReturnRCInfo.rcID = rcID
+            currentReturnRCInfo.rcRank = allPlaySingleFeatures[rcID].evaluateFlag
+            currentReturnRCInfo.rcSingleFeaturesType = allPlaySingleFeatures[rcID].singlefeatureType
+            currentReturnRCInfo.isPair = allPlaySingleFeatures[rcID].isPair
+            currentReturnRCInfo.RCSingleFeatures = allPlaySingleFeatures[rcID].rcSingleFeature
+            currentReturnRCInfo.communitySingleFeature = community
+            returnRCInfos.append(currentReturnRCInfo)
         }
         
         //从大到小排序
-        returnPlayerInfos = returnPlayerInfos.sorted(by: {$0.playerRank > $1.playerRank})
+        returnRCInfos = returnRCInfos.sorted(by: {$0.rcRank > $1.rcRank})
         
-        var leftCards: [Int] = []
-        for card in deck{
-            leftCards.append(card.cardIndex)
+        var leftSingleFeatures: [Int] = []
+        for singlefeature in FeatureList{
+            leftSingleFeatures.append(singlefeature.singlefeatureIndex)
         }
-        if leftCards.count < ThreeCardPokerGame.getMinCardNum(playerNum: playerNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
-            leftCards = []
+        if leftSingleFeatures.count < ZJHStatistic.getMinSingleFeatureNum(rcNum: rcNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+            leftSingleFeatures = []
         }
-        return (returnPlayerInfos, leftCards)
+        return (returnRCInfos, leftSingleFeatures)
     }
 }
 
 
-class ThreeCardPokerGameHandEvaluator {
+class ZJHStatisticHandEvaluator {
     
     var isCompareSuit: Int
     var minRank: Int
     var isAce: Int
     var isAceStraight: Int
-    var isHeadCard: Int
-    var isRedJoker: Int
-    var redJokerSuit: Int
-    var redJokerRank: Int
-    var isBlackJoker: Int
-    var blackJokerSuit: Int
-    var blackJokerRank: Int
-    var isReverseHighCard: Int
+    var isHeadSingleFeature: Int
+    var isRedspecialfeature: Int
+    var redspecialfeatureSuit: Int
+    var redspecialfeatureRank: Int
+    var isBlackspecialfeature: Int
+    var blackspecialfeatureSuit: Int
+    var blackspecialfeatureRank: Int
+    var isReverseHighSingleFeature: Int
     var rankRules: [Int]
     var suitRules: [Int]
     var maxRank: Int
@@ -463,14 +463,14 @@ class ThreeCardPokerGameHandEvaluator {
           minRank: Int,
           isAce: Int,
           isAceStraight: Int,
-          isHeadCard: Int,
-          isRedJoker: Int,
-          redJokerSuit: Int,
-          redJokerRank: Int,
-          isBlackJoker: Int,
-          blackJokerSuit: Int,
-          blackJokerRank: Int,
-          isReverseHighCard: Int,
+          isHeadSingleFeature: Int,
+          isRedspecialfeature: Int,
+          redspecialfeatureSuit: Int,
+          redspecialfeatureRank: Int,
+          isBlackspecialfeature: Int,
+          blackspecialfeatureSuit: Int,
+          blackspecialfeatureRank: Int,
+          isReverseHighSingleFeature: Int,
           rankRules: [Int],
           suitRules: [Int]){
         
@@ -478,18 +478,18 @@ class ThreeCardPokerGameHandEvaluator {
         self.minRank = minRank
         self.isAce = isAce
         self.isAceStraight = isAceStraight
-        self.isHeadCard = isHeadCard
-        self.isRedJoker = isRedJoker
-        self.redJokerSuit = redJokerSuit
-        self.redJokerRank = redJokerRank
-        self.isBlackJoker = isBlackJoker
-        self.blackJokerSuit = blackJokerSuit
-        self.blackJokerRank = blackJokerRank
-        self.isReverseHighCard = isReverseHighCard
+        self.isHeadSingleFeature = isHeadSingleFeature
+        self.isRedspecialfeature = isRedspecialfeature
+        self.redspecialfeatureSuit = redspecialfeatureSuit
+        self.redspecialfeatureRank = redspecialfeatureRank
+        self.isBlackspecialfeature = isBlackspecialfeature
+        self.blackspecialfeatureSuit = blackspecialfeatureSuit
+        self.blackspecialfeatureRank = blackspecialfeatureRank
+        self.isReverseHighSingleFeature = isReverseHighSingleFeature
         self.rankRules = rankRules
         self.suitRules = suitRules
         
-        if isHeadCard == 1 {
+        if isHeadSingleFeature == 1 {
             if isAce == 2 {
                 self.maxRank = 14
             } else {
@@ -521,107 +521,107 @@ class ThreeCardPokerGameHandEvaluator {
             }
         }
         
-        if isHeadCard == 0 {
+        if isHeadSingleFeature == 0 {
             if rankRules.contains(7) {
                 self.rankRules.removeAll { $0 == 7 }
             }
         }
     }
     
-    func evalHand(cards: [Card])-> (Int, String, Int){
+    func evalHand(singlefeatures: [SingleFeature])-> (Int, String, Int){
         
-        var sortedCards = sortCards(cards: cards)
+        var sortedSingleFeatures = sortSingleFeatures(singlefeatures: singlefeatures)
         var sortedString = ""
         var maxScore = 0
-        var maxCardType = ""
+        var maxSingleFeatureType = ""
         var maxIsPair = 0
         
-        for sortedCards in sortedCards {
-            let (score, cardType, isPair) = calcHandInfoFlg(sortedCards: sortedCards)
+        for sortedSingleFeatures in sortedSingleFeatures {
+            let (score, singlefeatureType, isPair) = calcHandInfoFlg(sortedSingleFeatures: sortedSingleFeatures)
             if score > maxScore {
                 maxScore = score
-                maxCardType = cardType
+                maxSingleFeatureType = singlefeatureType
                 maxIsPair = isPair
             }
         }
         
-        return (maxScore, maxCardType, maxIsPair)
+        return (maxScore, maxSingleFeatureType, maxIsPair)
     }
     
-    func sortCards(cards: [Card]) -> [[Card]] {
-        var cards = cards
-        var allCards = [[Card]]()
+    func sortSingleFeatures(singlefeatures: [SingleFeature]) -> [[SingleFeature]] {
+        var singlefeatures = singlefeatures
+        var allSingleFeatures = [[SingleFeature]]()
         
         for i in 0..<3 {
-            if cards[i].rank == 14 && isBlackJoker == 1 {
-                if blackJokerRank == 14 {
-                    cards[i].rank = -1
+            if singlefeatures[i].rank == 14 && isBlackspecialfeature == 1 {
+                if blackspecialfeatureRank == 14 {
+                    singlefeatures[i].rank = -1
                 } else {
-                    cards[i].rank = blackJokerRank
+                    singlefeatures[i].rank = blackspecialfeatureRank
                 }
-                if blackJokerSuit == 0 {
-                    cards[i].suit = [3, 2, 1, 0]
-                } else if blackJokerSuit == 1 {
-                    cards[i].suit = [suitRules[0], suitRules[2]].sorted()
+                if blackspecialfeatureSuit == 0 {
+                    singlefeatures[i].suit = [3, 2, 1, 0]
+                } else if blackspecialfeatureSuit == 1 {
+                    singlefeatures[i].suit = [suitRules[0], suitRules[2]].sorted()
                 }
-            } else if cards[i].rank == 15 && isRedJoker == 1 {
-                if redJokerRank == 14 {
-                    cards[i].rank = -1
+            } else if singlefeatures[i].rank == 15 && isRedspecialfeature == 1 {
+                if redspecialfeatureRank == 14 {
+                    singlefeatures[i].rank = -1
                 } else {
-                    cards[i].rank = redJokerRank
+                    singlefeatures[i].rank = redspecialfeatureRank
                 }
-                if redJokerSuit == 0 {
-                    cards[i].suit = [3, 2, 1, 0]
-                } else if redJokerSuit == 1 {
-                    cards[i].suit = [suitRules[1], suitRules[3]].sorted()
+                if redspecialfeatureSuit == 0 {
+                    singlefeatures[i].suit = [3, 2, 1, 0]
+                } else if redspecialfeatureSuit == 1 {
+                    singlefeatures[i].suit = [suitRules[1], suitRules[3]].sorted()
                 }
-            } else if cards[i].rank == 1 {
+            } else if singlefeatures[i].rank == 1 {
                 if isAce == 1 {
-                    cards[i].rank = minRank - 1
+                    singlefeatures[i].rank = minRank - 1
                 } else if isAce == 2 {
-                    cards[i].rank = maxRank
+                    singlefeatures[i].rank = maxRank
                 }
             }
         }
         
-        let handCombinations = cards.combinations(ofCount: 3)
+        let handCombinations = singlefeatures.combinations(ofCount: 3)
         for handCombination in handCombinations{
-            allCards.append(handCombination)
+            allSingleFeatures.append(handCombination)
             
-            var aceList = [Card]()
-            for card in handCombination{
-                aceList.append(Card(suit: card.suit, rank: card.rank, cardIndex: card.cardIndex))
+            var aceList = [SingleFeature]()
+            for singlefeature in handCombination{
+                aceList.append(SingleFeature(suit: singlefeature.suit, rank: singlefeature.rank, singlefeatureIndex: singlefeature.singlefeatureIndex))
             }
             
             if self.isAceStraight != 0 && self.isAce == 2{
                 var isAdd = false
-                for card in aceList{
-                    if card.rank == self.maxRank{
-                        card.rank = self.minRank - 1
+                for singlefeature in aceList{
+                    if singlefeature.rank == self.maxRank{
+                        singlefeature.rank = self.minRank - 1
                         isAdd = true
                     }
                 }
                 if isAdd{
-                    allCards.append(aceList)
+                    allSingleFeatures.append(aceList)
                 }
             }
         }
         
-        for i in 0..<allCards.count{
-            allCards[i].sort(by: { card1, card2 in
-                return Card.calScore(card: card1) > Card.calScore(card: card2)
+        for i in 0..<allSingleFeatures.count{
+            allSingleFeatures[i].sort(by: { singlefeature1, singlefeature2 in
+                return SingleFeature.calScore(singlefeature: singlefeature1) > SingleFeature.calScore(singlefeature: singlefeature2)
             })
         }
         
-        return allCards
+        return allSingleFeatures
     }
     
-    func calcHandInfoFlg(sortedCards: [Card]) -> (Int, String, Int) {
+    func calcHandInfoFlg(sortedSingleFeatures: [SingleFeature]) -> (Int, String, Int) {
         var rankResult = 0
-        var cardType: String = ""
+        var singlefeatureType: String = ""
         var isPair: Int = 0
-        var ruleDict: [Int: ([Card]) -> (Int, String, Int)] = [
-            0  : self.eval_holecard,
+        var ruleDict: [Int: ([SingleFeature]) -> (Int, String, Int)] = [
+            0  : self.eval_holesinglefeature,
             1  : self.eval_onepair,
             2  : self.eval_truepair,
             3  : self.eval_straight,
@@ -633,13 +633,13 @@ class ThreeCardPokerGameHandEvaluator {
             9  : self.eval_akjflush,
             10 : self.eval_235,
             11 : self.eval_235flush,
-            12 : self.eval_threecard,
-            13 : self.eval_doubleJoker
+            12 : self.eval_threesinglefeature,
+            13 : self.eval_doublespecialfeature
         ]
         
         for (index, ruleIndex) in rankRules.enumerated() {
             var rankFlag = 1 << (rankRules.count - index + 18)
-            (rankResult, cardType, isPair) = ruleDict[ruleIndex]!(sortedCards) // 假设 ruleDict 是一个规则函数的字典
+            (rankResult, singlefeatureType, isPair) = ruleDict[ruleIndex]!(sortedSingleFeatures) // 假设 ruleDict 是一个规则函数的字典
             
             if (isCompareSuit == 0) {
                 rankResult >>= 6
@@ -652,16 +652,16 @@ class ThreeCardPokerGameHandEvaluator {
         }
 
         
-        return (rankResult, cardType, isPair)
+        return (rankResult, singlefeatureType, isPair)
     }
     
-    func eval_doubleJoker(_ cards: [Card]) -> (Int, String, Int) {
+    func eval_doublespecialfeature(_ singlefeatures: [SingleFeature]) -> (Int, String, Int) {
         var rank: Int = 0
         var cnt: Int = 0
-        var cardType: String = ""
+        var singlefeatureType: String = ""
         var isPair: Int = 0
         for i in 0..<3 {
-            if cards[i].rank == -1 {
+            if singlefeatures[i].rank == -1 {
                 cnt += 1
             }
         }
@@ -669,40 +669,40 @@ class ThreeCardPokerGameHandEvaluator {
             for _ in 1..<3 {
                 rank = rank << 4 | maxRank
             }
-            rank = rank << 4 | cards[0].rank
+            rank = rank << 4 | singlefeatures[0].rank
             for i in 1..<3 {
-                rank = rank << 2 | cards[i].suit[0]
+                rank = rank << 2 | singlefeatures[i].suit[0]
             }
-            rank = rank << 4 | cards[0].suit[0]
+            rank = rank << 4 | singlefeatures[0].suit[0]
         }
         else if cnt == 3 {
             for _ in 0..<3 {
                 rank = rank << 4 | maxRank
             }
             for i in 0..<3 {
-                rank = rank << 4 | cards[i].suit[0]
+                rank = rank << 4 | singlefeatures[i].suit[0]
             }
         }
         if rank > 0 {
-            cardType = "对王"
+            singlefeatureType = "对王"
             isPair = 1
         }
         
-        return (rank, cardType, isPair)
+        return (rank, singlefeatureType, isPair)
     }
         
-    func eval_threecard(_ cards: [Card]) -> (Int, String, Int) {
+    func eval_threesinglefeature(_ singlefeatures: [SingleFeature]) -> (Int, String, Int) {
         var rank: Int = 0
         var cnt: Int = 0
-        var cardType: String = ""
+        var singlefeatureType: String = ""
 
-        var targetRank = cards[0].rank
+        var targetRank = singlefeatures[0].rank
         if targetRank == -1 {
             targetRank = maxRank
         }
         
         for i in 0..<3 {
-            if cards[i].rank == targetRank || cards[i].rank == -1 {
+            if singlefeatures[i].rank == targetRank || singlefeatures[i].rank == -1 {
                 cnt += 1
             }
         }
@@ -712,20 +712,20 @@ class ThreeCardPokerGameHandEvaluator {
                 rank = rank << 4 | targetRank
             }
             for i in 0..<3 {
-                rank = rank << 2 | cards[i].suit[0]
+                rank = rank << 2 | singlefeatures[i].suit[0]
             }
         }
         
         if rank > 0{
-            cardType = "三条" + ClassifierSettingArgs.CardNumberReportDic[cards[0].originalRank]!
+            singlefeatureType = "三条" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
 
         }
 
         
-        return (rank, cardType, 0)
+        return (rank, singlefeatureType, 0)
     }
 
-    func eval_235flush(cards: [Card]) -> (Int, String, Int) {
+    func eval_235flush(singlefeatures: [SingleFeature]) -> (Int, String, Int) {
         var rank: Int = 0
         var cnt5: Int = 0
         var cnt3: Int = 0
@@ -733,13 +733,13 @@ class ThreeCardPokerGameHandEvaluator {
         var cntC: Int = 0
 
         for i in 0..<3 {
-            if cards[i].rank == 5 {
+            if singlefeatures[i].rank == 5 {
                 cnt5 = 1
-            } else if cards[i].rank == 3 {
+            } else if singlefeatures[i].rank == 3 {
                 cnt3 = 1
-            } else if cards[i].rank == 2 {
+            } else if singlefeatures[i].rank == 2 {
                 cnt2 = 1
-            } else if cards[i].rank == -1 {
+            } else if singlefeatures[i].rank == -1 {
                 cntC += 1
             }
         }
@@ -748,7 +748,7 @@ class ThreeCardPokerGameHandEvaluator {
         var cntSuit: [Int] = [0, 0, 0, 0]
 
         for i in 0..<3 {
-            for suit in cards[i].suit {
+            for suit in singlefeatures[i].suit {
                     cntSuit[suit] += 1
             }
         }
@@ -770,7 +770,7 @@ class ThreeCardPokerGameHandEvaluator {
         return (rank, "同花235", 0)
     }
 
-    func eval_235(cards: [Card]) -> (Int, String, Int) {
+    func eval_235(singlefeatures: [SingleFeature]) -> (Int, String, Int) {
         var rank: Int = 0
         var cnt5: Int = 0
         var cnt3: Int = 0
@@ -778,13 +778,13 @@ class ThreeCardPokerGameHandEvaluator {
         var cntC: Int = 0
 
         for i in 0..<3 {
-            if cards[i].rank == 5 {
+            if singlefeatures[i].rank == 5 {
                 cnt5 = 1
-            } else if cards[i].rank == 3 {
+            } else if singlefeatures[i].rank == 3 {
                 cnt3 = 1
-            } else if cards[i].rank == 2 {
+            } else if singlefeatures[i].rank == 2 {
                 cnt2 = 1
-            } else if cards[i].rank == -1 {
+            } else if singlefeatures[i].rank == -1 {
                 cntC += 1
             }
         }
@@ -794,13 +794,13 @@ class ThreeCardPokerGameHandEvaluator {
             rank = rank << 4 | 3
             rank = rank << 4 | 2
             for i in 0..<3 {
-                rank = rank << 2 | cards[i].suit[0]
+                rank = rank << 2 | singlefeatures[i].suit[0]
             }
         }
         return (rank, "235", 0)
     }
     
-    func eval_akjflush(cards: [Card]) -> (Int,String,Int) {
+    func eval_akjflush(singlefeatures: [SingleFeature]) -> (Int,String,Int) {
         var rank: Int = 0
         var cntA: Int = 0
         var cntK: Int = 0
@@ -808,13 +808,13 @@ class ThreeCardPokerGameHandEvaluator {
         var cntC: Int = 0
 
         for i in 0..<3 {
-            if cards[i].rank == maxRank || cards[i].rank == minRank - 1 {
+            if singlefeatures[i].rank == maxRank || singlefeatures[i].rank == minRank - 1 {
                 cntA = 1
-            } else if cards[i].rank == 13 {
+            } else if singlefeatures[i].rank == 13 {
                 cntK = 1
-            } else if cards[i].rank == 11 {
+            } else if singlefeatures[i].rank == 11 {
                 cntJ = 1
-            } else if cards[i].rank == -1 {
+            } else if singlefeatures[i].rank == -1 {
                 cntC += 1
             }
         }
@@ -822,7 +822,7 @@ class ThreeCardPokerGameHandEvaluator {
         var targetSuit: Int = -1
         var cntSuit: [Int] = [0, 0, 0, 0]
         for i in 0..<3 {
-            for suit in cards[i].suit {
+            for suit in singlefeatures[i].suit {
                     cntSuit[suit] += 1
             }
         }
@@ -843,7 +843,7 @@ class ThreeCardPokerGameHandEvaluator {
         return (rank, "同花AKJ", 0)
     }
     
-    func eval_akj(cards: [Card]) -> (Int, String, Int) {
+    func eval_akj(singlefeatures: [SingleFeature]) -> (Int, String, Int) {
         var rank: Int = 0
         var cntA: Int = 0
         var cntK: Int = 0
@@ -851,13 +851,13 @@ class ThreeCardPokerGameHandEvaluator {
         var cntC: Int = 0
 
         for i in 0..<3 {
-            if cards[i].rank == maxRank || cards[i].rank == minRank - 1 {
+            if singlefeatures[i].rank == maxRank || singlefeatures[i].rank == minRank - 1 {
                 cntA = 1
-            } else if cards[i].rank == 13 {
+            } else if singlefeatures[i].rank == 13 {
                 cntK = 1
-            } else if cards[i].rank == 11 {
+            } else if singlefeatures[i].rank == 11 {
                 cntJ = 1
-            } else if cards[i].rank == -1 {
+            } else if singlefeatures[i].rank == -1 {
                 cntC += 1
             }
         }
@@ -867,52 +867,52 @@ class ThreeCardPokerGameHandEvaluator {
             rank = rank << 4 | 13
             rank = rank << 4 | 11
             for i in 0..<3 {
-                rank = rank << 2 | cards[i].suit[0]
+                rank = rank << 2 | singlefeatures[i].suit[0]
             }
         }
         return (rank, "AKJ", 0)
     }
     
-    func eval_threehead(cards: [Card]) -> (Int, String, Int) {
+    func eval_threehead(singlefeatures: [SingleFeature]) -> (Int, String, Int) {
         var rank: Int = 0
         var cnt: Int = 0
 
         for i in 0..<3 {
-            if cards[i].rank == 13 ||
-               cards[i].rank == 12 ||
-               cards[i].rank == 11 ||
-               cards[i].rank == -1 {
+            if singlefeatures[i].rank == 13 ||
+               singlefeatures[i].rank == 12 ||
+               singlefeatures[i].rank == 11 ||
+               singlefeatures[i].rank == -1 {
                 cnt += 1
             }
         }
 
         if cnt == 3 {
             for i in 0..<3 {
-                if cards[i].rank == -1 {
+                if singlefeatures[i].rank == -1 {
                     rank = rank << 4 | 13
                 } else {
-                    rank = rank << 4 | cards[i].rank
+                    rank = rank << 4 | singlefeatures[i].rank
                 }
             }
             for i in 0..<3 {
-                rank = rank << 2 | cards[i].suit[0]
+                rank = rank << 2 | singlefeatures[i].suit[0]
             }
         }
         return (rank, "三公", 0)
     }
     
-    func eval_straightflush(cards: [Card]) -> (Int, String, Int) {
+    func eval_straightflush(singlefeatures: [SingleFeature]) -> (Int, String, Int) {
         var rank: Int = 0
         var cntC: Int = 0
         var straightHead: Int = -1
-        var cardType: String = ""
+        var singlefeatureType: String = ""
         
         var rankList: [Int] = []
         for i in 0..<3 {
-            if cards[i].rank == -1 {
+            if singlefeatures[i].rank == -1 {
                 cntC += 1
             } else {
-                rankList.append(cards[i].rank)
+                rankList.append(singlefeatures[i].rank)
             }
         }
 
@@ -937,7 +937,7 @@ class ThreeCardPokerGameHandEvaluator {
         var targetSuit: Int = -1
         var cntSuit: [Int] = [0, 0, 0, 0]
         for i in 0..<3 {
-            for suit in cards[i].suit {
+            for suit in singlefeatures[i].suit {
                 cntSuit[suit] += 1
             }
         }
@@ -978,27 +978,27 @@ class ThreeCardPokerGameHandEvaluator {
         }
         
         if rank > 0 {
-            cardType = ClassifierSettingArgs.CardNumberReportDic[cards[0].originalRank]! + "同花顺"
+            singlefeatureType = ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]! + "同花顺"
         }
         
         
-        return (rank, cardType, 0)
+        return (rank, singlefeatureType, 0)
     }
     
-    func eval_pairflush(cards: [Card]) -> (Int, String, Int) {
+    func eval_pairflush(singlefeatures: [SingleFeature]) -> (Int, String, Int) {
         var rank: Int = 0
 
         var pairRank: Int = -1
         var singleRank: Int = -1
         var cntC: Int = 0
         var rankList: [Int] = []
-        var cardType: String = ""
+        var singlefeatureType: String = ""
         
         for i in 0..<3 {
-            if cards[i].rank == -1 {
+            if singlefeatures[i].rank == -1 {
                 cntC += 1
             } else {
-                rankList.append(cards[i].rank)
+                rankList.append(singlefeatures[i].rank)
             }
         }
 
@@ -1015,11 +1015,11 @@ class ThreeCardPokerGameHandEvaluator {
             if rankList[0] == rankList[1] {
                 pairRank = rankList[0]
                 singleRank = rankList[2]
-                cardType = "同花对" +  ClassifierSettingArgs.CardNumberReportDic[cards[0].originalRank]!
+                singlefeatureType = "同花对" +  ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
             } else if rankList[1] == rankList[2] {
                 pairRank = rankList[1]
                 singleRank = rankList[0]
-                cardType = "同花对" +  ClassifierSettingArgs.CardNumberReportDic[cards[1].originalRank]!
+                singlefeatureType = "同花对" +  ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[1].originalRank]!
             }
         }
 
@@ -1027,7 +1027,7 @@ class ThreeCardPokerGameHandEvaluator {
         var cntSuit: [Int] = [0, 0, 0, 0]
 
         for i in 0..<3 {
-            for suit in cards[i].suit {
+            for suit in singlefeatures[i].suit {
                 cntSuit[suit] += 1
             }
         }
@@ -1046,16 +1046,16 @@ class ThreeCardPokerGameHandEvaluator {
                 rank = rank << 2 | targetSuit
             }
         }
-        return (rank, cardType, 1)
+        return (rank, singlefeatureType, 1)
     }
     
-    func eval_flush(cards: [Card]) -> (Int, String, Int) {
+    func eval_flush(singlefeatures: [SingleFeature]) -> (Int, String, Int) {
         var rank: Int = 0
         var targetSuit: Int = -1
         var cntSuit: [Int] = [0, 0, 0, 0]
 
         for i in 0..<3 {
-            for suit in cards[i].suit {
+            for suit in singlefeatures[i].suit {
                 cntSuit[suit] += 1
             }
         }
@@ -1067,18 +1067,18 @@ class ThreeCardPokerGameHandEvaluator {
         }
 
         if targetSuit != -1 {
-            var jokerList: [Int] = []
+            var specialfeatureList: [Int] = []
             var normalList: [Int] = []
             
             for i in 0..<3 {
-                if cards[i].rank == -1 {
-                    jokerList.append(self.maxRank)
+                if singlefeatures[i].rank == -1 {
+                    specialfeatureList.append(self.maxRank)
                 } else {
-                    normalList.append(cards[i].rank)
+                    normalList.append(singlefeatures[i].rank)
                 }
             }
 
-            for c in jokerList {
+            for c in specialfeatureList {
                 rank = rank << 4 | c
             }
             
@@ -1093,7 +1093,7 @@ class ThreeCardPokerGameHandEvaluator {
         return (rank, "同花", 0)
     }
 
-    func eval_straight(cards: [Card]) -> (Int, String, Int) {
+    func eval_straight(singlefeatures: [SingleFeature]) -> (Int, String, Int) {
         var rank: Int = 0
         var cntC: Int = 0
         var straightHead: Int = -1
@@ -1103,36 +1103,36 @@ class ThreeCardPokerGameHandEvaluator {
         
 
         for i in 0..<3 {
-            if cards[i].rank == -1 {
+            if singlefeatures[i].rank == -1 {
                 cntC += 1
             } else {
-                rankList.append(cards[i].rank)
+                rankList.append(singlefeatures[i].rank)
             }
         }
         if cntC == 3 {
             straightHead = 15
             for i in 0..<3 {
-                suitList.append(cards[i].suit[0])
+                suitList.append(singlefeatures[i].suit[0])
             }
         }
         else if cntC == 2 {
             straightHead = min(self.maxRank, rankList[0] + 2)
-            suitList.append(cards[0].suit[0])
-            suitList.append(cards[1].suit[0])
-            suitList.append(cards[2].suit[0])
+            suitList.append(singlefeatures[0].suit[0])
+            suitList.append(singlefeatures[1].suit[0])
+            suitList.append(singlefeatures[2].suit[0])
         }
         else if cntC == 1 {
             if rankList[0] - rankList[1] == 1 {
                 straightHead = min(self.maxRank, rankList[0] + 1)
-                suitList.append(cards[2].suit[0])
-                suitList.append(cards[0].suit[0])
-                suitList.append(cards[1].suit[0])
+                suitList.append(singlefeatures[2].suit[0])
+                suitList.append(singlefeatures[0].suit[0])
+                suitList.append(singlefeatures[1].suit[0])
             }
             else if rankList[0] - rankList[1] == 2 {
                 straightHead = rankList[0]
-                suitList.append(cards[0].suit[0])
-                suitList.append(cards[2].suit[0])
-                suitList.append(cards[1].suit[0])
+                suitList.append(singlefeatures[0].suit[0])
+                suitList.append(singlefeatures[2].suit[0])
+                suitList.append(singlefeatures[1].suit[0])
             }
         }
         else {
@@ -1141,7 +1141,7 @@ class ThreeCardPokerGameHandEvaluator {
                 rankList[2] != 0 {
                 straightHead = rankList[0]
                 for i in 0..<3 {
-                    suitList.append(cards[i].suit[0])
+                    suitList.append(singlefeatures[i].suit[0])
                 }
             }
         }
@@ -1172,25 +1172,25 @@ class ThreeCardPokerGameHandEvaluator {
                 rank = rank << 2 | suitList[i]
             }
         }
-        var cardType: String = ""
+        var singlefeatureType: String = ""
         if rank > 0 {
-            cardType = ClassifierSettingArgs.CardNumberReportDic[cards[0].originalRank]! + "顺子"
+            singlefeatureType = ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]! + "顺子"
         }
 
-        return (rank, cardType, 0)
+        return (rank, singlefeatureType, 0)
     }
     
-    func eval_truepair(cards: [Card]) -> (Int, String, Int) {
+    func eval_truepair(singlefeatures: [SingleFeature]) -> (Int, String, Int) {
         var rank: Int = 0
 
         var pairRank: Int = -1
         var singleRank: Int = -1
         var cntC: Int = 0
         var suitList: [Int] = []
-        var cardType: String = ""
+        var singlefeatureType: String = ""
 
         for i in 0..<3 {
-            if cards[i].rank == -1 {
+            if singlefeatures[i].rank == -1 {
                 cntC += 1
             }
         }
@@ -1198,68 +1198,68 @@ class ThreeCardPokerGameHandEvaluator {
         if cntC == 3 {
             pairRank = self.maxRank
             singleRank = self.maxRank
-            if cards[0].suit[0] == cards[1].suit[0] {
-                suitList.append(cards[0].suit[0])
-                suitList.append(cards[1].suit[0])
-                suitList.append(cards[2].suit[0])
+            if singlefeatures[0].suit[0] == singlefeatures[1].suit[0] {
+                suitList.append(singlefeatures[0].suit[0])
+                suitList.append(singlefeatures[1].suit[0])
+                suitList.append(singlefeatures[2].suit[0])
             } else {
-                suitList.append(cards[1].suit[0])
-                suitList.append(cards[2].suit[0])
-                suitList.append(cards[0].suit[0])
+                suitList.append(singlefeatures[1].suit[0])
+                suitList.append(singlefeatures[2].suit[0])
+                suitList.append(singlefeatures[0].suit[0])
             }
         } else if cntC == 2 {
-            if cards[1].suit[0] == cards[2].suit[0] {
+            if singlefeatures[1].suit[0] == singlefeatures[2].suit[0] {
                 pairRank = self.maxRank
-                singleRank = cards[0].rank
-                suitList.append(cards[1].suit[0])
-                suitList.append(cards[2].suit[0])
-                suitList.append(cards[0].suit[0])
-            } else if cards[0].suit.contains(cards[1].suit[0]) {
-                pairRank = cards[0].rank
+                singleRank = singlefeatures[0].rank
+                suitList.append(singlefeatures[1].suit[0])
+                suitList.append(singlefeatures[2].suit[0])
+                suitList.append(singlefeatures[0].suit[0])
+            } else if singlefeatures[0].suit.contains(singlefeatures[1].suit[0]) {
+                pairRank = singlefeatures[0].rank
                 singleRank = self.maxRank
-                suitList.append(cards[0].suit[0])
-                suitList.append(cards[0].suit[0])
-                suitList.append(cards[2].suit[0])
-            } else if cards[0].suit.contains(cards[2].suit[0]) {
-                pairRank = cards[0].rank
+                suitList.append(singlefeatures[0].suit[0])
+                suitList.append(singlefeatures[0].suit[0])
+                suitList.append(singlefeatures[2].suit[0])
+            } else if singlefeatures[0].suit.contains(singlefeatures[2].suit[0]) {
+                pairRank = singlefeatures[0].rank
                 singleRank = self.maxRank
-                suitList.append(cards[0].suit[0])
-                suitList.append(cards[0].suit[0])
-                suitList.append(cards[1].suit[0])
+                suitList.append(singlefeatures[0].suit[0])
+                suitList.append(singlefeatures[0].suit[0])
+                suitList.append(singlefeatures[1].suit[0])
             }
         } else if cntC == 1 {
-            if cards[0].suit.contains(cards[2].suit[0]) {
-                pairRank = cards[0].rank
-                singleRank = cards[1].rank
-                suitList.append(cards[0].suit[0])
-                suitList.append(cards[0].suit[0])
-                suitList.append(cards[1].suit[0])
-                cardType = "真对" + ClassifierSettingArgs.CardNumberReportDic[cards[0].originalRank]!
-            } else if cards[1].suit.contains(cards[2].suit[0]) {
-                pairRank = cards[1].rank
-                singleRank = cards[0].rank
-                suitList.append(cards[1].suit[0])
-                suitList.append(cards[1].suit[0])
-                suitList.append(cards[0].suit[0])
-                cardType = "真对" + ClassifierSettingArgs.CardNumberReportDic[cards[1].originalRank]!
+            if singlefeatures[0].suit.contains(singlefeatures[2].suit[0]) {
+                pairRank = singlefeatures[0].rank
+                singleRank = singlefeatures[1].rank
+                suitList.append(singlefeatures[0].suit[0])
+                suitList.append(singlefeatures[0].suit[0])
+                suitList.append(singlefeatures[1].suit[0])
+                singlefeatureType = "真对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+            } else if singlefeatures[1].suit.contains(singlefeatures[2].suit[0]) {
+                pairRank = singlefeatures[1].rank
+                singleRank = singlefeatures[0].rank
+                suitList.append(singlefeatures[1].suit[0])
+                suitList.append(singlefeatures[1].suit[0])
+                suitList.append(singlefeatures[0].suit[0])
+                singlefeatureType = "真对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[1].originalRank]!
             }
         } else {
-            if cards[0].rank == cards[1].rank && cards[0].suit.contains(cards[1].suit[0]) {
-                pairRank = cards[0].rank
-                singleRank = cards[2].rank
-                suitList.append(cards[0].suit[0])
-                suitList.append(cards[0].suit[0])
-                suitList.append(cards[2].suit[0])
-                cardType = "真对" + ClassifierSettingArgs.CardNumberReportDic[cards[0].originalRank]!
+            if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].suit.contains(singlefeatures[1].suit[0]) {
+                pairRank = singlefeatures[0].rank
+                singleRank = singlefeatures[2].rank
+                suitList.append(singlefeatures[0].suit[0])
+                suitList.append(singlefeatures[0].suit[0])
+                suitList.append(singlefeatures[2].suit[0])
+                singlefeatureType = "真对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
             }
 
-            if cards[1].rank == cards[2].rank && cards[1].suit.contains(cards[2].suit[0]) {
-                pairRank = cards[1].rank
-                singleRank = cards[0].rank
-                suitList.append(cards[1].suit[0])
-                suitList.append(cards[1].suit[0])
-                suitList.append(cards[0].suit[0])
-                cardType = "真对" +  ClassifierSettingArgs.CardNumberReportDic[cards[1].originalRank]!
+            if singlefeatures[1].rank == singlefeatures[2].rank && singlefeatures[1].suit.contains(singlefeatures[2].suit[0]) {
+                pairRank = singlefeatures[1].rank
+                singleRank = singlefeatures[0].rank
+                suitList.append(singlefeatures[1].suit[0])
+                suitList.append(singlefeatures[1].suit[0])
+                suitList.append(singlefeatures[0].suit[0])
+                singlefeatureType = "真对" +  ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[1].originalRank]!
             }
         }
 
@@ -1272,20 +1272,20 @@ class ThreeCardPokerGameHandEvaluator {
             }
         }
 
-        return (rank, cardType, 0)
+        return (rank, singlefeatureType, 0)
     }
     
-    func eval_onepair(cards: [Card]) -> (Int, String, Int) {
+    func eval_onepair(singlefeatures: [SingleFeature]) -> (Int, String, Int) {
         var rank: Int = 0
 
         var pairRank: Int = -1
         var singleRank: Int = -1
         var cntC: Int = 0
         var suitList: [Int] = []
-        var cardType: String = ""
+        var singlefeatureType: String = ""
 
         for i in 0..<3 {
-            if cards[i].rank == -1 {
+            if singlefeatures[i].rank == -1 {
                 cntC += 1
             }
         }
@@ -1294,35 +1294,35 @@ class ThreeCardPokerGameHandEvaluator {
             pairRank = self.maxRank
             singleRank = self.maxRank
             for i in 0..<3 {
-                suitList.append(cards[i].suit[0])
+                suitList.append(singlefeatures[i].suit[0])
             }
         } else if cntC == 2 {
             pairRank = self.maxRank
-            singleRank = cards[0].rank
-            suitList.append(cards[1].suit[0])
-            suitList.append(cards[2].suit[0])
-            suitList.append(cards[0].suit[0])
+            singleRank = singlefeatures[0].rank
+            suitList.append(singlefeatures[1].suit[0])
+            suitList.append(singlefeatures[2].suit[0])
+            suitList.append(singlefeatures[0].suit[0])
         } else if cntC == 1 {
-            pairRank = cards[0].rank
-            singleRank = cards[1].rank
-            suitList.append(cards[0].suit[0])
-            suitList.append(cards[2].suit[0])
-            suitList.append(cards[1].suit[0])
+            pairRank = singlefeatures[0].rank
+            singleRank = singlefeatures[1].rank
+            suitList.append(singlefeatures[0].suit[0])
+            suitList.append(singlefeatures[2].suit[0])
+            suitList.append(singlefeatures[1].suit[0])
         } else {
-            if cards[0].rank == cards[1].rank {
-                pairRank = cards[0].rank
-                singleRank = cards[2].rank
-                suitList.append(cards[0].suit[0])
-                suitList.append(cards[1].suit[0])
-                suitList.append(cards[2].suit[0])
-                cardType = "对" + ClassifierSettingArgs.CardNumberReportDic[cards[0].originalRank]!
-            } else if cards[1].rank == cards[2].rank {
-                pairRank = cards[1].rank
-                singleRank = cards[0].rank
-                suitList.append(cards[1].suit[0])
-                suitList.append(cards[2].suit[0])
-                suitList.append(cards[0].suit[0])
-                cardType = "对" + ClassifierSettingArgs.CardNumberReportDic[cards[1].originalRank]!
+            if singlefeatures[0].rank == singlefeatures[1].rank {
+                pairRank = singlefeatures[0].rank
+                singleRank = singlefeatures[2].rank
+                suitList.append(singlefeatures[0].suit[0])
+                suitList.append(singlefeatures[1].suit[0])
+                suitList.append(singlefeatures[2].suit[0])
+                singlefeatureType = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+            } else if singlefeatures[1].rank == singlefeatures[2].rank {
+                pairRank = singlefeatures[1].rank
+                singleRank = singlefeatures[0].rank
+                suitList.append(singlefeatures[1].suit[0])
+                suitList.append(singlefeatures[2].suit[0])
+                suitList.append(singlefeatures[0].suit[0])
+                singlefeatureType = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[1].originalRank]!
             }
         }
 
@@ -1335,33 +1335,33 @@ class ThreeCardPokerGameHandEvaluator {
             }
         }
 
-        return (rank, cardType, 1)
+        return (rank, singlefeatureType, 1)
     }
 
-    func eval_holecard(cards: [Card]) -> (Int, String, Int) {
-        var jokerList: [[Int]] = []
+    func eval_holesinglefeature(singlefeatures: [SingleFeature]) -> (Int, String, Int) {
+        var specialfeatureList: [[Int]] = []
         var normalList: [[Int]] = []
         var rank: Int = 0
 
-        if (self.isReverseHighCard != 0) {
+        if (self.isReverseHighSingleFeature != 0) {
             var minRank = self.minRank
             if self.isAce == 1 {
                 minRank = self.minRank - 1
             }
             for i in 0..<3 {
-                if cards[i].rank == -1 {
-                    jokerList.append([minRank, cards[i].rank])
+                if singlefeatures[i].rank == -1 {
+                    specialfeatureList.append([minRank, singlefeatures[i].rank])
                 } else {
-                    normalList.append([cards[i].rank, cards[i].suit[0]])
+                    normalList.append([singlefeatures[i].rank, singlefeatures[i].suit[0]])
                 }
             }
-            for c in jokerList {
+            for c in specialfeatureList {
                 rank = rank << 4 | self.maxRank - c[0]
             }
             for c in normalList {
                 rank = rank << 4 | self.maxRank - c[0]
             }
-            for c in jokerList {
+            for c in specialfeatureList {
                 rank = rank << 2 | c[1]
             }
             for c in normalList {
@@ -1369,19 +1369,19 @@ class ThreeCardPokerGameHandEvaluator {
             }
         } else {
             for i in 0..<3 {
-                if cards[i].rank == -1 {
-                    jokerList.append([self.maxRank, cards[i].rank])
+                if singlefeatures[i].rank == -1 {
+                    specialfeatureList.append([self.maxRank, singlefeatures[i].rank])
                 } else {
-                    normalList.append([cards[i].rank, cards[i].suit[0]])
+                    normalList.append([singlefeatures[i].rank, singlefeatures[i].suit[0]])
                 }
             }
-            for c in jokerList {
+            for c in specialfeatureList {
                 rank = rank << 4 | c[0]
             }
             for c in normalList {
                 rank = rank << 4 | c[0]
             }
-            for c in jokerList {
+            for c in specialfeatureList {
                 rank = rank << 2 | c[1]
             }
             for c in normalList {

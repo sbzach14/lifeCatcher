@@ -2,15 +2,15 @@
 import Foundation
 
 
-class ThreeCardPointGameRule : Rule{
+class TCPStatisticRule : Rule{
     let handNum :[Int] = [2]
-    let redJokerValueRange:[Int:String] = [
+    let redspecialfeatureValueRange:[Int:String] = [
         0: "20",
         1: "1",
         2: "2",
         3: "0"
     ]
-    let blackJokerValueRange:[Int: String] = [
+    let blackspecialfeatureValueRange:[Int: String] = [
         0: "20",
         1: "1",
         2: "2",
@@ -91,28 +91,28 @@ class ThreeCardPointGameRule : Rule{
 """
     
             ]
-        self.playerNum = [2,3,4,5,6,7,8,9,10]    }
+        self.rcNum = [2,3,4,5,6,7,8,9,10]    }
 }
 
 
 
-class ThreeCardPointGame{
-    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
-        var deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (winners, leftCards)
+class TCPStatistic{
+    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputSingleFeatures:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([StatisticReturnRCInfo],[Int]) {
+        var FeatureList = initFeatureList(initialSingleFeatures: inputSingleFeatures, suitRules: suitRules)
+        let (winners, leftSingleFeatures) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, FeatureList: FeatureList, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winners, leftSingleFeatures)
     }
     
-    static func legalCheck(playerNum: Int) -> String{
+    static func legalCheck(rcNum: Int) -> String{
         var errMessage : String = ""
-        if(playerNum * 3 > 40)
+        if(rcNum * 3 > 40)
         {
             errMessage = "需要牌数量超出牌堆总数，请重新设置！"
         }
         return errMessage
     }
     
-    static func getAllCardIndex(setting: Int) -> [Int]{
+    static func getAllSingleFeatureIndex(setting: Int) -> [Int]{
         var result : [Int] = []
         switch setting{
         case 0:
@@ -141,17 +141,17 @@ class ThreeCardPointGame{
         return result
     }
     
-    static func getMinCardNum(playerNum: Int, handNum: Int, communityNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+    static func getMinSingleFeatureNum(rcNum: Int, handNum: Int, communityNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
         
         if dealType == 0 || dealType == 1{
-            return playerNum * handNum + communityNum
+            return rcNum * handNum + communityNum
         } else {
             var minNum = 0
             for i in 0..<diyDealNum.count {
                 let num = diyDealNum[i]
                 //派牌
                 if diyDealStatus[i][0] == true {
-                    minNum += playerNum * num
+                    minNum += rcNum * num
                 //公牌
                 } else if diyDealStatus[i][1] == true {
                     minNum += num
@@ -167,10 +167,10 @@ class ThreeCardPointGame{
     //args
     //0 dealType
     //1 diyDealType
-    //2 playerNum
+    //2 rcNum
     //3 handNum
-    //4 redJokerValueRange
-    //5 blackJokerValueRange
+    //4 redspecialfeatureValueRange
+    //5 blackspecialfeatureValueRange
     //6 KValueRange
     //7 QValueRange
     //8 JValueRange
@@ -178,17 +178,17 @@ class ThreeCardPointGame{
     //10 isCompareSuit
     //11 pointComparision
     
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], FeatureList: [SingleFeature], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([StatisticReturnRCInfo],[Int]) {
 
-        let rule  = ClassifierSettingArgs.targetSetting[13] as! ThreeCardPointGameRule
+        let rule  = ClassifierSettingArgs.targetSetting[13] as! TCPStatisticRule
 
         let dealNum = args[0]
         let dealType = args[1]
-        let playerNum = args[2]
+        let rcNum = args[2]
         let handNum = args[3]
         let communityNum = args[4]
-        let redJokerValueRange = args[5]
-        let blackJokerValueRange = args[6]
+        let redspecialfeatureValueRange = args[5]
+        let blackspecialfeatureValueRange = args[6]
         let KValueRange = args[7]
         let QValueRange = args[8]
         let JValueRange = args[9]
@@ -198,78 +198,78 @@ class ThreeCardPointGame{
         
         
         var maxRank = 0
-        var returnPlayerInfos: [GameReturnPlayerInfo] = []
+        var returnRCInfos: [StatisticReturnRCInfo] = []
 
-        var allPlayCards: [Player] = []
-        var community = [Card]()
-        if deck.count < ThreeCardPointGame.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
+        var allPlaySingleFeatures: [RC] = []
+        var community = [SingleFeature]()
+        if FeatureList.count < TCPStatistic.getMinSingleFeatureNum(rcNum: rcNum,handNum: handNum, communityNum: communityNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
             return ([],[])
         }
         
-        for _ in 0..<playerNum {
-            allPlayCards.append(Player())
+        for _ in 0..<rcNum {
+            allPlaySingleFeatures.append(RC())
         }
         
         
-        var deck = deck
+        var FeatureList = FeatureList
         // 发牌
         if dealNum == 0{
             for _ in 0..<handNum{
                 //正发
                 if dealType == 0{
-                    for i in 0..<playerNum {
-                        allPlayCards[i].insertCard(card: deck.removeFirst())
+                    for i in 0..<rcNum {
+                        allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeFirst())
                     }
                 //反发
                 } else if dealType == 1 {
-                    for i in 0..<playerNum {
-                        allPlayCards[i].insertCard(card: deck.removeLast())
+                    for i in 0..<rcNum {
+                        allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeLast())
                     }
                 }
             }
             
         } else {
             for actionIndex in 0...diyDealStatus.count - 1{
-                let cardNum = diyDealNum[actionIndex]
+                let singlefeatureNum = diyDealNum[actionIndex]
                 let action = diyDealStatus[actionIndex]
                 //派牌
                 if action[0] == true{
                     //正发
                     if dealType == 0{
-                        for i in 0..<playerNum {
-                            for _ in 0..<cardNum{
-                                allPlayCards[i].insertCard(card: deck.removeFirst())
+                        for i in 0..<rcNum {
+                            for _ in 0..<singlefeatureNum{
+                                allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeFirst())
                             }
                         }
                     //反发
                     } else if dealType == 1{
-                        for i in 0..<playerNum {
-                            for _ in 0..<cardNum{
-                                allPlayCards[i].insertCard(card: deck.removeLast())
+                        for i in 0..<rcNum {
+                            for _ in 0..<singlefeatureNum{
+                                allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeLast())
                             }
                         }
                     }
                 //公牌
                 } else if action[1] == true {
                     if dealType == 0{
-                        for _ in 0..<cardNum{
-                            community.append(deck.removeFirst())
+                        for _ in 0..<singlefeatureNum{
+                            community.append(FeatureList.removeFirst())
                         }
                     } else if dealType == 1{
-                        for _ in 0..<cardNum{
-                            community.append(deck.removeLast())
+                        for _ in 0..<singlefeatureNum{
+                            community.append(FeatureList.removeLast())
                         }
                     }
                     
                 //去牌
                 } else if action[2] == true {
                     if dealType == 0 {
-                        for _ in 0..<cardNum{
-                            deck.removeFirst()
+                        for _ in 0..<singlefeatureNum{
+                            FeatureList.removeFirst()
                         }
                     } else if dealType == 1{
-                        for _ in 0..<cardNum{
-                            deck.removeLast()
+                        for _ in 0..<singlefeatureNum{
+                            FeatureList.removeLast()
                         }
                     }
                 }
@@ -277,47 +277,47 @@ class ThreeCardPointGame{
         }
         
         
-        for i in 0..<playerNum {
-            (allPlayCards[i].evaluateFlag,allPlayCards[i].cardType, allPlayCards[i].isPair) = ThreeCardPointGameHandEvaluator(
+        for i in 0..<rcNum {
+            (allPlaySingleFeatures[i].evaluateFlag,allPlaySingleFeatures[i].singlefeatureType, allPlaySingleFeatures[i].isPair) = TCPStatisticHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules
-            ).evalHand(cards: allPlayCards[i].playerCard, redJokerValueRange: redJokerValueRange,blackJokerValueRange: blackJokerValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, samePointComparision: samePointComparision,pointComparision: pointComparision)
+            ).evalHand(singlefeatures: allPlaySingleFeatures[i].rcSingleFeature, redspecialfeatureValueRange: redspecialfeatureValueRange,blackspecialfeatureValueRange: blackspecialfeatureValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, samePointComparision: samePointComparision,pointComparision: pointComparision)
         }
         
-        for playerID in 0..<allPlayCards.count {
-            var currentReturnPlayerInfo = GameReturnPlayerInfo()
-            currentReturnPlayerInfo.playerID = playerID
-            currentReturnPlayerInfo.playerRank = allPlayCards[playerID].evaluateFlag
-            currentReturnPlayerInfo.playerCardsType = allPlayCards[playerID].cardType
-            currentReturnPlayerInfo.isPair = allPlayCards[playerID].isPair
-            currentReturnPlayerInfo.PlayerCards = allPlayCards[playerID].playerCard
-            currentReturnPlayerInfo.communityCard = community
-            returnPlayerInfos.append(currentReturnPlayerInfo)
+        for rcID in 0..<allPlaySingleFeatures.count {
+            var currentReturnRCInfo = StatisticReturnRCInfo()
+            currentReturnRCInfo.rcID = rcID
+            currentReturnRCInfo.rcRank = allPlaySingleFeatures[rcID].evaluateFlag
+            currentReturnRCInfo.rcSingleFeaturesType = allPlaySingleFeatures[rcID].singlefeatureType
+            currentReturnRCInfo.isPair = allPlaySingleFeatures[rcID].isPair
+            currentReturnRCInfo.RCSingleFeatures = allPlaySingleFeatures[rcID].rcSingleFeature
+            currentReturnRCInfo.communitySingleFeature = community
+            returnRCInfos.append(currentReturnRCInfo)
         }
         
         //从大到小排序
-        returnPlayerInfos = returnPlayerInfos.sorted(by: {$0.playerRank > $1.playerRank})
+        returnRCInfos = returnRCInfos.sorted(by: {$0.rcRank > $1.rcRank})
         
-        var leftCards:[Int] = []
-        for card in deck{
-            leftCards.append(card.cardIndex)
+        var leftSingleFeatures:[Int] = []
+        for singlefeature in FeatureList{
+            leftSingleFeatures.append(singlefeature.singlefeatureIndex)
         }
         
-        if leftCards.count < self.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus) {
-            leftCards = []
+        if leftSingleFeatures.count < self.getMinSingleFeatureNum(rcNum: rcNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus) {
+            leftSingleFeatures = []
         }
         
-        return (returnPlayerInfos, leftCards)
+        return (returnRCInfos, leftSingleFeatures)
     }
 }
 
-class ThreeCardPointGameHandEvaluator{
+class TCPStatisticHandEvaluator{
     
     var rankRules: [Int]
     var suitRules: [Int]
     var samePointComparision = 0
     var pointComparision = 0
-    var rankRulesDic:[Int:([ThreeCardPointCard]) -> (Bool, Int, String, Int)] = [:]
+    var rankRulesDic:[Int:([TCPSingleFeature]) -> (Bool, Int, String, Int)] = [:]
     
     init(rankRules: [Int],
          suitRules: [Int]){
@@ -331,98 +331,98 @@ class ThreeCardPointGameHandEvaluator{
         
     }
     
-    func evalHand(cards: [Card], redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange: Int, JValueRange: Int, samePointComparision: Int, pointComparision: Int)->(Int, String, Int){
+    func evalHand(singlefeatures: [SingleFeature], redspecialfeatureValueRange: Int, blackspecialfeatureValueRange: Int, KValueRange: Int, QValueRange: Int, JValueRange: Int, samePointComparision: Int, pointComparision: Int)->(Int, String, Int){
         
         self.samePointComparision = samePointComparision
         var score = 0
-        var maxCardType: String = ""
+        var maxSingleFeatureType: String = ""
         var maxIsPair: Int = 0
         
-        var num1 = ThreeCardPointCard(card: cards[0], redJokerValueRange: redJokerValueRange, blackJokerValueRange: blackJokerValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange)
-        var num2 = ThreeCardPointCard(card: cards[1], redJokerValueRange: redJokerValueRange, blackJokerValueRange: blackJokerValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange)
-        var num3 = ThreeCardPointCard(card: cards[2], redJokerValueRange: redJokerValueRange, blackJokerValueRange: blackJokerValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange)
+        var num1 = TCPSingleFeature(singlefeature: singlefeatures[0], redspecialfeatureValueRange: redspecialfeatureValueRange, blackspecialfeatureValueRange: blackspecialfeatureValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange)
+        var num2 = TCPSingleFeature(singlefeature: singlefeatures[1], redspecialfeatureValueRange: redspecialfeatureValueRange, blackspecialfeatureValueRange: blackspecialfeatureValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange)
+        var num3 = TCPSingleFeature(singlefeature: singlefeatures[2], redspecialfeatureValueRange: redspecialfeatureValueRange, blackspecialfeatureValueRange: blackspecialfeatureValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange)
         
         var i = self.rankRules.count + 1
         for ruleIndex in self.rankRules{
-            let (flag, rank, cardType, isPair) = self.rankRulesDic[ruleIndex]!([num1, num2, num3])
+            let (flag, rank, singlefeatureType, isPair) = self.rankRulesDic[ruleIndex]!([num1, num2, num3])
             i -= 1
             if flag == false{
                 continue
             } else {
                 score = (1 << (i + 10)) | rank
-                maxCardType = cardType
+                maxSingleFeatureType = singlefeatureType
                 maxIsPair = isPair
-                return (score, maxCardType, maxIsPair)
+                return (score, maxSingleFeatureType, maxIsPair)
             }
         }
 
-        return (score, maxCardType, maxIsPair)
+        return (score, maxSingleFeatureType, maxIsPair)
     }
     
-    func eval_NinePointFive(cards: [ThreeCardPointCard]) -> (Bool, Int, String, Int) {
-        if (cards[0].point + cards[1].point + cards[2].point) % 20 == 19 {
+    func eval_NinePointFive(singlefeatures: [TCPSingleFeature]) -> (Bool, Int, String, Int) {
+        if (singlefeatures[0].point + singlefeatures[1].point + singlefeatures[2].point) % 20 == 19 {
             return (true, 1, "9点半", 0)
         }
         return (false, 0, "", 0)
     }
     
-    func eval_TenPointFive(cards: [ThreeCardPointCard]) -> (Bool, Int, String, Int) {
-        if cards[0].point + cards[1].point + cards[2].point == 21 {
+    func eval_TenPointFive(singlefeatures: [TCPSingleFeature]) -> (Bool, Int, String, Int) {
+        if singlefeatures[0].point + singlefeatures[1].point + singlefeatures[2].point == 21 {
             return(true, 1, "10点半", 0)
         }
         return (false, 0, "", 0)
     }
     
-    func eval_Points(cards: [ThreeCardPointCard]) -> (Bool, Int, String, Int){
+    func eval_Points(singlefeatures: [TCPSingleFeature]) -> (Bool, Int, String, Int){
         //9点最大
-        var cardType: String = ""
-        let originpoint = cards[0].point + cards[1].point + cards[2].point
-        cardType = String(originpoint % 20 / 2) + "点"
+        var singlefeatureType: String = ""
+        let originpoint = singlefeatures[0].point + singlefeatures[1].point + singlefeatures[2].point
+        singlefeatureType = String(originpoint % 20 / 2) + "点"
         if originpoint % 2 == 1{
-            cardType += "半"
+            singlefeatureType += "半"
         }
         if self.pointComparision == 0{
-            return(true, (cards[0].point + cards[1].point + cards[2].point) % 20, cardType, 0)
+            return(true, (singlefeatures[0].point + singlefeatures[1].point + singlefeatures[2].point) % 20, singlefeatureType, 0)
             
         //10点最大
         } else if pointComparision == 1{
-            return (true, (cards[0].point + cards[1].point + cards[2].point - 1) % 20, cardType, 0)
+            return (true, (singlefeatures[0].point + singlefeatures[1].point + singlefeatures[2].point - 1) % 20, singlefeatureType, 0)
         }
         return (false, 0, "", 0)
     }
     
-    class ThreeCardPointCard{
+    class TCPSingleFeature{
         var rank: Int = 0
         var originalRank: Int = 0
         var point: Int = 0
         var suit: Int = 0
-        var cardIndex: Int = 0
+        var singlefeatureIndex: Int = 0
         
-        init(card: Card, redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange:Int, JValueRange:Int) {
-            let rule = ClassifierSettingArgs.targetSetting[13] as! ThreeCardPointGameRule
-            self.cardIndex = card.cardIndex
+        init(singlefeature: SingleFeature, redspecialfeatureValueRange: Int, blackspecialfeatureValueRange: Int, KValueRange: Int, QValueRange:Int, JValueRange:Int) {
+            let rule = ClassifierSettingArgs.targetSetting[13] as! TCPStatisticRule
+            self.singlefeatureIndex = singlefeature.singlefeatureIndex
             //initial suit
-            self.suit = card.suit[0]
+            self.suit = singlefeature.suit[0]
             //initial rank
-            self.originalRank = card.rank
-            self.rank = card.rank
+            self.originalRank = singlefeature.rank
+            self.rank = singlefeature.rank
             //initial point
-            if card.rank == 15 {
-                self.point =  Int(rule.redJokerValueRange[redJokerValueRange]!)!
+            if singlefeature.rank == 15 {
+                self.point =  Int(rule.redspecialfeatureValueRange[redspecialfeatureValueRange]!)!
             }
-            else if card.rank == 14 {
-                self.point = Int(rule.blackJokerValueRange[blackJokerValueRange]!)!
+            else if singlefeature.rank == 14 {
+                self.point = Int(rule.blackspecialfeatureValueRange[blackspecialfeatureValueRange]!)!
             }
-            else if card.rank == 13 {
+            else if singlefeature.rank == 13 {
                 self.point = Int(rule.KValueRange[KValueRange]!)!
             }
-            else if card.rank == 12 {
+            else if singlefeature.rank == 12 {
                 self.point = Int(rule.QValueRange[QValueRange]!)!
             }
-            else if card.rank == 11 {
+            else if singlefeature.rank == 11 {
                 self.point = Int(rule.JValueRange[JValueRange]!)!
             }else {
-                self.point = card.rank * 2
+                self.point = singlefeature.rank * 2
             }
         }
     }

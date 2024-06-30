@@ -4,13 +4,13 @@ import Foundation
 
 //小九
 
-class TinyNineGameRule : Rule{
+class TNStatisticRule : Rule{
     let handNum :[Int] = [2]
-    let redJokerValueRange:[Int:String] = [
+    let redspecialfeatureValueRange:[Int:String] = [
         0: "1",
         1: "6"
     ]
-    let blackJokerValueRange:[Int: String] = [
+    let blackspecialfeatureValueRange:[Int: String] = [
         0: "1",
         1: "3"
     ]
@@ -54,23 +54,23 @@ class TinyNineGameRule : Rule{
 
 
 
-class TinyNineGame{
-    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
-        let deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (winners, leftCards)
+class TNStatistic{
+    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputSingleFeatures:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([StatisticReturnRCInfo],[Int]) {
+        let FeatureList = initFeatureList(initialSingleFeatures: inputSingleFeatures, suitRules: suitRules)
+        let (winners, leftSingleFeatures) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, FeatureList: FeatureList, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winners, leftSingleFeatures)
     }
     
-    static func legalCheck(playerNum: Int) -> String{
+    static func legalCheck(rcNum: Int) -> String{
         var errMessage : String = ""
-        if(playerNum * 2 > 40)
+        if(rcNum * 2 > 40)
         {
             errMessage = "需要牌数量超出牌堆总数，请重新设置！"
         }
         return errMessage
     }
     
-    static func getAllCardIndex(setting: Int) -> [Int]{
+    static func getAllSingleFeatureIndex(setting: Int) -> [Int]{
         var result : [Int] = []
         switch setting{
         case 0:
@@ -87,17 +87,17 @@ class TinyNineGame{
         return result
     }
     
-    static func getMinCardNum(playerNum: Int, handNum: Int, communityNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+    static func getMinSingleFeatureNum(rcNum: Int, handNum: Int, communityNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
         
         if dealType == 0 || dealType == 1{
-            return playerNum * handNum + communityNum
+            return rcNum * handNum + communityNum
         } else {
             var minNum = 0
             for i in 0..<diyDealNum.count {
                 let num = diyDealNum[i]
                 //派牌
                 if diyDealStatus[i][0] == true {
-                    minNum += playerNum * num
+                    minNum += rcNum * num
                 //公牌
                 } else if diyDealStatus[i][1] == true {
                     minNum += num
@@ -113,143 +113,143 @@ class TinyNineGame{
     //args
     //0 dealType
     //1 diyDealType
-    //2 playerNum
+    //2 rcNum
     //3 handNum
-    //4 redJokerValueRange
-    //5 blackJokerValueRange
+    //4 redspecialfeatureValueRange
+    //5 blackspecialfeatureValueRange
     //6 samePointComparision
     
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], FeatureList: [SingleFeature], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([StatisticReturnRCInfo],[Int]) {
 
         let dealNum = args[0]
         let dealType = args[1]
-        let playerNum = args[2]
+        let rcNum = args[2]
         let handNum = args[3]
         let communityNum = args[4]
-        let redJokerValueRange = args[5]
-        let blackJokerValueRange = args[6]
+        let redspecialfeatureValueRange = args[5]
+        let blackspecialfeatureValueRange = args[6]
         let samePointComparision = args[7]
         
         
-        var allPlayCards: [Player] = []
-        var community = [Card]()
-        var returnPlayerInfos: [GameReturnPlayerInfo] = []
-        if deck.count < TinyNineGame.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
+        var allPlaySingleFeatures: [RC] = []
+        var community = [SingleFeature]()
+        var returnRCInfos: [StatisticReturnRCInfo] = []
+        if FeatureList.count < TNStatistic.getMinSingleFeatureNum(rcNum: rcNum,handNum: handNum, communityNum: communityNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
             return ([],[])
         }
         
-        for _ in 0..<playerNum {
-            allPlayCards.append(Player())
+        for _ in 0..<rcNum {
+            allPlaySingleFeatures.append(RC())
         }
         
         
-        var deck = deck
+        var FeatureList = FeatureList
         // 发牌
         if dealNum == 0{
             for _ in 0..<handNum{
                 //正发
                 if dealType == 0{
-                    for i in 0..<playerNum {
-                        allPlayCards[i].insertCard(card: deck.removeFirst())
+                    for i in 0..<rcNum {
+                        allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeFirst())
                     }
                 //反发
                 } else if dealType == 1 {
-                    for i in 0..<playerNum {
-                        allPlayCards[i].insertCard(card: deck.removeLast())
+                    for i in 0..<rcNum {
+                        allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeLast())
                     }
                 }
             }
             
         } else {
             for actionIndex in 0...diyDealStatus.count - 1{
-                let cardNum = diyDealNum[actionIndex]
+                let singlefeatureNum = diyDealNum[actionIndex]
                 let action = diyDealStatus[actionIndex]
                 //派牌
                 if action[0] == true{
                     //正发
                     if dealType == 0{
-                        for i in 0..<playerNum {
-                            for _ in 0..<cardNum{
-                                allPlayCards[i].insertCard(card: deck.removeFirst())
+                        for i in 0..<rcNum {
+                            for _ in 0..<singlefeatureNum{
+                                allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeFirst())
                             }
                         }
                     //反发
                     } else if dealType == 1{
-                        for i in 0..<playerNum {
-                            for _ in 0..<cardNum{
-                                allPlayCards[i].insertCard(card: deck.removeLast())
+                        for i in 0..<rcNum {
+                            for _ in 0..<singlefeatureNum{
+                                allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeLast())
                             }
                         }
                     }
                 //公牌
                 } else if action[1] == true {
                     if dealType == 0{
-                        for _ in 0..<cardNum{
-                            community.append(deck.removeFirst())
+                        for _ in 0..<singlefeatureNum{
+                            community.append(FeatureList.removeFirst())
                         }
                     } else if dealType == 1{
-                        for _ in 0..<cardNum{
-                            community.append(deck.removeLast())
+                        for _ in 0..<singlefeatureNum{
+                            community.append(FeatureList.removeLast())
                         }
                     }
                     
                 //去牌
                 } else if action[2] == true {
                     if dealType == 0 {
-                        for _ in 0..<cardNum{
-                            deck.removeFirst()
+                        for _ in 0..<singlefeatureNum{
+                            FeatureList.removeFirst()
                         }
                     } else if dealType == 1{
-                        for _ in 0..<cardNum{
-                            deck.removeLast()
+                        for _ in 0..<singlefeatureNum{
+                            FeatureList.removeLast()
                         }
                     }
                 }
             }
         }
         
-        for i in 0..<playerNum {
-            (allPlayCards[i].evaluateFlag, allPlayCards[i].cardType, allPlayCards[i].isPair) = TinyNineGameHandEvaluator(
+        for i in 0..<rcNum {
+            (allPlaySingleFeatures[i].evaluateFlag, allPlaySingleFeatures[i].singlefeatureType, allPlaySingleFeatures[i].isPair) = TNStatisticHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules
-            ).evalHand(cards: allPlayCards[i].playerCard, redJokerValueRange: redJokerValueRange,blackJokerValueRange: blackJokerValueRange, samePointComparision: samePointComparision)
+            ).evalHand(singlefeatures: allPlaySingleFeatures[i].rcSingleFeature, redspecialfeatureValueRange: redspecialfeatureValueRange,blackspecialfeatureValueRange: blackspecialfeatureValueRange, samePointComparision: samePointComparision)
         }
         
-        for playerID in 0..<allPlayCards.count {
-            var currentReturnPlayerInfo = GameReturnPlayerInfo()
-            currentReturnPlayerInfo.playerID = playerID
-            currentReturnPlayerInfo.playerRank = allPlayCards[playerID].evaluateFlag
-            currentReturnPlayerInfo.playerCardsType = allPlayCards[playerID].cardType
-            currentReturnPlayerInfo.isPair = allPlayCards[playerID].isPair
-            currentReturnPlayerInfo.PlayerCards = allPlayCards[playerID].playerCard
-            currentReturnPlayerInfo.communityCard = community
-            returnPlayerInfos.append(currentReturnPlayerInfo)
+        for rcID in 0..<allPlaySingleFeatures.count {
+            var currentReturnRCInfo = StatisticReturnRCInfo()
+            currentReturnRCInfo.rcID = rcID
+            currentReturnRCInfo.rcRank = allPlaySingleFeatures[rcID].evaluateFlag
+            currentReturnRCInfo.rcSingleFeaturesType = allPlaySingleFeatures[rcID].singlefeatureType
+            currentReturnRCInfo.isPair = allPlaySingleFeatures[rcID].isPair
+            currentReturnRCInfo.RCSingleFeatures = allPlaySingleFeatures[rcID].rcSingleFeature
+            currentReturnRCInfo.communitySingleFeature = community
+            returnRCInfos.append(currentReturnRCInfo)
         }
         
         //从大到小排序
-        returnPlayerInfos = returnPlayerInfos.sorted(by: {$0.playerRank > $1.playerRank})
+        returnRCInfos = returnRCInfos.sorted(by: {$0.rcRank > $1.rcRank})
         
-        var leftCards:[Int] = []
-        for card in deck{
-            leftCards.append(card.cardIndex)
+        var leftSingleFeatures:[Int] = []
+        for singlefeature in FeatureList{
+            leftSingleFeatures.append(singlefeature.singlefeatureIndex)
         }
         
-        if leftCards.count < self.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus) {
-            leftCards = []
+        if leftSingleFeatures.count < self.getMinSingleFeatureNum(rcNum: rcNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus) {
+            leftSingleFeatures = []
         }
         
-        return (returnPlayerInfos, leftCards)
+        return (returnRCInfos, leftSingleFeatures)
     }
 }
 
-class TinyNineGameHandEvaluator{
+class TNStatisticHandEvaluator{
     
     var rankRules: [Int]
     var suitRules: [Int]
-    var redJokerValueRange = 0
-    var blackJokerValueRange = 0
+    var redspecialfeatureValueRange = 0
+    var blackspecialfeatureValueRange = 0
     var samePointComparision = 0
-    var rankRulesDic:[Int:([Card]) -> (Bool, Int, String, Int)] = [:]
+    var rankRulesDic:[Int:([SingleFeature]) -> (Bool, Int, String, Int)] = [:]
     
     init(rankRules: [Int],
          suitRules: [Int]){
@@ -263,39 +263,39 @@ class TinyNineGameHandEvaluator{
         
     }
     
-    func evalHand(cards: [Card], redJokerValueRange: Int, blackJokerValueRange: Int, samePointComparision: Int)->(Int, String, Int){
-        self.redJokerValueRange = redJokerValueRange
-        self.blackJokerValueRange = blackJokerValueRange
+    func evalHand(singlefeatures: [SingleFeature], redspecialfeatureValueRange: Int, blackspecialfeatureValueRange: Int, samePointComparision: Int)->(Int, String, Int){
+        self.redspecialfeatureValueRange = redspecialfeatureValueRange
+        self.blackspecialfeatureValueRange = blackspecialfeatureValueRange
         self.samePointComparision = samePointComparision
         var score = 0
         
         
         var i = self.rankRules.count + 1
         for ruleIndex in self.rankRules{
-            let (flag, rank, cardType, isPair) = self.rankRulesDic[ruleIndex]!(cards)
+            let (flag, rank, singlefeatureType, isPair) = self.rankRulesDic[ruleIndex]!(singlefeatures)
             i -= 1
             if flag == false{
                 continue
             } else {
                 score = (1 << (i + 10)) | rank
-                return (score, cardType, isPair)
+                return (score, singlefeatureType, isPair)
             }
         }
 
         return (score, "", 0)
     }
     
-    func isPairKingPairAKingPlusA(cards: [Card]) -> (Bool, Int, String, Int){
-        if cards[0].rank > 13 && cards[1].rank > 13 {
+    func isPairKingPairAKingPlusA(singlefeatures: [SingleFeature]) -> (Bool, Int, String, Int){
+        if singlefeatures[0].rank > 13 && singlefeatures[1].rank > 13 {
             return (true, 1, "对王", 1)
         }
-        if cards[0].rank > 13 && cards[1].rank == 1 {
+        if singlefeatures[0].rank > 13 && singlefeatures[1].rank == 1 {
             return (true, 1, "王加A", 0)
         }
-        if cards[0].rank == 1 && cards[1].rank > 13 {
+        if singlefeatures[0].rank == 1 && singlefeatures[1].rank > 13 {
             return (true, 1, "王加A", 0)
         }
-        if cards[0].rank == 1 && cards[1].rank == 1{
+        if singlefeatures[0].rank == 1 && singlefeatures[1].rank == 1{
             return (true, 1, "对A", 1)
         }
         
@@ -303,32 +303,32 @@ class TinyNineGameHandEvaluator{
         
     }
     
-    func isPair(cards: [Card]) -> (Bool, Int, String, Int){
-        if cards[0].rank == cards[1].rank {
-            let cardType: String = "对" + ClassifierSettingArgs.CardNumberReportDic[cards[0].rank]!
-            return (true, cards[0].rank, cardType, 1)
+    func isPair(singlefeatures: [SingleFeature]) -> (Bool, Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank {
+            let singlefeatureType: String = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].rank]!
+            return (true, singlefeatures[0].rank, singlefeatureType, 1)
         }
         return (false, 0, "", 0)
     }
     
-    func PointsCalculator(cards: [Card]) -> (Bool, Int, String, Int){
-        let num1 = self.CardPointConvertor(card: cards[0])
-        let num2 = self.CardPointConvertor(card: cards[1])
+    func PointsCalculator(singlefeatures: [SingleFeature]) -> (Bool, Int, String, Int){
+        let num1 = self.SingleFeaturePointConvertor(singlefeature: singlefeatures[0])
+        let num2 = self.SingleFeaturePointConvertor(singlefeature: singlefeatures[1])
         let points = (num1 + num2) % 10
-        let cardType: String = String(points) + "点"
+        let singlefeatureType: String = String(points) + "点"
         if self.samePointComparision == 0{
-            let rank = RankForMaxCard(cards: cards)
-            return (true, points << 6 | rank, cardType, 0)
+            let rank = RankForMaxSingleFeature(singlefeatures: singlefeatures)
+            return (true, points << 6 | rank, singlefeatureType, 0)
         } else if self.samePointComparision == 1{
-            return (true, points << 6 | 1, cardType, 0)
+            return (true, points << 6 | 1, singlefeatureType, 0)
         }
         return (false, 0, "", 0)
     }
     
-    func RankForMaxCard(cards: [Card]) -> Int{
+    func RankForMaxSingleFeature(singlefeatures: [SingleFeature]) -> Int{
         var rank = 0
-        let rank1 = CardRankConvertor(card: cards[0]) << 2 | cards[0].suit[0]
-        let rank2 = CardRankConvertor(card: cards[1]) << 2 | cards[1].suit[0]
+        let rank1 = SingleFeatureRankConvertor(singlefeature: singlefeatures[0]) << 2 | singlefeatures[0].suit[0]
+        let rank2 = SingleFeatureRankConvertor(singlefeature: singlefeatures[1]) << 2 | singlefeatures[1].suit[0]
         if rank1 >= rank2 {
             rank = rank1
         } else {
@@ -339,34 +339,34 @@ class TinyNineGameHandEvaluator{
         
     }
     
-    func CardRankConvertor(card: Card) -> Int{
-        if card.rank <= 13 && card.rank != 1{
-            return card.rank - 1
+    func SingleFeatureRankConvertor(singlefeature: SingleFeature) -> Int{
+        if singlefeature.rank <= 13 && singlefeature.rank != 1{
+            return singlefeature.rank - 1
         }
-        if card.rank == 1{
+        if singlefeature.rank == 1{
             return 13
         }
-        return card.rank
+        return singlefeature.rank
     }
     
     
-    func CardPointConvertor(card: Card) -> Int {
-        if card.rank == 14 {
-            if self.blackJokerValueRange == 0{
+    func SingleFeaturePointConvertor(singlefeature: SingleFeature) -> Int {
+        if singlefeature.rank == 14 {
+            if self.blackspecialfeatureValueRange == 0{
                 return 1
-            } else if self.blackJokerValueRange == 1{
+            } else if self.blackspecialfeatureValueRange == 1{
                 return 3
             }
         }
-        if card.rank == 15 {
-            if self.redJokerValueRange == 0{
+        if singlefeature.rank == 15 {
+            if self.redspecialfeatureValueRange == 0{
                 return 1
-            } else if self.redJokerValueRange == 1{
+            } else if self.redspecialfeatureValueRange == 1{
                 return 6
             }
         }
         
-        return card.rank
+        return singlefeature.rank
     }
     
     

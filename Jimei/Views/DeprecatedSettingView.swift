@@ -4,9 +4,9 @@ import SwiftUI
 struct DeprecatedRecordSettingView: View {
 
     @State private var selectedRuleIndex: Int? = nil
-    @State private var rules:[GameRule] = RuleManager.allUsersGameRule
-    @State private var isNavigateToSelectGameView : Bool = false
-    private var GameImageDic:[Int:String] = [
+    @State private var rules:[StatisticRule] = DetectSettingArgs.allUsersStatisticRule
+    @State private var isNavigateToSelectStatisticView : Bool = false
+    private var StatisticImageDic:[Int:String] = [
         0:"德州",
         1:"牛牛",
         2:"炸金花",
@@ -26,7 +26,7 @@ struct DeprecatedRecordSettingView: View {
                         ForEach(0..<rules.count, id: \.self) { index in
                             
                             NavigationLink(
-                                destination: DeprecatedDeepSettingView(gameType: rules[index].gameType, selectedSaveIndex: index)
+                                destination: DeprecatedDeepSettingView(StatisticType: rules[index].StatisticType, selectedSaveIndex: index)
                             ) {
                                 
                                 let name: String = rules[index].RuleName
@@ -65,9 +65,9 @@ struct DeprecatedRecordSettingView: View {
                                 .resizable()
                                 .scaledToFill())
                         }.onDelete { indices in
-                            RuleManager.allUsersGameRule.remove(atOffsets: indices)
-                            rules = RuleManager.allUsersGameRule
-                            RuleManager.saveGameRule()
+                            DetectSettingArgs.allUsersStatisticRule.remove(atOffsets: indices)
+                            rules = DetectSettingArgs.allUsersStatisticRule
+                            DetectSettingArgs.saveStatisticRule()
                         }
                     }
                 }.listStyle(PlainListStyle())
@@ -80,11 +80,11 @@ struct DeprecatedRecordSettingView: View {
                 HStack{
                     
                     Button(action: {
-                        self.isNavigateToSelectGameView = true
+                        self.isNavigateToSelectStatisticView = true
                     }){
                         Image("icon_add").resizable().frame(width: 150, height: 60)
                     }.background(NavigationLink(destination: DeprecatedSelectSettingView(),
-                                                isActive: $isNavigateToSelectGameView,
+                                                isActive: $isNavigateToSelectStatisticView,
                                                 label: EmptyView.init).hidden()
                     )
                 }
@@ -97,7 +97,7 @@ struct DeprecatedRecordSettingView: View {
                 .scaledToFill()
             
         ).navigationTitle("历史记录").onAppear(){
-            self.rules = RuleManager.allUsersGameRule
+            self.rules = DetectSettingArgs.allUsersStatisticRule
         }
     }
 }
@@ -111,10 +111,10 @@ struct DeprecatedSelectSettingView: View {
                 
                 VStack{
                     
-                    ForEach(Array(GameManager.gameRules.keys).sorted(), id: \.self) { key in
-                        if let value = GameManager.gameRules[key] {
+                    ForEach(Array(ClassifierSettingArgs.targetSetting.keys).sorted(), id: \.self) { key in
+                        if let value = ClassifierSettingArgs.targetSetting[key] {
                             NavigationLink(
-                                destination: DeprecatedDeepSettingView(gameType: key, selectedSaveIndex: -1)
+                                destination: DeprecatedDeepSettingView(StatisticType: key, selectedSaveIndex: -1)
                             ){
                                 Text(value.ruleName)
                                     .font(.system(size: 24)) // 设置字体大小为 24，你可以根据需要调整
@@ -136,7 +136,7 @@ struct DeprecatedSelectSettingView: View {
 }
 
 class generalRuleSetting{
-    static let allGameType: [Int: String] = [
+    static let allStatisticType: [Int: String] = [
         0:"德州",
         1:"牛牛",
         2:"炸金花",
@@ -207,7 +207,7 @@ class generalRuleSetting{
 }
 
 struct DeprecatedDeepSettingView: View{
-    var gameType: Int
+    var StatisticType: Int
     var selectedSaveIndex: Int
     @State private var _selectedSaveIndex: Int = -1
     @State private var editType: Int = 0
@@ -217,10 +217,10 @@ struct DeprecatedDeepSettingView: View{
     @State private var dealType: Int = 0
     @State private var diyDealNum: [Int] = []
     @State private var diyDealStatus: [[Bool]] = []
-    @State private var playerNum: Int = 0
+    @State private var rcNum: Int = 0
     @State private var shuffleMode: Int = 0
     @State private var cutMode: Int = 0
-    @State private var cardToUse: [Int] = []
+    @State private var singlefeatureToUse: [Int] = []
     //色点设置
     @State private var cutNumSetting: Int = 0
     @State private var reportSetting: Int = 0
@@ -240,47 +240,40 @@ struct DeprecatedDeepSettingView: View{
     @State private var alertMessage = ""
     @State private var isNavigateToSelectRuleView = false
     @State private var isNavigateToMainContentView = false
-    @State private var playerNumList:[Int] = [2,3,4,5,6,7,8]
+    @State private var rcNumList:[Int] = [2,3,4,5,6,7,8]
     @State private var currentNum: Int = 2
-    @State private var minCardNum:Int = 0
+    @State private var minSingleFeatureNum:Int = 0
     @State private var resultReportType: Int = 0
     
     private func SetUpAll(){
-        print("init success")
-        
-        
-        //新建规则时初始化
         if self.selectedSaveIndex == -1 && self.editType == 0{
             
-            print("init new rule")
             _selectedSaveIndex = self.selectedSaveIndex
 
-            let selectedRule = GameManager.gameRules[gameType]!
-            self.playerNumList = selectedRule.playerNum
-            self.currentNum = playerNumList[self.playerNum]
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType]!
+            self.rcNumList = selectedRule.rcNum
+            self.currentNum = rcNumList[self.rcNum]
             self.cutNumRangeSetting = [1,5]
-            for cardIndex in 0...54{
-                if cardIndex != 52{
-                    self.cardToUse.append(cardIndex)
+            for singlefeatureIndex in 0...54{
+                if singlefeatureIndex != 52{
+                    self.singlefeatureToUse.append(singlefeatureIndex)
                 }
             }
            
-            self.args = RuleManager.allPreSetRules[self.gameType]![self.setting]![0]
-            self.suitRules = RuleManager.allPreSetRules[self.gameType]![self.setting]![1]
-            for rankIndex in 0...RuleManager.allPreSetRules[self.gameType]![self.setting]![2].count - 1 {
-                self.rankRules.append(RankRulesSate(index: RuleManager.allPreSetRules[self.gameType]![self.setting]![2][rankIndex], isChecked: (RuleManager.allPreSetRules[self.gameType]![self.setting]![3][rankIndex] != 0)))
+            self.args = DetectSettingArgs.allPreSetRules[self.StatisticType]![self.setting]![0]
+            self.suitRules = DetectSettingArgs.allPreSetRules[self.StatisticType]![self.setting]![1]
+            for rankIndex in 0...DetectSettingArgs.allPreSetRules[self.StatisticType]![self.setting]![2].count - 1 {
+                self.rankRules.append(RankRulesSate(index: DetectSettingArgs.allPreSetRules[self.StatisticType]![self.setting]![2][rankIndex], isChecked: (DetectSettingArgs.allPreSetRules[self.StatisticType]![self.setting]![3][rankIndex] != 0)))
             }
-            self.cardToUse = GameGetAllCardIndex()
-        //选择已经保存的规则时初始化
+            self.singlefeatureToUse = StatisticGetAllSingleFeatureIndex()
         }else if self.selectedSaveIndex > -1 && editType == 0{
-            print("init rule \(self.selectedSaveIndex)")
             _selectedSaveIndex = self.selectedSaveIndex
 
-            let rules = RuleManager.allUsersGameRule[self.selectedSaveIndex]
+            let rules = DetectSettingArgs.allUsersStatisticRule[self.selectedSaveIndex]
             
-            let selectedRule = GameManager.gameRules[gameType]!
-            self.playerNumList = selectedRule.playerNum
-            self.currentNum = playerNumList[self.playerNum]
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType]!
+            self.rcNumList = selectedRule.rcNum
+            self.currentNum = rcNumList[self.rcNum]
             
             self.setting = rules.setting
             self.dealNum = rules.dealNum
@@ -288,10 +281,10 @@ struct DeprecatedDeepSettingView: View{
             self.dealType = rules.dealType
             self.diyDealNum = rules.diyDealNum
             self.diyDealStatus = rules.diyDealStatus
-            self.playerNum = rules.playerNum
+            self.rcNum = rules.rcNum
             self.cutMode = rules.cutMode
             self.shuffleMode = rules.shuffleMode
-            self.cardToUse = rules.cardToUse
+            self.singlefeatureToUse = rules.singlefeatureToUse
             self.cutNumSetting = rules.cutNumSetting
             self.reportSetting = rules.reportSetting
             self.cutNumRangeSetting = rules.cutNumRangeSetting
@@ -304,12 +297,10 @@ struct DeprecatedDeepSettingView: View{
             for i in 0...rules.rankRules.count - 1{
                 self.rankRules.append(RankRulesSate(index: rules.rankRules[i], isChecked: (rules.rankRuleChecked[i] != 0)))
             }
-            self.minCardNum = minCardNum
+            self.minSingleFeatureNum = minSingleFeatureNum
             self.resultReportType = rules.resultReportType
         }
         
-        
-        //从别的设置页面返回时不再初始化各个参数
         self.editType = 1
     }
     
@@ -319,24 +310,24 @@ struct DeprecatedDeepSettingView: View{
                 Spacer()
                 ScrollView{
                     VStack{
-                        let selectedRule = GameManager.gameRules[gameType]
-                        //游戏玩法
+                        let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType]
                         
                         HStack{
                             Text("游戏玩法")
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .foregroundColor(.white) // 左侧间距
+                                .foregroundColor(.white)
+                                .padding(.leading,20)// 左侧间距
                             Picker("setting", selection: $setting) {
                                 ForEach(0...(selectedRule?.setting.count)! - 1, id: \.self){
                                     index in Text(selectedRule!.setting[index]!).tag(index)
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
-                            .frame(width: 200, height: 30, alignment: .trailing).padding(.trailing,30)
+                            .frame(width: 200, height: 30, alignment: .trailing).padding(.trailing,20)
                             .multilineTextAlignment(.leading)
                             .accentColor(.white)
                             .onChange(of: setting) { _ in
-                                handleSettingChange(selectedRuleIndex: gameType)
+                                handleSettingChange(selectedRuleIndex: StatisticType)
                             }
                             
                         }.background(
@@ -345,11 +336,12 @@ struct DeprecatedDeepSettingView: View{
                                 .scaledToFill()
                         )
                         .frame(height: 45)
-                        //游戏规则
+                        
                         HStack{
                             Text("游戏规则")
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .foregroundColor(.white) // 左侧间距
+                                .foregroundColor(.white)
+                                .padding(.leading,20)// 左侧间距
                             Button(action: {
                                 // 点击按钮时，显示弹出窗口
                                 self.showRuleInfo = true
@@ -357,8 +349,7 @@ struct DeprecatedDeepSettingView: View{
                             }) {
                                 Image("icon_next").resizable().frame(width: 30, height: 30)
                             }
-                            .frame(width: 10, height: 10, alignment: .leading)
-                            .padding(.trailing, 60)
+                            .padding(.trailing, 40)
                                 .alert(isPresented: $showRuleInfo) {
                                     Alert(
                                         title: Text("规则说明"),
@@ -373,21 +364,22 @@ struct DeprecatedDeepSettingView: View{
                             )
                             .frame(height: 45)
                             
-                            //人数设置
+                            
                             HStack{
                                 Text("人数设置")
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(.white) // 左侧间距
-                                Picker("playerNum", selection: $playerNum) {
-                                    ForEach(0...(self.playerNumList.count) - 1, id: \.self){
-                                        index in Text(String(self.playerNumList[index])).tag(index)
+                                    .foregroundColor(.white)
+                                    .padding(.leading,20)// 左侧间距
+                                Picker("rcNum", selection: $rcNum) {
+                                    ForEach(0...(self.rcNumList.count) - 1, id: \.self){
+                                        index in Text(String(self.rcNumList[index])).tag(index)
                                     }
                                 }
                                 .pickerStyle(MenuPickerStyle())
                                 .frame(width: 160, height: 30, alignment: .trailing)
-                                .padding(.trailing, 30) // 右侧间距
-                                .accentColor(.white).onChange(of: playerNum) { _ in
-                                    handlePlayerNumChange(playerNumIndex: playerNum)
+                                .padding(.trailing, 20) // 右侧间距
+                                .accentColor(.white).onChange(of: rcNum) { _ in
+                                    handleRCNumChange(rcNumIndex: rcNum)
                                     
                                 }
                                 
@@ -403,7 +395,8 @@ struct DeprecatedDeepSettingView: View{
                             HStack{
                                 Text("洗牌模式")
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(.white) // 左侧间距
+                                    .foregroundColor(.white)
+                                    .padding(.leading,20)// 左侧间距
                                 Picker("shuffleMode", selection: $shuffleMode) {
                                     ForEach(0...generalRuleSetting.allShuffleMode.count - 1, id: \.self){
                                         index in Text(generalRuleSetting.allShuffleMode[index]!).tag(index)
@@ -411,7 +404,7 @@ struct DeprecatedDeepSettingView: View{
                                 }
                                 .pickerStyle(MenuPickerStyle())
                                 .frame(width: 160, height: 30, alignment: .trailing)
-                                .padding(.trailing,30) // 右侧间距
+                                .padding(.trailing,20) // 右侧间距
                                 .accentColor(.white)
                                 
                             }.background(
@@ -424,7 +417,8 @@ struct DeprecatedDeepSettingView: View{
                             HStack{
                                 Text("切牌模式")
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(.white) // 左侧间距
+                                    .foregroundColor(.white)
+                                    .padding(.leading,20)// 左侧间距
                                 Picker("cutMode", selection: $cutMode) {
                                     ForEach(0...generalRuleSetting.allCutMode.count - 1, id: \.self){
                                         index in Text(generalRuleSetting.allCutMode[index]!).tag(index)
@@ -432,7 +426,7 @@ struct DeprecatedDeepSettingView: View{
                                 }
                                 .pickerStyle(MenuPickerStyle())
                                 .frame(width: 160, height: 30, alignment: .trailing)
-                                .padding(.trailing,30) // 右侧间距
+                                .padding(.trailing,20) // 右侧间距
                                 .accentColor(.white)
                                 
                             }.background(
@@ -442,13 +436,11 @@ struct DeprecatedDeepSettingView: View{
                             )
                             .frame(height: 45)
                         
-                        
-                        
-                            //发牌定制
                             HStack{
                                 Text("发牌定制")
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(.white) // 左侧间距
+                                    .foregroundColor(.white)
+                                    .padding(.leading,20)// 左侧间距
                                 NavigationLink(destination: TurnSettingView(dealNum: $dealNum, coloringType: $coloringType, dealType: $dealType, diyDealNum: $diyDealNum, diyDealStatus: $diyDealStatus)){
                                     Image("icon_next").resizable().frame(width: 30, height: 30).padding(.trailing, 40)
                                 }
@@ -462,8 +454,9 @@ struct DeprecatedDeepSettingView: View{
                             HStack{
                                 Text("用牌设置")
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(.white) // 左侧间距
-                                NavigationLink(destination: DeprecatedShowRecordHistoryView(cardToUse: $cardToUse)){
+                                    .foregroundColor(.white)
+                                    .padding(.leading,20)// 左侧间距
+                                NavigationLink(destination: DeprecatedShowRecordHistoryView(singlefeatureToUse: $singlefeatureToUse)){
                                     Image("icon_next").resizable().frame(width: 30, height: 30).padding(.trailing, 40)
                                 }
                                 
@@ -475,13 +468,13 @@ struct DeprecatedDeepSettingView: View{
                             )
                             .frame(height: 45)
                             
-                            
-                            //报法设置
+                
                             HStack{
                                 Text("报法设置")
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(.white) // 左侧间距
-                                NavigationLink(destination:  ReportSettingView(reportSetting: $reportSetting)){
+                                    .foregroundColor(.white)
+                                    .padding(.leading,20)// 左侧间距
+                                NavigationLink(destination:  DeprecatedRecordHistoryView(reportSetting: $reportSetting)){
                                 
                                     let text = ReportManager.allReportName[reportSetting]!
                                     Text(text).frame(width: 180, height: 50, alignment: .trailing)
@@ -498,11 +491,11 @@ struct DeprecatedDeepSettingView: View{
                         
                         
                         Group{
-                            //色点设置
                             HStack{
                                 Text("色点设置")
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(.white) // 左侧间距
+                                    .foregroundColor(.white)
+                                    .padding(.leading,20)// 左侧间距
                                 Picker("cutNumSetting", selection: $cutNumSetting) {
                                     ForEach(0...generalRuleSetting.allCutNumSetting.count - 1, id: \.self){
                                         index in Text(generalRuleSetting.allCutNumSetting[index]!).tag(index)
@@ -511,7 +504,7 @@ struct DeprecatedDeepSettingView: View{
                                 .pickerStyle(MenuPickerStyle())
                                 .frame(width: 200, height: 30, alignment: .trailing)
                                 .multilineTextAlignment(.leading)
-                                .padding(.trailing,30) // 右侧间距
+                                .padding(.trailing,20) // 右侧间距
                                 .accentColor(.white)
                                 
                             }.background(
@@ -524,7 +517,8 @@ struct DeprecatedDeepSettingView: View{
                             HStack{
                                 Text("打色参数")
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(.white) // 左侧间距
+                                    .foregroundColor(.white)
+                                    .padding(.leading,20)// 左侧间距
                                 NavigationLink(destination:  NumRangeSettingView(cutNumRangeSetting: $cutNumRangeSetting)){
                                     Text("X = \(cutNumRangeSetting[0])   Y = \(cutNumRangeSetting[1])").frame(maxWidth: .infinity, alignment: .trailing)
                                         .foregroundColor(.white).padding(.trailing,40)
@@ -537,11 +531,12 @@ struct DeprecatedDeepSettingView: View{
                         }
                         
                         Group{
-                            //位置设置
+                            
                             HStack{
                                 Text("位置设置")
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(.white) // 左侧间距
+                                    .foregroundColor(.white)
+                                    .padding(.leading,20)// 左侧间距
                                 Picker("positionSetting", selection: $positionSetting) {
                                     ForEach(0...self.currentNum - 1, id: \.self){
                                         index in Text(String(index + 1)).tag(index)
@@ -549,7 +544,7 @@ struct DeprecatedDeepSettingView: View{
                                 }
                                 .pickerStyle(MenuPickerStyle())
                                 .frame(width: 160, height: 30, alignment: .trailing)
-                                .padding(.trailing,30) // 右侧间距
+                                .padding(.trailing,20) // 右侧间距
                                 .accentColor(.white)
                             }.background(
                                 Image("list_bg") // 背景图片
@@ -558,11 +553,12 @@ struct DeprecatedDeepSettingView: View{
                             )
                             .frame(height: 45)
                         
-                            //连报轮数
+                            
                             HStack{
                                 Text("连报轮数")
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(.white) // 左侧间距
+                                    .foregroundColor(.white)
+                                    .padding(.leading,20)// 左侧间距
                                 Picker("consecutiveReport", selection: $consecutiveReport) {
                                     ForEach(1...generalRuleSetting.maxConsecutiveReport, id: \.self){
                                         index in Text(String(index)).tag(index)
@@ -570,7 +566,7 @@ struct DeprecatedDeepSettingView: View{
                                 }
                                 .pickerStyle(MenuPickerStyle())
                                 .frame(width: 160, height: 30, alignment: .trailing)
-                                .padding(.trailing,30) // 右侧间距
+                                .padding(.trailing,20) // 右侧间距
                                 .accentColor(.white)
                                 
                             }.background(
@@ -580,11 +576,11 @@ struct DeprecatedDeepSettingView: View{
                             )
                             .frame(height: 45)
                             
-                            //连报轮数
                             HStack{
                                 Text("结果播报")
                                     .frame(maxWidth: .infinity, alignment: .leading)
-                                    .foregroundColor(.white) // 左侧间距
+                                    .foregroundColor(.white)
+                                    .padding(.leading,20)// 左侧间距
                                 Picker("reportResultType", selection: $resultReportType) {
                                     ForEach(0...generalRuleSetting.allResultReportType.count - 1, id: \.self){
                                         index in Text(generalRuleSetting.allResultReportType[index]!).tag(index)
@@ -592,7 +588,7 @@ struct DeprecatedDeepSettingView: View{
                                 }
                                 .pickerStyle(MenuPickerStyle())
                                 .frame(width: 200, height: 30, alignment: .trailing)
-                                .padding(.trailing,30) // 右侧间距
+                                .padding(.trailing,20) // 右侧间距
                                 .accentColor(.white)
                                 
                             }.background(
@@ -663,8 +659,8 @@ struct DeprecatedDeepSettingView: View{
     private func saveData(isShowAlert: Bool){
         var rankRulesToAdd: [Int] = []
         var rankRuleToAddChecked: [Int] = []
-        let selectedRule = GameManager.gameRules[gameType]
-        self.minCardNum = self.GameGetMinCardNum()
+        let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType]
+        self.minSingleFeatureNum = self.StatisticGetMinSingleFeatureNum()
         for i in rankRules{
             rankRulesToAdd.append(i.index)
             if i.isChecked{
@@ -673,187 +669,187 @@ struct DeprecatedDeepSettingView: View{
                 rankRuleToAddChecked.append(0)
             }
         }
-        let ruleToAdd = GameRule(RuleName: selectedRule!.setting[setting]!, gameType: gameType, setting: setting, dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, playerNum: playerNum, shuffleMode: shuffleMode, cutMode: cutMode,  cardToUse: cardToUse, cutNumSetting: cutNumSetting, reportSetting: reportSetting, cutNumRangeSetting: cutNumRangeSetting, positionSetting: positionSetting, consecutiveReport: consecutiveReport, reportNumber: reportNumber, voiceReport: voiceReport, args: args, suitRanks: suitRules, rankRules: rankRulesToAdd, rankRuleChecked: rankRuleToAddChecked, minCardNum: minCardNum, resultReportType: resultReportType)
+        let ruleToAdd = StatisticRule(RuleName: selectedRule!.setting[setting]!, StatisticType: StatisticType, setting: setting, dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, rcNum: rcNum, shuffleMode: shuffleMode, cutMode: cutMode,  singlefeatureToUse: singlefeatureToUse, cutNumSetting: cutNumSetting, reportSetting: reportSetting, cutNumRangeSetting: cutNumRangeSetting, positionSetting: positionSetting, consecutiveReport: consecutiveReport, reportNumber: reportNumber, voiceReport: voiceReport, args: args, suitRanks: suitRules, rankRules: rankRulesToAdd, rankRuleChecked: rankRuleToAddChecked, minSingleFeatureNum: minSingleFeatureNum, resultReportType: resultReportType)
         if _selectedSaveIndex == -1{
-            RuleManager.allUsersGameRule.append(ruleToAdd)
-            _selectedSaveIndex = RuleManager.allUsersGameRule.count - 1
+            DetectSettingArgs.allUsersStatisticRule.append(ruleToAdd)
+            _selectedSaveIndex = DetectSettingArgs.allUsersStatisticRule.count - 1
         }else {
-            RuleManager.allUsersGameRule[_selectedSaveIndex] = ruleToAdd
+            DetectSettingArgs.allUsersStatisticRule[_selectedSaveIndex] = ruleToAdd
         }
-        RuleManager.saveGameRule()
+        DetectSettingArgs.saveStatisticRule()
         if isShowAlert{
             self.saveSuccessAlert = true
         }
     }
     
     private func handleSettingChange(selectedRuleIndex: Int){
-        let selectedRule = GameManager.gameRules[selectedRuleIndex]!
+        let selectedRule = ClassifierSettingArgs.targetSetting[selectedRuleIndex]!
         if self.setting != selectedRule.setting.count - 1 || selectedRule.setting.count == 1{
-            args = RuleManager.allPreSetRules[self.gameType]![self.setting]![0]
-            cardToUse = GameGetAllCardIndex()
-            suitRules = RuleManager.allPreSetRules[self.gameType]![self.setting]![1]
+            args = DetectSettingArgs.allPreSetRules[self.StatisticType]![self.setting]![0]
+            singlefeatureToUse = StatisticGetAllSingleFeatureIndex()
+            suitRules = DetectSettingArgs.allPreSetRules[self.StatisticType]![self.setting]![1]
             rankRules.removeAll()
-            for index in 0...RuleManager.allPreSetRules[self.gameType]![self.setting]![2].count - 1{
-                rankRules.append(RankRulesSate(index: RuleManager.allPreSetRules[self.gameType]![self.setting]![2][index], isChecked: (RuleManager.allPreSetRules[self.gameType]![self.setting]![3][index] != 0)))
+            for index in 0...DetectSettingArgs.allPreSetRules[self.StatisticType]![self.setting]![2].count - 1{
+                rankRules.append(RankRulesSate(index: DetectSettingArgs.allPreSetRules[self.StatisticType]![self.setting]![2][index], isChecked: (DetectSettingArgs.allPreSetRules[self.StatisticType]![self.setting]![3][index] != 0)))
             }
         }
     }
     
-    private func handleGameTypeChange(selectedRuleIndex: Int){
+    private func handleStatisticTypeChange(selectedRuleIndex: Int){
         self.setting = 0
-        self.playerNum = 0
-        let selectedRule = GameManager.gameRules[selectedRuleIndex]!
-        self.playerNumList = selectedRule.playerNum
-        self.currentNum = self.playerNumList[playerNum]
+        self.rcNum = 0
+        let selectedRule = ClassifierSettingArgs.targetSetting[selectedRuleIndex]!
+        self.rcNumList = selectedRule.rcNum
+        self.currentNum = self.rcNumList[rcNum]
         self.handleSettingChange(selectedRuleIndex: selectedRuleIndex)
     }
     
-    private func handlePlayerNumChange(playerNumIndex: Int){
-        self.currentNum = self.playerNumList[playerNumIndex]
+    private func handleRCNumChange(rcNumIndex: Int){
+        self.currentNum = self.rcNumList[rcNumIndex]
     }
     
-    private func GameGetAllCardIndex()-> [Int]{
-        var allCardIndex:[Int] = []
-        switch gameType{
+    private func StatisticGetAllSingleFeatureIndex()-> [Int]{
+        var allSingleFeatureIndex:[Int] = []
+        switch StatisticType{
         case 0:
-            let selectedRule = GameManager.gameRules[gameType] as! TexasPokerRule
-            allCardIndex = TexasPoker.getAllCardIndex(minRank: selectedRule.minRank[args[2]])
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! TPRule
+            allSingleFeatureIndex = TP.getAllSingleFeatureIndex(minRank: selectedRule.minRank[args[2]])
             break
         case 1:
-            allCardIndex = PokerBull.GetAllCardIndex(setting: self.setting)
+            allSingleFeatureIndex = PB.GetAllSingleFeatureIndex(setting: self.setting)
             break
         case 2:
-            let selectedRule = GameManager.gameRules[gameType] as! ThreeCardPokerGameRule
-            allCardIndex = ThreeCardPokerGame.getAllCardIndex(minRank: selectedRule.minRank[args[3]], isAce: args[4], isHeadCard: args[6], isRedJoker: args[7], isBlackJoker: args[10])
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! ZJHStatisticRule
+            allSingleFeatureIndex = ZJHStatistic.getAllSingleFeatureIndex(minRank: selectedRule.minRank[args[3]], isAce: args[4], isHeadSingleFeature: args[6], isRedspecialfeature: args[7], isBlackspecialfeature: args[10])
             break
         case 3:
-            allCardIndex = TinyNineGame.getAllCardIndex(setting: self.setting)
+            allSingleFeatureIndex = TNStatistic.getAllSingleFeatureIndex(setting: self.setting)
             break
         case 4:
-            allCardIndex = ThreeMenGame.getAllCardIndex(setting: self.setting)
+            allSingleFeatureIndex = TMStatistic.getAllSingleFeatureIndex(setting: self.setting)
             break
         case 5:
-            allCardIndex = TwoEightGangGame.getAllCardIndex(setting: self.setting)
+            allSingleFeatureIndex = TEGStatistic.getAllSingleFeatureIndex(setting: self.setting)
             break
         case 6:
-            allCardIndex = NinePointFiveGame.getAllCardIndex(setting: self.setting)
+            allSingleFeatureIndex = NPFiveStatistic.getAllSingleFeatureIndex(setting: self.setting)
             break
         case 7:
-            allCardIndex = BaoziGame.getAllCardIndex(setting: self.setting)
+            allSingleFeatureIndex = BZStatistic.getAllSingleFeatureIndex(setting: self.setting)
             break
         case 8:
-            allCardIndex = JiaJiaBaoGame.getAllCardIndex(setting: self.setting)
+            allSingleFeatureIndex = JJBStatistic.getAllSingleFeatureIndex(setting: self.setting)
             break
         case 9:
-            allCardIndex = CardNineGame.getAllCardIndex(setting: self.setting)
+            allSingleFeatureIndex = CNStatistic.getAllSingleFeatureIndex(setting: self.setting)
             break
         case 10:
-            allCardIndex = NinePointGame.getAllCardIndex(setting: self.setting)
+            allSingleFeatureIndex = NPStatistic.getAllSingleFeatureIndex(setting: self.setting)
             break
         case 11:
-            allCardIndex = FourCardGame.getAllCardIndex(setting: self.setting)
+            allSingleFeatureIndex = FCStatistic.getAllSingleFeatureIndex(setting: self.setting)
             break
         case 12:
-            allCardIndex = TwoCardGame.getAllCardIndex(setting: self.setting)
+            allSingleFeatureIndex = TCStatistic.getAllSingleFeatureIndex(setting: self.setting)
             break
         case 13:
-            allCardIndex = ThreeCardPointGame.getAllCardIndex(setting: self.setting)
+            allSingleFeatureIndex = TCPStatistic.getAllSingleFeatureIndex(setting: self.setting)
             break
         case 14:
-            allCardIndex = TenPointFiveGame.getAllCardIndex(setting: self.setting)
+            allSingleFeatureIndex = TPFiveStatistic.getAllSingleFeatureIndex(setting: self.setting)
             break
         case 15:
-            allCardIndex = ChickenBattleGame.getAllCardIndex(setting: self.setting)
+            allSingleFeatureIndex = CBStatistic.getAllSingleFeatureIndex(setting: self.setting)
             break
         case 16:
-            allCardIndex = ThirteenWaterGame.getAllCardIndex(setting: self.setting)
+            allSingleFeatureIndex = TWStatistic.getAllSingleFeatureIndex(setting: self.setting)
             break
         default:
             print("error")
         }
-        return allCardIndex
+        return allSingleFeatureIndex
     }
     
-    private func GameGetMinCardNum()-> Int{
-        var minCardNum:Int = 0
-        switch gameType {
+    private func StatisticGetMinSingleFeatureNum()-> Int{
+        var minSingleFeatureNum:Int = 0
+        switch StatisticType {
         case 0:
-            let selectedRule = GameManager.gameRules[gameType] as! TexasPokerRule
-            minCardNum = TexasPoker.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! TPRule
+            minSingleFeatureNum = TP.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 1:
-            let selectedRule = GameManager.gameRules[gameType] as! PokerBullRule
-            minCardNum = PokerBull.GetMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! PBRule
+            minSingleFeatureNum = PB.GetMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
         case 2:
-            let selectedRule = GameManager.gameRules[gameType] as! ThreeCardPokerGameRule
-            minCardNum = ThreeCardPokerGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! ZJHStatisticRule
+            minSingleFeatureNum = ZJHStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 3:
-            let selectedRule = GameManager.gameRules[gameType] as! TinyNineGameRule
-            minCardNum = TinyNineGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! TNStatisticRule
+            minSingleFeatureNum = TNStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 4:
-            let selectedRule = GameManager.gameRules[gameType]
-            as! ThreeMenGameRule
-            minCardNum = ThreeMenGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType]
+            as! TMStatisticRule
+            minSingleFeatureNum = TMStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 5:
-            let selectedRule = GameManager.gameRules[gameType] as! TwoEightGangGameRule
-            minCardNum = TwoEightGangGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! TEGStatisticRule
+            minSingleFeatureNum = TEGStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 6:
-            let selectedRule = GameManager.gameRules[gameType] as! NinePointFiveGameRule
-            minCardNum = NinePointFiveGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! NPFiveStatisticRule
+            minSingleFeatureNum = NPFiveStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 7:
-            let selectedRule = GameManager.gameRules[gameType] as!
-            BaoziGameRule
-            minCardNum = BaoziGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as!
+            BZStatisticRule
+            minSingleFeatureNum = BZStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 8:
-            let selectedRule = GameManager.gameRules[gameType] as! JiaJiaBaoGameRule
-            minCardNum = JiaJiaBaoGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! JJBStatisticRule
+            minSingleFeatureNum = JJBStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
         case 9:
-            let selectedRule = GameManager.gameRules[gameType] as! CardNineGameRule
-            minCardNum = CardNineGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! CNStatisticRule
+            minSingleFeatureNum = CNStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
         case 10:
-            let selectedRule = GameManager.gameRules[gameType] as! NinePointGameRule
-            minCardNum = NinePointGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! NPStatisticRule
+            minSingleFeatureNum = NPStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 11:
-            let selectedRule = GameManager.gameRules[gameType] as! FourCardGameRule
-            minCardNum = FourCardGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! FCStatisticRule
+            minSingleFeatureNum = FCStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 12:
-            let selectedRule = GameManager.gameRules[gameType] as! TwoCardGameRule
-            minCardNum = TwoCardGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! TCStatisticRule
+            minSingleFeatureNum = TCStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 13:
-            let selectedRule = GameManager.gameRules[gameType] as! ThreeCardPointGameRule
-            minCardNum = ThreeCardPointGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! TCPStatisticRule
+            minSingleFeatureNum = TCPStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 14:
-            let selectedRule = GameManager.gameRules[gameType] as! TenPointFiveGameRule
-            minCardNum = TenPointFiveGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! TPFiveStatisticRule
+            minSingleFeatureNum = TPFiveStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
             
         case 15:
-            let selectedRule = GameManager.gameRules[gameType] as! ChickenBattleGameRule
-            minCardNum = ChickenBattleGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! CBStatisticRule
+            minSingleFeatureNum = CBStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 16:
-            let selectedRule = GameManager.gameRules[gameType] as! ThirteenWaterGameRule
-            minCardNum = ThirteenWaterGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! TWStatisticRule
+            minSingleFeatureNum = TWStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         default:
             print("error")
         }
-        return minCardNum
+        return minSingleFeatureNum
     }
     
     private func alertMessageCheck()-> String{
         var alertMessage:String = ""
-        if cutNumRangeSetting[0] > self.cardToUse.count || cutNumRangeSetting[1] > self.cardToUse.count || cutNumRangeSetting[0] > cutNumRangeSetting[1]{
+        if cutNumRangeSetting[0] > self.singlefeatureToUse.count || cutNumRangeSetting[1] > self.singlefeatureToUse.count || cutNumRangeSetting[0] > cutNumRangeSetting[1]{
             alertMessage += "打色范围设置超出可用牌范围，或X值>Y值，请重新设置"
             
         }

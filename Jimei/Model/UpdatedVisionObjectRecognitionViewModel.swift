@@ -14,37 +14,45 @@ import Accelerate
 import AudioToolbox
 import MediaPlayer
 
-
 /// - Tag: ViewModel
 class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBufferDelegate, AVAudioPlayerDelegate {
     
     @Published var cameraImage : CGImage?
-    @Published var isShowCard : Bool = false
+    @Published var isShowSingleFeature : Bool = false
     @Published var isCamereSetting : Bool = false
     
-    @Published var cardArray :  [Int] = []
-    @Published var winnerPlayer: [[SpeakResultStruct]] = []
-    @Published var winnerPlayerShow: String = ""
-    @Published var multipleGamePlayerInfos: ReportManager.MultipleReportResultInfo = ReportManager.MultipleReportResultInfo()
-    @Published var leftCards: [Int] = []
-    @Published var usedCards: [Int] = []
+    @Published var singlefeatureArray :  [Int] = []
+    @Published var winnerRC: [[SpeakResultStruct]] = []
+    @Published var winnerRCShow: String = ""
+    @Published var multipleStatisticRCInfos: ReportManager.MultipleReportResultInfo = ReportManager.MultipleReportResultInfo()
+    @Published var leftSingleFeatures: [Int] = []
+    @Published var usedSingleFeatures: [Int] = []
     @Published var cutArray : [Int] = []
     @Published var cutShowArray : [Int] = []
+    
+//    let detectModel = try! detect_480320_0619()
+//    let fastModel = try! cls_480320_0620()
+//    let slowModel = try! cls_480320_0620()
+//    
+//    var originSize : [Float] = [1920, 1080] //相机图像大小
+//    var imageSize : [Float] = [569, 320] //target area 截图大小
+//    var originImageSize : [Float] = [569, 320] //target area 原始截图大小
+//    var inputSize : [Int] = [480, 320] //分类尺寸
+//    var detectSize : [Int] = [480, 320] //检测尺寸
+    
     
     let detectModel = try! detect_01()
     let fastModel = try! cls_01()
     let slowModel = try! cls_01()
-    
-    var imageSize : [Float] = [1137, 640] //target area 截图大小
-    var originImageSize : [Float] = [1137, 640] //target area 原始截图大小
-    //var originImageSize : [Float] = [853, 480] //target area 原始截图大小
     var originSize : [Float] = [1920, 1080] //相机图像大小
+    var imageSize : [Float] = [1138, 640] //target area 截图大小
+    var originImageSize : [Float] = [1138, 640] //target area 原始截图大小
     var inputSize : [Int] = [640, 640] //分类尺寸
     var detectSize : [Int] = [640, 640] //检测尺寸
     
-    var startAudioPlayer: AVAudioPlayer?
-    var successAudioPlayer: AVAudioPlayer?
-    var failAudioPlayer: AVAudioPlayer?
+    var startAudioRC: AVAudioPlayer?
+    var successAudioRC: AVAudioPlayer?
+    var failAudioRC: AVAudioPlayer?
     private let commandCenter = MPRemoteCommandCenter.shared()
     
     // 创建一个后台队列
@@ -58,7 +66,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     public var state : String = "idle"
     public var shuffleMode : Int = 0
     public var cutMode : Int = 0
-    public var playerNum: Int = 0
+    public var rcNum: Int = 0
     public var dealNum: Int = 0
     public var coloringType: Int = 0
     public var dealType: Int = 0
@@ -74,8 +82,8 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     public var args : [Int] = []
     public var rankRules : [Int] = []
     public var suitRules : [Int] = [3,2,1,0]
-    public var allCardIndex : [Int] = Array(0...51)
-    public var minCardNum : Int = 0
+    public var allSingleFeatureIndex : [Int] = Array(0...51)
+    public var minSingleFeatureNum : Int = 0
     public var resultReportType : Int = 0
     
     //测试用的定时器
@@ -111,11 +119,11 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     private var requests = [VNRequest]()
     
     private var stateCounter : Int = 0
-    private var stateCard : [Int] = [-1, -1]
+    private var stateSingleFeature : [Int] = [-1, -1]
     
     private var laplacianDic: [[Int:Float]] = [[:],[:]]
     
-    let cardLabelDic : [Int:String] = [
+    let singlefeatureLabelDic : [Int:String] = [
         0: "♠️A ", 1: "♠️2", 2: "♠️3", 3: "♠️4", 4: "♠️5 ", 5: "♠️6 ", 6: "♠️7 ", 7: "♠️8 ", 8: "♠️9 ", 9: "♠️10 ",
         10: "♠️J ", 11: "♠️Q ", 12: "♠️K ", 13: "♥️A ", 14: "♥️2 ", 15: "♥️3 ", 16: "♥️4 ", 17: "♥️5 ", 18: "♥️6 ",
         19: "♥️7 ", 20: "♥️8 ", 21: "♥️9 ", 22: "♥️10 ", 23: "♥️J ", 24: "♥️Q ", 25: "♥️K ", 26: "♣️A ", 27: "♣️2 ",
@@ -137,7 +145,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var volumeDown: Int = 0
     @Published var volumeValue: Float = 0.5
     @Published var zoomFactor: Float = 0
-    @Published var focusFactor: Float = 0.55
+    @Published var focusFactor: Float = 0.65
     
     var setFrameRate: Float64 = 120.0
     var cameraFrameRate: Int = 0
@@ -155,7 +163,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     var detectNeedToCut : Bool = false
     var detectSet : Set<Int> = []
     
-    override init(isSettingDone: Bool){
+    override init(){
         
         super.init()
               
@@ -168,7 +176,8 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             self.isRemote = boolDict["isRemote"]!
             self.isFast = boolDict["isFast"]!
             self.isActive = boolDict["isActive"]!
-            self.isAutoFocus = boolDict["isAutoFocus"]!
+            // self.isAutoFocus = boolDict["isAutoFocus"]!
+            self.isAutoFocus = false
             
             let intDict = configData["Int"] as! [String : Int]
             self.volumeUp = intDict["volumeUp"]!
@@ -184,32 +193,28 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         let successSoundURL = Bundle.main.url(forResource: "success_tip", withExtension: "mp3")
         let failSoundURL = Bundle.main.url(forResource: "fail_tip", withExtension: "mp3")
         do {
-            startAudioPlayer = try AVAudioPlayer(contentsOf: startSoundURL!)
-            startAudioPlayer?.delegate = self
-            successAudioPlayer = try AVAudioPlayer(contentsOf: successSoundURL!)
-            successAudioPlayer?.delegate = self
-            failAudioPlayer = try AVAudioPlayer(contentsOf: failSoundURL!)
-            failAudioPlayer?.delegate = self
+            startAudioRC = try AVAudioPlayer(contentsOf: startSoundURL!)
+            startAudioRC?.delegate = self
+            successAudioRC = try AVAudioPlayer(contentsOf: successSoundURL!)
+            successAudioRC?.delegate = self
+            failAudioRC = try AVAudioPlayer(contentsOf: failSoundURL!)
+            failAudioRC?.delegate = self
         } catch {
             print("Error playing sound: \(error.localizedDescription)")
         }
         
         self.isWorking = true
-        
-        if !isSettingDone{
-            setupAVCapture()
-        }
     }
 
     func initialize(saveRuleIndex: Int) {
-        
+        setupAVCapture()
         self.loadSaveRule(saveRuleIndex: saveRuleIndex)
         self.initShuffle()
         self.initDetectResult()
         self.initBoxes()
         
         self.laplacianDic = [[:],[:]]
-        for key in self.allCardIndex {
+        for key in self.allSingleFeatureIndex {
             self.laplacianDic[0][key] = 0
             self.laplacianDic[1][key] = 0
         }
@@ -218,18 +223,18 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     private func initDetectResult(){
         detectResultList = [:]
         stateCounter = 0
-        winnerPlayer = []
-        winnerPlayerShow = ""
+        winnerRC = []
+        winnerRCShow = ""
         detectSet = []
         detectNeedToCut = false
     }
     
     private func initShuffle(){
-        cardArray = []
+        singlefeatureArray = []
         cutArray = []
         cutShowArray = []
-        self.leftCards = []
-        self.usedCards = []
+        self.leftSingleFeatures = []
+        self.usedSingleFeatures = []
         if self.cutMode != 0{
             self.cutDone = false
         }
@@ -259,7 +264,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             self.setFrameRate = 120.0
         }
         
-
+        
         do {
             self.captureDeviceInput = try AVCaptureDeviceInput(device: self.captureDevice)
             
@@ -296,9 +301,12 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
             do {
                 try self.captureDevice.lockForConfiguration()
+                
                 self.captureDevice.activeFormat = format
                 self.captureDevice.activeVideoMinFrameDuration = CMTime(value: 1, timescale: Int32(format.videoSupportedFrameRateRanges.first!.maxFrameRate))
                 self.captureDevice.activeVideoMaxFrameDuration = CMTime(value: 1, timescale: Int32(format.videoSupportedFrameRateRanges.first!.maxFrameRate))
+                
+                self.captureDevice.exposureMode = .autoExpose
                 
                 self.captureDevice.unlockForConfiguration()
             } catch {
@@ -359,9 +367,15 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
     }
     
+    func prestartCamera() {
+        session.startRunning()
+        changeCameraFrameRate(to: Int(self.setFrameRate))
+        print("开启相机")
+    }
+    
     func startCamera() {
         session.startRunning()
-        changeCameraFrameRate(to: idleRate)
+        changeCameraFrameRate(to: self.idleRate)
         print("开启相机")
     }
     
@@ -381,14 +395,24 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             let format = device.activeFormat
             device.activeVideoMinFrameDuration = CMTime(value: 1, timescale: Int32(frameRate))
             device.activeVideoMaxFrameDuration = CMTime(value: 1, timescale: Int32(frameRate))
+            
+            
+            if frameRate == idleRate{
+                device.setExposureTargetBias((device.minExposureTargetBias + device.maxExposureTargetBias)/2)
+                device.setExposureTargetBias(0)
+            }
+            else{
+                //device.setExposureTargetBias(device.maxExposureTargetBias)
+                device.setExposureTargetBias(1)
+            }
+            
             device.unlockForConfiguration()
             cameraFrameRate = frameRate
             print("设置帧率为: \(frameRate)")
         }catch {
             print("设置帧率时发生错误: \(error)")
         }
-
-            
+     
     }
     
 
@@ -435,7 +459,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         let isTargetArea = self.isTargetArea
         var targetArea = Array(self.targetArea)
         
-        if !self.isShowCard && self.isWorking{
+        if !self.isShowSingleFeature && self.isWorking{
             
             self.detectionQueue.async {
                 
@@ -463,6 +487,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     let xOffset = ciImage.extent.size.height
                     let translationTransform = CGAffineTransform(translationX: xOffset, y: CGFloat(0))
                     let translatedImage = rotatedImage.transformed(by: translationTransform)
+                    
                     let outputCGImage = self.context.createCGImage(translatedImage, from: translatedImage.extent)
 
                     DispatchQueue.main.async {
@@ -491,38 +516,33 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             confidenceThreshold = 0.05
         }
         
-        var cardResult : [DetectionResult]
+        var singlefeatureResult : [DetectionResult]
         if !isTargetArea && self.isRemote{
             let result = try! detectModel.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
 
-            cardResult = getCard(from: result.confidence, from: result.coordinates, from: pixelBuffer, iscls: false)
-        }
-        else if self.isFast{
-            let result = try! fastModel.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
-
-            cardResult = getCard(from: result.confidence, from: result.coordinates, from: pixelBuffer)
+            singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, iscls: false)
         }
         else{
             let result = try! slowModel.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
-            cardResult = getCard(from: result.confidence, from: result.coordinates, from: pixelBuffer)
+            singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer)
         }
          
-        if cardResult[0].cardIndex[0] == self.stateCard[0] && cardResult[1].cardIndex[0] == self.stateCard[1]{
+        if singlefeatureResult[0].singlefeatureIndex[0] == self.stateSingleFeature[0] && singlefeatureResult[1].singlefeatureIndex[0] == self.stateSingleFeature[1]{
             stateCounter = min(stateCounter + 1, 600)
         }
         else{
             stateCounter = 0
         }
         
-        self.stateCard[0] = cardResult[0].cardIndex[0]
-        self.stateCard[1] = cardResult[1].cardIndex[0]
+        self.stateSingleFeature[0] = singlefeatureResult[0].singlefeatureIndex[0]
+        self.stateSingleFeature[1] = singlefeatureResult[1].singlefeatureIndex[0]
 
         
         var detectNum = 0
-        if cardResult[0].cardIndex[0] != -1{
+        if singlefeatureResult[0].singlefeatureIndex[0] != -1{
             detectNum += 1
         }
-        if cardResult[1].cardIndex[0] != -1{
+        if singlefeatureResult[1].singlefeatureIndex[0] != -1{
             detectNum += 1
         }
        
@@ -530,7 +550,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         let isShuffle = detectNum == 2 && (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4)
         let isRiffle = detectNum == 1 && (self.shuffleMode == 1 || self.shuffleMode == 2 || self.shuffleMode == 3 || self.shuffleMode == 4)
-        let isCut = detectNum != 0 && (!self.cutDone || self.resultReportType == 1) && self.cardArray.count > 0
+        let isCut = detectNum != 0 && (!self.cutDone || self.resultReportType == 1) && self.singlefeatureArray.count > 0
         
         DispatchQueue.main.async{
             if self.state == "idle"{
@@ -541,11 +561,11 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     self.changeCameraFrameRate(to: Int(self.setFrameRate))
                     
                     var stateResult : [[Float]] = []
-                    if cardResult[0].cardIndex[0] != -1{
-                        stateResult.append(cardResult[0].coordinate)
+                    if singlefeatureResult[0].singlefeatureIndex[0] != -1{
+                        stateResult.append(singlefeatureResult[0].coordinate)
                     }
-                    if cardResult[1].cardIndex[0] != -1{
-                        stateResult.append(cardResult[1].coordinate)
+                    if singlefeatureResult[1].singlefeatureIndex[0] != -1{
+                        stateResult.append(singlefeatureResult[1].coordinate)
                     }
                     
                     if self.isRemote{
@@ -566,11 +586,11 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     if self.isRemote && !isTargetArea && self.isTargetArea{
                         
                         var stateResult : [[Float]] = []
-                        if cardResult[0].cardIndex[0] != -1{
-                            stateResult.append(cardResult[0].coordinate)
+                        if singlefeatureResult[0].singlefeatureIndex[0] != -1{
+                            stateResult.append(singlefeatureResult[0].coordinate)
                         }
-                        if cardResult[1].cardIndex[0] != -1{
-                            stateResult.append(cardResult[1].coordinate)
+                        if singlefeatureResult[1].singlefeatureIndex[0] != -1{
+                            stateResult.append(singlefeatureResult[1].coordinate)
                         }
                         
                         let newTargetArea = self.computeTargetArea(stateResult: stateResult)
@@ -579,63 +599,63 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         let cvPixelBuffer_cut = createCVPixelBuffer(ciImage: cut_ciImage, targetSize: CGSize(width: self.inputSize[0], height: self.inputSize[1]), targetArea: newTargetArea)!
                         if self.isFast{
                             let cut_result = try! self.fastModel.prediction(image: cvPixelBuffer_cut, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
-                            cardResult = self.getCard(from: cut_result.confidence, from: cut_result.coordinates, from: cvPixelBuffer_cut)
+                            singlefeatureResult = self.getSingleFeature(from: cut_result.confidence, from: cut_result.coordinates, from: cvPixelBuffer_cut)
                         }
                         else{
                             let cut_result = try! self.slowModel.prediction(image: cvPixelBuffer_cut, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
-                            cardResult = self.getCard(from: cut_result.confidence, from: cut_result.coordinates, from: cvPixelBuffer_cut)
+                            singlefeatureResult = self.getSingleFeature(from: cut_result.confidence, from: cut_result.coordinates, from: cvPixelBuffer_cut)
                         }
                         
                         self.targetArea = newTargetArea
                     }
                     
-                    var detectCard = -1
-                    if cardResult[0].cardIndex[0] != -1{
-                        detectCard = cardResult[0].cardIndex[0]
+                    var detectSingleFeature = -1
+                    if singlefeatureResult[0].singlefeatureIndex[0] != -1{
+                        detectSingleFeature = singlefeatureResult[0].singlefeatureIndex[0]
                     }
-                    else if cardResult[1].cardIndex[0] != -1{
-                        detectCard = cardResult[1].cardIndex[0]
+                    else if singlefeatureResult[1].singlefeatureIndex[0] != -1{
+                        detectSingleFeature = singlefeatureResult[1].singlefeatureIndex[0]
                     }
 
                     if self.detectNeedToCut
                         && isCut
-                        && (detectNum == 1 || (detectNum == 2 && cardResult[0].cardIndex[0] == cardResult[1].cardIndex[0])){
-                        if self.usedCards.contains(detectCard) &&  self.resultReportType == 1 {
+                        && (detectNum == 1 || (detectNum == 2 && singlefeatureResult[0].singlefeatureIndex[0] == singlefeatureResult[1].singlefeatureIndex[0])){
+                        if self.usedSingleFeatures.contains(detectSingleFeature) &&  self.resultReportType == 1 {
                             self.computeNextRound()
                             self.detectNeedToCut = false
                         }
-                        else if self.cardArray.contains(detectCard) && !self.cutDone {
+                        else if self.singlefeatureArray.contains(detectSingleFeature) && !self.cutDone {
                             
-                            var cutIndex = self.cardArray.firstIndex(of: detectCard)!
+                            var cutIndex = self.singlefeatureArray.firstIndex(of: detectSingleFeature)!
                             if self.cutMode == 1{
                                 //看底
-                                self.cutCardArray(index: cutIndex)
+                                self.cutSingleFeatureArray(index: cutIndex)
                                 self.cutDone = true
                             }
                             else if self.cutMode == 2{
                                 //看顶
                                 cutIndex -= 1
                                 if cutIndex < 0{
-                                    cutIndex = self.cardArray.count - 1
+                                    cutIndex = self.singlefeatureArray.count - 1
                                 }
-                                self.cutCardArray(index: cutIndex)
+                                self.cutSingleFeatureArray(index: cutIndex)
                                 self.cutDone = true
                             }
                             else if self.cutMode == 3{
                                 //连续切牌
-                                self.cutArray.append(detectCard)
+                                self.cutArray.append(detectSingleFeature)
                             }
                             else if self.cutMode == 4{
                                 //看手
-                                self.cutArray.append(detectCard)
+                                self.cutArray.append(detectSingleFeature)
                                 self.cutDone = true
                             }
                             
                             self.detectNeedToCut = false
-                            self.cutShowArray.append(detectCard)
-                            self.detectSet.insert(detectCard)
-                            self.computeWinnerPlayer()
-                            self.computeCards()
+                            self.cutShowArray.append(detectSingleFeature)
+                            self.detectSet.insert(detectSingleFeature)
+                            self.computeWinnerRC()
+                            self.computeSingleFeatures()
                         }
                     }
                 }
@@ -653,9 +673,9 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         && (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4){
                         //洗牌
                         self.initShuffle()
-                        self.cardArray = detectState.detectionResult
+                        self.singlefeatureArray = detectState.detectionResult
                         
-                        if self.cardArray.count == self.allCardIndex.count{
+                        if self.singlefeatureArray.count == self.allSingleFeatureIndex.count{
                             self.speakText(input: 1)
                         }
                         else{
@@ -663,8 +683,8 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                         
                         if self.cutMode == 0 || self.cutMode == 3{
-                            self.computeWinnerPlayer()
-                            self.computeCards()
+                            self.computeWinnerRC()
+                            self.computeSingleFeatures()
 
                         }
                         
@@ -673,12 +693,12 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                 && (self.shuffleMode == 1 || self.shuffleMode == 2 || self.shuffleMode == 3 || self.shuffleMode == 4){
                         //拨牌
                         self.initShuffle()
-                        self.cardArray = detectState.detectionResult
+                        self.singlefeatureArray = detectState.detectionResult
  
                         
                         if(self.shuffleMode == 1 || self.shuffleMode == 3){
                             //拨到顶
-                            if self.cardArray.count >= self.minCardNum{
+                            if self.singlefeatureArray.count >= self.minSingleFeatureNum{
                                 self.speakText(input: 1)
                             }
                             else{
@@ -688,11 +708,11 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         
                         else if(self.shuffleMode == 2 || self.shuffleMode == 4){
                             //拨中间
-                            if self.cardArray.count > 0{
-                                self.cardArray.remove(at: 0)
+                            if self.singlefeatureArray.count > 0{
+                                self.singlefeatureArray.remove(at: 0)
                             }
                             
-                            if self.cardArray.count >= self.minCardNum{
+                            if self.singlefeatureArray.count >= self.minSingleFeatureNum{
                                 self.speakText(input: 1)
                             }
                             else{
@@ -701,8 +721,8 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                         
                         if self.cutMode == 0 || self.cutMode == 3{
-                            self.computeWinnerPlayer()
-                            self.computeCards()
+                            self.computeWinnerRC()
+                            self.computeSingleFeatures()
 
                         }
                     }
@@ -710,9 +730,9 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 
                 //识别过程
                 else if taskIndex >= 0{
-                    let shuffleCheck = cardResult[0].cardIndex[0] != cardResult[1].cardIndex[0]
-                    && cardResult[0].cardIndex[0] != -1
-                    && cardResult[1].cardIndex[0] != -1
+                    let shuffleCheck = singlefeatureResult[0].singlefeatureIndex[0] != singlefeatureResult[1].singlefeatureIndex[0]
+                    && singlefeatureResult[0].singlefeatureIndex[0] != -1
+                    && singlefeatureResult[1].singlefeatureIndex[0] != -1
                     
                     if isShuffle && shuffleCheck{
                         self.state = "shuffle"
@@ -722,25 +742,25 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         self.detectSet = []
                     }
                     else if self.detectSet.count > 0{
-                        self.detectSet.insert(cardResult[0].cardIndex[0])
-                        self.detectSet.insert(cardResult[1].cardIndex[0])
+                        self.detectSet.insert(singlefeatureResult[0].singlefeatureIndex[0])
+                        self.detectSet.insert(singlefeatureResult[1].singlefeatureIndex[0])
                     }
                     
                     
-                    self.detectResultList[taskIndex] = cardResult
+                    self.detectResultList[taskIndex] = singlefeatureResult
                     
                     var stateResult : [[Float]] = []
                     
                     if self.state == "shuffle"{
-                        stateResult.append(cardResult[0].coordinate)
-                        stateResult.append(cardResult[1].coordinate)
+                        stateResult.append(singlefeatureResult[0].coordinate)
+                        stateResult.append(singlefeatureResult[1].coordinate)
                     }
                     else{
-                        if cardResult[0].cardIndex[0] != -1{
-                            stateResult.append(cardResult[0].coordinate)
+                        if singlefeatureResult[0].singlefeatureIndex[0] != -1{
+                            stateResult.append(singlefeatureResult[0].coordinate)
                         }
-                        if cardResult[1].cardIndex[0] != -1{
-                            stateResult.append(cardResult[1].coordinate)
+                        if singlefeatureResult[1].singlefeatureIndex[0] != -1{
+                            stateResult.append(singlefeatureResult[1].coordinate)
                         }
                     }
                     
@@ -761,7 +781,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     func handleDetecResultList(targetDetecResultList: [Int : [DetectionResult]]) -> DetectionState{
         
         var confidenceDic : [Int:Float] = [:]
-        for key in self.allCardIndex {
+        for key in self.allSingleFeatureIndex {
             confidenceDic[key] = 0
         }
         
@@ -807,9 +827,9 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             let detectResultListIndex = sortedKeys[keyIndex]
             let nextDetectResultListIndex = sortedKeys[keyIndex+1]
             for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
-                let nowNum = targetDetecResultList[detectResultListIndex]![numIndex].cardIndex[0]
+                let nowNum = targetDetecResultList[detectResultListIndex]![numIndex].singlefeatureIndex[0]
                 if nowNum != -1
-                    && targetDetecResultList[nextDetectResultListIndex]![numIndex].cardIndex[0] == nowNum{
+                    && targetDetecResultList[nextDetectResultListIndex]![numIndex].singlefeatureIndex[0] == nowNum{
                     targetDetecResultList[detectResultListIndex]![numIndex].nodeType += 1
                     targetDetecResultList[nextDetectResultListIndex]![numIndex].nodeType += 2
                 }
@@ -922,7 +942,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
                 let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
                 if detectResultNode.nodeType == 1{
-                    confidenceDic[detectResultNode.cardIndex[0]] = 100
+                    confidenceDic[detectResultNode.singlefeatureIndex[0]] = 100
                 }
             }
         }
@@ -938,7 +958,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         
                         for keyIndex in beginIndex..<endIndex{
                             let detectResultListIndex = sortedKeys[keyIndex]
-                            let nowNum = targetDetecResultList[detectResultListIndex]![numIndex].cardIndex[0]
+                            let nowNum = targetDetecResultList[detectResultListIndex]![numIndex].singlefeatureIndex[0]
                             if nowNum == key && targetDetecResultList[detectResultListIndex]![numIndex].nodeType == 2{
                                 end = keyIndex
                             }
@@ -953,7 +973,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                 var middleNum = -1
                                 for updateIndex in end+1...head-1{
                                     let updateNodeIndex = sortedKeys[updateIndex]
-                                    let currentMiddleNum = targetDetecResultList[updateNodeIndex]![numIndex].cardIndex[0]
+                                    let currentMiddleNum = targetDetecResultList[updateNodeIndex]![numIndex].singlefeatureIndex[0]
                                     if currentMiddleNum != -1{
                                         middleNum = currentMiddleNum
                                         break
@@ -961,7 +981,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                 }
                                 for updateIndex in end+1...head-1{
                                     let updateNodeIndex = sortedKeys[updateIndex]
-                                    let currentMiddleNum = targetDetecResultList[updateNodeIndex]![numIndex].cardIndex[0]
+                                    let currentMiddleNum = targetDetecResultList[updateNodeIndex]![numIndex].singlefeatureIndex[0]
                                     if currentMiddleNum != -1 && currentMiddleNum != middleNum{
                                         isSameNum = false
                                         break
@@ -971,14 +991,14 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                 if isClose || isSameNum{
                                     for updateIndex in end...head{
                                         let updateNodeIndex = sortedKeys[updateIndex]
-                                        targetDetecResultList[updateNodeIndex]![numIndex].cardIndex[0] = nowNum
+                                        targetDetecResultList[updateNodeIndex]![numIndex].singlefeatureIndex[0] = nowNum
                                         targetDetecResultList[updateNodeIndex]![numIndex].nodeType = 3
                                     }
                                 }
                                 else{
                                     for updateIndex in head..<endIndex{
                                         let updateNodeIndex = sortedKeys[updateIndex]
-                                        if targetDetecResultList[updateNodeIndex]![numIndex].cardIndex[0] == nowNum{
+                                        if targetDetecResultList[updateNodeIndex]![numIndex].singlefeatureIndex[0] == nowNum{
                                             targetDetecResultList[updateNodeIndex]![numIndex].nodeType = 0
                                         }
                                         else{
@@ -999,7 +1019,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 for keyIndex in beginIndex..<endIndex{
                     let detectResultListIndex = sortedKeys[keyIndex]
                     for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
-                        let nowNum = targetDetecResultList[detectResultListIndex]![numIndex].cardIndex[0]
+                        let nowNum = targetDetecResultList[detectResultListIndex]![numIndex].singlefeatureIndex[0]
                         let nodeType = targetDetecResultList[detectResultListIndex]![numIndex].nodeType
                         if nowNum == key && nodeType == 1 {
                             isChain = true
@@ -1021,24 +1041,24 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
 
                 if detectResultNode.nodeType == 0
-                    && detectResultNode.cardIndex[0] != -1{
+                    && detectResultNode.singlefeatureIndex[0] != -1{
 
-                    var newCardIndex : [Int] = []
+                    var newSingleFeatureIndex : [Int] = []
                     var newConfidence : [Float] = []
-                    for i in 0..<detectResultNode.cardIndex.count{
+                    for i in 0..<detectResultNode.singlefeatureIndex.count{
                         if confidenceDic[i] == 0{
-                            newCardIndex.append(detectResultNode.cardIndex[i])
+                            newSingleFeatureIndex.append(detectResultNode.singlefeatureIndex[i])
                             newConfidence.append(detectResultNode.confidence[i])
                         }
                     }
 
-                    if newCardIndex.count == 0{
-                        newCardIndex.append(-1)
+                    if newSingleFeatureIndex.count == 0{
+                        newSingleFeatureIndex.append(-1)
                         newConfidence.append(1)
                         detectResultNode.nodeType = 5
                     }
 
-                    detectResultNode.cardIndex = newCardIndex
+                    detectResultNode.singlefeatureIndex = newSingleFeatureIndex
                     detectResultNode.confidence = newConfidence
                 }
             }
@@ -1051,7 +1071,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     let detectResultListIndex = sortedKeys[keyIndex]
                     
                     for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
-                        let nowNum = targetDetecResultList[detectResultListIndex]![numIndex].cardIndex[0]
+                        let nowNum = targetDetecResultList[detectResultListIndex]![numIndex].singlefeatureIndex[0]
                         let confidence = targetDetecResultList[detectResultListIndex]![numIndex].confidence[0]
                         if nowNum == key && confidence > confidenceDic[nowNum]! {
                             confidenceDic[nowNum] = confidence
@@ -1071,24 +1091,24 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
 
                 if detectResultNode.nodeType == 0
-                    && detectResultNode.cardIndex[0] != -1{
+                    && detectResultNode.singlefeatureIndex[0] != -1{
 
-                    var newCardIndex : [Int] = []
+                    var newSingleFeatureIndex : [Int] = []
                     var newConfidence : [Float] = []
-                    for i in 0..<detectResultNode.cardIndex.count{
+                    for i in 0..<detectResultNode.singlefeatureIndex.count{
                         if confidenceDic[i] == 0{
-                            newCardIndex.append(detectResultNode.cardIndex[i])
+                            newSingleFeatureIndex.append(detectResultNode.singlefeatureIndex[i])
                             newConfidence.append(detectResultNode.confidence[i])
                         }
                     }
 
-                    if newCardIndex.count == 0{
-                        newCardIndex.append(-1)
+                    if newSingleFeatureIndex.count == 0{
+                        newSingleFeatureIndex.append(-1)
                         newConfidence.append(1)
                         detectResultNode.nodeType = 5//所有可能的数字去除，标记为融合牌
                     }
 
-                    detectResultNode.cardIndex = newCardIndex
+                    detectResultNode.singlefeatureIndex = newSingleFeatureIndex
                     detectResultNode.confidence = newConfidence
                 }
             }
@@ -1101,7 +1121,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     let detectResultListIndex = sortedKeys[keyIndex]
                     
                     for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
-                        let nowNum = targetDetecResultList[detectResultListIndex]![numIndex].cardIndex[0]
+                        let nowNum = targetDetecResultList[detectResultListIndex]![numIndex].singlefeatureIndex[0]
                         let confidence = targetDetecResultList[detectResultListIndex]![numIndex].confidence[0]
                         if nowNum == key && confidence > confidenceDic[nowNum]! {
                             confidenceDic[nowNum] = confidence
@@ -1124,12 +1144,12 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
                     let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
                     if detectResultNode.nodeType == 3{
-                        if self.laplacianDic[numIndex][detectResultNode.cardIndex[0]] == 0{
-                            self.laplacianDic[numIndex][detectResultNode.cardIndex[0]] = detectResultNode.laplacianVariance
+                        if self.laplacianDic[numIndex][detectResultNode.singlefeatureIndex[0]] == 0{
+                            self.laplacianDic[numIndex][detectResultNode.singlefeatureIndex[0]] = detectResultNode.laplacianVariance
                         }
                         else{
-                            self.laplacianDic[numIndex][detectResultNode.cardIndex[0]]! += detectResultNode.laplacianVariance
-                            self.laplacianDic[numIndex][detectResultNode.cardIndex[0]]! /= 2
+                            self.laplacianDic[numIndex][detectResultNode.singlefeatureIndex[0]]! += detectResultNode.laplacianVariance
+                            self.laplacianDic[numIndex][detectResultNode.singlefeatureIndex[0]]! /= 2
                         }
                     }
                 }
@@ -1162,8 +1182,8 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
                             let nextDetectResultNode = targetDetecResultList[nextDetectResultListIndex]![numIndex]
                             if detectResultNode.nodeType == 5 && nextDetectResultNode.nodeType == 5{
-                                detectResultNode.cardIndex[0] = key
-                                nextDetectResultNode.cardIndex[0] = key
+                                detectResultNode.singlefeatureIndex[0] = key
+                                nextDetectResultNode.singlefeatureIndex[0] = key
                                 detectResultNode.nodeType = 1
                                 nextDetectResultNode.nodeType = 2
                                 confidenceDic[key] = 1
@@ -1189,8 +1209,8 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             let nextDetectResultNode = targetDetecResultList[nextDetectResultListIndex]![numIndex]
                             if (detectResultNode.nodeType == 0 || nextDetectResultNode.nodeType == 5)
                                 && (detectResultNode.nodeType == 5 || nextDetectResultNode.nodeType == 0){
-                                detectResultNode.cardIndex[0] = key
-                                nextDetectResultNode.cardIndex[0] = key
+                                detectResultNode.singlefeatureIndex[0] = key
+                                nextDetectResultNode.singlefeatureIndex[0] = key
                                 detectResultNode.nodeType = 1
                                 nextDetectResultNode.nodeType = 2
                                 confidenceDic[key] = 1
@@ -1215,7 +1235,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
                             let nextDetectResultNode = targetDetecResultList[nextDetectResultListIndex]![numIndex]
                             if detectResultNode.nodeType == 5{
-                                detectResultNode.cardIndex[0] = key
+                                detectResultNode.singlefeatureIndex[0] = key
                                 detectResultNode.nodeType = 4
                                 confidenceDic[key] = 1
                                 break
@@ -1239,7 +1259,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
                             let nextDetectResultNode = targetDetecResultList[nextDetectResultListIndex]![numIndex]
                             if detectResultNode.nodeType == 0{
-                                detectResultNode.cardIndex[0] = key
+                                detectResultNode.singlefeatureIndex[0] = key
                                 detectResultNode.nodeType = 4
                                 confidenceDic[key] = 1
                                 break
@@ -1283,14 +1303,14 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         && detectResultNode.laplacianVariance / lastDetectResultNode.laplacianVariance < blurThreshold{
                         lastDetectResultNode.nodeType = 3
                         detectResultNode.nodeType = 2
-                        detectResultNode.cardIndex[0] = lastDetectResultNode.cardIndex[0]
+                        detectResultNode.singlefeatureIndex[0] = lastDetectResultNode.singlefeatureIndex[0]
                         
                     }
                     
                     else if lastDetectResultNode.nodeType == 4{
                         lastDetectResultNode.nodeType = 1
                         detectResultNode.nodeType = 2
-                        detectResultNode.cardIndex[0] = lastDetectResultNode.cardIndex[0]
+                        detectResultNode.singlefeatureIndex[0] = lastDetectResultNode.singlefeatureIndex[0]
                     }
                     
                 }
@@ -1304,21 +1324,21 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         && detectResultNode.laplacianVariance / nextDetectResultNode.laplacianVariance < blurThreshold{
                         nextDetectResultNode.nodeType = 3
                         detectResultNode.nodeType = 1
-                        detectResultNode.cardIndex[0] = nextDetectResultNode.cardIndex[0]
+                        detectResultNode.singlefeatureIndex[0] = nextDetectResultNode.singlefeatureIndex[0]
                         
                     }
                     
                     else if nextDetectResultNode.nodeType == 4{
                         nextDetectResultNode.nodeType = 2
                         detectResultNode.nodeType = 1
-                        detectResultNode.cardIndex[0] = nextDetectResultNode.cardIndex[0]
+                        detectResultNode.singlefeatureIndex[0] = nextDetectResultNode.singlefeatureIndex[0]
                     }
                     
                 }
             }
         }
         
-        var detectCardArray : [Int] = []
+        var detectSingleFeatureArray : [Int] = []
         
         var noneCnt = 0
         var headCnt = 0
@@ -1343,20 +1363,24 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 let nextnextDetectResultNode0 = targetDetecResultList[nextnextDetectResultListIndex]![0]
                 let nextnextDetectResultNode1 = targetDetecResultList[nextnextDetectResultListIndex]![1]
                     
-                let nowNum0 = targetDetecResultList[detectResultListIndex]![0].cardIndex[0]
+                let nowNum0 = targetDetecResultList[detectResultListIndex]![0].singlefeatureIndex[0]
                 let nodeType0 = targetDetecResultList[detectResultListIndex]![0].nodeType
-                let nowNum1 = targetDetecResultList[detectResultListIndex]![1].cardIndex[0]
+                let nowNum1 = targetDetecResultList[detectResultListIndex]![1].singlefeatureIndex[0]
                 let nodeType1 = targetDetecResultList[detectResultListIndex]![1].nodeType
+                
+                print("index ", detectResultListIndex,
+                      singlefeatureLabelDic[nowNum0] ?? "none", detectResultNode0.nodeType, detectResultNode0.laplacianVariance, detectResultNode0.confidence[0], detectResultListIndex,
+                      singlefeatureLabelDic[nowNum1] ?? "none", detectResultNode1.nodeType, detectResultNode1.laplacianVariance, detectResultNode1.confidence[0])
                 
                 if isSingle{
                     if leftSideCnt > rightSideCnt{
                         if nodeType0 == 2{
-                            detectCardArray.insert(nowNum0, at: 0)
+                            detectSingleFeatureArray.insert(nowNum0, at: 0)
                         }
                     }
                     else{
                         if nodeType1 == 2{
-                            detectCardArray.insert(nowNum1, at: 0)
+                            detectSingleFeatureArray.insert(nowNum1, at: 0)
                         }
                     }
                 }
@@ -1383,28 +1407,28 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                         
                         if nextDetectResultNode0.nodeType == 5 && nextDetectResultNode1.nodeType != 5{
-                            detectCardArray.insert(nowNum1, at: 0)
-                            detectCardArray.insert(nowNum0, at: 0)
+                            detectSingleFeatureArray.insert(nowNum1, at: 0)
+                            detectSingleFeatureArray.insert(nowNum0, at: 0)
                         }
                         else if nextDetectResultNode0.nodeType != 5 && nextDetectResultNode1.nodeType == 5{
-                            detectCardArray.insert(nowNum0, at: 0)
-                            detectCardArray.insert(nowNum1, at: 0)
+                            detectSingleFeatureArray.insert(nowNum0, at: 0)
+                            detectSingleFeatureArray.insert(nowNum1, at: 0)
                         }
                         else if nextDetectResultNode0.nodeType == 0 && nextDetectResultNode1.nodeType != 0{
-                            detectCardArray.insert(nowNum1, at: 0)
-                            detectCardArray.insert(nowNum0, at: 0)
+                            detectSingleFeatureArray.insert(nowNum1, at: 0)
+                            detectSingleFeatureArray.insert(nowNum0, at: 0)
                         }
                         else if nextDetectResultNode0.nodeType != 0 && nextDetectResultNode1.nodeType == 0{
-                            detectCardArray.insert(nowNum0, at: 0)
-                            detectCardArray.insert(nowNum1, at: 0)
+                            detectSingleFeatureArray.insert(nowNum0, at: 0)
+                            detectSingleFeatureArray.insert(nowNum1, at: 0)
                         }
                         else if leftLaplacianPercent < blurThreshold && rightLaplacianPercent >= blurThreshold{
-                            detectCardArray.insert(nowNum0, at: 0)
-                            detectCardArray.insert(nowNum1, at: 0)
+                            detectSingleFeatureArray.insert(nowNum0, at: 0)
+                            detectSingleFeatureArray.insert(nowNum1, at: 0)
                         }
                         else if rightLaplacianPercent < blurThreshold && leftLaplacianPercent >= blurThreshold{
-                            detectCardArray.insert(nowNum1, at: 0)
-                            detectCardArray.insert(nowNum0, at: 0)
+                            detectSingleFeatureArray.insert(nowNum1, at: 0)
+                            detectSingleFeatureArray.insert(nowNum0, at: 0)
                         }
                         else{
                             var leftNextLaplacianPercent : Float = 1
@@ -1416,8 +1440,8 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             else if nextDetectResultNode0.nodeType == 0{
                                 leftNextLaplacianPercent = nextDetectResultNode0.laplacianVariance / nextnextDetectResultNode0.laplacianVariance
                             }
-                            else if nextDetectResultNode0.nodeType == 4 && self.laplacianDic[0][nextDetectResultNode0.cardIndex[0]] != 0{
-                                leftNextLaplacianPercent = nextDetectResultNode0.laplacianVariance / self.laplacianDic[0][nextDetectResultNode0.cardIndex[0]]!
+                            else if nextDetectResultNode0.nodeType == 4 && self.laplacianDic[0][nextDetectResultNode0.singlefeatureIndex[0]] != 0{
+                                leftNextLaplacianPercent = nextDetectResultNode0.laplacianVariance / self.laplacianDic[0][nextDetectResultNode0.singlefeatureIndex[0]]!
                             }
                             
                             if nextDetectResultNode1.nodeType == 1{
@@ -1426,37 +1450,37 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             else if nextDetectResultNode1.nodeType == 0{
                                 rightNextLaplacianPercent = nextDetectResultNode1.laplacianVariance / nextnextDetectResultNode1.laplacianVariance
                             }
-                            else if nextDetectResultNode1.nodeType == 4 && self.laplacianDic[1][nextDetectResultNode1.cardIndex[0]] != 0{
-                                rightNextLaplacianPercent = nextDetectResultNode1.laplacianVariance / self.laplacianDic[1][nextDetectResultNode1.cardIndex[0]]!
+                            else if nextDetectResultNode1.nodeType == 4 && self.laplacianDic[1][nextDetectResultNode1.singlefeatureIndex[0]] != 0{
+                                rightNextLaplacianPercent = nextDetectResultNode1.laplacianVariance / self.laplacianDic[1][nextDetectResultNode1.singlefeatureIndex[0]]!
                             }
                             
                             if leftNextLaplacianPercent < blurThreshold && rightNextLaplacianPercent >= blurThreshold{
-                                detectCardArray.insert(nowNum1, at: 0)
-                                detectCardArray.insert(nowNum0, at: 0)
+                                detectSingleFeatureArray.insert(nowNum1, at: 0)
+                                detectSingleFeatureArray.insert(nowNum0, at: 0)
                             }
                             else if rightNextLaplacianPercent < blurThreshold && leftNextLaplacianPercent >= blurThreshold{
-                                detectCardArray.insert(nowNum0, at: 0)
-                                detectCardArray.insert(nowNum1, at: 0)
+                                detectSingleFeatureArray.insert(nowNum0, at: 0)
+                                detectSingleFeatureArray.insert(nowNum1, at: 0)
                             }
                             //上一张和下一张两边都不模糊 直接比较上一张两边模糊程度
                             else if leftLaplacianPercent < blurThreshold && rightLaplacianPercent < blurThreshold{
                                 if leftLaplacianPercent < rightLaplacianPercent{
-                                    detectCardArray.insert(nowNum0, at: 0)
-                                    detectCardArray.insert(nowNum1, at: 0)
+                                    detectSingleFeatureArray.insert(nowNum0, at: 0)
+                                    detectSingleFeatureArray.insert(nowNum1, at: 0)
                                 }
                                 else{
-                                    detectCardArray.insert(nowNum1, at: 0)
-                                    detectCardArray.insert(nowNum0, at: 0)
+                                    detectSingleFeatureArray.insert(nowNum1, at: 0)
+                                    detectSingleFeatureArray.insert(nowNum0, at: 0)
                                 }
                             }
                             else{
                                 if leftNextLaplacianPercent < rightNextLaplacianPercent{
-                                    detectCardArray.insert(nowNum1, at: 0)
-                                    detectCardArray.insert(nowNum0, at: 0)
+                                    detectSingleFeatureArray.insert(nowNum1, at: 0)
+                                    detectSingleFeatureArray.insert(nowNum0, at: 0)
                                 }
                                 else{
-                                    detectCardArray.insert(nowNum0, at: 0)
-                                    detectCardArray.insert(nowNum1, at: 0)
+                                    detectSingleFeatureArray.insert(nowNum0, at: 0)
+                                    detectSingleFeatureArray.insert(nowNum1, at: 0)
                                 }
                             }
                             
@@ -1465,10 +1489,10 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     
                     else{
                         if nodeType0 == 4 || nodeType0 == 2{
-                            detectCardArray.insert(nowNum0, at: 0)
+                            detectSingleFeatureArray.insert(nowNum0, at: 0)
                         }
                         if nodeType1 == 4 || nodeType1 == 2{
-                            detectCardArray.insert(nowNum1, at: 0)
+                            detectSingleFeatureArray.insert(nowNum1, at: 0)
                         }
                     }
                 }
@@ -1476,9 +1500,9 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         
         var uniqueArray: [Int] = []
-        for card in detectCardArray {
-            if !uniqueArray.contains(card) {
-                uniqueArray.append(card)
+        for singlefeature in detectSingleFeatureArray {
+            if !uniqueArray.contains(singlefeature) {
+                uniqueArray.append(singlefeature)
             }
         }
         
@@ -1486,11 +1510,11 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         return result
     }
     
-    func cutCardArray(index : Int){
-        if index < cardArray.count - 1{
-            let elementsToMove = cardArray[(index+1)...]
-            cardArray.removeSubrange((index+1)...)
-            cardArray.insert(contentsOf: elementsToMove, at: 0)
+    func cutSingleFeatureArray(index : Int){
+        if index < singlefeatureArray.count - 1{
+            let elementsToMove = singlefeatureArray[(index+1)...]
+            singlefeatureArray.removeSubrange((index+1)...)
+            singlefeatureArray.insert(contentsOf: elementsToMove, at: 0)
         }
     }
 
@@ -1508,7 +1532,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             
             if !self.cutDone
                 && (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4)
-                && (originBoxes[0][2] + originBoxes[0][3]) > 0.2{
+                && (originBoxes[0][2] + originBoxes[0][3]) > 0.25{
                 return [0.5,0.5,1,1]
             }
             
@@ -1669,33 +1693,33 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         return computeTargetArea(stateResult: stateResult)
     }
 
-    func getCard(from cardArray: MLMultiArray, from boxArray : MLMultiArray, from pixelBuffer : CVPixelBuffer, iscls : Bool = true) -> [DetectionResult] {
-        let cnt : Int = Int(cardArray.shape[0])
-        let n : Int = Int(cardArray.shape[1])
+    func getSingleFeature(from singlefeatureArray: MLMultiArray, from boxArray : MLMultiArray, from pixelBuffer : CVPixelBuffer, iscls : Bool = true) -> [DetectionResult] {
+        let cnt : Int = Int(singlefeatureArray.shape[0])
+        let n : Int = Int(singlefeatureArray.shape[1])
         var result : [DetectionResult] = []
         
         
         if self.state == "idle"{
             for i in 0..<cnt {
-                var maxVal: Float32 = cardArray[i * n].floatValue
+                var maxVal: Float32 = singlefeatureArray[i * n].floatValue
                 var confidenceSum : Float = 0
-                var cardIndex : [Int] = []
+                var singlefeatureIndex : [Int] = []
                 var confidence : [Float] = []
                 for j in 0..<n {
                     let index = i * n + j
-                    let value = cardArray[index].floatValue
+                    let value = singlefeatureArray[index].floatValue
                     confidenceSum += value
                 }
                 for j in 0..<n {
                     let index = i * n + j
-                    let value = cardArray[index].floatValue
+                    let value = singlefeatureArray[index].floatValue
                     
                     let trueIndex = j == 52 ? 54 : j
                     
-                    if value > 0 && (self.allCardIndex.contains(trueIndex) || !iscls){
+                    if value > 0 && (self.allSingleFeatureIndex.contains(trueIndex) || !iscls){
                         
                         if (value/confidenceSum>=0) {
-                            cardIndex.append(j)
+                            singlefeatureIndex.append(j)
                             confidence.append(value)
                         }
                         
@@ -1705,7 +1729,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     }
                 }
                 
-                cardIndex.sort{cardArray[$0 + i*n].floatValue > cardArray[$1 + i*n].floatValue}
+                singlefeatureIndex.sort{singlefeatureArray[$0 + i*n].floatValue > singlefeatureArray[$1 + i*n].floatValue}
                 confidence.sort{ $0 > $1 }
                 
                 let centerX = boxArray[i*4].floatValue
@@ -1715,33 +1739,33 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 
                 let coordinate = [centerX, centerY, widthX, heightY]
                 
-                if cardIndex.count > 0{
+                if singlefeatureIndex.count > 0{
                     if let index = result.firstIndex(where: {(abs($0.coordinate[0] - coordinate[0]) < $0.coordinate[2] / 2 || abs($0.coordinate[0] - coordinate[0]) < coordinate[2] / 2) && (abs($0.coordinate[1] - coordinate[1]) < $0.coordinate[3] / 2 || abs($0.coordinate[1] - coordinate[1]) < coordinate[3] / 2)}) {
                         
                         if maxVal > result[index].confidence[0] {
-                            result[index].cardIndex = cardIndex + result[index].cardIndex
+                            result[index].singlefeatureIndex = singlefeatureIndex + result[index].singlefeatureIndex
                             result[index].confidence = confidence + result[index].confidence
                         }
                         else{
-                            result[index].cardIndex = result[index].cardIndex + cardIndex
+                            result[index].singlefeatureIndex = result[index].singlefeatureIndex + singlefeatureIndex
                             result[index].confidence = result[index].confidence + confidence
                         }
                     }
                     else{
-                        result.append(DetectionResult(cardIndex: cardIndex, confidence: confidence, confidencePercent: maxVal/confidenceSum, coordinate: coordinate, laplacianVariance: 0))
+                        result.append(DetectionResult(singlefeatureIndex: singlefeatureIndex, confidence: confidence, confidencePercent: maxVal/confidenceSum, coordinate: coordinate, laplacianVariance: 0))
                     }
                 }
             }
             
             if result.count > 2 && iscls{
-                var uniqueCardIndexes = Set<Int>()
+                var uniqueSingleFeatureIndexes = Set<Int>()
                 
                 result = result.filter {
-                    let cardIndex0 = $0.cardIndex[0]
-                    if uniqueCardIndexes.contains(cardIndex0) {
+                    let singlefeatureIndex0 = $0.singlefeatureIndex[0]
+                    if uniqueSingleFeatureIndexes.contains(singlefeatureIndex0) {
                         return false
                     } else {
-                        uniqueCardIndexes.insert(cardIndex0)
+                        uniqueSingleFeatureIndexes.insert(singlefeatureIndex0)
                         return true
                     }
                 }
@@ -1770,28 +1794,28 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             else if result.count == 1{
                 if isHorizon{
                     if result[0].coordinate[0] > self.centerPos[0]{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
+                        result.insert(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
                     }
                     else{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
+                        result.insert(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
                     }
                 }
                 else{
                     if result[0].coordinate[1] > self.centerPos[1]{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
+                        result.insert(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
                     }
                     else{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
+                        result.insert(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
                     }
                 }
             }
             else if result.count == 0{
-                result.append(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0))
-                result.append(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0))
+                result.append(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0))
+                result.append(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0))
             }
             
             for resultIndex in 0..<result.count{
-                result[resultIndex].cardIndex = result[resultIndex].cardIndex.map { $0 == 52 ? 54 : $0 }
+                result[resultIndex].singlefeatureIndex = result[resultIndex].singlefeatureIndex.map { $0 == 52 ? 54 : $0 }
             }
             
             self.centerPos = [(result[0].coordinate[0] + result[1].coordinate[0])/2, (result[0].coordinate[1] + result[1].coordinate[1])/2]
@@ -1827,25 +1851,25 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                    destination: destinationBuffer8)
             
             for i in 0..<cnt {
-                var maxVal: Float32 = cardArray[i * n].floatValue
+                var maxVal: Float32 = singlefeatureArray[i * n].floatValue
                 var confidenceSum : Float = 0
-                var cardIndex : [Int] = []
+                var singlefeatureIndex : [Int] = []
                 var confidence : [Float] = []
                 for j in 0..<n {
                     let index = i * n + j
-                    let value = cardArray[index].floatValue
+                    let value = singlefeatureArray[index].floatValue
                     confidenceSum += value
                 }
                 for j in 0..<n {
                     let index = i * n + j
-                    let value = cardArray[index].floatValue
+                    let value = singlefeatureArray[index].floatValue
                     
                     let trueIndex = j == 52 ? 54 : j
                     
-                    if value > 0 && (self.allCardIndex.contains(trueIndex) || !iscls){
+                    if value > 0 && (self.allSingleFeatureIndex.contains(trueIndex) || !iscls){
                         
                         if (value/confidenceSum>=0) {
-                            cardIndex.append(j)
+                            singlefeatureIndex.append(j)
                             confidence.append(value)
                         }
                         
@@ -1855,7 +1879,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     }
                 }
                 
-                cardIndex.sort{cardArray[$0 + i*n].floatValue > cardArray[$1 + i*n].floatValue}
+                singlefeatureIndex.sort{singlefeatureArray[$0 + i*n].floatValue > singlefeatureArray[$1 + i*n].floatValue}
                 confidence.sort{ $0 > $1 }
                 
                 let centerX = boxArray[i*4].floatValue
@@ -1865,33 +1889,33 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 
                 let coordinate = [centerX, centerY, widthX, heightY]
                 
-                if cardIndex.count > 0{
+                if singlefeatureIndex.count > 0{
                     if let index = result.firstIndex(where: {(abs($0.coordinate[0] - coordinate[0]) < $0.coordinate[2] / 2 || abs($0.coordinate[0] - coordinate[0]) < coordinate[2] / 2) && (abs($0.coordinate[1] - coordinate[1]) < $0.coordinate[3] / 2 || abs($0.coordinate[1] - coordinate[1]) < coordinate[3] / 2)}) {
                         
                         if maxVal > result[index].confidence[0] {
-                            result[index].cardIndex = cardIndex + result[index].cardIndex
+                            result[index].singlefeatureIndex = singlefeatureIndex + result[index].singlefeatureIndex
                             result[index].confidence = confidence + result[index].confidence
                         }
                         else{
-                            result[index].cardIndex = result[index].cardIndex + cardIndex
+                            result[index].singlefeatureIndex = result[index].singlefeatureIndex + singlefeatureIndex
                             result[index].confidence = result[index].confidence + confidence
                         }
                     }
                     else{
-                        result.append(DetectionResult(cardIndex: cardIndex, confidence: confidence, confidencePercent: maxVal/confidenceSum, coordinate: coordinate, laplacianVariance: 0))
+                        result.append(DetectionResult(singlefeatureIndex: singlefeatureIndex, confidence: confidence, confidencePercent: maxVal/confidenceSum, coordinate: coordinate, laplacianVariance: 0))
                     }
                 }
             }
             
             if result.count > 2 && iscls{
-                var uniqueCardIndexes = Set<Int>()
+                var uniqueSingleFeatureIndexes = Set<Int>()
                 
                 result = result.filter {
-                    let cardIndex0 = $0.cardIndex[0]
-                    if uniqueCardIndexes.contains(cardIndex0) {
+                    let singlefeatureIndex0 = $0.singlefeatureIndex[0]
+                    if uniqueSingleFeatureIndexes.contains(singlefeatureIndex0) {
                         return false
                     } else {
-                        uniqueCardIndexes.insert(cardIndex0)
+                        uniqueSingleFeatureIndexes.insert(singlefeatureIndex0)
                         return true
                     }
                 }
@@ -1922,30 +1946,30 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             else if result.count == 1{
                 if isHorizon{
                     if result[0].coordinate[0] > self.centerPos[0]{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
+                        result.insert(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
                     }
                     else{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
+                        result.insert(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
                     }
                 }
                 else{
                     if result[0].coordinate[1] > self.centerPos[1]{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
+                        result.insert(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
                     }
                     else{
-                        result.insert(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
+                        result.insert(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
                     }
                 }
             }
             else if result.count == 0{
-                result.append(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0))
-                result.append(DetectionResult(cardIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0))
+                result.append(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0))
+                result.append(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0))
             }
             
             
             
             for resultIndex in 0..<result.count{
-                result[resultIndex].cardIndex = result[resultIndex].cardIndex.map { $0 == 52 ? 54 : $0 }
+                result[resultIndex].singlefeatureIndex = result[resultIndex].singlefeatureIndex.map { $0 == 52 ? 54 : $0 }
             }
             
             self.centerPos = [(result[0].coordinate[0] + result[1].coordinate[0])/2, (result[0].coordinate[1] + result[1].coordinate[1])/2]
@@ -1963,64 +1987,64 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     //MARK: generate test result
     func generateTestResult(){
         var testArray:[Int] = []
-        for i in self.allCardIndex{
+        for i in self.allSingleFeatureIndex{
             testArray.append(i)
         }
         
         testArray.shuffle()
-        self.cardArray = testArray
+        self.singlefeatureArray = testArray
         
         self.cutArray = []
         self.cutShowArray = []
         
         if self.cutMode != 0{
-            let cutCard : Int = self.cardArray.randomElement()!
-            var cutIndex = self.cardArray.firstIndex(of: cutCard)!
+            let cutSingleFeature : Int = self.singlefeatureArray.randomElement()!
+            var cutIndex = self.singlefeatureArray.firstIndex(of: cutSingleFeature)!
             if self.cutMode == 1{
-                self.cutCardArray(index: cutIndex)
+                self.cutSingleFeatureArray(index: cutIndex)
             }
             else if self.cutMode == 2{
                 cutIndex -= 1
                 if cutIndex < 0{
-                    cutIndex = self.cardArray.count - 1
+                    cutIndex = self.singlefeatureArray.count - 1
                 }
-                self.cutCardArray(index: cutIndex)
+                self.cutSingleFeatureArray(index: cutIndex)
             }
             else if self.cutMode == 3{
-                self.cutArray.append(cutCard)
+                self.cutArray.append(cutSingleFeature)
             }
             else if self.cutMode == 4{
-                self.cutArray.append(cutCard)
+                self.cutArray.append(cutSingleFeature)
             }
-            self.cutShowArray.append(cutCard)
+            self.cutShowArray.append(cutSingleFeature)
         }
         
-        computeWinnerPlayer()
+        computeWinnerRC()
     }
     
-    func computeWinnerPlayer() {
-        if cardArray.count >= minCardNum && cardArray.count > cutNumRangeSetting[0] && cardArray.count > cutNumRangeSetting[1] - minCardNum{
-            multipleGamePlayerInfos = GameManager.selectGame(gameIndex: ruleIndex, inputCards: cardArray, playerNum: (GameManager.gameRules[ruleIndex]?.playerNum[playerNum])!, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, minCardNum: minCardNum, cutCardIndexArray: cutArray)
+    func computeWinnerRC() {
+        if singlefeatureArray.count >= minSingleFeatureNum && singlefeatureArray.count > cutNumRangeSetting[0] && singlefeatureArray.count > cutNumRangeSetting[1] - minSingleFeatureNum{
+            multipleStatisticRCInfos = ClassifierSettingArgs.selectStatistic(StatisticIndex: ruleIndex, inputSingleFeatures: singlefeatureArray, rcNum: (ClassifierSettingArgs.targetSetting[ruleIndex]?.rcNum[rcNum])!, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, minSingleFeatureNum: minSingleFeatureNum, cutSingleFeatureIndexArray: cutArray)
             
-            self.cardArray = multipleGamePlayerInfos.returnCardArray
+            self.singlefeatureArray = multipleStatisticRCInfos.returnSingleFeatureArray
             
-            speakText(input: multipleGamePlayerInfos.reportResult)
+            speakText(input: multipleStatisticRCInfos.reportResult)
         }
     }
     
-    func computeCards(){
-        if self.cardArray.count >= self.minCardNum && self.cardArray.count > self.cutNumRangeSetting[0] && self.cardArray.count > self.cutNumRangeSetting[1] - self.minCardNum{
-            self.leftCards = multipleGamePlayerInfos.leftCards
-            let usedNum = self.cardArray.count - self.leftCards.count
-            self.usedCards = Array(self.cardArray[0...(usedNum - 1)])
+    func computeSingleFeatures(){
+        if self.singlefeatureArray.count >= self.minSingleFeatureNum && self.singlefeatureArray.count > self.cutNumRangeSetting[0] && self.singlefeatureArray.count > self.cutNumRangeSetting[1] - self.minSingleFeatureNum{
+            self.leftSingleFeatures = multipleStatisticRCInfos.leftSingleFeatures
+            let usedNum = self.singlefeatureArray.count - self.leftSingleFeatures.count
+            self.usedSingleFeatures = Array(self.singlefeatureArray[0...(usedNum - 1)])
         }
     }
     
     func computeNextRound(){
-        if (self.leftCards.count > 0){
-            self.cardArray = self.leftCards
-            computeWinnerPlayer()
-            self.computeCards()
+        if (self.leftSingleFeatures.count > 0){
+            self.singlefeatureArray = self.leftSingleFeatures
+            computeWinnerRC()
+            self.computeSingleFeatures()
         }
     }
     
@@ -2029,13 +2053,13 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         if isSpeak{
             if input == 0{
-                self.startAudioPlayer?.play()
+                self.startAudioRC?.play()
             }
             else if input == 1{
-                self.successAudioPlayer?.play()
+                self.successAudioRC?.play()
             }
             else if input == 2{
-                self.failAudioPlayer?.play()
+                self.failAudioRC?.play()
             }
         }
     }
@@ -2066,20 +2090,20 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     
     public func handleVolumeIncrease() {
         
-        let selectedRule = GameManager.gameRules[ruleIndex]!
+        let selectedRule = ClassifierSettingArgs.targetSetting[ruleIndex]!
         
         // 处理音量增加事件的逻辑
         if self.volumeUp == 1{
-            let playNumList = selectedRule.playerNum
-            self.playerNum += 1
-            if self.playerNum >= playNumList.count{
-                self.playerNum = 0
+            let playNumList = selectedRule.rcNum
+            self.rcNum += 1
+            if self.rcNum >= playNumList.count{
+                self.rcNum = 0
             }
-            self.minCardNum = GameGetMinCardNum()
-            speakText(input: "人数" + String(selectedRule.playerNum[self.playerNum]))
+            self.minSingleFeatureNum = StatisticGetMinSingleFeatureNum()
+            speakText(input: "人数" + String(selectedRule.rcNum[self.rcNum]))
         }
         else if self.volumeUp == 2{
-            let currentNum = selectedRule.playerNum[self.playerNum]
+            let currentNum = selectedRule.rcNum[self.rcNum]
             var positionSetting = self.calModeArgs[1] + 1
             if positionSetting >= currentNum{
                 positionSetting = 0
@@ -2096,7 +2120,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         else if self.volumeUp == 4{
             self.selectedSaveIndex += 1
-            if self.selectedSaveIndex >= RuleManager.allUsersGameRule.count{
+            if self.selectedSaveIndex >= DetectSettingArgs.allUsersStatisticRule.count{
                 self.selectedSaveIndex = 0
             }
             loadSaveRule(saveRuleIndex: self.selectedSaveIndex)
@@ -2119,19 +2143,19 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     public func handleVolumeDecrease() {
         // 处理音量减少事件的逻辑
         
-        let selectedRule = GameManager.gameRules[ruleIndex]!
+        let selectedRule = ClassifierSettingArgs.targetSetting[ruleIndex]!
         
         if self.volumeDown == 1{
-            let playNumList = selectedRule.playerNum
-            self.playerNum -= 1
-            if self.playerNum < 0{
-                self.playerNum = playNumList.count - 1
+            let playNumList = selectedRule.rcNum
+            self.rcNum -= 1
+            if self.rcNum < 0{
+                self.rcNum = playNumList.count - 1
             }
-            self.minCardNum = GameGetMinCardNum()
-            speakText(input: "人数" + String(selectedRule.playerNum[self.playerNum]))
+            self.minSingleFeatureNum = StatisticGetMinSingleFeatureNum()
+            speakText(input: "人数" + String(selectedRule.rcNum[self.rcNum]))
         }
         else if self.volumeDown == 2{
-            let currentNum = selectedRule.playerNum[self.playerNum]
+            let currentNum = selectedRule.rcNum[self.rcNum]
             var positionSetting = self.calModeArgs[1] - 1
             if positionSetting < 0{
                 positionSetting = currentNum - 1
@@ -2149,7 +2173,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         else if self.volumeDown == 4{
             self.selectedSaveIndex -= 1
             if self.selectedSaveIndex < 0{
-                self.selectedSaveIndex = RuleManager.allUsersGameRule.count - 1
+                self.selectedSaveIndex = DetectSettingArgs.allUsersStatisticRule.count - 1
             }
             loadSaveRule(saveRuleIndex: self.selectedSaveIndex)
             speakText(input: "方案" + String(self.selectedSaveIndex+1))
@@ -2177,18 +2201,18 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     
     private func loadSaveRule(saveRuleIndex: Int){
         self.selectedSaveIndex = saveRuleIndex
-        let rules = RuleManager.allUsersGameRule[self.selectedSaveIndex]
-        self.ruleIndex = rules.gameType
-        self.playerNum = rules.playerNum
+        let rules = DetectSettingArgs.allUsersStatisticRule[self.selectedSaveIndex]
+        self.ruleIndex = rules.StatisticType
+        self.rcNum = rules.rcNum
         self.dealNum = rules.dealNum
         self.coloringType = rules.coloringType
         self.cutMode = rules.cutMode
         self.dealType = rules.dealType
         self.diyDealNum = rules.diyDealNum
         self.diyDealStatus = rules.diyDealStatus
-        self.playerNum = rules.playerNum
+        self.rcNum = rules.rcNum
         self.shuffleMode = rules.shuffleMode
-        self.allCardIndex = rules.cardToUse
+        self.allSingleFeatureIndex = rules.singlefeatureToUse
         self.cutNumSetting = rules.cutNumSetting
         self.cutNumRangeSetting = rules.cutNumRangeSetting
         self.calModeArgs = [rules.reportSetting, rules.positionSetting]
@@ -2198,87 +2222,87 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         self.args = rules.args
         self.suitRules = rules.suitRanks
         self.rankRules = rules.rankRules
-        self.minCardNum = rules.minCardNum
+        self.minSingleFeatureNum = rules.minSingleFeatureNum
         self.resultReportType = rules.resultReportType
     }
     
-    private func GameGetMinCardNum()-> Int{
-        var minCardNum:Int = 0
-        let gameType = ruleIndex
-        switch gameType {
+    private func StatisticGetMinSingleFeatureNum()-> Int{
+        var minSingleFeatureNum:Int = 0
+        let StatisticType = ruleIndex
+        switch StatisticType {
         case 0:
-            let selectedRule = GameManager.gameRules[gameType] as! TexasPokerRule
-            minCardNum = TexasPoker.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! TPRule
+            minSingleFeatureNum = TP.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 1:
-            let selectedRule = GameManager.gameRules[gameType] as! PokerBullRule
-            minCardNum = PokerBull.GetMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! PBRule
+            minSingleFeatureNum = PB.GetMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
         case 2:
-            let selectedRule = GameManager.gameRules[gameType] as! ThreeCardPokerGameRule
-            minCardNum = ThreeCardPokerGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! ZJHStatisticRule
+            minSingleFeatureNum = ZJHStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 3:
-            let selectedRule = GameManager.gameRules[gameType] as! TinyNineGameRule
-            minCardNum = TinyNineGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! TNStatisticRule
+            minSingleFeatureNum = TNStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 4:
-            let selectedRule = GameManager.gameRules[gameType]
-            as! ThreeMenGameRule
-            minCardNum = ThreeMenGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType]
+            as! TMStatisticRule
+            minSingleFeatureNum = TMStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 5:
-            let selectedRule = GameManager.gameRules[gameType] as! TwoEightGangGameRule
-            minCardNum = TwoEightGangGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! TEGStatisticRule
+            minSingleFeatureNum = TEGStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 6:
-            let selectedRule = GameManager.gameRules[gameType] as! NinePointFiveGameRule
-            minCardNum = NinePointFiveGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! NPFiveStatisticRule
+            minSingleFeatureNum = NPFiveStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 7:
-            let selectedRule = GameManager.gameRules[gameType] as!
-            BaoziGameRule
-            minCardNum = BaoziGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as!
+            BZStatisticRule
+            minSingleFeatureNum = BZStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum],handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 8:
-            let selectedRule = GameManager.gameRules[gameType] as! JiaJiaBaoGameRule
-            minCardNum = JiaJiaBaoGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! JJBStatisticRule
+            minSingleFeatureNum = JJBStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1],dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 9:
-            let selectedRule = GameManager.gameRules[gameType] as! CardNineGameRule
-            minCardNum = CardNineGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! CNStatisticRule
+            minSingleFeatureNum = CNStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 10:
-            let selectedRule = GameManager.gameRules[gameType] as! NinePointGameRule
-            minCardNum = NinePointGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! NPStatisticRule
+            minSingleFeatureNum = NPStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 11:
-            let selectedRule = GameManager.gameRules[gameType] as! FourCardGameRule
-            minCardNum = FourCardGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! FCStatisticRule
+            minSingleFeatureNum = FCStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 12:
-            let selectedRule = GameManager.gameRules[gameType] as! TwoCardGameRule
-            minCardNum = TwoCardGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! TCStatisticRule
+            minSingleFeatureNum = TCStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 13:
-            let selectedRule = GameManager.gameRules[gameType] as! ThreeCardPointGameRule
-            minCardNum = ThreeCardPointGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! TCPStatisticRule
+            minSingleFeatureNum = TCPStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 14:
-            let selectedRule = GameManager.gameRules[gameType] as! TenPointFiveGameRule
-            minCardNum = TenPointFiveGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! TPFiveStatisticRule
+            minSingleFeatureNum = TPFiveStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 15:
-            let selectedRule = GameManager.gameRules[gameType] as! ChickenBattleGameRule
-            minCardNum = ChickenBattleGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! CBStatisticRule
+            minSingleFeatureNum = CBStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         case 16:
-            let selectedRule = GameManager.gameRules[gameType] as! ThirteenWaterGameRule
-            minCardNum = ThirteenWaterGame.getMinCardNum(playerNum: selectedRule.playerNum[playerNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+            let selectedRule = ClassifierSettingArgs.targetSetting[StatisticType] as! TWStatisticRule
+            minSingleFeatureNum = TWStatistic.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
         default:
-            print("GameType error")
+            print("StatisticType error")
         }
-        return minCardNum
+        return minSingleFeatureNum
     }
     
     public func updateConfigJSON() {
@@ -2325,15 +2349,15 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 
 
 class DetectionResult {
-    var cardIndex : [Int]
+    var singlefeatureIndex : [Int]
     var confidence : [Float]
     var confidencePercent : Float
     var coordinate : [Float]
     var nodeType : Int
     var laplacianVariance : Float
 
-    init(cardIndex: [Int], confidence: [Float], confidencePercent: Float, coordinate: [Float], laplacianVariance: Float) {
-        self.cardIndex = cardIndex
+    init(singlefeatureIndex: [Int], confidence: [Float], confidencePercent: Float, coordinate: [Float], laplacianVariance: Float) {
+        self.singlefeatureIndex = singlefeatureIndex
         self.confidence = confidence
         self.confidencePercent = confidencePercent
         self.coordinate = coordinate
@@ -2373,7 +2397,7 @@ class SpeakResultStruct{
 
 class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
     let synthesizer = AVSpeechSynthesizer() // Your AVSpeechSynthesizer instance
-    let chineseFemaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.Mei-Jia-compact-CN_compact")
+    let chineseFemaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.Ting-Ting-compact")
     let chineseMaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.siri_male_zh-CN_compact")
     
     private let lock = NSLock()
@@ -2410,11 +2434,16 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
         
         for repeatIndex in 0..<2{
             for (turnIndex, turnResult) in speakResultStruct.enumerated() {
+                
+                var emptyflag = true
+                
                 for (reportIndex, reportResult) in turnResult.enumerated() {
                     let speakString = reportResult.content
                     if !speakString.isEmpty{
+                        
+                        emptyflag = false
+                        
                         let speechUtterance = AVSpeechUtterance(string: speakString)
-                        speechUtterance.postUtteranceDelay = 0.1
                         if reportResult.voiceType == 0{
                             speechUtterance.voice = chineseMaleVoice
                         }
@@ -2423,16 +2452,27 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
                         }
                         
                         if repeatIndex != 0 && turnIndex == 0 && reportIndex == 0{
-                            speechUtterance.preUtteranceDelay = 0.1
+                            speechUtterance.preUtteranceDelay = 0.05
                         }
                         
                         print("播报的input \(reportResult.content)")
                         
+                        speechUtterance.pitchMultiplier = 1.15
+                        speechUtterance.rate = 0.55
+                        
                         synthesizer.speak(speechUtterance)
                     }
                 }
+                
+                if emptyflag{
+                    let emptySpeechUtterance = AVSpeechUtterance(string: " ")
+                    synthesizer.speak(emptySpeechUtterance)
+                    break
+                }
             }
         }
+        let emptySpeechUtterance = AVSpeechUtterance(string: " ")
+        synthesizer.speak(emptySpeechUtterance)
     }
 
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {

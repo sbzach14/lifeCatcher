@@ -31,7 +31,7 @@ class PBRule : Rule{
         4:"同为牛牛相比5张总点数，点输越小越大，同牛同点一样大，无牛一样大"
     ]
     
-    let jokerIsMinZero:[Int:String] = [
+    let specialfeatureIsMinZero:[Int:String] = [
         0:"否",
     ]
     
@@ -73,12 +73,12 @@ class PBRule : Rule{
         2:"6",
         3:"13"
     ]
-    let blackJokerValueRange:[Int:String] = [
+    let blackspecialfeatureValueRange:[Int:String] = [
         0:"0",
         1:"1",
         2:"3",
     ]
-    let redJokerValueRange:[Int:String] = [
+    let redspecialfeatureValueRange:[Int:String] = [
         0:"0",
         1:"1",
         2:"6",
@@ -94,7 +94,7 @@ class PBRule : Rule{
         1:"0",
     ]
     
-    let threeCardsRankRules:[Int: String] = [
+    let threeSingleFeaturesRankRules:[Int: String] = [
         0:"三条",
         1:"jqk",
         2:"qj10",
@@ -102,7 +102,7 @@ class PBRule : Rule{
         4:"同花顺",
         5:"顺子",
     ]
-    static let fiveCardsRankRules: [Int: String] = [
+    static let fiveSingleFeaturesRankRules: [Int: String] = [
         0:"牌的点数之和大于等于40",
         1:"炸弹（四条）",
         2:"牌的点数之和小于等于10",
@@ -153,8 +153,8 @@ class PBRule : Rule{
     ]
     override init(ruleIndex: Int, ruleName: String) {
         super.init(ruleIndex: ruleIndex, ruleName: ruleName)
-        self.rankRules = PBRule.fiveCardsRankRules
-        self.playerNum = [2,3,4,5,6,7,8]
+        self.rankRules = PBRule.fiveSingleFeaturesRankRules
+        self.rcNum = [2,3,4,5,6,7,8]
         self.setting = [
             0: "斗牛-分花色[501]",
             1: "斗牛-不分花色[502]",
@@ -300,9 +300,9 @@ class PBRule : Rule{
 }
 
 class PB{
-    static func FindWinner(diyDealStatus:[[Bool]], diyDealNum:[Int], inputCards:[Int], args:[Int], rankRules:[Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
+    static func FindWinner(diyDealStatus:[[Bool]], diyDealNum:[Int], inputSingleFeatures:[Int], args:[Int], rankRules:[Int], suitRules: [Int]) -> ([StatisticReturnRCInfo],[Int]) {
         
-        let testCardLabelDic : [Int:String] = [
+        let testSingleFeatureLabelDic : [Int:String] = [
             0: "♠️A ", 1: "♠️2 ", 2: "♠️3 ", 3: "♠️4 ", 4: "♠️5 ", 5: "♠️6 ", 6: "♠️7 ", 7: "♠️8 ", 8: "♠️9 ", 9: "♠️10 ",
             10: "♠️J ", 11: "♠️Q ", 12: "♠️K ", 13: "♥️A ", 14: "♥️2 ", 15: "♥️3 ", 16: "♥️4 ", 17: "♥️5 ", 18: "♥️6 ",
             19: "♥️7 ", 20: "♥️8 ", 21: "♥️9 ", 22: "♥️10 ", 23: "♥️J ", 24: "♥️Q ", 25: "♥️K ", 26: "♣️A ", 27: "♣️2 ",
@@ -312,24 +312,24 @@ class PB{
         ]
 
         var inputString : String = ""
-        for i in 0..<inputCards.count{
-            inputString += testCardLabelDic[inputCards[i]]!
+        for i in 0..<inputSingleFeatures.count{
+            inputString += testSingleFeatureLabelDic[inputSingleFeatures[i]]!
         }
         
-        let (returnPlayerInfos, leftCards) = PBGame.calResult(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, cardArray: inputCards, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (returnPlayerInfos, leftCards)
+        let (returnRCInfos, leftSingleFeatures) = PBStatistic.calResult(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, singlefeatureArray: inputSingleFeatures, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (returnRCInfos, leftSingleFeatures)
     }
     
-    static func legalCheck(playerNum: Int, handNum: Int, cardNum: Int)->String{
+    static func legalCheck(rcNum: Int, handNum: Int, singlefeatureNum: Int)->String{
         
-        if(handNum * playerNum > cardNum){
+        if(handNum * rcNum > singlefeatureNum){
             return "牌数不足"
         }
         return ""
         
     }
     
-    static func GetAllCardIndex(setting: Int)->[Int]{
+    static func GetAllSingleFeatureIndex(setting: Int)->[Int]{
         var result : [Int] = []
         switch setting {
         case 0:
@@ -383,17 +383,17 @@ class PB{
         return result
     }
     
-    static func GetMinCardNum(playerNum: Int, handNum: Int, communityNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+    static func GetMinSingleFeatureNum(rcNum: Int, handNum: Int, communityNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
         
         if dealType == 0 || dealType == 1{
-            return playerNum * handNum + communityNum
+            return rcNum * handNum + communityNum
         } else {
             var minNum = 0
             for i in 0..<diyDealNum.count {
                 let num = diyDealNum[i]
                 //派牌
                 if diyDealStatus[i][0] == true {
-                    minNum += playerNum * num
+                    minNum += rcNum * num
                 //公牌
                 } else if diyDealStatus[i][1] == true {
                     minNum += num
@@ -411,47 +411,47 @@ class PB{
 
 
 //# UI STRUCTURE TO ARGUMENT VALUE
-//# number of cards -> int value:
+//# number of singlefeatures -> int value:
 //# 0: 20, 1: 32, 2: 36, 3: 40, 4: 42, 5: 52, 6: 54
 //
-//# way to deal cards -> int value:
-//# 0, normal dealing, 5 cards each
-//# 1, one card each for the first round and begin from the largest card
-//# 2, normal dealing, 3 cards each
-//# 3, normal dealing, 4 cards each*
-//# 4, normal dealing, 10 cards each*
+//# way to deal singlefeatures -> int value:
+//# 0, normal dealing, 5 singlefeatures each
+//# 1, one singlefeature each for the first round and begin from the largest singlefeature
+//# 2, normal dealing, 3 singlefeatures each
+//# 3, normal dealing, 4 singlefeatures each*
+//# 4, normal dealing, 10 singlefeatures each*
 //
 //# numberchangearray
-//# if card number change -> int Array:
+//# if singlefeature number change -> int Array:
 //# 0, 10 -> 0, 1, 1/0(计算点数时还是10)*, 1/0(计算点数时候时0/1)*
 //# 1, J -> 0, 1, 11
 //# 2, Q -> 0, 1, 2, 12
 //# 3, K -> 0, 1, 6, 13
-//# 4, BLACKJoker ->0, 1, 3, any*
-//# 5, REDJOKER ->0, 1, 6, any*
+//# 4, BLACKspecialfeature ->0, 1, 3, any*
+//# 5, REDspecialfeature ->0, 1, 6, any*
 //# 6, 3 -> 3, 3/6*
 //# 7, 6 -> 6, 3/6*
 //# 8, Spade A -> 1, 0(公牌)
 //
 //# Bull Rule for dealing 0, 1 -> int Array 0->no 1->yes:
-//# 0, any three cards equal to 10 * n
-//# 1, total five cards equal to 10 * n
-//# 2, Threecard
-//# 3, thress card straight
-//# 4, only contains J,K,Q,A,JOKER is BULLBULL(不看点数)
-//# 5, Three cards equal to 1
-//# 6, Five cards sum <= 10 (sum is the Bull number, exp. 1,2,2,2,1 牛8)
-//# 7, five cards sum <= 9
-//# 8, any three cards equal to 10 * n and at least > 20
+//# 0, any three singlefeatures equal to 10 * n
+//# 1, total five singlefeatures equal to 10 * n
+//# 2, Threesinglefeature
+//# 3, thress singlefeature straight
+//# 4, only contains J,K,Q,A,specialfeature is BULLBULL(不看点数)
+//# 5, Three singlefeatures equal to 1
+//# 6, Five singlefeatures sum <= 10 (sum is the Bull number, exp. 1,2,2,2,1 牛8)
+//# 7, five singlefeatures sum <= 9
+//# 8, any three singlefeatures equal to 10 * n and at least > 20
 //
 //# Rank Rule for dealing 0, 1, 4-> int Array
-//# 0, five cards sum >= 40
-//# 1, Fourcard
-//# 2, five cards sum <= 10
-//# 3, five cards sum == 20 and have bull
-//# 4, five cards sum == 30 and have bull
-//# 5, Threecard and other two sum == 10
-//# 6, five cards sum == 20 or 30
+//# 0, five singlefeatures sum >= 40
+//# 1, Foursinglefeature
+//# 2, five singlefeatures sum <= 10
+//# 3, five singlefeatures sum == 20 and have bull
+//# 4, five singlefeatures sum == 30 and have bull
+//# 5, Threesinglefeature and other two sum == 10
+//# 6, five singlefeatures sum == 20 or 30
 //# 7, Fullhouse
 //# 8, straight
 //# 9, Bullbull
@@ -462,33 +462,33 @@ class PB{
 //# 14, BullNine
 //# 15, Onepair
 //# 16, Flush
-//# 17, all cards < 5
-//# 18, DiamandBull(JQKJOKER)
+//# 17, all singlefeatures < 5
+//# 18, DiamandBull(JQKspecialfeature)
 //# 19, Bull+9pair max
 //# 20, Bull + JQ
 //# 21, Bull + 10J
 //# 22, Bull + A10
 //# 23, 235+pair
 //# 24, Bull + 10pair max
-//# 25, five cards sum = 40
-//# 26, IRONBULL threecard + other two sums 10 * n
+//# 25, five singlefeatures sum = 40
+//# 26, IRONBULL threesinglefeature + other two sums 10 * n
 //# 27, same color, all red or all black
 //# 28, straight Bull
 //# 29, hard bull three 2,3,5 -> bull
 //# 30，StraightFlush
 //# 31, FiveOne
-//# 32, five cards sum == 10
-//# 33, five cards sum == 20
-//# 34, five cards sum == 30
-//# 35, five cards sum == 40
-//# 36, five cards sum == 5
+//# 32, five singlefeatures sum == 10
+//# 33, five singlefeatures sum == 20
+//# 34, five singlefeatures sum == 30
+//# 35, five singlefeatures sum == 40
+//# 36, five singlefeatures sum == 5
 //# 37, spade A with JQK
 //# 38, BUll + Apairmax
 //# 39, BUll with spade A
 //# 40, GoldBull with Spade A
 //
 //# Rank Rule for dealing 2-> int Array
-//# 0，threecard
+//# 0，threesinglefeature
 //# 1, KQJ
 //# 2, QJ10
 //# 3, sum = 10 bull
@@ -504,30 +504,30 @@ class PB{
 //# 6, 顺子五小一样大*
 //# 7, 不分花色
 //# 8, 无牛只比最大两张牌
-//# 9，Joker是最小的0*
+//# 9，specialfeature是最小的0*
 
 
-class BullPlayer {
+class BullRC {
     
-    var playerID: Int
-    var playerCard: [PBGame.PBCard]
+    var rcID: Int
+    var rcSingleFeature: [PBStatistic.PBSingleFeature]
     var evaluateFlag: Int
-    var cardType: String
+    var singlefeatureType: String
     
     
-    init(playerIndex: Int) {
-        self.playerID = playerIndex
-        self.playerCard = []
+    init(rcIndex: Int) {
+        self.rcID = rcIndex
+        self.rcSingleFeature = []
         self.evaluateFlag = 0
-        self.cardType = ""
+        self.singlefeatureType = ""
     }
     
-    func insertCard(card: PBGame.PBCard) {
-        self.playerCard.append(card)
+    func insertSingleFeature(singlefeature: PBStatistic.PBSingleFeature) {
+        self.rcSingleFeature.append(singlefeature)
     }
     
-    func evaluateHandCards(bullRules: [Int], sameBullPointComparision: Int, fiveLittleComparision: Int, fiveLittleEqualToStraight: Bool, rankRules: [Int], startIndex: Int) {
-        (self.evaluateFlag, self.cardType) = BullHandEvaluator.evaluate(cards: Array(self.playerCard[startIndex..<startIndex+5]), inputBullRules: bullRules, inputSameBullPointComparision: sameBullPointComparision, inputFiveLittleComparision: fiveLittleComparision, inputFiveLittleEqualToStraight: fiveLittleEqualToStraight, rankRules: rankRules)
+    func evaluateHandSingleFeatures(bullRules: [Int], sameBullPointComparision: Int, fiveLittleComparision: Int, fiveLittleEqualToStraight: Bool, rankRules: [Int], startIndex: Int) {
+        (self.evaluateFlag, self.singlefeatureType) = BullHandEvaluator.evaluate(singlefeatures: Array(self.rcSingleFeature[startIndex..<startIndex+5]), inputBullRules: bullRules, inputSameBullPointComparision: sameBullPointComparision, inputFiveLittleComparision: fiveLittleComparision, inputFiveLittleEqualToStraight: fiveLittleEqualToStraight, rankRules: rankRules)
     }
 }
 
@@ -541,21 +541,21 @@ class BullPlayer {
 //# example2: []
 
 
-class PBGame {
+class PBStatistic {
     
-    class PBCard {
-        var tenValue, JValue, QValue, KValue, BJokerValue, RJokerValue, ThreeValue, SixValue, SpadeA: Int
+    class PBSingleFeature {
+        var tenValue, JValue, QValue, KValue, BspecialfeatureValue, RspecialfeatureValue, ThreeValue, SixValue, SpadeA: Int
         var suit, rank1Value, rank2Value, trueRank: Int
-        var cardIndex: Int
+        var singlefeatureIndex: Int
         var score: Int
         
-        init(card: Card, numberChangeArray: [Int], isNoSuit: Int, jokerMinZero: Int, suitRules: [Int]) {
+        init(singlefeature: SingleFeature, numberChangeArray: [Int], isNoSuit: Int, specialfeatureMinZero: Int, suitRules: [Int]) {
             self.tenValue = numberChangeArray[0]
             self.JValue = numberChangeArray[1]
             self.QValue = numberChangeArray[2]
             self.KValue = numberChangeArray[3]
-            self.BJokerValue = numberChangeArray[4]
-            self.RJokerValue = numberChangeArray[5]
+            self.BspecialfeatureValue = numberChangeArray[4]
+            self.RspecialfeatureValue = numberChangeArray[5]
             self.ThreeValue = numberChangeArray[6]
             self.SixValue = numberChangeArray[7]
             self.SpadeA = numberChangeArray[8]
@@ -563,12 +563,12 @@ class PBGame {
             self.suit = -1
             self.rank1Value = -1
             self.rank2Value = -1
-            self.trueRank = card.rank
-            self.cardIndex = card.cardIndex
+            self.trueRank = singlefeature.rank
+            self.singlefeatureIndex = singlefeature.singlefeatureIndex
             if isNoSuit == 0 {
                 self.suit = 0
             } else {
-                self.suit = card.suit[0]
+                self.suit = singlefeature.suit[0]
             }
             
 //            # rank1_value是用来组牛和计算点数时候的点数
@@ -576,10 +576,10 @@ class PBGame {
 //            # true_value是用来组成牌型的点数
 //            # 10 -10 10是0，1
             
-            if card.rank == 10 {
+            if singlefeature.rank == 10 {
                         if self.tenValue == 0 {
                             self.rank1Value = 0
-                            self.rank2Value = card.rank
+                            self.rank2Value = singlefeature.rank
                         } else if self.tenValue == 1 {
                             self.rank1Value = 1
                             self.rank2Value = 1
@@ -587,10 +587,10 @@ class PBGame {
                             self.rank1Value = -10
                             self.rank2Value = -10
                         }
-                    } else if card.rank == 11 {
+                    } else if singlefeature.rank == 11 {
                         if self.JValue == 0 {
                             self.rank1Value = 0
-                            self.rank2Value = card.rank
+                            self.rank2Value = singlefeature.rank
                         } else if self.JValue == 1 {
 
                             self.rank1Value = 1
@@ -604,10 +604,10 @@ class PBGame {
                             self.trueRank = 1
                             
                         }
-                    } else if card.rank == 12{
+                    } else if singlefeature.rank == 12{
                         if self.QValue == 0{
                             self.rank1Value = 0
-                            self.rank2Value = card.rank
+                            self.rank2Value = singlefeature.rank
                         } else if self.QValue == 1{
 
                             self.rank1Value = 1
@@ -619,7 +619,7 @@ class PBGame {
                             self.rank1Value = 12
                             self.rank2Value = 12
                         }
-                    } else if card.rank == 13 {
+                    } else if singlefeature.rank == 13 {
                         if self.KValue == 0 {
                             self.rank1Value = 0
                             self.rank2Value = 13
@@ -634,35 +634,35 @@ class PBGame {
                             self.rank1Value = 13
                             self.rank2Value = 13
                         }
-                    } else if card.rank == 14 {
-                        if self.BJokerValue == 0 {
+                    } else if singlefeature.rank == 14 {
+                        if self.BspecialfeatureValue == 0 {
                             self.rank1Value = 0
                             self.rank2Value = 14
-                        } else if self.BJokerValue == 1 {
+                        } else if self.BspecialfeatureValue == 1 {
                             self.rank1Value = 1
                             self.rank2Value = 1
-                        } else if self.BJokerValue == 2 {
+                        } else if self.BspecialfeatureValue == 2 {
                             self.rank1Value = 3
                             self.rank2Value = 3
-                        } else if self.BJokerValue == 3 {
+                        } else if self.BspecialfeatureValue == 3 {
                             self.rank1Value = -1
                             self.rank2Value = -1
                         }
-                    } else if card.rank == 15 {
-                        if self.RJokerValue == 0 {
+                    } else if singlefeature.rank == 15 {
+                        if self.RspecialfeatureValue == 0 {
                             self.rank1Value = 0
                             self.rank2Value = 15
-                        } else if self.RJokerValue == 1 {
+                        } else if self.RspecialfeatureValue == 1 {
                             self.rank1Value = 1
                             self.rank2Value = 1
-                        } else if self.RJokerValue == 2 {
+                        } else if self.RspecialfeatureValue == 2 {
                             self.rank1Value = 6
                             self.rank2Value = 6
-                        } else if self.RJokerValue == 3 {
+                        } else if self.RspecialfeatureValue == 3 {
                             self.rank1Value = -1
                             self.rank2Value = -1
                         }
-                    } else if card.rank == 3 {
+                    } else if singlefeature.rank == 3 {
                         if self.ThreeValue == 0 {
                             self.rank1Value = 3
                             self.rank2Value = 3
@@ -670,7 +670,7 @@ class PBGame {
                             self.rank1Value = -3
                             self.rank2Value = -3
                         }
-                    } else if card.rank == 6 {
+                    } else if singlefeature.rank == 6 {
                         if self.SixValue == 0 {
                             self.rank1Value = 6
                             self.rank2Value = 6
@@ -678,7 +678,7 @@ class PBGame {
                             self.rank1Value = -6
                             self.rank2Value = -6
                         }
-                    } else if card.rank == 1, card.suit[0] == 3 {
+                    } else if singlefeature.rank == 1, singlefeature.suit[0] == 3 {
                         if self.SpadeA == 0 {
                             self.rank1Value = 1
                             self.rank2Value = 1
@@ -687,8 +687,8 @@ class PBGame {
                             self.rank2Value = 0
                         }
                     } else {
-                        self.rank1Value = card.rank
-                        self.rank2Value = card.rank
+                        self.rank1Value = singlefeature.rank
+                        self.rank2Value = singlefeature.rank
                     }
             
             self.score = self.rank2Value << 2 | self.suit
@@ -697,55 +697,55 @@ class PBGame {
             // Note: Due to space limitations, I'm continuing the translation in the next response.
         }
         
-        func calScore(pokerBullCard: PBCard) -> Int {
-            return pokerBullCard.rank2Value << 2 | pokerBullCard.suit
+        func calScore(targetBullSingleFeature: PBSingleFeature) -> Int {
+            return targetBullSingleFeature.rank2Value << 2 | targetBullSingleFeature.suit
         }
         
         func calSelfScore() -> Int {
             return self.rank2Value << 2 | self.suit
         }
         
-        // Rest of the PBCard class translation...
+        // Rest of the PBSingleFeature class translation...
     }
     
-    static func calResult(diyDealStatus:[[Bool]], diyDealNum:[Int], cardArray: [Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
-        let deck = initDeck(initialCards: cardArray, suitRules: suitRules)
-        let (returnPlayerInfos, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules,suitRules: suitRules)
-        return (returnPlayerInfos, leftCards)
+    static func calResult(diyDealStatus:[[Bool]], diyDealNum:[Int], singlefeatureArray: [Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([StatisticReturnRCInfo],[Int]) {
+        let FeatureList = initFeatureList(initialSingleFeatures: singlefeatureArray, suitRules: suitRules)
+        let (returnRCInfos, leftSingleFeatures) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, FeatureList: FeatureList, args: args, rankRules: rankRules,suitRules: suitRules)
+        return (returnRCInfos, leftSingleFeatures)
     }
     
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], FeatureList: [SingleFeature], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([StatisticReturnRCInfo],[Int]) {
         // 解析 args
         let rule = ClassifierSettingArgs.targetSetting[1] as! PBRule
         let dealNum = args[0]
         let dealType = args[1]
-        let playerNum = args[2]
+        let rcNum = args[2]
         let communityNum = args[4]
         let handNum = args[3]
         //0 否，1 是
         let noSuit = args[5]
-        let wayToDealCards = args[6]
+        let wayToDealSingleFeatures = args[6]
         let fiveLittleComparision = args[7]
         let sameBullPointComparision = args[8]
-        let jokerMinZero = args[9]
+        let specialfeatureMinZero = args[9]
         let numberChangeArray = Array(args[10...18])
         let bullRule = Array(args[19...27])
         //TODO 是否需要添加牛牛
         let fiveLittleEqualToStraight = false
-        //组建bull deck
+        //组建bull FeatureList
         let suitRules = suitRules
         //debuglog
 
-        var bullDeck = [PBCard]()
-        for card in deck{
-            bullDeck.append(PBCard.init(card: card, numberChangeArray: numberChangeArray, isNoSuit: noSuit, jokerMinZero: jokerMinZero, suitRules: suitRules))
+        var bullFeatureList = [PBSingleFeature]()
+        for singlefeature in FeatureList{
+            bullFeatureList.append(PBSingleFeature.init(singlefeature: singlefeature, numberChangeArray: numberChangeArray, isNoSuit: noSuit, specialfeatureMinZero: specialfeatureMinZero, suitRules: suitRules))
         }
 
-        var allPlayers: [BullPlayer] = (0..<playerNum).map { BullPlayer(playerIndex: $0) }
-        var community = [PBCard]()
-        var returnPlayerInfos: [GameReturnPlayerInfo] = []
+        var allRCs: [BullRC] = (0..<rcNum).map { BullRC(rcIndex: $0) }
+        var community = [PBSingleFeature]()
+        var returnRCInfos: [StatisticReturnRCInfo] = []
         
-        if deck.count < PB.GetMinCardNum(playerNum: playerNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+        if FeatureList.count < PB.GetMinSingleFeatureNum(rcNum: rcNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
             return ([], [])
         }
         
@@ -754,59 +754,59 @@ class PBGame {
             for _ in 0..<handNum{
                 //正发
                 if dealType == 0{
-                    for i in 0..<playerNum {
-                        allPlayers[i].insertCard(card: bullDeck.removeFirst())
+                    for i in 0..<rcNum {
+                        allRCs[i].insertSingleFeature(singlefeature: bullFeatureList.removeFirst())
                     }
                 //反发
                 } else if dealType == 1 {
-                    for i in 0..<playerNum {
-                        allPlayers[i].insertCard(card: bullDeck.removeLast())
+                    for i in 0..<rcNum {
+                        allRCs[i].insertSingleFeature(singlefeature: bullFeatureList.removeLast())
                     }
                 }
             }
             
         } else {
             for actionIndex in 0...diyDealStatus.count - 1{
-                let cardNum = diyDealNum[actionIndex]
+                let singlefeatureNum = diyDealNum[actionIndex]
                 let action = diyDealStatus[actionIndex]
                 //派牌
                 if action[0] == true{
                     //正发
                     if dealType == 0{
-                        for i in 0..<playerNum {
-                            for _ in 0..<cardNum{
-                                allPlayers[i].insertCard(card: bullDeck.removeFirst())
+                        for i in 0..<rcNum {
+                            for _ in 0..<singlefeatureNum{
+                                allRCs[i].insertSingleFeature(singlefeature: bullFeatureList.removeFirst())
                             }
                         }
                     //反发
                     } else if dealType == 1{
-                        for i in 0..<playerNum {
-                            for _ in 0..<cardNum{
-                                allPlayers[i].insertCard(card: bullDeck.removeLast())
+                        for i in 0..<rcNum {
+                            for _ in 0..<singlefeatureNum{
+                                allRCs[i].insertSingleFeature(singlefeature: bullFeatureList.removeLast())
                             }
                         }
                     }
                 //公牌
                 } else if action[1] == true {
                     if dealType == 0{
-                        for _ in 0..<cardNum{
-                            community.append(bullDeck.removeFirst())
+                        for _ in 0..<singlefeatureNum{
+                            community.append(bullFeatureList.removeFirst())
                         }
                     } else if dealType == 1{
-                        for _ in 0..<cardNum{
-                            community.append(bullDeck.removeLast())
+                        for _ in 0..<singlefeatureNum{
+                            community.append(bullFeatureList.removeLast())
                         }
                     }
                     
                 //去牌
                 } else if action[2] == true {
                     if dealType == 0 {
-                        for _ in 0..<cardNum{
-                            bullDeck.removeFirst()
+                        for _ in 0..<singlefeatureNum{
+                            bullFeatureList.removeFirst()
                         }
                     } else if dealType == 1{
-                        for _ in 0..<cardNum{
-                            bullDeck.removeLast()
+                        for _ in 0..<singlefeatureNum{
+                            bullFeatureList.removeLast()
                         }
                     }
                 }
@@ -814,52 +814,52 @@ class PBGame {
         }
         
 //        // 计算牌额大小
-        if wayToDealCards == 0{
-            for player in allPlayers {
-                player.evaluateHandCards(bullRules: bullRule, sameBullPointComparision: sameBullPointComparision, fiveLittleComparision: fiveLittleComparision, fiveLittleEqualToStraight: fiveLittleEqualToStraight, rankRules: rankRules, startIndex: 0)
+        if wayToDealSingleFeatures == 0{
+            for rc in allRCs {
+                rc.evaluateHandSingleFeatures(bullRules: bullRule, sameBullPointComparision: sameBullPointComparision, fiveLittleComparision: fiveLittleComparision, fiveLittleEqualToStraight: fiveLittleEqualToStraight, rankRules: rankRules, startIndex: 0)
             }
-        } else if wayToDealCards == 1{
-            for player in allPlayers {
-                player.playerCard = player.playerCard + community
-                player.evaluateHandCards(bullRules: bullRule, sameBullPointComparision: sameBullPointComparision, fiveLittleComparision: fiveLittleComparision, fiveLittleEqualToStraight: fiveLittleEqualToStraight, rankRules: rankRules, startIndex: 0)
+        } else if wayToDealSingleFeatures == 1{
+            for rc in allRCs {
+                rc.rcSingleFeature = rc.rcSingleFeature + community
+                rc.evaluateHandSingleFeatures(bullRules: bullRule, sameBullPointComparision: sameBullPointComparision, fiveLittleComparision: fiveLittleComparision, fiveLittleEqualToStraight: fiveLittleEqualToStraight, rankRules: rankRules, startIndex: 0)
             }
         }
         
-        var leftCards:[Int] = []
+        var leftSingleFeatures:[Int] = []
 
-        for leftCard in bullDeck{
-            leftCards.append(leftCard.cardIndex)
+        for leftSingleFeature in bullFeatureList{
+            leftSingleFeatures.append(leftSingleFeature.singlefeatureIndex)
         }
         
-        if leftCards.count < PB.GetMinCardNum(playerNum: playerNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
-            leftCards = []
+        if leftSingleFeatures.count < PB.GetMinSingleFeatureNum(rcNum: rcNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+            leftSingleFeatures = []
         }
-        let sortedPlayers = allPlayers.sorted{$0.evaluateFlag > $1.evaluateFlag}
+        let sortedRCs = allRCs.sorted{$0.evaluateFlag > $1.evaluateFlag}
 
-        for player in sortedPlayers{
-            var currentPlayerReturnInfo = GameReturnPlayerInfo()
-            currentPlayerReturnInfo.playerID = player.playerID
-            currentPlayerReturnInfo.playerRank = player.evaluateFlag
-            currentPlayerReturnInfo.playerCardsType = player.cardType
-            currentPlayerReturnInfo.playerCardsSuit = ""
+        for rc in sortedRCs{
+            var currentRCReturnInfo = StatisticReturnRCInfo()
+            currentRCReturnInfo.rcID = rc.rcID
+            currentRCReturnInfo.rcRank = rc.evaluateFlag
+            currentRCReturnInfo.rcSingleFeaturesType = rc.singlefeatureType
+            currentRCReturnInfo.rcSingleFeaturesSuit = ""
             //存入手牌和公牌
-            for bullCard in player.playerCard {
-                currentPlayerReturnInfo.PlayerCards.append(Card(suit: [bullCard.suit], rank: bullCard.trueRank, cardIndex: bullCard.cardIndex))
+            for bullSingleFeature in rc.rcSingleFeature {
+                currentRCReturnInfo.RCSingleFeatures.append(SingleFeature(suit: [bullSingleFeature.suit], rank: bullSingleFeature.trueRank, singlefeatureIndex: bullSingleFeature.singlefeatureIndex))
             }
             
-            for bullCard in community {
-                currentPlayerReturnInfo.communityCard.append(Card(suit: [bullCard.suit], rank: bullCard.trueRank, cardIndex: bullCard.cardIndex))
+            for bullSingleFeature in community {
+                currentRCReturnInfo.communitySingleFeature.append(SingleFeature(suit: [bullSingleFeature.suit], rank: bullSingleFeature.trueRank, singlefeatureIndex: bullSingleFeature.singlefeatureIndex))
             }
             
-            returnPlayerInfos.append(currentPlayerReturnInfo)
+            returnRCInfos.append(currentRCReturnInfo)
         }
         
         
         
-        return (returnPlayerInfos, leftCards)
+        return (returnRCInfos, leftSingleFeatures)
     }
     
-    // Rest of the PBGame class translation...
+    // Rest of the PBStatistic class translation...
 }
 
 
@@ -884,52 +884,52 @@ class BullHandEvaluator {
     static let NOSUIT = false
 //    # 8, 无牛只比最大两张牌
     static let NOBULLRANKTOPTWO = false
-//    # 9，Joker是最小的0
-    static let JOKERISSMALLESTZERO = false
+//    # 9，specialfeature是最小的0
+    static let specialfeatureISSMALLESTZERO = false
     // ... (other class properties)
     static var bullRules: [Int] = [0]
     static var sameBullPointComparison: Int = 0
     static var fiveLittleComparison: Int = 0
     static var fiveLittleEqualToStraight: Bool = false
-    static let IS_BULL_DIC: [Int: ([PBGame.PBCard]) -> [[PBGame.PBCard]]] = [
-        0: anyThreeCardSumNten,
-        1: threeCard,
+    static let IS_BULL_DIC: [Int: ([PBStatistic.PBSingleFeature]) -> [[PBStatistic.PBSingleFeature]]] = [
+        0: anyThreeSingleFeatureSumNten,
+        1: threeSingleFeature,
         2: totalEqualToN10,
-        3: threeCardStraight,
-        4: onlyJKQAJoker,
-        5: threeRankOneCard,
-        6: fiveCardsSumLessThanTen,
-        7: fiveCardsSumLessThanNine,
-        8: anyThreeCardSumNtenOverTwenty
+        3: threeSingleFeatureStraight,
+        4: onlyJKQAspecialfeature,
+        5: threeRankOneSingleFeature,
+        6: fiveSingleFeaturesSumLessThanTen,
+        7: fiveSingleFeaturesSumLessThanNine,
+        8: anyThreeSingleFeatureSumNtenOverTwenty
         ]
-    static let THREE_CARDS_RANK_RULE_DIC: [Int: ([PBGame.PBCard]) -> (Bool, Int, String)] = [
-        1: isThreeCardTHR(cards:),
-        2: isJQKTHR(cards:),
-        3: isQJTENTHR(cards:),
-        4: isSumEqualToTenTHR(cards:),
-        5: isStraightTHR(cards:),
-        6: isStraightFlushTHR(cards:)
+    static let THREE_CARDS_RANK_RULE_DIC: [Int: ([PBStatistic.PBSingleFeature]) -> (Bool, Int, String)] = [
+        1: isThreeSingleFeatureTHR(singlefeatures:),
+        2: isJQKTHR(singlefeatures:),
+        3: isQJTENTHR(singlefeatures:),
+        4: isSumEqualToTenTHR(singlefeatures:),
+        5: isStraightTHR(singlefeatures:),
+        6: isStraightFlushTHR(singlefeatures:)
     ]
     
-    static let FIVE_CARDS_RANK_RULE_Dic: [Int: ([PBGame.PBCard]) -> (Bool, Int, String)] = [
-        0: isCardsSumLargerOrEqualForty,
-        1: isFourcard(cards:),
-        2: isFiveCardsSumLessOrEqualTen,
-        3: isFiveCardsSumEqualsToTwentyAndHaveBulls,
-        4: isFiveCardsSumEqualsToThirtyAndHaveBulls,
-        5: threecardAndOtherTen(cards:),
+    static let FIVE_CARDS_RANK_RULE_Dic: [Int: ([PBStatistic.PBSingleFeature]) -> (Bool, Int, String)] = [
+        0: isSingleFeaturesSumLargerOrEqualForty,
+        1: isFoursinglefeature(singlefeatures:),
+        2: isFiveSingleFeaturesSumLessOrEqualTen,
+        3: isFiveSingleFeaturesSumEqualsToTwentyAndHaveBulls,
+        4: isFiveSingleFeaturesSumEqualsToThirtyAndHaveBulls,
+        5: threesinglefeatureAndOtherTen(singlefeatures:),
         6: sumEqualTwentyOrThirty,
-        7: isFullhouse(cards:),
-        8: isStratght(cards:),
+        7: isFullhouse(singlefeatures:),
+        8: isStratght(singlefeatures:),
         9: isBullBull,
         10: isBull,
-        11: isGoldbull(cards:),
-        12: isSilverbull(cards:),
+        11: isGoldbull(singlefeatures:),
+        12: isSilverbull(singlefeatures:),
         13: isTwoPair,
         14: isBullNine,
         15: isOnePair,
         16: isFlush,
-        17: isAllCardsLessThanFive,
+        17: isAllSingleFeaturesLessThanFive,
         18: isDiamandBull,
         19: isBullPlusPairNine,
         20: isBullPlusJQ,
@@ -937,42 +937,42 @@ class BullHandEvaluator {
         22: isBullPlusATen,
         23: is235PlusPair,
         24: isBullPlusPair,
-        25: isFiveCardsSumForty,
+        25: isFiveSingleFeaturesSumForty,
         26: isIronBull,
         27: isSameColor,
         28: isStraightBull,
         29: is235Bull,
         30: isStraightFlush,
         31: isFiveOne,
-        32: isFiveCardsEqualTen,
-        33: isFiveCardsEqualTwenty,
-        34: isFiveCardsEqualThirty,
-        35: isFiveCardsEqualForty,
-        36: isFiveCardsEqualFive,
+        32: isFiveSingleFeaturesEqualTen,
+        33: isFiveSingleFeaturesEqualTwenty,
+        34: isFiveSingleFeaturesEqualThirty,
+        35: isFiveSingleFeaturesEqualForty,
+        36: isFiveSingleFeaturesEqualFive,
         37: isSpadeAWithJQK,
         38: isBullAPair,
         39: isBullWithSpadeA,
         40: isGoldBullWithSpadeA,
         41: isFiveLittle,
-        42: isHighCard,
+        42: isHighSingleFeature,
         43: isIronBullPlusBull,
-        44: isThreeCardBullPlusBull,
-        45: isThreeCardBullBUllPlusBullBull,
-        46: Is_threeCard(cards:)
+        44: isThreeSingleFeatureBullPlusBull,
+        45: isThreeSingleFeatureBullBUllPlusBullBull,
+        46: Is_threeSingleFeature(singlefeatures:)
             ]
     
-    static var TEN_CARDS_RANK_RULE_DIC: [Int: ([PBGame.PBCard]) -> (Bool, Int)] = [:]
+    static var TEN_CARDS_RANK_RULE_DIC: [Int: ([PBStatistic.PBSingleFeature]) -> (Bool, Int)] = [:]
         
-    static var FOUR_CARDS_RANK_RULE_DIC: [Int: ([PBGame.PBCard]) -> (Bool, Int)] = [:]
+    static var FOUR_CARDS_RANK_RULE_DIC: [Int: ([PBStatistic.PBSingleFeature]) -> (Bool, Int)] = [:]
 
     
-    static func evaluate(cards: [PBGame.PBCard], inputBullRules: [Int], inputSameBullPointComparision: Int, inputFiveLittleComparision: Int, inputFiveLittleEqualToStraight: Bool, rankRules: [Int]) -> (Int, String) {
+    static func evaluate(singlefeatures: [PBStatistic.PBSingleFeature], inputBullRules: [Int], inputSameBullPointComparision: Int, inputFiveLittleComparision: Int, inputFiveLittleEqualToStraight: Bool, rankRules: [Int]) -> (Int, String) {
         let suitRules :[Int] = [3,2,1,0]
 
-        var handCardsString:String = ""
-        for handCard in cards{
-            handCardsString += ClassifierSettingArgs.cardLabelDic[handCard.cardIndex]!
-            handCardsString += String(handCard.rank1Value) + " " + String(handCard.rank2Value)
+        var handSingleFeaturesString:String = ""
+        for handSingleFeature in singlefeatures{
+            handSingleFeaturesString += ClassifierSettingArgs.singlefeatureLabelDic[handSingleFeature.singlefeatureIndex]!
+            handSingleFeaturesString += String(handSingleFeature.rank1Value) + " " + String(handSingleFeature.rank2Value)
         }
         self.bullRules.removeAll()
         for i in 0..<inputBullRules.count{
@@ -986,12 +986,12 @@ class BullHandEvaluator {
         self.fiveLittleEqualToStraight = inputFiveLittleEqualToStraight
         let rank_rules: [Int] = rankRules
         
-        var funcs: [(_ cards: [PBGame.PBCard]) -> (Bool, Int, String)] = []
-        var ruleDic: [Int: ([PBGame.PBCard]) -> (Bool, Int, String)] = [:]
+        var funcs: [(_ singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String)] = []
+        var ruleDic: [Int: ([PBStatistic.PBSingleFeature]) -> (Bool, Int, String)] = [:]
 
-        if cards.count == 3 {
+        if singlefeatures.count == 3 {
             ruleDic = THREE_CARDS_RANK_RULE_DIC
-        } else if cards.count == 5 {
+        } else if singlefeatures.count == 5 {
             ruleDic = FIVE_CARDS_RANK_RULE_Dic
         }
 
@@ -1003,13 +1003,13 @@ class BullHandEvaluator {
         var tempIndex = 0
         for funcTuple in funcs {
             i -= 1
-            let (flag, rank, cardType) = funcTuple(cards)
+            let (flag, rank, singlefeatureType) = funcTuple(singlefeatures)
             if flag != true {
                 tempIndex += 1
                 continue
             } else {
                 let eval = (1 << (25 + i)) | rank
-                return (eval, cardType)
+                return (eval, singlefeatureType)
             }
         }
         return (0, "") // You should adjust the return value accordingly
@@ -1021,11 +1021,11 @@ class BullHandEvaluator {
 //            # TODO 组牛时候的多个值的变化
 //        ###################################################
         // Tested
-        static func anyThreeCardSumNten(cards: [PBGame.PBCard]) -> [[PBGame.PBCard]] {
-            var bulls: [[PBGame.PBCard]] = []
-            for combination in cards.combinations(ofCount: 3) {
+        static func anyThreeSingleFeatureSumNten(singlefeatures: [PBStatistic.PBSingleFeature]) -> [[PBStatistic.PBSingleFeature]] {
+            var bulls: [[PBStatistic.PBSingleFeature]] = []
+            for combination in singlefeatures.combinations(ofCount: 3) {
                 
-                let sumOfCombination = sumAllBullCard(combination: combination, rank: 1)
+                let sumOfCombination = sumAllBullSingleFeature(combination: combination, rank: 1)
                 if sumOfCombination % 10 == 0 && combination.count == 3 {
                     bulls.append(Array(combination))
                 }
@@ -1033,40 +1033,40 @@ class BullHandEvaluator {
             var allBulls = ""
             for bull in bulls{
                 allBulls += "组牛"
-                for card in bull{
-                    allBulls += " \(card.rank1Value) \(card.trueRank) "
+                for singlefeature in bull{
+                    allBulls += " \(singlefeature.rank1Value) \(singlefeature.trueRank) "
                 }
             }
             return bulls
         }
         //Tested
-        static func threeCard(cards: [PBGame.PBCard]) -> [[PBGame.PBCard]] {
-            var counts: [Int: [PBGame.PBCard]] = [:]
-            var bulls: [[PBGame.PBCard]] = []
+        static func threeSingleFeature(singlefeatures: [PBStatistic.PBSingleFeature]) -> [[PBStatistic.PBSingleFeature]] {
+            var counts: [Int: [PBStatistic.PBSingleFeature]] = [:]
+            var bulls: [[PBStatistic.PBSingleFeature]] = []
             
-            for card in cards {
-                counts[card.trueRank, default: []].append(card)
-                if counts[card.trueRank]!.count == 3 {
-                    bulls.append(counts[card.trueRank]!)
+            for singlefeature in singlefeatures {
+                counts[singlefeature.trueRank, default: []].append(singlefeature)
+                if counts[singlefeature.trueRank]!.count == 3 {
+                    bulls.append(counts[singlefeature.trueRank]!)
                 }
             }
             return bulls
         }
         //Tested
-        static func totalEqualToN10(cards: [PBGame.PBCard]) -> [[PBGame.PBCard]] {
-            let sum = sumAllBullCard(combination: cards, rank: 1)
+        static func totalEqualToN10(singlefeatures: [PBStatistic.PBSingleFeature]) -> [[PBStatistic.PBSingleFeature]] {
+            let sum = sumAllBullSingleFeature(combination: singlefeatures, rank: 1)
             if sum % 10 == 0 {
-                return [cards]
+                return [singlefeatures]
             }
             return []
         }
         //tested
-        static func threeCardStraight(cards: [PBGame.PBCard]) -> [[PBGame.PBCard]] {
-            var bulls: [[PBGame.PBCard]] = []
+        static func threeSingleFeatureStraight(singlefeatures: [PBStatistic.PBSingleFeature]) -> [[PBStatistic.PBSingleFeature]] {
+            var bulls: [[PBStatistic.PBSingleFeature]] = []
             
-            for combination in cards.combinations(ofCount: 3) {
-                let sortedCombination = combination.sorted(by: { (card1, card2) -> Bool in
-                    return card1.trueRank < card2.trueRank
+            for combination in singlefeatures.combinations(ofCount: 3) {
+                let sortedCombination = combination.sorted(by: { (singlefeature1, singlefeature2) -> Bool in
+                    return singlefeature1.trueRank < singlefeature2.trueRank
                 })
                 if sortedCombination.count == 3 && sortedCombination[0].trueRank + 2 == sortedCombination[1].trueRank + 1 &&
                    sortedCombination[1].trueRank + 1 == sortedCombination[2].trueRank {
@@ -1076,13 +1076,13 @@ class BullHandEvaluator {
             return bulls
         }
         //Tested
-        static func onlyJKQAJoker(cards: [PBGame.PBCard]) -> [[PBGame.PBCard]] {
-            var bulls: [[PBGame.PBCard]] = []
-            var combination: [PBGame.PBCard] = []
+        static func onlyJKQAspecialfeature(singlefeatures: [PBStatistic.PBSingleFeature]) -> [[PBStatistic.PBSingleFeature]] {
+            var bulls: [[PBStatistic.PBSingleFeature]] = []
+            var combination: [PBStatistic.PBSingleFeature] = []
             
-            for card in cards {
-                if card.trueRank == 1 || card.trueRank > 10 {
-                    combination.append(card)
+            for singlefeature in singlefeatures {
+                if singlefeature.trueRank == 1 || singlefeature.trueRank > 10 {
+                    combination.append(singlefeature)
                 }
             }
             
@@ -1093,11 +1093,11 @@ class BullHandEvaluator {
             return bulls
         }
         //tested
-        static func threeRankOneCard(cards: [PBGame.PBCard]) -> [[PBGame.PBCard]] {
-            var bulls: [[PBGame.PBCard]] = []
+        static func threeRankOneSingleFeature(singlefeatures: [PBStatistic.PBSingleFeature]) -> [[PBStatistic.PBSingleFeature]] {
+            var bulls: [[PBStatistic.PBSingleFeature]] = []
             
-            for combination in cards.combinations(ofCount: 3) {
-                let sumOfCombination = sumAllBullCard(combination: combination, rank: 1)
+            for combination in singlefeatures.combinations(ofCount: 3) {
+                let sumOfCombination = sumAllBullSingleFeature(combination: combination, rank: 1)
                 if sumOfCombination == 3 {
                     bulls.append(Array(combination))
                 }
@@ -1106,31 +1106,31 @@ class BullHandEvaluator {
             return bulls
         }
         //Tested
-        static func fiveCardsSumLessThanTen(cards: [PBGame.PBCard]) -> [[PBGame.PBCard]] {
-            var bulls: [[PBGame.PBCard]] = []
+        static func fiveSingleFeaturesSumLessThanTen(singlefeatures: [PBStatistic.PBSingleFeature]) -> [[PBStatistic.PBSingleFeature]] {
+            var bulls: [[PBStatistic.PBSingleFeature]] = []
             
-            if sumAllBullCard(combination: cards,rank: 2) <= 10 {
-                bulls.append(cards)
+            if sumAllBullSingleFeature(combination: singlefeatures,rank: 2) <= 10 {
+                bulls.append(singlefeatures)
             }
             
             return bulls
         }
         // Tested
-        static func fiveCardsSumLessThanNine(cards: [PBGame.PBCard]) -> [[PBGame.PBCard]] {
-            var bulls: [[PBGame.PBCard]] = []
+        static func fiveSingleFeaturesSumLessThanNine(singlefeatures: [PBStatistic.PBSingleFeature]) -> [[PBStatistic.PBSingleFeature]] {
+            var bulls: [[PBStatistic.PBSingleFeature]] = []
             
-            if sumAllBullCard(combination: cards,rank: 2) < 10 {
-                bulls.append(cards)
+            if sumAllBullSingleFeature(combination: singlefeatures,rank: 2) < 10 {
+                bulls.append(singlefeatures)
             }
             
             return bulls
         }
         //Tested
-        static func anyThreeCardSumNtenOverTwenty(cards: [PBGame.PBCard]) -> [[PBGame.PBCard]] {
-            var bulls: [[PBGame.PBCard]] = []
+        static func anyThreeSingleFeatureSumNtenOverTwenty(singlefeatures: [PBStatistic.PBSingleFeature]) -> [[PBStatistic.PBSingleFeature]] {
+            var bulls: [[PBStatistic.PBSingleFeature]] = []
             
-            for combination in cards.combinations(ofCount: 3) {
-                let sumOfCombination = sumAllBullCard(combination: combination, rank: 1)
+            for combination in singlefeatures.combinations(ofCount: 3) {
+                let sumOfCombination = sumAllBullSingleFeature(combination: combination, rank: 1)
                 if sumOfCombination % 10 == 0 && sumOfCombination > 20 && combination.count == 3{
                     bulls.append(Array(combination))
                 }
@@ -1143,139 +1143,139 @@ class BullHandEvaluator {
 //        #所有的3张牌的牌型判断
 //        # ################################
     //Tested
-    static func isThreeCardTHR(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
+    static func isThreeSingleFeatureTHR(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
         var counts: [Int: Int] = [:]
-        for card in cards {
-            counts[card.trueRank, default: 0] += 1
+        for singlefeature in singlefeatures {
+            counts[singlefeature.trueRank, default: 0] += 1
         }
         
         if counts.count == 1 {
-            let cardType: String = "三条" + ClassifierSettingArgs.CardNumberReportDic[cards[0].trueRank]!
-            return (true, cards[0].rank2Value, cardType)
+            let singlefeatureType: String = "三条" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].trueRank]!
+            return (true, singlefeatures[0].rank2Value, singlefeatureType)
         } else {
             return (false, 0, "")
         }
     }
     //Tested
-    static func isJQKTHR(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        var mutableCards = cards
-        mutableCards.sort(by: { $0.trueRank < $1.trueRank })
+    static func isJQKTHR(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        var mutableSingleFeatures = singlefeatures
+        mutableSingleFeatures.sort(by: { $0.trueRank < $1.trueRank })
         var firstRank = 11
-        for card in mutableCards {
-            if card.trueRank != firstRank {
+        for singlefeature in mutableSingleFeatures {
+            if singlefeature.trueRank != firstRank {
                 return (false, 0, "")
             }
             firstRank += 1
         }
-        return (true, mutableCards.last!.score, "JQK")
+        return (true, mutableSingleFeatures.last!.score, "JQK")
     }
     //Tested
-    static func isQJTENTHR(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        var mutableCards = cards // 创建可变副本
-        mutableCards.sort(by: { $0.trueRank < $1.trueRank })
+    static func isQJTENTHR(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        var mutableSingleFeatures = singlefeatures // 创建可变副本
+        mutableSingleFeatures.sort(by: { $0.trueRank < $1.trueRank })
         var firstRank = 10
-        for card in mutableCards {
-            if card.trueRank != firstRank {
+        for singlefeature in mutableSingleFeatures {
+            if singlefeature.trueRank != firstRank {
                 return (false, 0, "")
             }
             firstRank += 1
         }
-        return (true, mutableCards.last!.score, "QJ十")
+        return (true, mutableSingleFeatures.last!.score, "QJ十")
     }
 
     //Tested
-    static func isSumEqualToTenTHR(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        if sumAllBullCard(combination: cards, rank: 1) == 10 {
-            return (true, self.rankForMaxCard(cards: cards), "点数和10点")
+    static func isSumEqualToTenTHR(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        if sumAllBullSingleFeature(combination: singlefeatures, rank: 1) == 10 {
+            return (true, self.rankForMaxSingleFeature(singlefeatures: singlefeatures), "点数和10点")
         }
         return (false, 0, "")
     }
     
     //Tested
-    static func isStraightFlushTHR(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        return isStraightFlush(cards: cards)
+    static func isStraightFlushTHR(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        return isStraightFlush(singlefeatures: singlefeatures)
     }
     //Tested
-    static func isStraightTHR(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        return isStratght(cards: cards)
+    static func isStraightTHR(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        return isStratght(singlefeatures: singlefeatures)
     }
     
     //五张牌牌型判断
     //######################################
     
     //Tested
-    static func isCardsSumLargerOrEqualForty(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        if sumAllBullCard(combination: cards, rank: 2) < 40 {
+    static func isSingleFeaturesSumLargerOrEqualForty(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        if sumAllBullSingleFeature(combination: singlefeatures, rank: 2) < 40 {
                 return (false, 0, "")
             } else {
-                let rank = rankForMaxCard(cards: cards)
+                let rank = rankForMaxSingleFeature(singlefeatures: singlefeatures)
                 return (true, rank, "点数总和大于40")
             }
         }
     //Tested
-    static func isFourcard(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
+    static func isFoursinglefeature(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
         var counts: [Int: Int] = [:]
         
-        for card in cards {
-            counts[card.trueRank, default: 0] += 1
-            if counts[card.trueRank] == 4 {
-                var cardType: String = "四条" + ClassifierSettingArgs.CardNumberReportDic[card.trueRank]!
+        for singlefeature in singlefeatures {
+            counts[singlefeature.trueRank, default: 0] += 1
+            if counts[singlefeature.trueRank] == 4 {
+                var singlefeatureType: String = "四条" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeature.trueRank]!
             
-                return (true, card.trueRank, cardType)
+                return (true, singlefeature.trueRank, singlefeatureType)
             }
         }
         
         return (false, 0, "")
     }
     //Tested
-    static func isFiveCardsSumLessOrEqualTen(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        if sumAllBullCard(combination: cards, rank: 2) > 10 {
+    static func isFiveSingleFeaturesSumLessOrEqualTen(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        if sumAllBullSingleFeature(combination: singlefeatures, rank: 2) > 10 {
             return (false, 0, "")
         } else {
             if self.FIVELITTLESECONDRANK == 0 {
                 return (true, 0, "五张点数总和小于10")
             } else if self.FIVELITTLESECONDRANK == 1 {
-                return (true, sumAllBullCard(combination: cards, rank: 2),"五张点数总和小于10")
+                return (true, sumAllBullSingleFeature(combination: singlefeatures, rank: 2),"五张点数总和小于10")
             } else if self.FIVELITTLESECONDRANK == 2 {
-                return (true, ~sumAllBullCard(combination: cards, rank: 2),"五张点数总和小于10")
+                return (true, ~sumAllBullSingleFeature(combination: singlefeatures, rank: 2),"五张点数总和小于10")
             }
         }
         return (false, 0, "")
     }
     //Tested
-    static func isFiveCardsSumEqualsToTwentyAndHaveBulls(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        if sumAllBullCard(combination: cards, rank: 2) == 20 && isBull(cards: cards).0 {
-            let rank = rankForMaxCard(cards: cards)
+    static func isFiveSingleFeaturesSumEqualsToTwentyAndHaveBulls(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        if sumAllBullSingleFeature(combination: singlefeatures, rank: 2) == 20 && isBull(singlefeatures: singlefeatures).0 {
+            let rank = rankForMaxSingleFeature(singlefeatures: singlefeatures)
             return (true, rank, "五张总和等于20有牛")
         } else {
             return (false, 0,"")
         }
     }
     
-    static func isFiveCardsSumEqualsToThirtyAndHaveBulls(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        if cards.reduce(into: 0) { $0 + $1.rank2Value } == 30 && isBull(cards: cards).0 {
-            let rank = rankForMaxCard(cards: cards)
+    static func isFiveSingleFeaturesSumEqualsToThirtyAndHaveBulls(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        if singlefeatures.reduce(into: 0) { $0 + $1.rank2Value } == 30 && isBull(singlefeatures: singlefeatures).0 {
+            let rank = rankForMaxSingleFeature(singlefeatures: singlefeatures)
             return (true, rank,"五张总和等于30有牛")
         } else {
             return (false, 0,"")
         }
     }
     
-    static func threecardAndOtherTen(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
+    static func threesinglefeatureAndOtherTen(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
         var counts: [Int: Int] = [:]
         
-        for card in cards {
-            counts[card.trueRank, default: 0] += 1
+        for singlefeature in singlefeatures {
+            counts[singlefeature.trueRank, default: 0] += 1
         }
         
         for (key, value) in counts {
             if value == 3 {
                 let rank = key
-                let cardType: String = "三条" +  ClassifierSettingArgs.CardNumberReportDic[rank]! + "其他牌10倍数"
+                let singlefeatureType: String = "三条" +  ClassifierSettingArgs.SingleFeatureNumberReportDic[rank]! + "其他牌10倍数"
                 let otherValuesSum = counts.filter { $0.key != key }.reduce(0) { $0 + $1.value }
                 if otherValuesSum % 10 == 0 {
                     
-                    return (true, rank, cardType)
+                    return (true, rank, singlefeatureType)
                 }
             }
         }
@@ -1283,30 +1283,30 @@ class BullHandEvaluator {
         return (false, 0, "")
     }
     
-    static func sumEqualTwentyOrThirty(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        if cards.reduce(0) { $0 + $1.rank1Value } == 20 || cards.reduce(0) { $0 + $1.rank1Value } == 30 {
-            return (true, rankForMaxCard(cards: cards),"点数总和等于20或30")
+    static func sumEqualTwentyOrThirty(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        if singlefeatures.reduce(0) { $0 + $1.rank1Value } == 20 || singlefeatures.reduce(0) { $0 + $1.rank1Value } == 30 {
+            return (true, rankForMaxSingleFeature(singlefeatures: singlefeatures),"点数总和等于20或30")
         } else {
             return (false, 0,"")
         }
     }
     
-    static func isFullhouse(cards: [PBGame.PBCard]) -> (Bool, Int,String) {
+    static func isFullhouse(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int,String) {
         var counts: [Int: Int] = [:]
         var trueValueDic: [Int: Int] = [:]
         
-        for card in cards {
-            counts[card.trueRank, default: 0] += 1
-            trueValueDic[card.trueRank] = card.rank2Value
+        for singlefeature in singlefeatures {
+            counts[singlefeature.trueRank, default: 0] += 1
+            trueValueDic[singlefeature.trueRank] = singlefeature.rank2Value
         }
         
         for (key, value) in counts {
             if value == 3 {
                 let rank = trueValueDic[key] ?? 0
-                let cardType: String = ClassifierSettingArgs.CardNumberReportDic[rank]! + "葫芦"
+                let singlefeatureType: String = ClassifierSettingArgs.SingleFeatureNumberReportDic[rank]! + "葫芦"
                 let otherValuesNum = counts.filter { $0.key != key }.values.first ?? 0
                 if otherValuesNum == 2 {
-                    return (true, rank, cardType)
+                    return (true, rank, singlefeatureType)
                 }
             }
         }
@@ -1314,25 +1314,25 @@ class BullHandEvaluator {
         return (false, 0,"")
     }
     
-    static func isStratght(cards: [PBGame.PBCard]) -> (Bool, Int,String) {
-        let sortedCards = cards.sorted { $0.rank2Value < $1.rank2Value }
+    static func isStratght(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int,String) {
+        let sortedSingleFeatures = singlefeatures.sorted { $0.rank2Value < $1.rank2Value }
         
-        for cardIndex in 0..<(sortedCards.count - 1) {
-            if sortedCards[cardIndex].rank2Value + 1 != sortedCards[cardIndex + 1].rank2Value {
+        for singlefeatureIndex in 0..<(sortedSingleFeatures.count - 1) {
+            if sortedSingleFeatures[singlefeatureIndex].rank2Value + 1 != sortedSingleFeatures[singlefeatureIndex + 1].rank2Value {
                 return (false, 0, "")
             }
         }
-        let cardType: String = ClassifierSettingArgs.CardNumberReportDic[sortedCards[0].trueRank]! + "顺子"
-        return (true, sortedCards[0].score, cardType)
+        let singlefeatureType: String = ClassifierSettingArgs.SingleFeatureNumberReportDic[sortedSingleFeatures[0].trueRank]! + "顺子"
+        return (true, sortedSingleFeatures[0].score, singlefeatureType)
     }
     
-    static func isBullBull(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        var allbulls: [[[PBGame.PBCard]]] = []
+    static func isBullBull(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        var allbulls: [[[PBStatistic.PBSingleFeature]]] = []
         var bullRank = 0
         
         for index in self.bullRules {
             let bullFunc = self.IS_BULL_DIC[index]!
-            let bulls = bullFunc(cards)
+            let bulls = bullFunc(singlefeatures)
             if !bulls.isEmpty {
                 allbulls.append(bulls)
             }
@@ -1348,37 +1348,37 @@ class BullHandEvaluator {
             for bull in bulls {
                 if bull.count == 5 {
                     bullRank = bull.reduce(0) { $0 + $1.rank2Value } % 10
-                    if bullRank == 0 || !self.onlyJKQAJoker(cards: cards).isEmpty {
+                    if bullRank == 0 || !self.onlyJKQAspecialfeature(singlefeatures: singlefeatures).isEmpty {
                         if self.sameBullPointComparison == 0 {
-                            rank = rankForMaxCard(cards: cards)
+                            rank = rankForMaxSingleFeature(singlefeatures: singlefeatures)
                         } else if self.sameBullPointComparison == 1 {
                             
                         } else if self.sameBullPointComparison == 2 {
                             rank = 0
                         } else if sameBullPointComparison == 4{
-                            rank = 0x111111 & ~( cards.reduce(0){$0 + $1.rank1Value})
+                            rank = 0x111111 & ~( singlefeatures.reduce(0){$0 + $1.rank1Value})
                         }
                     }
                 }
                 
                 if bull.count == 3 {
-                    var otherCards: [PBGame.PBCard] = []
-                    for card in cards {
-                        if hasCard(combination: bull, searchCard: card) == false {
-                            otherCards.append(card)
+                    var otherSingleFeatures: [PBStatistic.PBSingleFeature] = []
+                    for singlefeature in singlefeatures {
+                        if hasSingleFeature(combination: bull, searchSingleFeature: singlefeature) == false {
+                            otherSingleFeatures.append(singlefeature)
                         }
                     }
                     
                     
-                    var cardsRank = 0
-                    for item in otherCards {
-                        cardsRank += item.rank1Value
+                    var singlefeaturesRank = 0
+                    for item in otherSingleFeatures {
+                        singlefeaturesRank += item.rank1Value
                     }
                     
-                    cardsRank = cardsRank % 10
+                    singlefeaturesRank = singlefeaturesRank % 10
                     
-                    if cardsRank == 0 {
-                        let currentRank = self.rankForSameBullSamePoint(cards: cards, otherCards: otherCards)
+                    if singlefeaturesRank == 0 {
+                        let currentRank = self.rankForSameBullSamePoint(singlefeatures: singlefeatures, otherSingleFeatures: otherSingleFeatures)
                         if currentRank > rank{
                             rank = currentRank
                         }
@@ -1393,15 +1393,15 @@ class BullHandEvaluator {
         return (true, (bullRank << 18) | rank, "牛牛")
     }
     
-    static func isBull(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        var allbulls: [[[PBGame.PBCard]]] = []
+    static func isBull(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        var allbulls: [[[PBStatistic.PBSingleFeature]]] = []
         var bullRank = 0
         var rank = 0
         
         for index in self.bullRules {
             let bullFunc = self.IS_BULL_DIC[index]!
             
-            let bulls = bullFunc(cards)
+            let bulls = bullFunc(singlefeatures)
             if !bulls.isEmpty {
                 allbulls.append(bulls)
             }
@@ -1414,58 +1414,58 @@ class BullHandEvaluator {
         for bulls in allbulls {
             for bull in bulls {
                 if bull.count == 5 {
-                    bullRank = sumAllBullCard(combination: bull, rank: 1) % 10
+                    bullRank = sumAllBullSingleFeature(combination: bull, rank: 1) % 10
                 }
                 if bull.count == 3 {
-                    var otherCards: [PBGame.PBCard] = []
-                    for card in cards {
-                        if hasCard(combination: bull, searchCard: card) == false {
-                            otherCards.append(card)
+                    var otherSingleFeatures: [PBStatistic.PBSingleFeature] = []
+                    for singlefeature in singlefeatures {
+                        if hasSingleFeature(combination: bull, searchSingleFeature: singlefeature) == false {
+                            otherSingleFeatures.append(singlefeature)
                         }
                     }
-                    var cardsRank = 0
-                    for item in otherCards {
-                        cardsRank += item.rank1Value
+                    var singlefeaturesRank = 0
+                    for item in otherSingleFeatures {
+                        singlefeaturesRank += item.rank1Value
                     }
-                    cardsRank = cardsRank % 10
-                    if cardsRank > bullRank {
-                        bullRank = cardsRank
-                        rank = self.rankForSameBullSamePoint(cards: cards, otherCards: otherCards)
+                    singlefeaturesRank = singlefeaturesRank % 10
+                    if singlefeaturesRank > bullRank {
+                        bullRank = singlefeaturesRank
+                        rank = self.rankForSameBullSamePoint(singlefeatures: singlefeatures, otherSingleFeatures: otherSingleFeatures)
                     }
                 }
             }
         }
         
-        let cardType = "牛" + String(bullRank)
-        return (true, (bullRank << 18) | rank, cardType)
+        let singlefeatureType = "牛" + String(bullRank)
+        return (true, (bullRank << 18) | rank, singlefeatureType)
     }
 
-    static func isGoldbull(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
+    static func isGoldbull(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
             var count = 0
             
-            for card in cards {
-                if card.rank2Value > 10 {
+            for singlefeature in singlefeatures {
+                if singlefeature.rank2Value > 10 {
                     count += 1
                 }
             }
             
             if count == 5 {
-                let rank = rankForMaxCard(cards: cards)
+                let rank = rankForMaxSingleFeature(singlefeatures: singlefeatures)
                 return (true, rank, "黄金牛")
             }
             
             return (false, 0, "")
         }
         
-        static func isSilverbull(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
+        static func isSilverbull(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
             var count = 0
             
-            for card in cards {
-                if card.rank2Value < 10 {
+            for singlefeature in singlefeatures {
+                if singlefeature.rank2Value < 10 {
                     return (false, 0, "")
                 }
                 
-                if card.rank2Value == 10 {
+                if singlefeature.rank2Value == 10 {
                     count += 1
                 }
                 
@@ -1474,46 +1474,46 @@ class BullHandEvaluator {
                 }
             }
             
-            let rank = rankForMaxCard(cards: cards)
+            let rank = rankForMaxSingleFeature(singlefeatures: singlefeatures)
             return (true, rank, "银牛")
         }
         
-        static func isTwoPair(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
+        static func isTwoPair(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
             var counts: [Int: Int] = [:]
             
-            for card in cards {
-                counts[card.trueRank, default: 0] += 1
+            for singlefeature in singlefeatures {
+                counts[singlefeature.trueRank, default: 0] += 1
             }
             
             var pair: [Int] = []
-            var highcard: [Int] = []
+            var highsinglefeature: [Int] = []
             
             for (key, value) in counts {
                 if value == 2 {
                     pair.append(key)
                 } else {
-                    highcard.append(key)
+                    highsinglefeature.append(key)
                 }
             }
             
             if pair.count == 2 {
                 pair.sort(by: >)
-                highcard.sort(by: >)
-                let cardType: String = ClassifierSettingArgs.CardNumberReportDic[pair[0]]! + ClassifierSettingArgs.CardNumberReportDic[pair[1]]! + "两对"
-                return (true, (pair[0] << 8) | (pair[1] << 4) | highcard[0], cardType)
+                highsinglefeature.sort(by: >)
+                let singlefeatureType: String = ClassifierSettingArgs.SingleFeatureNumberReportDic[pair[0]]! + ClassifierSettingArgs.SingleFeatureNumberReportDic[pair[1]]! + "两对"
+                return (true, (pair[0] << 8) | (pair[1] << 4) | highsinglefeature[0], singlefeatureType)
             }
             
             return (false, 0, "")
         }
         
-        static func isBullNine(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-            var allbulls: [[[PBGame.PBCard]]] = []
+        static func isBullNine(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+            var allbulls: [[[PBStatistic.PBSingleFeature]]] = []
             var bullRank = 0
             var rank = 0
             
             for index in self.bullRules {
                 let bullFunc = self.IS_BULL_DIC[index]!
-                let bulls = bullFunc(cards)
+                let bulls = bullFunc(singlefeatures)
                 if !bulls.isEmpty {
                     allbulls.append(bulls)
                 }
@@ -1530,24 +1530,24 @@ class BullHandEvaluator {
                     }
                     
                     if bull.count == 3 {
-                        var otherCards: [PBGame.PBCard] = []
-                        for card in cards {
-                            if !bull.contains(where: {$0 as! AnyHashable == card as! AnyHashable}) {
-                                otherCards.append(card)
+                        var otherSingleFeatures: [PBStatistic.PBSingleFeature] = []
+                        for singlefeature in singlefeatures {
+                            if !bull.contains(where: {$0 as! AnyHashable == singlefeature as! AnyHashable}) {
+                                otherSingleFeatures.append(singlefeature)
                             }
                         }
                         
-                        var cardsRank = 0
-                        for item in otherCards {
-                            cardsRank += item.rank1Value
+                        var singlefeaturesRank = 0
+                        for item in otherSingleFeatures {
+                            singlefeaturesRank += item.rank1Value
                         }
                         
-                        cardsRank = cardsRank % 10
+                        singlefeaturesRank = singlefeaturesRank % 10
                         
-                        if cardsRank > bullRank {
-                            bullRank = cardsRank
+                        if singlefeaturesRank > bullRank {
+                            bullRank = singlefeaturesRank
                             
-                            rank = self.rankForSameBullSamePoint(cards: cards, otherCards: otherCards)
+                            rank = self.rankForSameBullSamePoint(singlefeatures: singlefeatures, otherSingleFeatures: otherSingleFeatures)
                         }
                     }
                 }
@@ -1560,79 +1560,79 @@ class BullHandEvaluator {
             return (false, 0, "")
         }
         
-        static func isOnePair(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
+        static func isOnePair(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
             var counts: [Int: Int] = [:]
             
-            for card in cards {
-                counts[card.trueRank, default: 0] += 1
+            for singlefeature in singlefeatures {
+                counts[singlefeature.trueRank, default: 0] += 1
             }
             
             var pair: [Int] = []
-            var highcard: [Int] = []
+            var highsinglefeature: [Int] = []
             
             for (key, value) in counts {
                 if value == 2 {
                     pair.append(key)
                 } else {
-                    highcard.append(key)
+                    highsinglefeature.append(key)
                 }
             }
             
             if pair.count == 2 {
                 pair.sort(by: >)
-                highcard.sort(by: >)
-                let cardType: String = "对" +  ClassifierSettingArgs.CardNumberReportDic[pair[0]]!
-                return (true, (pair[0] << 8) | highcard[0], cardType)
+                highsinglefeature.sort(by: >)
+                let singlefeatureType: String = "对" +  ClassifierSettingArgs.SingleFeatureNumberReportDic[pair[0]]!
+                return (true, (pair[0] << 8) | highsinglefeature[0], singlefeatureType)
             }
             
             return (false, 0, "")
         }
         
-        static func isFlush(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-            let suit = cards[0].suit
+        static func isFlush(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+            let suit = singlefeatures[0].suit
             
-            for card in cards {
-                if card.suit != suit {
+            for singlefeature in singlefeatures {
+                if singlefeature.suit != suit {
                     return (false, 0, "")
                 }
             }
             
-            return (true, rankForMaxCard(cards: cards), "同花")
+            return (true, rankForMaxSingleFeature(singlefeatures: singlefeatures), "同花")
         }
 
-    static func isAllCardsLessThanFive(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        for card in cards {
-            if card.rank2Value > 5 {
+    static func isAllSingleFeaturesLessThanFive(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        for singlefeature in singlefeatures {
+            if singlefeature.rank2Value > 5 {
                 return (false, 0, "")
             }
         }
-        return (true, rankForMaxCard(cards: cards), "所有点数之和小于5")
+        return (true, rankForMaxSingleFeature(singlefeatures: singlefeatures), "所有点数之和小于5")
     }
     
-    static func isDiamandBull(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
+    static func isDiamandBull(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
         var diamand = 0
-        for card in cards {
-            if card.trueRank < 11 {
+        for singlefeature in singlefeatures {
+            if singlefeature.trueRank < 11 {
                 return (false, 0,"")
             }
-            if card.trueRank > 13 {
+            if singlefeature.trueRank > 13 {
                 diamand += 1
             }
         }
         if diamand != 0 {
-            return (true, rankForMaxCard(cards: cards), "钻石牛牛")
+            return (true, rankForMaxSingleFeature(singlefeatures: singlefeatures), "钻石牛牛")
         }
         return (false, 0, "")
     }
     
-    static func isBullPlusPairNine(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        var allbulls: [[[PBGame.PBCard]]] = []
+    static func isBullPlusPairNine(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        var allbulls: [[[PBStatistic.PBSingleFeature]]] = []
         var rank = 0
         
         // find out all bull
         for index in self.bullRules {
             let bullFunc = self.IS_BULL_DIC[index]!
-            let bulls = bullFunc(cards)
+            let bulls = bullFunc(singlefeatures)
             if !bulls.isEmpty {
                 allbulls.append(bulls)
             }
@@ -1648,18 +1648,18 @@ class BullHandEvaluator {
                     continue
                 }
                 if bull.count == 3 {
-                    var otherCards: [PBGame.PBCard] = []
-                    for card in cards {
-                        if !bull.contains(where: {$0 as! AnyHashable == card as! AnyHashable}) {
-                            otherCards.append(card)
+                    var otherSingleFeatures: [PBStatistic.PBSingleFeature] = []
+                    for singlefeature in singlefeatures {
+                        if !bull.contains(where: {$0 as! AnyHashable == singlefeature as! AnyHashable}) {
+                            otherSingleFeatures.append(singlefeature)
                         }
                     }
                     rank = 0
-                    if otherCards[0].trueRank == 9 && otherCards[1].trueRank == 9 {
+                    if otherSingleFeatures[0].trueRank == 9 && otherSingleFeatures[1].trueRank == 9 {
                         if self.sameBullPointComparison == 0 {
-                            rank = rankForMaxCard(cards: cards)
+                            rank = rankForMaxSingleFeature(singlefeatures: singlefeatures)
                         } else if self.sameBullPointComparison == 1 {
-                            rank = rankForMaxCard(cards: otherCards)
+                            rank = rankForMaxSingleFeature(singlefeatures: otherSingleFeatures)
                         } else if self.sameBullPointComparison == 2 {
                             rank = 0
                         }
@@ -1671,14 +1671,14 @@ class BullHandEvaluator {
         return (false, 0, "")
     }
     
-    static func isBullPlusJQ(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        var allbulls: [[[PBGame.PBCard]]] = []
+    static func isBullPlusJQ(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        var allbulls: [[[PBStatistic.PBSingleFeature]]] = []
         var rank = 0
         
         // find out all bull
         for index in self.bullRules {
             let bullFunc = self.IS_BULL_DIC[index]!
-            let bulls = bullFunc(cards)
+            let bulls = bullFunc(singlefeatures)
             if !bulls.isEmpty {
                 allbulls.append(bulls)
             }
@@ -1694,19 +1694,19 @@ class BullHandEvaluator {
                     continue
                 }
                 if bull.count == 3 {
-                    var otherCards: [PBGame.PBCard] = []
-                    for card in cards {
-                        if !bull.contains(where: {$0 as! AnyHashable == card as! AnyHashable}) {
-                            otherCards.append(card)
+                    var otherSingleFeatures: [PBStatistic.PBSingleFeature] = []
+                    for singlefeature in singlefeatures {
+                        if !bull.contains(where: {$0 as! AnyHashable == singlefeature as! AnyHashable}) {
+                            otherSingleFeatures.append(singlefeature)
                         }
                     }
-                    otherCards.sort(by: { $0.trueRank > $1.trueRank })
+                    otherSingleFeatures.sort(by: { $0.trueRank > $1.trueRank })
                     rank = 0
-                    if otherCards[0].trueRank == 12 && otherCards[1].trueRank == 11 {
+                    if otherSingleFeatures[0].trueRank == 12 && otherSingleFeatures[1].trueRank == 11 {
                         if self.sameBullPointComparison == 0 {
-                            rank = rankForMaxCard(cards: cards)
+                            rank = rankForMaxSingleFeature(singlefeatures: singlefeatures)
                         } else if self.sameBullPointComparison == 1 {
-                            rank = rankForMaxCard(cards: otherCards)
+                            rank = rankForMaxSingleFeature(singlefeatures: otherSingleFeatures)
                         } else if self.sameBullPointComparison==2 {
                             rank = 0
                         }
@@ -1718,14 +1718,14 @@ class BullHandEvaluator {
         return (false, 0, "")
     }
     
-    static func isBullPlusTenJ(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        var allbulls: [[[PBGame.PBCard]]] = []
+    static func isBullPlusTenJ(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        var allbulls: [[[PBStatistic.PBSingleFeature]]] = []
         var rank = 0
         
         // find out all bull
         for index in self.bullRules {
             let bullFunc = self.IS_BULL_DIC[index]!
-            let bulls = bullFunc(cards)
+            let bulls = bullFunc(singlefeatures)
             if !bulls.isEmpty {
                 allbulls.append(bulls)
             }
@@ -1741,19 +1741,19 @@ class BullHandEvaluator {
                     continue
                 }
                 if bull.count == 3 {
-                    var otherCards: [PBGame.PBCard] = []
-                    for card in cards {
-                        if !bull.contains(where: {$0 as! AnyHashable == card as! AnyHashable}) {
-                            otherCards.append(card)
+                    var otherSingleFeatures: [PBStatistic.PBSingleFeature] = []
+                    for singlefeature in singlefeatures {
+                        if !bull.contains(where: {$0 as! AnyHashable == singlefeature as! AnyHashable}) {
+                            otherSingleFeatures.append(singlefeature)
                         }
                     }
-                    otherCards.sort(by: { $0.trueRank > $1.trueRank })
+                    otherSingleFeatures.sort(by: { $0.trueRank > $1.trueRank })
                     rank = 0
-                    if otherCards[0].trueRank == 11 && otherCards[1].trueRank == 10 {
+                    if otherSingleFeatures[0].trueRank == 11 && otherSingleFeatures[1].trueRank == 10 {
                         if self.sameBullPointComparison == 0 {
-                            rank = rankForMaxCard(cards: cards)
+                            rank = rankForMaxSingleFeature(singlefeatures: singlefeatures)
                         } else if self.sameBullPointComparison == 1 {
-                            rank = rankForMaxCard(cards: otherCards)
+                            rank = rankForMaxSingleFeature(singlefeatures: otherSingleFeatures)
                         } else if (self.sameBullPointComparison != 0) {
                             rank = 0
                         }
@@ -1765,14 +1765,14 @@ class BullHandEvaluator {
         return (false, 0, "")
     }
     
-    static func isBullPlusATen(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        var allbulls: [[[PBGame.PBCard]]] = []
+    static func isBullPlusATen(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        var allbulls: [[[PBStatistic.PBSingleFeature]]] = []
         var rank = 0
         
         // find out all bull
         for index in self.bullRules {
             let bullFunc = self.IS_BULL_DIC[index]!
-            let bulls = bullFunc(cards)
+            let bulls = bullFunc(singlefeatures)
             if !bulls.isEmpty {
                 allbulls.append(bulls)
             }
@@ -1788,19 +1788,19 @@ class BullHandEvaluator {
                     continue
                 }
                 if bull.count == 3 {
-                    var otherCards: [PBGame.PBCard] = []
-                    for card in cards {
-                        if !bull.contains(where: {$0 as! AnyHashable == card as! AnyHashable}) {
-                            otherCards.append(card)
+                    var otherSingleFeatures: [PBStatistic.PBSingleFeature] = []
+                    for singlefeature in singlefeatures {
+                        if !bull.contains(where: {$0 as! AnyHashable == singlefeature as! AnyHashable}) {
+                            otherSingleFeatures.append(singlefeature)
                         }
                     }
-                    otherCards.sort(by: { $0.trueRank > $1.trueRank })
+                    otherSingleFeatures.sort(by: { $0.trueRank > $1.trueRank })
                     rank = 0
-                    if otherCards[0].trueRank == 10 && otherCards[1].trueRank == 1 {
+                    if otherSingleFeatures[0].trueRank == 10 && otherSingleFeatures[1].trueRank == 1 {
                         if self.sameBullPointComparison == 0 {
-                            rank = rankForMaxCard(cards: cards)
+                            rank = rankForMaxSingleFeature(singlefeatures: singlefeatures)
                         } else if self.sameBullPointComparison == 1 {
-                            rank = rankForMaxCard(cards: otherCards)
+                            rank = rankForMaxSingleFeature(singlefeatures: otherSingleFeatures)
                         } else if self.sameBullPointComparison==2{
                             rank = 0
                         }
@@ -1812,38 +1812,38 @@ class BullHandEvaluator {
         return (false, 0, "")
     }
     
-    static func is235PlusPair(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
+    static func is235PlusPair(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
         var counts: [Int: Int] = [:]
-        for card in cards {
-            counts[card.trueRank] = (counts[card.trueRank] ?? 0) + 1
+        for singlefeature in singlefeatures {
+            counts[singlefeature.trueRank] = (counts[singlefeature.trueRank] ?? 0) + 1
         }
         var pair: [Int] = []
-        var highcard: [Int] = []
+        var highsinglefeature: [Int] = []
         for (key, value) in counts {
             if value == 2 {
                 pair.append(key)
             } else {
-                highcard.append(key)
+                highsinglefeature.append(key)
             }
         }
         if pair.count == 1 {
             pair.sort(by: >)
-            highcard.sort(by: >)
-            if highcard[0] == 5 && highcard[1] == 3 && highcard[2] == 2 {
-                return (true, (pair[0] << 4) | highcard[0], "235加对子")
+            highsinglefeature.sort(by: >)
+            if highsinglefeature[0] == 5 && highsinglefeature[1] == 3 && highsinglefeature[2] == 2 {
+                return (true, (pair[0] << 4) | highsinglefeature[0], "235加对子")
             }
         }
         return (false, 0, "")
     }
     
-    static func isBullPlusPair(cards: [PBGame.PBCard]) -> (Bool, Int,String) {
-        var allbulls: [[[PBGame.PBCard]]] = []
+    static func isBullPlusPair(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int,String) {
+        var allbulls: [[[PBStatistic.PBSingleFeature]]] = []
         var rank = 0
         
         // find out all bull
         for index in self.bullRules {
             let bullFunc = self.IS_BULL_DIC[index]!
-            let bulls = bullFunc(cards)
+            let bulls = bullFunc(singlefeatures)
             if !bulls.isEmpty {
                 allbulls.append(bulls)
             }
@@ -1852,26 +1852,26 @@ class BullHandEvaluator {
         if allbulls.isEmpty {
             return (false, 0, "")
         }
-        var cardType: String = ""
+        var singlefeatureType: String = ""
         for bulls in allbulls {
             for bull in bulls {
                 if bull.count == 5 {
                     continue
                 }
                 if bull.count == 3 {
-                    var otherCards: [PBGame.PBCard] = []
-                    for card in cards {
-                        if self.hasCard(combination: bull, searchCard: card) == false {
-                            otherCards.append(card)
+                    var otherSingleFeatures: [PBStatistic.PBSingleFeature] = []
+                    for singlefeature in singlefeatures {
+                        if self.hasSingleFeature(combination: bull, searchSingleFeature: singlefeature) == false {
+                            otherSingleFeatures.append(singlefeature)
                         }
                     }
                     rank = 0
-                    if otherCards[0].trueRank == otherCards[1].trueRank{
+                    if otherSingleFeatures[0].trueRank == otherSingleFeatures[1].trueRank{
                         
-                        let currentRank = (otherCards[0].trueRank << 18) | self.rankForSameBullSamePoint(cards: cards, otherCards: otherCards)
+                        let currentRank = (otherSingleFeatures[0].trueRank << 18) | self.rankForSameBullSamePoint(singlefeatures: singlefeatures, otherSingleFeatures: otherSingleFeatures)
                         if currentRank > rank{
                             rank = currentRank
-                            cardType = "牛加对" + ClassifierSettingArgs.CardNumberReportDic[otherCards[0].trueRank]!
+                            singlefeatureType = "牛加对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[otherSingleFeatures[0].trueRank]!
                         }
                     }
                 }
@@ -1880,86 +1880,86 @@ class BullHandEvaluator {
         if rank == 0 {
             return (false, 0,"")
         }
-        return (true, rank, cardType)
+        return (true, rank, singlefeatureType)
     }
     
-    static func isFiveCardsSumForty(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        if cards.map({ $0.rank2Value }).reduce(0, +) == 40 {
-            return (true, rankForMaxCard(cards: cards), "五张牌等于40")
+    static func isFiveSingleFeaturesSumForty(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        if singlefeatures.map({ $0.rank2Value }).reduce(0, +) == 40 {
+            return (true, rankForMaxSingleFeature(singlefeatures: singlefeatures), "五张牌等于40")
         }
         return (false, 0, "")
     }
     
-    static func isIronBull(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        let threeCard = self.threeCard(cards: cards)
-        if threeCard.isEmpty {
+    static func isIronBull(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        let threeSingleFeature = self.threeSingleFeature(singlefeatures: singlefeatures)
+        if threeSingleFeature.isEmpty {
             return (false, 0,"")
         } else {
             var num = 0
-            for card in cards {
-                if !threeCard[0].contains(where: {$0.cardIndex == card.cardIndex}) {
-                    num += card.rank1Value
+            for singlefeature in singlefeatures {
+                if !threeSingleFeature[0].contains(where: {$0.singlefeatureIndex == singlefeature.singlefeatureIndex}) {
+                    num += singlefeature.rank1Value
                 }
             }
             if num % 10 == 0{
-                return (true, threeCard[0][0].trueRank, "铁板牛牛")
+                return (true, threeSingleFeature[0][0].trueRank, "铁板牛牛")
             }
         }
         return (false, 0, "")
     }
     
-    static func isSameColor(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
+    static func isSameColor(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
         var black = 0
         var red = 0
-        for card in cards {
-            if card.suit == 1 || card.suit == 3 {
+        for singlefeature in singlefeatures {
+            if singlefeature.suit == 1 || singlefeature.suit == 3 {
                 black += 1
             }
-            if card.suit == 2 || card.suit == 0 {
+            if singlefeature.suit == 2 || singlefeature.suit == 0 {
                 red += 1
             }
         }
         if black == 5 || red == 5 {
-            return (true, rankForMaxCard(cards: cards), "同色")
+            return (true, rankForMaxSingleFeature(singlefeatures: singlefeatures), "同色")
         }
         return (false, 0, "")
     }
     
-    static func isStraightBull(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        if !self.threeCardStraight(cards: cards).isEmpty {
-            return (true, rankForMaxCard(cards: cards), "顺牛")
+    static func isStraightBull(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        if !self.threeSingleFeatureStraight(singlefeatures: singlefeatures).isEmpty {
+            return (true, rankForMaxSingleFeature(singlefeatures: singlefeatures), "顺牛")
         }
         return (false, 0, "")
     }
     
-    static func is235Bull(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        var sortedCard = self.sortBullCardsFromLowToHigh(cards: cards)
+    static func is235Bull(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        var sortedSingleFeature = self.sortBullSingleFeaturesFromLowToHigh(singlefeatures: singlefeatures)
         var a = 0
         var b = 0
         var c = 0
-        var clonedList = sortedCard
+        var clonedList = sortedSingleFeature
         
-        for card in sortedCard {
-            if card.rank2Value == 2 && a != 1 {
+        for singlefeature in sortedSingleFeature {
+            if singlefeature.rank2Value == 2 && a != 1 {
                 a = 1
-                clonedList.removeAll { $0 as! AnyHashable == card as! AnyHashable }
+                clonedList.removeAll { $0 as! AnyHashable == singlefeature as! AnyHashable }
             }
-            if card.rank2Value == 3 && b != 1 {
+            if singlefeature.rank2Value == 3 && b != 1 {
                 b = 1
-                clonedList.removeAll { $0 as! AnyHashable == card as! AnyHashable }
+                clonedList.removeAll { $0 as! AnyHashable == singlefeature as! AnyHashable }
             }
-            if card.rank2Value == 5 && c != 1 {
+            if singlefeature.rank2Value == 5 && c != 1 {
                 c = 1
-                clonedList.removeAll { $0 as! AnyHashable == card as! AnyHashable }
+                clonedList.removeAll { $0 as! AnyHashable == singlefeature as! AnyHashable }
             }
         }
         if clonedList.count == 2 {
             if self.sameBullPointComparison == 0 {
-                let rank = rankForMaxCard(cards: cards)
+                let rank = rankForMaxSingleFeature(singlefeatures: singlefeatures)
                 return (true, rank, "235牛")
             }
             if self.sameBullPointComparison == 1 {
-                let rank = rankForMaxCard(cards: clonedList)
+                let rank = rankForMaxSingleFeature(singlefeatures: clonedList)
                 return (true, rank, "235牛")
             }
             if self.sameBullPointComparison==2 {
@@ -1969,82 +1969,82 @@ class BullHandEvaluator {
         return (false, 0, "")
     }
 
-    static func isStraightFlush(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        let (isFlush, _,_) = self.isFlush(cards: cards)
-        let (isStraight, _,_) = self.isStratght(cards: cards)
+    static func isStraightFlush(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        let (isFlush, _,_) = self.isFlush(singlefeatures: singlefeatures)
+        let (isStraight, _,_) = self.isStratght(singlefeatures: singlefeatures)
 
         if isFlush && isStraight {
-            return (true, rankForMaxCard(cards: cards), "同花顺")
+            return (true, rankForMaxSingleFeature(singlefeatures: singlefeatures), "同花顺")
         }
         return (false, 0, "")
     }
     
-    static func isFiveOne(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        for card in cards {
-            if card.rank2Value != 1 {
+    static func isFiveOne(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        for singlefeature in singlefeatures {
+            if singlefeature.rank2Value != 1 {
                 return (false, 0,"")
             }
         }
-        return (true, rankForMaxCard(cards: cards), "五个1点")
+        return (true, rankForMaxSingleFeature(singlefeatures: singlefeatures), "五个1点")
     }
     
-    static func isFiveCardsEqualTen(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        if cards.map({ $0.rank1Value }).reduce(0, +) == 10 {
-            return (true, rankForMaxCard(cards: cards), "五张牌和为10")
+    static func isFiveSingleFeaturesEqualTen(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        if singlefeatures.map({ $0.rank1Value }).reduce(0, +) == 10 {
+            return (true, rankForMaxSingleFeature(singlefeatures: singlefeatures), "五张牌和为10")
         }
         return (false, 0, "")
     }
     
-    static func isFiveCardsEqualTwenty(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        if cards.map({ $0.rank1Value }).reduce(0, +) == 20 {
-            return (true, rankForMaxCard(cards: cards), "五张牌和为20")
+    static func isFiveSingleFeaturesEqualTwenty(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        if singlefeatures.map({ $0.rank1Value }).reduce(0, +) == 20 {
+            return (true, rankForMaxSingleFeature(singlefeatures: singlefeatures), "五张牌和为20")
         }
         return (false, 0, "")
     }
     
-    static func isFiveCardsEqualThirty(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        if cards.map({ $0.rank1Value }).reduce(0, +) == 30 {
-            return (true, rankForMaxCard(cards: cards), "五张牌和为30")
+    static func isFiveSingleFeaturesEqualThirty(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        if singlefeatures.map({ $0.rank1Value }).reduce(0, +) == 30 {
+            return (true, rankForMaxSingleFeature(singlefeatures: singlefeatures), "五张牌和为30")
         }
         return (false, 0, "")
     }
     
-    static func isFiveCardsEqualForty(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        if cards.map({ $0.rank1Value }).reduce(0, +) == 40 {
-            return (true, rankForMaxCard(cards: cards), "五张牌和为40")
+    static func isFiveSingleFeaturesEqualForty(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        if singlefeatures.map({ $0.rank1Value }).reduce(0, +) == 40 {
+            return (true, rankForMaxSingleFeature(singlefeatures: singlefeatures), "五张牌和为40")
         }
         return (false, 0, "")
     }
     
-    static func isFiveCardsEqualFive(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        if cards.map({ $0.rank1Value }).reduce(0, +) == 5 {
-            return (true, rankForMaxCard(cards: cards), "五张牌和为5")
+    static func isFiveSingleFeaturesEqualFive(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        if singlefeatures.map({ $0.rank1Value }).reduce(0, +) == 5 {
+            return (true, rankForMaxSingleFeature(singlefeatures: singlefeatures), "五张牌和为5")
         }
         return (false, 0, "")
     }
     
-    static func isSpadeAWithJQK(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        var sortedCards = cards.sorted(by: { $0.trueRank > $1.trueRank })
-        if sortedCards.last?.trueRank == 1 && sortedCards.last?.suit == 3 {
-            sortedCards.removeLast()
-            for card in sortedCards {
-                if card.trueRank < 11 || card.trueRank > 13 {
+    static func isSpadeAWithJQK(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        var sortedSingleFeatures = singlefeatures.sorted(by: { $0.trueRank > $1.trueRank })
+        if sortedSingleFeatures.last?.trueRank == 1 && sortedSingleFeatures.last?.suit == 3 {
+            sortedSingleFeatures.removeLast()
+            for singlefeature in sortedSingleFeatures {
+                if singlefeature.trueRank < 11 || singlefeature.trueRank > 13 {
                     return (false, 0, "")
                 }
             }
-            return (true, rankForMaxCard(cards: cards), "黑桃A和JQK")
+            return (true, rankForMaxSingleFeature(singlefeatures: singlefeatures), "黑桃A和JQK")
         }
         return (false, 0, "")
     }
     
-    static func isBullAPair(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        var allbulls: [[[PBGame.PBCard]]] = []
+    static func isBullAPair(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        var allbulls: [[[PBStatistic.PBSingleFeature]]] = []
         var rank = 0
         
         // find out all bull
         for index in self.bullRules {
             let bullFunc = self.IS_BULL_DIC[index]!
-            let bulls = bullFunc(cards)
+            let bulls = bullFunc(singlefeatures)
             if !bulls.isEmpty {
                 allbulls.append(bulls)
             }
@@ -2060,18 +2060,18 @@ class BullHandEvaluator {
                     continue
                 }
                 if bull.count == 3 {
-                    var otherCards: [PBGame.PBCard] = []
-                    for card in cards {
-                        if !bull.contains(where: {$0 as! AnyHashable == card as! AnyHashable}) {
-                            otherCards.append(card)
+                    var otherSingleFeatures: [PBStatistic.PBSingleFeature] = []
+                    for singlefeature in singlefeatures {
+                        if !bull.contains(where: {$0 as! AnyHashable == singlefeature as! AnyHashable}) {
+                            otherSingleFeatures.append(singlefeature)
                         }
                     }
                     rank = 0
-                    if otherCards[0].trueRank == 1 && otherCards[1].trueRank == 1 {
+                    if otherSingleFeatures[0].trueRank == 1 && otherSingleFeatures[1].trueRank == 1 {
                         if self.sameBullPointComparison == 0 {
-                            rank = rankForMaxCard(cards: cards)
+                            rank = rankForMaxSingleFeature(singlefeatures: singlefeatures)
                         } else if self.sameBullPointComparison == 1 {
-                            rank = rankForMaxCard(cards: otherCards)
+                            rank = rankForMaxSingleFeature(singlefeatures: otherSingleFeatures)
                         } else if self.sameBullPointComparison==2{
                             rank = 0
                         }
@@ -2083,14 +2083,14 @@ class BullHandEvaluator {
         return (false, 0, "")
     }
     
-    static func isBullWithSpadeA(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        var allbulls: [[[PBGame.PBCard]]] = []
+    static func isBullWithSpadeA(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        var allbulls: [[[PBStatistic.PBSingleFeature]]] = []
         var rank = 0
         
         // find out all bull
         for index in self.bullRules {
             let bullFunc = self.IS_BULL_DIC[index]!
-            let bulls = bullFunc(cards)
+            let bulls = bullFunc(singlefeatures)
             if !bulls.isEmpty {
                 allbulls.append(bulls)
             }
@@ -2106,18 +2106,18 @@ class BullHandEvaluator {
                     continue
                 }
                 if bull.count == 3 {
-                    var otherCards: [PBGame.PBCard] = []
-                    for card in cards {
-                        if !bull.contains(where: {$0 as! AnyHashable == card as! AnyHashable}) {
-                            otherCards.append(card)
+                    var otherSingleFeatures: [PBStatistic.PBSingleFeature] = []
+                    for singlefeature in singlefeatures {
+                        if !bull.contains(where: {$0 as! AnyHashable == singlefeature as! AnyHashable}) {
+                            otherSingleFeatures.append(singlefeature)
                         }
                     }
                     rank = 0
-                    if (otherCards[0].trueRank == 1 && otherCards[0].suit == 3) || (otherCards[1].trueRank == 1 && otherCards[1].suit == 3) {
+                    if (otherSingleFeatures[0].trueRank == 1 && otherSingleFeatures[0].suit == 3) || (otherSingleFeatures[1].trueRank == 1 && otherSingleFeatures[1].suit == 3) {
                         if self.sameBullPointComparison == 0 {
-                            rank = rankForMaxCard(cards: cards)
+                            rank = rankForMaxSingleFeature(singlefeatures: singlefeatures)
                         } else if self.sameBullPointComparison == 1 {
-                            rank = rankForMaxCard(cards: otherCards)
+                            rank = rankForMaxSingleFeature(singlefeatures: otherSingleFeatures)
                         } else if self.sameBullPointComparison == 2{
                             rank = 0
                         }
@@ -2129,68 +2129,68 @@ class BullHandEvaluator {
         return (false, 0, "")
     }
     
-    static func isGoldBullWithSpadeA(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        var sortedCards = cards.sorted(by: { $0.trueRank < $1.trueRank })
-        if sortedCards.last?.trueRank == 1 && sortedCards.last?.suit == 3 {
-            sortedCards.removeLast()
-            for card in sortedCards {
-                if card.trueRank < 11 || card.trueRank > 15 {
+    static func isGoldBullWithSpadeA(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        var sortedSingleFeatures = singlefeatures.sorted(by: { $0.trueRank < $1.trueRank })
+        if sortedSingleFeatures.last?.trueRank == 1 && sortedSingleFeatures.last?.suit == 3 {
+            sortedSingleFeatures.removeLast()
+            for singlefeature in sortedSingleFeatures {
+                if singlefeature.trueRank < 11 || singlefeature.trueRank > 15 {
                     return (false, 0, "")
                 }
             }
-            return (true, rankForMaxCard(cards: cards), "黄金牛加黑桃A")
+            return (true, rankForMaxSingleFeature(singlefeatures: singlefeatures), "黄金牛加黑桃A")
         }
         return (false, 0, "")
     }
     
-    static func isFiveLittle(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        if cards.map({ $0.rank2Value }).reduce(0, +) > 10 {
+    static func isFiveLittle(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        if singlefeatures.map({ $0.rank2Value }).reduce(0, +) > 10 {
             return (false, 0, "")
         }
-        for card in cards {
-            if card.rank2Value > 5 {
+        for singlefeature in singlefeatures {
+            if singlefeature.rank2Value > 5 {
                 return (false, 0, "")
             }
         }
-        let rank = rankForMaxCard(cards: cards)
+        let rank = rankForMaxSingleFeature(singlefeatures: singlefeatures)
         return (true, rank, "五小")
     }
     
-    static func isHighCard(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
+    static func isHighSingleFeature(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
         
-        return (true, rankForMaxCard(cards: cards), "单牌")
+        return (true, rankForMaxSingleFeature(singlefeatures: singlefeatures), "单牌")
     }
-    static func isIronBullPlusBull(cards: [PBGame.PBCard]) -> (Bool, Int, String){
-        let (flag1, rank1, cardType1) =  self.isIronBull(cards: cards)
-        let (flag2, rank2, cardType2) = self.isBull(cards: cards)
+    static func isIronBullPlusBull(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String){
+        let (flag1, rank1, singlefeatureType1) =  self.isIronBull(singlefeatures: singlefeatures)
+        let (flag2, rank2, singlefeatureType2) = self.isBull(singlefeatures: singlefeatures)
         let mask = 0b111111111111111111
         let bullSecondRank = rank2 & mask
         let bullRank = (rank2 >> 18) << 1
         let ironRank = (rank1 << 1) | 1
         
-        var cardType = ""
+        var singlefeatureType = ""
         var rank = 0
         if bullRank > ironRank {
             rank = (bullRank << 18 | bullSecondRank)
-            cardType = cardType2
+            singlefeatureType = singlefeatureType2
             
         } else {
             rank = (ironRank << 18 | mask)
-            cardType = cardType1
+            singlefeatureType = singlefeatureType1
         }
         
-        return (flag1 || flag2, rank, cardType)
+        return (flag1 || flag2, rank, singlefeatureType)
     }
-    static func isThreeCardBullPlusBull(cards: [PBGame.PBCard]) -> (Bool, Int, String){
+    static func isThreeSingleFeatureBullPlusBull(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String){
         let tempBullRules = Array(self.bullRules)
         let mask = 0b111111111111111111
 
         self.bullRules = [0]
-        var (flag1, rank1, cardType1) = self.isBull(cards: cards)
+        var (flag1, rank1, singlefeatureType1) = self.isBull(singlefeatures: singlefeatures)
         let secondRank1 = rank1 & mask
         self.bullRules = [1]
 
-        var (flag2, rank2, cardType2) = self.isBull(cards: cards)
+        var (flag2, rank2, singlefeatureType2) = self.isBull(singlefeatures: singlefeatures)
         let secondRank2 = rank2 & mask
         self.bullRules = tempBullRules
         rank1 = rank1>>18
@@ -2198,29 +2198,29 @@ class BullHandEvaluator {
 
         if flag1 == true && flag2 == true{
             if (rank1>>18) < (rank2>>18){
-                return (flag1, (rank1 << 19) | secondRank1, cardType1)
+                return (flag1, (rank1 << 19) | secondRank1, singlefeatureType1)
             } else {
-                return (flag2, (((rank2 << 1) | 1)<<18 | secondRank2), cardType2)
+                return (flag2, (((rank2 << 1) | 1)<<18 | secondRank2), singlefeatureType2)
             }
         } else if flag1 == false && flag2 == true {
-            return (flag2, (((rank2 << 1) | 1)<<18 | secondRank2), cardType2)
+            return (flag2, (((rank2 << 1) | 1)<<18 | secondRank2), singlefeatureType2)
             
         } else if flag2 == false && flag1 == true {
-            return (flag1, (rank1 << 19) | secondRank1, cardType1)
+            return (flag1, (rank1 << 19) | secondRank1, singlefeatureType1)
         }
         return (false, 0, "")
     }
     
-    static func isThreeCardBullBUllPlusBullBull(cards: [PBGame.PBCard]) -> (Bool, Int, String){
+    static func isThreeSingleFeatureBullBUllPlusBullBull(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String){
         let tempBullRules = Array(self.bullRules)
         let mask = 0b111111111111111111
 
         self.bullRules = [0]
-        var (flag1, rank1, cardType1) = self.isBullBull(cards: cards)
+        var (flag1, rank1, singlefeatureType1) = self.isBullBull(singlefeatures: singlefeatures)
         let secondRank1 = rank1 & mask
 
         self.bullRules = [1]
-        var (flag2, rank2, cardType2) = self.isBullBull(cards: cards)
+        var (flag2, rank2, singlefeatureType2) = self.isBullBull(singlefeatures: singlefeatures)
         let secondRank2 = rank2 & mask
         
         rank1 = rank1>>18
@@ -2229,26 +2229,26 @@ class BullHandEvaluator {
         self.bullRules = tempBullRules
         if flag1 == true && flag2 == true{
             if rank1 < rank2{
-                return (flag1, (rank1 << 19) | secondRank1, cardType1)
+                return (flag1, (rank1 << 19) | secondRank1, singlefeatureType1)
             } else {
-                return (flag2, (((rank2 << 1) | 1)<<18 | secondRank2), cardType2)
+                return (flag2, (((rank2 << 1) | 1)<<18 | secondRank2), singlefeatureType2)
             }
         } else if flag1 == false && flag2 == true {
-            return (flag2, (((rank2 << 1) | 1)<<18 | secondRank2), cardType2)
+            return (flag2, (((rank2 << 1) | 1)<<18 | secondRank2), singlefeatureType2)
             
         } else if flag2 == false && flag1 == true {
-            return (flag1, (rank1 << 19) | secondRank1, cardType1)
+            return (flag1, (rank1 << 19) | secondRank1, singlefeatureType1)
         }
         return (false, 0, "")
     }
     
-    static func Is_threeCard(cards: [PBGame.PBCard]) -> (Bool, Int, String) {
-        var counts: [Int: [PBGame.PBCard]] = [:]
-        for card in cards {
-            counts[card.trueRank, default: []].append(card)
-            if counts[card.trueRank]!.count == 3 {
-                let cardType: String = "三条" + ClassifierSettingArgs.CardNumberReportDic[card.trueRank]!
-                return (true, card.rank2Value, cardType)
+    static func Is_threeSingleFeature(singlefeatures: [PBStatistic.PBSingleFeature]) -> (Bool, Int, String) {
+        var counts: [Int: [PBStatistic.PBSingleFeature]] = [:]
+        for singlefeature in singlefeatures {
+            counts[singlefeature.trueRank, default: []].append(singlefeature)
+            if counts[singlefeature.trueRank]!.count == 3 {
+                let singlefeatureType: String = "三条" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeature.trueRank]!
+                return (true, singlefeature.rank2Value, singlefeatureType)
             }
         }
         return (false, 0, "")
@@ -2256,34 +2256,34 @@ class BullHandEvaluator {
 
     // ... (other rank rule functions)
     //
-    static func rankForMaxCard(cards: [PBGame.PBCard]) -> Int {
-            let sortedCards = sortBullCardsFromHighToLow(cards: cards)
-            let rank = sortedCards[0].score
+    static func rankForMaxSingleFeature(singlefeatures: [PBStatistic.PBSingleFeature]) -> Int {
+            let sortedSingleFeatures = sortBullSingleFeaturesFromHighToLow(singlefeatures: singlefeatures)
+            let rank = sortedSingleFeatures[0].score
             return rank
         }
     
     
-    static func sortBullCardsFromHighToLow(cards: [PBGame.PBCard]) -> [PBGame.PBCard] {
-        return cards.sorted { $0.score > $1.score }
+    static func sortBullSingleFeaturesFromHighToLow(singlefeatures: [PBStatistic.PBSingleFeature]) -> [PBStatistic.PBSingleFeature] {
+        return singlefeatures.sorted { $0.score > $1.score }
     }
     
-    static func sortBullCardsFromLowToHigh(cards: [PBGame.PBCard]) -> [PBGame.PBCard] {
-        return cards.sorted { $0.score < $1.score }
+    static func sortBullSingleFeaturesFromLowToHigh(singlefeatures: [PBStatistic.PBSingleFeature]) -> [PBStatistic.PBSingleFeature] {
+        return singlefeatures.sorted { $0.score < $1.score }
     }
     
-    static func rankForSameBullSamePoint(cards: [PBGame.PBCard], otherCards: [PBGame.PBCard]) -> Int {
+    static func rankForSameBullSamePoint(singlefeatures: [PBStatistic.PBSingleFeature], otherSingleFeatures: [PBStatistic.PBSingleFeature]) -> Int {
         switch self.sameBullPointComparison{
         case 0:
-            let rank = rankForMaxCard(cards: cards)
+            let rank = rankForMaxSingleFeature(singlefeatures: singlefeatures)
             return rank
         case 1:
-            let rank = rankForMaxCard(cards: otherCards)
+            let rank = rankForMaxSingleFeature(singlefeatures: otherSingleFeatures)
             return rank
         case 2:
             return 1
         case 3:
-            let sortedCards = sortBullCardsFromHighToLow(cards: cards)
-            let rank = sortedCards[0].score << 12 | sortedCards[1].score << 6 | sortedCards[2].score
+            let sortedSingleFeatures = sortBullSingleFeaturesFromHighToLow(singlefeatures: singlefeatures)
+            let rank = sortedSingleFeatures[0].score << 12 | sortedSingleFeatures[1].score << 6 | sortedSingleFeatures[2].score
             return rank
         case 4:
             return 1
@@ -2292,25 +2292,25 @@ class BullHandEvaluator {
         }
     }
     
-    static func sumAllBullCard(combination:[PBGame.PBCard], rank: Int) -> Int{
+    static func sumAllBullSingleFeature(combination:[PBStatistic.PBSingleFeature], rank: Int) -> Int{
         var sum:Int = 0
-        for card in combination{
+        for singlefeature in combination{
             if rank == 1{
-                sum += card.rank1Value
+                sum += singlefeature.rank1Value
 
             } else if rank == 2{
-                sum += card.rank2Value
+                sum += singlefeature.rank2Value
 
             } else if rank == 3{
-                sum += card.trueRank
+                sum += singlefeature.trueRank
             }
         }
         return sum
     }
     
-    static func hasCard(combination: [PBGame.PBCard], searchCard: PBGame.PBCard)-> Bool{
-        for card in combination{
-            if card.cardIndex == searchCard.cardIndex{
+    static func hasSingleFeature(combination: [PBStatistic.PBSingleFeature], searchSingleFeature: PBStatistic.PBSingleFeature)-> Bool{
+        for singlefeature in combination{
+            if singlefeature.singlefeatureIndex == searchSingleFeature.singlefeatureIndex{
                 return true
             }
         }

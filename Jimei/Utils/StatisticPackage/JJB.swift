@@ -3,22 +3,22 @@ import Foundation
 
 
 
-class JJBGameRule : Rule{
+class JJBStatisticRule : Rule{
     
     let samePointComparision: [Int: String] = [
         0:"同点比最大牌",
         1:"同点庄家大"
     ]
     
-    let CardRankList: [Int:String] = [
+    let SingleFeatureRankList: [Int:String] = [
         0:"王>红A>红K....红2>黑 A>黑K>....黑2最小",
         1:"王>A>K>...2"
     ]
     
-    let redJokerValueRange: [Int:String] = [
+    let redspecialfeatureValueRange: [Int:String] = [
         0:"1"
     ]
-    let blackJokerValueRange: [Int:String] = [
+    let blackspecialfeatureValueRange: [Int:String] = [
         0:"1"
     ]
     let KValueRange: [Int:String] = [
@@ -82,33 +82,33 @@ class JJBGameRule : Rule{
     3)王为1点，K为3点,Q为2点，J为1点。
     """
         ]
-        self.playerNum = [2,3,4,5,6,7,8,9,10]
+        self.rcNum = [2,3,4,5,6,7,8,9,10]
 
     }
 }
 
 
-class JJBGame{
+class JJBStatistic{
     
     
     
-    static func FindWinner(diyDealStatus:[[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
+    static func FindWinner(diyDealStatus:[[Bool]], diyDealNum:[Int], inputSingleFeatures:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([StatisticReturnRCInfo],[Int]) {
         
-        let deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (winners, leftCards)
+        let FeatureList = initFeatureList(initialSingleFeatures: inputSingleFeatures, suitRules: suitRules)
+        let (winners, leftSingleFeatures) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, FeatureList: FeatureList, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winners, leftSingleFeatures)
     }
     
-    static func legalCheck(playerNum: Int, handNum: Int) -> String{
+    static func legalCheck(rcNum: Int, handNum: Int) -> String{
         var errMessage : String = ""
-        if(playerNum * handNum > 54)
+        if(rcNum * handNum > 54)
         {
             errMessage = "需要牌数量超出牌堆总数，请重新设置！"
         }
         return errMessage
     }
     
-    static func getAllCardIndex(setting: Int) -> [Int]{
+    static func getAllSingleFeatureIndex(setting: Int) -> [Int]{
         var result : [Int] = []
         switch setting {
         case 0:
@@ -128,17 +128,17 @@ class JJBGame{
         return result
     }
     
-    static func getMinCardNum(playerNum: Int, handNum: Int, communityNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+    static func getMinSingleFeatureNum(rcNum: Int, handNum: Int, communityNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
         
         if dealType == 0 || dealType == 1{
-            return playerNum * handNum + communityNum
+            return rcNum * handNum + communityNum
         } else {
             var minNum = 0
             for i in 0..<diyDealNum.count {
                 let num = diyDealNum[i]
                 //派牌
                 if diyDealStatus[i][0] == true {
-                    minNum += playerNum * num
+                    minNum += rcNum * num
                 //公牌
                 } else if diyDealStatus[i][1] == true {
                     minNum += num
@@ -154,11 +154,11 @@ class JJBGame{
     //args
     //0 dealType
     //1 diyDealType
-    //2 playerNum
+    //2 rcNum
     //3 samePointComparision
-    //4 CardRankList
-    //5 redJokerValueRange
-    //6 blackJokerValueRange
+    //4 SingleFeatureRankList
+    //5 redspecialfeatureValueRange
+    //6 blackspecialfeatureValueRange
     //7 KValueRange
     //8 QValueRange
     //9 JValueRange
@@ -166,17 +166,17 @@ class JJBGame{
     //11 isCompareSuit
 
     
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
-        let rule = ClassifierSettingArgs.targetSetting[8] as! JJBGameRule
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], FeatureList: [SingleFeature], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([StatisticReturnRCInfo],[Int]) {
+        let rule = ClassifierSettingArgs.targetSetting[8] as! JJBStatisticRule
         let dealNum = args[0]
         let dealType = args[1]
-        let playerNum = args[2]
+        let rcNum = args[2]
         let handNum = args[3]
         let communityNum = args[4]
         let samePointComparision = args[5]
-        let CardRankList = args[6]
-        let redJokerValueRange = args[7]
-        let blackJokerValueRange = args[8]
+        let SingleFeatureRankList = args[6]
+        let redspecialfeatureValueRange = args[7]
+        let blackspecialfeatureValueRange = args[8]
         let KValueRange = args[9]
         let QValueRange = args[10]
         let JValueRange = args[11]
@@ -186,77 +186,77 @@ class JJBGame{
         
         var maxRank = 0
 
-        var returnPlayerInfos: [GameReturnPlayerInfo] = []
+        var returnRCInfos: [StatisticReturnRCInfo] = []
 
-        var allPlayCards: [Player] = []
-        var community = [Card]()
-        if deck.count < self.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
+        var allPlaySingleFeatures: [RC] = []
+        var community = [SingleFeature]()
+        if FeatureList.count < self.getMinSingleFeatureNum(rcNum: rcNum,handNum: handNum, communityNum: communityNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
             return ([], [])
         }
         
-        for _ in 0..<playerNum {
-            allPlayCards.append(Player())
+        for _ in 0..<rcNum {
+            allPlaySingleFeatures.append(RC())
         }
         
-        var deck = deck
+        var FeatureList = FeatureList
         // 发牌
         if dealNum == 0{
             for _ in 0..<handNum{
                 //正发
                 if dealType == 0{
-                    for i in 0..<playerNum {
-                        allPlayCards[i].insertCard(card: deck.removeFirst())
+                    for i in 0..<rcNum {
+                        allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeFirst())
                     }
                 //反发
                 } else if dealType == 1 {
-                    for i in 0..<playerNum {
-                        allPlayCards[i].insertCard(card: deck.removeLast())
+                    for i in 0..<rcNum {
+                        allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeLast())
                     }
                 }
             }
             
         } else {
             for actionIndex in 0...diyDealStatus.count - 1{
-                let cardNum = diyDealNum[actionIndex]
+                let singlefeatureNum = diyDealNum[actionIndex]
                 let action = diyDealStatus[actionIndex]
                 //派牌
                 if action[0] == true{
                     //正发
                     if dealType == 0{
-                        for i in 0..<playerNum {
-                            for _ in 0..<cardNum{
-                                allPlayCards[i].insertCard(card: deck.removeFirst())
+                        for i in 0..<rcNum {
+                            for _ in 0..<singlefeatureNum{
+                                allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeFirst())
                             }
                         }
                     //反发
                     } else if dealType == 1{
-                        for i in 0..<playerNum {
-                            for _ in 0..<cardNum{
-                                allPlayCards[i].insertCard(card: deck.removeLast())
+                        for i in 0..<rcNum {
+                            for _ in 0..<singlefeatureNum{
+                                allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeLast())
                             }
                         }
                     }
                 //公牌
                 } else if action[1] == true {
                     if dealType == 0{
-                        for _ in 0..<cardNum{
-                            community.append(deck.removeFirst())
+                        for _ in 0..<singlefeatureNum{
+                            community.append(FeatureList.removeFirst())
                         }
                     } else if dealType == 1{
-                        for _ in 0..<cardNum{
-                            community.append(deck.removeLast())
+                        for _ in 0..<singlefeatureNum{
+                            community.append(FeatureList.removeLast())
                         }
                     }
                     
                 //去牌
                 } else if action[2] == true {
                     if dealType == 0 {
-                        for _ in 0..<cardNum{
-                            deck.removeFirst()
+                        for _ in 0..<singlefeatureNum{
+                            FeatureList.removeFirst()
                         }
                     } else if dealType == 1{
-                        for _ in 0..<cardNum{
-                            deck.removeLast()
+                        for _ in 0..<singlefeatureNum{
+                            FeatureList.removeLast()
                         }
                     }
                 }
@@ -267,43 +267,43 @@ class JJBGame{
             
         }
 
-        for i in 0..<playerNum {
-            (allPlayCards[i].evaluateFlag, allPlayCards[i].cardType, allPlayCards[i].isPair) = JJBGameHandEvaluator(
+        for i in 0..<rcNum {
+            (allPlaySingleFeatures[i].evaluateFlag, allPlaySingleFeatures[i].singlefeatureType, allPlaySingleFeatures[i].isPair) = JJBStatisticHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules
-            ).evalHand(cards: allPlayCards[i].playerCard, redJokerValueRange: redJokerValueRange,blackJokerRange: blackJokerValueRange,KValueRange: KValueRange,QValueRange: QValueRange,JValueRange: JValueRange,samePointComparision: samePointComparision, cardRankList: CardRankList, isCompareSuit: isCompareSuit)
+            ).evalHand(singlefeatures: allPlaySingleFeatures[i].rcSingleFeature, redspecialfeatureValueRange: redspecialfeatureValueRange,blackspecialfeatureRange: blackspecialfeatureValueRange,KValueRange: KValueRange,QValueRange: QValueRange,JValueRange: JValueRange,samePointComparision: samePointComparision, singlefeatureRankList: SingleFeatureRankList, isCompareSuit: isCompareSuit)
         }
         
         
-        for playerID in 0..<allPlayCards.count {
-            var currentReturnPlayerInfo = GameReturnPlayerInfo()
-            currentReturnPlayerInfo.playerID = playerID
-            currentReturnPlayerInfo.playerRank = allPlayCards[playerID].evaluateFlag
-            currentReturnPlayerInfo.playerCardsType = allPlayCards[playerID].cardType
-            currentReturnPlayerInfo.isPair = allPlayCards[playerID].isPair
-            currentReturnPlayerInfo.PlayerCards = allPlayCards[playerID].playerCard
-            currentReturnPlayerInfo.communityCard = community
-            returnPlayerInfos.append(currentReturnPlayerInfo)
+        for rcID in 0..<allPlaySingleFeatures.count {
+            var currentReturnRCInfo = StatisticReturnRCInfo()
+            currentReturnRCInfo.rcID = rcID
+            currentReturnRCInfo.rcRank = allPlaySingleFeatures[rcID].evaluateFlag
+            currentReturnRCInfo.rcSingleFeaturesType = allPlaySingleFeatures[rcID].singlefeatureType
+            currentReturnRCInfo.isPair = allPlaySingleFeatures[rcID].isPair
+            currentReturnRCInfo.RCSingleFeatures = allPlaySingleFeatures[rcID].rcSingleFeature
+            currentReturnRCInfo.communitySingleFeature = community
+            returnRCInfos.append(currentReturnRCInfo)
         }
         
         //从大到小排序
-        returnPlayerInfos = returnPlayerInfos.sorted(by: {$0.playerRank > $1.playerRank})
+        returnRCInfos = returnRCInfos.sorted(by: {$0.rcRank > $1.rcRank})
         
-        var leftCards:[Int] = []
-        for card in deck{
-            leftCards.append(card.cardIndex)
+        var leftSingleFeatures:[Int] = []
+        for singlefeature in FeatureList{
+            leftSingleFeatures.append(singlefeature.singlefeatureIndex)
         }
-        if leftCards.count < JJBGame.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
-            leftCards = []
+        if leftSingleFeatures.count < JJBStatistic.getMinSingleFeatureNum(rcNum: rcNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+            leftSingleFeatures = []
         }
-        return (returnPlayerInfos, leftCards)
+        return (returnRCInfos, leftSingleFeatures)
     }
 }
 
-class JJBGameHandEvaluator{
+class JJBStatisticHandEvaluator{
     var rankRules: [Int]
     var suitRules: [Int]
-    var ruleDict: [Int: ([JJBCard]) -> (Int, String, Int)] = [:]
+    var ruleDict: [Int: ([JJBSingleFeature]) -> (Int, String, Int)] = [:]
     var samePointComparision: Int = 0
 
     
@@ -312,24 +312,24 @@ class JJBGameHandEvaluator{
         self.rankRules = rankRules
         self.suitRules = suitRules
         self.ruleDict = [
-            0: eval_Points(cards:),
-            1: eval_IsBlackPair(cards:),
-            2: eval_IsRedPair(cards:),
-            3: eval_IsMixPair(cards:),
-            4: eval_IsPairJoker(cards:)
+            0: eval_Points(singlefeatures:),
+            1: eval_IsBlackPair(singlefeatures:),
+            2: eval_IsRedPair(singlefeatures:),
+            3: eval_IsMixPair(singlefeatures:),
+            4: eval_IsPairspecialfeature(singlefeatures:)
         ]
     }
     
-    func evalHand(cards: [Card], redJokerValueRange: Int, blackJokerRange: Int, KValueRange: Int, QValueRange: Int, JValueRange: Int, samePointComparision: Int, cardRankList: Int, isCompareSuit: Int)->(Int, String, Int){
-        var cards = cards
+    func evalHand(singlefeatures: [SingleFeature], redspecialfeatureValueRange: Int, blackspecialfeatureRange: Int, KValueRange: Int, QValueRange: Int, JValueRange: Int, samePointComparision: Int, singlefeatureRankList: Int, isCompareSuit: Int)->(Int, String, Int){
+        var singlefeatures = singlefeatures
         self.samePointComparision = samePointComparision
         
         
         
         
-        let num1 = JJBCard(card: cards[0], redJokerValueRange: redJokerValueRange, blackJokerValueRange: blackJokerRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange,CardRankList: cardRankList, isCompareSuit: isCompareSuit)
+        let num1 = JJBSingleFeature(singlefeature: singlefeatures[0], redspecialfeatureValueRange: redspecialfeatureValueRange, blackspecialfeatureValueRange: blackspecialfeatureRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange,SingleFeatureRankList: singlefeatureRankList, isCompareSuit: isCompareSuit)
         
-        let num2 = JJBCard(card: cards[1], redJokerValueRange: redJokerValueRange, blackJokerValueRange: blackJokerRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, CardRankList: cardRankList, isCompareSuit: isCompareSuit)
+        let num2 = JJBSingleFeature(singlefeature: singlefeatures[1], redspecialfeatureValueRange: redspecialfeatureValueRange, blackspecialfeatureValueRange: blackspecialfeatureRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, SingleFeatureRankList: singlefeatureRankList, isCompareSuit: isCompareSuit)
         
         var numList = [num1, num2]
         numList = numList.sorted(by: {$0.rank > $1.rank})
@@ -337,7 +337,7 @@ class JJBGameHandEvaluator{
         var score = 0
         var i = self.ruleDict.count + 1
         for ruleIndex in self.rankRules{
-            let (rank, cardType, isPair) = self.ruleDict[ruleIndex]!(numList)
+            let (rank, singlefeatureType, isPair) = self.ruleDict[ruleIndex]!(numList)
             i -= 1
             if rank == 0{
                 continue
@@ -350,96 +350,96 @@ class JJBGameHandEvaluator{
         return (score, "", 0)
     }
     
-    func eval_IsPairJoker(cards: [JJBCard]) -> (Int, String, Int) {
-        if cards[0].rank == 28 && cards[1].rank == 28 {
+    func eval_IsPairspecialfeature(singlefeatures: [JJBSingleFeature]) -> (Int, String, Int) {
+        if singlefeatures[0].rank == 28 && singlefeatures[1].rank == 28 {
             return (1, "对王", 1)
         }
         return (0, "", 0)
     }
-    func eval_IsRedPair(cards: [JJBCard]) -> (Int, String, Int) {
-        if cards[0].rank == cards[1].rank && cards[0].suit == 1{
-            let cardType: String = "红对" + ClassifierSettingArgs.CardNumberReportDic[cards[0].originalRank]!
-            return (cards[0].rank, cardType, 1)
+    func eval_IsRedPair(singlefeatures: [JJBSingleFeature]) -> (Int, String, Int) {
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].suit == 1{
+            let singlefeatureType: String = "红对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+            return (singlefeatures[0].rank, singlefeatureType, 1)
         }
         return (0, "", 0)
     }
-    func eval_IsBlackPair(cards: [JJBCard]) -> (Int, String, Int) {
-        if cards[0].rank == cards[1].rank && cards[0].suit == 0{
-            let cardType: String = "黑对" + ClassifierSettingArgs.CardNumberReportDic[cards[0].originalRank]!
-            return (cards[0].rank, cardType, 1)
+    func eval_IsBlackPair(singlefeatures: [JJBSingleFeature]) -> (Int, String, Int) {
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].suit == 0{
+            let singlefeatureType: String = "黑对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+            return (singlefeatures[0].rank, singlefeatureType, 1)
         }
         return (0, "", 0)
     } 
-    func eval_IsMixPair(cards: [JJBCard]) -> (Int, String, Int) {
-        if cards[0].rank == cards[1].rank + 13 && cards[0].suit != cards[1].suit{
-            let cardType: String = "混对" + ClassifierSettingArgs.CardNumberReportDic[cards[0].originalRank]!
-            return (cards[0].rank, cardType, 1)
+    func eval_IsMixPair(singlefeatures: [JJBSingleFeature]) -> (Int, String, Int) {
+        if singlefeatures[0].rank == singlefeatures[1].rank + 13 && singlefeatures[0].suit != singlefeatures[1].suit{
+            let singlefeatureType: String = "混对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+            return (singlefeatures[0].rank, singlefeatureType, 1)
         }
         return (0, "", 0)
     }
-    func eval_Points(cards: [JJBCard]) -> (Int, String, Int) {
-        let point = (cards[0].point + cards[1].point) % 10
-        let cardType = String(point) + "点"
+    func eval_Points(singlefeatures: [JJBSingleFeature]) -> (Int, String, Int) {
+        let point = (singlefeatures[0].point + singlefeatures[1].point) % 10
+        let singlefeatureType = String(point) + "点"
         if self.samePointComparision == 0{
-        return ((point + 1) << 6 | cards[0].rank, cardType, 0)
+        return ((point + 1) << 6 | singlefeatures[0].rank, singlefeatureType, 0)
         }
         else{
-            return (point + 1, cardType, 0)
+            return (point + 1, singlefeatureType, 0)
         }
     }
     
     
-    class JJBCard{
+    class JJBSingleFeature{
         var rank: Int = 0
         var point: Int = 0
         var suit: Int = 0
-        var cardIndex: Int = 0
+        var singlefeatureIndex: Int = 0
                 var originalRank: Int = 0
         
-        init(card: Card, redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange: Int, JValueRange: Int, CardRankList: Int, isCompareSuit: Int){
-            let rule = ClassifierSettingArgs.targetSetting[8] as! JJBGameRule
-            //cardIndex Initialization
-            self.cardIndex = card.cardIndex
+        init(singlefeature: SingleFeature, redspecialfeatureValueRange: Int, blackspecialfeatureValueRange: Int, KValueRange: Int, QValueRange: Int, JValueRange: Int, SingleFeatureRankList: Int, isCompareSuit: Int){
+            let rule = ClassifierSettingArgs.targetSetting[8] as! JJBStatisticRule
+            //singlefeatureIndex Initialization
+            self.singlefeatureIndex = singlefeature.singlefeatureIndex
             //suit Initialization
             if isCompareSuit == 0{
                 self.suit = 0
             } else {
-                self.suit = card.suit[0]
+                self.suit = singlefeature.suit[0]
             }
             
             //Point Initialization
-            if card.rank == 15 {
-                self.point =  Int(rule.redJokerValueRange[redJokerValueRange]!)!
+            if singlefeature.rank == 15 {
+                self.point =  Int(rule.redspecialfeatureValueRange[redspecialfeatureValueRange]!)!
             }
-            else if card.rank == 14 {
-                self.point = Int(rule.blackJokerValueRange[blackJokerValueRange]!)!
+            else if singlefeature.rank == 14 {
+                self.point = Int(rule.blackspecialfeatureValueRange[blackspecialfeatureValueRange]!)!
             }
-            else if card.rank == 13 {
+            else if singlefeature.rank == 13 {
                 self.point = Int(rule.KValueRange[KValueRange]!)!
             }
-            else if card.rank == 12 {
+            else if singlefeature.rank == 12 {
                 self.point = Int(rule.QValueRange[QValueRange]!)!
             }
-            else if card.rank == 11 {
+            else if singlefeature.rank == 11 {
                 self.point = Int(rule.JValueRange[JValueRange]!)!
             } else {
-                self.point = card.rank
+                self.point = singlefeature.rank
             }
             //rank Initialization
-            self.originalRank = card.rank
-            if CardRankList == 0{
+            self.originalRank = singlefeature.rank
+            if SingleFeatureRankList == 0{
                 //王 28
-                if card.rank == 15 || card.rank == 14 {
+                if singlefeature.rank == 15 || singlefeature.rank == 14 {
                     self.rank = 28
                 // A 14 27
-                } else if card.rank == 1 {
+                } else if singlefeature.rank == 1 {
                     self.rank = 14 + self.suit * 13
                 //黑色 2 - 13
                 } else if self.suit == 0{
-                    self.rank = card.rank
+                    self.rank = singlefeature.rank
                 //红色 15 - 26
                 } else if self.suit == 1{
-                    self.rank = card.rank + 13
+                    self.rank = singlefeature.rank + 13
                 }
                 
             }

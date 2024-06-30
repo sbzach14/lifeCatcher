@@ -3,7 +3,7 @@
 import Foundation
 
 
-class ThirteenWaterGameRule : Rule{
+class TWStatisticRule : Rule{
     
     //此处填入需要的参数，因为rulesettingview没有了，主要作用是注释
     let winCondition:[Int:String] = [
@@ -96,24 +96,24 @@ AKQJ10>A2345>KQJ109>....>23456
 """,
         ]
         
-        self.playerNum = [2,3,4]
+        self.rcNum = [2,3,4]
 
     }
 }
 
 
-class ThirteenWaterGame{
+class TWStatistic{
     
-    static func FindWinner(diyDealStatus:[[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
+    static func FindWinner(diyDealStatus:[[Bool]], diyDealNum:[Int], inputSingleFeatures:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([StatisticReturnRCInfo],[Int]) {
         
-        let deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (winners, leftCards)
+        let FeatureList = initFeatureList(initialSingleFeatures: inputSingleFeatures, suitRules: suitRules)
+        let (winners, leftSingleFeatures) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, FeatureList: FeatureList, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winners, leftSingleFeatures)
     }
     
-    static func legalCheck(playerNum: Int) -> String{
+    static func legalCheck(rcNum: Int) -> String{
         var errMessage : String = ""
-        if(playerNum * 13 > 52)
+        if(rcNum * 13 > 52)
         {
             errMessage = "需要牌数量超出牌堆总数，请重新设置！"
         }
@@ -121,7 +121,7 @@ class ThirteenWaterGame{
     }
     
     //加入每个规则需要的用牌
-    static func getAllCardIndex(setting: Int) -> [Int]{
+    static func getAllSingleFeatureIndex(setting: Int) -> [Int]{
         var result : [Int] = []
         switch setting {
         case 2:
@@ -135,17 +135,17 @@ class ThirteenWaterGame{
         return result
     }
     
-    static func getMinCardNum(playerNum: Int, handNum: Int, communityNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+    static func getMinSingleFeatureNum(rcNum: Int, handNum: Int, communityNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
         
         if dealType == 0 || dealType == 1{
-            return playerNum * handNum + communityNum
+            return rcNum * handNum + communityNum
         } else {
             var minNum = 0
             for i in 0..<diyDealNum.count {
                 let num = diyDealNum[i]
                 //派牌
                 if diyDealStatus[i][0] == true {
-                    minNum += playerNum * num
+                    minNum += rcNum * num
                 //公牌
                 } else if diyDealStatus[i][1] == true {
                     minNum += num
@@ -161,17 +161,17 @@ class ThirteenWaterGame{
     //args
     //0 dealType
     //1 diyDealType
-    //2 playerNum
+    //2 rcNum
     //3 handNum
     //4 communityNum
     //5 winCondition
     //6 AStraightMin
     //7 isDouble
     
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], FeatureList: [SingleFeature], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([StatisticReturnRCInfo],[Int]) {
         let dealNum = args[0]
         let dealType = args[1]
-        let playerNum = args[2]
+        let rcNum = args[2]
         let handNum = args[3]
         let communityNum = args[4]
         let winCondition = args[5]
@@ -179,78 +179,78 @@ class ThirteenWaterGame{
         let isDouble = args[7]
         
         var maxRank = 0
-        var returnPlayerInfos: [GameReturnPlayerInfo] = []
+        var returnRCInfos: [StatisticReturnRCInfo] = []
 
-        var allPlayCards: [Player] = []
-        var community = [Card]()
+        var allPlaySingleFeatures: [RC] = []
+        var community = [SingleFeature]()
         
-        if deck.count < self.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
+        if FeatureList.count < self.getMinSingleFeatureNum(rcNum: rcNum,handNum: handNum, communityNum: communityNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
             return ([], [])
         }
         
-        for _ in 0..<playerNum {
-            allPlayCards.append(Player())
+        for _ in 0..<rcNum {
+            allPlaySingleFeatures.append(RC())
         }
         
-        var deck = deck
+        var FeatureList = FeatureList
         // 发牌
         if dealNum == 0{
             for _ in 0..<handNum{
                 //正发
                 if dealType == 0{
-                    for i in 0..<playerNum {
-                        allPlayCards[i].insertCard(card: deck.removeFirst())
+                    for i in 0..<rcNum {
+                        allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeFirst())
                     }
                 //反发
                 } else if dealType == 1 {
-                    for i in 0..<playerNum {
-                        allPlayCards[i].insertCard(card: deck.removeLast())
+                    for i in 0..<rcNum {
+                        allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeLast())
                     }
                 }
             }
             
         } else {
             for actionIndex in 0...diyDealStatus.count - 1{
-                let cardNum = diyDealNum[actionIndex]
+                let singlefeatureNum = diyDealNum[actionIndex]
                 let action = diyDealStatus[actionIndex]
                 //派牌
                 if action[0] == true{
                     //正发
                     if dealType == 0{
-                        for i in 0..<playerNum {
-                            for _ in 0..<cardNum{
-                                allPlayCards[i].insertCard(card: deck.removeFirst())
+                        for i in 0..<rcNum {
+                            for _ in 0..<singlefeatureNum{
+                                allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeFirst())
                             }
                         }
                     //反发
                     } else if dealType == 1{
-                        for i in 0..<playerNum {
-                            for _ in 0..<cardNum{
-                                allPlayCards[i].insertCard(card: deck.removeLast())
+                        for i in 0..<rcNum {
+                            for _ in 0..<singlefeatureNum{
+                                allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeLast())
                             }
                         }
                     }
                 //公牌
                 } else if action[1] == true {
                     if dealType == 0{
-                        for _ in 0..<cardNum{
-                            community.append(deck.removeFirst())
+                        for _ in 0..<singlefeatureNum{
+                            community.append(FeatureList.removeFirst())
                         }
                     } else if dealType == 1{
-                        for _ in 0..<cardNum{
-                            community.append(deck.removeLast())
+                        for _ in 0..<singlefeatureNum{
+                            community.append(FeatureList.removeLast())
                         }
                     }
                     
                 //去牌
                 } else if action[2] == true {
                     if dealType == 0 {
-                        for _ in 0..<cardNum{
-                            deck.removeFirst()
+                        for _ in 0..<singlefeatureNum{
+                            FeatureList.removeFirst()
                         }
                     } else if dealType == 1{
-                        for _ in 0..<cardNum{
-                            deck.removeLast()
+                        for _ in 0..<singlefeatureNum{
+                            FeatureList.removeLast()
                         }
                     }
                 }
@@ -258,57 +258,57 @@ class ThirteenWaterGame{
         }
         
         
-        var playerRankList : [[Int]] = []
+        var rcRankList : [[Int]] = []
         
-        for i in 0..<playerNum {
+        for i in 0..<rcNum {
             
-            var turn1Cards:[ThirteenWaterCard] = []
-            for card in allPlayCards[i].playerCard {
-                turn1Cards.append(ThirteenWaterCard(card: card))
+            var turn1SingleFeatures:[TWSingleFeature] = []
+            for singlefeature in allPlaySingleFeatures[i].rcSingleFeature {
+                turn1SingleFeatures.append(TWSingleFeature(singlefeature: singlefeature))
             }
-            turn1Cards = turn1Cards.sorted(by: {$0.rank > $1.rank})
+            turn1SingleFeatures = turn1SingleFeatures.sorted(by: {$0.rank > $1.rank})
             
-            let (rank1, cardtype1, isPair1, usedCardIndex1) = ThirteenWaterGameHandEvaluator(
+            let (rank1, singlefeaturetype1, isPair1, usedSingleFeatureIndex1) = TWStatisticHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules,
                 AStraightMin: AStraightMin,
                 turn: 1
-            ).evalHand(cards: turn1Cards)
+            ).evalHand(singlefeatures: turn1SingleFeatures)
             
-            allPlayCards[i].evaluateFlag = rank1
-            allPlayCards[i].cardType = cardtype1
-            allPlayCards[i].isPair = isPair1
+            allPlaySingleFeatures[i].evaluateFlag = rank1
+            allPlaySingleFeatures[i].singlefeatureType = singlefeaturetype1
+            allPlaySingleFeatures[i].isPair = isPair1
                 
-            var turn2Cards:[ThirteenWaterCard] = []
-            for cardIndex in 0..<turn1Cards.count {
-                if !usedCardIndex1.contains(cardIndex){
-                    turn2Cards.append(turn1Cards[cardIndex])
+            var turn2SingleFeatures:[TWSingleFeature] = []
+            for singlefeatureIndex in 0..<turn1SingleFeatures.count {
+                if !usedSingleFeatureIndex1.contains(singlefeatureIndex){
+                    turn2SingleFeatures.append(turn1SingleFeatures[singlefeatureIndex])
                 }
             }
                 
-            let (rank2, cardtype2, isPair2, usedCardIndex2) = ThirteenWaterGameHandEvaluator(
+            let (rank2, singlefeaturetype2, isPair2, usedSingleFeatureIndex2) = TWStatisticHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules,
                 AStraightMin: AStraightMin,
                 turn: 2
-            ).evalHand(cards: turn2Cards)
+            ).evalHand(singlefeatures: turn2SingleFeatures)
                 
                     
-            var turn3Cards:[ThirteenWaterCard] = []
-            for cardIndex in 0..<turn2Cards.count {
-                if !usedCardIndex2.contains(cardIndex){
-                    turn3Cards.append(turn2Cards[cardIndex])
+            var turn3SingleFeatures:[TWSingleFeature] = []
+            for singlefeatureIndex in 0..<turn2SingleFeatures.count {
+                if !usedSingleFeatureIndex2.contains(singlefeatureIndex){
+                    turn3SingleFeatures.append(turn2SingleFeatures[singlefeatureIndex])
                 }
             }
                     
-            let (rank3, cardtype3, isPair3, usedCardIndex3) = ThirteenWaterGameHandEvaluator(
+            let (rank3, singlefeaturetype3, isPair3, usedSingleFeatureIndex3) = TWStatisticHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules,
                 AStraightMin: AStraightMin,
                 turn: 3
-            ).evalHand(cards: turn3Cards)
+            ).evalHand(singlefeatures: turn3SingleFeatures)
             
-            playerRankList.append([rank1, rank2, rank3])
+            rcRankList.append([rank1, rank2, rank3])
         }
         
         //尾墩
@@ -317,18 +317,18 @@ class ThirteenWaterGame{
         }
         //道数
         else if winCondition == 1{
-            for i in 0..<playerNum {
-                allPlayCards[i].evaluateFlag = 0
+            for i in 0..<rcNum {
+                allPlaySingleFeatures[i].evaluateFlag = 0
             }
-            for currentPlayer in 0..<playerNum {
-                for i in 0..<playerNum{
-                    if currentPlayer != i{
+            for currentRC in 0..<rcNum {
+                for i in 0..<rcNum{
+                    if currentRC != i{
                         var winNum = 0
                         for turn in 0..<3{
-                            if playerRankList[currentPlayer][turn] > playerRankList[i][turn]{
+                            if rcRankList[currentRC][turn] > rcRankList[i][turn]{
                                 winNum += 1
                             }
-                            else if playerRankList[currentPlayer][turn] < playerRankList[i][turn]{
+                            else if rcRankList[currentRC][turn] < rcRankList[i][turn]{
                                 winNum -= 1
                             }
                         }
@@ -337,7 +337,7 @@ class ThirteenWaterGame{
                             winNum *= 2
                         }
                         
-                        allPlayCards[i].evaluateFlag += winNum
+                        allPlaySingleFeatures[i].evaluateFlag += winNum
                             
                     }
                 }
@@ -345,20 +345,20 @@ class ThirteenWaterGame{
         }
         //两道
         else if winCondition == 2{
-            for i in 0..<playerNum {
-                allPlayCards[i].evaluateFlag = 0
+            for i in 0..<rcNum {
+                allPlaySingleFeatures[i].evaluateFlag = 0
             }
-            for currentPlayer in 0..<playerNum {
-                for i in 0..<playerNum{
-                    if currentPlayer != i{
+            for currentRC in 0..<rcNum {
+                for i in 0..<rcNum{
+                    if currentRC != i{
                         var winFlag = 0
                         for turn in 0..<3{
-                            if playerRankList[currentPlayer][turn] > playerRankList[i][turn]{
+                            if rcRankList[currentRC][turn] > rcRankList[i][turn]{
                                 winFlag += 1
                             }
                         }
                         if winFlag >= 2{
-                            allPlayCards[currentPlayer].evaluateFlag += 1
+                            allPlaySingleFeatures[currentRC].evaluateFlag += 1
                         }
                     }
                 }
@@ -368,36 +368,36 @@ class ThirteenWaterGame{
         
         //这里后面都不用改，最后按照牌的大小（evaluateflag）排序返回
         
-        for playerID in 0..<allPlayCards.count {
-            var currentReturnPlayerInfo = GameReturnPlayerInfo()
-            currentReturnPlayerInfo.playerID = playerID
-            currentReturnPlayerInfo.playerRank = allPlayCards[playerID].evaluateFlag
-            currentReturnPlayerInfo.playerCardsType = allPlayCards[playerID].cardType
-            currentReturnPlayerInfo.isPair = allPlayCards[playerID].isPair
-            currentReturnPlayerInfo.PlayerCards = allPlayCards[playerID].playerCard
-            currentReturnPlayerInfo.communityCard = community
-            returnPlayerInfos.append(currentReturnPlayerInfo)
+        for rcID in 0..<allPlaySingleFeatures.count {
+            var currentReturnRCInfo = StatisticReturnRCInfo()
+            currentReturnRCInfo.rcID = rcID
+            currentReturnRCInfo.rcRank = allPlaySingleFeatures[rcID].evaluateFlag
+            currentReturnRCInfo.rcSingleFeaturesType = allPlaySingleFeatures[rcID].singlefeatureType
+            currentReturnRCInfo.isPair = allPlaySingleFeatures[rcID].isPair
+            currentReturnRCInfo.RCSingleFeatures = allPlaySingleFeatures[rcID].rcSingleFeature
+            currentReturnRCInfo.communitySingleFeature = community
+            returnRCInfos.append(currentReturnRCInfo)
         }
         
         //从大到小排序
-        returnPlayerInfos = returnPlayerInfos.sorted(by: {$0.playerRank > $1.playerRank})
+        returnRCInfos = returnRCInfos.sorted(by: {$0.rcRank > $1.rcRank})
         
         
-        var leftCards:[Int] = []
-        for card in deck{
-            leftCards.append(card.cardIndex)
+        var leftSingleFeatures:[Int] = []
+        for singlefeature in FeatureList{
+            leftSingleFeatures.append(singlefeature.singlefeatureIndex)
         }
-        if leftCards.count < ThirteenWaterGame.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
-            leftCards = []
+        if leftSingleFeatures.count < TWStatistic.getMinSingleFeatureNum(rcNum: rcNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+            leftSingleFeatures = []
         }
-        return (returnPlayerInfos, leftCards)
+        return (returnRCInfos, leftSingleFeatures)
     }
 }
 
-class ThirteenWaterGameHandEvaluator{
+class TWStatisticHandEvaluator{
     var rankRules: [Int]
     var suitRules: [Int]
-    var ruleDict: [Int: ([ThirteenWaterCard], Int) -> ([Int], [String], Int, [[Int]])] = [:]
+    var ruleDict: [Int: ([TWSingleFeature], Int) -> ([Int], [String], Int, [[Int]])] = [:]
     var AStraightMin: Int
     var turn: Int
     
@@ -411,34 +411,34 @@ class ThirteenWaterGameHandEvaluator{
         self.turn = turn
         
         self.ruleDict = [
-            0:self.eval_holecard(cards:needCardsNum:),
-            1:self.eval_onepair(cards:needCardsNum:),
-            2:self.eval_twopair(cards:needCardsNum:),
-            3:self.eval_threecard(cards:needCardsNum:),
-            4:self.eval_straight(cards:needCardsNum:),
-            5:self.eval_flush(cards:needCardsNum:),
-            6:self.eval_fullhouse(cards:needCardsNum:),
-            7:self.eval_fourcard(_:needCardsNum:),
-            8:self.eval_straightflush(cards:needCardsNum:),
-            9:self.eval_threecard_turn3(cards:needCardsNum:)
+            0:self.eval_holesinglefeature(singlefeatures:needSingleFeaturesNum:),
+            1:self.eval_onepair(singlefeatures:needSingleFeaturesNum:),
+            2:self.eval_twopair(singlefeatures:needSingleFeaturesNum:),
+            3:self.eval_threesinglefeature(singlefeatures:needSingleFeaturesNum:),
+            4:self.eval_straight(singlefeatures:needSingleFeaturesNum:),
+            5:self.eval_flush(singlefeatures:needSingleFeaturesNum:),
+            6:self.eval_fullhouse(singlefeatures:needSingleFeaturesNum:),
+            7:self.eval_foursinglefeature(_:needSingleFeaturesNum:),
+            8:self.eval_straightflush(singlefeatures:needSingleFeaturesNum:),
+            9:self.eval_threesinglefeature_turn3(singlefeatures:needSingleFeaturesNum:)
         ]
     }
     
     //传入需要的参数
-    func evalHand(cards: [ThirteenWaterCard])->(Int, String, Int, [Int]){
-        var needCardNum = 5
+    func evalHand(singlefeatures: [TWSingleFeature])->(Int, String, Int, [Int]){
+        var needSingleFeatureNum = 5
         if turn == 3{
-            needCardNum = 3
+            needSingleFeatureNum = 3
         }
         
         var rank:Int = 0
-        var cardType:String = ""
+        var singlefeatureType:String = ""
         var isPair:Int = 0
-        var usedCardIndex:[Int] = []
+        var usedSingleFeatureIndex:[Int] = []
         
         var i = self.ruleDict.count + 1
         for ruleIndex in self.rankRules{
-            let (rankList, cardTypeList, isPair, usedCardIndexList) = self.ruleDict[ruleIndex]!(cards, needCardNum)
+            let (rankList, singlefeatureTypeList, isPair, usedSingleFeatureIndexList) = self.ruleDict[ruleIndex]!(singlefeatures, needSingleFeatureNum)
             i -= 1
             
             if rankList.count == 0{
@@ -448,273 +448,273 @@ class ThirteenWaterGameHandEvaluator{
                 let maxIndex = rankList.firstIndex(of: rankList.max() ?? 0)!
                 
                 rank = (1 << (i + 23)) | rankList[maxIndex]
-                cardType = cardTypeList[maxIndex]
-                usedCardIndex = usedCardIndexList[maxIndex]
+                singlefeatureType = singlefeatureTypeList[maxIndex]
+                usedSingleFeatureIndex = usedSingleFeatureIndexList[maxIndex]
                 
                 break
             }
         }
 
-        return (rank, cardType, isPair, usedCardIndex)
+        return (rank, singlefeatureType, isPair, usedSingleFeatureIndex)
     }
     //牌型函数
-    func eval_straightflush(cards: [ThirteenWaterCard], needCardsNum: Int) -> ([Int], [String], Int, [[Int]]) {
+    func eval_straightflush(singlefeatures: [TWSingleFeature], needSingleFeaturesNum: Int) -> ([Int], [String], Int, [[Int]]) {
         var rankList: [Int] = []
-        var cardTypeList: [String] = []
-        var usedCardIndexList : [[Int]] = []
+        var singlefeatureTypeList: [String] = []
+        var usedSingleFeatureIndexList : [[Int]] = []
         
         
-        let (straightRankList, straightCardTypeList, _, straightUsedCardIndexList) = eval_straight(cards: cards, needCardsNum: needCardsNum)
+        let (straightRankList, straightSingleFeatureTypeList, _, straightUsedSingleFeatureIndexList) = eval_straight(singlefeatures: singlefeatures, needSingleFeaturesNum: needSingleFeaturesNum)
         
         if straightRankList.count > 0 {
             
-            for i in 0..<straightUsedCardIndexList.count{
-                let currentStraightUsedCardIndex = straightUsedCardIndexList[i]
+            for i in 0..<straightUsedSingleFeatureIndexList.count{
+                let currentStraightUsedSingleFeatureIndex = straightUsedSingleFeatureIndexList[i]
                 
                 var suit = 3
-                for c in currentStraightUsedCardIndex {
-                    if cards[c].suit >= 0{
-                        suit = cards[c].suit
+                for c in currentStraightUsedSingleFeatureIndex {
+                    if singlefeatures[c].suit >= 0{
+                        suit = singlefeatures[c].suit
                         break
                     }
                 }
                 
                 var isFlush : Bool = true
-                for currentCardIndex in currentStraightUsedCardIndex{
-                    let currentCard = cards[currentCardIndex]
+                for currentSingleFeatureIndex in currentStraightUsedSingleFeatureIndex{
+                    let currentSingleFeature = singlefeatures[currentSingleFeatureIndex]
                     
-                    if currentCard.suit != suit && currentCard.suit != -1{
+                    if currentSingleFeature.suit != suit && currentSingleFeature.suit != -1{
                         isFlush = false
                         break
                     }
                 }
                 if isFlush{
-                    usedCardIndexList.append(currentStraightUsedCardIndex)
+                    usedSingleFeatureIndexList.append(currentStraightUsedSingleFeatureIndex)
                     
                     var rank = straightRankList[i] >> 2
-                    var cardType = "同花顺"
-                    for currentCardIndex in currentStraightUsedCardIndex{
-                        let currentCard = cards[currentCardIndex]
-                        cardType += String(currentCard.rank) + " "
+                    var singlefeatureType = "同花顺"
+                    for currentSingleFeatureIndex in currentStraightUsedSingleFeatureIndex{
+                        let currentSingleFeature = singlefeatures[currentSingleFeatureIndex]
+                        singlefeatureType += String(currentSingleFeature.rank) + " "
                     }
                     
                     rank = rank << 2 | suit
                     
                     rankList.append(rank)
-                    cardTypeList.append(cardType)
+                    singlefeatureTypeList.append(singlefeatureType)
                 }
             }
         }
         
-        return (rankList, cardTypeList, 0, usedCardIndexList)
+        return (rankList, singlefeatureTypeList, 0, usedSingleFeatureIndexList)
     }
     
-    func eval_fourcard(_ cards: [ThirteenWaterCard], needCardsNum: Int) -> ([Int], [String], Int, [[Int]]) {
+    func eval_foursinglefeature(_ singlefeatures: [TWSingleFeature], needSingleFeaturesNum: Int) -> ([Int], [String], Int, [[Int]]) {
         var rankList: [Int] = []
-        var cardTypeList: [String] = []
-        var usedCardIndexList : [[Int]] = []
+        var singlefeatureTypeList: [String] = []
+        var usedSingleFeatureIndexList : [[Int]] = []
         
-        if cards.count >= 5{
-            if cards[0].rank == 15 && cards[1].rank == 15{
-                for i in 2..<cards.count-1{
-                    if cards[i].rank == cards[i+1].rank{
-                        usedCardIndexList.append([0,1,i,i+1])
+        if singlefeatures.count >= 5{
+            if singlefeatures[0].rank == 15 && singlefeatures[1].rank == 15{
+                for i in 2..<singlefeatures.count-1{
+                    if singlefeatures[i].rank == singlefeatures[i+1].rank{
+                        usedSingleFeatureIndexList.append([0,1,i,i+1])
                     }
                 }
             }
-            else if cards[0].rank == 15{
-                for i in 1..<cards.count-2{
-                    if cards[i].rank == cards[i+1].rank && cards[i].rank == cards[i+2].rank{
-                        usedCardIndexList.append([0,i,i+1,i+2])
+            else if singlefeatures[0].rank == 15{
+                for i in 1..<singlefeatures.count-2{
+                    if singlefeatures[i].rank == singlefeatures[i+1].rank && singlefeatures[i].rank == singlefeatures[i+2].rank{
+                        usedSingleFeatureIndexList.append([0,i,i+1,i+2])
                     }
                 }
             }
             else {
-                for i in 0..<cards.count-3{
-                    if cards[i].rank == cards[i+1].rank && cards[i].rank == cards[i+2].rank && cards[i].rank == cards[i+3].rank{
-                        usedCardIndexList.append([i,i+1,i+2,i+3])
+                for i in 0..<singlefeatures.count-3{
+                    if singlefeatures[i].rank == singlefeatures[i+1].rank && singlefeatures[i].rank == singlefeatures[i+2].rank && singlefeatures[i].rank == singlefeatures[i+3].rank{
+                        usedSingleFeatureIndexList.append([i,i+1,i+2,i+3])
                     }
                 }
             }
         }
 
-        if usedCardIndexList.count > 0 {
+        if usedSingleFeatureIndexList.count > 0 {
             
-            for currentUsedCardIndex in usedCardIndexList{
+            for currentUsedSingleFeatureIndex in usedSingleFeatureIndexList{
                 var rank = 0
                 
-                var fourCardRank = cards[currentUsedCardIndex[2]].rank
+                var fourSingleFeatureRank = singlefeatures[currentUsedSingleFeatureIndex[2]].rank
                 
-                var fourcardSuit = cards[currentUsedCardIndex[0]].suit
-                if fourcardSuit == -1{
-                    fourcardSuit = 0
+                var foursinglefeatureSuit = singlefeatures[currentUsedSingleFeatureIndex[0]].suit
+                if foursinglefeatureSuit == -1{
+                    foursinglefeatureSuit = 0
                 }
                 
-                rank = rank << 4 | fourCardRank
-                rank = rank << 2 | fourcardSuit
+                rank = rank << 4 | fourSingleFeatureRank
+                rank = rank << 2 | foursinglefeatureSuit
                 
-                let cardType = "炸弹" + ClassifierSettingArgs.CardNumberReportDic[cards[currentUsedCardIndex[2]].originRank]!
+                let singlefeatureType = "炸弹" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[2]].originRank]!
                 
                 rankList.append(rank)
-                cardTypeList.append(cardType)
+                singlefeatureTypeList.append(singlefeatureType)
             }
         }
         
-        return (rankList, cardTypeList, 0, usedCardIndexList)
+        return (rankList, singlefeatureTypeList, 0, usedSingleFeatureIndexList)
     }
     
-    func eval_fullhouse(cards: [ThirteenWaterCard], needCardsNum: Int) -> ([Int], [String], Int, [[Int]]) {
+    func eval_fullhouse(singlefeatures: [TWSingleFeature], needSingleFeaturesNum: Int) -> ([Int], [String], Int, [[Int]]) {
         var rankList: [Int] = []
-        var cardTypeList: [String] = []
-        var usedCardIndexList : [[Int]] = []
+        var singlefeatureTypeList: [String] = []
+        var usedSingleFeatureIndexList : [[Int]] = []
         
-        if cards.count >= 5{
-            let (threecardRankList, threecardCardTypeList, _, threecardUsedCardIndexList) = eval_threecard(cards: cards, needCardsNum: needCardsNum)
+        if singlefeatures.count >= 5{
+            let (threesinglefeatureRankList, threesinglefeatureSingleFeatureTypeList, _, threesinglefeatureUsedSingleFeatureIndexList) = eval_threesinglefeature(singlefeatures: singlefeatures, needSingleFeaturesNum: needSingleFeaturesNum)
             
-            if threecardUsedCardIndexList.count > 0 {
+            if threesinglefeatureUsedSingleFeatureIndexList.count > 0 {
                 
-                for currentThreeCardUsedCardIndex in threecardUsedCardIndexList{
+                for currentThreeSingleFeatureUsedSingleFeatureIndex in threesinglefeatureUsedSingleFeatureIndexList{
                     
-                    var pairCards: [ThirteenWaterCard] = []
-                    var pairCardsIndex: [Int] = []
-                    for i in 0..<cards.count{
-                        if !currentThreeCardUsedCardIndex.contains(i){
-                            pairCards.append(cards[i])
-                            pairCardsIndex.append(i)
+                    var pairSingleFeatures: [TWSingleFeature] = []
+                    var pairSingleFeaturesIndex: [Int] = []
+                    for i in 0..<singlefeatures.count{
+                        if !currentThreeSingleFeatureUsedSingleFeatureIndex.contains(i){
+                            pairSingleFeatures.append(singlefeatures[i])
+                            pairSingleFeaturesIndex.append(i)
                         }
                     }
-                    let (pairRankList, pairCardTypeList, _, pairUsedCardIndexList) = eval_onepair(cards: pairCards, needCardsNum: needCardsNum)
+                    let (pairRankList, pairSingleFeatureTypeList, _, pairUsedSingleFeatureIndexList) = eval_onepair(singlefeatures: pairSingleFeatures, needSingleFeaturesNum: needSingleFeaturesNum)
                     
-                    if pairUsedCardIndexList.count > 0{
-                        for currentPairUsedCardIndex in pairUsedCardIndexList{
-                            usedCardIndexList.append([currentThreeCardUsedCardIndex[0],currentThreeCardUsedCardIndex[1], currentThreeCardUsedCardIndex[2], pairCardsIndex[currentPairUsedCardIndex[0]],pairCardsIndex[currentPairUsedCardIndex[1]]])
+                    if pairUsedSingleFeatureIndexList.count > 0{
+                        for currentPairUsedSingleFeatureIndex in pairUsedSingleFeatureIndexList{
+                            usedSingleFeatureIndexList.append([currentThreeSingleFeatureUsedSingleFeatureIndex[0],currentThreeSingleFeatureUsedSingleFeatureIndex[1], currentThreeSingleFeatureUsedSingleFeatureIndex[2], pairSingleFeaturesIndex[currentPairUsedSingleFeatureIndex[0]],pairSingleFeaturesIndex[currentPairUsedSingleFeatureIndex[1]]])
                         }
                     }
                 }
             }
         }
         
-        if usedCardIndexList.count > 0 {
+        if usedSingleFeatureIndexList.count > 0 {
             
-            for currentUsedCardIndex in usedCardIndexList{
+            for currentUsedSingleFeatureIndex in usedSingleFeatureIndexList{
                 var rank = 0
                 
-                var threecardRank = cards[currentUsedCardIndex[2]].rank
-                var pairRank = cards[currentUsedCardIndex[4]].rank
-                var threecardSuit = cards[currentUsedCardIndex[0]].suit
-                var pairSuit = cards[currentUsedCardIndex[3]].suit
+                var threesinglefeatureRank = singlefeatures[currentUsedSingleFeatureIndex[2]].rank
+                var pairRank = singlefeatures[currentUsedSingleFeatureIndex[4]].rank
+                var threesinglefeatureSuit = singlefeatures[currentUsedSingleFeatureIndex[0]].suit
+                var pairSuit = singlefeatures[currentUsedSingleFeatureIndex[3]].suit
                 
                 if pairRank == 15{
                     pairRank = 14
                 }
-                if threecardSuit == -1{
-                    threecardSuit = 0
+                if threesinglefeatureSuit == -1{
+                    threesinglefeatureSuit = 0
                 }
                 if pairSuit == -1{
                     pairSuit = 0
                 }
                 
-                rank = rank << 4 | threecardRank
+                rank = rank << 4 | threesinglefeatureRank
                 rank = rank << 4 | pairRank
-                rank = rank << 2 | threecardSuit
+                rank = rank << 2 | threesinglefeatureSuit
                 rank = rank << 2 | pairSuit
                 
-                let cardType = "三带二" + ClassifierSettingArgs.CardNumberReportDic[cards[currentUsedCardIndex[2]].originRank]!
+                let singlefeatureType = "三带二" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[2]].originRank]!
                 
                 rankList.append(rank)
-                cardTypeList.append(cardType)
+                singlefeatureTypeList.append(singlefeatureType)
             }
             
         }
 
-        return (rankList, cardTypeList, 0, usedCardIndexList)
+        return (rankList, singlefeatureTypeList, 0, usedSingleFeatureIndexList)
     }
     
-    func eval_flush(cards: [ThirteenWaterCard], needCardsNum: Int) -> ([Int], [String], Int, [[Int]]) {
+    func eval_flush(singlefeatures: [TWSingleFeature], needSingleFeaturesNum: Int) -> ([Int], [String], Int, [[Int]]) {
         var rankList: [Int] = []
-        var cardTypeList: [String] = []
-        var usedCardIndexList : [[Int]] = []
+        var singlefeatureTypeList: [String] = []
+        var usedSingleFeatureIndexList : [[Int]] = []
         
         
         for suit in 0..<4{
-            var suitCards : [Int] = []
-            for i in 0..<cards.count{
-                if cards[i].suit == -1 || cards[i].suit == suit{
-                    suitCards.append(i)
+            var suitSingleFeatures : [Int] = []
+            for i in 0..<singlefeatures.count{
+                if singlefeatures[i].suit == -1 || singlefeatures[i].suit == suit{
+                    suitSingleFeatures.append(i)
                 }
             }
             
-            if suitCards.count >= needCardsNum{
-                usedCardIndexList += suitCards.combinations(ofCount: needCardsNum)
+            if suitSingleFeatures.count >= needSingleFeaturesNum{
+                usedSingleFeatureIndexList += suitSingleFeatures.combinations(ofCount: needSingleFeaturesNum)
             }
         }
         
-        if usedCardIndexList.count > 0 {
+        if usedSingleFeatureIndexList.count > 0 {
             
-            for currentUsedCardIndex in usedCardIndexList{
+            for currentUsedSingleFeatureIndex in usedSingleFeatureIndexList{
                 var rank = 0
                 
                 var suit = 3
-                for c in currentUsedCardIndex {
-                    if cards[c].suit != -1{
-                        suit = cards[c].suit
+                for c in currentUsedSingleFeatureIndex {
+                    if singlefeatures[c].suit != -1{
+                        suit = singlefeatures[c].suit
                         break
                     }
                 }
                 
-                for c in currentUsedCardIndex {
-                    if cards[c].rank == 15{
+                for c in currentUsedSingleFeatureIndex {
+                    if singlefeatures[c].rank == 15{
                         rank = rank << 4 | 0
                     }
                     else{
-                        rank = rank << 4 | cards[c].rank
+                        rank = rank << 4 | singlefeatures[c].rank
                     }
                 }
                 rank = rank << 2 | suit
                 
-                let cardType = "同花" + ClassifierSettingArgs.CardNumberReportDic[cards[currentUsedCardIndex[0]].originRank]!
+                let singlefeatureType = "同花" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[0]].originRank]!
                 
                 rankList.append(rank)
-                cardTypeList.append(cardType)
+                singlefeatureTypeList.append(singlefeatureType)
             }
         }
         
-        return (rankList, cardTypeList, 0, usedCardIndexList)
+        return (rankList, singlefeatureTypeList, 0, usedSingleFeatureIndexList)
     }
     
 
-    func eval_straight(cards: [ThirteenWaterCard], needCardsNum: Int) -> ([Int], [String], Int, [[Int]]) {
+    func eval_straight(singlefeatures: [TWSingleFeature], needSingleFeaturesNum: Int) -> ([Int], [String], Int, [[Int]]) {
         var rankList: [Int] = []
-        var cardTypeList: [String] = []
-        var usedCardIndexList : [[Int]] = []
+        var singlefeatureTypeList: [String] = []
+        var usedSingleFeatureIndexList : [[Int]] = []
         
         
-        var allIndex:[Int] = Array(0...cards.count-1)
+        var allIndex:[Int] = Array(0...singlefeatures.count-1)
         
-        let allCombinations = allIndex.combinations(ofCount: needCardsNum)
+        let allCombinations = allIndex.combinations(ofCount: needSingleFeaturesNum)
         for combination in allCombinations {
             
             var currentCombination = combination
             currentCombination.sort(by: { index1, index2 in
-                return cards[index1].rank > cards[index2].rank
+                return singlefeatures[index1].rank > singlefeatures[index2].rank
             })
             
             var cntC = 0
-            if cards[currentCombination[0]].rank == 15{
+            if singlefeatures[currentCombination[0]].rank == 15{
                 cntC = 1
             }
-            if cards[currentCombination[1]].rank == 15{
+            if singlefeatures[currentCombination[1]].rank == 15{
                 cntC = 2
             }
             
             var headRank = -1
             var headSuit = -1
             
-            if needCardsNum == 3 && cntC == 2{
-                let nowRank = cards[currentCombination[2]].rank
+            if needSingleFeaturesNum == 3 && cntC == 2{
+                let nowRank = singlefeatures[currentCombination[2]].rank
                 if nowRank == 14{
                     headRank = 15 //AQK rank 15
-                    headSuit = cards[currentCombination[2]].suit
+                    headSuit = singlefeatures[currentCombination[2]].suit
                 }
                 else if nowRank == 13{
                     headRank = 15 //AQK rank 15
@@ -732,14 +732,14 @@ class ThirteenWaterGameHandEvaluator{
             else{
                 var gap = cntC
                 
-                if cards[currentCombination[cntC]].rank == 14{
-                    cards[currentCombination[cntC]].rank = 1
+                if singlefeatures[currentCombination[cntC]].rank == 14{
+                    singlefeatures[currentCombination[cntC]].rank = 1
                     currentCombination.sort(by: { index1, index2 in
-                        return cards[index1].rank > cards[index2].rank
+                        return singlefeatures[index1].rank > singlefeatures[index2].rank
                     })
                     for i in cntC..<currentCombination.count-1{
-                        let nowRank = cards[currentCombination[i]].rank
-                        let nextRank = cards[currentCombination[i+1]].rank
+                        let nowRank = singlefeatures[currentCombination[i]].rank
+                        let nextRank = singlefeatures[currentCombination[i+1]].rank
                         if nowRank == nextRank {
                             gap = -1
                             break
@@ -749,27 +749,27 @@ class ThirteenWaterGameHandEvaluator{
                         }
                     }
                     
-                    cards[currentCombination[currentCombination.count-1]].rank = 14
+                    singlefeatures[currentCombination[currentCombination.count-1]].rank = 14
                     currentCombination.sort(by: { index1, index2 in
-                        return cards[index1].rank > cards[index2].rank
+                        return singlefeatures[index1].rank > singlefeatures[index2].rank
                     })
                     
                     if gap > 0{
                         if self.AStraightMin == 0{
                             headRank = 14
-                            headSuit = cards[currentCombination[cntC]].suit
+                            headSuit = singlefeatures[currentCombination[cntC]].suit
                         }
                         else{
                             headRank = 3
-                            headSuit = cards[currentCombination[cntC]].suit
+                            headSuit = singlefeatures[currentCombination[cntC]].suit
                         }
                     }
                 }
                 
                 gap = cntC
                 for i in cntC..<currentCombination.count-1{
-                    let nowRank = cards[currentCombination[i]].rank
-                    let nextRank = cards[currentCombination[i+1]].rank
+                    let nowRank = singlefeatures[currentCombination[i]].rank
+                    let nextRank = singlefeatures[currentCombination[i+1]].rank
                     if nowRank == nextRank {
                         gap = -1
                         break
@@ -780,10 +780,10 @@ class ThirteenWaterGameHandEvaluator{
                 }
                 
                 if gap >= 0{
-                    let nowRank = cards[currentCombination[cntC]].rank
+                    let nowRank = singlefeatures[currentCombination[cntC]].rank
                     if nowRank == 14{
                         headRank = 15
-                        headSuit = cards[currentCombination[cntC]].suit
+                        headSuit = singlefeatures[currentCombination[cntC]].suit
                     }
                     else if nowRank + gap > 13{
                         headRank = 14
@@ -795,13 +795,13 @@ class ThirteenWaterGameHandEvaluator{
                     }
                     else{
                         headRank = nowRank
-                        headSuit = cards[currentCombination[cntC]].suit
+                        headSuit = singlefeatures[currentCombination[cntC]].suit
                     }
                 }
             }
             
             if headRank != -1{
-                usedCardIndexList.append(currentCombination)
+                usedSingleFeatureIndexList.append(currentCombination)
                 var rank = 0
                 if headSuit == -1{
                     headSuit = 0
@@ -809,163 +809,163 @@ class ThirteenWaterGameHandEvaluator{
                 rank = rank << 4 | headRank
                 rank = rank << 2 | headSuit
 
-                var cardType = "顺子"
-                for currentCardIndex in currentCombination{
-                    let currentCard = cards[currentCardIndex]
-                    cardType += String(currentCard.rank) + " "
+                var singlefeatureType = "顺子"
+                for currentSingleFeatureIndex in currentCombination{
+                    let currentSingleFeature = singlefeatures[currentSingleFeatureIndex]
+                    singlefeatureType += String(currentSingleFeature.rank) + " "
                 }
                 
                 rankList.append(rank)
-                cardTypeList.append(cardType)
+                singlefeatureTypeList.append(singlefeatureType)
             }
         }
         
         
-        return (rankList, cardTypeList, 0, usedCardIndexList)
+        return (rankList, singlefeatureTypeList, 0, usedSingleFeatureIndexList)
     }
     
-    func eval_threecard_turn3(cards: [ThirteenWaterCard], needCardsNum: Int) -> ([Int], [String], Int, [[Int]]) {
+    func eval_threesinglefeature_turn3(singlefeatures: [TWSingleFeature], needSingleFeaturesNum: Int) -> ([Int], [String], Int, [[Int]]) {
         var rankList: [Int] = []
-        var cardTypeList: [String] = []
-        var usedCardIndexList : [[Int]] = []
+        var singlefeatureTypeList: [String] = []
+        var usedSingleFeatureIndexList : [[Int]] = []
         
-        if needCardsNum == 3{
-            if cards[0].rank == 15 && cards[1].rank == 15{
-                for i in 2..<cards.count{
-                    usedCardIndexList.append([0,1,i])
+        if needSingleFeaturesNum == 3{
+            if singlefeatures[0].rank == 15 && singlefeatures[1].rank == 15{
+                for i in 2..<singlefeatures.count{
+                    usedSingleFeatureIndexList.append([0,1,i])
                 }
             }
-            else if cards[0].rank == 15{
-                for i in 1..<cards.count-1{
-                    if cards[i].rank == cards[i+1].rank{
-                        usedCardIndexList.append([0,i,i+1])
+            else if singlefeatures[0].rank == 15{
+                for i in 1..<singlefeatures.count-1{
+                    if singlefeatures[i].rank == singlefeatures[i+1].rank{
+                        usedSingleFeatureIndexList.append([0,i,i+1])
                     }
                 }
             }
             else {
-                for i in 0..<cards.count-2{
-                    if cards[i].rank == cards[i+1].rank && cards[i].rank == cards[i+2].rank{
-                        usedCardIndexList.append([i,i+1,i+2])
+                for i in 0..<singlefeatures.count-2{
+                    if singlefeatures[i].rank == singlefeatures[i+1].rank && singlefeatures[i].rank == singlefeatures[i+2].rank{
+                        usedSingleFeatureIndexList.append([i,i+1,i+2])
                     }
                 }
             }
             
-            if usedCardIndexList.count > 0 {
+            if usedSingleFeatureIndexList.count > 0 {
                 
-                for currentUsedCardIndex in usedCardIndexList{
+                for currentUsedSingleFeatureIndex in usedSingleFeatureIndexList{
                     var rank = 0
                     
-                    var threeCardRank = cards[currentUsedCardIndex[2]].rank
-                    var threeCardSuit = cards[currentUsedCardIndex[0]].rank
+                    var threeSingleFeatureRank = singlefeatures[currentUsedSingleFeatureIndex[2]].rank
+                    var threeSingleFeatureSuit = singlefeatures[currentUsedSingleFeatureIndex[0]].rank
                     
-                    if threeCardSuit == -1{
-                        threeCardSuit = 0
+                    if threeSingleFeatureSuit == -1{
+                        threeSingleFeatureSuit = 0
                     }
                     
-                    rank = rank << 4 | threeCardRank
-                    rank = rank << 2 | threeCardSuit
+                    rank = rank << 4 | threeSingleFeatureRank
+                    rank = rank << 2 | threeSingleFeatureSuit
                     
-                    let cardType = "三条炸弹" + ClassifierSettingArgs.CardNumberReportDic[cards[currentUsedCardIndex[2]].originRank]!
+                    let singlefeatureType = "三条炸弹" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[2]].originRank]!
                     
                     rankList.append(rank)
-                    cardTypeList.append(cardType)
+                    singlefeatureTypeList.append(singlefeatureType)
                 }
             }
         }
             
-        return (rankList, cardTypeList, 0, usedCardIndexList)
+        return (rankList, singlefeatureTypeList, 0, usedSingleFeatureIndexList)
     }
     
-    func eval_threecard(cards: [ThirteenWaterCard], needCardsNum: Int) -> ([Int], [String], Int, [[Int]]) {
+    func eval_threesinglefeature(singlefeatures: [TWSingleFeature], needSingleFeaturesNum: Int) -> ([Int], [String], Int, [[Int]]) {
         var rankList: [Int] = []
-        var cardTypeList: [String] = []
-        var usedCardIndexList : [[Int]] = []
+        var singlefeatureTypeList: [String] = []
+        var usedSingleFeatureIndexList : [[Int]] = []
         
-        if cards[0].rank == 15 && cards[1].rank == 15{
-            for i in 2..<cards.count{
-                usedCardIndexList.append([0,1,i])
+        if singlefeatures[0].rank == 15 && singlefeatures[1].rank == 15{
+            for i in 2..<singlefeatures.count{
+                usedSingleFeatureIndexList.append([0,1,i])
             }
         }
-        else if cards[0].rank == 15{
-            for i in 1..<cards.count-1{
-                if cards[i].rank == cards[i+1].rank{
-                    usedCardIndexList.append([0,i,i+1])
+        else if singlefeatures[0].rank == 15{
+            for i in 1..<singlefeatures.count-1{
+                if singlefeatures[i].rank == singlefeatures[i+1].rank{
+                    usedSingleFeatureIndexList.append([0,i,i+1])
                 }
             }
         }
         else {
-            for i in 0..<cards.count-2{
-                if cards[i].rank == cards[i+1].rank && cards[i].rank == cards[i+2].rank{
-                    usedCardIndexList.append([i,i+1,i+2])
+            for i in 0..<singlefeatures.count-2{
+                if singlefeatures[i].rank == singlefeatures[i+1].rank && singlefeatures[i].rank == singlefeatures[i+2].rank{
+                    usedSingleFeatureIndexList.append([i,i+1,i+2])
                 }
             }
         }
 
-        if usedCardIndexList.count > 0 {
+        if usedSingleFeatureIndexList.count > 0 {
             
-            for currentUsedCardIndex in usedCardIndexList{
+            for currentUsedSingleFeatureIndex in usedSingleFeatureIndexList{
                 var rank = 0
                 
-                var threeCardRank = cards[currentUsedCardIndex[2]].rank
-                var threeCardSuit = cards[currentUsedCardIndex[0]].rank
+                var threeSingleFeatureRank = singlefeatures[currentUsedSingleFeatureIndex[2]].rank
+                var threeSingleFeatureSuit = singlefeatures[currentUsedSingleFeatureIndex[0]].rank
                 
-                if threeCardSuit == -1{
-                    threeCardSuit = 0
+                if threeSingleFeatureSuit == -1{
+                    threeSingleFeatureSuit = 0
                 }
                 
-                rank = rank << 4 | threeCardRank
-                rank = rank << 2 | threeCardSuit
+                rank = rank << 4 | threeSingleFeatureRank
+                rank = rank << 2 | threeSingleFeatureSuit
                 
-                let cardType = "三条" + ClassifierSettingArgs.CardNumberReportDic[cards[currentUsedCardIndex[2]].originRank]!
+                let singlefeatureType = "三条" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[2]].originRank]!
                 
                 rankList.append(rank)
-                cardTypeList.append(cardType)
+                singlefeatureTypeList.append(singlefeatureType)
             }
         }
         
-        return (rankList, cardTypeList, 0, usedCardIndexList)
+        return (rankList, singlefeatureTypeList, 0, usedSingleFeatureIndexList)
     }
     
-    func eval_twopair(cards: [ThirteenWaterCard], needCardsNum: Int) -> ([Int], [String], Int, [[Int]]) {
+    func eval_twopair(singlefeatures: [TWSingleFeature], needSingleFeaturesNum: Int) -> ([Int], [String], Int, [[Int]]) {
         var rankList: [Int] = []
-        var cardTypeList: [String] = []
-        var usedCardIndexList : [[Int]] = []
+        var singlefeatureTypeList: [String] = []
+        var usedSingleFeatureIndexList : [[Int]] = []
         
-        if cards.count >= 5{
-            let (pairRankList, pairCardTypeList, _, pairUsedCardIndexList) = eval_onepair(cards: cards, needCardsNum: needCardsNum)
+        if singlefeatures.count >= 5{
+            let (pairRankList, pairSingleFeatureTypeList, _, pairUsedSingleFeatureIndexList) = eval_onepair(singlefeatures: singlefeatures, needSingleFeaturesNum: needSingleFeaturesNum)
             
-            if pairUsedCardIndexList.count > 0 {
+            if pairUsedSingleFeatureIndexList.count > 0 {
                 
-                for currentPairUsedCardIndex in pairUsedCardIndexList{
+                for currentPairUsedSingleFeatureIndex in pairUsedSingleFeatureIndexList{
                     
-                    var twopairCards: [ThirteenWaterCard] = []
-                    var twopairCardsIndex: [Int] = []
-                    for i in 0..<cards.count{
-                        if !currentPairUsedCardIndex.contains(i){
-                            twopairCards.append(cards[i])
-                            twopairCardsIndex.append(i)
+                    var twopairSingleFeatures: [TWSingleFeature] = []
+                    var twopairSingleFeaturesIndex: [Int] = []
+                    for i in 0..<singlefeatures.count{
+                        if !currentPairUsedSingleFeatureIndex.contains(i){
+                            twopairSingleFeatures.append(singlefeatures[i])
+                            twopairSingleFeaturesIndex.append(i)
                         }
                     }
-                    let (twopairRankList, twopairCardTypeList, _, twopairUsedCardIndexList) = eval_onepair(cards: twopairCards, needCardsNum: needCardsNum)
+                    let (twopairRankList, twopairSingleFeatureTypeList, _, twopairUsedSingleFeatureIndexList) = eval_onepair(singlefeatures: twopairSingleFeatures, needSingleFeaturesNum: needSingleFeaturesNum)
                     
-                    if twopairUsedCardIndexList.count > 0{
-                        for currentTwopairUsedCardIndex in twopairUsedCardIndexList{
-                            usedCardIndexList.append([currentPairUsedCardIndex[0],currentPairUsedCardIndex[1],twopairCardsIndex[currentTwopairUsedCardIndex[0]],twopairCardsIndex[currentTwopairUsedCardIndex[1]]])
+                    if twopairUsedSingleFeatureIndexList.count > 0{
+                        for currentTwopairUsedSingleFeatureIndex in twopairUsedSingleFeatureIndexList{
+                            usedSingleFeatureIndexList.append([currentPairUsedSingleFeatureIndex[0],currentPairUsedSingleFeatureIndex[1],twopairSingleFeaturesIndex[currentTwopairUsedSingleFeatureIndex[0]],twopairSingleFeaturesIndex[currentTwopairUsedSingleFeatureIndex[1]]])
                         }
                     }
                 }
             }
         }
         
-        if usedCardIndexList.count > 0 {
+        if usedSingleFeatureIndexList.count > 0 {
             
-            for currentUsedCardIndex in usedCardIndexList{
+            for currentUsedSingleFeatureIndex in usedSingleFeatureIndexList{
                 var rank = 0
                 
-                var firstPairRank = cards[currentUsedCardIndex[1]].rank
-                var firstPairSuit = cards[currentUsedCardIndex[0]].suit
-                var secondPairRank = cards[currentUsedCardIndex[3]].rank
-                var secondPairSuit = cards[currentUsedCardIndex[2]].suit
+                var firstPairRank = singlefeatures[currentUsedSingleFeatureIndex[1]].rank
+                var firstPairSuit = singlefeatures[currentUsedSingleFeatureIndex[0]].suit
+                var secondPairRank = singlefeatures[currentUsedSingleFeatureIndex[3]].rank
+                var secondPairSuit = singlefeatures[currentUsedSingleFeatureIndex[2]].suit
                 
                 if firstPairRank == 15{
                     firstPairRank = 14
@@ -985,42 +985,42 @@ class ThirteenWaterGameHandEvaluator{
                 rank = rank << 2 | firstPairSuit
                 
                 
-                let cardType = "两对" + ClassifierSettingArgs.CardNumberReportDic[cards[currentUsedCardIndex[1]].originRank]! + ClassifierSettingArgs.CardNumberReportDic[cards[currentUsedCardIndex[3]].originRank]!
+                let singlefeatureType = "两对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[1]].originRank]! + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[3]].originRank]!
                 
                 rankList.append(rank)
-                cardTypeList.append(cardType)
+                singlefeatureTypeList.append(singlefeatureType)
             }
             
             
         }
 
-        return (rankList, cardTypeList, 1, usedCardIndexList)
+        return (rankList, singlefeatureTypeList, 1, usedSingleFeatureIndexList)
     }
     
-    func eval_onepair(cards: [ThirteenWaterCard], needCardsNum: Int) -> ([Int], [String], Int, [[Int]]) {
+    func eval_onepair(singlefeatures: [TWSingleFeature], needSingleFeaturesNum: Int) -> ([Int], [String], Int, [[Int]]) {
         var rankList: [Int] = []
-        var cardTypeList: [String] = []
-        var usedCardIndexList : [[Int]] = []
+        var singlefeatureTypeList: [String] = []
+        var usedSingleFeatureIndexList : [[Int]] = []
         
-        for i in 0..<cards.count-1{
-            if cards[i].rank != 15 && cards[i].rank == cards[i+1].rank{
-                usedCardIndexList.append([i, i+1])
+        for i in 0..<singlefeatures.count-1{
+            if singlefeatures[i].rank != 15 && singlefeatures[i].rank == singlefeatures[i+1].rank{
+                usedSingleFeatureIndexList.append([i, i+1])
             }
         }
         
-        if cards[0].rank == 15{
-            for i in 1..<cards.count{
-                usedCardIndexList.append([0, i])
+        if singlefeatures[0].rank == 15{
+            for i in 1..<singlefeatures.count{
+                usedSingleFeatureIndexList.append([0, i])
             }
         }
 
-        if usedCardIndexList.count > 0 {
+        if usedSingleFeatureIndexList.count > 0 {
             
-            for currentUsedCardIndex in usedCardIndexList{
+            for currentUsedSingleFeatureIndex in usedSingleFeatureIndexList{
                 var rank = 0
                 
-                var pairRank = cards[currentUsedCardIndex[1]].rank
-                var pairsuit = cards[currentUsedCardIndex[0]].suit
+                var pairRank = singlefeatures[currentUsedSingleFeatureIndex[1]].rank
+                var pairsuit = singlefeatures[currentUsedSingleFeatureIndex[0]].suit
                 
                 if pairRank == 15{
                     pairRank = 14
@@ -1033,58 +1033,58 @@ class ThirteenWaterGameHandEvaluator{
                 rank = rank << 2 | pairsuit
                 
                 
-                let cardType = "对子" + ClassifierSettingArgs.CardNumberReportDic[cards[currentUsedCardIndex[1]].originRank]!
+                let singlefeatureType = "对子" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[1]].originRank]!
                 
                 rankList.append(rank)
-                cardTypeList.append(cardType)
+                singlefeatureTypeList.append(singlefeatureType)
             }
             
             
         }
 
-        return (rankList, cardTypeList, 1, usedCardIndexList)
+        return (rankList, singlefeatureTypeList, 1, usedSingleFeatureIndexList)
     }
 
-    func eval_holecard(cards: [ThirteenWaterCard], needCardsNum: Int) -> ([Int], [String], Int, [[Int]]) {
+    func eval_holesinglefeature(singlefeatures: [TWSingleFeature], needSingleFeaturesNum: Int) -> ([Int], [String], Int, [[Int]]) {
         var rank: Int = 0
-        var usedCardIndexList : [Int] = []
+        var usedSingleFeatureIndexList : [Int] = []
         
-        usedCardIndexList.append(0)
+        usedSingleFeatureIndexList.append(0)
         
-        for c in usedCardIndexList {
-            if cards[c].rank == 15{
+        for c in usedSingleFeatureIndexList {
+            if singlefeatures[c].rank == 15{
                 rank = rank << 4 | 14
                 rank = rank << 2 | 3
             }
             else{
-                rank = rank << 4 | cards[c].rank
-                rank = rank << 2 | cards[c].suit
+                rank = rank << 4 | singlefeatures[c].rank
+                rank = rank << 2 | singlefeatures[c].suit
             }
         }
 
-        return ([rank], ["单牌"], 0, [usedCardIndexList])
+        return ([rank], ["单牌"], 0, [usedSingleFeatureIndexList])
     }
 }
 
-class ThirteenWaterCard{
+class TWSingleFeature{
     var rank: Int = 0
     var suit: Int = 0
     var originRank : Int = 0
     
-    init(card: Card){
-        self.originRank = card.rank
+    init(singlefeature: SingleFeature){
+        self.originRank = singlefeature.rank
         
-        if card.rank == 14 || card.rank == 15{
+        if singlefeature.rank == 14 || singlefeature.rank == 15{
             self.rank = 15
             self.suit = -1
         }
-        else if card.rank == 1{
+        else if singlefeature.rank == 1{
             self.rank = 14
-            self.suit = card.suit[0]
+            self.suit = singlefeature.suit[0]
         }
         else{
-            self.rank = card.rank
-            self.suit = card.suit[0]
+            self.rank = singlefeature.rank
+            self.suit = singlefeature.suit[0]
         }
     }
 }

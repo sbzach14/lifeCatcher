@@ -1,7 +1,7 @@
 import Foundation
 
 
-class TEGGameRule : Rule{
+class TEGStatisticRule : Rule{
     let samePointComparision:[Int:String] = [
         0:"同点比最大牌",
         1:"同点比最大牌，最大牌相同时红红>黑红>黑黑，同点同色庄大",
@@ -111,30 +111,30 @@ class TEGGameRule : Rule{
 花色: ♠️>♥️>♣️>♦️
 """,
         ]
-        self.playerNum = [2,3,4,5,6,7,8,9,10]
+        self.rcNum = [2,3,4,5,6,7,8,9,10]
     }
     
 }
 
 
-class TEGGame{
-    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum: [Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
+class TEGStatistic{
+    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum: [Int], inputSingleFeatures:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([StatisticReturnRCInfo],[Int]) {
         
-        let deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (winners, leftCards)
+        let FeatureList = initFeatureList(initialSingleFeatures: inputSingleFeatures, suitRules: suitRules)
+        let (winners, leftSingleFeatures) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, FeatureList: FeatureList, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winners, leftSingleFeatures)
     }
     
-    static func legalCheck(playerNum: Int) -> String{
+    static func legalCheck(rcNum: Int) -> String{
         var errMessage : String = ""
-        if(playerNum * 2 > 36)
+        if(rcNum * 2 > 36)
         {
             errMessage = "需要牌数量超出牌堆总数，请重新设置！"
         }
         return errMessage
     }
     
-    static func getAllCardIndex(setting:Int) -> [Int]{
+    static func getAllSingleFeatureIndex(setting:Int) -> [Int]{
         var result : [Int] = []
         switch setting {
         case 0:
@@ -172,17 +172,17 @@ class TEGGame{
         return result
     }
     
-    static func getMinCardNum(playerNum: Int,handNum: Int, communityNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+    static func getMinSingleFeatureNum(rcNum: Int,handNum: Int, communityNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
         
         if dealType == 0 || dealType == 1{
-            return playerNum * handNum + communityNum
+            return rcNum * handNum + communityNum
         } else {
             var minNum = 0
             for i in 0..<diyDealNum.count {
                 let num = diyDealNum[i]
                 //派牌
                 if diyDealStatus[i][0] == true {
-                    minNum += playerNum * num
+                    minNum += rcNum * num
                 //公牌
                 } else if diyDealStatus[i][1] == true {
                     minNum += num
@@ -198,17 +198,17 @@ class TEGGame{
     //args
     //0 dealType
     //1 diyDealType
-    //2 playerNum
+    //2 rcNum
     //3 samePointComparision
     //4 isCompareSuit
     //5 KValueRange
     //6 QValueRange
     //7 JValueRange
     //8 pointComparision
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo], [Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], FeatureList: [SingleFeature], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([StatisticReturnRCInfo], [Int]) {
         let dealNum = args[0]
         let dealType = args[1]
-        let playerNum = args[2]
+        let rcNum = args[2]
         let handNum = args[3]
         let communityNum = args[4]
         let samePointComparision = args[4]
@@ -219,80 +219,80 @@ class TEGGame{
         let pointComparision = args[9]
         
         
-        var returnPlayerInfos: [GameReturnPlayerInfo] = []
+        var returnRCInfos: [StatisticReturnRCInfo] = []
 
-        var allPlayCards: [Player] = []
-        var community = [Card]()
-        if deck.count < TEGGame.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+        var allPlaySingleFeatures: [RC] = []
+        var community = [SingleFeature]()
+        if FeatureList.count < TEGStatistic.getMinSingleFeatureNum(rcNum: rcNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
             return ([],[])
         }
         
-        for _ in 0..<playerNum {
-            allPlayCards.append(Player())
+        for _ in 0..<rcNum {
+            allPlaySingleFeatures.append(RC())
         }
 
         
         
         
-        var deck = deck
+        var FeatureList = FeatureList
         // 发牌
         if dealNum == 0{
             for _ in 0..<handNum{
                 //正发
                 if dealType == 0{
-                    for i in 0..<playerNum {
-                        allPlayCards[i].insertCard(card: deck.removeFirst())
+                    for i in 0..<rcNum {
+                        allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeFirst())
                     }
                 //反发
                 } else if dealType == 1 {
-                    for i in 0..<playerNum {
-                        allPlayCards[i].insertCard(card: deck.removeLast())
+                    for i in 0..<rcNum {
+                        allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeLast())
                     }
                 }
             }
             
         } else {
             for actionIndex in 0...diyDealStatus.count - 1{
-                let cardNum = diyDealNum[actionIndex]
+                let singlefeatureNum = diyDealNum[actionIndex]
                 let action = diyDealStatus[actionIndex]
                 //派牌
                 if action[0] == true{
                     //正发
                     if dealType == 0{
-                        for i in 0..<playerNum {
-                            for _ in 0..<cardNum{
-                                allPlayCards[i].insertCard(card: deck.removeFirst())
+                        for i in 0..<rcNum {
+                            for _ in 0..<singlefeatureNum{
+                                allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeFirst())
                             }
                         }
                     //反发
                     } else if dealType == 1{
-                        for i in 0..<playerNum {
-                            for _ in 0..<cardNum{
-                                allPlayCards[i].insertCard(card: deck.removeLast())
+                        for i in 0..<rcNum {
+                            for _ in 0..<singlefeatureNum{
+                                allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeLast())
                             }
                         }
                     }
                 //公牌
                 } else if action[1] == true {
                     if dealType == 0{
-                        for _ in 0..<cardNum{
-                            community.append(deck.removeFirst())
+                        for _ in 0..<singlefeatureNum{
+                            community.append(FeatureList.removeFirst())
                         }
                     } else if dealType == 1{
-                        for _ in 0..<cardNum{
-                            community.append(deck.removeLast())
+                        for _ in 0..<singlefeatureNum{
+                            community.append(FeatureList.removeLast())
                         }
                     }
                     
                 //去牌
                 } else if action[2] == true {
                     if dealType == 0 {
-                        for _ in 0..<cardNum{
-                            deck.removeFirst()
+                        for _ in 0..<singlefeatureNum{
+                            FeatureList.removeFirst()
                         }
                     } else if dealType == 1{
-                        for _ in 0..<cardNum{
-                            deck.removeLast()
+                        for _ in 0..<singlefeatureNum{
+                            FeatureList.removeLast()
                         }
                     }
                 }
@@ -300,40 +300,40 @@ class TEGGame{
         }
         
         
-        for i in 0..<playerNum {
-            (allPlayCards[i].evaluateFlag, allPlayCards[i].cardType, allPlayCards[i].isPair) = TEGGameHandEvaluator(
+        for i in 0..<rcNum {
+            (allPlaySingleFeatures[i].evaluateFlag, allPlaySingleFeatures[i].singlefeatureType, allPlaySingleFeatures[i].isPair) = TEGStatisticHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules
-            ).evalHand(cards: allPlayCards[i].playerCard, samePointComparision: samePointComparision, isCompareSuit: isCompareSuit, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, pointComparision: pointComparision)
+            ).evalHand(singlefeatures: allPlaySingleFeatures[i].rcSingleFeature, samePointComparision: samePointComparision, isCompareSuit: isCompareSuit, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, pointComparision: pointComparision)
         }
         
-        for playerID in 0..<allPlayCards.count {
-            var currentReturnPlayerInfo = GameReturnPlayerInfo()
-            currentReturnPlayerInfo.playerID = playerID
-            currentReturnPlayerInfo.playerRank = allPlayCards[playerID].evaluateFlag
-            currentReturnPlayerInfo.playerCardsType = allPlayCards[playerID].cardType
-            currentReturnPlayerInfo.isPair = allPlayCards[playerID].isPair
-            currentReturnPlayerInfo.PlayerCards = allPlayCards[playerID].playerCard
-            currentReturnPlayerInfo.communityCard = community
-            returnPlayerInfos.append(currentReturnPlayerInfo)
+        for rcID in 0..<allPlaySingleFeatures.count {
+            var currentReturnRCInfo = StatisticReturnRCInfo()
+            currentReturnRCInfo.rcID = rcID
+            currentReturnRCInfo.rcRank = allPlaySingleFeatures[rcID].evaluateFlag
+            currentReturnRCInfo.rcSingleFeaturesType = allPlaySingleFeatures[rcID].singlefeatureType
+            currentReturnRCInfo.isPair = allPlaySingleFeatures[rcID].isPair
+            currentReturnRCInfo.RCSingleFeatures = allPlaySingleFeatures[rcID].rcSingleFeature
+            currentReturnRCInfo.communitySingleFeature = community
+            returnRCInfos.append(currentReturnRCInfo)
         }
         
         //从大到小排序
-        returnPlayerInfos = returnPlayerInfos.sorted(by: {$0.playerRank > $1.playerRank})
-        var leftCards:[Int] = []
-        for card in deck{
-            leftCards.append(card.cardIndex)
+        returnRCInfos = returnRCInfos.sorted(by: {$0.rcRank > $1.rcRank})
+        var leftSingleFeatures:[Int] = []
+        for singlefeature in FeatureList{
+            leftSingleFeatures.append(singlefeature.singlefeatureIndex)
         }
         
-        if leftCards.count < TEGGame.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
-            leftCards = []
+        if leftSingleFeatures.count < TEGStatistic.getMinSingleFeatureNum(rcNum: rcNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+            leftSingleFeatures = []
         }
         
-        return (returnPlayerInfos, leftCards)
+        return (returnRCInfos, leftSingleFeatures)
     }
 }
 
-class TEGGameHandEvaluator{
+class TEGStatisticHandEvaluator{
     var rankRules: [Int]
     var suitRules: [Int]
     var samePointComparision = 0
@@ -342,7 +342,7 @@ class TEGGameHandEvaluator{
     var QValueRange = 0
     var JValueRange = 0
     var pointComparision = 0
-    var rankRulesDic:[Int: ([Card]) -> (Int, String, Int)] = [:]
+    var rankRulesDic:[Int: ([SingleFeature]) -> (Int, String, Int)] = [:]
     init(rankRules: [Int],
          suitRules: [Int]){
         self.rankRules = rankRules
@@ -354,7 +354,7 @@ class TEGGameHandEvaluator{
         ]
     }
     
-    func evalHand(cards: [Card], samePointComparision: Int, isCompareSuit: Int, KValueRange:Int, QValueRange:Int, JValueRange:Int, pointComparision: Int)->(Int, String, Int){
+    func evalHand(singlefeatures: [SingleFeature], samePointComparision: Int, isCompareSuit: Int, KValueRange:Int, QValueRange:Int, JValueRange:Int, pointComparision: Int)->(Int, String, Int){
         
         self.samePointComparision = samePointComparision
         self.isCompareSuit = isCompareSuit
@@ -362,36 +362,36 @@ class TEGGameHandEvaluator{
         self.QValueRange = QValueRange
         self.JValueRange = JValueRange
         self.pointComparision = pointComparision
-        var cards = cards
+        var singlefeatures = singlefeatures
         if isCompareSuit == 0{
-            for i in 0..<cards.count{
-                cards[i].suit[0] = 0
+            for i in 0..<singlefeatures.count{
+                singlefeatures[i].suit[0] = 0
             }
         }
-        cards.sort(by: { card1, card2 in
-            return Card.calScore(card: card1) > Card.calScore(card: card2)
+        singlefeatures.sort(by: { singlefeature1, singlefeature2 in
+            return SingleFeature.calScore(singlefeature: singlefeature1) > SingleFeature.calScore(singlefeature: singlefeature2)
         })
         var handString = "手牌 "
-        for card in cards{
-            handString += ClassifierSettingArgs.cardLabelDic[card.cardIndex]!
-            handString += "花色 \(card.suit[0])"
+        for singlefeature in singlefeatures{
+            handString += ClassifierSettingArgs.singlefeatureLabelDic[singlefeature.singlefeatureIndex]!
+            handString += "花色 \(singlefeature.suit[0])"
         }
         
         var score = 0
         var i = self.rankRules.count + 1
         for ruleIndex in self.rankRules{
-            let (rank, cardType, isPair) = self.rankRulesDic[ruleIndex]!(cards)
+            let (rank, singlefeatureType, isPair) = self.rankRulesDic[ruleIndex]!(singlefeatures)
             i -= 1
             if rank == 0{
                 continue
             } else {
                 score = (1 << (i + 11)) | rank
-                return (score, cardType, isPair)
+                return (score, singlefeatureType, isPair)
             }
         }
         
-//        let num1 = cards[0].rank
-//        let num2 = cards[1].rank
+//        let num1 = singlefeatures[0].rank
+//        let num2 = singlefeatures[1].rank
 //
 //        if num1 == num2 {
 //            score = num1 + 100
@@ -404,26 +404,26 @@ class TEGGameHandEvaluator{
         return (score, "", 0)
     }
     
-    func eval_isPair(cards: [Card]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank {
+    func eval_isPair(singlefeatures: [SingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank {
             
-            let cardType: String = "对" + ClassifierSettingArgs.CardNumberReportDic[cards[0].originalRank]!
+            let singlefeatureType: String = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
             
             if self.samePointComparision == 1{
-                return (cards[0].rank << 2 | (self.blackRedJudger(card: cards[0]) + self.blackRedJudger(card: cards[1])), cardType, 1)
+                return (singlefeatures[0].rank << 2 | (self.blackRedJudger(singlefeature: singlefeatures[0]) + self.blackRedJudger(singlefeature: singlefeatures[1])), singlefeatureType, 1)
             } else if self.samePointComparision == 2 {
-                return (cards[0].rank << 2 | max(cards[0].suit[0], cards[1].suit[0]), cardType, 1)
+                return (singlefeatures[0].rank << 2 | max(singlefeatures[0].suit[0], singlefeatures[1].suit[0]), singlefeatureType, 1)
             } else {
-                return (cards[0].rank, cardType, 1)
+                return (singlefeatures[0].rank, singlefeatureType, 1)
             }
         }
         return (0,"",0)
     }
     
-    func eval_is28(cards:[Card]) -> (Int, String, Int) {
-        if cards[0].rank == 8 && cards[1].rank == 2{
+    func eval_is28(singlefeatures:[SingleFeature]) -> (Int, String, Int) {
+        if singlefeatures[0].rank == 8 && singlefeatures[1].rank == 2{
             if self.samePointComparision == 1 {
-                return (self.blackRedJudger(card: cards[0]) + self.blackRedJudger(card: cards[1]) + 1, "28", 0)
+                return (self.blackRedJudger(singlefeature: singlefeatures[0]) + self.blackRedJudger(singlefeature: singlefeatures[1]) + 1, "28", 0)
             } else {
                 return (1, "28", 0)
             }
@@ -431,10 +431,10 @@ class TEGGameHandEvaluator{
         return (0, "", 0)
     }
     
-    func eval_Points(cards: [Card]) -> (Int, String, Int){
-        var num1 = self.PointsConvertor(card: cards[0])
-        var num2 = self.PointsConvertor(card: cards[1])
-        let cardType: String = String((num1 + num2) % 10) + "点"
+    func eval_Points(singlefeatures: [SingleFeature]) -> (Int, String, Int){
+        var num1 = self.PointsConvertor(singlefeature: singlefeatures[0])
+        var num2 = self.PointsConvertor(singlefeature: singlefeatures[1])
+        let singlefeatureType: String = String((num1 + num2) % 10) + "点"
         //0 最大 1 最小
         if self.pointComparision == 1 {
             num1 = (num1 + 10 - 1) % 10
@@ -444,19 +444,19 @@ class TEGGameHandEvaluator{
         
         
         if self.samePointComparision == 0 {
-            return (rank << 6 | cards[0].rank << 2 | cards[0].suit[0], cardType, 0)
+            return (rank << 6 | singlefeatures[0].rank << 2 | singlefeatures[0].suit[0], singlefeatureType, 0)
         } else if self.samePointComparision == 1 {
-            return (rank << 8 | cards[0].rank << 4 | cards[0].suit[0] << 2 | (self.blackRedJudger(card: cards[0]) + self.blackRedJudger(card: cards[1])), cardType, 0)
+            return (rank << 8 | singlefeatures[0].rank << 4 | singlefeatures[0].suit[0] << 2 | (self.blackRedJudger(singlefeature: singlefeatures[0]) + self.blackRedJudger(singlefeature: singlefeatures[1])), singlefeatureType, 0)
         } else if self.samePointComparision == 2 {
-            return (rank << 2 | max(cards[0].suit[0], cards[1].suit[0]), cardType, 0)
+            return (rank << 2 | max(singlefeatures[0].suit[0], singlefeatures[1].suit[0]), singlefeatureType, 0)
         } else {
-            return (rank, cardType, 0)
+            return (rank, singlefeatureType, 0)
         }
     }
     
-    func blackRedJudger(card: Card) -> Int{
+    func blackRedJudger(singlefeature: SingleFeature) -> Int{
         //红
-        if self.suitRules.firstIndex(of: card.suit[0]) == 1 || self.suitRules.firstIndex(of: card.suit[0]) == 3 {
+        if self.suitRules.firstIndex(of: singlefeature.suit[0]) == 1 || self.suitRules.firstIndex(of: singlefeature.suit[0]) == 3 {
             return 1
         //黑
         } else{
@@ -464,18 +464,18 @@ class TEGGameHandEvaluator{
             
         }
     }
-    func PointsConvertor(card: Card) -> Int{
-        let rule = ClassifierSettingArgs.targetSetting[5] as! TEGGameRule
-        if card.rank == 13 {
+    func PointsConvertor(singlefeature: SingleFeature) -> Int{
+        let rule = ClassifierSettingArgs.targetSetting[5] as! TEGStatisticRule
+        if singlefeature.rank == 13 {
             return Int(rule.KValueRange[self.KValueRange]!)!
         }
-        if card.rank == 12 {
+        if singlefeature.rank == 12 {
             return Int(rule.QValueRange[self.QValueRange]!)!
         }
-        if card.rank == 11 {
+        if singlefeature.rank == 11 {
             return Int(rule.JValueRange[self.JValueRange]!)!
         }
         
-        return card.rank
+        return singlefeature.rank
     }
 }

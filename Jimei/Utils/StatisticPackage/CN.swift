@@ -2,13 +2,13 @@
 import Foundation
 
 
-class CNGameRule : Rule{
+class CNStatisticRule : Rule{
     
-    let redJokerValueRange:[Int:String] = [
+    let redspecialfeatureValueRange:[Int:String] = [
         0:"6",
         1:"1"
     ]
-    let blackJokerValueRange: [Int: String] = [
+    let blackspecialfeatureValueRange: [Int: String] = [
         0:"6",
         1:"3",
         2:"1"
@@ -39,7 +39,7 @@ class CNGameRule : Rule{
         0:"对子正常算大小",
         1:"对子一样大不分大小",
     ]
-    let cardRankRule:[Int:String] = [
+    let singlefeatureRankRule:[Int:String] = [
         0:"K>Q>J>...2>A",
         1:"A>K>Q>J>...>2",
         2:"红Q>红2>红8>红4>红10>红6>黑4>黑八>黑10>红7>黑6>黑9>",
@@ -249,33 +249,33 @@ Q+红9>红2+红9>红Q+8>红2+8>红 Q+7>红2+7>红8+红J
 3)三长都是平点，四短都是平点，所有零点都是平点
 """,
         ]
-        self.playerNum = [2,3,4,5,6,7,8,9,10]
+        self.rcNum = [2,3,4,5,6,7,8,9,10]
 
     }
 }
 
 
-class CNGame{
+class CNStatistic{
     
     
     
-    static func FindWinner(diyDealStatus:[[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
+    static func FindWinner(diyDealStatus:[[Bool]], diyDealNum:[Int], inputSingleFeatures:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([StatisticReturnRCInfo],[Int]) {
         
-        let deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (winners, leftCards)
+        let FeatureList = initFeatureList(initialSingleFeatures: inputSingleFeatures, suitRules: suitRules)
+        let (winners, leftSingleFeatures) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, FeatureList: FeatureList, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winners, leftSingleFeatures)
     }
     
-    static func legalCheck(playerNum: Int) -> String{
+    static func legalCheck(rcNum: Int) -> String{
         var errMessage : String = ""
-        if(playerNum * 2 > 52)
+        if(rcNum * 2 > 52)
         {
             errMessage = "需要牌数量超出牌堆总数，请重新设置！"
         }
         return errMessage
     }
     
-    static func getAllCardIndex(setting: Int) -> [Int]{
+    static func getAllSingleFeatureIndex(setting: Int) -> [Int]{
         var result : [Int] = []
         switch setting {
         case 0:
@@ -338,17 +338,17 @@ class CNGame{
         return result
     }
     
-    static func getMinCardNum(playerNum: Int, handNum: Int, communityNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+    static func getMinSingleFeatureNum(rcNum: Int, handNum: Int, communityNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
         
         if dealType == 0 || dealType == 1{
-            return playerNum * handNum + communityNum
+            return rcNum * handNum + communityNum
         } else {
             var minNum = 0
             for i in 0..<diyDealNum.count {
                 let num = diyDealNum[i]
                 //派牌
                 if diyDealStatus[i][0] == true {
-                    minNum += playerNum * num
+                    minNum += rcNum * num
                 //公牌
                 } else if diyDealStatus[i][1] == true {
                     minNum += num
@@ -364,9 +364,9 @@ class CNGame{
     //args
     //0 dealType
     //1 diyDealType
-    //2 playerNum
-    //3 redJokerValueRange
-    //4 blackJokerValueRange
+    //2 rcNum
+    //3 redspecialfeatureValueRange
+    //4 blackspecialfeatureValueRange
     //5 KValueRange
     //6 QValueRange
     //7 JValueRange
@@ -374,20 +374,20 @@ class CNGame{
     //9 samePointComparision
     //10 AValueRange
     //11 pairRank
-    //12 cardRankRule
+    //12 singlefeatureRankRule
     //13 handNum
 
 
     
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
-        let rule = ClassifierSettingArgs.targetSetting[9] as! CNGameRule
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], FeatureList: [SingleFeature], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([StatisticReturnRCInfo],[Int]) {
+        let rule = ClassifierSettingArgs.targetSetting[9] as! CNStatisticRule
         let dealNum = args[0]
         let dealType = args[1]
-        let playerNum = args[2]
+        let rcNum = args[2]
         let handNum = args[3]
         let communityNum = args[4]
-        let redJokerValueRange = args[5]
-        let blackJokerValueRange = args[6]
+        let redspecialfeatureValueRange = args[5]
+        let blackspecialfeatureValueRange = args[6]
         let KValueRange = args[7]
         let QValueRange = args[8]
         let JValueRange = args[9]
@@ -395,82 +395,82 @@ class CNGame{
         let samePointComparision = args[11]
         let AValueRange = args[12]
         let pairRank = args[13]
-        let cardRankRule = args[14]
+        let singlefeatureRankRule = args[14]
 
         
         var maxRank = 0
 
-        var allPlayCards: [Player] = []
-        var community = [Card]()
-        var returnPlayerInfos:[GameReturnPlayerInfo] = []
-        if deck.count < self.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
+        var allPlaySingleFeatures: [RC] = []
+        var community = [SingleFeature]()
+        var returnRCInfos:[StatisticReturnRCInfo] = []
+        if FeatureList.count < self.getMinSingleFeatureNum(rcNum: rcNum,handNum: handNum, communityNum: communityNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
             return ([], [])
         }
         
-        for _ in 0..<playerNum {
-            allPlayCards.append(Player())
+        for _ in 0..<rcNum {
+            allPlaySingleFeatures.append(RC())
         }
         
         
-        var deck = deck
+        var FeatureList = FeatureList
         // 发牌
         if dealNum == 0{
             for _ in 0..<handNum{
                 //正发
                 if dealType == 0{
-                    for i in 0..<playerNum {
-                        allPlayCards[i].insertCard(card: deck.removeFirst())
+                    for i in 0..<rcNum {
+                        allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeFirst())
                     }
                 //反发
                 } else if dealType == 1 {
-                    for i in 0..<playerNum {
-                        allPlayCards[i].insertCard(card: deck.removeLast())
+                    for i in 0..<rcNum {
+                        allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeLast())
                     }
                 }
             }
             
         } else {
             for actionIndex in 0...diyDealStatus.count - 1{
-                let cardNum = diyDealNum[actionIndex]
+                let singlefeatureNum = diyDealNum[actionIndex]
                 let action = diyDealStatus[actionIndex]
                 //派牌
                 if action[0] == true{
                     //正发
                     if dealType == 0{
-                        for i in 0..<playerNum {
-                            for _ in 0..<cardNum{
-                                allPlayCards[i].insertCard(card: deck.removeFirst())
+                        for i in 0..<rcNum {
+                            for _ in 0..<singlefeatureNum{
+                                allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeFirst())
                             }
                         }
                     //反发
                     } else if dealType == 1{
-                        for i in 0..<playerNum {
-                            for _ in 0..<cardNum{
-                                allPlayCards[i].insertCard(card: deck.removeLast())
+                        for i in 0..<rcNum {
+                            for _ in 0..<singlefeatureNum{
+                                allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeLast())
                             }
                         }
                     }
                 //公牌
                 } else if action[1] == true {
                     if dealType == 0{
-                        for _ in 0..<cardNum{
-                            community.append(deck.removeFirst())
+                        for _ in 0..<singlefeatureNum{
+                            community.append(FeatureList.removeFirst())
                         }
                     } else if dealType == 1{
-                        for _ in 0..<cardNum{
-                            community.append(deck.removeLast())
+                        for _ in 0..<singlefeatureNum{
+                            community.append(FeatureList.removeLast())
                         }
                     }
                     
                 //去牌
                 } else if action[2] == true {
                     if dealType == 0 {
-                        for _ in 0..<cardNum{
-                            deck.removeFirst()
+                        for _ in 0..<singlefeatureNum{
+                            FeatureList.removeFirst()
                         }
                     } else if dealType == 1{
-                        for _ in 0..<cardNum{
-                            deck.removeLast()
+                        for _ in 0..<singlefeatureNum{
+                            FeatureList.removeLast()
                         }
                     }
                 }
@@ -479,43 +479,43 @@ class CNGame{
         
         
         
-        for i in 0..<playerNum {
-            (allPlayCards[i].evaluateFlag, allPlayCards[i].cardType, allPlayCards[i].isPair) = CNGameHandEvaluator(
+        for i in 0..<rcNum {
+            (allPlaySingleFeatures[i].evaluateFlag, allPlaySingleFeatures[i].singlefeatureType, allPlaySingleFeatures[i].isPair) = CNStatisticHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules
-            ).evalHand(cards: allPlayCards[i].playerCard, redJokerValueRange: redJokerValueRange,blackJokerValueRange: blackJokerValueRange,KValueRange: KValueRange,QValueRange: QValueRange,JValueRange: JValueRange, AValueRange: AValueRange,pointComparision: pointComparision,samePointComparision: samePointComparision, cardRankRule: cardRankRule, pairRank: pairRank)
+            ).evalHand(singlefeatures: allPlaySingleFeatures[i].rcSingleFeature, redspecialfeatureValueRange: redspecialfeatureValueRange,blackspecialfeatureValueRange: blackspecialfeatureValueRange,KValueRange: KValueRange,QValueRange: QValueRange,JValueRange: JValueRange, AValueRange: AValueRange,pointComparision: pointComparision,samePointComparision: samePointComparision, singlefeatureRankRule: singlefeatureRankRule, pairRank: pairRank)
         }
         
                 
-        for playerID in 0..<allPlayCards.count {
-            var currentReturnPlayerInfo = GameReturnPlayerInfo()
-            currentReturnPlayerInfo.playerID = playerID
-            currentReturnPlayerInfo.playerRank = allPlayCards[playerID].evaluateFlag
-            currentReturnPlayerInfo.playerCardsType = allPlayCards[playerID].cardType
-            currentReturnPlayerInfo.isPair = allPlayCards[playerID].isPair
-            currentReturnPlayerInfo.PlayerCards = allPlayCards[playerID].playerCard
-            currentReturnPlayerInfo.communityCard = community
-            returnPlayerInfos.append(currentReturnPlayerInfo)
+        for rcID in 0..<allPlaySingleFeatures.count {
+            var currentReturnRCInfo = StatisticReturnRCInfo()
+            currentReturnRCInfo.rcID = rcID
+            currentReturnRCInfo.rcRank = allPlaySingleFeatures[rcID].evaluateFlag
+            currentReturnRCInfo.rcSingleFeaturesType = allPlaySingleFeatures[rcID].singlefeatureType
+            currentReturnRCInfo.isPair = allPlaySingleFeatures[rcID].isPair
+            currentReturnRCInfo.RCSingleFeatures = allPlaySingleFeatures[rcID].rcSingleFeature
+            currentReturnRCInfo.communitySingleFeature = community
+            returnRCInfos.append(currentReturnRCInfo)
         }
         
         //从大到小排序
-        returnPlayerInfos = returnPlayerInfos.sorted(by: {$0.playerRank > $1.playerRank})
+        returnRCInfos = returnRCInfos.sorted(by: {$0.rcRank > $1.rcRank})
         
-        var leftCards:[Int] = []
-        for card in deck{
-            leftCards.append(card.cardIndex)
+        var leftSingleFeatures:[Int] = []
+        for singlefeature in FeatureList{
+            leftSingleFeatures.append(singlefeature.singlefeatureIndex)
         }
-        if leftCards.count < CNGame.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
-            leftCards = []
+        if leftSingleFeatures.count < CNStatistic.getMinSingleFeatureNum(rcNum: rcNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+            leftSingleFeatures = []
         }
-        return (returnPlayerInfos, leftCards)
+        return (returnRCInfos, leftSingleFeatures)
     }
 }
 
-class CNGameHandEvaluator{
+class CNStatisticHandEvaluator{
     var rankRules: [Int]
     var suitRules: [Int]
-    var ruleDict: [Int: ([CNCard]) -> (Int,String,Int)] = [:]
+    var ruleDict: [Int: ([CNSingleFeature]) -> (Int,String,Int)] = [:]
     var pointComparision:Int = 0
     var samePointComparision: Int = 0
     var pairRank: Int = 0
@@ -525,62 +525,62 @@ class CNGameHandEvaluator{
         self.rankRules = rankRules
         self.suitRules = suitRules
         self.ruleDict = [
-            0:self.eval_isPoint(cards:),
-            1:self.eval_is2Plus8(cards:),
-            2:self.eval_isQPlus8(cards:),
-            3:self.eval_isQPlus9(cards:),
-            4:self.eval_isPair(cards:),
-            5:self.eval_isMixColorPair(cards: ),
-            6:self.eval_isBlackColorPair(cards: ),
-            7:self.eval_isRedColorPair(cards: ),
-            8:self.eval_isRedQPair(cards: ),
-            9:self.eval_isRedTwoPair(cards: ),
-            10:self.eval_BlackAandBlackThree(cards: ),
-            11:self.eval_isRedFivePair(cards: ),
-            12:self.eval_RedJokerandBlackThree(cards: ),
-            13:self.eval_isBlackFivePair(cards:),
-            14:self.eval_isQPair(cards: ),
-            15:self.eval_isTwoPair(cards: ),
-            16:self.eval_isJokerPair(cards: ),
-            17:self.eval_isRedEightPair(cards: ),
-            18:self.eval_isRedFourPair(cards: ),
-            19:self.eval_isRedTenPair(cards: ),
-            20:self.eval_isRedSixPair(cards: ),
-            21:self.eval_isBlackFourPair(cards: ),
-            22:self.eval_isBlackJPair(cards: ),
-            23:self.eval_isBlackTenPair(cards: ),
-            24:self.eval_isRedSevenPair(cards: ),
-            25:self.eval_isBlackSixPair(cards: ),
-            26:self.eval_isBlackNinePair(cards: ),
-            27:self.eval_isBlackEightPair(cards: ),
-            28:self.eval_isBlackSevenPair(cards: ),
-            29:self.eval_isBlackTenSixFourPair(cards: ),
-            30:self.eval_isRedJTenSevenSixPair(cards: ),
-            31:self.eval_isBlackNineEightSevenFivePair(cards: ),
-            32:self.eval_HeartThreeRedEight(cards: ),
-            33:self.eval_RedFiveRedJoker(cards: ),
-            34:self.eval_RedThreeBlackEight(cards: ),
-            35:self.eval_isRedNineFiveBlackEightSevenPair(cards: ),
-            36:self.eval_RedTwoRedNine(cards: ),
-            37:self.eval_RedQRedSeven(cards: ),
-            38:self.eval_RedTwoRedSeven(cards: ),
-            39:self.eval_RedEightRedJ(cards: ),
-            40:self.eval_isSameColorPair(cards:),
-            41:self.eval_isJokerPlusNine(cards:),
-            42:self.eval_isRedAPair(cards:),
+            0:self.eval_isPoint(singlefeatures:),
+            1:self.eval_is2Plus8(singlefeatures:),
+            2:self.eval_isQPlus8(singlefeatures:),
+            3:self.eval_isQPlus9(singlefeatures:),
+            4:self.eval_isPair(singlefeatures:),
+            5:self.eval_isMixColorPair(singlefeatures: ),
+            6:self.eval_isBlackColorPair(singlefeatures: ),
+            7:self.eval_isRedColorPair(singlefeatures: ),
+            8:self.eval_isRedQPair(singlefeatures: ),
+            9:self.eval_isRedTwoPair(singlefeatures: ),
+            10:self.eval_BlackAandBlackThree(singlefeatures: ),
+            11:self.eval_isRedFivePair(singlefeatures: ),
+            12:self.eval_RedspecialfeatureandBlackThree(singlefeatures: ),
+            13:self.eval_isBlackFivePair(singlefeatures:),
+            14:self.eval_isQPair(singlefeatures: ),
+            15:self.eval_isTwoPair(singlefeatures: ),
+            16:self.eval_isspecialfeaturePair(singlefeatures: ),
+            17:self.eval_isRedEightPair(singlefeatures: ),
+            18:self.eval_isRedFourPair(singlefeatures: ),
+            19:self.eval_isRedTenPair(singlefeatures: ),
+            20:self.eval_isRedSixPair(singlefeatures: ),
+            21:self.eval_isBlackFourPair(singlefeatures: ),
+            22:self.eval_isBlackJPair(singlefeatures: ),
+            23:self.eval_isBlackTenPair(singlefeatures: ),
+            24:self.eval_isRedSevenPair(singlefeatures: ),
+            25:self.eval_isBlackSixPair(singlefeatures: ),
+            26:self.eval_isBlackNinePair(singlefeatures: ),
+            27:self.eval_isBlackEightPair(singlefeatures: ),
+            28:self.eval_isBlackSevenPair(singlefeatures: ),
+            29:self.eval_isBlackTenSixFourPair(singlefeatures: ),
+            30:self.eval_isRedJTenSevenSixPair(singlefeatures: ),
+            31:self.eval_isBlackNineEightSevenFivePair(singlefeatures: ),
+            32:self.eval_HeartThreeRedEight(singlefeatures: ),
+            33:self.eval_RedFiveRedspecialfeature(singlefeatures: ),
+            34:self.eval_RedThreeBlackEight(singlefeatures: ),
+            35:self.eval_isRedNineFiveBlackEightSevenPair(singlefeatures: ),
+            36:self.eval_RedTwoRedNine(singlefeatures: ),
+            37:self.eval_RedQRedSeven(singlefeatures: ),
+            38:self.eval_RedTwoRedSeven(singlefeatures: ),
+            39:self.eval_RedEightRedJ(singlefeatures: ),
+            40:self.eval_isSameColorPair(singlefeatures:),
+            41:self.eval_isspecialfeaturePlusNine(singlefeatures:),
+            42:self.eval_isRedAPair(singlefeatures:),
             
         ]
     }
     
-    func evalHand(cards: [Card],redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange:Int, JValueRange:Int, AValueRange: Int, pointComparision: Int, samePointComparision: Int, cardRankRule: Int, pairRank: Int)->(Int, String, Int){
-        var cards = cards
+    func evalHand(singlefeatures: [SingleFeature],redspecialfeatureValueRange: Int, blackspecialfeatureValueRange: Int, KValueRange: Int, QValueRange:Int, JValueRange:Int, AValueRange: Int, pointComparision: Int, samePointComparision: Int, singlefeatureRankRule: Int, pairRank: Int)->(Int, String, Int){
+        var singlefeatures = singlefeatures
         self.pointComparision = pointComparision
         self.samePointComparision = samePointComparision
         self.pairRank = pairRank
         
-        let num1 = CNCard(card: cards[0], redJokerValueRange: redJokerValueRange, blackJokerValueRange: blackJokerValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, AValueRange: AValueRange, suitRules: self.suitRules, cardRankRule: cardRankRule)
+        let num1 = CNSingleFeature(singlefeature: singlefeatures[0], redspecialfeatureValueRange: redspecialfeatureValueRange, blackspecialfeatureValueRange: blackspecialfeatureValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, AValueRange: AValueRange, suitRules: self.suitRules, singlefeatureRankRule: singlefeatureRankRule)
         
-        let num2 = CNCard(card: cards[1], redJokerValueRange: redJokerValueRange, blackJokerValueRange: blackJokerValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, AValueRange: AValueRange, suitRules: self.suitRules, cardRankRule: cardRankRule)
+        let num2 = CNSingleFeature(singlefeature: singlefeatures[1], redspecialfeatureValueRange: redspecialfeatureValueRange, blackspecialfeatureValueRange: blackspecialfeatureValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, AValueRange: AValueRange, suitRules: self.suitRules, singlefeatureRankRule: singlefeatureRankRule)
         
         var numList = [num1, num2]
         numList = numList.sorted(by: {$0.rank > $1.rank})
@@ -589,13 +589,13 @@ class CNGameHandEvaluator{
         var score = 0
         var i = self.ruleDict.count + 1
         for ruleIndex in self.rankRules{
-            let (rank, cardType, isPair) = self.ruleDict[ruleIndex]!(numList)
+            let (rank, singlefeatureType, isPair) = self.ruleDict[ruleIndex]!(numList)
             i -= 1
             if rank == 0{
                 continue
             } else {
                 score = (1 << (i + 10)) | rank
-                return (score, cardType, isPair)
+                return (score, singlefeatureType, isPair)
                 break
             }
         }
@@ -603,162 +603,162 @@ class CNGameHandEvaluator{
         return (score, "", 0)
     }
     
-    //规则函数，返回(rank, cardType, isPair)
+    //规则函数，返回(rank, singlefeatureType, isPair)
     
-    func eval_isRedAPair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].color == 1 && cards[1].color == 1 && cards[0].originalRank == 1{
+    func eval_isRedAPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 1{
             return (1, "对红1", 1)
         }
         return (0, "", 0)
     }
     
     
-    func eval_isJokerPlusNine(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].originalRank == 15 && cards[0].originalRank == 9{
+    func eval_isspecialfeaturePlusNine(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].originalRank == 15 && singlefeatures[0].originalRank == 9{
             return (1, "王 + 9", 1)
         }
         return (0, "", 0)
     }
     
     
-    func eval_isSameColorPair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].color == cards[1].color {
+    func eval_isSameColorPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == singlefeatures[1].color {
             
-            var cardType: String = "对" + ClassifierSettingArgs.CardNumberReportDic[cards[0].originalRank]!
+            var singlefeatureType: String = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
             
             if self.pairRank == 0{
-                return (cards[0].rank, cardType, 1)
+                return (singlefeatures[0].rank, singlefeatureType, 1)
             } else if self.pairRank == 1{
-                return (1, cardType, 1)
+                return (1, singlefeatureType, 1)
             }
         }
         return (0, "", 0)
     }
     
     
-    func eval_RedEightRedJ(cards: [CNCard]) -> (Int, String, Int) {
-        if cards[0].originalRank == 8 && cards[0].color == 1 && cards[1].originalRank == 11 && cards[1].color == 1{
+    func eval_RedEightRedJ(singlefeatures: [CNSingleFeature]) -> (Int, String, Int) {
+        if singlefeatures[0].originalRank == 8 && singlefeatures[0].color == 1 && singlefeatures[1].originalRank == 11 && singlefeatures[1].color == 1{
             return (1, "红8红J", 0)
         }
-        if cards[0].originalRank == 11 && cards[0].color == 1 && cards[1].originalRank == 8 && cards[1].color == 1{
+        if singlefeatures[0].originalRank == 11 && singlefeatures[0].color == 1 && singlefeatures[1].originalRank == 8 && singlefeatures[1].color == 1{
             return (1, "红8红J", 0)
         }
         return (1, "", 0)
     }
     
-    func eval_RedTwoRedSeven(cards: [CNCard]) -> (Int, String, Int){
-        if cards[0].originalRank == 2 && cards[0].color == 1 && cards[1].originalRank == 7 && cards[1].color == 1{
+    func eval_RedTwoRedSeven(singlefeatures: [CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].originalRank == 2 && singlefeatures[0].color == 1 && singlefeatures[1].originalRank == 7 && singlefeatures[1].color == 1{
             return (1, "红2红7", 0)
         }
-        if cards[0].originalRank == 7 && cards[0].color == 1 && cards[1].originalRank == 2 && cards[1].color == 1{
+        if singlefeatures[0].originalRank == 7 && singlefeatures[0].color == 1 && singlefeatures[1].originalRank == 2 && singlefeatures[1].color == 1{
             return (1, "红8红J", 0)
         }
         return (0, "", 0)
     }
     
-    func eval_RedQRedSeven(cards: [CNCard]) -> (Int, String, Int){
-        if cards[0].originalRank == 12 && cards[0].color == 1 && cards[1].originalRank == 7 && cards[1].color == 1{
+    func eval_RedQRedSeven(singlefeatures: [CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].originalRank == 12 && singlefeatures[0].color == 1 && singlefeatures[1].originalRank == 7 && singlefeatures[1].color == 1{
             return (1, "红Q红7", 0)
         }
-        if cards[0].originalRank == 7 && cards[0].color == 1 && cards[1].originalRank == 12 && cards[1].color == 1{
+        if singlefeatures[0].originalRank == 7 && singlefeatures[0].color == 1 && singlefeatures[1].originalRank == 12 && singlefeatures[1].color == 1{
             return (1, "红Q红7", 0)
         }
         return (0, "", 0)
     }
     
-    func eval_RedTwoRedNine(cards: [CNCard]) -> (Int, String, Int){
-        if cards[0].originalRank == 2 && cards[0].color == 1 && cards[1].originalRank == 9 && cards[1].color == 1{
+    func eval_RedTwoRedNine(singlefeatures: [CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].originalRank == 2 && singlefeatures[0].color == 1 && singlefeatures[1].originalRank == 9 && singlefeatures[1].color == 1{
             return (1, "红2红9", 0)
         }
-        if cards[0].originalRank == 9 && cards[0].color == 1 && cards[1].originalRank == 2 && cards[1].color == 1{
+        if singlefeatures[0].originalRank == 9 && singlefeatures[0].color == 1 && singlefeatures[1].originalRank == 2 && singlefeatures[1].color == 1{
             return (1, "红2红9", 0)
         }
         return (0, "", 0)
     }
     
-    func eval_isRedNineFiveBlackEightSevenPair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].color == 1 && cards[1].color == 1 && (cards[0].originalRank == 9 || cards[0].originalRank == 5){
+    func eval_isRedNineFiveBlackEightSevenPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && (singlefeatures[0].originalRank == 9 || singlefeatures[0].originalRank == 5){
             
-            var cardType: String = ""
+            var singlefeatureType: String = ""
             
-            if cards[0].originalRank == 5{
-                cardType = "对红5"
-            } else if cards[0].originalRank == 9 {
-                cardType = "对红9"
+            if singlefeatures[0].originalRank == 5{
+                singlefeatureType = "对红5"
+            } else if singlefeatures[0].originalRank == 9 {
+                singlefeatureType = "对红9"
             }
             
-            return (1, cardType, 1)
+            return (1, singlefeatureType, 1)
         }
         
-        if cards[0].rank == cards[1].rank && cards[0].color == 0 && cards[1].color == 0 && (cards[0].originalRank == 8 || cards[0].originalRank == 7){
-            var cardType: String = ""
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && (singlefeatures[0].originalRank == 8 || singlefeatures[0].originalRank == 7){
+            var singlefeatureType: String = ""
             
-            if cards[0].originalRank == 7{
-                cardType = "对黑7"
-            } else if cards[0].originalRank == 8 {
-                cardType = "对黑8"
+            if singlefeatures[0].originalRank == 7{
+                singlefeatureType = "对黑7"
+            } else if singlefeatures[0].originalRank == 8 {
+                singlefeatureType = "对黑8"
             }
             
-            return (1, cardType, 1)
+            return (1, singlefeatureType, 1)
         }
         return (0,"",0)
     }
     
     
-    func eval_RedThreeBlackEight(cards: [CNCard]) -> (Int,String, Int){
-        if cards[0].originalRank == 3 && cards[0].color == 1 && cards[1].originalRank == 8 && cards[1].color == 0{
+    func eval_RedThreeBlackEight(singlefeatures: [CNSingleFeature]) -> (Int,String, Int){
+        if singlefeatures[0].originalRank == 3 && singlefeatures[0].color == 1 && singlefeatures[1].originalRank == 8 && singlefeatures[1].color == 0{
             return (1, "红3 + 黑8", 0)
         }
-        if cards[0].originalRank == 8 && cards[0].color == 0 && cards[1].originalRank == 3 && cards[1].color == 1{
+        if singlefeatures[0].originalRank == 8 && singlefeatures[0].color == 0 && singlefeatures[1].originalRank == 3 && singlefeatures[1].color == 1{
             return (1, "红3 + 黑8", 0)
         }
         return (0, "", 0)
     }
     
-    func eval_RedFiveRedJoker(cards: [CNCard]) -> (Int, String, Int){
-        if cards[0].originalRank == 15 && cards[1].originalRank == 5 && cards[1].color == 1{
+    func eval_RedFiveRedspecialfeature(singlefeatures: [CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].originalRank == 15 && singlefeatures[1].originalRank == 5 && singlefeatures[1].color == 1{
             return (1, "红5 + 大王", 0)
         }
-        if cards[0].originalRank == 5 && cards[0].color == 1 && cards[1].originalRank == 15 {
+        if singlefeatures[0].originalRank == 5 && singlefeatures[0].color == 1 && singlefeatures[1].originalRank == 15 {
             return (1, "红5 + 大王", 0)
         }
         return (0, "", 0)
     }
     
-    func eval_HeartThreeRedEight(cards: [CNCard]) -> (Int, String, Int){
-        if (cards[0].originalRank == 8 && cards[0].color == 1) && (cards[1].originalRank == 3 && self.suitRules.firstIndex(of: cards[1].suit) == 1){
+    func eval_HeartThreeRedEight(singlefeatures: [CNSingleFeature]) -> (Int, String, Int){
+        if (singlefeatures[0].originalRank == 8 && singlefeatures[0].color == 1) && (singlefeatures[1].originalRank == 3 && self.suitRules.firstIndex(of: singlefeatures[1].suit) == 1){
             return (1, "红桃3 + 红8", 0)
         }
         
         return (0, "", 0)
     }
     
-    func eval_isBlackNineEightSevenFivePair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].color == 0 && cards[1].color == 0 && (cards[0].originalRank == 9 || cards[0].originalRank == 8 || cards[0].originalRank == 7 || cards[0].originalRank == 5){
+    func eval_isBlackNineEightSevenFivePair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && (singlefeatures[0].originalRank == 9 || singlefeatures[0].originalRank == 8 || singlefeatures[0].originalRank == 7 || singlefeatures[0].originalRank == 5){
             
-            if cards[0].originalRank == 9{
+            if singlefeatures[0].originalRank == 9{
                 return (1, "对黑9", 1)
-            } else if cards[0].originalRank == 8 {
+            } else if singlefeatures[0].originalRank == 8 {
                 return (1, "对黑8", 1)
-            } else if cards[0].originalRank == 7 {
+            } else if singlefeatures[0].originalRank == 7 {
                 return (1, "对黑7", 1)
-            } else if cards[0].originalRank == 5 {
+            } else if singlefeatures[0].originalRank == 5 {
                 return (1, "对黑5", 1)
             }
         }
         return (0, "", 0)
     }
     
-    func eval_isRedJTenSevenSixPair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].color == 1 && cards[1].color == 1 && (cards[0].originalRank == 11 || cards[0].originalRank == 10 || cards[0].originalRank == 7 || cards[0].originalRank == 6){
+    func eval_isRedJTenSevenSixPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && (singlefeatures[0].originalRank == 11 || singlefeatures[0].originalRank == 10 || singlefeatures[0].originalRank == 7 || singlefeatures[0].originalRank == 6){
             
-            if cards[0].originalRank == 11{
+            if singlefeatures[0].originalRank == 11{
                 return (1, "对红J", 1)
-            } else if cards[0].originalRank == 10 {
+            } else if singlefeatures[0].originalRank == 10 {
                 return (1, "对红10", 1)
-            } else if cards[0].originalRank == 7 {
+            } else if singlefeatures[0].originalRank == 7 {
                 return (1, "对红7", 1)
-            } else if cards[0].originalRank == 6 {
+            } else if singlefeatures[0].originalRank == 6 {
                 return (1, "对红6", 1)
             }
             
@@ -766,269 +766,269 @@ class CNGameHandEvaluator{
         return (0, "", 0)
     }
     
-    func eval_isBlackTenSixFourPair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].color == 0 && cards[1].color == 0 && (cards[0].originalRank == 10 || cards[0].originalRank == 6 || cards[0].originalRank == 5){
+    func eval_isBlackTenSixFourPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && (singlefeatures[0].originalRank == 10 || singlefeatures[0].originalRank == 6 || singlefeatures[0].originalRank == 5){
             
-            if cards[0].originalRank == 10{
+            if singlefeatures[0].originalRank == 10{
                 return (1, "对黑10", 1)
-            } else if cards[0].originalRank == 6 {
+            } else if singlefeatures[0].originalRank == 6 {
                 return (1, "对黑6", 1)
-            } else if cards[0].originalRank == 4 {
+            } else if singlefeatures[0].originalRank == 4 {
                 return (1, "对黑4", 1)
             }
         }
         return (0, "", 0)
     }
     
-    func eval_isBlackSevenPair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].color == 0 && cards[1].color == 0 && cards[0].originalRank == 7{
+    func eval_isBlackSevenPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 7{
             return (1, "对黑7", 1)
         }
         return (0, "", 0)
     }
     
-    func eval_isBlackEightPair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].color == 0 && cards[1].color == 0 && cards[0].originalRank == 8{
+    func eval_isBlackEightPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 8{
             return (1, "对黑8", 1)
         }
         return (0, "", 0)
     }
     
-    func eval_isBlackNinePair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].color == 0 && cards[1].color == 0 && cards[0].originalRank == 9{
+    func eval_isBlackNinePair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 9{
             return (1, "对黑9", 1)
         }
         return (0, "", 0)
     }
     
-    func eval_isBlackSixPair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].color == 0 && cards[1].color == 0 && cards[0].originalRank == 6{
+    func eval_isBlackSixPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 6{
             return (1, "对黑6", 1)
         }
         return (0, "", 0)
     }
     
-    func eval_isRedSevenPair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].color == 1 && cards[1].color == 1 && cards[0].originalRank == 7{
+    func eval_isRedSevenPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 7{
             return (1, "对红7", 1)
         }
         return (0, "", 0)
     }
     
-    func eval_isBlackTenPair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].color == 0 && cards[1].color == 0 && cards[0].originalRank == 10{
+    func eval_isBlackTenPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 10{
             return (1, "对黑10", 1)
         }
         return (0, "", 0)
     }
     
-    func eval_isBlackJPair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].color == 0 && cards[1].color == 0 && cards[0].originalRank == 11{
+    func eval_isBlackJPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 11{
             return (1, "对黑J", 1)
         }
         return (0, "", 0)
     }
     
-    func eval_isBlackFourPair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].color == 0 && cards[1].color == 0 && cards[0].originalRank == 4{
+    func eval_isBlackFourPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 4{
             return (1, "对黑4", 1)
         }
         return (0, "", 0)
     }
     
-    func eval_isRedSixPair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].color == 1 && cards[1].color == 1 && cards[0].originalRank == 6{
+    func eval_isRedSixPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 6{
             return (1, "对红6", 1)
         }
         return (0, "", 0)
     }
     
-    func eval_isRedTenPair(cards:[CNCard]) -> (Int, String,Int){
-        if cards[0].rank == cards[1].rank && cards[0].color == 1 && cards[1].color == 1 && cards[0].originalRank == 10{
+    func eval_isRedTenPair(singlefeatures:[CNSingleFeature]) -> (Int, String,Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 10{
             return (1, "对红10", 1)
         }
         return (0, "", 0)
     }
     
-    func eval_isRedFourPair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].color == 1 && cards[1].color == 1 && cards[0].originalRank == 4{
+    func eval_isRedFourPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 4{
             return (1, "对红4", 1)
         }
         return (0, "", 0)
     }
     
-    func eval_isRedEightPair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].color == 1 && cards[1].color == 1 && cards[0].originalRank == 8{
+    func eval_isRedEightPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 8{
             return (1, "对红8", 1)
         }
         return (0, "", 0)
     }
     
-    func eval_isJokerPair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].originalRank == 15 && cards[0].originalRank == 14{
+    func eval_isspecialfeaturePair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].originalRank == 15 && singlefeatures[0].originalRank == 14{
             return (1, "对王", 1)
         }
         return (0, "", 0)
     }
     
-    func eval_isTwoPair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].originalRank == 2{
+    func eval_isTwoPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].originalRank == 2{
             return (1, "对2", 1)
         }
         return (0, "", 0)
     }
     
-    func eval_isQPair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].originalRank == 12{
+    func eval_isQPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].originalRank == 12{
             return (1, "对Q", 1)
         }
         return (0, "", 0)
     }
     
-    func eval_isBlackFivePair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].color == 0 && cards[1].color == 0 && cards[0].originalRank == 5{
+    func eval_isBlackFivePair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 5{
             return (1, "对黑5", 1)
         }
         return (0, "", 0)
     }
     
-    func eval_RedJokerandBlackThree(cards: [CNCard]) -> (Int, String, Int){
-        if cards[0].originalRank == 15 && cards[0].color == 0 && cards[1].originalRank == 3 && cards[1].color == 0{
+    func eval_RedspecialfeatureandBlackThree(singlefeatures: [CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].originalRank == 15 && singlefeatures[0].color == 0 && singlefeatures[1].originalRank == 3 && singlefeatures[1].color == 0{
             return (1, "黑3+大王", 0)
         }
-        if cards[0].originalRank == 3 && cards[0].color == 0 && cards[1].originalRank == 15 && cards[1].color == 0{
+        if singlefeatures[0].originalRank == 3 && singlefeatures[0].color == 0 && singlefeatures[1].originalRank == 15 && singlefeatures[1].color == 0{
             return (1, "黑3+大王", 0)
         }
         return (0, "", 0)
         
     }
     
-    func eval_isRedFivePair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].color == 1 && cards[1].color == 1 && cards[0].originalRank == 5{
+    func eval_isRedFivePair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 5{
             return (1, "对红5", 1)
         }
         return (0, "", 0)
     }
     
-    func eval_BlackAandBlackThree(cards: [CNCard]) -> (Int, String, Int){
-        if cards[0].originalRank == 1 && cards[0].color == 0 && cards[1].originalRank == 3 && cards[1].color == 0{
+    func eval_BlackAandBlackThree(singlefeatures: [CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].originalRank == 1 && singlefeatures[0].color == 0 && singlefeatures[1].originalRank == 3 && singlefeatures[1].color == 0{
             return (1, "黑A+黑3", 0)
         }
-        if cards[0].originalRank == 3 && cards[0].color == 0 && cards[1].originalRank == 1 && cards[1].color == 0{
+        if singlefeatures[0].originalRank == 3 && singlefeatures[0].color == 0 && singlefeatures[1].originalRank == 1 && singlefeatures[1].color == 0{
             return (1, "黑A+黑3", 0)
         }
         return (0, "", 0)
         
     }
-    func eval_isRedTwoPair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].color == 1 && cards[1].color == 1 && cards[0].originalRank == 2{
+    func eval_isRedTwoPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 2{
             return (1, "对红2", 1)
         }
         return (0, "", 0)
     }
     
-    func eval_isRedQPair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].color == 1 && cards[1].color == 1 && cards[0].originalRank == 12{
+    func eval_isRedQPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 12{
             return (1, "对红Q", 1)
         }
         return (0, "", 0)
     }
     
-    func eval_isRedColorPair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].color == 1 && cards[1].color == 1 {
+    func eval_isRedColorPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 {
             
-            var cardType: String = "红对" + ClassifierSettingArgs.CardNumberReportDic[cards[0].originalRank]!
+            var singlefeatureType: String = "红对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
             
             if self.pairRank == 0{
-                return (cards[0].rank, cardType, 1)
+                return (singlefeatures[0].rank, singlefeatureType, 1)
             } else if self.pairRank == 1{
-                return (1, cardType, 1)
+                return (1, singlefeatureType, 1)
             }
         }
         return (0, "", 0)
     }
     
-    func eval_isBlackColorPair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].color == 0 && cards[1].color == 0 {
+    func eval_isBlackColorPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 {
             
-            var cardType: String = "黑对" + ClassifierSettingArgs.CardNumberReportDic[cards[0].originalRank]!
+            var singlefeatureType: String = "黑对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
             
             if self.pairRank == 0{
-                return (cards[0].rank, cardType, 1)
+                return (singlefeatures[0].rank, singlefeatureType, 1)
             } else if self.pairRank == 1{
-                return (1, cardType, 1)
+                return (1, singlefeatureType, 1)
             }
         }
         return (0, "", 0)
     }
     
-    func eval_isMixColorPair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank && cards[0].color != cards[1].color {
+    func eval_isMixColorPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color != singlefeatures[1].color {
             
-            var cardType: String = "混对" + ClassifierSettingArgs.CardNumberReportDic[cards[0].originalRank]!
+            var singlefeatureType: String = "混对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
             
             if self.pairRank == 0{
-                return (cards[0].rank, cardType, 1)
+                return (singlefeatures[0].rank, singlefeatureType, 1)
             } else if self.pairRank == 1{
-                return (1, cardType, 1)
+                return (1, singlefeatureType, 1)
             }
         }
         return (0, "", 0)
     }
     
-    func eval_isPair(cards:[CNCard]) -> (Int, String, Int){
-        if cards[0].rank == cards[1].rank{
+    func eval_isPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == singlefeatures[1].rank{
             
-            var cardType: String = "对" + ClassifierSettingArgs.CardNumberReportDic[cards[0].originalRank]!
+            var singlefeatureType: String = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
             if self.pairRank == 0{
-                return (cards[0].rank, cardType, 1)
+                return (singlefeatures[0].rank, singlefeatureType, 1)
             } else if self.pairRank == 1{
-                return (1, cardType, 1)
+                return (1, singlefeatureType, 1)
             }
         }
         return (0, "", 0)
     }
                                                       
-    func eval_isQPlus9(cards: [CNCard]) -> (Int, String, Int) {
-        if cards[0].originalRank == 12 && cards[1].originalRank == 9{
+    func eval_isQPlus9(singlefeatures: [CNSingleFeature]) -> (Int, String, Int) {
+        if singlefeatures[0].originalRank == 12 && singlefeatures[1].originalRank == 9{
             return (1, "Q + 9", 0)
         }
         return (0, "",  0)
     }
-    func eval_isQPlus8(cards: [CNCard]) -> (Int, String, Int) {
-        if cards[0].originalRank == 12 && cards[1].originalRank == 8{
+    func eval_isQPlus8(singlefeatures: [CNSingleFeature]) -> (Int, String, Int) {
+        if singlefeatures[0].originalRank == 12 && singlefeatures[1].originalRank == 8{
             return (1, "Q + 8", 0)
         }
         return (0, "",  0)
     }
-    func eval_is2Plus8(cards: [CNCard]) -> (Int, String, Int) {
-        if cards[0].originalRank == 8 && cards[1].originalRank == 2{
+    func eval_is2Plus8(singlefeatures: [CNSingleFeature]) -> (Int, String, Int) {
+        if singlefeatures[0].originalRank == 8 && singlefeatures[1].originalRank == 2{
             return (1, "2 + 8", 0)
         }
         return (0, "",  0)
     }
-    func eval_isPoint(cards:[CNCard]) -> (Int, String, Int) {
-        let point = (cards[0].point + cards[1].point) % 10
+    func eval_isPoint(singlefeatures:[CNSingleFeature]) -> (Int, String, Int) {
+        let point = (singlefeatures[0].point + singlefeatures[1].point) % 10
         
-        var cardType: String = String(point) + "点"
+        var singlefeatureType: String = String(point) + "点"
         
-        return ((point + 1) << 4 | cards[0].rank, cardType, 0)
+        return ((point + 1) << 4 | singlefeatures[0].rank, singlefeatureType, 0)
     }
     
-    class CNCard{
+    class CNSingleFeature{
         var rank: Int = 0
         var originalRank: Int = 0
         var point: Int = 0
         var suit: Int = 0
-        var cardIndex: Int = 0
+        var singlefeatureIndex: Int = 0
         var color: Int = 0
         
-        init(card: Card, redJokerValueRange: Int, blackJokerValueRange: Int, KValueRange: Int, QValueRange:Int, JValueRange:Int, AValueRange: Int, suitRules:[Int], cardRankRule: Int){
-            let rule = ClassifierSettingArgs.targetSetting[9] as! CNGameRule
-            self.cardIndex = card.cardIndex
+        init(singlefeature: SingleFeature, redspecialfeatureValueRange: Int, blackspecialfeatureValueRange: Int, KValueRange: Int, QValueRange:Int, JValueRange:Int, AValueRange: Int, suitRules:[Int], singlefeatureRankRule: Int){
+            let rule = ClassifierSettingArgs.targetSetting[9] as! CNStatisticRule
+            self.singlefeatureIndex = singlefeature.singlefeatureIndex
             
             //suit Initialization
-            self.suit = card.suit[0]
+            self.suit = singlefeature.suit[0]
             //color Initialization
             //black
             if suitRules.firstIndex(of: self.suit)! == 0 || suitRules.firstIndex(of: self.suit)! == 2{
@@ -1039,198 +1039,198 @@ class CNGameHandEvaluator{
             }
             
             //Rank Initialization
-            self.originalRank = card.rank
-            if cardRankRule == 0{
-                self.rank = card.rank
-            } else if cardRankRule == 1{
-                if card.rank == 1{
+            self.originalRank = singlefeature.rank
+            if singlefeatureRankRule == 0{
+                self.rank = singlefeature.rank
+            } else if singlefeatureRankRule == 1{
+                if singlefeature.rank == 1{
                     self.rank = 14
                 }
-                if card.rank > 13 {
-                    self.rank = card.rank + 1
+                if singlefeature.rank > 13 {
+                    self.rank = singlefeature.rank + 1
                 }
-            } else if cardRankRule == 2{
+            } else if singlefeatureRankRule == 2{
                 //红Q
-                if self.color == 1 && card.rank == 12{
+                if self.color == 1 && singlefeature.rank == 12{
                     self.rank = 17
                 }
                 //红2
-                if self.color == 1 && card.rank == 2{
+                if self.color == 1 && singlefeature.rank == 2{
                     self.rank = 16
                 }
                 //红8
-                if self.color == 1 && card.rank == 8{
+                if self.color == 1 && singlefeature.rank == 8{
                     self.rank = 15
                 }
                 //红4
-                if self.color == 1 && card.rank == 4{
+                if self.color == 1 && singlefeature.rank == 4{
                     self.rank = 14
                 }
                 //红10
-                if self.color == 1 && card.rank == 10{
+                if self.color == 1 && singlefeature.rank == 10{
                     self.rank = 13
                 }
                 //红6
-                if self.color == 1 && card.rank == 6{
+                if self.color == 1 && singlefeature.rank == 6{
                     self.rank = 12
                 }
                 //黑4
-                if self.color == 0 && card.rank == 4{
+                if self.color == 0 && singlefeature.rank == 4{
                     self.rank = 11
                 }
                 //黑8
-                if self.color == 0 && card.rank == 8{
+                if self.color == 0 && singlefeature.rank == 8{
                     self.rank = 10
                 }
                 //黑10
-                if self.color == 0 && card.rank == 10{
+                if self.color == 0 && singlefeature.rank == 10{
                     self.rank = 9
                 }
                 //红7
-                if self.color == 1 && card.rank == 7{
+                if self.color == 1 && singlefeature.rank == 7{
                     self.rank = 8
                 }
                 //黑6
-                if self.color == 0 && card.rank == 6{
+                if self.color == 0 && singlefeature.rank == 6{
                     self.rank = 7
                 }
                 //黑9
-                if self.color == 0 && card.rank == 9{
+                if self.color == 0 && singlefeature.rank == 9{
                     self.rank = 6
                 }
                 
-            } else if cardRankRule == 3 {
+            } else if singlefeatureRankRule == 3 {
                 //红Q
-                if self.color == 1 && card.rank == 12{
+                if self.color == 1 && singlefeature.rank == 12{
                     self.rank = 17
                 }
                 //红2
-                if self.color == 1 && card.rank == 2{
+                if self.color == 1 && singlefeature.rank == 2{
                     self.rank = 16
                 }
                 //红8
-                if self.color == 1 && card.rank == 8{
+                if self.color == 1 && singlefeature.rank == 8{
                     self.rank = 15
                 }
                 //红4
-                if self.color == 1 && card.rank == 4{
+                if self.color == 1 && singlefeature.rank == 4{
                     self.rank = 14
                 }
                 //红10
-                if self.color == 1 && card.rank == 10{
+                if self.color == 1 && singlefeature.rank == 10{
                     self.rank = 13
                 }
                 //红6
-                if self.color == 1 && card.rank == 6{
+                if self.color == 1 && singlefeature.rank == 6{
                     self.rank = 12
                 }
                 //黑4
-                if self.color == 0 && card.rank == 4{
+                if self.color == 0 && singlefeature.rank == 4{
                     self.rank = 11
                 }
                 //黑J
-                if self.color == 0 && card.rank == 11{
+                if self.color == 0 && singlefeature.rank == 11{
                     self.rank = 10
                 }
                 //黑10
-                if self.color == 0 && card.rank == 10{
+                if self.color == 0 && singlefeature.rank == 10{
                     self.rank = 9
                 }
                 //红7
-                if self.color == 1 && card.rank == 7{
+                if self.color == 1 && singlefeature.rank == 7{
                     self.rank = 8
                 }
                 //黑6
-                if self.color == 0 && card.rank == 6{
+                if self.color == 0 && singlefeature.rank == 6{
                     self.rank = 7
                 }
                 //黑9
-                if self.color == 0 && card.rank == 9{
+                if self.color == 0 && singlefeature.rank == 9{
                     self.rank = 6
                 }
                 //黑8
-                if self.color == 0 && card.rank == 8{
+                if self.color == 0 && singlefeature.rank == 8{
                     self.rank = 5
                 }
                 //黑7
-                if self.color == 0 && card.rank == 7{
+                if self.color == 0 && singlefeature.rank == 7{
                     self.rank = 4
                 }
                 //黑5
-                if self.color == 0 && card.rank == 5{
+                if self.color == 0 && singlefeature.rank == 5{
                     self.rank = 3
                 }
                 //大王
-                if card.rank == 15{
+                if singlefeature.rank == 15{
                     self.rank = 2
                 }
                 //小王
-                if card.rank == 14{
+                if singlefeature.rank == 14{
                     self.rank = 1
                 }
-            } else if cardRankRule == 4{
+            } else if singlefeatureRankRule == 4{
                 //红Q
-                if self.color == 1 && card.rank == 12{
+                if self.color == 1 && singlefeature.rank == 12{
                     self.rank = 17
                 }
                 //红2
-                if self.color == 1 && card.rank == 2{
+                if self.color == 1 && singlefeature.rank == 2{
                     self.rank = 16
                 }
                 //红8
-                if self.color == 1 && card.rank == 8{
+                if self.color == 1 && singlefeature.rank == 8{
                     self.rank = 15
                 }
                 //红4
-                if self.color == 1 && card.rank == 4{
+                if self.color == 1 && singlefeature.rank == 4{
                     self.rank = 14
                 }
                 //红10
-                if self.color == 1 && card.rank == 10{
+                if self.color == 1 && singlefeature.rank == 10{
                     self.rank = 13
                 }
                 //红6
-                if self.color == 1 && card.rank == 6{
+                if self.color == 1 && singlefeature.rank == 6{
                     self.rank = 13
                 }
                 //黑4
-                if self.color == 0 && card.rank == 4{
+                if self.color == 0 && singlefeature.rank == 4{
                     self.rank = 13
                 }
                 //红J
-                if self.color == 1 && card.rank == 11{
+                if self.color == 1 && singlefeature.rank == 11{
                     self.rank = 10
                 }
                 //黑10
-                if self.color == 0 && card.rank == 10{
+                if self.color == 0 && singlefeature.rank == 10{
                     self.rank = 10
                 }
                 //红7
-                if self.color == 1 && card.rank == 7{
+                if self.color == 1 && singlefeature.rank == 7{
                     self.rank = 10
                 }
                 //黑6
-                if self.color == 0 && card.rank == 6{
+                if self.color == 0 && singlefeature.rank == 6{
                     self.rank = 10
                 }
                 //红9
-                if self.color == 1 && card.rank == 9{
+                if self.color == 1 && singlefeature.rank == 9{
                     self.rank = 6
                 }
                 //黑8
-                if self.color == 0 && card.rank == 8{
+                if self.color == 0 && singlefeature.rank == 8{
                     self.rank = 6
                 }
                 //黑7
-                if self.color == 0 && card.rank == 7{
+                if self.color == 0 && singlefeature.rank == 7{
                     self.rank = 6
                 }
                 //红5
-                if self.color == 1 && card.rank == 5{
+                if self.color == 1 && singlefeature.rank == 5{
                     self.rank = 6
                 }
                 //大王
-                if card.rank == 15{
+                if singlefeature.rank == 15{
                     self.rank = 6
                 }
                 //黑桃A
@@ -1239,73 +1239,73 @@ class CNGameHandEvaluator{
                 else {
                     self.rank = 6
                 }
-            } else if cardRankRule == 5{
+            } else if singlefeatureRankRule == 5{
                 //黑2
-                if self.color == 0 && card.rank == 2{
+                if self.color == 0 && singlefeature.rank == 2{
                     self.rank = 17
                 }
                 //红2
-                if self.color == 1 && card.rank == 2{
+                if self.color == 1 && singlefeature.rank == 2{
                     self.rank = 16
                 }
                 //红8
-                if self.color == 1 && card.rank == 8{
+                if self.color == 1 && singlefeature.rank == 8{
                     self.rank = 15
                 }
                 //红4
-                if self.color == 1 && card.rank == 4{
+                if self.color == 1 && singlefeature.rank == 4{
                     self.rank = 14
                 }
                 //红10
-                if self.color == 1 && card.rank == 10{
+                if self.color == 1 && singlefeature.rank == 10{
                     self.rank = 13
                 }
                 //红6
-                if self.color == 1 && card.rank == 6{
+                if self.color == 1 && singlefeature.rank == 6{
                     self.rank = 12
                 }
                 //黑4
-                if self.color == 0 && card.rank == 4{
+                if self.color == 0 && singlefeature.rank == 4{
                     self.rank = 11
                 }
                 //红1
-                if self.color == 1 && card.rank == 1{
+                if self.color == 1 && singlefeature.rank == 1{
                     self.rank = 10
                 }
                 //黑10
-                if self.color == 0 && card.rank == 10{
+                if self.color == 0 && singlefeature.rank == 10{
                     self.rank = 9
                 }
                 //红7
-                if self.color == 1 && card.rank == 7{
+                if self.color == 1 && singlefeature.rank == 7{
                     self.rank = 8
                 }
                 //黑6
-                if self.color == 0 && card.rank == 6{
+                if self.color == 0 && singlefeature.rank == 6{
                     self.rank = 7
                 }
                 //黑9
-                if self.color == 0 && card.rank == 9{
+                if self.color == 0 && singlefeature.rank == 9{
                     self.rank = 6
                 }
                 //黑8
-                if self.color == 0 && card.rank == 8{
+                if self.color == 0 && singlefeature.rank == 8{
                     self.rank = 5
                 }
                 //黑7
-                if self.color == 0 && card.rank == 7{
+                if self.color == 0 && singlefeature.rank == 7{
                     self.rank = 4
                 }
                 //黑5
-                if self.color == 0 && card.rank == 5{
+                if self.color == 0 && singlefeature.rank == 5{
                     self.rank = 3
                 }
                 //大王
-                if card.rank == 15{
+                if singlefeature.rank == 15{
                     self.rank = 2
                 }
                 //小王
-                if card.rank == 14{
+                if singlefeature.rank == 14{
                     self.rank = 1
                 }
             }
@@ -1313,24 +1313,24 @@ class CNGameHandEvaluator{
             
             
             //Point Initialization
-            if card.rank == 15 {
-                self.point =  Int(rule.redJokerValueRange[redJokerValueRange]!)!
+            if singlefeature.rank == 15 {
+                self.point =  Int(rule.redspecialfeatureValueRange[redspecialfeatureValueRange]!)!
             }
-            else if card.rank == 14 {
-                self.point = Int(rule.blackJokerValueRange[blackJokerValueRange]!)!
+            else if singlefeature.rank == 14 {
+                self.point = Int(rule.blackspecialfeatureValueRange[blackspecialfeatureValueRange]!)!
             }
-            else if card.rank == 13 {
+            else if singlefeature.rank == 13 {
                 self.point = Int(rule.KValueRange[KValueRange]!)!
             }
-            else if card.rank == 12 {
+            else if singlefeature.rank == 12 {
                 self.point = Int(rule.QValueRange[QValueRange]!)!
             }
-            else if card.rank == 11 {
+            else if singlefeature.rank == 11 {
                 self.point = Int(rule.JValueRange[JValueRange]!)!
-            }else if card.rank == 1{
+            }else if singlefeature.rank == 1{
                 self.point = Int(rule.AValueRange[AValueRange]!)!
             } else {
-                self.point = card.rank
+                self.point = singlefeature.rank
             }
         }
     }

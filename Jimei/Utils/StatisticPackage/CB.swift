@@ -2,7 +2,7 @@
 import Foundation
 
 
-class CBGameRule : Rule{
+class CBStatisticRule : Rule{
     
     //此处填入需要的参数，因为rulesettingview没有了，主要作用是注释
     let winCondition:[Int:String] = [
@@ -16,13 +16,13 @@ class CBGameRule : Rule{
         1:"A23最小",
     ]
     
-    let jokerChangeSetting:[Int:String] = [
+    let specialfeatureChangeSetting:[Int:String] = [
         0:"王百变",
         1:"大王红牌 小王黑牌",
         2:"大王红6 小王黑3",
     ]
     
-    let jokerThreeCardSetting:[Int:String] = [
+    let specialfeatureThreeSingleFeatureSetting:[Int:String] = [
         0:"王不能当三头",
         1:"王能当三头"
     ]
@@ -164,24 +164,24 @@ class CBGameRule : Rule{
 (
 """,
         ]
-        self.playerNum = [2,3,4,5,6]
+        self.rcNum = [2,3,4,5,6]
 
     }
 }
 
 
-class CBGame{
+class CBStatistic{
     
-    static func FindWinner(diyDealStatus:[[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
+    static func FindWinner(diyDealStatus:[[Bool]], diyDealNum:[Int], inputSingleFeatures:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([StatisticReturnRCInfo],[Int]) {
         
-        let deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (winners, leftCards)
+        let FeatureList = initFeatureList(initialSingleFeatures: inputSingleFeatures, suitRules: suitRules)
+        let (winners, leftSingleFeatures) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, FeatureList: FeatureList, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winners, leftSingleFeatures)
     }
     
-    static func legalCheck(playerNum: Int, setting: Int) -> String{
+    static func legalCheck(rcNum: Int, setting: Int) -> String{
         var errMessage : String = ""
-        if(playerNum * 9 > getAllCardIndex(setting: setting).count)
+        if(rcNum * 9 > getAllSingleFeatureIndex(setting: setting).count)
         {
             errMessage = "需要牌数量超出牌堆总数，请重新设置！"
         }
@@ -189,7 +189,7 @@ class CBGame{
     }
     
     //加入每个规则需要的用牌
-    static func getAllCardIndex(setting: Int) -> [Int]{
+    static func getAllSingleFeatureIndex(setting: Int) -> [Int]{
         var result : [Int] = []
         switch setting {
         case 0:
@@ -233,17 +233,17 @@ class CBGame{
         return result
     }
     
-    static func getMinCardNum(playerNum: Int, handNum: Int, communityNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+    static func getMinSingleFeatureNum(rcNum: Int, handNum: Int, communityNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
         
         if dealType == 0 || dealType == 1{
-            return playerNum * handNum + communityNum
+            return rcNum * handNum + communityNum
         } else {
             var minNum = 0
             for i in 0..<diyDealNum.count {
                 let num = diyDealNum[i]
                 //派牌
                 if diyDealStatus[i][0] == true {
-                    minNum += playerNum * num
+                    minNum += rcNum * num
                 //公牌
                 } else if diyDealStatus[i][1] == true {
                     minNum += num
@@ -259,99 +259,99 @@ class CBGame{
     //args
     //0 dealType
     //1 diyDealType
-    //2 playerNum
+    //2 rcNum
     //3 handNum
     //4 communityNum
     //5 winCondition
     //6 AStraightMin
-    //7 jokerChangeSetting
-    //8 jokerThreeCardSetting
+    //7 specialfeatureChangeSetting
+    //8 specialfeatureThreeSingleFeatureSetting
 
     
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], FeatureList: [SingleFeature], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([StatisticReturnRCInfo],[Int]) {
         let dealNum = args[0]
         let dealType = args[1]
-        let playerNum = args[2]
+        let rcNum = args[2]
         let handNum = args[3]
         let communityNum = args[4]
         let winCondition = args[5]
         let AStraightMin = args[6]
-        let jokerChangeSetting = args[7]
-        let jokerThreeCardSetting = args[8]
+        let specialfeatureChangeSetting = args[7]
+        let specialfeatureThreeSingleFeatureSetting = args[8]
         
         var maxRank = 0
-        var returnPlayerInfos: [GameReturnPlayerInfo] = []
+        var returnRCInfos: [StatisticReturnRCInfo] = []
 
-        var allPlayCards: [Player] = []
-        var community = [Card]()
+        var allPlaySingleFeatures: [RC] = []
+        var community = [SingleFeature]()
         
-        if deck.count < self.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
+        if FeatureList.count < self.getMinSingleFeatureNum(rcNum: rcNum,handNum: handNum, communityNum: communityNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
             return ([], [])
         }
         
-        for _ in 0..<playerNum {
-            allPlayCards.append(Player())
+        for _ in 0..<rcNum {
+            allPlaySingleFeatures.append(RC())
         }
         
-        var deck = deck
+        var FeatureList = FeatureList
         // 发牌
         if dealNum == 0{
             for _ in 0..<handNum{
                 //正发
                 if dealType == 0{
-                    for i in 0..<playerNum {
-                        allPlayCards[i].insertCard(card: deck.removeFirst())
+                    for i in 0..<rcNum {
+                        allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeFirst())
                     }
                 //反发
                 } else if dealType == 1 {
-                    for i in 0..<playerNum {
-                        allPlayCards[i].insertCard(card: deck.removeLast())
+                    for i in 0..<rcNum {
+                        allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeLast())
                     }
                 }
             }
             
         } else {
             for actionIndex in 0...diyDealStatus.count - 1{
-                let cardNum = diyDealNum[actionIndex]
+                let singlefeatureNum = diyDealNum[actionIndex]
                 let action = diyDealStatus[actionIndex]
                 //派牌
                 if action[0] == true{
                     //正发
                     if dealType == 0{
-                        for i in 0..<playerNum {
-                            for _ in 0..<cardNum{
-                                allPlayCards[i].insertCard(card: deck.removeFirst())
+                        for i in 0..<rcNum {
+                            for _ in 0..<singlefeatureNum{
+                                allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeFirst())
                             }
                         }
                     //反发
                     } else if dealType == 1{
-                        for i in 0..<playerNum {
-                            for _ in 0..<cardNum{
-                                allPlayCards[i].insertCard(card: deck.removeLast())
+                        for i in 0..<rcNum {
+                            for _ in 0..<singlefeatureNum{
+                                allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeLast())
                             }
                         }
                     }
                 //公牌
                 } else if action[1] == true {
                     if dealType == 0{
-                        for _ in 0..<cardNum{
-                            community.append(deck.removeFirst())
+                        for _ in 0..<singlefeatureNum{
+                            community.append(FeatureList.removeFirst())
                         }
                     } else if dealType == 1{
-                        for _ in 0..<cardNum{
-                            community.append(deck.removeLast())
+                        for _ in 0..<singlefeatureNum{
+                            community.append(FeatureList.removeLast())
                         }
                     }
                     
                 //去牌
                 } else if action[2] == true {
                     if dealType == 0 {
-                        for _ in 0..<cardNum{
-                            deck.removeFirst()
+                        for _ in 0..<singlefeatureNum{
+                            FeatureList.removeFirst()
                         }
                     } else if dealType == 1{
-                        for _ in 0..<cardNum{
-                            deck.removeLast()
+                        for _ in 0..<singlefeatureNum{
+                            FeatureList.removeLast()
                         }
                     }
                 }
@@ -359,56 +359,56 @@ class CBGame{
         }
         
         
-        var playerRankList : [[Int]] = []
+        var rcRankList : [[Int]] = []
         
-        for i in 0..<playerNum {
+        for i in 0..<rcNum {
             
-            var turn1Cards:[CBGameCard] = []
-            for card in allPlayCards[i].playerCard {
-                turn1Cards.append(CBGameCard(card: card, jokerChangeSetting: jokerChangeSetting))
+            var turn1SingleFeatures:[CBStatisticSingleFeature] = []
+            for singlefeature in allPlaySingleFeatures[i].rcSingleFeature {
+                turn1SingleFeatures.append(CBStatisticSingleFeature(singlefeature: singlefeature, specialfeatureChangeSetting: specialfeatureChangeSetting))
             }
-            turn1Cards = turn1Cards.sorted(by: {$0.rank > $1.rank})
+            turn1SingleFeatures = turn1SingleFeatures.sorted(by: {$0.rank > $1.rank})
             
-            let (rank1, cardtype1, isPair1, usedCardIndex1) = CBGameHandEvaluator(
+            let (rank1, singlefeaturetype1, isPair1, usedSingleFeatureIndex1) = CBStatisticHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules,
                 AStraightMin: AStraightMin,
-                jokerThreeCardSetting: jokerThreeCardSetting
-            ).evalHand(cards: turn1Cards)
+                specialfeatureThreeSingleFeatureSetting: specialfeatureThreeSingleFeatureSetting
+            ).evalHand(singlefeatures: turn1SingleFeatures)
             
-            allPlayCards[i].evaluateFlag = rank1
-            allPlayCards[i].cardType = cardtype1
-            allPlayCards[i].isPair = isPair1
+            allPlaySingleFeatures[i].evaluateFlag = rank1
+            allPlaySingleFeatures[i].singlefeatureType = singlefeaturetype1
+            allPlaySingleFeatures[i].isPair = isPair1
                 
-            var turn2Cards:[CBGameCard] = []
-            for cardIndex in 0..<turn1Cards.count {
-                if !usedCardIndex1.contains(cardIndex){
-                    turn2Cards.append(turn1Cards[cardIndex])
+            var turn2SingleFeatures:[CBStatisticSingleFeature] = []
+            for singlefeatureIndex in 0..<turn1SingleFeatures.count {
+                if !usedSingleFeatureIndex1.contains(singlefeatureIndex){
+                    turn2SingleFeatures.append(turn1SingleFeatures[singlefeatureIndex])
                 }
             }
             
-            let (rank2, cardtype2, isPair2, usedCardIndex2) = CBGameHandEvaluator(
+            let (rank2, singlefeaturetype2, isPair2, usedSingleFeatureIndex2) = CBStatisticHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules,
                 AStraightMin: AStraightMin,
-                jokerThreeCardSetting: jokerThreeCardSetting
-            ).evalHand(cards: turn2Cards)
+                specialfeatureThreeSingleFeatureSetting: specialfeatureThreeSingleFeatureSetting
+            ).evalHand(singlefeatures: turn2SingleFeatures)
             
-            var turn3Cards:[CBGameCard] = []
-            for cardIndex in 0..<turn2Cards.count {
-                if !usedCardIndex2.contains(cardIndex){
-                    turn3Cards.append(turn2Cards[cardIndex])
+            var turn3SingleFeatures:[CBStatisticSingleFeature] = []
+            for singlefeatureIndex in 0..<turn2SingleFeatures.count {
+                if !usedSingleFeatureIndex2.contains(singlefeatureIndex){
+                    turn3SingleFeatures.append(turn2SingleFeatures[singlefeatureIndex])
                 }
             }
                     
-            let (rank3, cardtype3, isPair3, usedCardIndex3) = CBGameHandEvaluator(
+            let (rank3, singlefeaturetype3, isPair3, usedSingleFeatureIndex3) = CBStatisticHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules,
                 AStraightMin: AStraightMin,
-                jokerThreeCardSetting: jokerThreeCardSetting
-            ).evalHand(cards: turn3Cards)
+                specialfeatureThreeSingleFeatureSetting: specialfeatureThreeSingleFeatureSetting
+            ).evalHand(singlefeatures: turn3SingleFeatures)
             
-            playerRankList.append([rank1, rank2, rank3])
+            rcRankList.append([rank1, rank2, rank3])
         }
         
         //尾墩
@@ -417,18 +417,18 @@ class CBGame{
         }
         //道数
         else if winCondition == 1{
-            for i in 0..<playerNum {
-                allPlayCards[i].evaluateFlag = 0
+            for i in 0..<rcNum {
+                allPlaySingleFeatures[i].evaluateFlag = 0
             }
-            for currentPlayer in 0..<playerNum {
-                for i in 0..<playerNum{
-                    if currentPlayer != i{
+            for currentRC in 0..<rcNum {
+                for i in 0..<rcNum{
+                    if currentRC != i{
                         for turn in 0..<3{
-                            if playerRankList[currentPlayer][turn] > playerRankList[i][turn]{
-                                allPlayCards[currentPlayer].evaluateFlag += 1
+                            if rcRankList[currentRC][turn] > rcRankList[i][turn]{
+                                allPlaySingleFeatures[currentRC].evaluateFlag += 1
                             }
-                            else if playerRankList[currentPlayer][turn] < playerRankList[i][turn]{
-                                allPlayCards[currentPlayer].evaluateFlag -= 1
+                            else if rcRankList[currentRC][turn] < rcRankList[i][turn]{
+                                allPlaySingleFeatures[currentRC].evaluateFlag -= 1
                             }
                         }
                     }
@@ -438,93 +438,93 @@ class CBGame{
         //积分
         else if winCondition == 2{
             
-            for i in 0..<playerNum {
-                allPlayCards[i].evaluateFlag = 0
+            for i in 0..<rcNum {
+                allPlaySingleFeatures[i].evaluateFlag = 0
             }
             
             for turn in 0..<3{
                 
-                var maxPlayer = 0
+                var maxRC = 0
                 var maxRank = 0
                 
-                for i in 0..<playerNum {
-                    let currentRank = playerRankList[i][turn]
+                for i in 0..<rcNum {
+                    let currentRank = rcRankList[i][turn]
                     if currentRank > maxRank{
                         maxRank = currentRank
-                        maxPlayer = i
+                        maxRC = i
                     }
                 }
                 
-                allPlayCards[maxPlayer].evaluateFlag += 1
+                allPlaySingleFeatures[maxRC].evaluateFlag += 1
             }
         }
         
         
         //这里后面都不用改，最后按照牌的大小（evaluateflag）排序返回
         
-        for playerID in 0..<allPlayCards.count {
-            var currentReturnPlayerInfo = GameReturnPlayerInfo()
-            currentReturnPlayerInfo.playerID = playerID
-            currentReturnPlayerInfo.playerRank = allPlayCards[playerID].evaluateFlag
-            currentReturnPlayerInfo.playerCardsType = allPlayCards[playerID].cardType
-            currentReturnPlayerInfo.isPair = allPlayCards[playerID].isPair
-            currentReturnPlayerInfo.PlayerCards = allPlayCards[playerID].playerCard
-            currentReturnPlayerInfo.communityCard = community
-            returnPlayerInfos.append(currentReturnPlayerInfo)
+        for rcID in 0..<allPlaySingleFeatures.count {
+            var currentReturnRCInfo = StatisticReturnRCInfo()
+            currentReturnRCInfo.rcID = rcID
+            currentReturnRCInfo.rcRank = allPlaySingleFeatures[rcID].evaluateFlag
+            currentReturnRCInfo.rcSingleFeaturesType = allPlaySingleFeatures[rcID].singlefeatureType
+            currentReturnRCInfo.isPair = allPlaySingleFeatures[rcID].isPair
+            currentReturnRCInfo.RCSingleFeatures = allPlaySingleFeatures[rcID].rcSingleFeature
+            currentReturnRCInfo.communitySingleFeature = community
+            returnRCInfos.append(currentReturnRCInfo)
         }
         
         //从大到小排序
-        returnPlayerInfos = returnPlayerInfos.sorted(by: {$0.playerRank > $1.playerRank})
+        returnRCInfos = returnRCInfos.sorted(by: {$0.rcRank > $1.rcRank})
         
         
-        var leftCards:[Int] = []
-        for card in deck{
-            leftCards.append(card.cardIndex)
+        var leftSingleFeatures:[Int] = []
+        for singlefeature in FeatureList{
+            leftSingleFeatures.append(singlefeature.singlefeatureIndex)
         }
-        if leftCards.count < CBGame.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
-            leftCards = []
+        if leftSingleFeatures.count < CBStatistic.getMinSingleFeatureNum(rcNum: rcNum,handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+            leftSingleFeatures = []
         }
-        return (returnPlayerInfos, leftCards)
+        return (returnRCInfos, leftSingleFeatures)
     }
 }
 
-class CBGameHandEvaluator{
+class CBStatisticHandEvaluator{
     var rankRules: [Int]
     var suitRules: [Int]
-    var ruleDict: [Int: ([CBGameCard]) -> ([Int], [String], Int, [[Int]])] = [:]
+    var ruleDict: [Int: ([CBStatisticSingleFeature]) -> ([Int], [String], Int, [[Int]])] = [:]
     var AStraightMin: Int
-    var jokerThreeCardSetting: Int
+    var specialfeatureThreeSingleFeatureSetting: Int
         
     init(rankRules: [Int],
          suitRules: [Int],
          AStraightMin: Int,
-         jokerThreeCardSetting: Int){
+         specialfeatureThreeSingleFeatureSetting: Int){
         self.rankRules = rankRules
         self.suitRules = suitRules
         self.AStraightMin = AStraightMin
-        self.jokerThreeCardSetting = jokerThreeCardSetting
+        self.specialfeatureThreeSingleFeatureSetting = specialfeatureThreeSingleFeatureSetting
         
         self.ruleDict = [
-            0:self.eval_holecard(cards:),
-            1:self.eval_onepair(cards:),
-            2:self.eval_straight(cards:),
-            3:self.eval_flush(cards:),
-            4:self.eval_straightflush(cards:),
-            5:self.eval_threecard(cards:)
+            0:self.eval_holesinglefeature(singlefeatures:),
+            1:self.eval_onepair(singlefeatures:),
+            2:self.eval_straight(singlefeatures:),
+            3:self.eval_flush(singlefeatures:),
+            4:self.eval_straightflush(singlefeatures:),
+            5:self.eval_threesinglefeature(singlefeatures:)
         ]
     }
     
     //传入需要的参数
-    func evalHand(cards: [CBGameCard])->(Int, String, Int, [Int]){
+    func evalHand(singlefeatures: [CBStatisticSingleFeature])->(Int, String, Int, [Int]){
         
         var rank:Int = 0
-        var cardType:String = ""
+        var singlefeatureType:String = ""
         var isPair:Int = 0
-        var usedCardIndex:[Int] = []
+        var usedSingleFeatureIndex:[Int] = []
         
         var i = self.ruleDict.count + 1
         for ruleIndex in self.rankRules{
-            let (rankList, cardTypeList, isPair, usedCardIndexList) = self.ruleDict[ruleIndex]!(cards)
+            let (rankList, singlefeatureTypeList, isPair, usedSingleFeatureIndexList) = self.ruleDict[ruleIndex]!(singlefeatures)
             i -= 1
             
             if rankList.count == 0{
@@ -534,105 +534,105 @@ class CBGameHandEvaluator{
                 let maxIndex = rankList.firstIndex(of: rankList.max() ?? 0)!
                 
                 rank = (1 << (i + 15)) | rankList[maxIndex]
-                cardType = cardTypeList[maxIndex]
-                usedCardIndex = usedCardIndexList[maxIndex]
+                singlefeatureType = singlefeatureTypeList[maxIndex]
+                usedSingleFeatureIndex = usedSingleFeatureIndexList[maxIndex]
                 
                 break
             }
         }
 
-        return (rank, cardType, isPair, usedCardIndex)
+        return (rank, singlefeatureType, isPair, usedSingleFeatureIndex)
     }
     
     //牌型函数
     
-    func eval_threecard(cards: [CBGameCard]) -> ([Int], [String], Int, [[Int]]) {
+    func eval_threesinglefeature(singlefeatures: [CBStatisticSingleFeature]) -> ([Int], [String], Int, [[Int]]) {
         var rankList: [Int] = []
-        var cardTypeList: [String] = []
-        var usedCardIndexList : [[Int]] = []
+        var singlefeatureTypeList: [String] = []
+        var usedSingleFeatureIndexList : [[Int]] = []
         
-        if self.jokerThreeCardSetting == 1{
-            if cards[0].rank == 15 && cards[1].rank == 15{
-                for i in 2..<cards.count{
-                    usedCardIndexList.append([0,1,i])
+        if self.specialfeatureThreeSingleFeatureSetting == 1{
+            if singlefeatures[0].rank == 15 && singlefeatures[1].rank == 15{
+                for i in 2..<singlefeatures.count{
+                    usedSingleFeatureIndexList.append([0,1,i])
                 }
             }
-            else if cards[0].rank == 15{
-                for i in 1..<cards.count-1{
-                    if cards[i].rank == cards[i+1].rank{
-                        usedCardIndexList.append([0,i,i+1])
+            else if singlefeatures[0].rank == 15{
+                for i in 1..<singlefeatures.count-1{
+                    if singlefeatures[i].rank == singlefeatures[i+1].rank{
+                        usedSingleFeatureIndexList.append([0,i,i+1])
                     }
                 }
             }
             else {
-                for i in 0..<cards.count-2{
-                    if cards[i].rank == cards[i+1].rank && cards[i].rank == cards[i+2].rank{
-                        usedCardIndexList.append([i,i+1,i+2])
+                for i in 0..<singlefeatures.count-2{
+                    if singlefeatures[i].rank == singlefeatures[i+1].rank && singlefeatures[i].rank == singlefeatures[i+2].rank{
+                        usedSingleFeatureIndexList.append([i,i+1,i+2])
                     }
                 }
             }
         }
         else{
-            for i in 0..<cards.count-2{
-                if cards[i].originRank == cards[i+1].originRank && cards[i].originRank == cards[i+2].originRank{
-                    usedCardIndexList.append([i,i+1,i+2])
+            for i in 0..<singlefeatures.count-2{
+                if singlefeatures[i].originRank == singlefeatures[i+1].originRank && singlefeatures[i].originRank == singlefeatures[i+2].originRank{
+                    usedSingleFeatureIndexList.append([i,i+1,i+2])
                 }
             }
         }
 
-        if usedCardIndexList.count > 0 {
+        if usedSingleFeatureIndexList.count > 0 {
             
-            for currentUsedCardIndex in usedCardIndexList{
+            for currentUsedSingleFeatureIndex in usedSingleFeatureIndexList{
                 var rank = 0
                 
-                var threeCardRank = cards[currentUsedCardIndex[2]].rank
-                var threeCardSuit = cards[currentUsedCardIndex[0]].rank
+                var threeSingleFeatureRank = singlefeatures[currentUsedSingleFeatureIndex[2]].rank
+                var threeSingleFeatureSuit = singlefeatures[currentUsedSingleFeatureIndex[0]].rank
                 
-                if threeCardSuit == -1{
-                    threeCardSuit = 0
+                if threeSingleFeatureSuit == -1{
+                    threeSingleFeatureSuit = 0
                 }
                 
-                rank = rank << 4 | threeCardRank
-                rank = rank << 2 | threeCardSuit
+                rank = rank << 4 | threeSingleFeatureRank
+                rank = rank << 2 | threeSingleFeatureSuit
                 
-                let cardType = "豹子" + ClassifierSettingArgs.CardNumberReportDic[cards[currentUsedCardIndex[2]].originRank]!
+                let singlefeatureType = "豹子" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[2]].originRank]!
                 
                 rankList.append(rank)
-                cardTypeList.append(cardType)
+                singlefeatureTypeList.append(singlefeatureType)
             }
         }
         
-        return (rankList, cardTypeList, 0, usedCardIndexList)
+        return (rankList, singlefeatureTypeList, 0, usedSingleFeatureIndexList)
     }
     
-    func eval_straightflush(cards: [CBGameCard]) -> ([Int], [String], Int, [[Int]]) {
+    func eval_straightflush(singlefeatures: [CBStatisticSingleFeature]) -> ([Int], [String], Int, [[Int]]) {
         var rankList: [Int] = []
-        var cardTypeList: [String] = []
-        var usedCardIndexList : [[Int]] = []
+        var singlefeatureTypeList: [String] = []
+        var usedSingleFeatureIndexList : [[Int]] = []
         
-        let (straightRankList, straightCardTypeList, _, straightUsedCardIndexList) = eval_straight(cards: cards)
+        let (straightRankList, straightSingleFeatureTypeList, _, straightUsedSingleFeatureIndexList) = eval_straight(singlefeatures: singlefeatures)
         
         if straightRankList.count > 0 {
             
-            for i in 0..<straightUsedCardIndexList.count{
-                let currentStraightUsedCardIndex = straightUsedCardIndexList[i]
+            for i in 0..<straightUsedSingleFeatureIndexList.count{
+                let currentStraightUsedSingleFeatureIndex = straightUsedSingleFeatureIndexList[i]
                 
                 var suit = 3
-                for c in currentStraightUsedCardIndex {
-                    if cards[c].suit >= 0{
-                        suit = cards[c].suit
+                for c in currentStraightUsedSingleFeatureIndex {
+                    if singlefeatures[c].suit >= 0{
+                        suit = singlefeatures[c].suit
                         break
                     }
                 }
                 
                 var isFlush : Bool = true
-                for currentCardIndex in currentStraightUsedCardIndex{
-                    let currentCardSuit = cards[currentCardIndex].suit
+                for currentSingleFeatureIndex in currentStraightUsedSingleFeatureIndex{
+                    let currentSingleFeatureSuit = singlefeatures[currentSingleFeatureIndex].suit
                     
-                    if currentCardSuit == -1
-                        || currentCardSuit == suit
-                        || (currentCardSuit == -2 && (suit == 0 || suit == 2))
-                        || (currentCardSuit == -3 && (suit == 1 || suit == 3)){
+                    if currentSingleFeatureSuit == -1
+                        || currentSingleFeatureSuit == suit
+                        || (currentSingleFeatureSuit == -2 && (suit == 0 || suit == 2))
+                        || (currentSingleFeatureSuit == -3 && (suit == 1 || suit == 3)){
                         continue
                     }
                     else{
@@ -642,98 +642,98 @@ class CBGameHandEvaluator{
                 }
                 
                 if isFlush{
-                    usedCardIndexList.append(currentStraightUsedCardIndex)
+                    usedSingleFeatureIndexList.append(currentStraightUsedSingleFeatureIndex)
                     
                     var rank = straightRankList[i] >> 2
                     
-                    let cardType = "顺金" + String(rank)
+                    let singlefeatureType = "顺金" + String(rank)
                     rank = rank << 2 | suit
                     
                     rankList.append(rank)
-                    cardTypeList.append(cardType)
+                    singlefeatureTypeList.append(singlefeatureType)
                 }
             }
         }
         
-        return (rankList, cardTypeList, 0, usedCardIndexList)
+        return (rankList, singlefeatureTypeList, 0, usedSingleFeatureIndexList)
     }
     
-    func eval_flush(cards: [CBGameCard]) -> ([Int], [String], Int, [[Int]]) {
+    func eval_flush(singlefeatures: [CBStatisticSingleFeature]) -> ([Int], [String], Int, [[Int]]) {
         var rankList: [Int] = []
-        var cardTypeList: [String] = []
-        var usedCardIndexList : [[Int]] = []
+        var singlefeatureTypeList: [String] = []
+        var usedSingleFeatureIndexList : [[Int]] = []
         
         
         for suit in 0..<4{
-            var suitCards : [Int] = []
-            for i in 0..<cards.count{
-                if cards[i].suit == -1
-                    || cards[i].suit == suit
-                    || (cards[i].suit == -2 && (suit == 0 || suit == 2))
-                    || (cards[i].suit == -3 && (suit == 1 || suit == 3)){
-                    suitCards.append(i)
+            var suitSingleFeatures : [Int] = []
+            for i in 0..<singlefeatures.count{
+                if singlefeatures[i].suit == -1
+                    || singlefeatures[i].suit == suit
+                    || (singlefeatures[i].suit == -2 && (suit == 0 || suit == 2))
+                    || (singlefeatures[i].suit == -3 && (suit == 1 || suit == 3)){
+                    suitSingleFeatures.append(i)
                 }
             }
             
-            if suitCards.count >= 3{
-                usedCardIndexList += suitCards.combinations(ofCount: 3)
+            if suitSingleFeatures.count >= 3{
+                usedSingleFeatureIndexList += suitSingleFeatures.combinations(ofCount: 3)
             }
         }
         
-        if usedCardIndexList.count > 0 {
+        if usedSingleFeatureIndexList.count > 0 {
             
-            for currentUsedCardIndex in usedCardIndexList{
+            for currentUsedSingleFeatureIndex in usedSingleFeatureIndexList{
                 var rank = 0
                 
                 var suit = 3
-                for c in currentUsedCardIndex {
-                    if cards[c].suit >= 0{
-                        suit = cards[c].suit
+                for c in currentUsedSingleFeatureIndex {
+                    if singlefeatures[c].suit >= 0{
+                        suit = singlefeatures[c].suit
                         break
                     }
                 }
                 
-                for c in currentUsedCardIndex {
-                    if cards[c].rank == 15{
+                for c in currentUsedSingleFeatureIndex {
+                    if singlefeatures[c].rank == 15{
                         rank = rank << 4 | 0
                     }
                     else{
-                        rank = rank << 4 | cards[c].rank
+                        rank = rank << 4 | singlefeatures[c].rank
                     }
                 }
                 rank = rank << 2 | suit
                 
-                let cardType = "金花" + String(cards[currentUsedCardIndex[0]].rank)
+                let singlefeatureType = "金花" + String(singlefeatures[currentUsedSingleFeatureIndex[0]].rank)
                 
                 rankList.append(rank)
-                cardTypeList.append(cardType)
+                singlefeatureTypeList.append(singlefeatureType)
             }
         }
         
-        return (rankList, cardTypeList, 0, usedCardIndexList)
+        return (rankList, singlefeatureTypeList, 0, usedSingleFeatureIndexList)
     }
     
 
-    func eval_straight(cards: [CBGameCard]) -> ([Int], [String], Int, [[Int]]) {
+    func eval_straight(singlefeatures: [CBStatisticSingleFeature]) -> ([Int], [String], Int, [[Int]]) {
         var rankList: [Int] = []
-        var cardTypeList: [String] = []
-        var usedCardIndexList : [[Int]] = []
+        var singlefeatureTypeList: [String] = []
+        var usedSingleFeatureIndexList : [[Int]] = []
         
         
-        var allIndex:[Int] = Array(0...cards.count-1)
+        var allIndex:[Int] = Array(0...singlefeatures.count-1)
        
         let allCombinations = allIndex.combinations(ofCount: 3)
         for combination in allCombinations {
             var currentCombination = combination
             currentCombination.sort(by: { index1, index2 in
-                return cards[index1].rank > cards[index2].rank
+                return singlefeatures[index1].rank > singlefeatures[index2].rank
             })
             
             var cntC = 0
-            if cards[currentCombination[0]].rank == 15{
+            if singlefeatures[currentCombination[0]].rank == 15{
                 cntC = 1
             }
-            if cards[currentCombination[1]].rank == 15{
+            if singlefeatures[currentCombination[1]].rank == 15{
                 cntC = 2
             }
             
@@ -741,10 +741,10 @@ class CBGameHandEvaluator{
             var headSuit = -1
             
             if cntC == 2{
-                let nowRank = cards[currentCombination[2]].rank
+                let nowRank = singlefeatures[currentCombination[2]].rank
                 if nowRank == 14{
                     headRank = 15 //AQK rank 15
-                    headSuit = cards[currentCombination[2]].suit
+                    headSuit = singlefeatures[currentCombination[2]].suit
                 }
                 else if nowRank == 13{
                     headRank = 15 //AQK rank 15
@@ -762,14 +762,14 @@ class CBGameHandEvaluator{
             else{
                 var gap = cntC
                 
-                if cards[currentCombination[cntC]].rank == 14{
-                    cards[currentCombination[cntC]].rank = 1
+                if singlefeatures[currentCombination[cntC]].rank == 14{
+                    singlefeatures[currentCombination[cntC]].rank = 1
                     currentCombination.sort(by: { index1, index2 in
-                        return cards[index1].rank > cards[index2].rank
+                        return singlefeatures[index1].rank > singlefeatures[index2].rank
                     })
                     for i in cntC..<currentCombination.count-1{
-                        let nowRank = cards[currentCombination[i]].rank
-                        let nextRank = cards[currentCombination[i+1]].rank
+                        let nowRank = singlefeatures[currentCombination[i]].rank
+                        let nextRank = singlefeatures[currentCombination[i+1]].rank
                         if nowRank == nextRank {
                             gap = -1
                             break
@@ -779,27 +779,27 @@ class CBGameHandEvaluator{
                         }
                     }
                     
-                    cards[currentCombination[currentCombination.count-1]].rank = 14
+                    singlefeatures[currentCombination[currentCombination.count-1]].rank = 14
                     currentCombination.sort(by: { index1, index2 in
-                        return cards[index1].rank > cards[index2].rank
+                        return singlefeatures[index1].rank > singlefeatures[index2].rank
                     })
                     
                     if gap > 0{
                         if self.AStraightMin == 0{
                             headRank = 14
-                            headSuit = cards[currentCombination[cntC]].suit
+                            headSuit = singlefeatures[currentCombination[cntC]].suit
                         }
                         else{
                             headRank = 3
-                            headSuit = cards[currentCombination[cntC]].suit
+                            headSuit = singlefeatures[currentCombination[cntC]].suit
                         }
                     }
                 }
                 
                 gap = cntC
                 for i in cntC..<currentCombination.count-1{
-                    let nowRank = cards[currentCombination[i]].rank
-                    let nextRank = cards[currentCombination[i+1]].rank
+                    let nowRank = singlefeatures[currentCombination[i]].rank
+                    let nextRank = singlefeatures[currentCombination[i+1]].rank
                     if nowRank == nextRank {
                         gap = -1
                         break
@@ -810,10 +810,10 @@ class CBGameHandEvaluator{
                 }
                 
                 if gap >= 0{
-                    let nowRank = cards[currentCombination[cntC]].rank
+                    let nowRank = singlefeatures[currentCombination[cntC]].rank
                     if nowRank == 14{
                         headRank = 15
-                        headSuit = cards[currentCombination[cntC]].suit
+                        headSuit = singlefeatures[currentCombination[cntC]].suit
                     }
                     else if nowRank + gap > 13{
                         headRank = 14
@@ -825,13 +825,13 @@ class CBGameHandEvaluator{
                     }
                     else{
                         headRank = nowRank
-                        headSuit = cards[currentCombination[cntC]].suit
+                        headSuit = singlefeatures[currentCombination[cntC]].suit
                     }
                 }
             }
             
             if headRank != -1{
-                usedCardIndexList.append(currentCombination)
+                usedSingleFeatureIndexList.append(currentCombination)
                 var rank = 0
                 if headSuit < 0{
                     headSuit = 0
@@ -840,42 +840,42 @@ class CBGameHandEvaluator{
                 rank = rank << 4 | headRank
                 rank = rank << 2 | headSuit
 
-                let cardType = "顺子" + String(headRank)
+                let singlefeatureType = "顺子" + String(headRank)
                 
                 rankList.append(rank)
-                cardTypeList.append(cardType)
+                singlefeatureTypeList.append(singlefeatureType)
             }
         }
         
         
-        return (rankList, cardTypeList, 0, usedCardIndexList)
+        return (rankList, singlefeatureTypeList, 0, usedSingleFeatureIndexList)
     }
 
     
-    func eval_onepair(cards: [CBGameCard]) -> ([Int], [String], Int, [[Int]]) {
+    func eval_onepair(singlefeatures: [CBStatisticSingleFeature]) -> ([Int], [String], Int, [[Int]]) {
         var rankList: [Int] = []
-        var cardTypeList: [String] = []
-        var usedCardIndexList : [[Int]] = []
+        var singlefeatureTypeList: [String] = []
+        var usedSingleFeatureIndexList : [[Int]] = []
         
-        for i in 0..<cards.count-1{
-            if cards[i].rank != 15 && cards[i].rank == cards[i+1].rank{
-                usedCardIndexList.append([i, i+1])
+        for i in 0..<singlefeatures.count-1{
+            if singlefeatures[i].rank != 15 && singlefeatures[i].rank == singlefeatures[i+1].rank{
+                usedSingleFeatureIndexList.append([i, i+1])
             }
         }
         
-        if cards[0].rank == 15{
-            for i in 1..<cards.count{
-                usedCardIndexList.append([0, i])
+        if singlefeatures[0].rank == 15{
+            for i in 1..<singlefeatures.count{
+                usedSingleFeatureIndexList.append([0, i])
             }
         }
 
-        if usedCardIndexList.count > 0 {
+        if usedSingleFeatureIndexList.count > 0 {
             
-            for currentUsedCardIndex in usedCardIndexList{
+            for currentUsedSingleFeatureIndex in usedSingleFeatureIndexList{
                 var rank = 0
                 
-                var pairRank = cards[currentUsedCardIndex[1]].rank
-                var pairsuit = cards[currentUsedCardIndex[0]].suit
+                var pairRank = singlefeatures[currentUsedSingleFeatureIndex[1]].rank
+                var pairsuit = singlefeatures[currentUsedSingleFeatureIndex[0]].suit
                 
                 if pairRank == 15{
                     pairRank = 14
@@ -888,32 +888,32 @@ class CBGameHandEvaluator{
                 rank = rank << 2 | pairsuit
                 
                 
-                let cardType = "对子" + ClassifierSettingArgs.CardNumberReportDic[cards[currentUsedCardIndex[1]].originRank]!
+                let singlefeatureType = "对子" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[1]].originRank]!
                 
                 rankList.append(rank)
-                cardTypeList.append(cardType)
+                singlefeatureTypeList.append(singlefeatureType)
             }
             
             
         }
 
-        return (rankList, cardTypeList, 1, usedCardIndexList)
+        return (rankList, singlefeatureTypeList, 1, usedSingleFeatureIndexList)
     }
 
-    func eval_holecard(cards: [CBGameCard]) -> ([Int], [String], Int, [[Int]]) {
+    func eval_holesinglefeature(singlefeatures: [CBStatisticSingleFeature]) -> ([Int], [String], Int, [[Int]]) {
         var rank: Int = 0
-        var usedCardIndexList : [Int] = []
+        var usedSingleFeatureIndexList : [Int] = []
         
-        for i in 0..<cards.count-1{
-            if cards[i].rank != 15{
-                usedCardIndexList.append(i)
+        for i in 0..<singlefeatures.count-1{
+            if singlefeatures[i].rank != 15{
+                usedSingleFeatureIndexList.append(i)
                 break
             }
         }
         
-        for c in usedCardIndexList {
+        for c in usedSingleFeatureIndexList {
             
-            var suit = cards[c].suit
+            var suit = singlefeatures[c].suit
             if suit == -1{
                 suit = 3
             }
@@ -924,57 +924,57 @@ class CBGameHandEvaluator{
                 suit = 3
             }
             
-            rank = rank << 4 | cards[c].rank
+            rank = rank << 4 | singlefeatures[c].rank
             rank = rank << 2 | suit
         }
 
-        return ([rank], ["单牌"], 0, [usedCardIndexList])
+        return ([rank], ["单牌"], 0, [usedSingleFeatureIndexList])
     }
 }
 
-class CBGameCard{
+class CBStatisticSingleFeature{
     var rank: Int = 0
     var suit: Int = 0
     var originRank : Int = 0
     
-    init(card: Card, jokerChangeSetting: Int){
-        self.originRank = card.rank
+    init(singlefeature: SingleFeature, specialfeatureChangeSetting: Int){
+        self.originRank = singlefeature.rank
         
-        if card.rank == 14 {
-            if jokerChangeSetting == 0{
+        if singlefeature.rank == 14 {
+            if specialfeatureChangeSetting == 0{
                 self.rank = 15
                 self.suit = -1
             }
-            else if jokerChangeSetting == 1{
+            else if specialfeatureChangeSetting == 1{
                 self.rank = 15
                 self.suit = -3
             }
-            else if jokerChangeSetting == 2{
+            else if specialfeatureChangeSetting == 2{
                 self.rank = 3
                 self.suit = -3
             }
         }
-        else if card.rank == 15 {
-            if jokerChangeSetting == 0{
+        else if singlefeature.rank == 15 {
+            if specialfeatureChangeSetting == 0{
                 self.rank = 15
                 self.suit = -1
             }
-            else if jokerChangeSetting == 1{
+            else if specialfeatureChangeSetting == 1{
                 self.rank = 15
                 self.suit = -2
             }
-            else if jokerChangeSetting == 2{
+            else if specialfeatureChangeSetting == 2{
                 self.rank = 6
                 self.suit = -2
             }
         }
-        else if card.rank == 1{
+        else if singlefeature.rank == 1{
             self.rank = 14
-            self.suit = card.suit[0]
+            self.suit = singlefeature.suit[0]
         }
         else{
-            self.rank = card.rank
-            self.suit = card.suit[0]
+            self.rank = singlefeature.rank
+            self.suit = singlefeature.suit[0]
         }
     }
 }

@@ -1,84 +1,75 @@
 import Foundation
 
-class Card {
+class SingleFeature {
     var suit: [Int]
     var rank: Int
-    var cardIndex: Int
+    var singlefeatureIndex: Int
     let originalRank: Int
     
-    init(suit: [Int], rank: Int, cardIndex: Int) {
+    init(suit: [Int], rank: Int, singlefeatureIndex: Int) {
         self.suit = suit
         self.rank = rank
         self.originalRank = rank
-        self.cardIndex = cardIndex
+        self.singlefeatureIndex = singlefeatureIndex
     }
     
-    static func calScore(card: Card) -> Int {
-        return card.rank * 10 + card.suit.max()!
+    static func calScore(singlefeature: SingleFeature) -> Int {
+        return singlefeature.rank * 10 + singlefeature.suit.max()!
     }
 }
 
 
-class Player {
-    var playerCard = [Card]()
+class RC {
+    var rcSingleFeature = [SingleFeature]()
     var evaluateFlag = 0
-    var cardType: String = ""
-    var cardSuit: String = ""
+    var singlefeatureType: String = ""
+    var singlefeatureSuit: String = ""
     var isPair: Int = 0
     
-    func insertCard(card: Card) {
-        playerCard.append(card)
+    func insertSingleFeature(singlefeature: SingleFeature) {
+        rcSingleFeature.append(singlefeature)
     }
 }
 
 
-func initDeck(initialCards: [Int], suitRules: [Int]) -> [Card] {
-    var deckList = [Card]()
+func initFeatureList(initialSingleFeatures: [Int], suitRules: [Int]) -> [SingleFeature] {
+    var FeatureListList = [SingleFeature]()
     
-    for cardIndex in initialCards {
-        if cardIndex < 52 {
-            deckList.append(Card(suit: [suitRules[cardIndex / 13]], rank: cardIndex % 13 + 1, cardIndex: cardIndex))
+    for singlefeatureIndex in initialSingleFeatures {
+        if singlefeatureIndex < 52 {
+            FeatureListList.append(SingleFeature(suit: [suitRules[singlefeatureIndex / 13]], rank: singlefeatureIndex % 13 + 1, singlefeatureIndex: singlefeatureIndex))
         } else {
-            if cardIndex == 53 {
-                deckList.append(Card(suit: [0], rank: 14, cardIndex: cardIndex))
-            } else if cardIndex == 54 {
-                deckList.append(Card(suit: [0], rank: 15, cardIndex: cardIndex))
+            if singlefeatureIndex == 53 {
+                FeatureListList.append(SingleFeature(suit: [0], rank: 14, singlefeatureIndex: singlefeatureIndex))
+            } else if singlefeatureIndex == 54 {
+                FeatureListList.append(SingleFeature(suit: [0], rank: 15, singlefeatureIndex: singlefeatureIndex))
             }
         }
     }
     
-    return deckList
+    return FeatureListList
 }
 
-func randomCardArray(cardNum: Int) -> [Int] {
-    var cardArray = [Int]()
+func randomSingleFeatureArray(singlefeatureNum: Int) -> [Int] {
+    var singlefeatureArray = [Int]()
     
-    if cardNum == 52 {
+    if singlefeatureNum == 52 {
         for suit in 0..<4 {
             for rank in 0..<13 {
-                cardArray.append(suit * 13 + rank)
+                singlefeatureArray.append(suit * 13 + rank)
             }
         }
-    } else if cardNum == 40 {
+    } else if singlefeatureNum == 40 {
         for suit in 0..<4 {
             for rank in 0..<10 {
-                cardArray.append(suit * 13 + rank)
+                singlefeatureArray.append(suit * 13 + rank)
             }
         }
     }
     
-    cardArray.shuffle()
-    return cardArray
+    singlefeatureArray.shuffle()
+    return singlefeatureArray
 }
-
-func showCardArray(cardArray: [Int]) {
-    let suitDic = ["S", "H", "C", "D"]
-    
-    for card in cardArray {
-        print("\(card % 13 + 1)\(suitDic[card / 13]) ", terminator: "")
-    }
-}
-
 
 // Helper extension for combinations
 extension Array {

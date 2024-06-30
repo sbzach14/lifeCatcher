@@ -4,7 +4,7 @@ import Foundation
 
 //三公
 
-class ThreeMenGameRule : Rule{
+class TMStatisticRule : Rule{
     let pointComparision:[Int: String] = [
         0:"0最大，9次大，1最小",
         1:"9最大，0最小"
@@ -25,7 +25,7 @@ class ThreeMenGameRule : Rule{
         0:"否",
         1:"是"
     ]
-    let threeCardComparision: [Int:String] = [
+    let threeSingleFeatureComparision: [Int:String] = [
         0:"KKK>QQQ>JJJ>...222>AAA",
         1:"AAA>KKK>QQQ...333>222",
         2:"333>AAA>KKK>QQQ...>222"
@@ -148,29 +148,29 @@ class ThreeMenGameRule : Rule{
     3) 无混公比点数，同点情况下比最大牌。单张先比大小，同大比花色。大王>小王>K>...>2>A,方片>红心>梅花>黑桃
     """
         ]
-        self.playerNum = [2,3,4,5,6,7,8,9,10]
+        self.rcNum = [2,3,4,5,6,7,8,9,10]
 
     }
 }
 
 
-class ThreeMenGame{
-    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
-        var deck = initDeck(initialCards: inputCards, suitRules: suitRules)
-        let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: deck, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (winners, leftCards)
+class TMStatistic{
+    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputSingleFeatures:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([StatisticReturnRCInfo],[Int]) {
+        var FeatureList = initFeatureList(initialSingleFeatures: inputSingleFeatures, suitRules: suitRules)
+        let (winners, leftSingleFeatures) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, FeatureList: FeatureList, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (winners, leftSingleFeatures)
     }
     
-    static func legalCheck(playerNum: Int) -> String{
+    static func legalCheck(rcNum: Int) -> String{
         var errMessage : String = ""
-        if(playerNum * 3 > 52)
+        if(rcNum * 3 > 52)
         {
             errMessage = "需要牌数量超出牌堆总数，请重新设置！"
         }
         return errMessage
     }
     
-    static func getAllCardIndex(setting: Int) -> [Int]{
+    static func getAllSingleFeatureIndex(setting: Int) -> [Int]{
         var result : [Int] = []
         switch setting{
         case 0:
@@ -217,17 +217,17 @@ class ThreeMenGame{
         return result
     }
     
-    static func getMinCardNum(playerNum: Int,handNum: Int, communityNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+    static func getMinSingleFeatureNum(rcNum: Int,handNum: Int, communityNum: Int,dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
         
         if dealType == 0 || dealType == 1{
-            return playerNum * handNum + communityNum
+            return rcNum * handNum + communityNum
         } else {
             var minNum = 0
             for i in 0..<diyDealNum.count {
                 let num = diyDealNum[i]
                 //派牌
                 if diyDealStatus[i][0] == true {
-                    minNum += playerNum * num
+                    minNum += rcNum * num
                 //公牌
                 } else if diyDealStatus[i][1] == true {
                     minNum += num
@@ -243,100 +243,100 @@ class ThreeMenGame{
     //args
     //0 dealType
     //1 diyDealType
-    //2 playerNum
+    //2 rcNum
     //3 pointComparision
     //4 samePointComparision
     //5 isAAsMan
     //6 isCompareSuit
-    //7 threeCardComparision
+    //7 threeSingleFeatureComparision
     //8 mixManComparision
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: [Card], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
-        let rule = ClassifierSettingArgs.targetSetting[4] as! ThreeMenGameRule
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], FeatureList: [SingleFeature], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([StatisticReturnRCInfo],[Int]) {
+        let rule = ClassifierSettingArgs.targetSetting[4] as! TMStatisticRule
         let dealNum = args[0]
         let dealType = args[1]
-        let playerNum = args[2]
+        let rcNum = args[2]
         let handNum = args[3]
         let communityNum = args[4]
         let pointPointComparision = args[5]
         let samePointComparision = args[6]
         let isAAsMan = args[7]
         let isCompareSuit = args[8]
-        let threeCardComparision = args[9]
+        let threeSingleFeatureComparision = args[9]
         let mixManComparision = args[10]
         
         var maxRank = 0
-        var returnPlayerInfos: [GameReturnPlayerInfo] = []
+        var returnRCInfos: [StatisticReturnRCInfo] = []
 
-        var allPlayCards: [Player] = []
-        var community = [Card]()
-        if deck.count < ThreeMenGame.getMinCardNum(playerNum: playerNum,handNum: handNum, communityNum: communityNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
+        var allPlaySingleFeatures: [RC] = []
+        var community = [SingleFeature]()
+        if FeatureList.count < TMStatistic.getMinSingleFeatureNum(rcNum: rcNum,handNum: handNum, communityNum: communityNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
             return ([],[])
         }
         
-        for _ in 0..<playerNum {
-            allPlayCards.append(Player())
+        for _ in 0..<rcNum {
+            allPlaySingleFeatures.append(RC())
         }
         
         
-        var deck = deck
+        var FeatureList = FeatureList
         // 发牌
         if dealNum == 0{
             for _ in 0..<handNum{
                 //正发
                 if dealType == 0{
-                    for i in 0..<playerNum {
-                        allPlayCards[i].insertCard(card: deck.removeFirst())
+                    for i in 0..<rcNum {
+                        allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeFirst())
                     }
                 //反发
                 } else if dealType == 1 {
-                    for i in 0..<playerNum {
-                        allPlayCards[i].insertCard(card: deck.removeLast())
+                    for i in 0..<rcNum {
+                        allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeLast())
                     }
                 }
             }
             
         } else {
             for actionIndex in 0...diyDealStatus.count - 1{
-                let cardNum = diyDealNum[actionIndex]
+                let singlefeatureNum = diyDealNum[actionIndex]
                 let action = diyDealStatus[actionIndex]
                 //派牌
                 if action[0] == true{
                     //正发
                     if dealType == 0{
-                        for i in 0..<playerNum {
-                            for _ in 0..<cardNum{
-                                allPlayCards[i].insertCard(card: deck.removeFirst())
+                        for i in 0..<rcNum {
+                            for _ in 0..<singlefeatureNum{
+                                allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeFirst())
                             }
                         }
                     //反发
                     } else if dealType == 1{
-                        for i in 0..<playerNum {
-                            for _ in 0..<cardNum{
-                                allPlayCards[i].insertCard(card: deck.removeLast())
+                        for i in 0..<rcNum {
+                            for _ in 0..<singlefeatureNum{
+                                allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeLast())
                             }
                         }
                     }
                 //公牌
                 } else if action[1] == true {
                     if dealType == 0{
-                        for _ in 0..<cardNum{
-                            community.append(deck.removeFirst())
+                        for _ in 0..<singlefeatureNum{
+                            community.append(FeatureList.removeFirst())
                         }
                     } else if dealType == 1{
-                        for _ in 0..<cardNum{
-                            community.append(deck.removeLast())
+                        for _ in 0..<singlefeatureNum{
+                            community.append(FeatureList.removeLast())
                         }
                     }
                     
                 //去牌
                 } else if action[2] == true {
                     if dealType == 0 {
-                        for _ in 0..<cardNum{
-                            deck.removeFirst()
+                        for _ in 0..<singlefeatureNum{
+                            FeatureList.removeFirst()
                         }
                     } else if dealType == 1{
-                        for _ in 0..<cardNum{
-                            deck.removeLast()
+                        for _ in 0..<singlefeatureNum{
+                            FeatureList.removeLast()
                         }
                     }
                 }
@@ -344,47 +344,47 @@ class ThreeMenGame{
         }
         
 
-        for i in 0..<playerNum {
-            (allPlayCards[i].evaluateFlag, allPlayCards[i].cardType, allPlayCards[i].isPair) = ThreeMenGameHandEvaluator(
+        for i in 0..<rcNum {
+            (allPlaySingleFeatures[i].evaluateFlag, allPlaySingleFeatures[i].singlefeatureType, allPlaySingleFeatures[i].isPair) = TMStatisticHandEvaluator(
                 rankRules: rankRules,
                 suitRules: suitRules
-            ).evalHand(cards: allPlayCards[i].playerCard, pointComparision: pointPointComparision, samePointComparision: samePointComparision, isAAsMan: isAAsMan, isCompareSuit: isCompareSuit, threeCardComparision: threeCardComparision,mixManComparision: mixManComparision)
+            ).evalHand(singlefeatures: allPlaySingleFeatures[i].rcSingleFeature, pointComparision: pointPointComparision, samePointComparision: samePointComparision, isAAsMan: isAAsMan, isCompareSuit: isCompareSuit, threeSingleFeatureComparision: threeSingleFeatureComparision,mixManComparision: mixManComparision)
         }
         
-        for playerID in 0..<allPlayCards.count {
-            var currentReturnPlayerInfo = GameReturnPlayerInfo()
-            currentReturnPlayerInfo.playerID = playerID
-            currentReturnPlayerInfo.playerRank = allPlayCards[playerID].evaluateFlag
-            currentReturnPlayerInfo.playerCardsType = allPlayCards[playerID].cardType
-            currentReturnPlayerInfo.isPair = allPlayCards[playerID].isPair
-            currentReturnPlayerInfo.PlayerCards = allPlayCards[playerID].playerCard
-            currentReturnPlayerInfo.communityCard = community
-            returnPlayerInfos.append(currentReturnPlayerInfo)
+        for rcID in 0..<allPlaySingleFeatures.count {
+            var currentReturnRCInfo = StatisticReturnRCInfo()
+            currentReturnRCInfo.rcID = rcID
+            currentReturnRCInfo.rcRank = allPlaySingleFeatures[rcID].evaluateFlag
+            currentReturnRCInfo.rcSingleFeaturesType = allPlaySingleFeatures[rcID].singlefeatureType
+            currentReturnRCInfo.isPair = allPlaySingleFeatures[rcID].isPair
+            currentReturnRCInfo.RCSingleFeatures = allPlaySingleFeatures[rcID].rcSingleFeature
+            currentReturnRCInfo.communitySingleFeature = community
+            returnRCInfos.append(currentReturnRCInfo)
         }
         
         //从大到小排序
-        returnPlayerInfos = returnPlayerInfos.sorted(by: {$0.playerRank > $1.playerRank})
-        var leftCards:[Int] = []
-        for card in deck{
-            leftCards.append(card.cardIndex)
+        returnRCInfos = returnRCInfos.sorted(by: {$0.rcRank > $1.rcRank})
+        var leftSingleFeatures:[Int] = []
+        for singlefeature in FeatureList{
+            leftSingleFeatures.append(singlefeature.singlefeatureIndex)
         }
         
-        if leftCards.count < ThreeMenGame.getMinCardNum(playerNum: playerNum, handNum: handNum, communityNum: communityNum,dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus) {
-            leftCards = []
+        if leftSingleFeatures.count < TMStatistic.getMinSingleFeatureNum(rcNum: rcNum, handNum: handNum, communityNum: communityNum,dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus) {
+            leftSingleFeatures = []
         }
         
-        return (returnPlayerInfos, leftCards)
+        return (returnRCInfos, leftSingleFeatures)
     }
 }
 
-class ThreeMenGameHandEvaluator{
+class TMStatisticHandEvaluator{
     var rankRules: [Int]
     var suitRules: [Int]
     var pointComparision = 0
     var samePointComparision = 0
     var isAAsMan = 0
     var isCompareSuit = 0
-    var threeCardComparision = 0
+    var threeSingleFeatureComparision = 0
     var mixManComparision = 0
     
     init(rankRules: [Int],
@@ -393,18 +393,18 @@ class ThreeMenGameHandEvaluator{
         self.suitRules = suitRules
     }
     
-    func evalHand(cards: [Card], pointComparision: Int, samePointComparision: Int, isAAsMan: Int, isCompareSuit: Int, threeCardComparision: Int, mixManComparision: Int)->(Int, String, Int){
+    func evalHand(singlefeatures: [SingleFeature], pointComparision: Int, samePointComparision: Int, isAAsMan: Int, isCompareSuit: Int, threeSingleFeatureComparision: Int, mixManComparision: Int)->(Int, String, Int){
         
-        var cards = cards
+        var singlefeatures = singlefeatures
         
         if isCompareSuit == 0{
-            for i in 0..<cards.count{
-                cards[i].suit[0] = 0
+            for i in 0..<singlefeatures.count{
+                singlefeatures[i].suit[0] = 0
             }
         }
         
-        cards.sort(by: { card1, card2 in
-            return (card1.rank<<2 | card1.suit[0]) > (card2.rank << 2 | card2.suit[0])
+        singlefeatures.sort(by: { singlefeature1, singlefeature2 in
+            return (singlefeature1.rank<<2 | singlefeature1.suit[0]) > (singlefeature2.rank << 2 | singlefeature2.suit[0])
         })
         
     
@@ -413,35 +413,35 @@ class ThreeMenGameHandEvaluator{
         self.samePointComparision = samePointComparision
         self.isAAsMan = isAAsMan
         self.isCompareSuit = isCompareSuit
-        self.threeCardComparision = threeCardComparision
+        self.threeSingleFeatureComparision = threeSingleFeatureComparision
         self.mixManComparision = mixManComparision
-        let (score, cardType, isPair) = calcHandInfoFlg(sortedCards: cards)
-        return (score, cardType, isPair)
+        let (score, singlefeatureType, isPair) = calcHandInfoFlg(sortedSingleFeatures: singlefeatures)
+        return (score, singlefeatureType, isPair)
     }
     
-    func calcHandInfoFlg(sortedCards: [Card]) -> (Int, String, Int) {
+    func calcHandInfoFlg(sortedSingleFeatures: [SingleFeature]) -> (Int, String, Int) {
         var rankResult = 0
-        var cardType: String = ""
+        var singlefeatureType: String = ""
         var isPair = 0
-        var ruleDict: [Int: ([Card]) -> (Int, String, Int)] = [
-            0  : self.eval_holecard,
+        var ruleDict: [Int: ([SingleFeature]) -> (Int, String, Int)] = [
+            0  : self.eval_holesinglefeature,
             1  : self.eval_mixMan,
             2  : self.eval_threemen,
-            3  : self.eval_threecard,
+            3  : self.eval_threesinglefeature,
             4  : self.eval_threethree,
-            5  : self.eval_JokerPlusAny,
-            6  : self.eval_anyPairPlusJokerPlusThreeKQJ,
+            5  : self.eval_specialfeaturePlusAny,
+            6  : self.eval_anyPairPlusspecialfeaturePlusThreeKQJ,
             7  : self.eval_anyThreeMan_allSameRank
         ]
         
-        var handCardString = ""
-        for card in sortedCards{
-            handCardString += ClassifierSettingArgs.cardLabelDic[card.cardIndex]!
+        var handSingleFeatureString = ""
+        for singlefeature in sortedSingleFeatures{
+            handSingleFeatureString += ClassifierSettingArgs.singlefeatureLabelDic[singlefeature.singlefeatureIndex]!
         }
         
         for (index, ruleIndex) in rankRules.enumerated() {
             var rankFlag = 1 << (rankRules.count - index + 12)
-            (rankResult, cardType, isPair) = ruleDict[ruleIndex]!(sortedCards)
+            (rankResult, singlefeatureType, isPair) = ruleDict[ruleIndex]!(sortedSingleFeatures)
             
             if rankResult != 0 {
                 rankResult |= rankFlag
@@ -449,38 +449,38 @@ class ThreeMenGameHandEvaluator{
             }
         }
 
-        return (rankResult, cardType, isPair)
+        return (rankResult, singlefeatureType, isPair)
     }
-    func eval_anyThreeMan_allSameRank(cards: [Card]) -> (Int, String, Int){
-        if cards[0].rank >= 10 && cards[1].rank >= 10 && cards[2].rank >= 10 {
+    func eval_anyThreeMan_allSameRank(singlefeatures: [SingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank >= 10 && singlefeatures[1].rank >= 10 && singlefeatures[2].rank >= 10 {
             return (1, "三公", 0)
         }
         
         return (0, "", 0)
     }
-    func eval_anyPairPlusJokerPlusThreeKQJ(cards: [Card]) -> (Int, String, Int){
-        if (cards[0].rank == 15 || cards[0].rank == 14) && cards[1].rank == cards[2].rank {
+    func eval_anyPairPlusspecialfeaturePlusThreeKQJ(singlefeatures: [SingleFeature]) -> (Int, String, Int){
+        if (singlefeatures[0].rank == 15 || singlefeatures[0].rank == 14) && singlefeatures[1].rank == singlefeatures[2].rank {
             return (1, "对子加王", 1)
-        } else if (cards[0].rank == cards[1].rank && cards[1].rank == cards[2].rank) && (cards[0].rank > 10 && cards[1].rank > 10 && cards[2].rank > 10){
-            var cardType: String = "三条" + ClassifierSettingArgs.CardNumberReportDic[cards[0].rank]!
-            return (1, cardType, 0)
+        } else if (singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[1].rank == singlefeatures[2].rank) && (singlefeatures[0].rank > 10 && singlefeatures[1].rank > 10 && singlefeatures[2].rank > 10){
+            var singlefeatureType: String = "三条" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].rank]!
+            return (1, singlefeatureType, 0)
         }
         return (0, "", 0)
             
     }
     
-    func eval_JokerPlusAny(cards: [Card]) -> (Int, String, Int){
-        if cards[0].rank == 15 && cards[1].rank == 14{
-            var cardType: String = "大小王加" + ClassifierSettingArgs.CardNumberReportDic[cards[2].originalRank]!
-            return (1, cardType, 0)
+    func eval_specialfeaturePlusAny(singlefeatures: [SingleFeature]) -> (Int, String, Int){
+        if singlefeatures[0].rank == 15 && singlefeatures[1].rank == 14{
+            var singlefeatureType: String = "大小王加" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[2].originalRank]!
+            return (1, singlefeatureType, 0)
         }
         return (0, "", 0)
     }
     
-    func eval_mixMan(cards: [Card]) -> (Int, String, Int) {
-        if cards[0].rank > 10 && cards[1].rank > 10 && cards[2].rank > 10 {
+    func eval_mixMan(singlefeatures: [SingleFeature]) -> (Int, String, Int) {
+        if singlefeatures[0].rank > 10 && singlefeatures[1].rank > 10 && singlefeatures[2].rank > 10 {
             if self.mixManComparision == 0{
-                return (cards[0].rank << 2 | cards[0].suit[0], "混公", 0)
+                return (singlefeatures[0].rank << 2 | singlefeatures[0].suit[0], "混公", 0)
             } else if self.mixManComparision == 1{
                 return (1, "混公", 0)
             }
@@ -488,52 +488,52 @@ class ThreeMenGameHandEvaluator{
         return (0, "", 0)
     }
     
-    func eval_threethree(_ cards: [Card]) -> (Int, String, Int) {
+    func eval_threethree(_ singlefeatures: [SingleFeature]) -> (Int, String, Int) {
         var rank = 0
-        if cards[0].rank == 3 && cards[1].rank == 3 && cards[2].rank == 3{
+        if singlefeatures[0].rank == 3 && singlefeatures[1].rank == 3 && singlefeatures[2].rank == 3{
             rank = 1
         }
         return (rank, "三三", 0)
     }
     
-    func eval_threecard(_ cards: [Card]) -> (Int, String, Int) {
+    func eval_threesinglefeature(_ singlefeatures: [SingleFeature]) -> (Int, String, Int) {
         var rank = 0
-        if cards[0].rank == cards[1].rank && cards[0].rank == cards[2].rank{
-            let cardType: String = "三条" + ClassifierSettingArgs.CardNumberReportDic[cards[0].originalRank]!
-            if self.threeCardComparision == 0 {
-                return (cards[0].rank, cardType, 0)
-            } else if self.threeCardComparision == 1 {
-                if cards[0].rank == 1{
-                    return (13, cardType, 0)
+        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].rank == singlefeatures[2].rank{
+            let singlefeatureType: String = "三条" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+            if self.threeSingleFeatureComparision == 0 {
+                return (singlefeatures[0].rank, singlefeatureType, 0)
+            } else if self.threeSingleFeatureComparision == 1 {
+                if singlefeatures[0].rank == 1{
+                    return (13, singlefeatureType, 0)
                 } else {
-                    return (cards[0].rank - 1, cardType, 0)
+                    return (singlefeatures[0].rank - 1, singlefeatureType, 0)
                 }
-            } else if self.threeCardComparision == 2 {
-                if cards[0].rank == 3 {
-                    return (13, cardType, 0)
-                } else if cards[0].rank == 1 {
-                    return (12, cardType, 0)
+            } else if self.threeSingleFeatureComparision == 2 {
+                if singlefeatures[0].rank == 3 {
+                    return (13, singlefeatureType, 0)
+                } else if singlefeatures[0].rank == 1 {
+                    return (12, singlefeatureType, 0)
                 } else {
-                    return (cards[0].rank - 2, cardType, 0)
+                    return (singlefeatures[0].rank - 2, singlefeatureType, 0)
                 }
             }
         }
         return (rank, "", 0)
     }
     
-    func eval_threemen(_ cards: [Card]) -> (Int, String, Int) {
+    func eval_threemen(_ singlefeatures: [SingleFeature]) -> (Int, String, Int) {
         var rank = 0
-        if cards[0].rank > 10 && cards[1].rank > 10 && cards[2].rank > 10 && cards[1].rank == cards[0].rank && cards[1].rank == cards[2].rank{
-            rank = cards[0].rank << 2 | cards[0].suit[0]
+        if singlefeatures[0].rank > 10 && singlefeatures[1].rank > 10 && singlefeatures[2].rank > 10 && singlefeatures[1].rank == singlefeatures[0].rank && singlefeatures[1].rank == singlefeatures[2].rank{
+            rank = singlefeatures[0].rank << 2 | singlefeatures[0].suit[0]
         }
         return (rank, "三公", 0)
     }
     
-    func eval_holecard(cards: [Card]) -> (Int, String, Int) {
+    func eval_holesinglefeature(singlefeatures: [SingleFeature]) -> (Int, String, Int) {
         
         var sumRank = 0
         for i in 0..<3 {
-            sumRank += min(10, cards[i].rank)
+            sumRank += min(10, singlefeatures[i].rank)
         }
         sumRank = sumRank % 10
         if self.pointComparision == 0{
@@ -543,39 +543,39 @@ class ThreeMenGameHandEvaluator{
         switch self.samePointComparision{
         case 0:
             var menNum = 0
-            for card in cards{
+            for singlefeature in singlefeatures{
                 if self.isAAsMan == 1 {
-                    if card.rank > 10 || card.rank == 1{
+                    if singlefeature.rank > 10 || singlefeature.rank == 1{
                         menNum += 1
                     }
                 } else {
-                    if card.rank > 10{
+                    if singlefeature.rank > 10{
                         menNum += 1
                     }
                 }
             }
-            rank = sumRank << 8 | menNum << 6 | (cards[0].rank << 2 | cards[0].suit[0])
+            rank = sumRank << 8 | menNum << 6 | (singlefeatures[0].rank << 2 | singlefeatures[0].suit[0])
             break
         case 1:
-            rank = sumRank << 6 | (cards[0].rank << 2 | cards[0].suit[0])
+            rank = sumRank << 6 | (singlefeatures[0].rank << 2 | singlefeatures[0].suit[0])
             break
         case 2:
             var menNum = 0
-            for card in cards{
+            for singlefeature in singlefeatures{
                 if self.isAAsMan == 1 {
-                    if card.rank > 10 || card.rank == 1{
+                    if singlefeature.rank > 10 || singlefeature.rank == 1{
                         menNum += 1
                     }
                 } else {
-                    if card.rank > 10{
+                    if singlefeature.rank > 10{
                         menNum += 1
                     }
                 }
             }
             
-            let rank1 = rankConvertor(card: cards[0], convertorFlag: 0)<<2 | cards[0].suit[0]
-            let rank2 = rankConvertor(card: cards[1], convertorFlag: 0)<<2 | cards[1].suit[0]
-            let rank3 = rankConvertor(card: cards[2], convertorFlag: 0) | cards[2].suit[0]
+            let rank1 = rankConvertor(singlefeature: singlefeatures[0], convertorFlag: 0)<<2 | singlefeatures[0].suit[0]
+            let rank2 = rankConvertor(singlefeature: singlefeatures[1], convertorFlag: 0)<<2 | singlefeatures[1].suit[0]
+            let rank3 = rankConvertor(singlefeature: singlefeatures[2], convertorFlag: 0) | singlefeatures[2].suit[0]
             
             let maxRank = max(rank1, rank2, rank3)
             
@@ -587,13 +587,13 @@ class ThreeMenGameHandEvaluator{
             break
         case 4:
             var menNum = 0
-            for card in cards{
+            for singlefeature in singlefeatures{
                 if self.isAAsMan == 1 {
-                    if card.rank > 10 || card.rank == 1{
+                    if singlefeature.rank > 10 || singlefeature.rank == 1{
                         menNum += 1
                     }
                 } else {
-                    if card.rank > 10{
+                    if singlefeature.rank > 10{
                         menNum += 1
                     }
                 }
@@ -609,19 +609,19 @@ class ThreeMenGameHandEvaluator{
     
     //0, A K ... 2
     
-    func rankConvertor(card: Card, convertorFlag: Int) -> Int{
+    func rankConvertor(singlefeature: SingleFeature, convertorFlag: Int) -> Int{
         switch convertorFlag {
         case 0:
-            if card.rank == 1{
+            if singlefeature.rank == 1{
                 return 13
-            } else if card.rank < 14 {
-                return card.rank - 1
+            } else if singlefeature.rank < 14 {
+                return singlefeature.rank - 1
             }
             break
         default:
             break
         }
-        return card.rank
+        return singlefeature.rank
     }
 
 }

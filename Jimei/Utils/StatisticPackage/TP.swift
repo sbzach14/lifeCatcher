@@ -37,7 +37,7 @@ class TPRule : Rule{
             1: "一对",
             0: "高牌"
         ]
-        self.playerNum = [2,3,4,5,6,7,8]
+        self.rcNum = [2,3,4,5,6,7,8]
         self.setting = [
             0: "德州扑克[701]",
             1: "短牌德州",
@@ -86,23 +86,23 @@ class TPRule : Rule{
     }
 }
 
-//德州扑克
+
 class TP{
     
 
-    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputCards:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo], [Int]) {
+    static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputSingleFeatures:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([StatisticReturnRCInfo], [Int]) {
         
         
         var inputString : String = ""
-        for i in 0..<inputCards.count{
-            inputString += ClassifierSettingArgs.cardLabelDic[inputCards[i]]!
+        for i in 0..<inputSingleFeatures.count{
+            inputString += ClassifierSettingArgs.singlefeatureLabelDic[inputSingleFeatures[i]]!
         }
         
-        let (resultInfoList,leftCards) = TPGame.calResult(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, cardArray: inputCards, args: args, rankRules: rankRules, suitRules: suitRules)
-        return (resultInfoList, leftCards)
+        let (resultInfoList,leftSingleFeatures) = TPStatistic.calResult(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, singlefeatureArray: inputSingleFeatures, args: args, rankRules: rankRules, suitRules: suitRules)
+        return (resultInfoList, leftSingleFeatures)
     }
     
-    static func legalCheck(playerNum: Int, minRank: Int, handUseType: Int, handUseNum: Int, handNum: Int, communityNum: Int) -> String
+    static func legalCheck(rcNum: Int, minRank: Int, handUseType: Int, handUseNum: Int, handNum: Int, communityNum: Int) -> String
     {
         var errMessage : String = ""
         if(handUseType == 0 && handNum + communityNum < 5)
@@ -121,14 +121,14 @@ class TP{
         {
             errMessage = "可用牌不足5张，请重新设置！"
         }
-        else if(playerNum * handNum + communityNum > 52 - (minRank - 2) * 4)
+        else if(rcNum * handNum + communityNum > 52 - (minRank - 2) * 4)
         {
             errMessage = "需要牌数量超出牌堆总数，请重新设置！"
         }
         return errMessage
     }
     
-    static func getAllCardIndex(minRank: Int) -> [Int]{
+    static func getAllSingleFeatureIndex(minRank: Int) -> [Int]{
         var result : [Int] = []
         for i in 0...3{
             for rank in 0...12{
@@ -140,17 +140,17 @@ class TP{
         return result
     }
     
-    static func getMinCardNum(playerNum: Int, handNum: Int, communityNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
+    static func getMinSingleFeatureNum(rcNum: Int, handNum: Int, communityNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
         
         if dealType == 0 || dealType == 1{
-            return playerNum * handNum + communityNum + 3
+            return rcNum * handNum + communityNum + 3
         } else {
             var minNum = 0
             for i in 0..<diyDealNum.count {
                 let num = diyDealNum[i]
                 //派牌
                 if diyDealStatus[i][0] == true {
-                    minNum += playerNum * num
+                    minNum += rcNum * num
                 //公牌
                 } else if diyDealStatus[i][1] == true {
                     minNum += num
@@ -165,21 +165,21 @@ class TP{
 }
 
 
-class TexasPlayer {
-    var playerCard = [Card]()
+class TexasRC {
+    var rcSingleFeature = [SingleFeature]()
     var evaluateFlag = 0
-    var cardsType: String = ""
-    var cardsSuit: String = ""
+    var singlefeaturesType: String = ""
+    var singlefeaturesSuit: String = ""
     var isPair: Int = 0
     
-    func insertCard(card: Card) {
-        playerCard.append(card)
+    func insertSingleFeature(singlefeature: SingleFeature) {
+        rcSingleFeature.append(singlefeature)
     }
 }
 
-class TPGame {
+class TPStatistic {
 //    #args
-//    #0 playerNum
+//    #0 rcNum
 //    #1 isCompareSuit 0/1
 //    #2 isAceStraight 0/1
 //    #3 minRank 2-9
@@ -187,17 +187,17 @@ class TPGame {
 //    #5 communityNum 0/3/5
 //    #6 handUseType 0无限制/1必须/2至少
 //    #7 handUseNum 1-5
-    static func calResult(diyDealStatus:[[Bool]], diyDealNum:[Int], cardArray: [Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
-        var deck = initDeck(initialCards: cardArray, suitRules: suitRules)
-            let (winners, leftCards) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, deck: &deck, args: args, rankRules: rankRules)
-            return (winners, leftCards)
+    static func calResult(diyDealStatus:[[Bool]], diyDealNum:[Int], singlefeatureArray: [Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([StatisticReturnRCInfo],[Int]) {
+        var FeatureList = initFeatureList(initialSingleFeatures: singlefeatureArray, suitRules: suitRules)
+            let (winners, leftSingleFeatures) = calWinners(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, FeatureList: &FeatureList, args: args, rankRules: rankRules)
+            return (winners, leftSingleFeatures)
         }
     
-    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], deck: inout [Card], args: [Int], rankRules: [Int]) -> ([GameReturnPlayerInfo],[Int]) {
+    static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], FeatureList: inout [SingleFeature], args: [Int], rankRules: [Int]) -> ([StatisticReturnRCInfo],[Int]) {
         let rule = ClassifierSettingArgs.targetSetting[0] as! TPRule
         let dealNum = args[0]
         let dealType = args[1]
-        let playerNum = args[2]
+        let rcNum = args[2]
         let handNum = args[3]
         let communityNum = args[4]
         let isCompareSuit = args[5] == 1
@@ -206,156 +206,156 @@ class TPGame {
         let handUseType = args[8]
         let handUseNum = rule.handUseNum[args[9]]
         
-        var returnPlayerInfos: [GameReturnPlayerInfo] = []
+        var returnRCInfos: [StatisticReturnRCInfo] = []
 
-        var allPlayCards = [TexasPlayer]()
-        var community = [Card]()
-        if deck.count < TP.getMinCardNum(playerNum: playerNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+        var allPlaySingleFeatures = [TexasRC]()
+        var community = [SingleFeature]()
+        if FeatureList.count < TP.getMinSingleFeatureNum(rcNum: rcNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
             return ([],[])
         }
         
         
-        for _ in 0..<playerNum {
-            allPlayCards.append(TexasPlayer())
+        for _ in 0..<rcNum {
+            allPlaySingleFeatures.append(TexasRC())
         }
         
         // 发牌
         //反发倒过来
         if dealType == 1 {
-            deck = deck.reversed()
+            FeatureList = FeatureList.reversed()
         }
         // 每轮发一张
         if  dealNum == 0{
 
             for _ in 0..<handNum {
-                for i in 0..<playerNum {
-                    allPlayCards[i].insertCard(card: deck.removeFirst())
+                for i in 0..<rcNum {
+                    allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeFirst())
                 }
             }
             if communityNum == 3 {
-                deck.removeFirst()
+                FeatureList.removeFirst()
                 for _ in 0..<3 {
-                    community.append(deck.removeFirst())
+                    community.append(FeatureList.removeFirst())
                 }
             } else if communityNum == 5 {
-                deck.removeFirst()
+                FeatureList.removeFirst()
                 for _ in 0..<3 {
-                    community.append(deck.removeFirst())
+                    community.append(FeatureList.removeFirst())
                 }
                 for _ in 0..<2 {
-                    deck.removeFirst()
-                    community.append(deck.removeFirst())
+                    FeatureList.removeFirst()
+                    community.append(FeatureList.removeFirst())
                 }
             }
         }
         // 自定义发牌 dealNum = 2
         else {
             for actionIndex in 0...diyDealStatus.count - 1{
-                let cardNum = diyDealNum[actionIndex]
+                let singlefeatureNum = diyDealNum[actionIndex]
                 let action = diyDealStatus[actionIndex]
                 //派牌
                 if action[0] == true{
-                    for i in 0..<playerNum {
-                        for _ in 0..<cardNum{
-                            allPlayCards[i].insertCard(card: deck.removeFirst())
+                    for i in 0..<rcNum {
+                        for _ in 0..<singlefeatureNum{
+                            allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeFirst())
                         }
                     }
                 //公牌
                 } else if action[1] == true {
-                    for _ in 0..<cardNum{
-                        community.append(deck.removeFirst())
+                    for _ in 0..<singlefeatureNum{
+                        community.append(FeatureList.removeFirst())
                     }
                 //去牌
                 } else if action[2] == true {
-                    for _ in 0..<cardNum{
-                        deck.removeFirst()
+                    for _ in 0..<singlefeatureNum{
+                        FeatureList.removeFirst()
                     }
                 }
             }
         }
         if dealType == 1 {
-            deck = deck.reversed()
+            FeatureList = FeatureList.reversed()
         }
         
-        for i in 0..<playerNum {
+        for i in 0..<rcNum {
             
-            (allPlayCards[i].evaluateFlag, allPlayCards[i].cardsType) = HandEvaluator.evalHand(cards: allPlayCards[i].playerCard, community: community, isCompareSuit: isCompareSuit, isAceStraight: isAceStraight, minRank: minRank, handUseType: handUseType, handUseNum: handUseNum, rankRules: rankRules)
+            (allPlaySingleFeatures[i].evaluateFlag, allPlaySingleFeatures[i].singlefeaturesType) = HandEvaluator.evalHand(singlefeatures: allPlaySingleFeatures[i].rcSingleFeature, community: community, isCompareSuit: isCompareSuit, isAceStraight: isAceStraight, minRank: minRank, handUseType: handUseType, handUseNum: handUseNum, rankRules: rankRules)
         }
         
-        for playerID in 0..<allPlayCards.count {
-            var currentReturnPlayerInfo = GameReturnPlayerInfo()
-            currentReturnPlayerInfo.playerID = playerID
-            currentReturnPlayerInfo.playerRank = allPlayCards[playerID].evaluateFlag
-            currentReturnPlayerInfo.playerCardsType = allPlayCards[playerID].cardsType
-            currentReturnPlayerInfo.isPair = allPlayCards[playerID].isPair
-            currentReturnPlayerInfo.PlayerCards = allPlayCards[playerID].playerCard
-            currentReturnPlayerInfo.communityCard = community
-            returnPlayerInfos.append(currentReturnPlayerInfo)
+        for rcID in 0..<allPlaySingleFeatures.count {
+            var currentReturnRCInfo = StatisticReturnRCInfo()
+            currentReturnRCInfo.rcID = rcID
+            currentReturnRCInfo.rcRank = allPlaySingleFeatures[rcID].evaluateFlag
+            currentReturnRCInfo.rcSingleFeaturesType = allPlaySingleFeatures[rcID].singlefeaturesType
+            currentReturnRCInfo.isPair = allPlaySingleFeatures[rcID].isPair
+            currentReturnRCInfo.RCSingleFeatures = allPlaySingleFeatures[rcID].rcSingleFeature
+            currentReturnRCInfo.communitySingleFeature = community
+            returnRCInfos.append(currentReturnRCInfo)
         }
         
         //从大到小排序
-        returnPlayerInfos = returnPlayerInfos.sorted(by: {$0.playerRank > $1.playerRank})
-        var leftCards:[Int] = []
-        for card in deck{
-            leftCards.append(card.cardIndex)
+        returnRCInfos = returnRCInfos.sorted(by: {$0.rcRank > $1.rcRank})
+        var leftSingleFeatures:[Int] = []
+        for singlefeature in FeatureList{
+            leftSingleFeatures.append(singlefeature.singlefeatureIndex)
         }
         
-        if leftCards.count < TP.getMinCardNum(playerNum: playerNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
-            leftCards = []
+        if leftSingleFeatures.count < TP.getMinSingleFeatureNum(rcNum: rcNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+            leftSingleFeatures = []
         }
         
-        return (returnPlayerInfos, leftCards)
+        return (returnRCInfos, leftSingleFeatures)
     }
 }
 
 class HandEvaluator {
     
-    static func evalHand(cards: [Card], community: [Card], isCompareSuit: Bool, isAceStraight: Bool, minRank: Int, handUseType: Int, handUseNum: Int, rankRules: [Int]) -> (Int, String) {
+    static func evalHand(singlefeatures: [SingleFeature], community: [SingleFeature], isCompareSuit: Bool, isAceStraight: Bool, minRank: Int, handUseType: Int, handUseNum: Int, rankRules: [Int]) -> (Int, String) {
         let suitRules :[Int] = [3,2,1,0]
 
-        var handCardsString:String = ""
-        for handCard in cards{
-            handCardsString += ClassifierSettingArgs.cardLabelDic[handCard.rank
-                                                               - 1 + suitRules[handCard.suit[0]]*13]!
+        var handSingleFeaturesString:String = ""
+        for handSingleFeature in singlefeatures{
+            handSingleFeaturesString += ClassifierSettingArgs.singlefeatureLabelDic[handSingleFeature.rank
+                                                               - 1 + suitRules[handSingleFeature.suit[0]]*13]!
         }
-        var communityCardsString: String = ""
-        for communityCard in community{
-            communityCardsString += ClassifierSettingArgs.cardLabelDic[communityCard.rank - 1 + suitRules[communityCard.suit[0]] * 13]!
+        var communitySingleFeaturesString: String = ""
+        for communitySingleFeature in community{
+            communitySingleFeaturesString += ClassifierSettingArgs.singlefeatureLabelDic[communitySingleFeature.rank - 1 + suitRules[communitySingleFeature.suit[0]] * 13]!
         }
         
-        let (cardsLength, allSortedCards) = sortCards(cards: cards, community: community, handUseType: handUseType, handUseNum: handUseNum, isAceStraight: isAceStraight, minRank: minRank)
+        let (singlefeaturesLength, allSortedSingleFeatures) = sortSingleFeatures(singlefeatures: singlefeatures, community: community, handUseType: handUseType, handUseNum: handUseNum, isAceStraight: isAceStraight, minRank: minRank)
         var sortedString:String = ""
-        for sortedcard in allSortedCards[0]{
-            sortedString += ClassifierSettingArgs.cardLabelDic[sortedcard.cardIndex]!
+        for sortedsinglefeature in allSortedSingleFeatures[0]{
+            sortedString += ClassifierSettingArgs.singlefeatureLabelDic[sortedsinglefeature.singlefeatureIndex]!
         }
         
         var maxScore = 0
-        var maxCardType: String = ""
-        for sortedCards in allSortedCards {
-            let (score, cardType) = calcHandInfoFlg(sortedCards: sortedCards, isCompareSuit: isCompareSuit, rankRules: rankRules, cardsLength: cardsLength)
+        var maxSingleFeatureType: String = ""
+        for sortedSingleFeatures in allSortedSingleFeatures {
+            let (score, singlefeatureType) = calcHandInfoFlg(sortedSingleFeatures: sortedSingleFeatures, isCompareSuit: isCompareSuit, rankRules: rankRules, singlefeaturesLength: singlefeaturesLength)
             if score > maxScore {
                 maxScore = score
-                maxCardType = cardType
+                maxSingleFeatureType = singlefeatureType
             }
         }
-        return (maxScore, maxCardType)
+        return (maxScore, maxSingleFeatureType)
     }
     
-    static func sortCards(cards: [Card], community: [Card], handUseType: Int, handUseNum: Int, isAceStraight: Bool, minRank: Int) -> (Int, [[Card]]) {
-        var allCards = [[Card]]()
-        var cardsLength = 0
-        var cardCopy:[Card] = []
-        var communityCopy:[Card] = []
-        for card in cards {
-            let copy:Card = Card(suit: card.suit, rank: card.rank, cardIndex: card.cardIndex)
+    static func sortSingleFeatures(singlefeatures: [SingleFeature], community: [SingleFeature], handUseType: Int, handUseNum: Int, isAceStraight: Bool, minRank: Int) -> (Int, [[SingleFeature]]) {
+        var allSingleFeatures = [[SingleFeature]]()
+        var singlefeaturesLength = 0
+        var singlefeatureCopy:[SingleFeature] = []
+        var communityCopy:[SingleFeature] = []
+        for singlefeature in singlefeatures {
+            let copy:SingleFeature = SingleFeature(suit: singlefeature.suit, rank: singlefeature.rank, singlefeatureIndex: singlefeature.singlefeatureIndex)
             if copy.rank == 1 {
                 copy.rank = 14
             }
-            cardCopy.append(copy)
+            singlefeatureCopy.append(copy)
         }
         
-        for card in community {
-            let copy:Card = Card(suit: card.suit, rank: card.rank, cardIndex: card.cardIndex)
+        for singlefeature in community {
+            let copy:SingleFeature = SingleFeature(suit: singlefeature.suit, rank: singlefeature.rank, singlefeatureIndex: singlefeature.singlefeatureIndex)
 
             if copy.rank == 1 {
                 copy.rank = 14
@@ -364,107 +364,107 @@ class HandEvaluator {
         }
         
         if handUseType == 0 {
-            allCards.append(cardCopy + communityCopy)
-            cardsLength = cardCopy.count + communityCopy.count
+            allSingleFeatures.append(singlefeatureCopy + communityCopy)
+            singlefeaturesLength = singlefeatureCopy.count + communityCopy.count
         } else if handUseType == 1 {
-            cardsLength = 5
+            singlefeaturesLength = 5
             let communityNum = 5 - handUseNum
-            let handCombinations = cardCopy.combinations(ofCount: handUseNum)
+            let handCombinations = singlefeatureCopy.combinations(ofCount: handUseNum)
             let communityCombinations = communityCopy.combinations(ofCount: communityNum)
             
             for handCombination in handCombinations {
                 if communityNum != 0 {
                     for communityCombination in communityCombinations {
-                        allCards.append(handCombination + communityCombination)
+                        allSingleFeatures.append(handCombination + communityCombination)
                     }
                 } else {
-                    allCards.append(handCombination)
+                    allSingleFeatures.append(handCombination)
                 }
             }
         } else if handUseType == 2 {
-            cardsLength = 5
+            singlefeaturesLength = 5
             for handNum in 1...handUseNum {
                 let communityNum = 5 - handNum
-                let handCombinations = cardCopy.combinations(ofCount: handNum)
+                let handCombinations = singlefeatureCopy.combinations(ofCount: handNum)
                 let communityCombinations = communityCopy.combinations(ofCount: communityNum)
                 
                 for handCombination in handCombinations {
                     if communityNum != 0 {
                         for communityCombination in communityCombinations {
-                            allCards.append(handCombination + communityCombination)
+                            allSingleFeatures.append(handCombination + communityCombination)
                         }
                     } else {
-                        allCards.append(handCombination)
+                        allSingleFeatures.append(handCombination)
                     }
                 }
             }
         }
-        var returnAllCards = [[Card]]()
+        var returnAllSingleFeatures = [[SingleFeature]]()
         
-        for var cardsList in allCards {
+        for var singlefeaturesList in allSingleFeatures {
             if isAceStraight {
-                var aceCards = [Card]()
-                for card in cardsList {
-                    if card.rank == 14 {
-                        aceCards.append(Card(suit: card.suit, rank: minRank - 1, cardIndex: card.cardIndex))
+                var aceSingleFeatures = [SingleFeature]()
+                for singlefeature in singlefeaturesList {
+                    if singlefeature.rank == 14 {
+                        aceSingleFeatures.append(SingleFeature(suit: singlefeature.suit, rank: minRank - 1, singlefeatureIndex: singlefeature.singlefeatureIndex))
                     }
                 }
-                cardsList += aceCards
+                singlefeaturesList += aceSingleFeatures
             }
-            cardsList.sort(by: { card1, card2 in
-                return Card.calScore(card: card1) > Card.calScore(card: card2)
+            singlefeaturesList.sort(by: { singlefeature1, singlefeature2 in
+                return SingleFeature.calScore(singlefeature: singlefeature1) > SingleFeature.calScore(singlefeature: singlefeature2)
             })
-            returnAllCards.append(cardsList)
+            returnAllSingleFeatures.append(singlefeaturesList)
         }
         
-        return (cardsLength, returnAllCards)
+        return (singlefeaturesLength, returnAllSingleFeatures)
     }
     
-    static func calcHandInfoFlg(sortedCards: [Card], isCompareSuit: Bool, rankRules: [Int], cardsLength: Int) -> (Int, String) {
-        let ruleDict: [Int: ([Card], Int) -> Int] = [
-            0: evalHoleCard,
+    static func calcHandInfoFlg(sortedSingleFeatures: [SingleFeature], isCompareSuit: Bool, rankRules: [Int], singlefeaturesLength: Int) -> (Int, String) {
+        let ruleDict: [Int: ([SingleFeature], Int) -> Int] = [
+            0: evalHoleSingleFeature,
             1: evalOnePair,
             2: evalTwoPair,
             3: evalThreeFlush,
             4: evalThreeStraight,
             5: evalThreeStraightFlush,
-            6: evalThreeCard,
+            6: evalThreeSingleFeature,
             7: evalStraight,
             8: evalFlush,
             9: evalFullHouse,
-            10: evalFourCard,
+            10: evalFourSingleFeature,
             11: evalStraightFlush
         ]
         
         var rankResult = 0
-        var cardType: String = ""
+        var singlefeatureType: String = ""
         let rule = ClassifierSettingArgs.targetSetting[0] as! TPRule
         for (index, ruleIndex) in rankRules.enumerated() {
             let rankFlag = 1 << (rankRules.count - index + 23)
-            rankResult = ruleDict[ruleIndex]!(sortedCards, cardsLength)
+            rankResult = ruleDict[ruleIndex]!(sortedSingleFeatures, singlefeaturesLength)
             if !isCompareSuit {
                 rankResult >>= 2
             }
             if rankResult != 0 {
                 rankResult |= rankFlag
-                cardType = rule.rankRules[ruleIndex]!
+                singlefeatureType = rule.rankRules[ruleIndex]!
                 break
             }
         }
-        return (rankResult, cardType)
+        return (rankResult, singlefeatureType)
     }
     
     
-    static func evalStraightFlush(cards: [Card], cardsLength: Int) -> Int {
+    static func evalStraightFlush(singlefeatures: [SingleFeature], singlefeaturesLength: Int) -> Int {
         var rank = 0
         for suit in [3, 2, 1, 0] {
             var rankList = [Int]()
             var cnt = 1
             var straightHeadRank = 0
             
-            for i in 0..<cards.count {
-                if cards[i].suit[0]  == suit {
-                    rankList.append(cards[i].rank)
+            for i in 0..<singlefeatures.count {
+                if singlefeatures[i].suit[0]  == suit {
+                    rankList.append(singlefeatures[i].rank)
                 }
             }
             
@@ -497,22 +497,22 @@ class HandEvaluator {
         return rank
     }
         
-    static func evalFourCard(cards: [Card], cardsLength: Int) -> Int {
+    static func evalFourSingleFeature(singlefeatures: [SingleFeature], singlefeaturesLength: Int) -> Int {
             var rank = 0
-            for i in 0...(cardsLength - 4) {
-                var isFourCard = true
+            for i in 0...(singlefeaturesLength - 4) {
+                var isFourSingleFeature = true
                 for j in 1...3 {
-                    if cards[i + j].rank != cards[i].rank {
-                        isFourCard = false
+                    if singlefeatures[i + j].rank != singlefeatures[i].rank {
+                        isFourSingleFeature = false
                         break
                     }
                 }
-                if isFourCard {
-                    rank = cards[i].rank << 4
+                if isFourSingleFeature {
+                    rank = singlefeatures[i].rank << 4
                     if i == 0 {
-                        rank = rank | cards[4].rank
+                        rank = rank | singlefeatures[4].rank
                     } else {
-                        rank = rank | cards[0].rank
+                        rank = rank | singlefeatures[0].rank
                     }
                     rank = rank << 2
                     break
@@ -521,40 +521,40 @@ class HandEvaluator {
             return rank
         }
         
-        static func evalFullHouse(cards: [Card], cardsLength: Int) -> Int {
+        static func evalFullHouse(singlefeatures: [SingleFeature], singlefeaturesLength: Int) -> Int {
             var rank = 0
-            var threeCardRank = 0
+            var threeSingleFeatureRank = 0
             var pairRank = 0
-            for i in 0...(cardsLength - 3) {
-                if cards[i].rank == cards[i+1].rank && cards[i].rank == cards[i+2].rank {
-                    threeCardRank = cards[i].rank
+            for i in 0...(singlefeaturesLength - 3) {
+                if singlefeatures[i].rank == singlefeatures[i+1].rank && singlefeatures[i].rank == singlefeatures[i+2].rank {
+                    threeSingleFeatureRank = singlefeatures[i].rank
                     break
                 }
             }
-            if threeCardRank != 0 {
-                for i in 0...(cardsLength - 2) {
-                    if cards[i].rank == cards[i+1].rank && cards[i].rank != threeCardRank {
-                        pairRank = cards[i].rank
+            if threeSingleFeatureRank != 0 {
+                for i in 0...(singlefeaturesLength - 2) {
+                    if singlefeatures[i].rank == singlefeatures[i+1].rank && singlefeatures[i].rank != threeSingleFeatureRank {
+                        pairRank = singlefeatures[i].rank
                         break
                     }
                 }
             }
-            if threeCardRank != 0 && pairRank != 0 {
-                rank = threeCardRank << 4 | pairRank
+            if threeSingleFeatureRank != 0 && pairRank != 0 {
+                rank = threeSingleFeatureRank << 4 | pairRank
                 rank = rank << 2
             }
             return rank
         }
     
     
-    static func evalFlush(cards: [Card], cardsLength: Int) -> Int {
+    static func evalFlush(singlefeatures: [SingleFeature], singlefeaturesLength: Int) -> Int {
             var rank = 0
             for suit in [3, 2, 1, 0] {
                 var cnt = 0
-                for i in 0..<cardsLength {
-                    if cards[i].suit[0] == suit && cnt < 5 {
+                for i in 0..<singlefeaturesLength {
+                    if singlefeatures[i].suit[0] == suit && cnt < 5 {
                         cnt += 1
-                        rank = rank << 4 | cards[i].rank
+                        rank = rank << 4 | singlefeatures[i].rank
                     }
                 }
                 if cnt == 5 {
@@ -567,32 +567,32 @@ class HandEvaluator {
             return rank
         }
         
-        static func evalStraight(cards: [Card], cardsLength: Int) -> Int {
+        static func evalStraight(singlefeatures: [SingleFeature], singlefeaturesLength: Int) -> Int {
             var rank = 0
             var cnt = 1
             var straightHeadRank = 0
             
             
             
-            for i in 0..<(cards.count - 1)  {
-                if cards[i].rank - cards[i+1].rank == 1 {
+            for i in 0..<(singlefeatures.count - 1)  {
+                if singlefeatures[i].rank - singlefeatures[i+1].rank == 1 {
                     cnt += 1
                     if straightHeadRank == 0 {
-                        straightHeadRank = cards[i].rank
+                        straightHeadRank = singlefeatures[i].rank
                     }
                     if cnt == 5 {
                         rank = straightHeadRank
                         break
                     }
-                } else if cards[i].rank != cards[i+1].rank {
+                } else if singlefeatures[i].rank != singlefeatures[i+1].rank {
                     cnt = 1
                     straightHeadRank = 0
                 }
             }
             if rank != 0 {
-                for card in cards {
-                    if card.rank == rank {
-                        rank = rank << 2 | (card.suit[0])
+                for singlefeature in singlefeatures {
+                    if singlefeature.rank == rank {
+                        rank = rank << 2 | (singlefeature.suit[0])
                         break
                     }
                 }
@@ -600,61 +600,61 @@ class HandEvaluator {
             return rank
         }
         
-        static func evalThreeCard(cards: [Card], cardsLength: Int) -> Int {
+        static func evalThreeSingleFeature(singlefeatures: [SingleFeature], singlefeaturesLength: Int) -> Int {
             var rank = 0
-            var threeCardRank = 0
-            var highCardRank1 = 0
-            var highCardRank2 = 0
-            var threeCardSuit = 0
-            for i in 0..<(cardsLength - 2) {
-                if cards[i].rank == cards[i+1].rank && cards[i].rank == cards[i+2].rank {
-                    threeCardRank = cards[i].rank
-                    threeCardSuit = cards[i].suit[0]
+            var threeSingleFeatureRank = 0
+            var highSingleFeatureRank1 = 0
+            var highSingleFeatureRank2 = 0
+            var threeSingleFeatureSuit = 0
+            for i in 0..<(singlefeaturesLength - 2) {
+                if singlefeatures[i].rank == singlefeatures[i+1].rank && singlefeatures[i].rank == singlefeatures[i+2].rank {
+                    threeSingleFeatureRank = singlefeatures[i].rank
+                    threeSingleFeatureSuit = singlefeatures[i].suit[0]
                     break
                 }
             }
-            if threeCardRank != 0 {
-                for i in 0..<cardsLength {
-                    if cards[i].rank != threeCardRank {
-                        highCardRank1 = cards[i].rank
+            if threeSingleFeatureRank != 0 {
+                for i in 0..<singlefeaturesLength {
+                    if singlefeatures[i].rank != threeSingleFeatureRank {
+                        highSingleFeatureRank1 = singlefeatures[i].rank
                         break
                     }
                 }
-                for i in 0..<cardsLength {
-                    if cards[i].rank != threeCardRank && cards[i].rank != highCardRank1 {
-                        highCardRank2 = cards[i].rank
+                for i in 0..<singlefeaturesLength {
+                    if singlefeatures[i].rank != threeSingleFeatureRank && singlefeatures[i].rank != highSingleFeatureRank1 {
+                        highSingleFeatureRank2 = singlefeatures[i].rank
                         break
                     }
                 }
-                rank = threeCardRank << 8 | highCardRank1 << 4 | highCardRank2
-                rank = rank << 2 | threeCardSuit
+                rank = threeSingleFeatureRank << 8 | highSingleFeatureRank1 << 4 | highSingleFeatureRank2
+                rank = rank << 2 | threeSingleFeatureSuit
             }
             return rank
         }
     
-    static func evalThreeStraightFlush(cards: [Card], cardsLength: Int) -> Int {
+    static func evalThreeStraightFlush(singlefeatures: [SingleFeature], singlefeaturesLength: Int) -> Int {
             var rank = 0
             for suit in [3, 2, 1, 0] {
-                var cardList: [Card] = []
+                var singlefeatureList: [SingleFeature] = []
                 var cnt = 1
                 var straightHeadRank = 0
-                for card in cards {
-                    if card.suit[0] == suit {
-                        cardList.append(card)
+                for singlefeature in singlefeatures {
+                    if singlefeature.suit[0] == suit {
+                        singlefeatureList.append(singlefeature)
                     }
                 }
-                if cardList.count < 3{
+                if singlefeatureList.count < 3{
                     continue
                 }
-                for i in 0..<(cardList.count - 1) {
-                    if cardList[i].rank - cardList[i+1].rank == 1 {
+                for i in 0..<(singlefeatureList.count - 1) {
+                    if singlefeatureList[i].rank - singlefeatureList[i+1].rank == 1 {
                         cnt += 1
                         if straightHeadRank == 0 {
-                            straightHeadRank = cardList[i].rank
+                            straightHeadRank = singlefeatureList[i].rank
                         }
                         if cnt == 3 {
                             rank = straightHeadRank
-                            cardList = Array(cardList[i - 1...i + 2])
+                            singlefeatureList = Array(singlefeatureList[i - 1...i + 2])
                             break
                         }
                     } else {
@@ -663,13 +663,13 @@ class HandEvaluator {
                     }
                 }
                 if rank != 0 {
-                    var highCardCnt = 0
-                    for card in cards {
-                        if !cardList.contains(where: { $0 as! AnyHashable == card as! AnyHashable }){
-                            rank = rank << 4 | card.rank
-                            highCardCnt += 1
+                    var highSingleFeatureCnt = 0
+                    for singlefeature in singlefeatures {
+                        if !singlefeatureList.contains(where: { $0 as! AnyHashable == singlefeature as! AnyHashable }){
+                            rank = rank << 4 | singlefeature.rank
+                            highSingleFeatureCnt += 1
                         }
-                        if highCardCnt == 2 {
+                        if highSingleFeatureCnt == 2 {
                             break
                         }
                     }
@@ -680,42 +680,42 @@ class HandEvaluator {
             return rank
         }
         
-        static func evalThreeStraight(cards: [Card], cardsLength: Int) -> Int {
+        static func evalThreeStraight(singlefeatures: [SingleFeature], singlefeaturesLength: Int) -> Int {
             var rank = 0
             var cnt = 1
             var straightHeadRank = 0
-            var cardList: [Card] = [cards[0]]
-            for i in 0..<(cards.count - 1) {
-                if cards[i].rank - cards[i+1].rank == 1 {
+            var singlefeatureList: [SingleFeature] = [singlefeatures[0]]
+            for i in 0..<(singlefeatures.count - 1) {
+                if singlefeatures[i].rank - singlefeatures[i+1].rank == 1 {
                     cnt += 1
-                    cardList.append(cards[i + 1])
+                    singlefeatureList.append(singlefeatures[i + 1])
                     if straightHeadRank == 0 {
-                        straightHeadRank = cards[i].rank
+                        straightHeadRank = singlefeatures[i].rank
                     }
                     if cnt == 3 {
                         rank = straightHeadRank
                         break
                     }
-                } else if cards[i].rank != cards[i+1].rank {
+                } else if singlefeatures[i].rank != singlefeatures[i+1].rank {
                     cnt = 1
-                    cardList = [cards[i]]
+                    singlefeatureList = [singlefeatures[i]]
                     straightHeadRank = 0
                 }
             }
             if rank != 0 {
-                var highCardCnt = 0
-                for card in cards {
-                    if !cardList.contains(where: { $0 as! AnyHashable == card as! AnyHashable }) {
-                        rank = rank << 4 | card.rank
-                        highCardCnt += 1
+                var highSingleFeatureCnt = 0
+                for singlefeature in singlefeatures {
+                    if !singlefeatureList.contains(where: { $0 as! AnyHashable == singlefeature as! AnyHashable }) {
+                        rank = rank << 4 | singlefeature.rank
+                        highSingleFeatureCnt += 1
                     }
-                    if highCardCnt == 2 {
+                    if highSingleFeatureCnt == 2 {
                         break
                     }
                 }
-                for card in cards {
-                    if card.rank == rank {
-                        rank = rank << 2 | (card.suit[0])
+                for singlefeature in singlefeatures {
+                    if singlefeature.rank == rank {
+                        rank = rank << 2 | (singlefeature.suit[0])
                         break
                     }
                 }
@@ -723,26 +723,26 @@ class HandEvaluator {
             return rank
         }
         
-        static func evalThreeFlush(cards: [Card], cardsLength: Int) -> Int {
+        static func evalThreeFlush(singlefeatures: [SingleFeature], singlefeaturesLength: Int) -> Int {
             var rank = 0
-            var cardList: [Card] = []
+            var singlefeatureList: [SingleFeature] = []
             for suit in [3, 2, 1, 0] {
                 var cnt = 0
-                for i in 0..<cardsLength {
-                    if cards[i].suit[0] == suit && cnt < 3 {
+                for i in 0..<singlefeaturesLength {
+                    if singlefeatures[i].suit[0] == suit && cnt < 3 {
                         cnt += 1
-                        cardList.append(cards[i])
-                        rank = rank << 4 | cards[i].rank
+                        singlefeatureList.append(singlefeatures[i])
+                        rank = rank << 4 | singlefeatures[i].rank
                     }
                 }
                 if cnt == 3 {
-                    var highCardCnt = 0
-                    for card in cards {
-                        if !cardList.contains(where: { $0 as! AnyHashable == card as! AnyHashable }) {
-                            rank = rank << 4 | card.rank
-                            highCardCnt += 1
+                    var highSingleFeatureCnt = 0
+                    for singlefeature in singlefeatures {
+                        if !singlefeatureList.contains(where: { $0 as! AnyHashable == singlefeature as! AnyHashable }) {
+                            rank = rank << 4 | singlefeature.rank
+                            highSingleFeatureCnt += 1
                         }
-                        if highCardCnt == 2 {
+                        if highSingleFeatureCnt == 2 {
                             break
                         }
                     }
@@ -750,60 +750,60 @@ class HandEvaluator {
                     break
                 } else {
                     rank = 0
-                    cardList = []
+                    singlefeatureList = []
                 }
             }
             return rank
         }
         
-        static func evalTwoPair(cards: [Card], cardsLength: Int) -> Int {
+        static func evalTwoPair(singlefeatures: [SingleFeature], singlefeaturesLength: Int) -> Int {
             var rank = 0
             var firstPairRank = 0
             var secondPairRank = 0
-            var highCardRank = 0
+            var highSingleFeatureRank = 0
             var firstPairSuit = 0
-            for i in 0..<(cardsLength - 1) {
-                if cards[i].rank == cards[i+1].rank {
+            for i in 0..<(singlefeaturesLength - 1) {
+                if singlefeatures[i].rank == singlefeatures[i+1].rank {
                     if firstPairRank == 0 {
-                        firstPairRank = cards[i].rank
-                        firstPairSuit = cards[i].suit[0]
+                        firstPairRank = singlefeatures[i].rank
+                        firstPairSuit = singlefeatures[i].suit[0]
                     } else {
-                        secondPairRank = cards[i].rank
+                        secondPairRank = singlefeatures[i].rank
                         break
                     }
                 }
             }
             if firstPairRank != 0 && secondPairRank != 0 {
-                for i in 0..<cardsLength {
-                    if cards[i].rank != firstPairRank && cards[i].rank != secondPairRank {
-                        highCardRank = cards[i].rank
+                for i in 0..<singlefeaturesLength {
+                    if singlefeatures[i].rank != firstPairRank && singlefeatures[i].rank != secondPairRank {
+                        highSingleFeatureRank = singlefeatures[i].rank
                         break
                     }
                 }
-                rank = firstPairRank << 8 | secondPairRank << 4 | highCardRank
+                rank = firstPairRank << 8 | secondPairRank << 4 | highSingleFeatureRank
                 rank = rank << 2 | firstPairSuit
             }
             return rank
         }
     
-    static func evalOnePair(cards: [Card], cardsLength: Int) -> Int {
+    static func evalOnePair(singlefeatures: [SingleFeature], singlefeaturesLength: Int) -> Int {
             var rank = 0
             var pairRank = 0
             var pairSuit = 0
             var rankList: [Int] = []
-            for i in 0..<(cardsLength - 1) {
-                if cards[i].rank == cards[i + 1].rank {
-                    pairRank = cards[i].rank
-                    pairSuit = cards[i].suit[0]
+            for i in 0..<(singlefeaturesLength - 1) {
+                if singlefeatures[i].rank == singlefeatures[i + 1].rank {
+                    pairRank = singlefeatures[i].rank
+                    pairSuit = singlefeatures[i].suit[0]
                     rankList.append(pairRank)
                     break
                 }
             }
             if pairRank != 0 {
                 for _ in 0..<3 {
-                    for i in 0..<cardsLength {
-                        if !rankList.contains(cards[i].rank) {
-                            rankList.append(cards[i].rank)
+                    for i in 0..<singlefeaturesLength {
+                        if !rankList.contains(singlefeatures[i].rank) {
+                            rankList.append(singlefeatures[i].rank)
                             break
                         }
                     }
@@ -816,12 +816,12 @@ class HandEvaluator {
             return rank
         }
         
-        static func evalHoleCard(cards: [Card], cardsLength: Int) -> Int {
+        static func evalHoleSingleFeature(singlefeatures: [SingleFeature], singlefeaturesLength: Int) -> Int {
             var rank = 0
             for i in 0..<5 {
-                rank = rank << 4 | cards[i].rank
+                rank = rank << 4 | singlefeatures[i].rank
             }
-            rank = rank << 2 | (cards[0].suit[0])
+            rank = rank << 2 | (singlefeatures[0].suit[0])
             return rank
         }
 }
