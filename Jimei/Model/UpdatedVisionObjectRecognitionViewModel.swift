@@ -306,7 +306,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 self.captureDevice.activeVideoMinFrameDuration = CMTime(value: 1, timescale: Int32(format.videoSupportedFrameRateRanges.first!.maxFrameRate))
                 self.captureDevice.activeVideoMaxFrameDuration = CMTime(value: 1, timescale: Int32(format.videoSupportedFrameRateRanges.first!.maxFrameRate))
                 
-                self.captureDevice.exposureMode = .autoExpose
+//                self.captureDevice.exposureMode = .autoExpose
                 
                 self.captureDevice.unlockForConfiguration()
             } catch {

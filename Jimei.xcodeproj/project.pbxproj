@@ -15,8 +15,6 @@
 		18A7A5172C14E2EB0020138E /* cls_01.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 18A7A5142C14E2E80020138E /* cls_01.mlmodel */; };
 		18A7A5192C14E2EB0020138E /* detect_01.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 18A7A5162C14E2EB0020138E /* detect_01.mlmodel */; };
 		18A7A51D2C14E5A50020138E /* Icon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 18A7A51C2C14E5A50020138E /* Icon.xcassets */; };
-		18C98CC62C14F57000A8CD49 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 18C98CC52C14F57000A8CD49 /* AsyncAlgorithms */; };
-		18C98CDF2C14F8C100A8CD49 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = 18C98CDE2C14F8C100A8CD49 /* Collections */; };
 		18C98CE52C15893200A8CD49 /* DeprecatedComponentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C98CE42C15893200A8CD49 /* DeprecatedComponentView.swift */; };
 		18C98D072C158F7B00A8CD49 /* ClassifierUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C98CEB2C158F7B00A8CD49 /* ClassifierUtils.swift */; };
 		18C98D0B2C158F7B00A8CD49 /* BZ.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C98CF12C158F7B00A8CD49 /* BZ.swift */; };
@@ -42,6 +40,8 @@
 		18CA14DB284AC42C00F90372 /* MyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14D0284AC42C00F90372 /* MyApp.swift */; };
 		18F6C0C32C10A685007BEAEC /* RecordHistoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F6C0C22C10A685007BEAEC /* RecordHistoryViewModel.swift */; };
 		18FFC40A2BB9587A00029B0D /* BlurDetector_origin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FFC4092BB9587900029B0D /* BlurDetector_origin.swift */; };
+		A81F7F852C31C5E9009ED8EB /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = A81F7F842C31C5E9009ED8EB /* AsyncAlgorithms */; };
+		A81F7F872C31C5F6009ED8EB /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = A81F7F862C31C5F6009ED8EB /* Collections */; };
 		A82088902C0BB9E000268013 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A820888F2C0BB9E000268013 /* Assets.xcassets */; };
 		A838534C2ADA7C0200346038 /* BackGround.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A838534B2ADA7C0200346038 /* BackGround.xcassets */; };
 		A83853532ADA918000346038 /* CustomUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83853522ADA918000346038 /* CustomUI.swift */; };
@@ -121,8 +121,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				18C98CDF2C14F8C100A8CD49 /* Collections in Frameworks */,
-				18C98CC62C14F57000A8CD49 /* AsyncAlgorithms in Frameworks */,
+				A81F7F872C31C5F6009ED8EB /* Collections in Frameworks */,
+				A81F7F852C31C5E9009ED8EB /* AsyncAlgorithms in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -309,8 +309,8 @@
 			);
 			name = Jimei;
 			packageProductDependencies = (
-				18C98CC52C14F57000A8CD49 /* AsyncAlgorithms */,
-				18C98CDE2C14F8C100A8CD49 /* Collections */,
+				A81F7F842C31C5E9009ED8EB /* AsyncAlgorithms */,
+				A81F7F862C31C5F6009ED8EB /* Collections */,
 			);
 			productName = CountMyActions;
 			productReference = 18CA1477284ABEC600F90372 /* Jimei.app */;
@@ -690,12 +690,12 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		18C98CC52C14F57000A8CD49 /* AsyncAlgorithms */ = {
+		A81F7F842C31C5E9009ED8EB /* AsyncAlgorithms */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A82088912C0C5D6400268013 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
 			productName = AsyncAlgorithms;
 		};
-		18C98CDE2C14F8C100A8CD49 /* Collections */ = {
+		A81F7F862C31C5F6009ED8EB /* Collections */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 18C98CD92C14F72E00A8CD49 /* XCRemoteSwiftPackageReference "swift-collections" */;
 			productName = Collections;

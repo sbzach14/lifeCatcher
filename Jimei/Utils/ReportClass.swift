@@ -2534,13 +2534,22 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         // 打色，位置转换
                         var resultPos:[Int] = []
                         for resultTargetPo in resultTargetPos {
-                            resultPos.append((singlefeatureRank + resultTargetPo) % rcNum)
+                            if singlefeatureRank == 0{
+                                resultPos.append(resultTargetPo % rcNum)
+                            } else {
+                                resultPos.append((singlefeatureRank + resultTargetPo - 1) % rcNum)
+                            }
                         }
                         allReportResult.append(resultPos)
                         
                         //还原显示的rcID
                         for index in 0..<currentResultInfo.RCReturnInfoList.count {
-                            currentResultInfo.RCReturnInfoList[index].rcID = (singlefeatureRank + currentResultInfo.RCReturnInfoList[index].rcID) % rcNum
+                            if singlefeatureRank == 0 {
+                                currentResultInfo.RCReturnInfoList[index].rcID = currentResultInfo.RCReturnInfoList[index].rcID % rcNum
+                            } else {
+                                currentResultInfo.RCReturnInfoList[index].rcID = (singlefeatureRank + currentResultInfo.RCReturnInfoList[index].rcID - 1) % rcNum
+                            }
+                            
                         }
                         currentResultInfo.RCReturnInfoList = currentResultInfo.RCReturnInfoList.sorted(by: {$0.rcID < $1.rcID} )
                         
