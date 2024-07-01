@@ -12,6 +12,9 @@
 		187A45472C2DA26100BB055C /* fail_tip.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 187A45442C2DA26100BB055C /* fail_tip.mp3 */; };
 		187A45502C31BBB400BB055C /* ReportClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187A454E2C31BBB400BB055C /* ReportClass.swift */; };
 		187A45512C31BBB400BB055C /* ClassifierSettingArgs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187A454F2C31BBB400BB055C /* ClassifierSettingArgs.swift */; };
+		187A45532C31D0CE00BB055C /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 187A45522C31D0CE00BB055C /* AsyncAlgorithms */; };
+		187A455B2C31D1A300BB055C /* Crypto in Frameworks */ = {isa = PBXBuildFile; productRef = 187A455A2C31D1A300BB055C /* Crypto */; };
+		187A455D2C31D1B600BB055C /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = 187A455C2C31D1B600BB055C /* Collections */; };
 		18A7A5172C14E2EB0020138E /* cls_01.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 18A7A5142C14E2E80020138E /* cls_01.mlmodel */; };
 		18A7A5192C14E2EB0020138E /* detect_01.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 18A7A5162C14E2EB0020138E /* detect_01.mlmodel */; };
 		18A7A51D2C14E5A50020138E /* Icon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 18A7A51C2C14E5A50020138E /* Icon.xcassets */; };
@@ -40,8 +43,6 @@
 		18CA14DB284AC42C00F90372 /* MyApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CA14D0284AC42C00F90372 /* MyApp.swift */; };
 		18F6C0C32C10A685007BEAEC /* RecordHistoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F6C0C22C10A685007BEAEC /* RecordHistoryViewModel.swift */; };
 		18FFC40A2BB9587A00029B0D /* BlurDetector_origin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FFC4092BB9587900029B0D /* BlurDetector_origin.swift */; };
-		A81F7F852C31C5E9009ED8EB /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = A81F7F842C31C5E9009ED8EB /* AsyncAlgorithms */; };
-		A81F7F872C31C5F6009ED8EB /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = A81F7F862C31C5F6009ED8EB /* Collections */; };
 		A82088902C0BB9E000268013 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A820888F2C0BB9E000268013 /* Assets.xcassets */; };
 		A838534C2ADA7C0200346038 /* BackGround.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A838534B2ADA7C0200346038 /* BackGround.xcassets */; };
 		A83853532ADA918000346038 /* CustomUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83853522ADA918000346038 /* CustomUI.swift */; };
@@ -121,8 +122,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A81F7F872C31C5F6009ED8EB /* Collections in Frameworks */,
-				A81F7F852C31C5E9009ED8EB /* AsyncAlgorithms in Frameworks */,
+				187A455D2C31D1B600BB055C /* Collections in Frameworks */,
+				187A45532C31D0CE00BB055C /* AsyncAlgorithms in Frameworks */,
+				187A455B2C31D1A300BB055C /* Crypto in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -309,8 +311,9 @@
 			);
 			name = Jimei;
 			packageProductDependencies = (
-				A81F7F842C31C5E9009ED8EB /* AsyncAlgorithms */,
-				A81F7F862C31C5F6009ED8EB /* Collections */,
+				187A45522C31D0CE00BB055C /* AsyncAlgorithms */,
+				187A455A2C31D1A300BB055C /* Crypto */,
+				187A455C2C31D1B600BB055C /* Collections */,
 			);
 			productName = CountMyActions;
 			productReference = 18CA1477284ABEC600F90372 /* Jimei.app */;
@@ -690,12 +693,17 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		A81F7F842C31C5E9009ED8EB /* AsyncAlgorithms */ = {
+		187A45522C31D0CE00BB055C /* AsyncAlgorithms */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A82088912C0C5D6400268013 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
 			productName = AsyncAlgorithms;
 		};
-		A81F7F862C31C5F6009ED8EB /* Collections */ = {
+		187A455A2C31D1A300BB055C /* Crypto */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 184F10C02C165087003A6D50 /* XCRemoteSwiftPackageReference "swift-crypto" */;
+			productName = Crypto;
+		};
+		187A455C2C31D1B600BB055C /* Collections */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 18C98CD92C14F72E00A8CD49 /* XCRemoteSwiftPackageReference "swift-collections" */;
 			productName = Collections;
