@@ -10,7 +10,7 @@ struct InfoView: View {
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 0)  {
-                    Text("版本 : 1.0").padding()
+                    Text("版本 : 1.0.5").padding()
                         .foregroundColor(.white)
                     
                     Divider().colorInvert()
@@ -21,7 +21,7 @@ struct InfoView: View {
                     Divider().colorInvert()
                     
                     if viewModel.isActive{
-                        Text("激活日期 : " + viewModel.activeDate).padding()
+                        Text("激活日期 : " + viewModel.trueDate).padding()
                             .foregroundColor(.white)
                         
                         Divider().colorInvert()

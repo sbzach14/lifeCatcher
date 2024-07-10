@@ -3,9 +3,14 @@ import Security
 import Foundation
 import CryptoKit
 import CoreML
-
+import ZIPFoundation
+import CryptoSwift
 
 class AuthManager {
+    
+    static var det_model_url : URL = URL(fileURLWithPath: "")
+    static var cls_model_url : URL = URL(fileURLWithPath: "")
+    
     static func getUniqueID() -> String? {
         // 获取设备ID
         let keychainIdentifier = UIDevice.current.identifierForVendor!.uuidString
@@ -56,29 +61,4 @@ class AuthManager {
         
         return hash == input
     }
-
-    // 解密模型文件
-//    static func decryptModel(target: String, key: [UInt8]) -> URL? {
-//        let detect_key: [UInt8] = [0xe4, 0xb3, 0xd0, 0x49, 0x21, 0xe1, 0x7f, 0xfd, 0x43, 0x88, 0x13, 0x1c, 0xe2, 0x65, 0xaf, 0xb1]
-//        let cls_key: [UInt8] = [0xcc, 0x11, 0x63, 0x20, 0xec, 0xb0, 0xa8, 0x1c, 0xe7, 0xc1, 0x6c, 0xbf, 0x84, 0xae, 0xbe, 0xbf]
-//
-//        let encryptedModelURL = Bundle.main.url(forResource: target + ".mlmodel.enc", withExtension: nil)!
-//        let decryptedModelURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(target + ".mlmodel")
-//
-//        do {
-//            let encryptedData = try Data(contentsOf: encryptedModelURL)
-//            let iv = Array(encryptedData.prefix(16))
-//            let ciphertext = Array(encryptedData.suffix(from: 16))
-//
-//            let aes = try AES(key: key, blockMode: CBC(iv: iv), padding: .pkcs7)
-//            let decryptedData = try aes.decrypt(ciphertext)
-//
-//            try decryptedData.write(to: decryptedModelURL)
-//            return decryptedModelURL
-//        } catch {
-//            print("Failed to decrypt model: \(error)")
-//            return nil
-//        }
-//    }
-
 }

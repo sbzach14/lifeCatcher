@@ -6,12 +6,12 @@ import CoreML
 
 
 // Helper method to read config.json and return the data as a dictionary
-
 func createParaJSON() {
     // Create the config dictionary with default values
     let paraDict: [String: String] = [
         "activeTime": "",
-        "uniqueID": AuthManager.getUniqueID()!
+        "uniqueID": AuthManager.getUniqueID()!,
+        "authKey": ""
     ]
 
     do {
@@ -75,10 +75,8 @@ func createConfigJSON() {
     let boolDict: [String: Bool] = [
         "isBlack": false,
         "isMute": false,
-        "isActive": false,
         "isBackCamera": true,
         "isRemote": true,
-        "isFast": true,
         "isAutoFocus": true
     ]
     

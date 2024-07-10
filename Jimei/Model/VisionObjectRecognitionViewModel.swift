@@ -18,6 +18,7 @@ class VisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVid
     @Published var showAlert: Bool = false
     private var speechSynthesizer = AVSpeechSynthesizer()
     @Published var isCameraSetting : Bool = false
+    var successAudioRC: AVAudioPlayer?
     
     func initialize(){
         switch AVCaptureDevice.authorizationStatus(for: .video) {
@@ -25,6 +26,7 @@ class VisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVid
             setupAVCapture()
             setupVision()
             startCaptureSession()
+            configureAudioSession()
         @unknown default:
             AVCaptureDevice.requestAccess(for: .video) { granted in
                 DispatchQueue.main.async {
@@ -134,6 +136,28 @@ class VisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVid
     
     func stopCamera() {
         session.stopRunning()
+    }
+    
+    func configureAudioSession() {
+        do {
+            let audioSession = AVAudioSession.sharedInstance()
+            try audioSession.setCategory(.playback, mode: .default, options: [])
+            try audioSession.setActive(true)
+        } catch {
+            print("Failed to set up audio session: \(error)")
+        }
+        
+        guard let soundURL = Bundle.main.url(forResource: "success_tip", withExtension: "mp3") else {
+            print("Sound file not found")
+            return
+        }
+
+        do {
+            successAudioRC = try AVAudioPlayer(contentsOf: soundURL)
+            successAudioRC!.prepareToPlay()
+        } catch {
+            print("Failed to play sound: \(error)")
+        }
     }
     
     // MARK: - Vision Setup
@@ -278,6 +302,7 @@ class VisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVid
     }
     
     func speakText(input: String){
+        successAudioRC!.play()
         let speechUtterance = AVSpeechUtterance(string: input)
         speechSynthesizer.stopSpeaking(at: .immediate)
         speechSynthesizer.speak(speechUtterance)

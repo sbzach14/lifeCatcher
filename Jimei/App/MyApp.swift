@@ -1,8 +1,10 @@
 import SwiftUI
 import AVFoundation
 import CryptoKit
+
 @main
 struct MyApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
     init(){
         // 创建导航栏外观样式
@@ -43,16 +45,11 @@ struct MyApp: App {
     public func initFile(){
         
         createParaJSON()
-        
         createConfigJSON()
-        
         createRecordHistoryJSON()
         
         DetectSettingArgs.allUsersStatisticRule = DetectSettingArgs.loadStatisticRule()!
         DetectSettingArgs.LoadAllPresetRules()
         DetectSettingArgs.LoadAllReportRules()
     }
-    
-    
 }
-

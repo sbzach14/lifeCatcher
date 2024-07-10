@@ -2,16 +2,17 @@ import Foundation
 import SwiftUI
 import CoreML
 import Vision
+import CryptoKit
+
 class SettingViewModel: ObservableObject {
     @Published var isBlack: Bool = false
     @Published var isMute: Bool = false
     @Published var isBackCamera: Bool = true
     @Published var isRemote: Bool = true
-    @Published var isFast: Bool = true
-    @Published var isActive: Bool = false
     @Published var isAutoFocus: Bool = true
     @Published var activeDate: String = ""
     @Published var uniqueID: String = ""
+    @Published var authKey: String = ""
     @Published var volumeUp: Int = 0
     @Published var volumeDown: Int = 0
     @Published var volumeValue: Float = 0.5
@@ -19,6 +20,11 @@ class SettingViewModel: ObservableObject {
     @Published var focusFactor: Float = 0.65
     
     @Published var isLogin : Bool = false
+    
+    var dateKey : SymmetricKey?
+    @Published var trueDate : String = ""
+    @Published var isActive : Bool = false
+    
 
     init() {
         // Load data from config.json
@@ -28,8 +34,6 @@ class SettingViewModel: ObservableObject {
             self.isMute = boolDict["isMute"]!
             self.isBackCamera = boolDict["isBackCamera"]!
             self.isRemote = boolDict["isRemote"]!
-            self.isFast = boolDict["isFast"]!
-            self.isActive = boolDict["isActive"]!
             self.isAutoFocus = boolDict["isAutoFocus"]!
             
             let intDict = configData["Int"] as! [String : Int]
@@ -45,11 +49,32 @@ class SettingViewModel: ObservableObject {
         if let paraData = readParaJSON() {
             self.activeDate = paraData["activeTime"]!
             self.uniqueID = paraData["uniqueID"]!
+            self.authKey = paraData["authKey"]!
         }
         
+        if self.activeDate == "测试版" || AuthManager.authKey(input: self.authKey, uniqueID: self.uniqueID) == true{
+            self.isActive = true
+        }
         
+        do{
+            // 自定义密钥字符串
+            let keyData = "_isCameraSetting".md5().hexToBytes()
+            
+            // 使用自定义的密钥数据创建 SymmetricKey
+            self.dateKey = SymmetricKey(data: keyData!)
+            
+            if self.activeDate == "测试版"{
+                self.trueDate = "测试版"
+            }
+            else if self.activeDate != ""{
+                self.trueDate = try decrypt(self.activeDate, key: self.dateKey!)!
+            }
+        }
+        catch{
+            
+        }
     }
-    
+
     // Method to update the config.json file whenever any property changes
     public func updateConfigJSON() {
         do {
@@ -61,8 +86,6 @@ class SettingViewModel: ObservableObject {
                 "isMute": self.isMute,
                 "isBackCamera" : self.isBackCamera,
                 "isRemote" : self.isRemote,
-                "isFast": self.isFast,
-                "isActive": self.isActive,
                 "isAutoFocus": self.isAutoFocus
             ]
             
@@ -93,17 +116,20 @@ class SettingViewModel: ObservableObject {
     }
     
     public func onReturnKeyPressed(searchText: String){
-        if searchText == "pangutest"{
-            self.isActive.toggle()
-            let dateString = "测试版"
-            
+        if searchText == "pangu" && self.isActive{
+            isLogin = true
+            timeCheck()
+        }
+        else if searchText == "pangutest" && !self.isActive{
+            self.isActive = true
             do {
                 let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
                 let fileURL = documentsURL.appendingPathComponent("para.json")
 
                 let paraData: [String: String] = [
-                    "activeTime": dateString,
-                    "uniqueID": self.uniqueID
+                    "activeTime": "测试版",
+                    "uniqueID": self.uniqueID,
+                    "authKey": ""
                 ]
 
                 let jsonData = try JSONSerialization.data(withJSONObject: paraData, options: .prettyPrinted)
@@ -121,55 +147,47 @@ class SettingViewModel: ObservableObject {
                 print("Error updating para.json: \(error)")
             }
         }
-        else if AuthManager.authKey(input: searchText, uniqueID: self.uniqueID) == true && self.isActive == false{
+        else if AuthManager.authKey(input: searchText, uniqueID: self.uniqueID) == true && self.authKey == ""{
             fetchInternetCurrentDate { internetDate in
                 if let internetDate = internetDate {
                     
                     self.isActive = true
+                    self.authKey = searchText
                     
-                    let activeTimeString = readParaJSON()!["activeTime"]
-                    if activeTimeString == ""{
-                        let dateFormatter = DateFormatter()
-                        dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
 
-                        let dateString = dateFormatter.string(from: internetDate)
-                        
-                        do {
-                            let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-                            let fileURL = documentsURL.appendingPathComponent("para.json")
+                    let dateString = dateFormatter.string(from: internetDate)
+                    
+                    do {
+                        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+                        let fileURL = documentsURL.appendingPathComponent("para.json")
 
-                            let paraData: [String: String] = [
-                                "activeTime": dateString,
-                                "uniqueID": self.uniqueID
-                            ]
+                        let paraData: [String: String] = [
+                            "activeTime": try self.encrypt(dateString, key: self.dateKey!),
+                            "uniqueID": self.uniqueID,
+                            "authKey": self.authKey
+                        ]
 
-                            let jsonData = try JSONSerialization.data(withJSONObject: paraData, options: .prettyPrinted)
-                            try jsonData.write(to: fileURL)
+                        let jsonData = try JSONSerialization.data(withJSONObject: paraData, options: .prettyPrinted)
+                        try jsonData.write(to: fileURL)
 
-                            print("para.json file updated successfully")
-                        } catch {
-                            print("Error updating para.json: \(error)")
-                        }
-
+                        print("para.json file updated successfully")
+                    } catch {
+                        print("Error updating para.json: \(error)")
                     }
                 } else {
                     exit(0)
                 }
             }
         }
-        else if searchText == "pangu" && self.isActive{
-            isLogin = true
-            timeCheck()
-        }
-        
-        updateConfigJSON()
     }
     
     public func timeCheck(){
         
         fetchInternetCurrentDate { internetDate in
             
-            let activeTimeString = readParaJSON()!["activeTime"]
+            let activeTimeString = self.trueDate
             
             if let internetDate = internetDate {
                 if activeTimeString == "测试版"{
@@ -184,7 +202,7 @@ class SettingViewModel: ObservableObject {
                     // 格式化日期字符串为 Date 对象
                     let dateFormatter = DateFormatter()
                     dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-                    let activeTime = dateFormatter.date(from: activeTimeString!)
+                    let activeTime = dateFormatter.date(from: activeTimeString)
                         
                     if TimeLimitations(activeDate: activeTime!, nowDate: internetDate){
                         print("有效期内")
@@ -198,4 +216,20 @@ class SettingViewModel: ObservableObject {
             }
         }
     }
+    
+    // 加密方法
+    func encrypt(_ plaintext: String, key: SymmetricKey) throws -> String {
+        let data = Data(plaintext.utf8)
+        let sealedBox = try AES.GCM.seal(data, using: key)
+        return sealedBox.combined!.base64EncodedString()
+    }
+
+    // 解密方法
+    func decrypt(_ base64Ciphertext: String, key: SymmetricKey) throws -> String? {
+        guard let ciphertext = Data(base64Encoded: base64Ciphertext) else { return nil }
+        let sealedBox = try AES.GCM.SealedBox(combined: ciphertext)
+        let decryptedData = try AES.GCM.open(sealedBox, using: key)
+        return String(data: decryptedData, encoding: .utf8)
+    }
 }
+

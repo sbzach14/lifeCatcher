@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1824EF5D2C3973100029836C /* Zip in Frameworks */ = {isa = PBXBuildFile; productRef = 1824EF5C2C3973100029836C /* Zip */; };
+		1824EF652C3EB1FE0029836C /* detect_01.mlmodelc.enc in Resources */ = {isa = PBXBuildFile; fileRef = 1824EF642C3EB1F20029836C /* detect_01.mlmodelc.enc */; };
+		1824EF672C3EB4990029836C /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1824EF662C3EB4990029836C /* AuthView.swift */; };
 		187A45452C2DA26100BB055C /* success_tip.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 187A45422C2DA25E00BB055C /* success_tip.mp3 */; };
 		187A45462C2DA26100BB055C /* start_DetecBeep.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 187A45432C2DA25F00BB055C /* start_DetecBeep.mp3 */; };
 		187A45472C2DA26100BB055C /* fail_tip.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 187A45442C2DA26100BB055C /* fail_tip.mp3 */; };
@@ -15,8 +18,10 @@
 		187A45532C31D0CE00BB055C /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 187A45522C31D0CE00BB055C /* AsyncAlgorithms */; };
 		187A455B2C31D1A300BB055C /* Crypto in Frameworks */ = {isa = PBXBuildFile; productRef = 187A455A2C31D1A300BB055C /* Crypto */; };
 		187A455D2C31D1B600BB055C /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = 187A455C2C31D1B600BB055C /* Collections */; };
-		18A7A5172C14E2EB0020138E /* cls_01.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 18A7A5142C14E2E80020138E /* cls_01.mlmodel */; };
-		18A7A5192C14E2EB0020138E /* detect_01.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 18A7A5162C14E2EB0020138E /* detect_01.mlmodel */; };
+		187A457E2C39406600BB055C /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 187A457D2C39406600BB055C /* ZIPFoundation */; };
+		187A45812C39423D00BB055C /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 187A45802C39423D00BB055C /* CryptoSwift */; };
+		187A45832C39440800BB055C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187A45822C39440800BB055C /* AppDelegate.swift */; };
+		187A45872C395B3B00BB055C /* cls_01.mlmodelc.enc in Resources */ = {isa = PBXBuildFile; fileRef = 187A45862C395A2F00BB055C /* cls_01.mlmodelc.enc */; };
 		18A7A51D2C14E5A50020138E /* Icon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 18A7A51C2C14E5A50020138E /* Icon.xcassets */; };
 		18C98CE52C15893200A8CD49 /* DeprecatedComponentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C98CE42C15893200A8CD49 /* DeprecatedComponentView.swift */; };
 		18C98D072C158F7B00A8CD49 /* ClassifierUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C98CEB2C158F7B00A8CD49 /* ClassifierUtils.swift */; };
@@ -62,13 +67,15 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1824EF642C3EB1F20029836C /* detect_01.mlmodelc.enc */ = {isa = PBXFileReference; lastKnownFileType = file; path = detect_01.mlmodelc.enc; sourceTree = "<group>"; };
+		1824EF662C3EB4990029836C /* AuthView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		187A45422C2DA25E00BB055C /* success_tip.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = success_tip.mp3; sourceTree = "<group>"; };
 		187A45432C2DA25F00BB055C /* start_DetecBeep.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = start_DetecBeep.mp3; sourceTree = "<group>"; };
 		187A45442C2DA26100BB055C /* fail_tip.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = fail_tip.mp3; sourceTree = "<group>"; };
 		187A454E2C31BBB400BB055C /* ReportClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReportClass.swift; sourceTree = "<group>"; };
 		187A454F2C31BBB400BB055C /* ClassifierSettingArgs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClassifierSettingArgs.swift; sourceTree = "<group>"; };
-		18A7A5142C14E2E80020138E /* cls_01.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_01.mlmodel; sourceTree = "<group>"; };
-		18A7A5162C14E2EB0020138E /* detect_01.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = detect_01.mlmodel; sourceTree = "<group>"; };
+		187A45822C39440800BB055C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		187A45862C395A2F00BB055C /* cls_01.mlmodelc.enc */ = {isa = PBXFileReference; lastKnownFileType = file; path = cls_01.mlmodelc.enc; sourceTree = "<group>"; };
 		18A7A51C2C14E5A50020138E /* Icon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Icon.xcassets; sourceTree = "<group>"; };
 		18C98CE42C15893200A8CD49 /* DeprecatedComponentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeprecatedComponentView.swift; sourceTree = "<group>"; };
 		18C98CEB2C158F7B00A8CD49 /* ClassifierUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClassifierUtils.swift; sourceTree = "<group>"; };
@@ -122,9 +129,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1824EF5D2C3973100029836C /* Zip in Frameworks */,
 				187A455D2C31D1B600BB055C /* Collections in Frameworks */,
 				187A45532C31D0CE00BB055C /* AsyncAlgorithms in Frameworks */,
 				187A455B2C31D1A300BB055C /* Crypto in Frameworks */,
+				187A45812C39423D00BB055C /* CryptoSwift in Frameworks */,
+				187A457E2C39406600BB055C /* ZIPFoundation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -212,6 +222,7 @@
 			isa = PBXGroup;
 			children = (
 				A88EFDC72A7D249C00897243 /* VisionObjectRecognitionView.swift */,
+				1824EF662C3EB4990029836C /* AuthView.swift */,
 				18CA14C8284AC42C00F90372 /* CameraView.swift */,
 				A88EFE0C2A7FDC9500897243 /* RecordHistoryView.swift */,
 				A892C5FF2A765A0A003FA2B3 /* MainMenuView.swift */,
@@ -229,6 +240,7 @@
 				50053F80284ACAED00C86BF4 /* Info.plist */,
 				A820888F2C0BB9E000268013 /* Assets.xcassets */,
 				18CA14D0284AC42C00F90372 /* MyApp.swift */,
+				187A45822C39440800BB055C /* AppDelegate.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -282,9 +294,9 @@
 		A8FBC7BE2A3F057700EDDFD7 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				187A45862C395A2F00BB055C /* cls_01.mlmodelc.enc */,
+				1824EF642C3EB1F20029836C /* detect_01.mlmodelc.enc */,
 				A88EFE022A7E8ACC00897243 /* cls_v0.mlmodel */,
-				18A7A5142C14E2E80020138E /* cls_01.mlmodel */,
-				18A7A5162C14E2EB0020138E /* detect_01.mlmodel */,
 				187A45422C2DA25E00BB055C /* success_tip.mp3 */,
 				187A45442C2DA26100BB055C /* fail_tip.mp3 */,
 				187A45432C2DA25F00BB055C /* start_DetecBeep.mp3 */,
@@ -314,6 +326,9 @@
 				187A45522C31D0CE00BB055C /* AsyncAlgorithms */,
 				187A455A2C31D1A300BB055C /* Crypto */,
 				187A455C2C31D1B600BB055C /* Collections */,
+				187A457D2C39406600BB055C /* ZIPFoundation */,
+				187A45802C39423D00BB055C /* CryptoSwift */,
+				1824EF5C2C3973100029836C /* Zip */,
 			);
 			productName = CountMyActions;
 			productReference = 18CA1477284ABEC600F90372 /* Jimei.app */;
@@ -350,6 +365,9 @@
 				A82088912C0C5D6400268013 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
 				18C98CD92C14F72E00A8CD49 /* XCRemoteSwiftPackageReference "swift-collections" */,
 				184F10C02C165087003A6D50 /* XCRemoteSwiftPackageReference "swift-crypto" */,
+				187A457C2C39406600BB055C /* XCLocalSwiftPackageReference "../Downloads/ZIPFoundation-development" */,
+				187A457F2C39423D00BB055C /* XCLocalSwiftPackageReference "../Downloads/CryptoSwift-main" */,
+				1824EF5B2C3973100029836C /* XCLocalSwiftPackageReference "../Downloads/Zip-master" */,
 			);
 			productRefGroup = 18CA1478284ABEC600F90372 /* Products */;
 			projectDirPath = "";
@@ -365,6 +383,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1824EF652C3EB1FE0029836C /* detect_01.mlmodelc.enc in Resources */,
+				187A45872C395B3B00BB055C /* cls_01.mlmodelc.enc in Resources */,
 				187A45452C2DA26100BB055C /* success_tip.mp3 in Resources */,
 				187A45472C2DA26100BB055C /* fail_tip.mp3 in Resources */,
 				A82088902C0BB9E000268013 /* Assets.xcassets in Resources */,
@@ -381,7 +401,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				18A7A5172C14E2EB0020138E /* cls_01.mlmodel in Sources */,
+				187A45832C39440800BB055C /* AppDelegate.swift in Sources */,
 				18F6C0C32C10A685007BEAEC /* RecordHistoryViewModel.swift in Sources */,
 				187A45502C31BBB400BB055C /* ReportClass.swift in Sources */,
 				18C98D0B2C158F7B00A8CD49 /* BZ.swift in Sources */,
@@ -398,10 +418,10 @@
 				A88EFDC82A7D249C00897243 /* VisionObjectRecognitionView.swift in Sources */,
 				187A45512C31BBB400BB055C /* ClassifierSettingArgs.swift in Sources */,
 				18C98D0E2C158F7B00A8CD49 /* FC.swift in Sources */,
-				18A7A5192C14E2EB0020138E /* detect_01.mlmodel in Sources */,
 				A887B6522A8104BC009F488F /* TimeUtils.swift in Sources */,
 				18C98D0F2C158F7B00A8CD49 /* JJB.swift in Sources */,
 				18C98D1B2C158F7B00A8CD49 /* TN.swift in Sources */,
+				1824EF672C3EB4990029836C /* AuthView.swift in Sources */,
 				18C98D0D2C158F7B00A8CD49 /* CB.swift in Sources */,
 				18C98D112C158F7B00A8CD49 /* NPFive.swift in Sources */,
 				A892C6002A765A0A003FA2B3 /* MainMenuView.swift in Sources */,
@@ -665,6 +685,21 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		1824EF5B2C3973100029836C /* XCLocalSwiftPackageReference "../Downloads/Zip-master" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../Downloads/Zip-master";
+		};
+		187A457C2C39406600BB055C /* XCLocalSwiftPackageReference "../Downloads/ZIPFoundation-development" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../Downloads/ZIPFoundation-development";
+		};
+		187A457F2C39423D00BB055C /* XCLocalSwiftPackageReference "../Downloads/CryptoSwift-main" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../Downloads/CryptoSwift-main";
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		184F10C02C165087003A6D50 /* XCRemoteSwiftPackageReference "swift-crypto" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -693,6 +728,10 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		1824EF5C2C3973100029836C /* Zip */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Zip;
+		};
 		187A45522C31D0CE00BB055C /* AsyncAlgorithms */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = A82088912C0C5D6400268013 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
@@ -707,6 +746,14 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 18C98CD92C14F72E00A8CD49 /* XCRemoteSwiftPackageReference "swift-collections" */;
 			productName = Collections;
+		};
+		187A457D2C39406600BB055C /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = ZIPFoundation;
+		};
+		187A45802C39423D00BB055C /* CryptoSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CryptoSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
