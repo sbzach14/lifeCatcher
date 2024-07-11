@@ -8,8 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		1824EF5D2C3973100029836C /* Zip in Frameworks */ = {isa = PBXBuildFile; productRef = 1824EF5C2C3973100029836C /* Zip */; };
-		1824EF652C3EB1FE0029836C /* detect_01.mlmodelc.enc in Resources */ = {isa = PBXBuildFile; fileRef = 1824EF642C3EB1F20029836C /* detect_01.mlmodelc.enc */; };
 		1824EF672C3EB4990029836C /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1824EF662C3EB4990029836C /* AuthView.swift */; };
+		1824EF6E2C3FC9630029836C /* cls_01.mlmodelc.enc in Resources */ = {isa = PBXBuildFile; fileRef = 1824EF6C2C3FC9560029836C /* cls_01.mlmodelc.enc */; };
+		1824EF6F2C3FC9660029836C /* detect_01.mlmodelc.enc in Resources */ = {isa = PBXBuildFile; fileRef = 1824EF6D2C3FC9560029836C /* detect_01.mlmodelc.enc */; };
 		187A45452C2DA26100BB055C /* success_tip.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 187A45422C2DA25E00BB055C /* success_tip.mp3 */; };
 		187A45462C2DA26100BB055C /* start_DetecBeep.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 187A45432C2DA25F00BB055C /* start_DetecBeep.mp3 */; };
 		187A45472C2DA26100BB055C /* fail_tip.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 187A45442C2DA26100BB055C /* fail_tip.mp3 */; };
@@ -21,7 +22,6 @@
 		187A457E2C39406600BB055C /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 187A457D2C39406600BB055C /* ZIPFoundation */; };
 		187A45812C39423D00BB055C /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 187A45802C39423D00BB055C /* CryptoSwift */; };
 		187A45832C39440800BB055C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187A45822C39440800BB055C /* AppDelegate.swift */; };
-		187A45872C395B3B00BB055C /* cls_01.mlmodelc.enc in Resources */ = {isa = PBXBuildFile; fileRef = 187A45862C395A2F00BB055C /* cls_01.mlmodelc.enc */; };
 		18A7A51D2C14E5A50020138E /* Icon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 18A7A51C2C14E5A50020138E /* Icon.xcassets */; };
 		18C98CE52C15893200A8CD49 /* DeprecatedComponentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C98CE42C15893200A8CD49 /* DeprecatedComponentView.swift */; };
 		18C98D072C158F7B00A8CD49 /* ClassifierUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C98CEB2C158F7B00A8CD49 /* ClassifierUtils.swift */; };
@@ -67,15 +67,15 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1824EF642C3EB1F20029836C /* detect_01.mlmodelc.enc */ = {isa = PBXFileReference; lastKnownFileType = file; path = detect_01.mlmodelc.enc; sourceTree = "<group>"; };
 		1824EF662C3EB4990029836C /* AuthView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
+		1824EF6C2C3FC9560029836C /* cls_01.mlmodelc.enc */ = {isa = PBXFileReference; lastKnownFileType = file; path = cls_01.mlmodelc.enc; sourceTree = "<group>"; };
+		1824EF6D2C3FC9560029836C /* detect_01.mlmodelc.enc */ = {isa = PBXFileReference; lastKnownFileType = file; path = detect_01.mlmodelc.enc; sourceTree = "<group>"; };
 		187A45422C2DA25E00BB055C /* success_tip.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = success_tip.mp3; sourceTree = "<group>"; };
 		187A45432C2DA25F00BB055C /* start_DetecBeep.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = start_DetecBeep.mp3; sourceTree = "<group>"; };
 		187A45442C2DA26100BB055C /* fail_tip.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = fail_tip.mp3; sourceTree = "<group>"; };
 		187A454E2C31BBB400BB055C /* ReportClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReportClass.swift; sourceTree = "<group>"; };
 		187A454F2C31BBB400BB055C /* ClassifierSettingArgs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClassifierSettingArgs.swift; sourceTree = "<group>"; };
 		187A45822C39440800BB055C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		187A45862C395A2F00BB055C /* cls_01.mlmodelc.enc */ = {isa = PBXFileReference; lastKnownFileType = file; path = cls_01.mlmodelc.enc; sourceTree = "<group>"; };
 		18A7A51C2C14E5A50020138E /* Icon.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Icon.xcassets; sourceTree = "<group>"; };
 		18C98CE42C15893200A8CD49 /* DeprecatedComponentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeprecatedComponentView.swift; sourceTree = "<group>"; };
 		18C98CEB2C158F7B00A8CD49 /* ClassifierUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClassifierUtils.swift; sourceTree = "<group>"; };
@@ -294,8 +294,8 @@
 		A8FBC7BE2A3F057700EDDFD7 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				187A45862C395A2F00BB055C /* cls_01.mlmodelc.enc */,
-				1824EF642C3EB1F20029836C /* detect_01.mlmodelc.enc */,
+				1824EF6C2C3FC9560029836C /* cls_01.mlmodelc.enc */,
+				1824EF6D2C3FC9560029836C /* detect_01.mlmodelc.enc */,
 				A88EFE022A7E8ACC00897243 /* cls_v0.mlmodel */,
 				187A45422C2DA25E00BB055C /* success_tip.mp3 */,
 				187A45442C2DA26100BB055C /* fail_tip.mp3 */,
@@ -383,8 +383,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1824EF652C3EB1FE0029836C /* detect_01.mlmodelc.enc in Resources */,
-				187A45872C395B3B00BB055C /* cls_01.mlmodelc.enc in Resources */,
+				1824EF6F2C3FC9660029836C /* detect_01.mlmodelc.enc in Resources */,
+				1824EF6E2C3FC9630029836C /* cls_01.mlmodelc.enc in Resources */,
 				187A45452C2DA26100BB055C /* success_tip.mp3 in Resources */,
 				187A45472C2DA26100BB055C /* fail_tip.mp3 in Resources */,
 				A82088902C0BB9E000268013 /* Assets.xcassets in Resources */,
@@ -599,7 +599,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.5;
+				MARKETING_VERSION = 1.0.6;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.shuffle.JimeiApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -647,7 +647,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.5;
+				MARKETING_VERSION = 1.0.6;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.shuffle.JimeiDistribution;
 				PRODUCT_NAME = "$(TARGET_NAME)";

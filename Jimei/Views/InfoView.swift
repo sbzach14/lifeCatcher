@@ -10,7 +10,7 @@ struct InfoView: View {
             
             ScrollView {
                 VStack(alignment: .leading, spacing: 0)  {
-                    Text("版本 : 1.0.5").padding()
+                    Text("版本 : 1.0.6").padding()
                         .foregroundColor(.white)
                     
                     Divider().colorInvert()

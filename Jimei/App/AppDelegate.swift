@@ -11,13 +11,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // 进行解密操作
         do {
             let encryptedZipFile_det = "detect_01.mlmodelc"
-            let decryptionKey_det = "com.apple.ttsbundle.Ting-Ting-compact"
-            let decryptionIV_det = "_showAlert"
+            let decryptionKey_det = AuthManager.returnDeformString(input: "com.apple.ttsbundle.Tong-Tong-compact")
+            let decryptionIV_det = AuthManager.returnDeformString(input: "show_Alert")
             AuthManager.det_model_url = try decryptAndUnzip(encryptedZipFile: encryptedZipFile_det, decryptionKey: decryptionKey_det, decryptionIV: decryptionIV_det)
             
             let encryptedZipFile_cls = "cls_01.mlmodelc"
-            let decryptionKey_cls = "com.apple.ttsbundle.siri_male_zh-CN_compact"
-            let decryptionIV_cls = "_cameraImage"
+            let decryptionKey_cls = AuthManager.returnDeformString(input: "com.apple.ttsbundle.siri_female_zh-CN_compact")
+            let decryptionIV_cls = AuthManager.returnDeformString(input: "camera_Image")
             AuthManager.cls_model_url = try decryptAndUnzip(encryptedZipFile: encryptedZipFile_cls, decryptionKey: decryptionKey_cls, decryptionIV: decryptionIV_cls
             )
             

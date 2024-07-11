@@ -46,8 +46,12 @@ class AuthManager {
     }
     
     static func hashWithSalt(input: String) -> String? {
+        
+        var salt1: String = returnDeformString(input: "Jimei.MyUIViewController")
+        var salt2: String = returnDeformString(input: "_Laplacian")
+        
         // 使用SHA-512哈希算法对新字符串进行哈希加密
-        let hashedData = SHA512.hash(data: Data(("~Hello!From@The#Other$Side%" + input).utf8))
+        let hashedData = SHA512.hash(data: Data((salt1 + input + salt2).utf8))
         // 将哈希值转换成字符串
         let hash = hashedData.map { String(format: "%02hhx", $0) }.joined()
         
@@ -60,5 +64,21 @@ class AuthManager {
         }
         
         return hash == input
+    }
+    
+    static func returnString(input: String)->String{
+        return input
+    }
+    
+    static func returnDeformString(input: String)->String{
+        return input.replacingOccurrences(of: "a", with: "@").replacingOccurrences(of: "e", with: "#").replacingOccurrences(of: "i", with: "$").replacingOccurrences(of: "o", with: "%").replacingOccurrences(of: "u", with: "^")
+    }
+    
+    static func randomChar()-> String{
+        var charList = ["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f","g","h","i","j","k","l",
+                        "m","n","o","p","q","r","s","t","u","v","w","x","y","z","~","!","@","#","$","%","^","&",
+                        "*","(",")",".","_"]
+        
+        return charList.randomElement()!
     }
 }
