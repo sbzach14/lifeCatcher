@@ -34,7 +34,8 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     //let detectModel = try! MLModel(contentsOf: AuthManager.det_model_url)
     //let clsModel = try! MLModel(contentsOf: AuthManager.cls_model_url)
     let detectModel = try! detect_640_0719()
-    let clsModel = try! cls_crop_0715()
+    let clsModel_h = try! cls_0715_h()
+    let clsModel_v = try! cls_0727_v()
     var originSize : [Float] = [1920, 1080] //相机图像大小
     var imageSize : [Float] = [569, 320] //target area 截图大小
     var originImageSize : [Float] = [569, 320] //target area 原始截图大小
@@ -164,7 +165,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             self.isMute = boolDict["isMute"]!
             self.isBackCamera = boolDict["isBackCamera"]!
             self.isCameraHorizon = boolDict["isCameraHorizon"]!
-            self.isRemote = boolDict["isRemote"]!
+            self.isRemote = true
             self.isAutoFocus = false
             
             let intDict = configData["Int"] as! [String : Int]
@@ -189,12 +190,6 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         self.initShuffle()
         self.initDetectResult()
         self.initBoxes()
-        
-        self.laplacianDic = [[:],[:]]
-        for key in self.allSingleFeatureIndex {
-            self.laplacianDic[0][key] = 0
-            self.laplacianDic[1][key] = 0
-        }
     }
 
     private func initDetectResult(){
@@ -524,40 +519,34 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         var singlefeatureResult : [DetectionResult]
         if !isTargetArea && self.isRemote{
-            let result = try! detectModel.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
+            let result = try! self.detectModel.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
             singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, iscls: false)
-            
-//            // 创建输入
-//            let input = try! DetectionInput(image: pixelBuffer,
-//                                           iouThreshold: 0.45,
-//                                           confidenceThreshold: confidenceThreshold)
-//            
-//            // 进行预测
-//            let prediction = try! detectModel.prediction(from: input)
-//            
-//            // 处理预测结果
-//            let confidence = prediction.featureValue(for: "confidence")!.multiArrayValue!
-//            let coordinates = prediction.featureValue(for: "coordinates")!.multiArrayValue!
-//            singlefeatureResult = getSingleFeature(from: confidence, from: coordinates, from: pixelBuffer)
+        }
+        else if self.isCameraHorizon{
+            let result = try! self.clsModel_h.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
+            singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, iscls: false)
         }
         else{
-            let result = try! clsModel.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
-            singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer)
-            
+            let result = try! self.clsModel_v.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
+            singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, iscls: false)
+        }
+        
+        
+        
 //            // 创建输入
 //            let input = try! DetectionInput(image: pixelBuffer,
 //                                           iouThreshold: 0.45,
 //                                           confidenceThreshold: confidenceThreshold)
 //            
 //            // 进行预测
-//            let prediction = try! clsModel.prediction(from: input)
-//            
+//            let prediction = try! mlmodel.prediction(from: input)
+//
 //            // 处理预测结果
 //            let confidence = prediction.featureValue(for: "confidence")!.multiArrayValue!
 //            let coordinates = prediction.featureValue(for: "coordinates")!.multiArrayValue!
 //            singlefeatureResult = getSingleFeature(from: confidence, from: coordinates, from: pixelBuffer)
-        }
-         
+
+        
         if singlefeatureResult[0].singlefeatureIndex[0] == self.stateSingleFeature[0] && singlefeatureResult[1].singlefeatureIndex[0] == self.stateSingleFeature[1]{
             stateCounter = min(stateCounter + 1, 600)
         }
@@ -633,8 +622,14 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         let cut_ciImage = CIImage(cvPixelBuffer: pixelBuffer)
                         let cvPixelBuffer_cut = createCVPixelBuffer(ciImage: cut_ciImage, targetSize: CGSize(width: self.inputSize[0], height: self.inputSize[1]), targetArea: newTargetArea)!
                         
-                        let cut_result = try! self.clsModel.prediction(image: cvPixelBuffer_cut, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
-                        singlefeatureResult = self.getSingleFeature(from: cut_result.confidence, from: cut_result.coordinates, from: cvPixelBuffer_cut)
+                        if self.isCameraHorizon{
+                            let cut_result = try! self.clsModel_h.prediction(image: cvPixelBuffer_cut, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
+                            singlefeatureResult = self.getSingleFeature(from: cut_result.confidence, from: cut_result.coordinates, from: cvPixelBuffer_cut)
+                        }
+                        else{
+                            let cut_result = try! self.clsModel_v.prediction(image: cvPixelBuffer_cut, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
+                            singlefeatureResult = self.getSingleFeature(from: cut_result.confidence, from: cut_result.coordinates, from: cvPixelBuffer_cut)
+                        }
                         
 //                        // 创建输入
 //                        let cut_input = try! DetectionInput(image: cvPixelBuffer_cut,
@@ -642,8 +637,8 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 //                                                       confidenceThreshold: confidenceThreshold)
 //                        
 //                        // 进行预测
-//                        let cut_prediction = try! self.clsModel.prediction(from: cut_input)
-//                        
+//                        let cut_prediction = try! mlmodel.prediction(from: cut_input)
+//
 //                        // 处理预测结果
 //                        let cut_confidence = cut_prediction.featureValue(for: "confidence")!.multiArrayValue!
 //                        let cut_coordinates = cut_prediction.featureValue(for: "coordinates")!.multiArrayValue!
@@ -900,7 +895,8 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
                 let nowNum = targetDetecResultList[detectResultListIndex]![numIndex].singlefeatureIndex[0]
                 if nowNum != -1
-                    && targetDetecResultList[nextDetectResultListIndex]![numIndex].singlefeatureIndex[0] == nowNum{
+                    && targetDetecResultList[nextDetectResultListIndex]![numIndex].singlefeatureIndex[0] == nowNum
+                    && confidenceDic.keys.contains(nowNum){
                     targetDetecResultList[detectResultListIndex]![numIndex].nodeType += 1
                     targetDetecResultList[nextDetectResultListIndex]![numIndex].nodeType += 2
                 }
@@ -1038,7 +1034,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
         }
         
-        print("isSingle:\(isSingle) isShort:\(isShort) leftHead:\(leftFirstHead) rightHead:\(rightFirstHead) leftHead:\(leftFirstHead) leftTail:\(leftLastTail)")
+        print("isSingle:\(isSingle) isShort:\(isShort) leftHead:\(leftFirstHead) rightHead:\(rightFirstHead)  leftTail:\(leftLastTail) rightTail:\(leftLastTail)")
   
         if beginIndex >= endIndex{
             let result = DetectionState(detectionResult: [], isSingle: false, isShort: false, longestIndex: -1)
@@ -1154,9 +1150,12 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     var newSingleFeatureIndex : [Int] = []
                     var newConfidence : [Float] = []
                     for i in 0..<detectResultNode.singlefeatureIndex.count{
-                        if confidenceDic[i] == 0{
-                            newSingleFeatureIndex.append(detectResultNode.singlefeatureIndex[i])
-                            newConfidence.append(detectResultNode.confidence[i])
+                        let currentNum = detectResultNode.singlefeatureIndex[i]
+                        if confidenceDic.keys.contains(currentNum){
+                            if confidenceDic[currentNum] == 0{
+                                newSingleFeatureIndex.append(detectResultNode.singlefeatureIndex[i])
+                                newConfidence.append(detectResultNode.confidence[i])
+                            }
                         }
                     }
 
@@ -1727,6 +1726,9 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4){
                     boxfactor = 5
                 }
+                else{
+                    boxfactor = 2.5
+                }
                 
                 minW = max(minW,minH) * boxfactor
                 minW = min(minW, self.originSize[0] - 10)
@@ -1763,11 +1765,14 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4){
                     boxfactor = 5
                 }
+                else{
+                    boxfactor = 2.5
+                }
                 
                 minH = max(minW,minH) * boxfactor
                 minH = min(minH, self.originSize[1] - 10)
                 
-                targetArea[2] = minH / h * w
+                targetArea[2] = minH / w * h
                 targetArea[3] = minH
                 
                 let centerX = (minX + maxX)/2
@@ -2443,6 +2448,14 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         self.rankRules = rules.rankRules
         self.minSingleFeatureNum = rules.minSingleFeatureNum
         self.resultReportType = rules.resultReportType
+        
+        self.laplacianDic = [[:],[:]]
+        for key in self.allSingleFeatureIndex {
+            self.laplacianDic[0][key] = 0
+            self.laplacianDic[1][key] = 0
+        }
+        
+        print(self.allSingleFeatureIndex.count)
     }
     
     private func StatisticGetMinSingleFeatureNum()-> Int{

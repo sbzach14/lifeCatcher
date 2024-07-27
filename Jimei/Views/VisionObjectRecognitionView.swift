@@ -65,7 +65,7 @@ struct UpdatedVisionObjectRecognitionView: View {
                                     .toggleStyle(CustomToggleStyle())
                                     .frame(width: 200, height: 30, alignment: .trailing)
                                     .accentColor(.white)
-                                    .onChange(of: viewModel.isBackCamera) {
+                                    .onChange(of: viewModel.isCameraHorizon) {
                                         newValue in
                                         viewModel.updateConfigJSON()
                                     }
