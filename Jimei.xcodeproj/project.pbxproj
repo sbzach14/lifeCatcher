@@ -11,6 +11,8 @@
 		1824EF672C3EB4990029836C /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1824EF662C3EB4990029836C /* AuthView.swift */; };
 		1824EF6E2C3FC9630029836C /* cls_01.mlmodelc.enc in Resources */ = {isa = PBXBuildFile; fileRef = 1824EF6C2C3FC9560029836C /* cls_01.mlmodelc.enc */; };
 		1824EF6F2C3FC9660029836C /* detect_01.mlmodelc.enc in Resources */ = {isa = PBXBuildFile; fileRef = 1824EF6D2C3FC9560029836C /* detect_01.mlmodelc.enc */; };
+		1824EF7B2C4FF3F10029836C /* detect_640_0719.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 1824EF7A2C4FF3F10029836C /* detect_640_0719.mlmodel */; };
+		1824EF7D2C4FFF380029836C /* cls_crop_0715.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 1824EF7C2C4FFF380029836C /* cls_crop_0715.mlmodel */; };
 		187A45452C2DA26100BB055C /* success_tip.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 187A45422C2DA25E00BB055C /* success_tip.mp3 */; };
 		187A45462C2DA26100BB055C /* start_DetecBeep.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 187A45432C2DA25F00BB055C /* start_DetecBeep.mp3 */; };
 		187A45472C2DA26100BB055C /* fail_tip.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 187A45442C2DA26100BB055C /* fail_tip.mp3 */; };
@@ -70,6 +72,8 @@
 		1824EF662C3EB4990029836C /* AuthView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		1824EF6C2C3FC9560029836C /* cls_01.mlmodelc.enc */ = {isa = PBXFileReference; lastKnownFileType = file; path = cls_01.mlmodelc.enc; sourceTree = "<group>"; };
 		1824EF6D2C3FC9560029836C /* detect_01.mlmodelc.enc */ = {isa = PBXFileReference; lastKnownFileType = file; path = detect_01.mlmodelc.enc; sourceTree = "<group>"; };
+		1824EF7A2C4FF3F10029836C /* detect_640_0719.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = detect_640_0719.mlmodel; sourceTree = "<group>"; };
+		1824EF7C2C4FFF380029836C /* cls_crop_0715.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_crop_0715.mlmodel; sourceTree = "<group>"; };
 		187A45422C2DA25E00BB055C /* success_tip.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = success_tip.mp3; sourceTree = "<group>"; };
 		187A45432C2DA25F00BB055C /* start_DetecBeep.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = start_DetecBeep.mp3; sourceTree = "<group>"; };
 		187A45442C2DA26100BB055C /* fail_tip.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = fail_tip.mp3; sourceTree = "<group>"; };
@@ -296,6 +300,8 @@
 			children = (
 				1824EF6C2C3FC9560029836C /* cls_01.mlmodelc.enc */,
 				1824EF6D2C3FC9560029836C /* detect_01.mlmodelc.enc */,
+				1824EF7C2C4FFF380029836C /* cls_crop_0715.mlmodel */,
+				1824EF7A2C4FF3F10029836C /* detect_640_0719.mlmodel */,
 				A88EFE022A7E8ACC00897243 /* cls_v0.mlmodel */,
 				187A45422C2DA25E00BB055C /* success_tip.mp3 */,
 				187A45442C2DA26100BB055C /* fail_tip.mp3 */,
@@ -411,6 +417,7 @@
 				A887167F2A0623E500B7F2CD /* AuthManager.swift in Sources */,
 				18C98D1A2C158F7B00A8CD49 /* TM.swift in Sources */,
 				A88EFE0B2A7FC05900897243 /* JsonUtils.swift in Sources */,
+				1824EF7D2C4FFF380029836C /* cls_crop_0715.mlmodel in Sources */,
 				18C98D0C2C158F7B00A8CD49 /* CN.swift in Sources */,
 				18C98CE52C15893200A8CD49 /* DeprecatedComponentView.swift in Sources */,
 				18C98D172C158F7B00A8CD49 /* TW.swift in Sources */,
@@ -444,6 +451,7 @@
 				A88EFDC42A7D217200897243 /* VisionObjectRecognitionViewModel.swift in Sources */,
 				18C98D182C158F7B00A8CD49 /* TCP.swift in Sources */,
 				A88EFE032A7E8ACD00897243 /* cls_v0.mlmodel in Sources */,
+				1824EF7B2C4FF3F10029836C /* detect_640_0719.mlmodel in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -577,7 +585,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = Jimei/App/Assets.xcassets;
-				DEVELOPMENT_TEAM = 9ZQUFT987F;
+				DEVELOPMENT_TEAM = YRLX79V4XC;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Jimei/App/Info.plist;
@@ -601,7 +609,7 @@
 				);
 				MARKETING_VERSION = 1.0.6;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.shuffle.JimeiApp;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.Jimei";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -625,7 +633,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = Jimei/App/Assets.xcassets;
-				DEVELOPMENT_TEAM = 9ZQUFT987F;
+				DEVELOPMENT_TEAM = YRLX79V4XC;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Jimei/App/Info.plist;
@@ -649,7 +657,7 @@
 				);
 				MARKETING_VERSION = 1.0.6;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.shuffle.JimeiDistribution;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.Jimei";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

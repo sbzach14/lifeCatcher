@@ -55,6 +55,24 @@ struct UpdatedVisionObjectRecognitionView: View {
                             Divider().colorInvert()
                             
                             HStack {
+                                Text("横屏模式")
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                
+                                Spacer()
+                                
+                                Toggle("", isOn: $viewModel.isCameraHorizon)
+                                    .toggleStyle(CustomToggleStyle())
+                                    .frame(width: 200, height: 30, alignment: .trailing)
+                                    .accentColor(.white)
+                                    .onChange(of: viewModel.isBackCamera) {
+                                        newValue in
+                                        viewModel.updateConfigJSON()
+                                    }
+                            }
+                            Divider().colorInvert()
+                            
+                            HStack {
                                 Text("缩放:\(String(format: "%.2f", viewModel.zoomFactor))").foregroundColor(.white).frame(maxWidth: .infinity, alignment: .leading)
                                 
                                 Spacer()

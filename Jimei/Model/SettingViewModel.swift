@@ -8,6 +8,7 @@ class SettingViewModel: ObservableObject {
     @Published var isBlack: Bool = false
     @Published var isMute: Bool = false
     @Published var isBackCamera: Bool = true
+    @Published var isCameraHorizon: Bool = true
     @Published var isRemote: Bool = true
     @Published var isAutoFocus: Bool = true
     @Published var activeDate: String = ""
@@ -33,6 +34,7 @@ class SettingViewModel: ObservableObject {
             self.isBlack = boolDict["isBlack"]!
             self.isMute = boolDict["isMute"]!
             self.isBackCamera = boolDict["isBackCamera"]!
+            self.isCameraHorizon = boolDict["isCameraHorizon"]!
             self.isRemote = boolDict["isRemote"]!
             self.isAutoFocus = boolDict["isAutoFocus"]!
             
@@ -85,6 +87,7 @@ class SettingViewModel: ObservableObject {
                 "isBlack": self.isBlack,
                 "isMute": self.isMute,
                 "isBackCamera" : self.isBackCamera,
+                "isCameraHorizon": self.isCameraHorizon,
                 "isRemote" : self.isRemote,
                 "isAutoFocus": self.isAutoFocus
             ]
@@ -117,7 +120,6 @@ class SettingViewModel: ObservableObject {
     
     public func onReturnKeyPressed(searchText: String){
         if searchText == "pangu" && self.isActive{
-            isLogin = true
             timeCheck()
         }
         else if searchText == "pangutest" && !self.isActive{
@@ -136,13 +138,6 @@ class SettingViewModel: ObservableObject {
                 try jsonData.write(to: fileURL)
                 
                 print("para.json file updated successfully")
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 5 * 60) {
-                    UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        exit(0)
-                    }
-                }
             } catch {
                 print("Error updating para.json: \(error)")
             }
@@ -176,8 +171,6 @@ class SettingViewModel: ObservableObject {
                     } catch {
                         print("Error updating para.json: \(error)")
                     }
-                } else {
-                    exit(0)
                 }
             }
         }
@@ -191,6 +184,7 @@ class SettingViewModel: ObservableObject {
             
             if let internetDate = internetDate {
                 if activeTimeString == "测试版"{
+                    self.isLogin = true
                     DispatchQueue.main.asyncAfter(deadline: .now() + 5 * 60) {
                         UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -206,14 +200,12 @@ class SettingViewModel: ObservableObject {
                         
                     if TimeLimitations(activeDate: activeTime!, nowDate: internetDate){
                         print("有效期内")
-                    }
-                    else{
-                        exit(0)
+                        self.isLogin = true
                     }
                 }
-            } else {
-                exit(0)
             }
+            
+            
         }
     }
     

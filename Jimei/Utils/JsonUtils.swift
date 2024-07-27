@@ -76,6 +76,7 @@ func createConfigJSON() {
         "isBlack": false,
         "isMute": false,
         "isBackCamera": true,
+        "isCameraHorizon": true,
         "isRemote": true,
         "isAutoFocus": true
     ]

@@ -47,8 +47,8 @@ class AuthManager {
     
     static func hashWithSalt(input: String) -> String? {
         
-        var salt1: String = returnDeformString(input: "Jimei.MyUIViewController")
-        var salt2: String = returnDeformString(input: "_Laplacian")
+        let salt1: String = returnDeformString(input: "Jimei.MyUIViewController")
+        let salt2: String = returnDeformString(input: "_Laplacian")
         
         // 使用SHA-512哈希算法对新字符串进行哈希加密
         let hashedData = SHA512.hash(data: Data((salt1 + input + salt2).utf8))
