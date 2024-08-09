@@ -58,7 +58,6 @@ struct ReportClass{
     //8，保至少一家有牛牛
     //9，保单个位置大小, 不跳出全部
     //10, 保2个位置必有一家大小，不跳出全部
-    //11, 报生死门
     
     var reportTarget: Int = -1
     //0,留色再根据色牌点数去牌
@@ -262,17 +261,17 @@ class ReportManager{
         77:"[120]:下10张打色色先发保位置最大次大",
         78:"[121]:下10张打色色先发保位置最小次小",
         79:"[130]:看手牌报生死门*",
-        80:"[131]:看手牌报最大*",
-        81:"[132]:看手牌报最大次大*",
-        82:"[133]:看手牌报最大次大生死门*",
+        80:"[131]:看手牌报最大",
+        81:"[132]:看手牌报最大次大",
+        82:"[133]:看手牌报最大次大生死门",
         83:"[134]:看手牌比第一张牌从最大牌继续发报最大*",
         84:"[135]:看手牌比第一张牌从最大牌继续发报最大次大*",
-        85:"[143]:看手牌面为色留色报最大*",
-        86:"[144]:看手牌面为色留色报最大次大*",
-        87:"[145]:看手牌面为色留色报最大次大生死门*",
-        88:"[147]:看手牌面为色去色报最大*",
-        89:"[148]:看手牌面为色去色报最大次大*",
-        90:"[149]:看手牌面为色去色报最大次大生死门*",
+        85:"[143]:看手牌面为色留色报最大",
+        86:"[144]:看手牌面为色留色报最大次大",
+        87:"[145]:看手牌面为色留色报最大次大生死门",
+        88:"[147]:看手牌面为色去色报最大",
+        89:"[148]:看手牌面为色去色报最大次大",
+        90:"[149]:看手牌面为色去色报最大次大生死门",
         91:"[200]:飞2张保位置最大",
         92: "[201]:飞2张保位置最小",
             93: "[202]:飞2张打色留色保位置最大",
@@ -1633,6 +1632,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         var singlefeatureIndexToConfirmAliveDeath: [[Int]] = []
         //活门2，4(下，上）
         var aliveNumber: Int = 0
+        //看手牌的 aliveNumber List
+        var handCardAliveNumberList: [Int] = []
         //保XY门最大/最小，X 还是 Y最大/小
         var XorYMax: [[Int]] = []
         //有牛牛的rcID
@@ -1738,6 +1739,37 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         }
         
         return result
+    }
+    // startIndex, start from 0
+    static func LeftDealCardCal(startIndex: Int, diyDealStatus: [[Bool]], diyDealNum:[Int], dealType: Int, handNum: Int, minimumCardsNum: Int) -> Int{
+        
+        var leftNum: Int = 0
+        
+        //mo ren mei lun fa yi zhang
+        if dealType == 0 {
+            leftNum = minimumCardsNum - startIndex
+        //zi ding yi fa pai
+        } else {
+            var currentNum = 0
+            
+            for i in 0..<diyDealNum.count {
+                let num = diyDealNum[i]
+                //派牌
+                if diyDealStatus[i][0] == true {
+                    currentNum += startIndex * num
+                    break
+                //公牌
+                } else if diyDealStatus[i][1] == true {
+                    currentNum += num
+                //去牌
+                } else {
+                    currentNum += num
+                }
+            }
+            leftNum = minimumCardsNum - currentNum
+        }
+        
+        return leftNum
     }
     
     //[[SpeakResultStruct]]--> 每一轮的结果 [
@@ -1909,7 +1941,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     cutList.append([cutNumRangeSetting[0] - 1, cutNumRangeSetting[1] - 1])
                     cutList.append([cutNumRangeSetting[0] - 1, cutNumRangeSetting[1] - 1])
                     break
-                //6，看手牌
+                //6，看手牌, 0-player num - 1
                 case 6:
                     cutList.append([0, rcNum - 1])
                     break
@@ -1976,69 +2008,85 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     break
                 //1, 看手牌报下轮，传入下一轮牌堆
                 case 1:
-                    for orderNum in 1...rcNum{
-                        let length = inputSingleFeatures.count
-                        let preRCNum = orderNum - 1
+                    for orderNum in 0..<rcNum{
+                        let leftNum = LeftDealCardCal(startIndex: orderNum, diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, dealType: newArgs[0], handNum: handNum, minimumCardsNum: minSingleFeatureNum)
+                        var originalSingleFeatures: [Int] = []
+                        print("剩余没发的牌数量 \(leftNum)")
+
                         //正发
-                        if newArgs[1] == 0{
-                            var originalSingleFeatures: [Int] = []
-                            //默认每轮发一张牌
-                            if newArgs[0] == 0{
-                                if preRCNum == 0 {
-                                    originalSingleFeatures = inputSingleFeatures
-                                } else {
-                                    originalSingleFeatures = Array(inputSingleFeatures[(length - preRCNum)...]) +  Array(inputSingleFeatures[0...(length - 1 - preRCNum)])
-                                }
-                                originalSingleFeatures = Array(originalSingleFeatures[minSingleFeatureNum...])
-                                lookHandSingleFeatures.append(originalSingleFeatures)
-                            } else {
-                                var dealedSingleFeaturesNum: Int = 0
-                                for i in 0...diyDealStatus.count - 1{
-                                    if diyDealStatus[i][0] == true {
-                                        dealedSingleFeaturesNum += orderNum - 1
-                                        break
-                                    } else if diyDealStatus[i][1] == true {
-                                        dealedSingleFeaturesNum += diyDealNum[i]
-                                    } else if diyDealStatus[i][2] == true {
-                                        dealedSingleFeaturesNum += diyDealNum[i]
-                                    }
-                                }
-                                if dealedSingleFeaturesNum == 0 {
-                                    originalSingleFeatures = inputSingleFeatures
-                                } else {
-                                    originalSingleFeatures = Array(inputSingleFeatures[(length - dealedSingleFeaturesNum)...]) + Array(inputSingleFeatures[0..<length - dealedSingleFeaturesNum])
-                                }
-                                originalSingleFeatures = Array(originalSingleFeatures[minSingleFeatureNum...])
-                                lookHandSingleFeatures.append(originalSingleFeatures)
-                            }
-                            //反发
+                        if newArgs[1] == 0 {
+                            originalSingleFeatures = Array(inputSingleFeatures[leftNum...])
+                        //反发
                         } else {
-                            var originalSingleFeatures: [Int] = []
-                            //默认每轮发一张牌
-                            if newArgs[0] == 0{
-                                
-                                originalSingleFeatures = Array(inputSingleFeatures[(preRCNum + 1)...]) + inputSingleFeatures[0..<(preRCNum + 1)]
-                                
-                                originalSingleFeatures = Array(originalSingleFeatures[minSingleFeatureNum...])
-                                lookHandSingleFeatures.append(originalSingleFeatures)
-                            } else {
-                                var dealedSingleFeaturesNum: Int = 0
-                                for i in 0...diyDealStatus.count - 1{
-                                    if diyDealStatus[i][0] == true {
-                                        dealedSingleFeaturesNum += orderNum - 1
-                                        break
-                                    } else if diyDealStatus[i][1] == true {
-                                        dealedSingleFeaturesNum += diyDealNum[i]
-                                    } else if diyDealStatus[i][2] == true {
-                                        dealedSingleFeaturesNum += diyDealNum[i]
-                                    }
-                                }
-                                originalSingleFeatures = Array(inputSingleFeatures[(dealedSingleFeaturesNum + 1)...]) + Array(inputSingleFeatures[0..<dealedSingleFeaturesNum + 1])
-                                originalSingleFeatures = Array(originalSingleFeatures[0..<length - minSingleFeatureNum])
-                                lookHandSingleFeatures.append(originalSingleFeatures)
-                            }
+                            let length = inputSingleFeatures.count
+                            originalSingleFeatures = Array(inputSingleFeatures[0...(length - leftNum)])
                         }
+                        lookHandSingleFeatures.append(originalSingleFeatures)
                     }
+                    
+//                    for orderNum in 1...rcNum{
+//                        let length = inputSingleFeatures.count
+//                        let preRCNum = orderNum - 1
+//                        //正发
+//                        if newArgs[1] == 0{
+//                            var originalSingleFeatures: [Int] = []
+//                            //默认每轮发一张牌
+//                            if newArgs[0] == 0{
+//                                if preRCNum == 0 {
+//                                    originalSingleFeatures = inputSingleFeatures
+//                                } else {
+//                                    originalSingleFeatures = Array(inputSingleFeatures[(length - preRCNum)...]) +  Array(inputSingleFeatures[0...(length - 1 - preRCNum)])
+//                                }
+//                                originalSingleFeatures = Array(originalSingleFeatures[minSingleFeatureNum...])
+//                                lookHandSingleFeatures.append(originalSingleFeatures)
+//                            } else {
+//                                var dealedSingleFeaturesNum: Int = 0
+//                                for i in 0...diyDealStatus.count - 1{
+//                                    if diyDealStatus[i][0] == true {
+//                                        dealedSingleFeaturesNum += orderNum - 1
+//                                        break
+//                                    } else if diyDealStatus[i][1] == true {
+//                                        dealedSingleFeaturesNum += diyDealNum[i]
+//                                    } else if diyDealStatus[i][2] == true {
+//                                        dealedSingleFeaturesNum += diyDealNum[i]
+//                                    }
+//                                }
+//                                if dealedSingleFeaturesNum == 0 {
+//                                    originalSingleFeatures = inputSingleFeatures
+//                                } else {
+//                                    originalSingleFeatures = Array(inputSingleFeatures[(length - dealedSingleFeaturesNum)...]) + Array(inputSingleFeatures[0..<length - dealedSingleFeaturesNum])
+//                                }
+//                                originalSingleFeatures = Array(originalSingleFeatures[minSingleFeatureNum...])
+//                                lookHandSingleFeatures.append(originalSingleFeatures)
+//                            }
+//                            //反发
+//                        } else {
+//                            var originalSingleFeatures: [Int] = []
+//                            //默认每轮发一张牌
+//                            if newArgs[0] == 0{
+//                                
+//                                originalSingleFeatures = Array(inputSingleFeatures[(preRCNum + 1)...]) + inputSingleFeatures[0..<(preRCNum + 1)]
+//                                
+//                                originalSingleFeatures = Array(originalSingleFeatures[minSingleFeatureNum...])
+//                                lookHandSingleFeatures.append(originalSingleFeatures)
+//                            } else {
+//                                var dealedSingleFeaturesNum: Int = 0
+//                                for i in 0...diyDealStatus.count - 1{
+//                                    if diyDealStatus[i][0] == true {
+//                                        dealedSingleFeaturesNum += orderNum - 1
+//                                        break
+//                                    } else if diyDealStatus[i][1] == true {
+//                                        dealedSingleFeaturesNum += diyDealNum[i]
+//                                    } else if diyDealStatus[i][2] == true {
+//                                        dealedSingleFeaturesNum += diyDealNum[i]
+//                                    }
+//                                }
+//                                originalSingleFeatures = Array(inputSingleFeatures[(dealedSingleFeaturesNum + 1)...]) + Array(inputSingleFeatures[0..<dealedSingleFeaturesNum + 1])
+//                                originalSingleFeatures = Array(originalSingleFeatures[0..<length - minSingleFeatureNum])
+//                                lookHandSingleFeatures.append(originalSingleFeatures)
+//                            }
+//                        }
+//                    }
                     break
                 //TODO: 看手牌比第一张牌从最大牌继续发
                 case 2:
@@ -2082,6 +2130,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     currentResultInfo.XorYMax.append([])
                     
                     for singlefeatureIndex in cutRange1...cutRange2{
+                        print("发牌位置 \(singlefeatureIndex)")
                         var coloringInputSingleFeatures = inputSingleFeatures
                         
                         if reportRule.differentDeal == 1 || reportRule.differentDeal == 2 {
@@ -2693,14 +2742,20 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         //报大小
                         case 0:
                             currentResultInfo.targetRCList.append(resultPos)
+                            
                             if colorSingleFeatureIndexList.count > 0 {
                                 currentResultInfo.ColorSingleFeatures = colorSingleFeatureIndexList
                             }
                             if upAlive {
                                 currentResultInfo.aliveNumber = 4
+                                currentResultInfo.handCardAliveNumberList.append(4)
                             } else if downAlive {
                                 currentResultInfo.aliveNumber = 2
+                                currentResultInfo.handCardAliveNumberList.append(2)
+                            } else {
+                                currentResultInfo.handCardAliveNumberList.append(0)
                             }
+                            
                             break
                         //保单个位置大小
                         case 1:
@@ -3361,20 +3416,82 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 reportResult.append(currentSpeakStruct)
             }
             break
-            
 //            79:"[130]:看手牌报生死门*",
+        case 79:
+            for resultInfo in multipleReportResultInfo.singleResultList{
+                var reportString = ""
+                let voiceType = 1
+                var currentReportStruct: [SpeakResultStruct] = []
+                var dealPos: Int = 1
+                for aliveNumber in resultInfo.handCardAliveNumberList{
+                    let initialString : String = String(dealPos) + "张"
+                    reportString = "\(aliveNumber)"
+                    reportString = initialString + reportString
+                    currentReportStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                    dealPos += 1
+                }
+                reportResult.append(currentReportStruct)
+            }
+            break
+            
+//            87:"[145]:看手牌面为色留色报最大次大生死门*",
+//            90:"[149]:看手牌面为色去色报最大次大生死门*",
+//            82:"[133]:看手牌报最大次大生死门*",
+
+        case 87, 90, 82:
+            
+            for resultInfo in multipleReportResultInfo.singleResultList{
+                var reportString = ""
+                let voiceType = 1
+                var currentReportStruct: [SpeakResultStruct] = []
+                var dealPos: Int = 1
+                for handindex in 0..<resultInfo.targetRCList.count{
+                    let subTargetRCList = resultInfo.targetRCList[handindex]
+                    let aliveNumber = resultInfo.handCardAliveNumberList[handindex]
+                    let initialString : String = String(dealPos) + "张"
+                    reportString = ""
+                    for rcID in subTargetRCList {
+                        reportString += String(rcID + 1) + " "
+                    }
+                    reportString = initialString + reportString + "\(aliveNumber)"
+                    currentReportStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                    dealPos += 1
+                }
+                
+                
+                reportResult.append(currentReportStruct)
+            }
+            
 //            80:"[131]:看手牌报最大*",
 //            81:"[132]:看手牌报最大次大*",
-//            82:"[133]:看手牌报最大次大生死门*",
 //            83:"[134]:看手牌比第一张牌从最大牌继续发报最大*",
 //            84:"[135]:看手牌比第一张牌从最大牌继续发报最大次大*",
 //            85:"[143]:看手牌面为色留色报最大*",
 //            86:"[144]:看手牌面为色留色报最大次大*",
-//            87:"[145]:看手牌面为色留色报最大次大生死门*",
 //            88:"[147]:看手牌面为色去色报最大*",
 //            89:"[148]:看手牌面为色去色报最大次大*",
-//            90:"[149]:看手牌面为色去色报最大次大生死门*",
-        case 79...90:
+        case 80...81, 83...86, 88...89:
+            
+            for resultInfo in multipleReportResultInfo.singleResultList{
+                var reportString = ""
+                let voiceType = 1
+                var currentReportStruct: [SpeakResultStruct] = []
+                var dealPos: Int = 1
+                for subTargetRCList in resultInfo.targetRCList{
+                    let initialString : String = String(dealPos) + "张"
+                    reportString = ""
+                    for rcID in subTargetRCList {
+                        reportString += String(rcID + 1) + " "
+                    }
+                    reportString = initialString + reportString
+                    currentReportStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                    dealPos += 1
+                }
+                
+                
+                reportResult.append(currentReportStruct)
+            }
+            
             
             break
 //            91:"[200]:飞2张保位置最大*",

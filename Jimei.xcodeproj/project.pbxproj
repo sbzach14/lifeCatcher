@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		1824EF5D2C3973100029836C /* Zip in Frameworks */ = {isa = PBXBuildFile; productRef = 1824EF5C2C3973100029836C /* Zip */; };
 		1824EF672C3EB4990029836C /* AuthView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1824EF662C3EB4990029836C /* AuthView.swift */; };
 		1824EF6E2C3FC9630029836C /* cls_01.mlmodelc.enc in Resources */ = {isa = PBXBuildFile; fileRef = 1824EF6C2C3FC9560029836C /* cls_01.mlmodelc.enc */; };
 		1824EF6F2C3FC9660029836C /* detect_01.mlmodelc.enc in Resources */ = {isa = PBXBuildFile; fileRef = 1824EF6D2C3FC9560029836C /* detect_01.mlmodelc.enc */; };
@@ -19,11 +18,6 @@
 		187A45472C2DA26100BB055C /* fail_tip.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 187A45442C2DA26100BB055C /* fail_tip.mp3 */; };
 		187A45502C31BBB400BB055C /* ReportClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187A454E2C31BBB400BB055C /* ReportClass.swift */; };
 		187A45512C31BBB400BB055C /* ClassifierSettingArgs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187A454F2C31BBB400BB055C /* ClassifierSettingArgs.swift */; };
-		187A45532C31D0CE00BB055C /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 187A45522C31D0CE00BB055C /* AsyncAlgorithms */; };
-		187A455B2C31D1A300BB055C /* Crypto in Frameworks */ = {isa = PBXBuildFile; productRef = 187A455A2C31D1A300BB055C /* Crypto */; };
-		187A455D2C31D1B600BB055C /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = 187A455C2C31D1B600BB055C /* Collections */; };
-		187A457E2C39406600BB055C /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = 187A457D2C39406600BB055C /* ZIPFoundation */; };
-		187A45812C39423D00BB055C /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 187A45802C39423D00BB055C /* CryptoSwift */; };
 		187A45832C39440800BB055C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187A45822C39440800BB055C /* AppDelegate.swift */; };
 		18A7A51D2C14E5A50020138E /* Icon.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 18A7A51C2C14E5A50020138E /* Icon.xcassets */; };
 		18C98CE52C15893200A8CD49 /* DeprecatedComponentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C98CE42C15893200A8CD49 /* DeprecatedComponentView.swift */; };
@@ -52,6 +46,12 @@
 		18F6C0C32C10A685007BEAEC /* RecordHistoryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18F6C0C22C10A685007BEAEC /* RecordHistoryViewModel.swift */; };
 		18FFC40A2BB9587A00029B0D /* BlurDetector_origin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FFC4092BB9587900029B0D /* BlurDetector_origin.swift */; };
 		A82088902C0BB9E000268013 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A820888F2C0BB9E000268013 /* Assets.xcassets */; };
+		A8350DE12C587B390042DB39 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = A8350DE02C587B390042DB39 /* AsyncAlgorithms */; };
+		A8350DE42C587B620042DB39 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = A8350DE32C587B620042DB39 /* Collections */; };
+		A8350DE72C587B920042DB39 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = A8350DE62C587B920042DB39 /* CryptoSwift */; };
+		A8350DEA2C587BA60042DB39 /* Zip in Frameworks */ = {isa = PBXBuildFile; productRef = A8350DE92C587BA60042DB39 /* Zip */; };
+		A8350DED2C587BBE0042DB39 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = A8350DEC2C587BBE0042DB39 /* ZIPFoundation */; };
+		A8350DF02C587BE70042DB39 /* Crypto in Frameworks */ = {isa = PBXBuildFile; productRef = A8350DEF2C587BE70042DB39 /* Crypto */; };
 		A838534C2ADA7C0200346038 /* BackGround.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A838534B2ADA7C0200346038 /* BackGround.xcassets */; };
 		A83853532ADA918000346038 /* CustomUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83853522ADA918000346038 /* CustomUI.swift */; };
 		A887167F2A0623E500B7F2CD /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887167E2A0623E500B7F2CD /* AuthManager.swift */; };
@@ -135,12 +135,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1824EF5D2C3973100029836C /* Zip in Frameworks */,
-				187A455D2C31D1B600BB055C /* Collections in Frameworks */,
-				187A45532C31D0CE00BB055C /* AsyncAlgorithms in Frameworks */,
-				187A455B2C31D1A300BB055C /* Crypto in Frameworks */,
-				187A45812C39423D00BB055C /* CryptoSwift in Frameworks */,
-				187A457E2C39406600BB055C /* ZIPFoundation in Frameworks */,
+				A8350DE42C587B620042DB39 /* Collections in Frameworks */,
+				A8350DE12C587B390042DB39 /* AsyncAlgorithms in Frameworks */,
+				A8350DEA2C587BA60042DB39 /* Zip in Frameworks */,
+				A8350DF02C587BE70042DB39 /* Crypto in Frameworks */,
+				A8350DE72C587B920042DB39 /* CryptoSwift in Frameworks */,
+				A8350DED2C587BBE0042DB39 /* ZIPFoundation in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -332,12 +332,12 @@
 			);
 			name = Jimei;
 			packageProductDependencies = (
-				187A45522C31D0CE00BB055C /* AsyncAlgorithms */,
-				187A455A2C31D1A300BB055C /* Crypto */,
-				187A455C2C31D1B600BB055C /* Collections */,
-				187A457D2C39406600BB055C /* ZIPFoundation */,
-				187A45802C39423D00BB055C /* CryptoSwift */,
-				1824EF5C2C3973100029836C /* Zip */,
+				A8350DE02C587B390042DB39 /* AsyncAlgorithms */,
+				A8350DE32C587B620042DB39 /* Collections */,
+				A8350DE62C587B920042DB39 /* CryptoSwift */,
+				A8350DE92C587BA60042DB39 /* Zip */,
+				A8350DEC2C587BBE0042DB39 /* ZIPFoundation */,
+				A8350DEF2C587BE70042DB39 /* Crypto */,
 			);
 			productName = CountMyActions;
 			productReference = 18CA1477284ABEC600F90372 /* Jimei.app */;
@@ -371,12 +371,12 @@
 			);
 			mainGroup = 18CA146E284ABEC600F90372;
 			packageReferences = (
-				A82088912C0C5D6400268013 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
-				18C98CD92C14F72E00A8CD49 /* XCRemoteSwiftPackageReference "swift-collections" */,
-				184F10C02C165087003A6D50 /* XCRemoteSwiftPackageReference "swift-crypto" */,
-				187A457C2C39406600BB055C /* XCLocalSwiftPackageReference "../Downloads/ZIPFoundation-development" */,
-				187A457F2C39423D00BB055C /* XCLocalSwiftPackageReference "../Downloads/CryptoSwift-main" */,
-				1824EF5B2C3973100029836C /* XCLocalSwiftPackageReference "../Downloads/Zip-master" */,
+				A8350DDF2C587B390042DB39 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
+				A8350DE22C587B570042DB39 /* XCRemoteSwiftPackageReference "swift-collections" */,
+				A8350DE52C587B920042DB39 /* XCRemoteSwiftPackageReference "CryptoSwift" */,
+				A8350DE82C587BA60042DB39 /* XCRemoteSwiftPackageReference "Zip" */,
+				A8350DEB2C587BBE0042DB39 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
+				A8350DEE2C587BE70042DB39 /* XCRemoteSwiftPackageReference "swift-crypto" */,
 			);
 			productRefGroup = 18CA1478284ABEC600F90372 /* Products */;
 			projectDirPath = "";
@@ -589,7 +589,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = Jimei/App/Assets.xcassets;
-				DEVELOPMENT_TEAM = YRLX79V4XC;
+				DEVELOPMENT_TEAM = FYQ8UYQL3M;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Jimei/App/Info.plist;
@@ -637,7 +637,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = Jimei/App/Assets.xcassets;
-				DEVELOPMENT_TEAM = YRLX79V4XC;
+				DEVELOPMENT_TEAM = FYQ8UYQL3M;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Jimei/App/Info.plist;
@@ -697,75 +697,87 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		1824EF5B2C3973100029836C /* XCLocalSwiftPackageReference "../Downloads/Zip-master" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = "../Downloads/Zip-master";
-		};
-		187A457C2C39406600BB055C /* XCLocalSwiftPackageReference "../Downloads/ZIPFoundation-development" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = "../Downloads/ZIPFoundation-development";
-		};
-		187A457F2C39423D00BB055C /* XCLocalSwiftPackageReference "../Downloads/CryptoSwift-main" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = "../Downloads/CryptoSwift-main";
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
-		184F10C02C165087003A6D50 /* XCRemoteSwiftPackageReference "swift-crypto" */ = {
+		A8350DDF2C587B390042DB39 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-crypto.git";
+			repositoryURL = "https://github.com/apple/swift-async-algorithms.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 3.4.0;
+				minimumVersion = 1.0.1;
 			};
 		};
-		18C98CD92C14F72E00A8CD49 /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+		A8350DE22C587B570042DB39 /* XCRemoteSwiftPackageReference "swift-collections" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-collections.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.1.1;
+				minimumVersion = 1.1.2;
 			};
 		};
-		A82088912C0C5D6400268013 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */ = {
+		A8350DE52C587B920042DB39 /* XCRemoteSwiftPackageReference "CryptoSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-async-algorithms.git";
+			repositoryURL = "https://github.com/krzyzanowskim/CryptoSwift.git";
 			requirement = {
-				kind = exactVersion;
-				version = 1.0.0;
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.8.2;
+			};
+		};
+		A8350DE82C587BA60042DB39 /* XCRemoteSwiftPackageReference "Zip" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/marmelroy/Zip.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.1.2;
+			};
+		};
+		A8350DEB2C587BBE0042DB39 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/weichsel/ZIPFoundation.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.9.19;
+			};
+		};
+		A8350DEE2C587BE70042DB39 /* XCRemoteSwiftPackageReference "swift-crypto" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-crypto.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.5.2;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		1824EF5C2C3973100029836C /* Zip */ = {
+		A8350DE02C587B390042DB39 /* AsyncAlgorithms */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = Zip;
-		};
-		187A45522C31D0CE00BB055C /* AsyncAlgorithms */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = A82088912C0C5D6400268013 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
+			package = A8350DDF2C587B390042DB39 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
 			productName = AsyncAlgorithms;
 		};
-		187A455A2C31D1A300BB055C /* Crypto */ = {
+		A8350DE32C587B620042DB39 /* Collections */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 184F10C02C165087003A6D50 /* XCRemoteSwiftPackageReference "swift-crypto" */;
-			productName = Crypto;
-		};
-		187A455C2C31D1B600BB055C /* Collections */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 18C98CD92C14F72E00A8CD49 /* XCRemoteSwiftPackageReference "swift-collections" */;
+			package = A8350DE22C587B570042DB39 /* XCRemoteSwiftPackageReference "swift-collections" */;
 			productName = Collections;
 		};
-		187A457D2C39406600BB055C /* ZIPFoundation */ = {
+		A8350DE62C587B920042DB39 /* CryptoSwift */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = A8350DE52C587B920042DB39 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
+			productName = CryptoSwift;
+		};
+		A8350DE92C587BA60042DB39 /* Zip */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A8350DE82C587BA60042DB39 /* XCRemoteSwiftPackageReference "Zip" */;
+			productName = Zip;
+		};
+		A8350DEC2C587BBE0042DB39 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A8350DEB2C587BBE0042DB39 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
 			productName = ZIPFoundation;
 		};
-		187A45802C39423D00BB055C /* CryptoSwift */ = {
+		A8350DEF2C587BE70042DB39 /* Crypto */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = CryptoSwift;
+			package = A8350DEE2C587BE70042DB39 /* XCRemoteSwiftPackageReference "swift-crypto" */;
+			productName = Crypto;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
