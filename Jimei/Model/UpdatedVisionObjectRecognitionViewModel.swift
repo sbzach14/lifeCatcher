@@ -855,6 +855,19 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 }
             }
         }
+        
+//        let modelCIImage = CIImage(cvPixelBuffer: pixelBuffer)
+//        let cgImage = CIContext().createCGImage(modelCIImage, from: modelCIImage.extent)
+//        let savedUIImage = UIImage(cgImage: cgImage!)
+//        UIImageWriteToSavedPhotosAlbum(savedUIImage, self, #selector(self.imageSaved(_:didFinishSavingWithError:contextInfo:)), nil)
+    }
+    
+    @objc private func imageSaved(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeMutableRawPointer?) {
+        if let error = error {
+            print("保存图片到相册失败: \(error)")
+        } else {
+            print("图片保存成功")
+        }
     }
     
     
@@ -882,6 +895,9 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         var deleteKeys:[Int] = []
         //去除重复帧
         for keyIndex in 0..<sortedKeys.count-1{
+            
+            
+            
             let detectResultListIndex = sortedKeys[keyIndex]
             let nextDetectResultListIndex = sortedKeys[keyIndex+1]
             for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
@@ -891,6 +907,16 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 if abs(nowLaplacian - nextLaplacian) <= 0.000000001{
                     deleteKeys.append(detectResultListIndex)
                 }
+                
+                let dRNode0 = targetDetecResultList[detectResultListIndex]![0]
+                let dRNode1 = targetDetecResultList[detectResultListIndex]![1]
+                
+                let nowN0 = dRNode0.singlefeatureIndex[0]
+                let nowN1 = dRNode1.singlefeatureIndex[0]
+            
+//                print("index ", detectResultListIndex,
+//                      singlefeatureLabelDic[nowN0] ?? "none", dRNode0.nodeType, dRNode0.laplacianVariance, dRNode0.confidence[0], detectResultListIndex,
+//                      singlefeatureLabelDic[nowN1] ?? "none", dRNode1.nodeType, dRNode1.laplacianVariance, dRNode1.confidence[0])
             }
         }
         
@@ -1588,8 +1614,6 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 let nodeType0 = targetDetecResultList[detectResultListIndex]![0].nodeType
                 let nowNum1 = targetDetecResultList[detectResultListIndex]![1].singlefeatureIndex[0]
                 let nodeType1 = targetDetecResultList[detectResultListIndex]![1].nodeType
-                
-                
                 
                 if isSingle{
                     if nodeType0 == 2{

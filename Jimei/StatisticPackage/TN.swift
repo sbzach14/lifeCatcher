@@ -34,6 +34,9 @@ class TNStatisticRule : Rule{
         self.rankRules = [2:"对王，对A，A加王",
                           1:"对子",
                           0:"点数"]
+        
+        self.rcNum = [2,3,4,5,6,7,8]
+
         self.ruleInfo = [
             0:"""
     一人发两张牌，一共四十张牌1-10

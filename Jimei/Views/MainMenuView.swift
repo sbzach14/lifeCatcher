@@ -43,6 +43,17 @@ struct MainMenuView: View {
                                 }
                                 .padding()
                             }
+                            
+//                            NavigationLink(
+//                                destination: AuthView()
+//                            ) {
+//                                VStack(alignment: .leading) {
+//                                    Text("验证")
+//                                        .foregroundColor(.white)
+//                                    Divider().colorInvert()
+//                                }
+//                                .padding()
+//                            }
                         }
                     }
                 }   
