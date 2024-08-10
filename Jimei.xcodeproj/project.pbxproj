@@ -14,6 +14,7 @@
 		1824EF7B2C4FF3F10029836C /* detect_640_0719.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 1824EF7A2C4FF3F10029836C /* detect_640_0719.mlmodel */; };
 		1824EF7D2C4FFF380029836C /* cls_0715_h.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 1824EF7C2C4FFF380029836C /* cls_0715_h.mlmodel */; };
 		1824EF812C553E6F0029836C /* cls_0727_v.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 1824EF802C553E6F0029836C /* cls_0727_v.mlmodel */; };
+		1824EF832C56D9B60029836C /* detect_01.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 1824EF822C56D9B60029836C /* detect_01.mlmodel */; };
 		187A45452C2DA26100BB055C /* success_tip.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 187A45422C2DA25E00BB055C /* success_tip.mp3 */; };
 		187A45462C2DA26100BB055C /* start_DetecBeep.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 187A45432C2DA25F00BB055C /* start_DetecBeep.mp3 */; };
 		187A45472C2DA26100BB055C /* fail_tip.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 187A45442C2DA26100BB055C /* fail_tip.mp3 */; };
@@ -76,6 +77,7 @@
 		1824EF7A2C4FF3F10029836C /* detect_640_0719.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = detect_640_0719.mlmodel; sourceTree = "<group>"; };
 		1824EF7C2C4FFF380029836C /* cls_0715_h.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0715_h.mlmodel; sourceTree = "<group>"; };
 		1824EF802C553E6F0029836C /* cls_0727_v.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0727_v.mlmodel; sourceTree = "<group>"; };
+		1824EF822C56D9B60029836C /* detect_01.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = detect_01.mlmodel; sourceTree = "<group>"; };
 		187A45422C2DA25E00BB055C /* success_tip.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = success_tip.mp3; sourceTree = "<group>"; };
 		187A45432C2DA25F00BB055C /* start_DetecBeep.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = start_DetecBeep.mp3; sourceTree = "<group>"; };
 		187A45442C2DA26100BB055C /* fail_tip.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = fail_tip.mp3; sourceTree = "<group>"; };
@@ -302,6 +304,7 @@
 			children = (
 				1824EF6C2C3FC9560029836C /* cls_01.mlmodelc.enc */,
 				1824EF6D2C3FC9560029836C /* detect_01.mlmodelc.enc */,
+				1824EF822C56D9B60029836C /* detect_01.mlmodel */,
 				1824EF7C2C4FFF380029836C /* cls_0715_h.mlmodel */,
 				1824EF802C553E6F0029836C /* cls_0727_v.mlmodel */,
 				1824EF7A2C4FF3F10029836C /* detect_640_0719.mlmodel */,
@@ -435,6 +438,7 @@
 				18C98D0D2C158F7B00A8CD49 /* CB.swift in Sources */,
 				18C98D112C158F7B00A8CD49 /* NPFive.swift in Sources */,
 				A892C6002A765A0A003FA2B3 /* MainMenuView.swift in Sources */,
+				1824EF832C56D9B60029836C /* detect_01.mlmodel in Sources */,
 				18C98D072C158F7B00A8CD49 /* ClassifierUtils.swift in Sources */,
 				18C98D152C158F7B00A8CD49 /* TP.swift in Sources */,
 				B058BE5F2B09FFC20078E792 /* BlurDetector.swift in Sources */,
@@ -613,7 +617,7 @@
 				);
 				MARKETING_VERSION = 1.0.6;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.Jimei";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.JimeiTest";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -661,7 +665,7 @@
 				);
 				MARKETING_VERSION = 1.0.6;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.Jimei";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.example.apple-samplecode.JimeiTest";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
