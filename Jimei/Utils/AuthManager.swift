@@ -3,7 +3,6 @@ import Security
 import Foundation
 import CryptoKit
 import CoreML
-import ZIPFoundation
 import CryptoSwift
 
 class AuthManager {

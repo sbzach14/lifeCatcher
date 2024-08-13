@@ -682,7 +682,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         detectSingleFeature = rightDetectSingleFeature
                     }
                     
-                    if !self.isDetect && (isShuffle || detectConfidence >= detectConfidenceThreshold){
+                    if !self.isDetect && (isShuffle && detectConfidence >= detectConfidenceThreshold){
                         self.isDetect = true
                         self.speakText(input: 0)
                     }
