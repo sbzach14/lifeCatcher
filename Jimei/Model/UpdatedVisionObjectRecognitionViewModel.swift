@@ -95,7 +95,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     
     var detectResultList : [Int : [DetectionResult]] = [:]
     var centerPos : [Float] = [0.5, 0.5]
-    var lastBoxes : [[Float]] = [[0.1, 0.1, 0.05, 0.05], [0.9, 0.9, 0.05, 0.05]]
+    var lastBoxes : [[Float]] = [[0.02, 0.02, 0.01, 0.05], [0.98, 0.98, 0.01, 0.01]]
     var targetArea : [Float] = [0, 0, 0, 0]
     var isTargetArea : Bool = false
     var isDetect: Bool = false
@@ -218,7 +218,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     
     private func initBoxes(){
         centerPos = [0.5, 0.5]
-        lastBoxes = [[0.1, 0.1, 0.05, 0.05], [0.9, 0.9, 0.05, 0.05]]
+        lastBoxes = [[0.02, 0.02, 0.01, 0.01], [0.98, 0.98, 0.02, 0.02]]
         targetArea = [0,0,0,0]
         imageSize[0] = min(originSize[0], originImageSize[0] * (1 + self.zoomFactor * self.maxZoomScale))
         imageSize[1] = min(originSize[1], originImageSize[1] * (1 + self.zoomFactor * self.maxZoomScale))
@@ -406,6 +406,9 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             device.unlockForConfiguration()
             cameraFrameRate = frameRate
             print("设置帧率为: \(frameRate)")
+            
+            updateZoomFactor()
+            updateFocusFactor()
         }catch {
             print("设置帧率时发生错误: \(error)")
         }
@@ -484,7 +487,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     let xOffset = ciImage.extent.size.height * 0.5
                     let translationTransform = CGAffineTransform(translationX: xOffset, y: CGFloat(0))
                     
-                    let combinedTransform = transform.concatenating(rotationTransform).concatenating(translationTransform)
+                    let combinedTransform = rotationTransform.concatenating(translationTransform)
                     
                     let translatedImage = ciImage.transformed(by: combinedTransform)
                     
@@ -508,10 +511,11 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
  
     func processImageOrigin(_ pixelBuffer: CVPixelBuffer, taskIndex: Int, isTargetArea: Bool, targetArea: [Float]){
         
-        var detectConfidenceThreshold:Float = 0.85
-        var confidenceThreshold = 0.5
+        let detectConfidenceThreshold:Float = 0.85
+        let detectEndThreshold:Float = 0.3
+        var confidenceThreshold = 0.05
         if self.state == "idle"{
-            confidenceThreshold = 0.75
+            confidenceThreshold = 0.7
         }
         else{
             confidenceThreshold = 0.05
@@ -519,16 +523,16 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         var singlefeatureResult : [DetectionResult]
         if !isTargetArea && self.isRemote{
-            let result = try! self.detectModel.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
+            let result = try! self.detectModel.prediction(image: pixelBuffer, iouThreshold: 0.01, confidenceThreshold: confidenceThreshold)
             singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, iscls: false)
         }
         else if self.isCameraHorizon{
-            let result = try! self.clsModel_h.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
-            singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, iscls: false)
+            let result = try! self.clsModel_h.prediction(image: pixelBuffer, iouThreshold: 0.01, confidenceThreshold: confidenceThreshold)
+            singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer)
         }
         else{
-            let result = try! self.clsModel_v.prediction(image: pixelBuffer, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
-            singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, iscls: false)
+            let result = try! self.clsModel_v.prediction(image: pixelBuffer, iouThreshold: 0.01, confidenceThreshold: confidenceThreshold)
+            singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer)
         }
         
         
@@ -547,11 +551,14 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 //            singlefeatureResult = getSingleFeature(from: confidence, from: coordinates, from: pixelBuffer)
 
         
-        if singlefeatureResult[0].singlefeatureIndex[0] == self.stateSingleFeature[0] && singlefeatureResult[1].singlefeatureIndex[0] == self.stateSingleFeature[1]{
-            stateCounter = min(stateCounter + 1, 600)
-        }
-        else{
-            stateCounter = 0
+        if self.state == "idle"{
+            if singlefeatureResult[0].singlefeatureIndex[0] == self.stateSingleFeature[0]
+                && singlefeatureResult[1].singlefeatureIndex[0] == self.stateSingleFeature[1]{
+                stateCounter += 1
+            }
+            else{
+                stateCounter = 0
+            }
         }
         
         self.stateSingleFeature[0] = singlefeatureResult[0].singlefeatureIndex[0]
@@ -623,11 +630,11 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         let cvPixelBuffer_cut = createCVPixelBuffer(ciImage: cut_ciImage, targetSize: CGSize(width: self.inputSize[0], height: self.inputSize[1]), targetArea: newTargetArea)!
                         
                         if self.isCameraHorizon{
-                            let cut_result = try! self.clsModel_h.prediction(image: cvPixelBuffer_cut, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
+                            let cut_result = try! self.clsModel_h.prediction(image: cvPixelBuffer_cut, iouThreshold: 0.01, confidenceThreshold: confidenceThreshold)
                             singlefeatureResult = self.getSingleFeature(from: cut_result.confidence, from: cut_result.coordinates, from: cvPixelBuffer_cut)
                         }
                         else{
-                            let cut_result = try! self.clsModel_v.prediction(image: cvPixelBuffer_cut, iouThreshold: 0.45, confidenceThreshold: confidenceThreshold)
+                            let cut_result = try! self.clsModel_v.prediction(image: cvPixelBuffer_cut, iouThreshold: 0.01, confidenceThreshold: confidenceThreshold)
                             singlefeatureResult = self.getSingleFeature(from: cut_result.confidence, from: cut_result.coordinates, from: cvPixelBuffer_cut)
                         }
                         
@@ -675,11 +682,19 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         detectSingleFeature = rightDetectSingleFeature
                     }
                     
-                    if !self.isDetect && detectConfidence >= detectConfidenceThreshold{
+                    if !self.isDetect && (isShuffle && detectConfidence >= detectConfidenceThreshold){
                         self.isDetect = true
                         self.speakText(input: 0)
                     }
-
+                    
+                    if detectConfidence < detectEndThreshold{
+                        self.stateCounter += 1
+                        detectNum = 0
+                    }
+                    else{
+                        self.stateCounter = 0
+                    }
+                    
                     if self.detectNeedToCut
                         && detectConfidence >= detectConfidenceThreshold
                         && isCut
@@ -724,7 +739,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     }
                 }
                 
-                if detectNum == 0 && self.stateCounter >= 5{
+                if self.stateCounter >= 3{
                     
                     self.stateCounter = 0
                     self.state = "idle"
@@ -763,7 +778,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         if(self.shuffleMode == 1 || self.shuffleMode == 3){
                             //拨到顶
                             if self.singlefeatureArray.count >= self.minSingleFeatureNum{
-                                self.speakText(input: 1)
+                                //self.speakText(input: 1)
                             }
                             else{
                                 self.speakText(input: 2)
@@ -777,7 +792,7 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             }
                             
                             if self.singlefeatureArray.count >= self.minSingleFeatureNum{
-                                self.speakText(input: 1)
+                                //self.speakText(input: 1)
                             }
                             else{
                                 self.speakText(input: 2)
@@ -865,8 +880,8 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         
         var sortedKeys = targetDetecResultList.keys.sorted()
-        let blurThreshold : Float = 0.8
-        let longHeadIndex = 10
+        let blurThreshold : Float = 0.75
+        let longHeadIndex = 5
         
         print("检测sortedKeys \(sortedKeys)")
 
@@ -941,9 +956,44 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         var leftTailCnt = 0
         var rightTailCnt = 0
         
+        var singleCnt = 0
+        var doubleCnt = 0
+        
         
         for keyIndex in beginIndex..<endIndex{
             let detectResultListIndex = sortedKeys[keyIndex]
+            let lastDetectResultListIndex = sortedKeys[keyIndex-1]
+            let nextDetectResultListIndex = sortedKeys[keyIndex+1]
+            let nextnextDetectResultListIndex = sortedKeys[keyIndex+2]
+            
+            let detectResultNode0 = targetDetecResultList[detectResultListIndex]![0]
+            let detectResultNode1 = targetDetecResultList[detectResultListIndex]![1]
+            
+            let lastDetectResultNode0 = targetDetecResultList[lastDetectResultListIndex]![0]
+            let lastDetectResultNode1 = targetDetecResultList[lastDetectResultListIndex]![1]
+            
+            let nextDetectResultNode0 = targetDetecResultList[nextDetectResultListIndex]![0]
+            let nextDetectResultNode1 = targetDetecResultList[nextDetectResultListIndex]![1]
+            
+            let nextnextDetectResultNode0 = targetDetecResultList[nextnextDetectResultListIndex]![0]
+            let nextnextDetectResultNode1 = targetDetecResultList[nextnextDetectResultListIndex]![1]
+                
+            let nowNum0 = targetDetecResultList[detectResultListIndex]![0].singlefeatureIndex[0]
+            let nodeType0 = targetDetecResultList[detectResultListIndex]![0].nodeType
+            let nowNum1 = targetDetecResultList[detectResultListIndex]![1].singlefeatureIndex[0]
+            let nodeType1 = targetDetecResultList[detectResultListIndex]![1].nodeType
+            print("index ", keyIndex,
+                  singlefeatureLabelDic[nowNum0] ?? "none", detectResultNode0.nodeType, detectResultNode0.laplacianVariance, detectResultNode0.confidence[0], detectResultListIndex,
+                  singlefeatureLabelDic[nowNum1] ?? "none", detectResultNode1.nodeType, detectResultNode1.laplacianVariance, detectResultNode1.confidence[0])
+            
+            if targetDetecResultList[detectResultListIndex]![0].singlefeatureIndex[0] != -1
+                && targetDetecResultList[detectResultListIndex]![1].singlefeatureIndex[0] != -1{
+                doubleCnt += 1
+            }
+            else{
+                singleCnt += 1
+            }
+            
             for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
                 let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
                 
@@ -979,22 +1029,22 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         rightTailCnt = 0
                     }
                 }
-                else if detectResultNode.nodeType == 0 || detectResultNode.nodeType == 5{
-                    if numIndex == 0{
-                        leftTailCnt += 1
-                    }
-                    if numIndex == 1{
-                        rightTailCnt += 1
-                    }
-                }
-                else{
-                    if numIndex == 0 && leftTailCnt < 5{
-                        leftTailCnt = 0
-                    }
-                    if numIndex == 1 && rightTailCnt < 5{
-                        rightTailCnt = 0
-                    }
-                }
+//                else if detectResultNode.nodeType == 0 || detectResultNode.nodeType == 5{
+//                    if numIndex == 0{
+//                        leftTailCnt += 1
+//                    }
+//                    if numIndex == 1{
+//                        rightTailCnt += 1
+//                    }
+//                }
+//                else{
+//                    if numIndex == 0 && leftTailCnt < 5{
+//                        leftTailCnt = 0
+//                    }
+//                    if numIndex == 1 && rightTailCnt < 5{
+//                        rightTailCnt = 0
+//                    }
+//                }
             }
         }
         
@@ -1002,12 +1052,12 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         var rightSideCnt = rightSideSet.count
         
         var isSingle = true
-        if  leftSideCnt >= 10 && rightSideCnt >= 10{
+        if  doubleCnt > singleCnt{
             isSingle = false
         }
         
         var isShort = true
-        if leftSideCnt + rightSideCnt >= 10{
+        if leftSideCnt + rightSideCnt >= self.minSingleFeatureNum{
             isShort = false
         }
         
@@ -1032,36 +1082,29 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 beginIndex = rightFirstHead
             }
             
-            if !isSingle{
-                let min_endIndex = min(leftLastTail, rightLastTail) + 3
-                let max_endIndex = max(leftLastTail, rightLastTail) - 1
-                endIndex = max(min_endIndex, max_endIndex)
-                let detectResultListIndex = sortedKeys[endIndex-1]
-                if targetDetecResultList[detectResultListIndex]![0].nodeType == 3{
-                    targetDetecResultList[detectResultListIndex]![0].nodeType = 2
-                }
-                else if targetDetecResultList[detectResultListIndex]![1].nodeType == 3{
-                    targetDetecResultList[detectResultListIndex]![1].nodeType = 2
-                }
-                if targetDetecResultList[detectResultListIndex]![0].nodeType != 2{
-                    targetDetecResultList[detectResultListIndex]![0].nodeType = 0
-                }
-                else if targetDetecResultList[detectResultListIndex]![1].nodeType != 2{
-                    targetDetecResultList[detectResultListIndex]![1].nodeType = 0
-                }
-            }
-            else{
-                if leftSideCnt > rightSideCnt{
-                    endIndex = leftLastTail + 1
-                }
-                else{
-                    endIndex = rightLastTail + 1
-                }
-            }
+            endIndex = max(leftLastTail, rightLastTail) + 1
+
+//            if !isSingle{
+//                let min_endIndex = min(leftLastTail, rightLastTail) + 3
+//                let max_endIndex = max(leftLastTail, rightLastTail) - 1
+//                endIndex = max(min_endIndex, max_endIndex)
+//                
+//                let detectResultListIndex = sortedKeys[endIndex-1]
+//                if targetDetecResultList[detectResultListIndex]![0].nodeType == 3{
+//                    targetDetecResultList[detectResultListIndex]![0].nodeType = 2
+//                }
+//                else if targetDetecResultList[detectResultListIndex]![1].nodeType == 3{
+//                    targetDetecResultList[detectResultListIndex]![1].nodeType = 2
+//                }
+//                if targetDetecResultList[detectResultListIndex]![0].nodeType != 2{
+//                    targetDetecResultList[detectResultListIndex]![0].nodeType = 0
+//                }
+//                else if targetDetecResultList[detectResultListIndex]![1].nodeType != 2{
+//                    targetDetecResultList[detectResultListIndex]![1].nodeType = 0
+//                }
+//            }
         }
-        
-        print("isSingle:\(isSingle) isShort:\(isShort) leftHead:\(leftFirstHead) rightHead:\(rightFirstHead)  leftTail:\(leftLastTail) rightTail:\(leftLastTail)")
-  
+
         if beginIndex >= endIndex{
             let result = DetectionState(detectionResult: [], isSingle: false, isShort: false, longestIndex: -1)
             return result
@@ -1218,51 +1261,47 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         rightTailCnt = 0
                     }
                 }
-                else if detectResultNode.nodeType == 0 || detectResultNode.nodeType == 5{
-                    if numIndex == 0{
-                        leftTailCnt += 1
-                    }
-                    if numIndex == 1{
-                        rightTailCnt += 1
-                    }
-                }
-                else{
-                    if numIndex == 0 && leftTailCnt < 5{
-                        leftTailCnt = 0
-                    }
-                    if numIndex == 1 && rightTailCnt < 5{
-                        rightTailCnt = 0
-                    }
-                }
+//                else if detectResultNode.nodeType == 0 || detectResultNode.nodeType == 5{
+//                    if numIndex == 0{
+//                        leftTailCnt += 1
+//                    }
+//                    if numIndex == 1{
+//                        rightTailCnt += 1
+//                    }
+//                }
+//                else{
+//                    if numIndex == 0 && leftTailCnt < 5{
+//                        leftTailCnt = 0
+//                    }
+//                    if numIndex == 1 && rightTailCnt < 5{
+//                        rightTailCnt = 0
+//                    }
+//                }
             }
         }
         if !isShort{
-            if !isSingle{
-                let min_endIndex = min(leftLastTail, rightLastTail) + 3
-                let max_endIndex = max(leftLastTail, rightLastTail) - 1
-                endIndex = max(min_endIndex, max_endIndex)
-                let detectResultListIndex = sortedKeys[endIndex-1]
-                if targetDetecResultList[detectResultListIndex]![0].nodeType == 3{
-                    targetDetecResultList[detectResultListIndex]![0].nodeType = 2
-                }
-                else if targetDetecResultList[detectResultListIndex]![1].nodeType == 3{
-                    targetDetecResultList[detectResultListIndex]![1].nodeType = 2
-                }
-                if targetDetecResultList[detectResultListIndex]![0].nodeType != 2{
-                    targetDetecResultList[detectResultListIndex]![0].nodeType = 0
-                }
-                else if targetDetecResultList[detectResultListIndex]![1].nodeType != 2{
-                    targetDetecResultList[detectResultListIndex]![1].nodeType = 0
-                }
-            }
-            else{
-                if leftSideCnt > rightSideCnt{
-                    endIndex = leftLastTail + 1
-                }
-                else{
-                    endIndex = rightLastTail + 1
-                }
-            }
+            
+            endIndex = max(leftLastTail, rightLastTail) + 1
+            
+//            if !isSingle{
+//                let min_endIndex = min(leftLastTail, rightLastTail) + 3
+//                let max_endIndex = max(leftLastTail, rightLastTail) - 1
+//                endIndex = max(min_endIndex, max_endIndex)
+//                
+//                let detectResultListIndex = sortedKeys[endIndex-1]
+//                if targetDetecResultList[detectResultListIndex]![0].nodeType == 3{
+//                    targetDetecResultList[detectResultListIndex]![0].nodeType = 2
+//                }
+//                else if targetDetecResultList[detectResultListIndex]![1].nodeType == 3{
+//                    targetDetecResultList[detectResultListIndex]![1].nodeType = 2
+//                }
+//                if targetDetecResultList[detectResultListIndex]![0].nodeType != 2{
+//                    targetDetecResultList[detectResultListIndex]![0].nodeType = 0
+//                }
+//                else if targetDetecResultList[detectResultListIndex]![1].nodeType != 2{
+//                    targetDetecResultList[detectResultListIndex]![1].nodeType = 0
+//                }
+//            }
         }
         
         var addEndIndex = min(leftLastTail, rightLastTail)
@@ -1550,6 +1589,8 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         var headCnt = 0
         var tailCnt = 0
         
+        print("isSingle:\(isSingle) isShort:\(isShort) leftHead:\(leftFirstHead) rightHead:\(rightFirstHead)  leftTail:\(leftLastTail) rightTail:\(rightLastTail) endIndex:\(endIndex)")
+        
         for keyIndex in beginIndex..<endIndex{
             let detectResultListIndex = sortedKeys[keyIndex]
             let lastDetectResultListIndex = sortedKeys[keyIndex-1]
@@ -1574,21 +1615,20 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 let nowNum1 = targetDetecResultList[detectResultListIndex]![1].singlefeatureIndex[0]
                 let nodeType1 = targetDetecResultList[detectResultListIndex]![1].nodeType
                 
-//                print("index ", detectResultListIndex,
-//                      singlefeatureLabelDic[nowNum0] ?? "none", detectResultNode0.nodeType, detectResultNode0.laplacianVariance, detectResultNode0.confidence[0], detectResultListIndex,
-//                      singlefeatureLabelDic[nowNum1] ?? "none", detectResultNode1.nodeType, detectResultNode1.laplacianVariance, detectResultNode1.confidence[0])
-                
                 if isSingle{
-                    if leftSideCnt > rightSideCnt{
-                        if nodeType0 == 2{
-                            detectSingleFeatureArray.insert(nowNum0, at: 0)
-                        }
+                    if nodeType0 == 2{
+                        detectSingleFeatureArray.insert(nowNum0, at: 0)
                     }
-                    else{
-                        if nodeType1 == 2{
-                            detectSingleFeatureArray.insert(nowNum1, at: 0)
-                        }
+//                    else if nodeType0 == 4 && detectResultNode0.confidence[0] > 0.9{
+//                        detectSingleFeatureArray.insert(nowNum0, at: 0)
+//                    }
+                
+                    if nodeType1 == 2{
+                        detectSingleFeatureArray.insert(nowNum1, at: 0)
                     }
+//                    else if nodeType1 == 4 && detectResultNode1.confidence[0] > 0.9{
+//                        detectSingleFeatureArray.insert(nowNum1, at: 0)
+//                    }
                 }
                 else{
                     if (nodeType0 == 2 || nodeType0 == 4)
@@ -2008,7 +2048,10 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 let coordinate = [centerX, centerY, widthX, heightY]
                 
                 if singlefeatureIndex.count > 0{
-                    if let index = result.firstIndex(where: {(abs($0.coordinate[0] - coordinate[0]) < $0.coordinate[2] / 2 || abs($0.coordinate[0] - coordinate[0]) < coordinate[2] / 2) && (abs($0.coordinate[1] - coordinate[1]) < $0.coordinate[3] / 2 || abs($0.coordinate[1] - coordinate[1]) < coordinate[3] / 2)}) {
+                    if let index = result.firstIndex(where: {
+                        abs($0.coordinate[0] - coordinate[0]) < ($0.coordinate[2] + coordinate[2]) / 2
+                         && abs($0.coordinate[1] - coordinate[1]) < ($0.coordinate[3] + coordinate[3]) / 2
+                    }) {
                         
                         if maxVal > result[index].confidence[0] {
                             result[index].singlefeatureIndex = singlefeatureIndex + result[index].singlefeatureIndex
@@ -2149,7 +2192,10 @@ class UpdatedVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 let coordinate = [centerX, centerY, widthX, heightY]
                 
                 if singlefeatureIndex.count > 0{
-                    if let index = result.firstIndex(where: {(abs($0.coordinate[0] - coordinate[0]) < $0.coordinate[2] / 2 || abs($0.coordinate[0] - coordinate[0]) < coordinate[2] / 2) && (abs($0.coordinate[1] - coordinate[1]) < $0.coordinate[3] / 2 || abs($0.coordinate[1] - coordinate[1]) < coordinate[3] / 2)}) {
+                    if let index = result.firstIndex(where: {
+                        abs($0.coordinate[0] - coordinate[0]) < ($0.coordinate[2] + coordinate[2]) / 2
+                         && abs($0.coordinate[1] - coordinate[1]) < ($0.coordinate[3] + coordinate[3]) / 2
+                    }) {
                         
                         if maxVal > result[index].confidence[0] {
                             result[index].singlefeatureIndex = singlefeatureIndex + result[index].singlefeatureIndex

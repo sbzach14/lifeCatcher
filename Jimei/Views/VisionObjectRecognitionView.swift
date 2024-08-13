@@ -36,7 +36,7 @@ struct UpdatedVisionObjectRecognitionView: View {
                             HStack {
                                 Text("后置相机")
                                     .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .frame(maxWidth: 80, alignment: .leading)
                                 
                                 Spacer()
                                 
@@ -52,12 +52,13 @@ struct UpdatedVisionObjectRecognitionView: View {
                                         viewModel.updateConfigJSON()
                                     }
                             }
+                            
                             Divider().colorInvert()
                             
                             HStack {
                                 Text("横屏模式")
                                     .foregroundColor(.white)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .frame(maxWidth: 80, alignment: .leading)
                                 
                                 Spacer()
                                 
@@ -70,15 +71,16 @@ struct UpdatedVisionObjectRecognitionView: View {
                                         viewModel.updateConfigJSON()
                                     }
                             }
+                            
                             Divider().colorInvert()
                             
                             HStack {
-                                Text("缩放:\(String(format: "%.2f", viewModel.zoomFactor))").foregroundColor(.white).frame(maxWidth: .infinity, alignment: .leading)
+                                Text("缩放:\(String(format: "%.2f", viewModel.zoomFactor))").foregroundColor(.white).frame(maxWidth: 80, alignment: .leading)
                                 
                                 Spacer()
                                 
                                 Slider(value: $viewModel.zoomFactor, in: 0...1, step: 0.01)
-                                    .frame(width: 200, height: 30, alignment: .trailing)
+                                    .frame(width: .infinity, height: 30, alignment: .trailing)
                                     .accentColor(.white)
                                     .onChange(of: viewModel.zoomFactor) {
                                         newValue in
@@ -112,12 +114,12 @@ struct UpdatedVisionObjectRecognitionView: View {
                                 Divider().colorInvert()
                                 
                                 HStack {
-                                    Text("焦距:\(String(format: "%.2f", viewModel.focusFactor))").foregroundColor(.white).frame(maxWidth: .infinity, alignment: .leading)
+                                    Text("焦距:\(String(format: "%.2f", viewModel.focusFactor))").foregroundColor(.white).frame(maxWidth:80, alignment: .leading)
                                     
                                     Spacer()
                                     
                                     Slider(value: $viewModel.focusFactor, in: 0...1, step: 0.01)
-                                        .frame(width: 200, height: 30, alignment: .trailing)
+                                        .frame(width: .infinity, height: 30, alignment: .trailing)
                                         .accentColor(.white)
                                         .onChange(of: viewModel.focusFactor) {
                                             newValue in
@@ -127,7 +129,6 @@ struct UpdatedVisionObjectRecognitionView: View {
                                 }
                             }
                         }
-                        .padding()
                         .bubbleBackground()
                     }
                     
