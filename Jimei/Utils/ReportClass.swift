@@ -2023,73 +2023,33 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         }
                         lookHandSingleFeatures.append(originalSingleFeatures)
                     }
-                    
-//                    for orderNum in 1...rcNum{
-//                        let length = inputSingleFeatures.count
-//                        let preRCNum = orderNum - 1
-//                        //正发
-//                        if newArgs[1] == 0{
-//                            var originalSingleFeatures: [Int] = []
-//                            //默认每轮发一张牌
-//                            if newArgs[0] == 0{
-//                                if preRCNum == 0 {
-//                                    originalSingleFeatures = inputSingleFeatures
-//                                } else {
-//                                    originalSingleFeatures = Array(inputSingleFeatures[(length - preRCNum)...]) +  Array(inputSingleFeatures[0...(length - 1 - preRCNum)])
-//                                }
-//                                originalSingleFeatures = Array(originalSingleFeatures[minSingleFeatureNum...])
-//                                lookHandSingleFeatures.append(originalSingleFeatures)
-//                            } else {
-//                                var dealedSingleFeaturesNum: Int = 0
-//                                for i in 0...diyDealStatus.count - 1{
-//                                    if diyDealStatus[i][0] == true {
-//                                        dealedSingleFeaturesNum += orderNum - 1
-//                                        break
-//                                    } else if diyDealStatus[i][1] == true {
-//                                        dealedSingleFeaturesNum += diyDealNum[i]
-//                                    } else if diyDealStatus[i][2] == true {
-//                                        dealedSingleFeaturesNum += diyDealNum[i]
-//                                    }
-//                                }
-//                                if dealedSingleFeaturesNum == 0 {
-//                                    originalSingleFeatures = inputSingleFeatures
-//                                } else {
-//                                    originalSingleFeatures = Array(inputSingleFeatures[(length - dealedSingleFeaturesNum)...]) + Array(inputSingleFeatures[0..<length - dealedSingleFeaturesNum])
-//                                }
-//                                originalSingleFeatures = Array(originalSingleFeatures[minSingleFeatureNum...])
-//                                lookHandSingleFeatures.append(originalSingleFeatures)
-//                            }
-//                            //反发
-//                        } else {
-//                            var originalSingleFeatures: [Int] = []
-//                            //默认每轮发一张牌
-//                            if newArgs[0] == 0{
-//                                
-//                                originalSingleFeatures = Array(inputSingleFeatures[(preRCNum + 1)...]) + inputSingleFeatures[0..<(preRCNum + 1)]
-//                                
-//                                originalSingleFeatures = Array(originalSingleFeatures[minSingleFeatureNum...])
-//                                lookHandSingleFeatures.append(originalSingleFeatures)
-//                            } else {
-//                                var dealedSingleFeaturesNum: Int = 0
-//                                for i in 0...diyDealStatus.count - 1{
-//                                    if diyDealStatus[i][0] == true {
-//                                        dealedSingleFeaturesNum += orderNum - 1
-//                                        break
-//                                    } else if diyDealStatus[i][1] == true {
-//                                        dealedSingleFeaturesNum += diyDealNum[i]
-//                                    } else if diyDealStatus[i][2] == true {
-//                                        dealedSingleFeaturesNum += diyDealNum[i]
-//                                    }
-//                                }
-//                                originalSingleFeatures = Array(inputSingleFeatures[(dealedSingleFeaturesNum + 1)...]) + Array(inputSingleFeatures[0..<dealedSingleFeaturesNum + 1])
-//                                originalSingleFeatures = Array(originalSingleFeatures[0..<length - minSingleFeatureNum])
-//                                lookHandSingleFeatures.append(originalSingleFeatures)
-//                            }
-//                        }
-//                    }
                     break
-                //TODO: 看手牌比第一张牌从最大牌继续发
+                //看手牌比第一张牌从最大牌继续发, 从第一轮开始报
                 case 2:
+                    for orderNum in 0..<rcNum{
+                        //获得第一轮的牌
+                        let prevCardsNum = rcNum - orderNum - 1
+                        let length = inputSingleFeatures.count
+                        var firstRoundCard: [Int] = []
+                        //正发
+                        if newArgs[1] == 0{
+                            if orderNum == 0{
+                                firstRoundCard = Array(inputSingleFeatures[0..<rcNum])
+                            } else{
+                                firstRoundCard = Array(inputSingleFeatures[0...prevCardsNum]) + Array(inputSingleFeatures[(length - orderNum)...])
+                            }
+                        //反发
+                        } else {
+                            if orderNum == rcNum - 1{
+                                firstRoundCard = Array(inputSingleFeatures[0..<rcNum]).reversed()
+                            } else{
+                                firstRoundCard =
+                                Array(inputSingleFeatures[(length - prevCardsNum)...]) + Array(inputSingleFeatures[0...orderNum])
+                                firstRoundCard = firstRoundCard.reversed()
+                            }
+                        }
+                        
+                    }
                     break
                 default:
                     break

@@ -7,41 +7,78 @@ struct InfoView: View {
 
     var body: some View {
         VStack{
-            
             ScrollView {
                 VStack(alignment: .leading, spacing: 0)  {
-                    Text("版本 : 1.0.6").padding()
+                    
+                    // 版本信息
+                    Text("版本 : 1.0.6")
+                        .padding()
                         .foregroundColor(.white)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color.black.opacity(0.3))
+                        )
                     
                     Divider().colorInvert()
                     
-                    Text("序列号 : " + viewModel.uniqueID).textSelection(.enabled).padding()
+                    // 序列号
+                    Text("序列号 : " + viewModel.uniqueID)
+                        .textSelection(.enabled)
+                        .padding()
                         .foregroundColor(.white)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color.black.opacity(0.3))
+                        )
                     
                     Divider().colorInvert()
                     
+                    // 激活日期（如果激活）
                     if viewModel.isActive{
-                        Text("激活日期 : " + viewModel.trueDate).padding()
+                        Text("激活日期 : " + viewModel.trueDate)
+                            .padding()
                             .foregroundColor(.white)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color.black.opacity(0.3))
+                            )
                         
                         Divider().colorInvert()
                     }
                     
-                    Text("声明:本软件的使用范围仅限于日常生活图像识别与记录用途，使用本程序造成的任何后果及责任由使用者承担，本公司不承担因用户或代理商在非允许使用范围内使用或销售而导致的任何后果及相关责任。").padding()
+                    // 声明信息
+                    Text("声明:本软件的使用范围仅限于日常生活图像识别与记录用途，使用本程序造成的任何后果及责任由使用者承担，本公司不承担因用户或代理商在非允许使用范围内使用或销售而导致的任何后果及相关责任。")
+                        .padding()
                         .foregroundColor(.white)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color.black.opacity(0.3))
+                        )
                     
                     Divider().colorInvert()
+                    // 插入图片
+                    Image("lifeCatcherTitle") // Replace with your image name
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color.black.opacity(0.3))
+                        )
+                        .padding(.top, 20) // Add some spacing above the image
                 }
             }
         }
         .background(
-            Image("bg")
+            Image("Newbg2")
                 .resizable()
                 .scaledToFill()
         )
         .navigationBarTitle("信息")
     }
 }
+
 
 struct DeprecatedInfoView: View {
     @StateObject var viewModel = SettingViewModel()

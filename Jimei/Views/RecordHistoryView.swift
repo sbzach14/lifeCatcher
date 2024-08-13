@@ -72,13 +72,11 @@ struct RecordHistoryView: View {
             }
     }
     .background(
-        Image("bg")
+        Image("Newbg2")
             .resizable()
             .scaledToFill()
     )
-    .navigationBarTitle("历史记录")
-        
-            
+    .navigationBarTitle("历史美图")
     }
 }
 
