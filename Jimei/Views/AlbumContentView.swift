@@ -178,7 +178,7 @@ struct ShowRecordHistoryView: View {
             .padding(16)
         }
         .background(
-            Image("bg")
+            Image("Newbg2")
                 .resizable()
                 .scaledToFill()
         )

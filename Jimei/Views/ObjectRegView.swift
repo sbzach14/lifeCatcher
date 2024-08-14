@@ -330,7 +330,7 @@ struct VisionObjectRecognitionView: View {
             Button(action: {
                 viewModel.recordScreen()
             }) {
-                Image("icon_save").resizable().frame(width: 150, height: 60)
+                Image("save").resizable().frame(width: 150, height: 150)
             }
             .padding(.bottom, 20)
         }
