@@ -189,7 +189,7 @@ class ReportManager{
         5:"[6]:报活门",
         6:"[7]:报活门半活门对子*",
         7:"[8]:报最大次大和生死门",
-        8:"[8_1]:报最大次大活门半活门平点对子*",
+        8:"[8_1]:报最大次大活门半活门平点对子",
         9:"[10]:报最大和最大家牌",
         10:"[12]:报排名",
         11:"[13]:报原始排名 4432和生死门*",
@@ -1617,11 +1617,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         return -1
     }
     
-    struct LookeHandsStruct{
-        var liveDead: Int = 0
-        var targetPos: [Int] = []
-    }
-    
     struct SingleReportResultInfo{
         
         //都存一轮的结果
@@ -1644,8 +1639,17 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         var targetRCList: [[Int]] = []
         //每轮有无平点
         var hasDrawPoint: Int = -1
+        //每轮的平点类型
+        //1,平点，2杂平点，3双平点，4三平点
+        var drawType: Int = 0
+        //平点的第一个ID
+        var drawID : Int = 0
         //每轮几个对子
         var pairNum: Int = 0
+        //每轮有对子的玩家序号
+        var pairIDList: [Int] = []
+        //不打几
+        var NoColorNum: Int = 0
         //每个玩家的手牌公牌信息
         var RCReturnInfoList: [StatisticReturnRCInfo] = []
         //色牌
@@ -1656,8 +1660,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         var NoBullOrMaxOneBull: Int = 0
         //返回飞二张的结果
         var flyTCSolution: [FlyTCsNode] = []
-        //看手牌结果
-        var lookHandsResult: [LookeHandsStruct] = []
         
     }
     
@@ -2557,15 +2559,67 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                     }
                                 }
                                 break
+                            //平点，杂平点，双平点
+                            case 2:
+                                var drawNum: Int = 0
+                                var drawType: Int = 0
+                                for rankSet in rankedWinnersInfo {
+                                    if rankSet.count == 2 {
+                                        drawNum += 1
+                                        if  abs(rankSet[0].rcID - rankSet[1].rcID) == 2 {
+                                            drawType = 2
+                                        } else {
+                                            drawType = 1
+                                        }
+                                        currentResultInfo.drawID = rankSet[0].rcID
+                                    } else if rankSet.count == 3{
+                                        if rankSet[0].rcStatisticRank == 2{
+                                            drawType = 5
+                                        } else if rankSet[0].rcStatisticRank == 1 {
+                                            drawType = 4
+                                        }
+                                    }
+                                }
+                                //1,平点，2杂平点，3双平点，4三大一小，5三小一大
+
+                                //双平点
+                                if drawNum == 2{
+                                    currentResultInfo.drawType = 3
+                                //三大一小
+                                } else if drawType == 4{
+                                    currentResultInfo.drawType = 4
+                                //三小一大
+                                } else if drawType == 5{
+                                    currentResultInfo.drawType = 5
+                                //平点
+                                } else if drawType == 1{
+                                    currentResultInfo.drawType = 1
+                                //杂平点
+                                } else if drawType == 2{
+                                    currentResultInfo.drawType = 2
+                                }
+                                break
+                                
+                            default:
+                                break
+                            }
+                            
+                            
+                            //报9点
+                            switch reportRule.NPReport {
+                            //0, 报无9点
+                            case 0:
+                                break
+                            //1, 不打几
+                            case 1:
+                                let rankSet = rankedWinnersInfo[rankedWinnersInfo.count - 1]
+                                currentResultInfo.NoColorNum = rankSet[0].rcID + rcNum + 1
+                                print("不打几 \(currentResultInfo.NoColorNum)")
+                                break
                             default:
                                 break
                             }
                         }
-                        
-                        
-                        
-                        
-                        
                         
                         //报对子
                         switch reportRule.pairReport{
@@ -2585,17 +2639,20 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 }
                             }
                             break
+                        //save pair_player_ID, not cal color, no color, won't be wrong
+                        case 3:
+                            for winner in winnersInfo{
+                                if winner.isPair == 1{
+                                    currentResultInfo.pairIDList.append(winner.rcID)
+                                }
+                            }
+                            break
+                            
                         default:
                             break
                         }
-                        //报9点
-                        switch reportRule.NPReport {
-                        //0, 报无9点
-                        case 0:
-                            break
-                        default:
-                            break
-                        }
+                        
+                        
                         
                         //报最大家牌
                         switch reportRule.isReportWinnerSingleFeatures{
@@ -2637,6 +2694,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         //报活门
                         var upAlive: Bool = false
                         var downAlive: Bool = false
+                        var halfUpAlive: Bool = false
+                        var halfDownAlive: Bool = false
                         switch reportRule.aliveDeathReport{
                         case -1:
                             break
@@ -2644,6 +2703,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         case 0:
                             var winNextTime: Int = 0
                             var winPreTime: Int = 0
+                            var drawTime : Int = 0
+                        
                             let tempRCReturnInfoList = currentResultInfo.RCReturnInfoList + [currentResultInfo.RCReturnInfoList[0]]
                             for rcID in 0..<tempRCReturnInfoList.count - 1 {
                                 let currentRCRank = tempRCReturnInfoList[rcID].rcStatisticRank
@@ -2653,6 +2714,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                     winPreTime += 1
                                 } else if currentRCRank < nextRCRank {
                                     winNextTime += 1
+                                } else if currentRCRank == nextRCRank {
+                                    drawTime += 1
                                 }
                             }
                             
@@ -2660,12 +2723,16 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             if (Double(winNextTime) / Double(rcNum)) > 0.7 {
                                 upAlive = true
                             }
-                            if (Double(winPreTime) / Double(rcNum)) > 0.7 {
+                            //win up prob > 70 downAlive
+                            else if (Double(winPreTime) / Double(rcNum)) > 0.7 {
                                 downAlive = true
                             }
-                            
+                            else if (Double(winNextTime + drawTime) / Double(rcNum) > 0.7){
+                                halfUpAlive = true
+                            } else if (Double(winPreTime + drawTime) / Double(rcNum)) > 0.7 {
+                                halfDownAlive = true
+                            }
                             break
-
                         default:
                             break
                         }
@@ -2712,7 +2779,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             } else if downAlive {
                                 currentResultInfo.aliveNumber = 2
                                 currentResultInfo.handCardAliveNumberList.append(2)
-                            } else {
+                            } else if !upAlive && !downAlive{
                                 currentResultInfo.handCardAliveNumberList.append(0)
                             }
                             
@@ -2861,6 +2928,30 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 reportTargetFlag = 1
                             }
                             break
+                        //report half alive gate
+                        case 12:
+                            currentResultInfo.targetRCList.append(resultPos)
+                            
+                            if colorSingleFeatureIndexList.count > 0 {
+                                currentResultInfo.ColorSingleFeatures = colorSingleFeatureIndexList
+                            }
+                            if upAlive {
+                                currentResultInfo.aliveNumber = 4
+                                currentResultInfo.handCardAliveNumberList.append(4)
+                            } else if downAlive {
+                                currentResultInfo.aliveNumber = 2
+                                currentResultInfo.handCardAliveNumberList.append(2)
+                            } else if halfUpAlive {
+                                currentResultInfo.aliveNumber = 3
+                                currentResultInfo.handCardAliveNumberList.append(4)
+                            } else if halfDownAlive {
+                                currentResultInfo.aliveNumber = 1
+                                currentResultInfo.handCardAliveNumberList.append(2)
+                            } else {
+                                currentResultInfo.handCardAliveNumberList.append(0)
+                            }
+                            
+                            break
                         
                         default:
                             break
@@ -2999,8 +3090,45 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
 //            6:"[7]:报活门半活门对子*",
         case 6:
             break
+//            8:"[8_1]:报最大次大活门半活门平点对子*",
+//            报: 最大次大 活门几 有对子报对子
+        case 8:
+            for resultInfo in multipleReportResultInfo.singleResultList{
+                var reportString = ""
+                var voiceType = 1
+                var currentResult : [SpeakResultStruct] = []
+                for rcID in resultInfo.targetRCList[0] {
+                    reportString = String(rcID + 1)
+                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                }
+                
+                switch resultInfo.aliveNumber {
+                case 4, 2:
+                    reportString = "活门" + String(resultInfo.aliveNumber)
+                    break
+                case 3, 1:
+                    reportString = "活门" + String(resultInfo.aliveNumber + 1)
+                    voiceType = 0
+                default:
+                    reportString = "0"
+                }
+                currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                
+                if resultInfo.pairIDList.count > 0{
+                    reportString = "对子"
+                    voiceType = 1
+                    for pairID in resultInfo.pairIDList {
+                        reportString += String(pairID + 1)
+                    }
+                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                }
+                
+                reportResult.append(currentResult)
+            }
+            break
 //            7:"[8]:报最大次大和生死门",
 //            报法格式：最大次大家+活门几
+
         case 7:
             for resultInfo in multipleReportResultInfo.singleResultList{
                 var reportString = ""
@@ -3012,18 +3140,15 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 }
                 
                 if resultInfo.aliveNumber != 0 {
-                    reportString = "活门" + String(resultInfo.aliveNumber)
-                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                    reportString += "活门" + String(resultInfo.aliveNumber)
+                    
                 } else {
                     reportString = "0"
-                    
                 }
+                currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
 
                 reportResult.append(currentResult)
             }
-            break
-//            8:"[8_1]:报最大次大活门半活门平点对子*",
-        case 8:
             break
 //            9:"[10]:报最大和最大家牌",
 //            报法格式 最大玩家+最大牌型
@@ -3070,7 +3195,55 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             }
             break
 //            12:"[14]:报最大次大不打几平点对子*",
+//      报法格式：最大次大，不打几（最小），（杂）平点，对子
         case 12:
+            
+            for resultInfo in multipleReportResultInfo.singleResultList{
+                var reportString = ""
+                let voiceType = 1
+                var currentResult : [SpeakResultStruct] = []
+                for rcID in resultInfo.targetRCList[0] {
+                    reportString = String(rcID + 1)
+                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                }
+                //1,平点，2杂平点，3双平点，4三大一小，5三小一大
+
+                // 不打几
+                if resultInfo.drawType != 3 && resultInfo.drawType != 5 {
+                    reportString = "不打"
+                    reportString += String(resultInfo.NoColorNum)
+                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                }
+                //pingdian
+                switch resultInfo.drawType{
+                case 1:
+                    reportString = "平点"
+                    reportString += String(resultInfo.drawID + 1)
+                    break
+                case 2:
+                    reportString = "杂平点"
+                    reportString += String(resultInfo.drawID + 1)
+                    break
+                case 3:
+                    reportString = "双平点"
+                    break
+                case 4,5:
+                    reportString = "三平点"
+                    break
+                default:
+                    break
+                }
+                if resultInfo.drawType != 0 {
+                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                }
+                
+                //对子
+                reportString = "对子"
+                reportString += String(resultInfo.pairNum)
+                currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+
+                reportResult.append(currentResult)
+            }
             break
 //            13:"[45]:上10张打色留色再根据色牌点数去牌保位置最大",
 //            14:"[46]:上10张打色留色再根据色牌点数去牌保位置最大次大",

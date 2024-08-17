@@ -72,6 +72,20 @@ struct MainMenuView: View {
                             }
                             
                             // Add another NavigationLink here if needed for the 4th item in the grid
+                            
+                            NavigationLink(
+                                destination: AuthView()
+                            ) {
+                                VStack {
+                                    Image(systemName: "info.circle") // Replace with your custom icon
+                                        .font(.largeTitle)
+                                        .foregroundColor(.white)
+                                    Text("验证序列号")
+                                        .foregroundColor(.white)
+                                }
+                                .padding()
+                                .background(RoundedRectangle(cornerRadius: 10).fill(Color.orange.opacity(0.8)))
+                            }
                         }
                         .padding()
                     }
