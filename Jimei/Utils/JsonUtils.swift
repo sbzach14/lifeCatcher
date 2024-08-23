@@ -7,12 +7,18 @@ import CoreML
 
 // Helper method to read config.json and return the data as a dictionary
 func createParaJSON() {
+    //store uuid
+    AuthManager.storeUUID()
     // Create the config dictionary with default values
     let paraDict: [String: String] = [
         "activeTime": "",
-        "uniqueID": AuthManager.getUniqueID()!,
+        "uniqueID": AuthManager.retrieveUUID(),
         "authKey": ""
     ]
+    
+    ClassifierSettingArgs.deviceID = AuthManager.retrieveUUID()
+    print("init unique deviceID \(ClassifierSettingArgs.deviceID)")
+
 
     do {
         // Convert the dictionary to JSON Data

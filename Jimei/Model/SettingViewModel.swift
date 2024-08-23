@@ -51,6 +51,7 @@ class SettingViewModel: ObservableObject {
         if let paraData = readParaJSON() {
             self.activeDate = paraData["activeTime"]!
             self.uniqueID = paraData["uniqueID"]!
+            print("uniqueID \(self.uniqueID)")
             self.authKey = paraData["authKey"]!
         }
         

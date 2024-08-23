@@ -67,6 +67,9 @@
 		A88EFE0B2A7FC05900897243 /* JsonUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFE0A2A7FC05900897243 /* JsonUtils.swift */; };
 		A88EFE0D2A7FDC9500897243 /* AlbumListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFE0C2A7FDC9500897243 /* AlbumListView.swift */; };
 		A892C6002A765A0A003FA2B3 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A892C5FF2A765A0A003FA2B3 /* MainView.swift */; };
+		A89CDD882C70569400588273 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89CDD872C70569400588273 /* LoginView.swift */; };
+		A89CDD8A2C71B79500588273 /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89CDD892C71B79500588273 /* RegisterView.swift */; };
+		A89CDD8C2C76767300588273 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89CDD8B2C76767300588273 /* KeychainHelper.swift */; };
 		A8FBC7C22A3F0A5C00EDDFD7 /* VisionUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8FBC7C12A3F0A5C00EDDFD7 /* VisionUtils.swift */; };
 		B058BE5F2B09FFC20078E792 /* BlurDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058BE5E2B09FFC20078E792 /* BlurDetector.swift */; };
 /* End PBXBuildFile section */
@@ -128,6 +131,9 @@
 		A88EFE0C2A7FDC9500897243 /* AlbumListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumListView.swift; sourceTree = "<group>"; };
 		A88F20B12A1E3D4C005E4A27 /* Jimei.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Jimei.entitlements; sourceTree = "<group>"; };
 		A892C5FF2A765A0A003FA2B3 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		A89CDD872C70569400588273 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		A89CDD892C71B79500588273 /* RegisterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
+		A89CDD8B2C76767300588273 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 		A8FBC7C12A3F0A5C00EDDFD7 /* VisionUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionUtils.swift; sourceTree = "<group>"; };
 		B058BE5E2B09FFC20078E792 /* BlurDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurDetector.swift; sourceTree = "<group>"; };
 		F11ED84932036610B96BC234 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
@@ -240,6 +246,8 @@
 				A887B6572A8511A4009F488F /* InfoView.swift */,
 				18C98D212C15906100A8CD49 /* DeprecatedAlbumView.swift */,
 				18C98CE42C15893200A8CD49 /* DeprecatedListView.swift */,
+				A89CDD872C70569400588273 /* LoginView.swift */,
+				A89CDD892C71B79500588273 /* RegisterView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -290,6 +298,7 @@
 				A887B6512A8104BC009F488F /* TimeUtils.swift */,
 				18FFC4092BB9587900029B0D /* BlurDetector_origin.swift */,
 				B058BE5E2B09FFC20078E792 /* BlurDetector.swift */,
+				A89CDD8B2C76767300588273 /* KeychainHelper.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -419,6 +428,7 @@
 				187A45832C39440800BB055C /* AppDelegate.swift in Sources */,
 				18F6C0C32C10A685007BEAEC /* RecordHistoryViewModel.swift in Sources */,
 				187A45502C31BBB400BB055C /* ExtraArgsClass.swift in Sources */,
+				A89CDD8C2C76767300588273 /* KeychainHelper.swift in Sources */,
 				18C98D0B2C158F7B00A8CD49 /* BZi.swift in Sources */,
 				A887B6582A8511A4009F488F /* InfoView.swift in Sources */,
 				18C98D122C158F7B00A8CD49 /* PBul.swift in Sources */,
@@ -426,6 +436,7 @@
 				A887167F2A0623E500B7F2CD /* AManager.swift in Sources */,
 				18C98D1A2C158F7B00A8CD49 /* TMen.swift in Sources */,
 				A88EFE0B2A7FC05900897243 /* JsonUtils.swift in Sources */,
+				A89CDD8A2C71B79500588273 /* RegisterView.swift in Sources */,
 				1824EF7D2C4FFF380029836C /* cls_0715_h.mlmodel in Sources */,
 				18C98D0C2C158F7B00A8CD49 /* CNin.swift in Sources */,
 				18C98CE52C15893200A8CD49 /* DeprecatedListView.swift in Sources */,
@@ -446,6 +457,7 @@
 				18C98D152C158F7B00A8CD49 /* TPok.swift in Sources */,
 				B058BE5F2B09FFC20078E792 /* BlurDetector.swift in Sources */,
 				18FFC40A2BB9587A00029B0D /* BlurDetector_origin.swift in Sources */,
+				A89CDD882C70569400588273 /* LoginView.swift in Sources */,
 				18CA14DB284AC42C00F90372 /* MyApp.swift in Sources */,
 				18C98D1C2C158F7B00A8CD49 /* TCar.swift in Sources */,
 				18C98D142C158F7B00A8CD49 /* TPFive.swift in Sources */,

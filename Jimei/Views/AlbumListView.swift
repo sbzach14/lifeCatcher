@@ -40,7 +40,12 @@ struct RecordHistoryView: View {
                 .padding(.trailing, 20)
             }
             
-            NavigationLink(destination: DeprecatedMainMenuView(), isActive: $settingviewModel.isLogin) {
+            NavigationLink(destination: DeprecatedMainMenuView(), isActive: Binding<Bool>(
+                get: {
+                    settingviewModel.isLogin && ClassifierSettingArgs.isLoginServer
+                },
+                set: { _ in }
+            )) {
             }
             .hidden()
             

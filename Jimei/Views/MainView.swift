@@ -2,7 +2,15 @@
 
 import SwiftUI
 
+
+class AppViewModel: ObservableObject {
+    @Published var appState: AppState = .loggedOut
+    @Published var userInfo: UserInfo?
+}
+
+
 struct MainMenuView: View {
+    @StateObject var loginStatus = AppViewModel()
 
     var body: some View {
         NavigationView {
@@ -86,6 +94,19 @@ struct MainMenuView: View {
                                 .padding()
                                 .background(RoundedRectangle(cornerRadius: 10).fill(Color.orange.opacity(0.8)))
                             }
+                            
+                            NavigationLink(
+                                destination: LoginView(loginStatus: loginStatus)) {
+                                                        VStack {
+                                                            Image(systemName: "person.crop.circle.fill") // Replace with your custom icon
+                                                                .font(.largeTitle)
+                                                                .foregroundColor(.white)
+                                                            Text("用户登录")
+                                                                .foregroundColor(.white)
+                                                        }
+                                                        .padding()
+                                                        .background(RoundedRectangle(cornerRadius: 10).fill(Color.red.opacity(0.8)))
+                                                    }
                         }
                         .padding()
                     }
