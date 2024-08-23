@@ -22,8 +22,7 @@ struct MyApp: App {
     
     var body: some Scene {
         WindowGroup {
-            
-            MainMenuView().onAppear {
+            MainView().onAppear {
                 requestPermissions()
                 initFile()
             }
@@ -34,10 +33,10 @@ struct MyApp: App {
     private func requestPermissions() {
         AVCaptureDevice.requestAccess(for: .video) { granted in
             if !granted {
-                print("camera access fail")
+                // print("camera access fail")
             }
             else{
-                print("camera access success")
+                // print("camera access success")
             }
         }
     }
@@ -48,7 +47,7 @@ struct MyApp: App {
         createConfigJSON()
         createRecordHistoryJSON()
         
-        DetectSettingArgs.allUsersStatisticRule = DetectSettingArgs.loadStatisticRule()!
+        DetectSettingArgs.allUsersDatasetRule = DetectSettingArgs.loadDatasetRule()!
         DetectSettingArgs.LoadAllPresetRules()
         DetectSettingArgs.LoadAllReportRules()
     }

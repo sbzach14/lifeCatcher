@@ -24,10 +24,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //            let detectModelPath = Bundle.main.path(forResource: "detect_640_0719_test", ofType: "mlmodelc")
 //            AuthManager.detectModel = try MLModel.init(contentsOf: URL.init(fileURLWithPath: detectModelPath!))
 //            AuthManager.det_model_url = detectModelPath
-//            print(AuthManager.detectModel?.description)
             
         } catch {
-            print("解密操作失败：\(error)")
+            // print("解密操作失败：\(error)")
         }
         
         return true
@@ -93,10 +92,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         do {
             try Zip.unzipFile(decryptedZipURL, destination: tempDirectoryURL, overwrite: true, password: "password", progress: { (progress) -> () in
-                    print(progress)
+                    // print(progress)
                 }) // Unzip
         } catch {
-            print("解压缩失败: \(error.localizedDescription)")
+            // print("解压缩失败: \(error.localizedDescription)")
         }
         
         // 删除解密后的 ZIP 文件
