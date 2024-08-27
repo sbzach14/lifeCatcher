@@ -38,6 +38,35 @@ struct CustomToggleStyle: ToggleStyle{
     }
 }
 
+struct CustomToggleStyle_NoText: ToggleStyle{
+    let onImage: Image = Image("icon_slider_bg_on")
+    let offImage: Image = Image("icon_slider_bg_off")
+    let buttonImage: Image = Image(systemName: "circle") // 使用系统提供的圆形图像
+
+    func makeBody(configuration: Configuration) -> some View {
+        Button(action: {
+            configuration.isOn.toggle()
+        }) {
+            ZStack {
+                if configuration.isOn {
+                    onImage
+                        .resizable()
+                        .frame(width: 60, height: 25)
+                } else {
+                    offImage
+                        .resizable()
+                        .frame(width: 60, height: 25)
+                }
+                
+                buttonImage
+                    .resizable()
+                    .frame(width: 30, height: 30)
+                    .offset(x: configuration.isOn ? 15 : -15)
+            }
+        }
+    }
+}
+
 struct SearchBar: View {
     @Binding var searchText: String
     

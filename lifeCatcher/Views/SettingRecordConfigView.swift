@@ -82,7 +82,7 @@ struct SettingRecordConfigView: View{
     @State private var dealType: Int = 0
     @State private var diyDealNum: [Int] = []
     @State private var diyDealStatus: [[Bool]] = []
-    @State private var rcNum: Int = 0
+    @State private var rcNum: Int = 2
     @State private var shuffleMode: Int = 0
     @State private var cutMode: Int = 0
     @State private var singlefeatureToUse: [Int] = []
@@ -117,7 +117,7 @@ struct SettingRecordConfigView: View{
 
             let selectedRule = ClassifierSettingArgs.targetSetting[DatasetType]!
             self.rcNumList = selectedRule.rcNum
-            self.currentNum = rcNumList[self.rcNum]
+            
             self.cutNumRangeSetting = [1,5]
             for singlefeatureIndex in 0...54{
                 if singlefeatureIndex != 52{
@@ -131,6 +131,8 @@ struct SettingRecordConfigView: View{
                 self.rankRules.append(RankRulesSate(index: DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![2][rankIndex], isChecked: (DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![3][rankIndex] != 0)))
             }
             self.singlefeatureToUse = DatasetGetAllSingleFeatureIndex()
+            
+            self.currentNum = rcNumList[self.rcNum]
         }else if self.selectedSaveIndex > -1 && editType == 0{
             _selectedSaveIndex = self.selectedSaveIndex
 
@@ -138,7 +140,6 @@ struct SettingRecordConfigView: View{
             
             let selectedRule = ClassifierSettingArgs.targetSetting[DatasetType]!
             self.rcNumList = selectedRule.rcNum
-            self.currentNum = rcNumList[self.rcNum]
             
             self.setting = rules.setting
             self.dealNum = rules.dealNum
@@ -164,6 +165,8 @@ struct SettingRecordConfigView: View{
             }
             self.minSingleFeatureNum = minSingleFeatureNum
             self.resultReportType = rules.resultReportType
+            
+            self.currentNum = rcNumList[self.rcNum]
         }
         
         self.editType = 1

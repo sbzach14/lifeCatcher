@@ -333,7 +333,7 @@ class PB{
         var result : [Int] = []
         switch setting {
         case 0:
-            result = Array(0...51) + [53,54]
+            result = Array(0...51)
             break
         case 1:
             result = Array(0...51) + [53,54]

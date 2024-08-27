@@ -31,59 +31,67 @@ struct CurrentVisionObjectRecognitionView: View {
                     if viewModel.isCamereSetting{
                         VStack{
                             HStack {
-                                Text("后置相机")
+                                Text("相机选择")
                                     .foregroundColor(.white)
                                     .frame(maxWidth: 80, alignment: .leading)
                                 
                                 Spacer()
                                 
+                                Text("前置")
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: 40, alignment: .trailing)
+                                
                                 Toggle("", isOn: $viewModel.isBackCamera)
-                                    .toggleStyle(CustomToggleStyle())
-                                    .frame(width: 200, height: 30, alignment: .trailing)
+                                    .toggleStyle(CustomToggleStyle_NoText())
+                                    .frame(width:70, height: 30, alignment: .trailing)
                                     .accentColor(.white)
                                     .onChange(of: viewModel.isBackCamera) {
                                         newValue in
+                                        
+                                        //前置
+                                        if newValue == false{
+                                            viewModel.isCameraHorizon = true
+                                        }
+                                        
                                         viewModel.stopCamera()
                                         viewModel.setupAVCapture()
                                         viewModel.startCamera()
                                         viewModel.updateConfigJSON()
                                     }
-                            }
-                            
-                            Divider().colorInvert()
-                            
-                            HStack {
-                                Text("横屏模式")
+                                
+                                Text("后置")
                                     .foregroundColor(.white)
-                                    .frame(maxWidth: 80, alignment: .leading)
-                                
-                                Spacer()
-                                
-                                Toggle("", isOn: $viewModel.isCameraHorizon)
-                                    .toggleStyle(CustomToggleStyle())
-                                    .frame(width: 200, height: 30, alignment: .trailing)
-                                    .accentColor(.white)
-                                    .onChange(of: viewModel.isCameraHorizon) {
-                                        newValue in
-                                        viewModel.updateConfigJSON()
-                                    }
+                                    .frame(maxWidth: 40, alignment: .trailing)
                             }
                             
-                            Divider().colorInvert()
-                            
-                            HStack {
-                                Text("缩放:\(String(format: "%.2f", viewModel.zoomFactor))").foregroundColor(.white).frame(maxWidth: 80, alignment: .leading)
+                            if viewModel.isBackCamera{
                                 
-                                Spacer()
+                                Divider().colorInvert()
                                 
-                                Slider(value: $viewModel.zoomFactor, in: 0...1, step: 0.01)
-                                    .frame(width: .infinity, height: 30, alignment: .trailing)
-                                    .accentColor(.white)
-                                    .onChange(of: viewModel.zoomFactor) {
-                                        newValue in
-                                        viewModel.updateZoomFactor()
-                                        viewModel.updateConfigJSON()
-                                    }
+                                HStack {
+                                    Text("屏幕方向")
+                                        .foregroundColor(.white)
+                                        .frame(maxWidth: 80, alignment: .leading)
+                                    
+                                    Spacer()
+                                    
+                                    Text("竖屏")
+                                        .foregroundColor(.white)
+                                        .frame(maxWidth: 40, alignment: .trailing)
+                                    
+                                    Toggle("", isOn: $viewModel.isCameraHorizon)
+                                        .toggleStyle(CustomToggleStyle_NoText())
+                                        .frame(width: 70, height: 30, alignment: .trailing)
+                                        .accentColor(.white)
+                                        .onChange(of: viewModel.isCameraHorizon) {
+                                            newValue in
+                                            viewModel.updateConfigJSON()
+                                        }
+                                    
+                                    Text("横屏")
+                                        .foregroundColor(.white)
+                                        .frame(maxWidth: 40, alignment: .trailing)
+                                }
                             }
                             
 //                            Divider().colorInvert()
@@ -106,7 +114,7 @@ struct CurrentVisionObjectRecognitionView: View {
 //                                }
 //                            }
                             
-                            if !viewModel.isAutoFocus{
+                            if !viewModel.isAutoFocus && viewModel.isBackCamera{
                                 
                                 Divider().colorInvert()
                                 
@@ -122,8 +130,25 @@ struct CurrentVisionObjectRecognitionView: View {
                                             newValue in
                                             viewModel.updateFocusFactor()
                                             viewModel.updateConfigJSON()
-                                        }
+                                    }
                                 }
+                            }
+                            
+                            Divider().colorInvert()
+                            
+                            HStack {
+                                Text("缩放:\(String(format: "%.2f", viewModel.zoomFactor))").foregroundColor(.white).frame(maxWidth: 80, alignment: .leading)
+                                
+                                Spacer()
+                                
+                                Slider(value: $viewModel.zoomFactor, in: 0...1, step: 0.01)
+                                    .frame(width: .infinity, height: 30, alignment: .trailing)
+                                    .accentColor(.white)
+                                    .onChange(of: viewModel.zoomFactor) {
+                                        newValue in
+                                        viewModel.updateZoomFactor()
+                                        viewModel.updateConfigJSON()
+                                    }
                             }
                         }
                         .bubbleBackground()

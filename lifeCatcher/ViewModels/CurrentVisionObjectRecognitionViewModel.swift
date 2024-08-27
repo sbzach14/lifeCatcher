@@ -22,8 +22,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var isCamereSetting : Bool = false
     
     @Published var singlefeatureArray :  [Int] = []
-    @Published var winnerRC: [[SpeakResultStruct]] = []
-    @Published var winnerRCShow: String = ""
     @Published var multipleDatasetRCInfos: ReportManager.MultipleReportResultInfo = ReportManager.MultipleReportResultInfo()
     @Published var leftSingleFeatures: [Int] = []
     @Published var usedSingleFeatures: [Int] = []
@@ -150,7 +148,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     
     let speechPerformer = SpeechPerformer()
     
+    //单次流程的牌切了吗
     var cutDone : Bool = true
+    //单次识别是否等待识别切牌
     var detectNeedToCut : Bool = false
     var detectSet : Set<Int> = []
     
@@ -195,8 +195,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     private func initDetectResult(){
         detectResultList = [:]
         stateCounter = 0
-        winnerRC = []
-        winnerRCShow = ""
         detectSet = []
         detectNeedToCut = false
         isDetect = false
@@ -214,6 +212,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         else{
             self.cutDone = true
         }
+        multipleDatasetRCInfos = ReportManager.MultipleReportResultInfo()
     }
     
     private func initBoxes(){
@@ -397,10 +396,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             
             
             if frameRate == idleRate{
-                device.setExposureTargetBias(0)
+                self.captureDevice.exposureMode = .continuousAutoExposure
+                self.captureDevice.setExposureTargetBias(0)
             }
             else{
-                device.setExposureTargetBias(1.5)
+                self.captureDevice.exposureMode = .autoExpose
+                self.captureDevice.setExposureTargetBias(1.5)
             }
             
             device.unlockForConfiguration()
@@ -428,8 +429,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         // 每秒更新一次帧率
         if deltaTime >= 1.0 {
             let frameRate = Double(frameCount) / deltaTime
-            // print("实时帧率\(frameRate)fps")
-            
+            print("实时帧率\(frameRate)fps")
+            print(self.captureDevice.exposureTargetOffset)
+            print(self.captureDevice.maxExposureTargetBias)
             timestamp = currentTimestamp
             // 重置计数器
             frameCount = 0
@@ -581,7 +583,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         let isShuffle = detectNum == 2 && (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4)
         let isRiffle = detectNum == 1 && (self.shuffleMode == 1 || self.shuffleMode == 2 || self.shuffleMode == 3 || self.shuffleMode == 4)
-        let isCut = detectNum != 0 && (!self.cutDone || self.resultReportType == 1) && self.singlefeatureArray.count > 0
+        var isCut = detectNum != 0 && (!self.cutDone || self.resultReportType == 1) && self.singlefeatureArray.count > 0
         
         DispatchQueue.main.async{
             if self.state == "idle"{
@@ -697,6 +699,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         self.stateCounter = 0
                     }
                     
+                    
                     if self.detectNeedToCut
                         && detectConfidence >= detectConfidenceThreshold
                         && isCut
@@ -776,7 +779,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         self.initShuffle()
                         self.singlefeatureArray = detectState.detectionResult
  
-                        
                         if(self.shuffleMode == 1 || self.shuffleMode == 3){
                             //拨到顶
                             if self.singlefeatureArray.count >= self.minSingleFeatureNum{
@@ -811,25 +813,13 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 
                 //识别过程
                 else if taskIndex >= 0 && self.isDetect{
-//                    let shuffleCheck = singlefeatureResult[0].singlefeatureIndex[0] != singlefeatureResult[1].singlefeatureIndex[0]
-//                    && singlefeatureResult[0].singlefeatureIndex[0] != -1
-//                    && singlefeatureResult[1].singlefeatureIndex[0] != -1
-//                    
-//                    if isShuffle && shuffleCheck{
-//                        self.state = "shuffle"
-//                    }
+                    let shuffleCheck = singlefeatureResult[0].singlefeatureIndex[0] != singlefeatureResult[1].singlefeatureIndex[0]
+                    && singlefeatureResult[0].singlefeatureIndex[0] != -1
+                    && singlefeatureResult[1].singlefeatureIndex[0] != -1
                     
-                    if isShuffle{
+                    if isShuffle && shuffleCheck && self.detectResultList.count > 60{
                         self.state = "shuffle"
-                    }
-                    
-                    
-                    if self.detectSet.count > 10 || isShuffle{
-                        self.detectSet = []
-                    }
-                    else if self.detectSet.count > 0{
-                        self.detectSet.insert(singlefeatureResult[0].singlefeatureIndex[0])
-                        self.detectSet.insert(singlefeatureResult[1].singlefeatureIndex[0])
+                        self.detectNeedToCut = false
                     }
                     
                     
@@ -984,9 +974,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             let nodeType0 = targetDetecResultList[detectResultListIndex]![0].nodeType
             let nowNum1 = targetDetecResultList[detectResultListIndex]![1].singlefeatureIndex[0]
             let nodeType1 = targetDetecResultList[detectResultListIndex]![1].nodeType
-//            print("index ", keyIndex,
-//                  singlefeatureLabelDic[nowNum0] ?? "none", detectResultNode0.nodeType, detectResultNode0.laplacianVariance, detectResultNode0.confidence[0], detectResultListIndex,
-//                  singlefeatureLabelDic[nowNum1] ?? "none", detectResultNode1.nodeType, detectResultNode1.laplacianVariance, detectResultNode1.confidence[0])
+            
+            print("index ", keyIndex,
+                  singlefeatureLabelDic[nowNum0] ?? "none", detectResultNode0.nodeType, detectResultNode0.laplacianVariance, detectResultNode0.confidence[0], detectResultListIndex,
+                  singlefeatureLabelDic[nowNum1] ?? "none", detectResultNode1.nodeType, detectResultNode1.laplacianVariance, detectResultNode1.confidence[0])
             
             if targetDetecResultList[detectResultListIndex]![0].singlefeatureIndex[0] != -1
                 && targetDetecResultList[detectResultListIndex]![1].singlefeatureIndex[0] != -1{

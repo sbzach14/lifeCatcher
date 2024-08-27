@@ -69,7 +69,7 @@ class OriginVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCapt
             let dimensions = CMVideoFormatDescriptionGetDimensions(format.formatDescription)
             return dimensions.width == 1920
                 && ranges.contains { range in
-                return range.maxFrameRate >= setFrameRate
+                    return range.maxFrameRate >= setFrameRate && format.supportedColorSpaces.count == 1
             }
         }) else {
             // print("不支持\(setFrameRate)帧的摄像头格式")

@@ -9,7 +9,7 @@ struct InfoView: View {
         VStack(alignment: .leading, spacing: 10){
                     
                     // 版本信息
-                    Text("Version:1.0.0")
+                    Text("Version:1.0.1")
                         .padding()
                         .foregroundColor(.black)
                     
