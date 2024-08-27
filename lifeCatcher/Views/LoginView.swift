@@ -115,10 +115,14 @@ struct LoginView: View {
         let url = URL(string: "http://1.94.17.30:8080/login")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
+        //获取登陆的时间戳
+        let timestamp = Int(Date().timeIntervalSince1970)
+
         let parameters: [String: Any] = [
             "deviceID": ClassifierSettingArgs.deviceID,
             "username": username,
-            "password": password
+            "password": password,
+            "loginTime": timestamp
         ]
         request.httpBody = try? JSONSerialization.data(withJSONObject: parameters, options: [])
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -132,8 +136,18 @@ struct LoginView: View {
                 return
             }
             let jsonResponse = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+            
+//            # account status
+//            # -1, login error, 错误
+//            # 0, formal version, 正式
+//            # 1, test version, 测试
+//            # 2, exipired, 超时
+//            # 3, not activated, 未激活 appletest (True 3)
+            
             let success = jsonResponse?["success"] as? Bool ?? false
             let message = jsonResponse?["message"] as? String ?? "对方什么也没说"
+            let accountStatus = jsonResponse?["accountStatus"] as? Int ?? -1
+            print("账号状态：\(accountStatus)")
             
             DispatchQueue.main.async {
                 if success {

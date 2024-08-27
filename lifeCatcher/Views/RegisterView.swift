@@ -47,12 +47,17 @@ struct RegisterView: View {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        //获取设备序列号
+        
+        //获取注册的时间
+        let timestamp = Int(Date().timeIntervalSince1970)
 
+        //获取设备序列号
+        
         let body: [String: Any] = [
             "deviceID": ClassifierSettingArgs.deviceID,
             "username": username,
-            "password": password
+            "password": password,
+            "registerTime": timestamp
         ]
         
         do {
