@@ -57,10 +57,11 @@
 		A88EFE0B2A7FC05900897243 /* JsonIOUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFE0A2A7FC05900897243 /* JsonIOUtils.swift */; };
 		A88EFE0D2A7FDC9500897243 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFE0C2A7FDC9500897243 /* HistoryView.swift */; };
 		A892C6002A765A0A003FA2B3 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A892C5FF2A765A0A003FA2B3 /* MainView.swift */; };
+		A89CDD882C70569400588273 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89CDD872C70569400588273 /* LoginView.swift */; };
+		A89CDD8A2C71B79500588273 /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89CDD892C71B79500588273 /* RegisterView.swift */; };
+		A89CDD8C2C76767300588273 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89CDD8B2C76767300588273 /* KeychainHelper.swift */; };
 		A8FBC7C22A3F0A5C00EDDFD7 /* VisionUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8FBC7C12A3F0A5C00EDDFD7 /* VisionUtils.swift */; };
 		B058BE5F2B09FFC20078E792 /* CurrentBlurDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058BE5E2B09FFC20078E792 /* CurrentBlurDetector.swift */; };
-		D013E3682C712E1F000F2B57 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = D013E3672C712E1F000F2B57 /* CryptoSwift */; };
-		D013E36B2C712E2D000F2B57 /* Zip in Frameworks */ = {isa = PBXBuildFile; productRef = D013E36A2C712E2D000F2B57 /* Zip */; };
 		D013E36D2C712F8D000F2B57 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D013E36C2C712F8D000F2B57 /* Assets.xcassets */; };
 		D03811A22C75401200726B99 /* cls_main.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D03811A12C75401200726B99 /* cls_main.mlmodel */; };
 		D03811A62C7542C300726B99 /* detect_0719_trans.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D03811A32C7542C000726B99 /* detect_0719_trans.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/detect_0719_trans.mlmodelkey"; }; };
@@ -72,6 +73,8 @@
 		D0DAEF952C7766D900D5938A /* UsedFeatureSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF942C7766D900D5938A /* UsedFeatureSelectView.swift */; };
 		D0DAEF972C77684F00D5938A /* NewSettingRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF962C77684F00D5938A /* NewSettingRecordView.swift */; };
 		D0DAEF992C7768DD00D5938A /* SettingRecordConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF982C7768DD00D5938A /* SettingRecordConfigView.swift */; };
+		D0DAEF9C2C7E439E00D5938A /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = D0DAEF9B2C7E439E00D5938A /* CryptoSwift */; };
+		D0DAEF9F2C7E43AE00D5938A /* Zip in Frameworks */ = {isa = PBXBuildFile; productRef = D0DAEF9E2C7E43AE00D5938A /* Zip */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -122,6 +125,9 @@
 		A88EFE0A2A7FC05900897243 /* JsonIOUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonIOUtils.swift; sourceTree = "<group>"; };
 		A88EFE0C2A7FDC9500897243 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		A892C5FF2A765A0A003FA2B3 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		A89CDD872C70569400588273 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		A89CDD892C71B79500588273 /* RegisterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
+		A89CDD8B2C76767300588273 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 		A8FBC7C12A3F0A5C00EDDFD7 /* VisionUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionUtils.swift; sourceTree = "<group>"; };
 		B058BE5E2B09FFC20078E792 /* CurrentBlurDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentBlurDetector.swift; sourceTree = "<group>"; };
 		D013E3612C7129EE000F2B57 /* lifeCatcher.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = lifeCatcher.entitlements; sourceTree = "<group>"; };
@@ -144,13 +150,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D013E36B2C712E2D000F2B57 /* Zip in Frameworks */,
+				D0DAEF9F2C7E43AE00D5938A /* Zip in Frameworks */,
 				18B7DA622C675E2900F37509 /* Crypto in Frameworks */,
 				18B7DA5C2C675E0000F37509 /* Algorithms in Frameworks */,
 				18B7DA642C675E2900F37509 /* _CryptoExtras in Frameworks */,
 				18B7DA5F2C675E1800F37509 /* Collections in Frameworks */,
 				18B7DA672C675E3F00F37509 /* AsyncAlgorithms in Frameworks */,
-				D013E3682C712E1F000F2B57 /* CryptoSwift in Frameworks */,
+				D0DAEF9C2C7E439E00D5938A /* CryptoSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -246,6 +252,8 @@
 				D0DAEF922C77664100D5938A /* HistoryItemView.swift */,
 				D0DAEF902C77657400D5938A /* ReportSettingView.swift */,
 				A892C5FF2A765A0A003FA2B3 /* MainView.swift */,
+				A89CDD872C70569400588273 /* LoginView.swift */,
+				A89CDD892C71B79500588273 /* RegisterView.swift */,
 				A887B64F2A7FE1AF009F488F /* ShowResultView.swift */,
 				A887B6572A8511A4009F488F /* InformationView.swift */,
 				18C98D212C15906100A8CD49 /* SettingRecordView.swift */,
@@ -290,6 +298,7 @@
 				187A454F2C31BBB400BB055C /* AllBaseSettingArgs.swift */,
 				187A454E2C31BBB400BB055C /* ExtraArgsClass.swift */,
 				A8FBC7C12A3F0A5C00EDDFD7 /* VisionUtils.swift */,
+				A89CDD8B2C76767300588273 /* KeychainHelper.swift */,
 				A88EFE0A2A7FC05900897243 /* JsonIOUtils.swift */,
 				A887B6512A8104BC009F488F /* TimeAuthUtils.swift */,
 				18FFC4092BB9587900029B0D /* OriginBlurDetector.swift */,
@@ -343,8 +352,8 @@
 				18B7DA612C675E2900F37509 /* Crypto */,
 				18B7DA632C675E2900F37509 /* _CryptoExtras */,
 				18B7DA662C675E3F00F37509 /* AsyncAlgorithms */,
-				D013E3672C712E1F000F2B57 /* CryptoSwift */,
-				D013E36A2C712E2D000F2B57 /* Zip */,
+				D0DAEF9B2C7E439E00D5938A /* CryptoSwift */,
+				D0DAEF9E2C7E43AE00D5938A /* Zip */,
 			);
 			productName = CountMyActions;
 			productReference = 18CA1477284ABEC600F90372 /* lifeCatcher.app */;
@@ -382,8 +391,8 @@
 				18B7DA5D2C675E1800F37509 /* XCRemoteSwiftPackageReference "swift-collections" */,
 				18B7DA602C675E2900F37509 /* XCRemoteSwiftPackageReference "swift-crypto" */,
 				18B7DA652C675E3F00F37509 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
-				D013E3662C712E1F000F2B57 /* XCLocalSwiftPackageReference "../Downloads/CryptoSwift-main" */,
-				D013E3692C712E2C000F2B57 /* XCLocalSwiftPackageReference "../Downloads/Zip-master" */,
+				D0DAEF9A2C7E439E00D5938A /* XCLocalSwiftPackageReference "../Downloads/CryptoSwift-main" */,
+				D0DAEF9D2C7E43AE00D5938A /* XCLocalSwiftPackageReference "../Downloads/Zip-master" */,
 			);
 			productRefGroup = 18CA1478284ABEC600F90372 /* Products */;
 			projectDirPath = "";
@@ -419,12 +428,14 @@
 				187A45832C39440800BB055C /* AppDelegate.swift in Sources */,
 				18F6C0C32C10A685007BEAEC /* RecordViewModel.swift in Sources */,
 				187A45502C31BBB400BB055C /* ExtraArgsClass.swift in Sources */,
+				A89CDD8C2C76767300588273 /* KeychainHelper.swift in Sources */,
 				18C98D0B2C158F7B00A8CD49 /* BZi.swift in Sources */,
 				A887B6582A8511A4009F488F /* InformationView.swift in Sources */,
 				18C98D122C158F7B00A8CD49 /* PBul.swift in Sources */,
 				18C98D192C158F7B00A8CD49 /* ZJHua.swift in Sources */,
 				A887167F2A0623E500B7F2CD /* AManager.swift in Sources */,
 				18C98D1A2C158F7B00A8CD49 /* TMen.swift in Sources */,
+				A89CDD8A2C71B79500588273 /* RegisterView.swift in Sources */,
 				D0DAEF992C7768DD00D5938A /* SettingRecordConfigView.swift in Sources */,
 				A88EFE0B2A7FC05900897243 /* JsonIOUtils.swift in Sources */,
 				18C98D0C2C158F7B00A8CD49 /* CNin.swift in Sources */,
@@ -448,6 +459,7 @@
 				D0DAEF952C7766D900D5938A /* UsedFeatureSelectView.swift in Sources */,
 				18C98D072C158F7B00A8CD49 /* CUtils.swift in Sources */,
 				18C98D152C158F7B00A8CD49 /* TPok.swift in Sources */,
+				A89CDD882C70569400588273 /* LoginView.swift in Sources */,
 				B058BE5F2B09FFC20078E792 /* CurrentBlurDetector.swift in Sources */,
 				18FFC40A2BB9587A00029B0D /* OriginBlurDetector.swift in Sources */,
 				18CA14DB284AC42C00F90372 /* MyApp.swift in Sources */,
@@ -714,11 +726,11 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		D013E3662C712E1F000F2B57 /* XCLocalSwiftPackageReference "../Downloads/CryptoSwift-main" */ = {
+		D0DAEF9A2C7E439E00D5938A /* XCLocalSwiftPackageReference "../Downloads/CryptoSwift-main" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = "../Downloads/CryptoSwift-main";
 		};
-		D013E3692C712E2C000F2B57 /* XCLocalSwiftPackageReference "../Downloads/Zip-master" */ = {
+		D0DAEF9D2C7E43AE00D5938A /* XCLocalSwiftPackageReference "../Downloads/Zip-master" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = "../Downloads/Zip-master";
 		};
@@ -785,11 +797,11 @@
 			package = 18B7DA652C675E3F00F37509 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
 			productName = AsyncAlgorithms;
 		};
-		D013E3672C712E1F000F2B57 /* CryptoSwift */ = {
+		D0DAEF9B2C7E439E00D5938A /* CryptoSwift */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = CryptoSwift;
 		};
-		D013E36A2C712E2D000F2B57 /* Zip */ = {
+		D0DAEF9E2C7E43AE00D5938A /* Zip */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Zip;
 		};

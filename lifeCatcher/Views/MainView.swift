@@ -2,8 +2,16 @@
 
 import SwiftUI
 
-struct MainView: View {
-    
+
+class AppViewModel: ObservableObject {
+    @Published var appState: AppState = .loggedOut
+    @Published var userInfo: UserInfo?
+}
+
+
+struct MainMenuView: View {
+    @StateObject var loginStatus = AppViewModel()
+
     var body: some View {
         NavigationView {
             ZStack{
@@ -13,7 +21,6 @@ struct MainView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 200, height: 200) // Adjust the size as needed
-                            .padding()
                             .background(RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.3)))
                         
                     Spacer()
@@ -65,6 +72,20 @@ struct MainView: View {
                             
                             // Add another NavigationLink here if needed for the 4th item in the grid
                             
+                            NavigationLink(
+                                destination: LoginView(loginStatus: loginStatus)
+                            ) {
+                                VStack {
+                                    Image(systemName: "person.crop.circle.fill") // Replace with your custom icon
+                                        .font(.largeTitle)
+                                        .foregroundColor(.white)
+                                    Text("Account")
+                                        .foregroundColor(.white)
+                                }
+                                .padding()
+                                .background(RoundedRectangle(cornerRadius: 10).fill(Color.red.opacity(0.8)).frame(width: 150, height: 100, alignment: .center))
+                            }
+
 //                                                        NavigationLink(
 //                                                            destination: AuthTestView()
 //                                                        ) {
@@ -91,7 +112,7 @@ struct MainView: View {
                             RoundedRectangle(cornerRadius: 10)
                                 .fill(Color.black.opacity(0.3))
                         )
-                        .padding(.top, 20) // Add some spacing above the image
+                        .padding(.bottom, 20) // Add some spacing above the image
                 }
             }
             .background(

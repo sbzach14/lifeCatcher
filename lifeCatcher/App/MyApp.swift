@@ -22,7 +22,7 @@ struct MyApp: App {
     
     var body: some Scene {
         WindowGroup {
-            MainView().onAppear {
+            MainMenuView().onAppear {
                 requestPermissions()
                 initFile()
             }

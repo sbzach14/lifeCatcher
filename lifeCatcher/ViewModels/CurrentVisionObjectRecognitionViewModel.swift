@@ -430,8 +430,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         if deltaTime >= 1.0 {
             let frameRate = Double(frameCount) / deltaTime
             print("实时帧率\(frameRate)fps")
-            print(self.captureDevice.exposureTargetOffset)
-            print(self.captureDevice.maxExposureTargetBias)
             timestamp = currentTimestamp
             // 重置计数器
             frameCount = 0

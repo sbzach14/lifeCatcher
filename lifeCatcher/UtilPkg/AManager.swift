@@ -3,7 +3,6 @@ import Security
 import Foundation
 import CryptoKit
 import CoreML
-import CryptoSwift
 
 class AuthManager {
     
@@ -81,4 +80,29 @@ class AuthManager {
         
         return charList.randomElement()!
     }
+    
+    static func storeUUID() {
+        let uuidKey = "com.lifeCatcher.uniqueUUID"
+        
+        if let savedUUID = KeychainHelper.shared.getUUIDFromKeychain(forKey: uuidKey) {
+            print("UUID already exists: \(savedUUID)")
+        } else {
+            let newUUID = UUID().uuidString
+            KeychainHelper.shared.saveUUIDToKeychain(uuid: newUUID, forKey: uuidKey)
+            print("New UUID saved: \(newUUID)")
+        }
+    }
+    
+    static func retrieveUUID() -> String {
+        let uuidKey = "com.lifeCatcher.uniqueUUID"
+        return KeychainHelper.shared.getUUIDFromKeychain(forKey: uuidKey)!
+    }
+    
+    static func deleteStoredUUID() {
+        let uuidKey = "com.lifeCatcher.uniqueUUID"
+        KeychainHelper.shared.deleteUUIDFromKeychain(forKey: uuidKey)
+    }
+
+
+
 }
