@@ -92,9 +92,10 @@ struct SettingRecordView: View {
 
         }
         .background(
-            Image("bg")
+            Image("Newbg2")
                 .resizable()
                 .scaledToFill()
+                .ignoresSafeArea()
             
         ).navigationTitle("历史记录").onAppear(){
             self.rules = DetectSettingArgs.allUsersDatasetRule

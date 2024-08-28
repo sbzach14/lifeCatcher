@@ -15,6 +15,7 @@ struct LoginView: View {
     @State private var password: String = ""
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
+    @State private var isAction: Bool = true
     @ObservedObject var loginStatus: AppViewModel = AppViewModel()
     
     var body: some View {
@@ -78,7 +79,8 @@ struct LoginView: View {
                         // 执行退出登录操作
                         loginStatus.userInfo = nil // 清空用户名
                         loginStatus.appState = .loggedOut // 将状态改为未登录
-                        ClassifierSettingArgs.isLoginServer = false
+                        AuthManager.isLoginServer = false
+                        AuthManager.loginStatus = -1
                     }) {
                         Text("Sign Out")
                             .foregroundColor(.white)
@@ -116,7 +118,7 @@ struct LoginView: View {
         let timestamp = Int(Date().timeIntervalSince1970)
 
         let parameters: [String: Any] = [
-            "deviceID": ClassifierSettingArgs.deviceID,
+            "deviceID": AuthManager.deviceID,
             "username": username,
             "password": password,
             "loginTime": timestamp
@@ -140,6 +142,7 @@ struct LoginView: View {
 //            # 1, test version, 测试
 //            # 2, exipired, 超时
 //            # 3, not activated, 未激活 appletest (True 3)
+//            # 4, deactivated, 被禁用
             
             let success = jsonResponse?["success"] as? Bool ?? false
             let message = jsonResponse?["message"] as? String ?? "对方什么也没说"
@@ -151,7 +154,8 @@ struct LoginView: View {
                     // 更新为已登录状态并保存用户信息
                     loginStatus.appState = .loggedIn(username: username)
                     loginStatus.userInfo = UserInfo(username: username)
-                    ClassifierSettingArgs.isLoginServer = true
+                    AuthManager.isLoginServer = true
+                    AuthManager.loginStatus = accountStatus
                 } else {
                     showAlert = true
                     alertMessage = message

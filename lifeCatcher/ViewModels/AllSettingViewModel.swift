@@ -21,11 +21,8 @@ class SettingViewModel: ObservableObject {
     @Published var zoomFactor: Float = 0
     @Published var focusFactor: Float = 0.65
     
-    @Published var isLogin : Bool = false
-    
     var dateKey : SymmetricKey?
     @Published var trueDate : String = ""
-    @Published var isActive : Bool = false
     
 
     init() {
@@ -56,26 +53,19 @@ class SettingViewModel: ObservableObject {
             self.authKey = paraData["authKey"]!
         }
         
-        if self.activeDate == "测试版" || AuthManager.authKey(input: self.authKey, uniqueID: self.uniqueID) == true{
-            self.isActive = true
-        }
-        
-        do{
-            // 自定义密钥字符串
-            let keyData = "_isCameraSetting".md5().hexToBytes()
-            
-            // 使用自定义的密钥数据创建 SymmetricKey
-            self.dateKey = SymmetricKey(data: keyData!)
-            
-            if self.activeDate == "测试版"{
-                self.trueDate = "测试版"
+        if AuthManager.authKey(input: self.authKey, uniqueID: self.uniqueID) == true{
+            do{
+                // 自定义密钥字符串
+                let keyData = "_isCameraSetting".md5().hexToBytes()
+                
+                // 使用自定义的密钥数据创建 SymmetricKey
+                self.dateKey = SymmetricKey(data: keyData!)
+                
+                self.trueDate = try AuthManager.decrypt(self.activeDate, key: self.dateKey!)!
             }
-            else if self.activeDate != ""{
-                self.trueDate = try decrypt(self.activeDate, key: self.dateKey!)!
+            catch{
+                
             }
-        }
-        catch{
-            
         }
     }
 
@@ -121,34 +111,10 @@ class SettingViewModel: ObservableObject {
     }
     
     public func onReturnKeyPressed(searchText: String){
-        if searchText == "pangu" && self.isActive{
-            timeCheck()
-        }
-        else if searchText == "pangutest" && !self.isActive{
-            self.isActive = true
-            do {
-                let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-                let fileURL = documentsURL.appendingPathComponent("para.json")
-
-                let paraData: [String: String] = [
-                    "activeTime": "测试版",
-                    "uniqueID": self.uniqueID,
-                    "authKey": ""
-                ]
-
-                let jsonData = try JSONSerialization.data(withJSONObject: paraData, options: .prettyPrinted)
-                try jsonData.write(to: fileURL)
-                
-                // print("para.json file updated successfully")
-            } catch {
-                // print("Error updating para.json: \(error)")
-            }
-        }
-        else if AuthManager.authKey(input: searchText, uniqueID: self.uniqueID) == true && self.authKey == ""{
+        if AuthManager.authKey(input: searchText, uniqueID: self.uniqueID) == true && self.authKey == ""{
             fetchInternetCurrentDate { internetDate in
                 if let internetDate = internetDate {
                     
-                    self.isActive = true
                     self.authKey = searchText
                     
                     let dateFormatter = DateFormatter()
@@ -161,7 +127,7 @@ class SettingViewModel: ObservableObject {
                         let fileURL = documentsURL.appendingPathComponent("para.json")
 
                         let paraData: [String: String] = [
-                            "activeTime": try self.encrypt(dateString, key: self.dateKey!),
+                            "activeTime": try AuthManager.encrypt(dateString, key: self.dateKey!),
                             "uniqueID": self.uniqueID,
                             "authKey": self.authKey
                         ]
@@ -176,54 +142,6 @@ class SettingViewModel: ObservableObject {
                 }
             }
         }
-    }
-    
-    public func timeCheck(){
-        
-        fetchInternetCurrentDate { internetDate in
-            
-            let activeTimeString = self.trueDate
-            
-            if let internetDate = internetDate {
-                if activeTimeString == "测试版"{
-                    self.isLogin = true
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 5 * 60) {
-                        UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            exit(0)
-                        }
-                    }
-                }
-                else if activeTimeString != ""{
-                    // 格式化日期字符串为 Date 对象
-                    let dateFormatter = DateFormatter()
-                    dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-                    let activeTime = dateFormatter.date(from: activeTimeString)
-                        
-                    if TimeLimitations(activeDate: activeTime!, nowDate: internetDate){
-                        // print("有效期内")
-                        self.isLogin = true
-                    }
-                }
-            }
-            
-            
-        }
-    }
-    
-    // 加密方法
-    func encrypt(_ plaintext: String, key: SymmetricKey) throws -> String {
-        let data = Data(plaintext.utf8)
-        let sealedBox = try AES.GCM.seal(data, using: key)
-        return sealedBox.combined!.base64EncodedString()
-    }
-
-    // 解密方法
-    func decrypt(_ base64Ciphertext: String, key: SymmetricKey) throws -> String? {
-        guard let ciphertext = Data(base64Encoded: base64Ciphertext) else { return nil }
-        let sealedBox = try AES.GCM.SealedBox(combined: ciphertext)
-        let decryptedData = try AES.GCM.open(sealedBox, using: key)
-        return String(data: decryptedData, encoding: .utf8)
     }
 }
 

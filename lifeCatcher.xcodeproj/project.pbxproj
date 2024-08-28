@@ -75,6 +75,7 @@
 		D0DAEF992C7768DD00D5938A /* SettingRecordConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF982C7768DD00D5938A /* SettingRecordConfigView.swift */; };
 		D0DAEF9C2C7E439E00D5938A /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = D0DAEF9B2C7E439E00D5938A /* CryptoSwift */; };
 		D0DAEF9F2C7E43AE00D5938A /* Zip in Frameworks */ = {isa = PBXBuildFile; productRef = D0DAEF9E2C7E43AE00D5938A /* Zip */; };
+		D0DAEFA12C7EC46200D5938A /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEFA02C7EC46200D5938A /* AppViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -142,6 +143,7 @@
 		D0DAEF942C7766D900D5938A /* UsedFeatureSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsedFeatureSelectView.swift; sourceTree = "<group>"; };
 		D0DAEF962C77684F00D5938A /* NewSettingRecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSettingRecordView.swift; sourceTree = "<group>"; };
 		D0DAEF982C7768DD00D5938A /* SettingRecordConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingRecordConfigView.swift; sourceTree = "<group>"; };
+		D0DAEFA02C7EC46200D5938A /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
 		F11ED84932036610B96BC234 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -235,6 +237,7 @@
 				18F6C0C22C10A685007BEAEC /* RecordViewModel.swift */,
 				A88EFE082A7FAD1100897243 /* AllSettingViewModel.swift */,
 				18C98D1F2C15902700A8CD49 /* CurrentVisionObjectRecognitionViewModel.swift */,
+				D0DAEFA02C7EC46200D5938A /* AppViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -426,6 +429,7 @@
 			files = (
 				D0DAEF972C77684F00D5938A /* NewSettingRecordView.swift in Sources */,
 				187A45832C39440800BB055C /* AppDelegate.swift in Sources */,
+				D0DAEFA12C7EC46200D5938A /* AppViewModel.swift in Sources */,
 				18F6C0C32C10A685007BEAEC /* RecordViewModel.swift in Sources */,
 				187A45502C31BBB400BB055C /* ExtraArgsClass.swift in Sources */,
 				A89CDD8C2C76767300588273 /* KeychainHelper.swift in Sources */,

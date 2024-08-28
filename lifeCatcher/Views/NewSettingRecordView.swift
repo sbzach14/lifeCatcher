@@ -28,7 +28,9 @@ struct NewSettingRecordView: View {
             }.padding()
             
         }
-        .background(Image("bg").resizable().scaledToFill())
+        .background(Image("Newbg2").resizable()
+            .scaledToFill()
+            .ignoresSafeArea())
             .navigationTitle("选择类别")
     }
 }

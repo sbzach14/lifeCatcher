@@ -40,9 +40,6 @@ struct HistoryView: View {
                 .padding(.trailing, 20)
             }
             
-            NavigationLink(destination: DeprecatedMainView(), isActive: $settingviewModel.isLogin) {
-            }
-            .hidden()
             
             ScrollView {
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20){

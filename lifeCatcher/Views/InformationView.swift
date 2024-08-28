@@ -8,29 +8,56 @@ struct InfoView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10){
                     
-                    // 版本信息
-                    Text("Version:1.0.1")
+            // 版本信息
+            Text("Version:1.0.2")
+                .padding()
+                .foregroundColor(.black)
+            
+            Divider()
+            
+            // 序列号
+            Text("ID:" + viewModel.uniqueID)
+                .textSelection(.enabled)
+                .padding()
+                .foregroundColor(.black)
+            Divider()
+            
+            // 激活日期（如果激活）
+            if AuthManager.isLoginServer{
+                if viewModel.authKey != ""{
+                    Text("激活版本:正式版")
                         .padding()
                         .foregroundColor(.black)
                     
                     Divider()
                     
-                    // 序列号
-                    Text("ID:" + viewModel.uniqueID)
-                        .textSelection(.enabled)
+                    Text("激活日期:" + viewModel.trueDate)
+                        .padding()
+                        .foregroundColor(.black)
+                    
+                    Divider()
+                }
+                else if AuthManager.loginStatus == 0{
+                    Text("激活版本:正式版")
                         .padding()
                         .foregroundColor(.black)
                     
                     Divider()
                     
-                    // 激活日期（如果激活）
-                    if viewModel.isActive{
-                        Text("激活日期:" + viewModel.trueDate)
-                            .padding()
-                            .foregroundColor(.black)
-                        
-                        Divider()
-                    }
+                    Text("激活日期:" + AuthManager.activeTime)
+                        .padding()
+                        .foregroundColor(.black)
+                    
+                    Divider()
+                }
+                else if AuthManager.loginStatus == 1{
+                    Text("激活版本:测试版")
+                        .padding()
+                        .foregroundColor(.black)
+                    
+                    Divider()
+                }
+            }
                     
                     // 声明信息
 //                    Text("声明:本软件的使用范围仅限于日常生活图像识别与记录用途，使用本程序造成的任何后果及责任由使用者承担，本公司不承担因用户或代理商在非允许使用范围内使用或销售而导致的任何后果及相关责任。")
@@ -69,82 +96,90 @@ struct DeprecatedInfoView: View {
     @StateObject var viewModel = SettingViewModel()
     
     var body: some View {
+        VStack{
             VStack{
-
-                ScrollView {
-                    VStack()  {
-                            HStack {
-                                Text("黑屏").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
-
-                                Toggle("", isOn: $viewModel.isBlack).toggleStyle(CustomToggleStyle())
-                                    .frame(width: 160, height: 30, alignment: .trailing)
-                                    .padding(.trailing,30) // 右侧间距
-                                    .accentColor(.white)
-                            }
-                            Divider().colorInvert()
-                            
-                            HStack {
-                                Text("耳机").foregroundColor(.white).padding(.leading, 20)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                
-                                Toggle("", isOn: $viewModel.isMute).toggleStyle(CustomToggleStyle())
-                                    .frame(width: 160, height: 30, alignment: .trailing)
-                                    .padding(.trailing,30) // 右侧间距
-                                    .accentColor(.white)
-                            }
-                            Divider().colorInvert()
-                            
-                            HStack {
-                                Text("音量上键功能").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
-                                
-                                Picker("volumeUp", selection: $viewModel.volumeUp) {
-                                    ForEach(0...volumeSetting.volumeUpDict.count - 1, id: \.self){
-                                        index in Text(volumeSetting.volumeUpDict[index]!).tag(index)
-                                    }
-                                }
-                                .pickerStyle(MenuPickerStyle())
-                                .frame(width: 200, height: 30, alignment: .trailing)
-                                .padding(.trailing,30) // 右侧间距
-                                .accentColor(.white)
-                            }
-                            Divider().colorInvert()
-                            
-                            HStack {
-                                Text("音量下键功能").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
-                                
-                                Picker("volumeDown", selection: $viewModel.volumeDown) {
-                                    ForEach(0...volumeSetting.volumeDownDict.count - 1, id: \.self){
-                                        index in Text(volumeSetting.volumeDownDict[index]!).tag(index)
-                                    }
-                                }
-                                .pickerStyle(MenuPickerStyle())
-                                .frame(width: 200, height: 30, alignment: .trailing)
-                                .padding(.trailing,30) // 右侧间距
-                                .accentColor(.white)
-                            }
-                            Divider().colorInvert()
-                            
-                            HStack {
-                                Text("音量大小").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
-                                
-                                Slider(value: $viewModel.volumeValue, in: 0.01...0.99)
-                                    .frame(width: 200, height: 30, alignment: .trailing)
-                                    .padding(.trailing,30) // 右侧间距
-                                    .accentColor(.white)
-                            }
-                            Divider().colorInvert()
-                        }
+                HStack {
+                    Text("黑屏").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    Toggle("", isOn: $viewModel.isBlack).toggleStyle(CustomToggleStyle())
+                        .frame(width: 160, height: 30, alignment: .trailing)
+                        .padding(.trailing,30) // 右侧间距
+                        .accentColor(.white)
                 }
-            }
-            .onDisappear{
-                viewModel.updateConfigJSON()
-            }
-            .background(
-                Image("bg")
-                    .resizable()
-                    .scaledToFill()
-            )
-            .navigationBarTitle("设置")
+                Divider().colorInvert()
+            }.padding()
+            
+            VStack{
+                HStack {
+                    Text("耳机").foregroundColor(.white).padding(.leading, 20)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    Toggle("", isOn: $viewModel.isMute).toggleStyle(CustomToggleStyle())
+                        .frame(width: 160, height: 30, alignment: .trailing)
+                        .padding(.trailing,30) // 右侧间距
+                        .accentColor(.white)
+                }
+                Divider().colorInvert()
+            }.padding()
+            
+            VStack{
+                HStack {
+                    Text("音量上键功能").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    Picker("volumeUp", selection: $viewModel.volumeUp) {
+                        ForEach(0...volumeSetting.volumeUpDict.count - 1, id: \.self){
+                            index in Text(volumeSetting.volumeUpDict[index]!).tag(index)
+                        }
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                    .frame(width: 200, height: 30, alignment: .trailing)
+                    .padding(.trailing,30) // 右侧间距
+                    .accentColor(.white)
+                }
+                Divider().colorInvert()
+            }.padding(/*@START_MENU_TOKEN@*/EdgeInsets()/*@END_MENU_TOKEN@*/)
+            
+            VStack{
+                HStack {
+                    Text("音量下键功能").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    Picker("volumeDown", selection: $viewModel.volumeDown) {
+                        ForEach(0...volumeSetting.volumeDownDict.count - 1, id: \.self){
+                            index in Text(volumeSetting.volumeDownDict[index]!).tag(index)
+                        }
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                    .frame(width: 200, height: 30, alignment: .trailing)
+                    .padding(.trailing,30) // 右侧间距
+                    .accentColor(.white)
+                }
+                Divider().colorInvert()
+            }.padding()
+            
+            VStack{
+                HStack {
+                    Text("音量大小").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    Slider(value: $viewModel.volumeValue, in: 0.01...0.99)
+                        .frame(width: 200, height: 30, alignment: .trailing)
+                        .padding(.trailing,30) // 右侧间距
+                        .accentColor(.white)
+                }
+                Divider().colorInvert()
+            }.padding()
+            
+            Spacer()
+        }
+        .onDisappear{
+            viewModel.updateConfigJSON()
+        }
+        .background(
+            Image("Newbg2")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+        )
+        .navigationBarTitle("设置")
     }
 }
 

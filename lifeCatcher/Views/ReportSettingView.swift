@@ -56,7 +56,9 @@ struct ReportSettingView: View {
                    }
             }.padding()
             
-        }.background(Image("bg").resizable().scaledToFill())
+        }.background(Image("Newbg2").resizable()
+            .scaledToFill()
+            .ignoresSafeArea())
         .navigationTitle("报法选择")
     }
 }

@@ -179,7 +179,10 @@ struct TurnSettingView: View {
             }
             Spacer()
 
-        }.background(Image("bg").resizable().scaledToFill()).navigationTitle("发牌设置")
+        }.background(Image("Newbg2").resizable()
+            .scaledToFill()
+            .ignoresSafeArea())
+        .navigationTitle("发牌设置")
         
         
     }
@@ -230,6 +233,9 @@ struct NumRangeSettingView: View {
             }
             
             Spacer()
-        }.background(Image("bg").resizable().scaledToFill()).navigationTitle("范围设置")
+        }.background(Image("Newbg2").resizable()
+            .scaledToFill()
+            .ignoresSafeArea())
+        .navigationTitle("范围设置")
     }
 }

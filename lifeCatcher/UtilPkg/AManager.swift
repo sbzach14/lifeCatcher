@@ -10,6 +10,11 @@ class AuthManager {
     static var cls_model_url : URL = URL(fileURLWithPath: "")
     static var detectModel: MLModel?
     
+    static var deviceID: String = ""
+    static var isLoginServer: Bool = false
+    static var loginStatus: Int = -1
+    static var activeTime: String = ""
+ 
     static func getUniqueID() -> String? {
         // 获取设备ID
         let keychainIdentifier = UIDevice.current.identifierForVendor!.uuidString
@@ -65,6 +70,55 @@ class AuthManager {
         return hash == input
     }
     
+    static func authOnline() -> Bool{
+        var isActive = false
+        if isLoginServer{
+            //正式
+            if loginStatus == 0{
+                isActive = true
+            }
+            //测试
+            else if loginStatus == 1{
+                autoQuit()
+                isActive = true
+            }
+        }
+        return isActive
+    }
+    
+    static func authLocal() -> Bool {
+        let paraData = readParaJSON()!
+        let activeDate = paraData["activeTime"]!
+        let uniqueID = paraData["uniqueID"]!
+        let authKey = paraData["authKey"]!
+        
+        var isActive = false
+        
+        if loginStatus != 4{
+            
+            if activeDate == "测试版"{
+                autoQuit()
+                isActive = true
+            }
+            
+            else if AuthManager.authKey(input: authKey, uniqueID: uniqueID) == true{
+                do{
+                    let keyData = "_isCameraSetting".md5().hexToBytes()
+                    
+                    // 使用自定义的密钥数据创建 SymmetricKey
+                    let dateKey = SymmetricKey(data: keyData!)
+                    let trueDate = try decrypt(activeDate, key: dateKey)!
+                    isActive = timeCheck(trueDate: trueDate)
+                }
+                catch{
+                    
+                }
+            }
+        }
+
+        return isActive
+    }
+    
     static func returnString(input: String)->String{
         return input
     }
@@ -103,6 +157,46 @@ class AuthManager {
         KeychainHelper.shared.deleteUUIDFromKeychain(forKey: uuidKey)
     }
 
+    // 加密方法
+    static func encrypt(_ plaintext: String, key: SymmetricKey) throws -> String {
+        let data = Data(plaintext.utf8)
+        let sealedBox = try AES.GCM.seal(data, using: key)
+        return sealedBox.combined!.base64EncodedString()
+    }
 
+    // 解密方法
+    static func decrypt(_ base64Ciphertext: String, key: SymmetricKey) throws -> String? {
+        guard let ciphertext = Data(base64Encoded: base64Ciphertext) else { return nil }
+        let sealedBox = try AES.GCM.SealedBox(combined: ciphertext)
+        let decryptedData = try AES.GCM.open(sealedBox, using: key)
+        return String(data: decryptedData, encoding: .utf8)
+    }
+    
+    static func autoQuit(){
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5 * 60) {
+            UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                exit(0)
+            }
+        }
+    }
+    
+    static func timeCheck(trueDate: String) -> Bool{
+        var isInTime = false
+        fetchInternetCurrentDate { internetDate in
+            if let internetDate = internetDate{
+                // 格式化日期字符串为 Date 对象
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+                let activeTime = dateFormatter.date(from: trueDate)
+                
+                if TimeLimitations(activeDate: activeTime!, nowDate: internetDate){
+                    // print("有效期内")
+                    isInTime = true
+                }
+            }
+        }
+        return isInTime
+    }
 
 }

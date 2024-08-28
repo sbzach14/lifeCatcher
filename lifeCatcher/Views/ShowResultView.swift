@@ -131,7 +131,9 @@ struct ShowResultView: View {
                 Spacer()
             }
         }
-        .background(Image("bg").scaledToFill())
+        .background(Image("Newbg2").resizable()
+            .scaledToFill()
+            .ignoresSafeArea())
         .navigationTitle("结果显示")
     }
     

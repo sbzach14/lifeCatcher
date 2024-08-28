@@ -517,7 +517,9 @@ struct SettingRecordConfigView: View{
                     Spacer()
                 }.padding()
                 
-            }.background(Image("bg").scaledToFill())
+            }.background(Image("Newbg2").resizable()
+                .scaledToFill()
+                .ignoresSafeArea())
             .onAppear(){
                 self.SetUpAll()
             }

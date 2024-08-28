@@ -1,15 +1,7 @@
-
-
 import SwiftUI
 
-
-class AppViewModel: ObservableObject {
-    @Published var appState: AppState = .loggedOut
-    @Published var userInfo: UserInfo?
-}
-
-
 struct MainMenuView: View {
+    @State private var historyNavigate : Int? = -1
     @StateObject var loginStatus = AppViewModel()
 
     var body: some View {
@@ -23,7 +15,7 @@ struct MainMenuView: View {
                             .frame(width: 200, height: 200) // Adjust the size as needed
                             .background(RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.3)))
                         
-                    Spacer()
+                        Spacer()
                     
                         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
                             
@@ -41,18 +33,52 @@ struct MainMenuView: View {
                                 .background(RoundedRectangle(cornerRadius: 10).fill(Color.blue.opacity(0.8)).frame(width: 150, height: 100, alignment: .center))
                             }
                             
-                            NavigationLink(
-                                destination: HistoryView()
-                            ) {
-                                VStack {
-                                    Image(systemName: "clock") // Replace with your custom icon
-                                        .font(.largeTitle)
-                                        .foregroundColor(.white)
-                                    Text("History")
-                                        .foregroundColor(.white)
+                            VStack {
+                                Button(action: {
+                                    if !AuthManager.isLoginServer{
+                                        historyNavigate = 0
+                                    }
+                                    else if AuthManager.authLocal() || AuthManager.authOnline(){
+                                        historyNavigate = 1
+                                    }
+                                    else{
+                                        historyNavigate = 2
+                                    }
+                                }) {
+                                    VStack {
+                                        Image(systemName: "clock") // Replace with your custom icon
+                                            .font(.largeTitle)
+                                            .foregroundColor(.white)
+                                        Text("History")
+                                            .foregroundColor(.white)
+                                    }
+                                    .padding()
+                                    .background(RoundedRectangle(cornerRadius: 10)
+                                        .fill(Color.green.opacity(0.8))
+                                        .frame(width: 150, height: 100, alignment: .center))
                                 }
-                                .padding()
-                                .background(RoundedRectangle(cornerRadius: 10).fill(Color.green.opacity(0.8)).frame(width: 150, height: 100, alignment: .center))
+                                .background(
+                                    NavigationLink(
+                                        destination: LoginView(loginStatus: loginStatus),
+                                        tag: 0,
+                                        selection: $historyNavigate
+                                    ) { EmptyView() }
+                                )
+                                .background(
+                                    NavigationLink(
+                                        destination: DeprecatedMainView(),
+                                        tag: 1,
+                                        selection: $historyNavigate
+                                    ) { EmptyView() }
+                                )
+                                .background(
+                                    NavigationLink(
+                                        destination: HistoryView(),
+                                        tag: 2,
+                                        selection: $historyNavigate
+                                    ) { EmptyView() }
+                                )
+                                
                             }
                             
                             NavigationLink(
@@ -69,8 +95,6 @@ struct MainMenuView: View {
                                 .background(RoundedRectangle(cornerRadius: 10).fill(Color.orange.opacity(0.8)).frame(width: 150, height: 100, alignment: .center))
                                 
                             }
-                            
-                            // Add another NavigationLink here if needed for the 4th item in the grid
                             
                             NavigationLink(
                                 destination: LoginView(loginStatus: loginStatus)
@@ -131,39 +155,38 @@ struct DeprecatedMainView: View {
     var body: some View {
         ZStack{
             //Image("Logo")
-            VStack{
-                Spacer()
-                ScrollView {
-                    VStack(spacing: 0) {
-                        NavigationLink(
-                            destination: SettingRecordView()
-                        ) {
-                            VStack(alignment: .leading) {
-                                Text("历史记录")
-                                    .foregroundColor(.white)
-                                Divider().colorInvert()
-                            }
-                            .padding()
-                        }
-                        NavigationLink(
-                            destination: DeprecatedInfoView()
-                        ) {
-                            VStack(alignment: .leading) {
-                                Text("系统设置")
-                                    .foregroundColor(.white)
-                                Divider().colorInvert()
-                            }
-                            .padding()
-                        }
+            VStack {
+                NavigationLink(
+                    destination: SettingRecordView()
+                ) {
+                    VStack(alignment: .leading) {
+                        Text("历史记录")
+                            .foregroundColor(.white)
+                        Divider().colorInvert()
                     }
+                    .padding()
                 }
+                NavigationLink(
+                    destination: DeprecatedInfoView()
+                ) {
+                    VStack(alignment: .leading) {
+                        Text("系统设置")
+                            .foregroundColor(.white)
+                        Divider().colorInvert()
+                    }
+                    .padding()
+                }
+                
+                Spacer()
             }
+            
         }
         .background(
-            Image("bg")
+            Image("Newbg2")
                 .resizable()
                 .scaledToFill()
+                .ignoresSafeArea()
         )
-        .navigationBarTitle("  ")
+        .navigationBarTitle("天照")
     }
 }

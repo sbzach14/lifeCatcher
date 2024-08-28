@@ -63,7 +63,7 @@ struct RegisterView: View {
         //获取设备序列号
         
         let body: [String: Any] = [
-            "deviceID": ClassifierSettingArgs.deviceID,
+            "deviceID": AuthManager.deviceID,
             "username": username,
             "password": password,
             "registerTime": timestamp
