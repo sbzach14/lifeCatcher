@@ -6,7 +6,6 @@ struct HistoryView: View {
     @State private var searchText = ""
     @State private var selectedRuleIndex: Int? = nil
     @StateObject private var viewModel = RecordViewModel()
-    @StateObject private var settingviewModel = SettingViewModel()
     
     var showRecordHistoryData : [String:[String]]{
         if searchText.isEmpty {
@@ -29,7 +28,7 @@ struct HistoryView: View {
                     
                     // 等待键盘收回后再执行搜索操作
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        settingviewModel.onReturnKeyPressed(searchText: searchText)
+                        AuthManager.activeAccount(input: searchText)
                     }
                 } label: {
                     Label("ShowSingleFeature", systemImage: "magnifyingglass")

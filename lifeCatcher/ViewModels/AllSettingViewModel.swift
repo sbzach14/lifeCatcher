@@ -22,6 +22,7 @@ class SettingViewModel: ObservableObject {
     @Published var focusFactor: Float = 0.65
     
     var dateKey : SymmetricKey?
+    @Published var trueVersion : String = ""
     @Published var trueDate : String = ""
     
 
@@ -49,22 +50,32 @@ class SettingViewModel: ObservableObject {
         if let paraData = readParaJSON() {
             self.activeDate = paraData["activeTime"]!
             self.uniqueID = paraData["uniqueID"]!
-            print("uniqueID \(self.uniqueID)")
             self.authKey = paraData["authKey"]!
-        }
-        
-        if AuthManager.authKey(input: self.authKey, uniqueID: self.uniqueID) == true{
-            do{
-                // 自定义密钥字符串
-                let keyData = "_isCameraSetting".md5().hexToBytes()
-                
-                // 使用自定义的密钥数据创建 SymmetricKey
-                self.dateKey = SymmetricKey(data: keyData!)
-                
-                self.trueDate = try AuthManager.decrypt(self.activeDate, key: self.dateKey!)!
-            }
-            catch{
-                
+            
+            if AuthManager.isLoginServer{
+                if AuthManager.authLocal(){
+                    do{
+                        // 自定义密钥字符串
+                        let keyData = "_isCameraSetting".md5().hexToBytes()
+                        
+                        // 使用自定义的密钥数据创建 SymmetricKey
+                        self.dateKey = SymmetricKey(data: keyData!)
+                        
+                        self.trueDate = try AuthManager.decrypt(self.activeDate, key: self.dateKey!)
+                        self.trueVersion = "正式版"
+                    }
+                    catch{
+                        
+                    }
+                }
+                else if AuthManager.loginStatus == 1 && AuthManager.authOnline(){
+                    self.trueDate = AuthManager.activeDate
+                    self.trueVersion = "正式版"
+                }
+                else if AuthManager.loginStatus == 2{
+                    self.trueDate = AuthManager.activeDate
+                    self.trueVersion = "测试版"
+                }
             }
         }
     }
@@ -107,40 +118,6 @@ class SettingViewModel: ObservableObject {
             // print("config.json file updated successfully")
         } catch {
             // print("Error updating config.json: \(error)")
-        }
-    }
-    
-    public func onReturnKeyPressed(searchText: String){
-        if AuthManager.authKey(input: searchText, uniqueID: self.uniqueID) == true && self.authKey == ""{
-            fetchInternetCurrentDate { internetDate in
-                if let internetDate = internetDate {
-                    
-                    self.authKey = searchText
-                    
-                    let dateFormatter = DateFormatter()
-                    dateFormatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
-
-                    let dateString = dateFormatter.string(from: internetDate)
-                    
-                    do {
-                        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-                        let fileURL = documentsURL.appendingPathComponent("para.json")
-
-                        let paraData: [String: String] = [
-                            "activeTime": try AuthManager.encrypt(dateString, key: self.dateKey!),
-                            "uniqueID": self.uniqueID,
-                            "authKey": self.authKey
-                        ]
-
-                        let jsonData = try JSONSerialization.data(withJSONObject: paraData, options: .prettyPrinted)
-                        try jsonData.write(to: fileURL)
-
-                        // print("para.json file updated successfully")
-                    } catch {
-                        // print("Error updating para.json: \(error)")
-                    }
-                }
-            }
         }
     }
 }

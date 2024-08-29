@@ -10,10 +10,11 @@ class AuthManager {
     static var cls_model_url : URL = URL(fileURLWithPath: "")
     static var detectModel: MLModel?
     
-    static var deviceID: String = ""
     static var isLoginServer: Bool = false
-    static var loginStatus: Int = -1
-    static var activeTime: String = ""
+    static var loginStatus: Int = 0
+    static var isActive: Bool = false
+    
+    static var activeDate: String = ""
  
     static func getUniqueID() -> String? {
         // 获取设备ID
@@ -62,61 +63,56 @@ class AuthManager {
         return hash
     }
     
-    static func authKey(input: String, uniqueID: String) -> Bool? {
+    static func activeAccount(input: String){
+        if authKey(input: input, uniqueID: retrieveUUID()) && isLoginServer && loginStatus == 0{
+            storeAuthKey(newKey: input)
+            
+            //TODO: post active request
+        }
+    }
+    
+    static func authKey(input: String, uniqueID: String) -> Bool {
         guard let hash = hashWithSalt(input: uniqueID) else {
-            return nil
+            return false
         }
         
         return hash == input
     }
     
+    
     static func authOnline() -> Bool{
-        var isActive = false
-        if isLoginServer{
-            //正式
-            if loginStatus == 0{
-                isActive = true
-            }
-            //测试
-            else if loginStatus == 1{
-                autoQuit()
-                isActive = true
-            }
+        let uniqueID = retrieveUUID()
+        let uniqueKey = retrieveAuthKey()
+        if uniqueID != "" && uniqueKey != ""{
+            return authKey(input: uniqueKey, uniqueID: uniqueID)
         }
-        return isActive
+        else{
+            return false
+        }
     }
     
     static func authLocal() -> Bool {
         let paraData = readParaJSON()!
         let activeDate = paraData["activeTime"]!
         let uniqueID = paraData["uniqueID"]!
-        let authKey = paraData["authKey"]!
+        let uniqueKey = paraData["authKey"]!
         
-        var isActive = false
-        
-        if loginStatus != 4{
-            
-            if activeDate == "测试版"{
-                autoQuit()
-                isActive = true
+        if activeDate != "" && uniqueID != "" && uniqueKey != ""{
+            var trueDate = ""
+            do{
+                let keyData = "_isCameraSetting".md5().hexToBytes()
+                // 使用自定义的密钥数据创建 SymmetricKey
+                let dateKey = SymmetricKey(data: keyData!)
+                trueDate = try decrypt(activeDate, key: dateKey)
             }
-            
-            else if AuthManager.authKey(input: authKey, uniqueID: uniqueID) == true{
-                do{
-                    let keyData = "_isCameraSetting".md5().hexToBytes()
-                    
-                    // 使用自定义的密钥数据创建 SymmetricKey
-                    let dateKey = SymmetricKey(data: keyData!)
-                    let trueDate = try decrypt(activeDate, key: dateKey)!
-                    isActive = timeCheck(trueDate: trueDate)
-                }
-                catch{
-                    
-                }
+            catch{
+                
             }
+            return authKey(input: uniqueKey, uniqueID: uniqueID) && timeCheck(trueDate: trueDate)
         }
-
-        return isActive
+        else{
+            return false
+        }
     }
     
     static func returnString(input: String)->String{
@@ -135,6 +131,27 @@ class AuthManager {
         return charList.randomElement()!
     }
     
+    static func storeAuthKey(newKey: String) {
+        let uuidKey = "com.lifeCatcher.uniqueKey"
+        
+        if let savedKey = KeychainHelper.shared.getUUIDFromKeychain(forKey: uuidKey) {
+            print("Key already exists: \(savedKey)")
+        } else {
+            KeychainHelper.shared.saveUUIDToKeychain(uuid: newKey, forKey: uuidKey)
+            print("New Key saved: \(newKey)")
+        }
+    }
+    
+    static func retrieveAuthKey() -> String {
+        let uuidKey = "com.lifeCatcher.uniqueKey"
+        return KeychainHelper.shared.getUUIDFromKeychain(forKey: uuidKey) ?? ""
+    }
+    
+    static func deleteStoredAuthKey() {
+        let uuidKey = "com.lifeCatcher.uniqueKey"
+        KeychainHelper.shared.deleteUUIDFromKeychain(forKey: uuidKey)
+    }
+    
     static func storeUUID() {
         let uuidKey = "com.lifeCatcher.uniqueUUID"
         
@@ -149,7 +166,7 @@ class AuthManager {
     
     static func retrieveUUID() -> String {
         let uuidKey = "com.lifeCatcher.uniqueUUID"
-        return KeychainHelper.shared.getUUIDFromKeychain(forKey: uuidKey)!
+        return KeychainHelper.shared.getUUIDFromKeychain(forKey: uuidKey) ?? ""
     }
     
     static func deleteStoredUUID() {
@@ -165,11 +182,11 @@ class AuthManager {
     }
 
     // 解密方法
-    static func decrypt(_ base64Ciphertext: String, key: SymmetricKey) throws -> String? {
-        guard let ciphertext = Data(base64Encoded: base64Ciphertext) else { return nil }
+    static func decrypt(_ base64Ciphertext: String, key: SymmetricKey) throws -> String {
+        guard let ciphertext = Data(base64Encoded: base64Ciphertext) else { return "" }
         let sealedBox = try AES.GCM.SealedBox(combined: ciphertext)
         let decryptedData = try AES.GCM.open(sealedBox, using: key)
-        return String(data: decryptedData, encoding: .utf8)
+        return String(data: decryptedData, encoding: .utf8) ?? ""
     }
     
     static func autoQuit(){

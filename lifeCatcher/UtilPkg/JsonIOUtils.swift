@@ -9,13 +9,11 @@ import CoreML
 func createParaJSON() {
     //store uuid
     AuthManager.storeUUID()
-    AuthManager.deviceID = AuthManager.retrieveUUID()
-    print("init unique deviceID \(AuthManager.deviceID)")
     
     // Create the config dictionary with default values
     let paraDict: [String: String] = [
         "activeTime": "",
-        "uniqueID": AuthManager.deviceID,
+        "uniqueID": "",
         "authKey": ""
     ]
 

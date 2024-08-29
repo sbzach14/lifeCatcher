@@ -38,7 +38,7 @@ struct MainMenuView: View {
                                     if !AuthManager.isLoginServer{
                                         historyNavigate = 0
                                     }
-                                    else if AuthManager.authLocal() || AuthManager.authOnline(){
+                                    else if AuthManager.isActive{
                                         historyNavigate = 1
                                     }
                                     else{

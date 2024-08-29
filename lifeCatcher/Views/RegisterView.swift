@@ -23,7 +23,13 @@ struct RegisterView: View {
                     .padding(.horizontal, 20)
                 
                 Button(action: {
-                    registerUser(username: username, password: password)
+                    if username == "tianzhao" || username == "appletest"{
+                        showAlert = true
+                        alertMessage = "Illegal username."
+                    }
+                    else{
+                        registerUser(username: username, password: password)
+                    }
                 }) {
                     Text("Register")
                         .foregroundColor(.white)
@@ -63,7 +69,7 @@ struct RegisterView: View {
         //获取设备序列号
         
         let body: [String: Any] = [
-            "deviceID": AuthManager.deviceID,
+            "deviceID": AuthManager.retrieveUUID(),
             "username": username,
             "password": password,
             "registerTime": timestamp

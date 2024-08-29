@@ -118,7 +118,7 @@ struct LoginView: View {
         let timestamp = Int(Date().timeIntervalSince1970)
 
         let parameters: [String: Any] = [
-            "deviceID": AuthManager.deviceID,
+            "deviceID": AuthManager.retrieveUUID(),
             "username": username,
             "password": password,
             "loginTime": timestamp
@@ -137,12 +137,10 @@ struct LoginView: View {
             let jsonResponse = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
             
 //            # account status
-//            # -1, login error, 错误
-//            # 0, formal version, 正式
-//            # 1, test version, 测试
-//            # 2, exipired, 超时
-//            # 3, not activated, 未激活 appletest (True 3)
-//            # 4, deactivated, 被禁用
+//            # 0, 未激活
+//            # 1, 正式版
+//            # 2, 测试版
+//            # 3, 禁用中
             
             let success = jsonResponse?["success"] as? Bool ?? false
             let message = jsonResponse?["message"] as? String ?? "对方什么也没说"
@@ -156,6 +154,15 @@ struct LoginView: View {
                     loginStatus.userInfo = UserInfo(username: username)
                     AuthManager.isLoginServer = true
                     AuthManager.loginStatus = accountStatus
+                    
+                    if (accountStatus == 1 && AuthManager.authOnline())
+                        || AuthManager.authLocal(){
+                        AuthManager.isActive = true
+                    }
+                    else if accountStatus == 2{
+                        AuthManager.isActive = true
+                        AuthManager.autoQuit()
+                    }
                 } else {
                     showAlert = true
                     alertMessage = message

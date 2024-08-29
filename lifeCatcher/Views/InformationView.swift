@@ -23,43 +23,22 @@ struct InfoView: View {
             Divider()
             
             // 激活日期（如果激活）
-            if AuthManager.isLoginServer{
-                if viewModel.authKey != ""{
-                    Text("激活版本:正式版")
-                        .padding()
-                        .foregroundColor(.black)
-                    
-                    Divider()
-                    
-                    Text("激活日期:" + viewModel.trueDate)
-                        .padding()
-                        .foregroundColor(.black)
-                    
-                    Divider()
-                }
-                else if AuthManager.loginStatus == 0{
-                    Text("激活版本:正式版")
-                        .padding()
-                        .foregroundColor(.black)
-                    
-                    Divider()
-                    
-                    Text("激活日期:" + AuthManager.activeTime)
-                        .padding()
-                        .foregroundColor(.black)
-                    
-                    Divider()
-                }
-                else if AuthManager.loginStatus == 1{
-                    Text("激活版本:测试版")
-                        .padding()
-                        .foregroundColor(.black)
-                    
-                    Divider()
-                }
+            if viewModel.trueVersion != ""{
+                Text("激活版本:" + viewModel.trueVersion)
+                    .padding()
+                    .foregroundColor(.black)
+                
+                Divider()
             }
-                    
-                    // 声明信息
+            if viewModel.trueDate != ""{
+                Text("激活日期:" + viewModel.trueDate)
+                    .padding()
+                    .foregroundColor(.black)
+                
+                Divider()
+            }
+            
+            // 声明信息
 //                    Text("声明:本软件的使用范围仅限于日常生活图像识别与记录用途，使用本程序造成的任何后果及责任由使用者承担，本公司不承担因用户或代理商在非允许使用范围内使用或销售而导致的任何后果及相关责任。")
 //                        .padding()
 //                        .foregroundColor(.white)
