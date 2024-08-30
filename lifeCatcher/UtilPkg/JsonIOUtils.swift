@@ -78,7 +78,7 @@ func createConfigJSON() {
     let boolDict: [String: Bool] = [
         "isBlack": false,
         "isMute": false,
-        "isBackCamera": true,
+        "isBackCamera": false,
         "isCameraHorizon": true,
         "isRemote": true,
         "isAutoFocus": true

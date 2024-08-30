@@ -31,7 +31,7 @@ struct InfoView: View {
                 Divider()
             }
             if viewModel.trueDate != ""{
-                Text("激活日期:" + viewModel.trueDate)
+                Text("有效日期:" + viewModel.trueDate)
                     .padding()
                     .foregroundColor(.black)
                 

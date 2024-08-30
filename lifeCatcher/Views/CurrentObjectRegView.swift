@@ -52,6 +52,9 @@ struct CurrentVisionObjectRecognitionView: View {
                                         if newValue == false{
                                             viewModel.isCameraHorizon = true
                                         }
+                                        else{
+                                            viewModel.isCameraHorizon = false
+                                        }
                                         
                                         viewModel.stopCamera()
                                         viewModel.setupAVCapture()

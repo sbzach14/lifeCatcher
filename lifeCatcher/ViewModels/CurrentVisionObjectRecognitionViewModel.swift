@@ -124,7 +124,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     
     @Published var isBlack: Bool = false
     @Published var isMute: Bool = false
-    @Published var isBackCamera: Bool = true
+    @Published var isBackCamera: Bool = false
     @Published var isCameraHorizon: Bool = true
     @Published var isRemote: Bool = true
     @Published var isAutoFocus: Bool = true
@@ -2773,13 +2773,14 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
                     }
                     
                     if repeatIndex != 0 && turnIndex == 0 && reportIndex == 0{
-                        speechUtterance.preUtteranceDelay = 0.05
+                        speechUtterance.preUtteranceDelay = 0.2
                     }
+                    speechUtterance.postUtteranceDelay = 0.2
                     
                     // print("播报的input \(reportResult.content)")
                     
-                    speechUtterance.pitchMultiplier = 1.15
-                    speechUtterance.rate = 0.55
+                    speechUtterance.pitchMultiplier = 1
+                    speechUtterance.rate = 0.5
                     
                     synthesizer.speak(speechUtterance)
                 }

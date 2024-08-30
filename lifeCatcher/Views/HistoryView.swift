@@ -6,6 +6,7 @@ struct HistoryView: View {
     @State private var searchText = ""
     @State private var selectedRuleIndex: Int? = nil
     @StateObject private var viewModel = RecordViewModel()
+    @State private var showAlert: Bool = false
     
     var showRecordHistoryData : [String:[String]]{
         if searchText.isEmpty {
@@ -28,7 +29,7 @@ struct HistoryView: View {
                     
                     // 等待键盘收回后再执行搜索操作
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        AuthManager.activeAccount(input: searchText)
+                        showAlert = AuthManager.activeAccount(input: searchText)
                     }
                 } label: {
                     Label("ShowSingleFeature", systemImage: "magnifyingglass")
@@ -72,6 +73,9 @@ struct HistoryView: View {
                 .ignoresSafeArea()
         )
         .navigationBarTitle("History")
+        .alert(isPresented: $showAlert) {
+            Alert(title: Text("激活成功"), message: Text(""), dismissButton: .default(Text("OK")))
+        }
     }
 }
 

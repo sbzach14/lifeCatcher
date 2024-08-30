@@ -63,12 +63,14 @@ class AuthManager {
         return hash
     }
     
-    static func activeAccount(input: String){
+    static func activeAccount(input: String) -> Bool{
+        var isSuccess = false
         if authKey(input: input, uniqueID: retrieveUUID()) && isLoginServer && loginStatus == 0{
             storeAuthKey(newKey: input)
             
             //TODO: post active request
         }
+        return isSuccess
     }
     
     static func authKey(input: String, uniqueID: String) -> Bool {

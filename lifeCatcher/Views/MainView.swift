@@ -187,6 +187,6 @@ struct DeprecatedMainView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
         )
-        .navigationBarTitle("天照")
+        .navigationBarTitle("幻影")
     }
 }

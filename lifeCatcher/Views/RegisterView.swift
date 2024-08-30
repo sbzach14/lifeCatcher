@@ -23,9 +23,13 @@ struct RegisterView: View {
                     .padding(.horizontal, 20)
                 
                 Button(action: {
-                    if username == "tianzhao" || username == "appletest"{
+                    if username == ""{
                         showAlert = true
-                        alertMessage = "Illegal username."
+                        alertMessage = "Username can not be empty."
+                    }
+                    else if password == ""{
+                        showAlert = true
+                        alertMessage = "Password can not be empty."
                     }
                     else{
                         registerUser(username: username, password: password)

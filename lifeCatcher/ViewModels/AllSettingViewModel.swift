@@ -8,7 +8,7 @@ import CryptoSwift
 class SettingViewModel: ObservableObject {
     @Published var isBlack: Bool = false
     @Published var isMute: Bool = false
-    @Published var isBackCamera: Bool = true
+    @Published var isBackCamera: Bool = false
     @Published var isCameraHorizon: Bool = true
     @Published var isRemote: Bool = true
     @Published var isAutoFocus: Bool = true
