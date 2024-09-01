@@ -5,6 +5,42 @@ import SwiftUI
 
 class ClassifierSettingArgs {
     
+    static let enRegisterDic : [Int: String] = [
+        0:"The device is already registered",
+        1:"Register successfully",
+        2:"Ilegal username"
+    ]
+    
+    static let chRegisterDic : [Int: String] = [
+        0:"设备已存在",
+        1:"注册成功",
+        2:"非法用户名"
+    ]
+    
+    static let enLoginDic : [Int: String] = [
+        0:"Login successfully",
+        1:"The device is locked",
+        2:"The user is expired",
+        3:"The device does not exist",
+        4:"Wrong username",
+        5:"Wrong password",
+        6:"The device is not activated",
+        7:"The username or password cannot be empty"
+    ]
+    
+    static let chLoginDic : [Int: String] = [
+        0:"登陆成功",
+        1:"设备已禁用",
+        2:"设备已过期",
+        3:"设备不存在",
+        4:"用户名错误",
+        5:"密码错误",
+        6:"设备未激活",
+        7:"用户名和密码不能为空"
+    ]
+    
+    static let languageList: [String] = [""]
+    
     static let singlefeatureLabelDic : [Int:String] = [
         0: "♠️A ", 1: "♠️2", 2: "♠️3", 3: "♠️4", 4: "♠️5 ", 5: "♠️6 ", 6: "♠️7 ", 7: "♠️8 ", 8: "♠️9 ", 9: "♠️10 ",
         10: "♠️J ", 11: "♠️Q ", 12: "♠️K ", 13: "♥️A ", 14: "♥️2 ", 15: "♥️3 ", 16: "♥️4 ", 17: "♥️5 ", 18: "♥️6 ",

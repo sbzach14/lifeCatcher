@@ -1,4 +1,5 @@
 import SwiftUI
+import Localize_Swift
 
 enum AppState {
     case loggedOut
@@ -11,37 +12,64 @@ struct UserInfo {
 
 
 struct LoginView: View {
-    @State private var username: String = ""
-    @State private var password: String = ""
+    @State private var username: String = UserDefaults.standard.string(forKey: "savedUsername") ?? ""    
+    @State private var rememberPassword = false
+    @State private var password: String = UserDefaults.standard.string(forKey: "savedPassword") ?? ""
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
     @State private var isAction: Bool = true
+    @State private var showPassword = false
+    
+
     @ObservedObject var loginStatus: AppViewModel = AppViewModel()
     
     var body: some View {
         VStack {
             VStack(spacing: 20) {
-                
                 if case .loggedOut = loginStatus.appState {
-                    // 用户名输入框
-                    TextField("Username", text: $username)
+                    // Username input
+                    TextField("Username".localized(), text: $username)
                         .padding()
                         .background(Color.gray.opacity(0.2))
                         .cornerRadius(10)
                         .padding(.horizontal, 20)
-                    
-                    // 密码输入框
-                    SecureField("Password", text: $password)
-                        .padding()
-                        .background(Color.gray.opacity(0.2))
-                        .cornerRadius(10)
-                        .padding(.horizontal, 20)
-                    
-                    // 登录按钮
+
+                    // Password input with visibility toggle
+                    HStack {
+                        if showPassword {
+                            TextField("Password".localized(), text: $password)
+                                .padding()
+                                .background(Color.gray.opacity(0.2))
+                                .cornerRadius(10)
+                                .padding(.horizontal, 20)
+                        } else {
+                            SecureField("Password".localized(), text: $password)
+                                .padding()
+                                .background(Color.gray.opacity(0.2))
+                                .cornerRadius(10)
+                                .padding(.horizontal, 20)
+                        }
+                        
+                        Button(action: {
+                            showPassword.toggle()
+                        }) {
+                            Image(systemName: showPassword ? "eye.slash" : "eye")
+                                .foregroundColor(.gray)
+                        }
+                        .padding(.trailing, 20)
+                    }
+
+                    // Remember Password checkbox
+                    Toggle(isOn: $rememberPassword) {
+                        Text("Remember Password".localized())
+                    }
+                    .padding(.horizontal, 20)
+
+                    // Sign In button
                     Button(action: {
                         loginUser()
                     }) {
-                        Text("Sign In")
+                        Text("Sign In".localized())
                             .foregroundColor(.white)
                             .padding()
                             .frame(maxWidth: .infinity)
@@ -49,10 +77,10 @@ struct LoginView: View {
                             .cornerRadius(10)
                             .padding(.horizontal, 20)
                     }
-                    
-                    // 注册账号按钮
+
+                    // Register button
                     NavigationLink(destination: RegisterView()) {
-                        Text("Register")
+                        Text("Register".localized())
                             .foregroundColor(.white)
                             .padding()
                             .frame(maxWidth: .infinity)
@@ -60,29 +88,29 @@ struct LoginView: View {
                             .cornerRadius(10)
                             .padding(.horizontal, 20)
                     }
-                    
-                    // 错误提示框
+
+                    // Error alert
                     .alert(isPresented: $showAlert) {
-                        Alert(title: Text("Error"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+                        Alert(title: Text("Error".localized()), message: Text(alertMessage.localized()), dismissButton: .default(Text("OK")))
                     }
                 } else if case .loggedIn(username: loginStatus.userInfo?.username) = loginStatus.appState {
-                    
-                    Text("You have logged in")
+
+                    Text("You have logged in".localized())
                         .foregroundColor(.blue)
                         .padding()
                         .frame(maxWidth: .infinity)
                         .background(Color.white)
                         .cornerRadius(10)
                         .padding(.horizontal, 20)
-                    
+
                     Button(action: {
-                        // 执行退出登录操作
-                        loginStatus.userInfo = nil // 清空用户名
-                        loginStatus.appState = .loggedOut // 将状态改为未登录
+                        // Perform sign out
+                        loginStatus.userInfo = nil // Clear username
+                        loginStatus.appState = .loggedOut // Set state to logged out
                         AuthManager.isLoginServer = false
                         AuthManager.loginStatus = -1
                     }) {
-                        Text("Sign Out")
+                        Text("Sign Out".localized())
                             .foregroundColor(.white)
                             .padding()
                             .frame(maxWidth: .infinity)
@@ -102,6 +130,7 @@ struct LoginView: View {
                 .ignoresSafeArea()
         )
         .navigationTitle("Account")
+
     }
     
     // 登录逻辑
@@ -111,17 +140,16 @@ struct LoginView: View {
             return
         }
         
+        Localize.setCurrentLanguage("zh-Hans")
+        
         let url = URL(string: "http://1.94.17.30:8080/login")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        //获取登陆的时间戳
-        let timestamp = Int(Date().timeIntervalSince1970)
-
+        
         let parameters: [String: Any] = [
             "deviceID": AuthManager.retrieveUUID(),
             "username": username,
             "password": password,
-            "loginTime": timestamp
         ]
         request.httpBody = try? JSONSerialization.data(withJSONObject: parameters, options: [])
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -130,7 +158,7 @@ struct LoginView: View {
             guard let data = data, error == nil else {
                 DispatchQueue.main.async {
                     showAlert = true
-                    alertMessage = "Please check your network."
+                    alertMessage = "Please check your network.".localized()
                 }
                 return
             }
@@ -143,27 +171,49 @@ struct LoginView: View {
 //            # 3, 禁用中
             
             let success = jsonResponse?["success"] as? Bool ?? false
-            let message = jsonResponse?["message"] as? String ?? "对方什么也没说"
-            let accountStatus = jsonResponse?["accountStatus"] as? Int ?? -1
-            print("账号状态：\(accountStatus)")
-            
+            let returnLoginStatus = jsonResponse?["loginStatus"] as? Int ?? -1
+            let returnAccountStatus = jsonResponse?["accountStatus"] as? Int ?? -1
+            let returnExpiredTime = jsonResponse?["expiredTime"] as? Int ?? 0
+
             DispatchQueue.main.async {
                 if success {
                     // 更新为已登录状态并保存用户信息
                     loginStatus.appState = .loggedIn(username: username)
                     loginStatus.userInfo = UserInfo(username: username)
                     AuthManager.isLoginServer = true
-                    AuthManager.loginStatus = accountStatus
+                    AuthManager.loginStatus = returnAccountStatus
                     
-                    if (accountStatus == 1 && AuthManager.authOnline())
+                    UserDefaults.standard.set(username, forKey: "savedUsername")
+                    if rememberPassword {
+                        UserDefaults.standard.set(password, forKey: "savedPassword")
+                    }
+
+                    
+                    if (returnAccountStatus == 1 && AuthManager.authOnline())
                         || AuthManager.authLocal(){
                         AuthManager.isActive = true
                     }
-                    else if accountStatus == 2{
+                    else if returnAccountStatus == 2{
                         AuthManager.isActive = true
                         AuthManager.autoQuit()
                     }
+                    
+                //登陆失败
                 } else {
+                    
+                    var message: String = ""
+                    if returnLoginStatus == 1{
+                        message = "Wrong username".localized()
+                    } else if returnLoginStatus == 2{
+                        message = "Wrong password".localized()
+                    } else if returnLoginStatus == 3{
+                        message = "username is expired".localized()
+                    } else if returnLoginStatus == 4{
+                        message = "username does not exist".localized()
+                    } else if returnAccountStatus == 3{
+                        message = "The device is locked".localized()
+                    }
+                    
                     showAlert = true
                     alertMessage = message
                 }

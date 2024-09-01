@@ -193,7 +193,7 @@ class ReportManager{
         9:"[10]:报最大和最大家牌",
         10:"[12]:报排名",
         11:"[13]:报原始排名 4432和生死门*",
-        12:"[14]:报最大次大不打几平点对子*",
+        12:"[14]:报最大次大不打几平点对子",
         13:"[45]:上10张打色留色再根据色牌点数去牌保位置最大",
         14:"[46]:上10张打色留色再根据色牌点数去牌保位置最大次大",
         15:"[47]:上10张打色去色全部再根据色牌点数去牌保位置最大",
@@ -3073,7 +3073,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 
                 reportResult.append(currentReportStruct)
             }
-//            5:"[6]:报活门*",
+//            5:"[6]:报活门",
 //            报法格式：活门2，4或无
         case 5:
             for resultInfo in multipleReportResultInfo.singleResultList{
@@ -3116,7 +3116,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 
                 if resultInfo.pairIDList.count > 0{
                     reportString = "对子"
-                    voiceType = 1
+                    voiceType = 0
                     for pairID in resultInfo.pairIDList {
                         reportString += String(pairID + 1)
                     }
@@ -3234,13 +3234,14 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     break
                 }
                 if resultInfo.drawType != 0 {
-                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                    
+                    currentResult.append(SpeakResultStruct(voiceType: 0, content: reportString))
                 }
                 
                 //对子
                 reportString = "对子"
                 reportString += String(resultInfo.pairNum)
-                currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                currentResult.append(SpeakResultStruct(voiceType: 0, content: reportString))
 
                 reportResult.append(currentResult)
             }

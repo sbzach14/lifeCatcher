@@ -16,10 +16,23 @@ struct InfoView: View {
             Divider()
             
             // 序列号
-            Text("ID:" + viewModel.uniqueID)
-                .textSelection(.enabled)
-                .padding()
-                .foregroundColor(.black)
+            HStack {
+                Text("ID: \(viewModel.uniqueID)")
+                    .textSelection(.enabled)
+                    .padding()
+                    .foregroundColor(.black)
+                
+                Button(action: {
+                    UIPasteboard.general.string = viewModel.uniqueID
+                }) {
+                    Text("复制")
+                        .padding(.vertical, 4)
+                        .padding(.horizontal, 8)
+                        .foregroundColor(.white)
+                        .background(Color.blue)
+                        .cornerRadius(5)
+                }
+            }
             Divider()
             
             // 激活日期（如果激活）

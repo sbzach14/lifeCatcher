@@ -60,6 +60,7 @@
 		A89CDD882C70569400588273 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89CDD872C70569400588273 /* LoginView.swift */; };
 		A89CDD8A2C71B79500588273 /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89CDD892C71B79500588273 /* RegisterView.swift */; };
 		A89CDD8C2C76767300588273 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89CDD8B2C76767300588273 /* KeychainHelper.swift */; };
+		A89D91282C83E399009B7003 /* Localize_Swift in Frameworks */ = {isa = PBXBuildFile; productRef = A89D91272C83E399009B7003 /* Localize_Swift */; };
 		A8FBC7C22A3F0A5C00EDDFD7 /* VisionUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8FBC7C12A3F0A5C00EDDFD7 /* VisionUtils.swift */; };
 		B058BE5F2B09FFC20078E792 /* CurrentBlurDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058BE5E2B09FFC20078E792 /* CurrentBlurDetector.swift */; };
 		D013E36D2C712F8D000F2B57 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D013E36C2C712F8D000F2B57 /* Assets.xcassets */; };
@@ -157,6 +158,7 @@
 				18B7DA5C2C675E0000F37509 /* Algorithms in Frameworks */,
 				18B7DA642C675E2900F37509 /* _CryptoExtras in Frameworks */,
 				18B7DA5F2C675E1800F37509 /* Collections in Frameworks */,
+				A89D91282C83E399009B7003 /* Localize_Swift in Frameworks */,
 				18B7DA672C675E3F00F37509 /* AsyncAlgorithms in Frameworks */,
 				D0DAEF9C2C7E439E00D5938A /* CryptoSwift in Frameworks */,
 			);
@@ -357,6 +359,7 @@
 				18B7DA662C675E3F00F37509 /* AsyncAlgorithms */,
 				D0DAEF9B2C7E439E00D5938A /* CryptoSwift */,
 				D0DAEF9E2C7E43AE00D5938A /* Zip */,
+				A89D91272C83E399009B7003 /* Localize_Swift */,
 			);
 			productName = CountMyActions;
 			productReference = 18CA1477284ABEC600F90372 /* lifeCatcher.app */;
@@ -396,6 +399,7 @@
 				18B7DA652C675E3F00F37509 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
 				D0DAEF9A2C7E439E00D5938A /* XCLocalSwiftPackageReference "../Downloads/CryptoSwift-main" */,
 				D0DAEF9D2C7E43AE00D5938A /* XCLocalSwiftPackageReference "../Downloads/Zip-master" */,
+				A89D91262C83E398009B7003 /* XCRemoteSwiftPackageReference "Localize-Swift" */,
 			);
 			productRefGroup = 18CA1478284ABEC600F90372 /* Products */;
 			projectDirPath = "";
@@ -773,6 +777,14 @@
 				minimumVersion = 1.0.1;
 			};
 		};
+		A89D91262C83E398009B7003 /* XCRemoteSwiftPackageReference "Localize-Swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/marmelroy/Localize-Swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.2.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -800,6 +812,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 18B7DA652C675E3F00F37509 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
 			productName = AsyncAlgorithms;
+		};
+		A89D91272C83E399009B7003 /* Localize_Swift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A89D91262C83E398009B7003 /* XCRemoteSwiftPackageReference "Localize-Swift" */;
+			productName = Localize_Swift;
 		};
 		D0DAEF9B2C7E439E00D5938A /* CryptoSwift */ = {
 			isa = XCSwiftPackageProductDependency;

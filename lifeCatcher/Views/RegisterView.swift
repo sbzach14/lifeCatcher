@@ -1,4 +1,5 @@
 import SwiftUI
+import Localize_Swift
 
 struct RegisterView: View {
     @State private var username: String = ""
@@ -67,16 +68,12 @@ struct RegisterView: View {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        //获取注册的时间
-        let timestamp = Int(Date().timeIntervalSince1970)
-
         //获取设备序列号
         
         let body: [String: Any] = [
             "deviceID": AuthManager.retrieveUUID(),
             "username": username,
             "password": password,
-            "registerTime": timestamp
         ]
         
         do {
@@ -90,7 +87,7 @@ struct RegisterView: View {
             if let error = error {
                 print("Error in registration: \(error)")
                 DispatchQueue.main.async {
-                    self.alertMessage = "Please check your network."
+                    self.alertMessage = "Please check your network.".localized()
                     self.showAlert = true
                 }
                 return
@@ -105,13 +102,18 @@ struct RegisterView: View {
             }
 
             do {
-                if let responseObject = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                   let success = responseObject["success"] as? Bool {
+                if let responseObject = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    let success = responseObject["success"] as? Bool ?? false
+                    let registerStatus = responseObject["registerStatus"] as? Int ?? -1
                     DispatchQueue.main.async {
                         if success {
-                            self.alertMessage = responseObject["message"] as? String ?? ""
+                            self.alertMessage = "register successfully".localized()
                         } else {
-                            self.alertMessage = responseObject["message"] as? String ?? ""
+                            if registerStatus == 0{
+                                self.alertMessage = "The device is registered".localized()
+                            } else if registerStatus == 2 {
+                                self.alertMessage = "Ilegal username".localized()
+                            }
                         }
                         self.showAlert = true
                     }
