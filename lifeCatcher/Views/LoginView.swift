@@ -203,6 +203,9 @@ struct LoginView: View {
                     else if returnAccountStatus == 2{
                         AuthManager.isActive = true
                         AuthManager.autoQuit()
+                    //todo: appleTest
+                    } else if returnAccountStatus == 3 {
+                        
                     }
                     
                 //登陆失败

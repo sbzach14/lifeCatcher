@@ -32,8 +32,6 @@
 "Account" = "账户";
 "Error" = "错误";
 "Please check your network." = "请检查您的网络。";
-"Wrong username" = "用户名错误";
-"Wrong password" = "密码错误";
 "username is expired" = "用户名已过期";
 "username does not exist" = "用户名不存在";
 "The device is locked" = "设备已锁定";
