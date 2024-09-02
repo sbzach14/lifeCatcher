@@ -59,7 +59,7 @@ struct MainMenuView: View {
                                 }
                                 .background(
                                     NavigationLink(
-                                        destination: LoginView(loginStatus: loginStatus),
+                                        destination: LoginView().environmentObject(loginStatus),
                                         tag: 0,
                                         selection: $historyNavigate
                                     ) { EmptyView() }
@@ -97,7 +97,7 @@ struct MainMenuView: View {
                             }
                             
                             NavigationLink(
-                                destination: LoginView(loginStatus: loginStatus)
+                                destination: LoginView().environmentObject(loginStatus)
                             ) {
                                 VStack {
                                     Image(systemName: "person.crop.circle.fill") // Replace with your custom icon
@@ -170,7 +170,7 @@ struct DeprecatedMainView: View {
                     destination: DeprecatedInfoView()
                 ) {
                     VStack(alignment: .leading) {
-                        Text("系统设置")
+                        Text("功能设置")
                             .foregroundColor(.white)
                         Divider().colorInvert()
                     }

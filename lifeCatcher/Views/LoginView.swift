@@ -13,10 +13,11 @@ struct UserInfo {
 struct LoginView: View {
     @State private var username: String = ""
     @State private var password: String = ""
+    @State private var vericode: String = ""
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
     @State private var isAction: Bool = true
-    @ObservedObject var loginStatus: AppViewModel = AppViewModel()
+    @EnvironmentObject var loginStatus: AppViewModel
     
     var body: some View {
         VStack {
@@ -37,9 +38,37 @@ struct LoginView: View {
                         .cornerRadius(10)
                         .padding(.horizontal, 20)
                     
+                    HStack{
+                        // 验证码输入框
+                        TextField("Verification Code ", text: $vericode)
+                            .padding()
+                            .background(Color.gray.opacity(0.2))
+                            .cornerRadius(10)
+                            .padding(.horizontal, 20)
+                        
+                        Text(loginStatus.vericode)
+                            .font(.system(size: 20, weight: .bold))
+                            .foregroundColor(.black)
+                            .padding()
+                            .frame(width: 100)
+                            .background(Color.gray)
+                            .cornerRadius(10)
+                            .padding(.horizontal, 20)
+                            .contextMenu {
+                                Text("") // 空的contextMenu意味着禁用所有默认操作
+                            }
+                    }
+                    
                     // 登录按钮
                     Button(action: {
-                        loginUser()
+                        if vericode != loginStatus.vericode{
+                            showAlert = true
+                            alertMessage = "Verification Code Error"
+                            loginStatus.resetVericode()
+                        }
+                        else{
+                            loginUser()
+                        }
                     }) {
                         Text("Sign In")
                             .foregroundColor(.white)
@@ -140,7 +169,6 @@ struct LoginView: View {
 //            # 0, 未激活
 //            # 1, 正式版
 //            # 2, 测试版
-//            # 3, 禁用中
             
             let success = jsonResponse?["success"] as? Bool ?? false
             let message = jsonResponse?["message"] as? String ?? "对方什么也没说"

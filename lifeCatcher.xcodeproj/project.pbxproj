@@ -71,7 +71,6 @@
 		D0DAEF912C77657400D5938A /* ReportSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF902C77657400D5938A /* ReportSettingView.swift */; };
 		D0DAEF932C77664100D5938A /* HistoryItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF922C77664100D5938A /* HistoryItemView.swift */; };
 		D0DAEF952C7766D900D5938A /* UsedFeatureSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF942C7766D900D5938A /* UsedFeatureSelectView.swift */; };
-		D0DAEF972C77684F00D5938A /* NewSettingRecordView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF962C77684F00D5938A /* NewSettingRecordView.swift */; };
 		D0DAEF992C7768DD00D5938A /* SettingRecordConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF982C7768DD00D5938A /* SettingRecordConfigView.swift */; };
 		D0DAEF9C2C7E439E00D5938A /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = D0DAEF9B2C7E439E00D5938A /* CryptoSwift */; };
 		D0DAEF9F2C7E43AE00D5938A /* Zip in Frameworks */ = {isa = PBXBuildFile; productRef = D0DAEF9E2C7E43AE00D5938A /* Zip */; };
@@ -141,7 +140,6 @@
 		D0DAEF902C77657400D5938A /* ReportSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportSettingView.swift; sourceTree = "<group>"; };
 		D0DAEF922C77664100D5938A /* HistoryItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryItemView.swift; sourceTree = "<group>"; };
 		D0DAEF942C7766D900D5938A /* UsedFeatureSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsedFeatureSelectView.swift; sourceTree = "<group>"; };
-		D0DAEF962C77684F00D5938A /* NewSettingRecordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewSettingRecordView.swift; sourceTree = "<group>"; };
 		D0DAEF982C7768DD00D5938A /* SettingRecordConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingRecordConfigView.swift; sourceTree = "<group>"; };
 		D0DAEFA02C7EC46200D5938A /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
 		F11ED84932036610B96BC234 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
@@ -260,7 +258,6 @@
 				A887B64F2A7FE1AF009F488F /* ShowResultView.swift */,
 				A887B6572A8511A4009F488F /* InformationView.swift */,
 				18C98D212C15906100A8CD49 /* SettingRecordView.swift */,
-				D0DAEF962C77684F00D5938A /* NewSettingRecordView.swift */,
 				D0DAEF942C7766D900D5938A /* UsedFeatureSelectView.swift */,
 				18C98CE42C15893200A8CD49 /* DeprecatedComponentView.swift */,
 			);
@@ -427,7 +424,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D0DAEF972C77684F00D5938A /* NewSettingRecordView.swift in Sources */,
 				187A45832C39440800BB055C /* AppDelegate.swift in Sources */,
 				D0DAEFA12C7EC46200D5938A /* AppViewModel.swift in Sources */,
 				18F6C0C32C10A685007BEAEC /* RecordViewModel.swift in Sources */,
@@ -444,7 +440,6 @@
 				A88EFE0B2A7FC05900897243 /* JsonIOUtils.swift in Sources */,
 				18C98D0C2C158F7B00A8CD49 /* CNin.swift in Sources */,
 				18C98CE52C15893200A8CD49 /* DeprecatedComponentView.swift in Sources */,
-				D03811A72C7542C300726B99 /* cls_0727_v_trans.mlmodel in Sources */,
 				18C98D172C158F7B00A8CD49 /* TWat.swift in Sources */,
 				D0DAEF932C77664100D5938A /* HistoryItemView.swift in Sources */,
 				D0DAEF912C77657400D5938A /* ReportSettingView.swift in Sources */,
@@ -457,6 +452,9 @@
 				18C98D1B2C158F7B00A8CD49 /* TNin.swift in Sources */,
 				1824EF672C3EB4990029836C /* AuthTestView.swift in Sources */,
 				18C98D0D2C158F7B00A8CD49 /* CBat.swift in Sources */,
+				D03811A62C7542C300726B99 /* detect_0719_trans.mlmodel in Sources */,
+				D03811A72C7542C300726B99 /* cls_0727_v_trans.mlmodel in Sources */,
+				D03811A82C7542C300726B99 /* cls_0715_h_trans.mlmodel in Sources */,
 				D03811A22C75401200726B99 /* cls_main.mlmodel in Sources */,
 				18C98D112C158F7B00A8CD49 /* NPFive.swift in Sources */,
 				A892C6002A765A0A003FA2B3 /* MainView.swift in Sources */,
@@ -467,7 +465,6 @@
 				B058BE5F2B09FFC20078E792 /* CurrentBlurDetector.swift in Sources */,
 				18FFC40A2BB9587A00029B0D /* OriginBlurDetector.swift in Sources */,
 				18CA14DB284AC42C00F90372 /* MyApp.swift in Sources */,
-				D03811A82C7542C300726B99 /* cls_0715_h_trans.mlmodel in Sources */,
 				18C98D1C2C158F7B00A8CD49 /* TCar.swift in Sources */,
 				18C98D142C158F7B00A8CD49 /* TPFive.swift in Sources */,
 				A88EFE092A7FAD1100897243 /* AllSettingViewModel.swift in Sources */,
@@ -475,7 +472,6 @@
 				18C98D222C15906100A8CD49 /* SettingRecordView.swift in Sources */,
 				A8FBC7C22A3F0A5C00EDDFD7 /* VisionUtils.swift in Sources */,
 				A88EFE0D2A7FDC9500897243 /* HistoryView.swift in Sources */,
-				D03811A62C7542C300726B99 /* detect_0719_trans.mlmodel in Sources */,
 				18C98D102C158F7B00A8CD49 /* NPoi.swift in Sources */,
 				18CA14D6284AC42C00F90372 /* CameraImageView.swift in Sources */,
 				A83853532ADA918000346038 /* CustomUIComponent.swift in Sources */,

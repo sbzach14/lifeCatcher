@@ -117,6 +117,25 @@ extension View {
                     .opacity(0.7)
             }
     }
+    
+    func bluebubbleBackground() -> some View {
+        self.padding(5)
+            .background {
+                RoundedRectangle(cornerRadius: 10)
+                    .foregroundColor(.blue)
+                    .opacity(0.3)
+            }
+    }
+    
+    func imagebubbleBackground() -> some View {
+        self.background {
+                Image("list_bg") // 背景图片
+                    .resizable()
+                    .scaledToFill()
+                    .cornerRadius(10)
+                    .opacity(0.7)
+            }
+    }
 }
 
 

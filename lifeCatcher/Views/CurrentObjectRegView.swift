@@ -5,7 +5,6 @@ import Combine
 struct CurrentVisionObjectRecognitionView: View {
     var saveRuleIndex : Int
     @StateObject var viewModel : CurrentVisionObjectRecognitionViewModel = CurrentVisionObjectRecognitionViewModel()
-    @State var isNavigateToShowSingleFeatureView = false
     @State var isAVCaptureActive = false
     
     var body: some View {
@@ -17,6 +16,11 @@ struct CurrentVisionObjectRecognitionView: View {
                     Color.black
                         .edgesIgnoringSafeArea(.all)
                         .opacity(1.0)
+                        .onTapGesture{
+                            if viewModel.blackMode == 2{
+                                viewModel.toggleWorking()
+                            }
+                        }
                 }
                 .onAppear {
                     UIScreen.main.brightness = 0.0
@@ -26,7 +30,33 @@ struct CurrentVisionObjectRecognitionView: View {
                     UIScreen.main.brightness = 1.0
                 }
                 .navigationBarBackButtonHidden(true)
-            } else {
+            } 
+            else if viewModel.isShowSingleFeature{
+                ShowResultView().environmentObject(viewModel)
+            }
+            else {
+                
+                if let cameraImage = viewModel.cameraImage{
+                    Image(cameraImage, scale: 1.0, label: Text("Camera"))
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .ignoresSafeArea()
+                        .onTapGesture(count: 2){
+                            if viewModel.blackMode == 2{
+                                viewModel.isBlack = true
+                            }
+                        }
+                        .gesture(
+                            DragGesture(minimumDistance: 50)
+                                .onChanged { value in
+                                    if value.translation.width < 0 {
+                                        // 右滑
+                                        viewModel.isShowSingleFeature = true
+                                    }
+                                }
+                        )
+                }
+                
                 VStack{
                     if viewModel.isCamereSetting{
                         VStack{
@@ -75,7 +105,7 @@ struct CurrentVisionObjectRecognitionView: View {
                                     Text("屏幕方向")
                                         .foregroundColor(.white)
                                         .frame(maxWidth: 80, alignment: .leading)
-                                    
+                 
                                     Spacer()
                                     
                                     Text("竖屏")
@@ -97,27 +127,7 @@ struct CurrentVisionObjectRecognitionView: View {
                                 }
                             }
                             
-//                            Divider().colorInvert()
-//                            
-//                            HStack {
-//                                Text("自动对焦").foregroundColor(.white).frame(maxWidth: .infinity, alignment: .leading)
-//                                
-//                                Spacer()
-//                                
-//                                if viewModel.captureDevice.isFocusModeSupported(.locked){
-//                                    Toggle("", isOn: $viewModel.isAutoFocus)
-//                                        .toggleStyle(CustomToggleStyle())
-//                                        .frame(width: 200, height: 30, alignment: .trailing)
-//                                        .accentColor(.white)
-//                                        .onChange(of: viewModel.isAutoFocus) {
-//                                            newValue in
-//                                            viewModel.updateFocusFactor()
-//                                            viewModel.updateConfigJSON()
-//                                        }
-//                                }
-//                            }
-                            
-                            if !viewModel.isAutoFocus && viewModel.isBackCamera{
+                            if viewModel.isBackCamera{
                                 
                                 Divider().colorInvert()
                                 
@@ -160,7 +170,6 @@ struct CurrentVisionObjectRecognitionView: View {
                     HStack{
                         Button {
                             viewModel.isShowSingleFeature = true
-                            self.isNavigateToShowSingleFeatureView = true
                         } label: {
                             Label("ShowSingleFeature", systemImage: "magnifyingglass")
                                 .foregroundColor(.blue)
@@ -169,10 +178,6 @@ struct CurrentVisionObjectRecognitionView: View {
                                 
                         }
                         .frame(width: 50, height: 50)
-                        .background(NavigationLink(destination: ShowResultView().environmentObject(viewModel),
-                                                   isActive: $isNavigateToShowSingleFeatureView,
-                                                   label: EmptyView.init).hidden()
-                        )
                         
                         Spacer()
                         
@@ -189,6 +194,7 @@ struct CurrentVisionObjectRecognitionView: View {
                     }
                     .padding()
                 }
+                
             }
             Spacer()
         }
@@ -209,13 +215,6 @@ struct CurrentVisionObjectRecognitionView: View {
         }
         .toolbarBackground(.hidden)
         .navigationTitle("")
-        .background {
-            if let image = viewModel.cameraImage {
-                CameraImageView(cameraImage: image)
-                    .ignoresSafeArea()
-            }
-        }
-        
     }
 }
 
@@ -240,7 +239,7 @@ class ButtonViewController: UIViewController {
     var currentVolume: Float = -1
     let volumeView = MPVolumeView(frame: CGRect(x: -1000, y: -1000, width: 1, height: 1))
     var lastVolumeChangeTime: Date = Date()
-    let minVolumeChangeInterval: TimeInterval = 0.2
+    let minVolumeChangeInterval: TimeInterval = 0.5
     var isFirst: Bool = true
     var volumeValue: Float = 0.5
     

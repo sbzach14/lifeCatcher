@@ -4,13 +4,14 @@ import SwiftUI
 
 class DealClass{
     static let dealDic:[Int:String] = [
-        0:"正发",
-        1:"反发",
+        0:"正面发牌",
+        1:"反面发牌",
     ]
     
     static let coloringDic: [Int: String] = [
         0:"正面打色",
-        1:"反面打色"
+        1:"反面打色",
+        2:"不打色"
     ]
 }
 struct DealStatus{
@@ -27,9 +28,10 @@ struct TurnSettingView: View {
     @Binding var diyDealStatus: [[Bool]] // [[0，派牌，1，公牌， 2， 去牌]]
     var body: some View {
         VStack{
+            Divider()
             
             HStack{
-                Text("发牌定制").frame(maxWidth: .infinity, alignment: .leading)
+                Text("发牌模式").frame(maxWidth: .infinity, alignment: .leading)
                     .foregroundColor(.white)
                     .padding(.leading,20)
                 Picker("dealType", selection: $dealNum) {
@@ -42,15 +44,29 @@ struct TurnSettingView: View {
                 .padding(.trailing,20) // 右侧间距
                 .accentColor(.white)
                 
-            }.background(
-                Image("list_bg") // 背景图片
-                    .resizable()
-                    .scaledToFill()
-            )
-            .frame(height: 50)
+            }
+            
+            Divider()
             
             HStack{
-                Text("打色模式").frame(maxWidth: .infinity, alignment: .leading)
+                Text("发牌方向").frame(maxWidth: .infinity, alignment: .leading)
+                    .foregroundColor(.white)
+                    .padding(.leading,20)
+                Picker("dealType", selection: $dealType) {
+                    ForEach(0...DealClass.dealDic.count - 1, id: \.self){
+                        index in Text(DealClass.dealDic[index]!).tag(index)
+                    }
+                }
+                .pickerStyle(MenuPickerStyle())
+                .frame(width: 160, height: 30, alignment: .trailing)
+                .padding(.trailing,20) // 右侧间距
+                .accentColor(.white)
+            }
+            
+            Divider()
+            
+            HStack{
+                Text("打色方向").frame(maxWidth: .infinity, alignment: .leading)
                     .foregroundColor(.white)
                     .padding(.leading,20)
                 
@@ -63,32 +79,9 @@ struct TurnSettingView: View {
                 .frame(width: 160, height: 30, alignment: .trailing)
                 .padding(.trailing,20) // 右侧间距
                 .accentColor(.white)
-            }.background(
-                Image("list_bg") // 背景图片
-                    .resizable()
-                    .scaledToFill()
-            )
-            .frame(height: 50)
+            }
             
-            HStack{
-                Text("正发反发").frame(maxWidth: .infinity, alignment: .leading)
-                    .foregroundColor(.white)
-                    .padding(.leading,20)
-                Picker("dealType", selection: $dealType) {
-                    ForEach(0...DealClass.dealDic.count - 1, id: \.self){
-                        index in Text(DealClass.dealDic[index]!).tag(index)
-                    }
-                }
-                .pickerStyle(MenuPickerStyle())
-                .frame(width: 160, height: 30, alignment: .trailing)
-                .padding(.trailing,20) // 右侧间距
-                .accentColor(.white)
-            }.background(
-                Image("list_bg") // 背景图片
-                    .resizable()
-                    .scaledToFill()
-            )
-            .frame(height: 50)
+            Divider()
             
             if dealNum == 1{
                 Group{

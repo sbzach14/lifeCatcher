@@ -25,6 +25,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //            AuthManager.detectModel = try MLModel.init(contentsOf: URL.init(fileURLWithPath: detectModelPath!))
 //            AuthManager.det_model_url = detectModelPath
             
+//            let detectModelPath = Bundle.main.path(forResource: "detect_0719", ofType: "mlmodelc")
+//            let ClsHModelPath = Bundle.main.path(forResource: "cls_0715_h_trans", ofType: "mlmodelc")
+//            let ClsVModelPath = Bundle.main.path(forResource: "cls_0727_v_trans", ofType: "mlmodelc")
+//            
+//            AuthManager.detectModel = try MLModel.init(contentsOf: URL.init(fileURLWithPath: detectModelPath!))
+//            AuthManager.clsModel_h = try MLModel.init(contentsOf: URL.init(fileURLWithPath: ClsHModelPath!))
+//            AuthManager.clsModel_v = try MLModel.init(contentsOf: URL.init(fileURLWithPath: ClsVModelPath!))
+            
         } catch {
             // print("解密操作失败：\(error)")
         }

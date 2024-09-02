@@ -168,7 +168,7 @@ class ClassifierSettingArgs {
         //target 0max 1min 2生死门
         //targetPos 这里变为0开始
         //dealNum 0 默认每轮发一张，1 自定义
-        //coloringType 0，正面打色 1，反面打色
+        //coloringType 0，正面打色 1，反面打色 2，不打色同0
         //dealType 0 正发 1 反发
         //diyDealNum 派牌，公牌，或者去牌的数量
         //diyDealStatus 派牌/公牌/去牌
@@ -183,7 +183,7 @@ class ClassifierSettingArgs {
         // 返回的result包括两个int数组，一个是按牌大小从大到小排序的玩家编号数组，一个是这一轮结束之后牌库里剩下的牌
 
         
-        let multipleDatasetInfo =  ReportManager.DatasetReporter(DatasetIndex: DatasetIndex, inputSingleFeatures: inputSingleFeatures, cutSingleFeatureIndexList: cutSingleFeatureIndexArray, diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, newArgs: newArgs, rankRules: rankRules, suitRules: suitRules, reportID: calMode, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, targetPos: targetPos, coloringType: coloringType, consecutiveNum: consecutiveReport)
+        let multipleDatasetInfo =  ReportManager.DatasetReporter(DatasetIndex: DatasetIndex, inputSingleFeatures: inputSingleFeatures, cutSingleFeatureIndexList: cutSingleFeatureIndexArray, diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, newArgs: newArgs, rankRules: rankRules, suitRules: suitRules, reportID: calMode, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, targetPos: targetPos, coloringTypeArg: coloringType, consecutiveNum: consecutiveReport)
         
         return multipleDatasetInfo
     }
@@ -3610,8 +3610,8 @@ struct DatasetRule: Codable{
     var rankRules: [Int] = []
     var rankRuleChecked: [Int] = []
     var minSingleFeatureNum: Int
-    var resultReportType: Int
-    init(RuleName: String, DatasetType: Int, setting: Int, dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], rcNum: Int, shuffleMode: Int, cutMode: Int, singlefeatureToUse: [Int], cutNumSetting : Int, reportSetting: Int, cutNumRangeSetting: [Int], positionSetting: Int, consecutiveReport: Int, reportNumber: Int, voiceReport: Int, args: [Int], suitRanks: [Int], rankRules: [Int], rankRuleChecked: [Int], minSingleFeatureNum: Int, resultReportType: Int) {
+    var recgReport: Bool
+    init(RuleName: String, DatasetType: Int, setting: Int, dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], rcNum: Int, shuffleMode: Int, cutMode: Int, singlefeatureToUse: [Int], cutNumSetting : Int, reportSetting: Int, cutNumRangeSetting: [Int], positionSetting: Int, consecutiveReport: Int, reportNumber: Int, voiceReport: Int, args: [Int], suitRanks: [Int], rankRules: [Int], rankRuleChecked: [Int], minSingleFeatureNum: Int, recgReport: Bool) {
         self.RuleName = RuleName
         self.DatasetType = DatasetType
         self.setting = setting
@@ -3636,7 +3636,7 @@ struct DatasetRule: Codable{
         self.rankRules = rankRules
         self.rankRuleChecked = rankRuleChecked
         self.minSingleFeatureNum = minSingleFeatureNum
-        self.resultReportType = resultReportType
+        self.recgReport = recgReport
     }
 }
 

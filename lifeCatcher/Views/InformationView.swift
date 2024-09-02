@@ -9,7 +9,7 @@ struct InfoView: View {
         VStack(alignment: .leading, spacing: 10){
                     
             // 版本信息
-            Text("Version:1.0.2")
+            Text("Version:" + AuthManager.version)
                 .padding()
                 .foregroundColor(.black)
             
@@ -76,76 +76,92 @@ struct DeprecatedInfoView: View {
     
     var body: some View {
         VStack{
-            VStack{
-                HStack {
-                    Text("黑屏").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    Toggle("", isOn: $viewModel.isBlack).toggleStyle(CustomToggleStyle())
-                        .frame(width: 160, height: 30, alignment: .trailing)
-                        .padding(.trailing,30) // 右侧间距
-                        .accentColor(.white)
-                }
-                Divider().colorInvert()
-            }.padding()
             
-            VStack{
-                HStack {
-                    Text("耳机").foregroundColor(.white).padding(.leading, 20)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    Toggle("", isOn: $viewModel.isMute).toggleStyle(CustomToggleStyle())
-                        .frame(width: 160, height: 30, alignment: .trailing)
-                        .padding(.trailing,30) // 右侧间距
-                        .accentColor(.white)
-                }
-                Divider().colorInvert()
-            }.padding()
+            Divider()
             
-            VStack{
-                HStack {
-                    Text("音量上键功能").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    Picker("volumeUp", selection: $viewModel.volumeUp) {
-                        ForEach(0...volumeSetting.volumeUpDict.count - 1, id: \.self){
-                            index in Text(volumeSetting.volumeUpDict[index]!).tag(index)
-                        }
+            HStack {
+                Text("屏幕显示").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
+                
+                Picker("blackMode", selection: $viewModel.blackMode) {
+                    ForEach(0...FunctionSetting.blackModeDict.count - 1, id: \.self){
+                        index in Text(FunctionSetting.blackModeDict[index]!).tag(index)
                     }
-                    .pickerStyle(MenuPickerStyle())
-                    .frame(width: 200, height: 30, alignment: .trailing)
+                }
+                .pickerStyle(MenuPickerStyle())
+                .frame(width: 200, height: 30, alignment: .trailing)
+                .padding(.trailing,30) // 右侧间距
+            }
+            Divider()
+        
+            
+            HStack {
+                Text("音量上键功能").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
+                
+                Picker("volumeUp", selection: $viewModel.volumeUp) {
+                    ForEach(0...FunctionSetting.volumeUpDict.count - 1, id: \.self){
+                        index in Text(FunctionSetting.volumeUpDict[index]!).tag(index)
+                    }
+                }
+                .pickerStyle(MenuPickerStyle())
+                .frame(width: 200, height: 30, alignment: .trailing)
+                .padding(.trailing,30) // 右侧间距
+            }
+            Divider()
+        
+            HStack {
+                Text("音量下键功能").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
+                
+                Picker("volumeDown", selection: $viewModel.volumeDown) {
+                    ForEach(0...FunctionSetting.volumeDownDict.count - 1, id: \.self){
+                        index in Text(FunctionSetting.volumeDownDict[index]!).tag(index)
+                    }
+                }
+                .pickerStyle(MenuPickerStyle())
+                .frame(width: 200, height: 30, alignment: .trailing)
+                .padding(.trailing,30) // 右侧间距
+            }
+            Divider()
+            
+            HStack {
+                Text("播放设备").foregroundColor(.white).padding(.leading, 20)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                
+                Picker("voiceDevice", selection: $viewModel.voiceDevice) {
+                    ForEach(0...FunctionSetting.voiceDeviceDict.count - 1, id: \.self){
+                        index in Text(FunctionSetting.voiceDeviceDict[index]!).tag(index)
+                    }
+                }
+                .pickerStyle(MenuPickerStyle())
+                .frame(width: 200, height: 30, alignment: .trailing)
+                .padding(.trailing,30) // 右侧间距
+            }
+            
+            Divider()
+        
+            HStack {
+                Text("音量:\(String(format: "%.2f",viewModel.volumeValue))").foregroundColor(.white).padding(.leading, 20).frame(width: 100, alignment: .leading)
+                
+                Spacer()
+                
+                Slider(value: $viewModel.volumeValue, in: 0...1, step: 0.01)
+                    .frame(maxWidth: 200, alignment: .trailing)
                     .padding(.trailing,30) // 右侧间距
                     .accentColor(.white)
-                }
-                Divider().colorInvert()
-            }.padding(/*@START_MENU_TOKEN@*/EdgeInsets()/*@END_MENU_TOKEN@*/)
+            }.frame(height: 30)
             
-            VStack{
-                HStack {
-                    Text("音量下键功能").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    Picker("volumeDown", selection: $viewModel.volumeDown) {
-                        ForEach(0...volumeSetting.volumeDownDict.count - 1, id: \.self){
-                            index in Text(volumeSetting.volumeDownDict[index]!).tag(index)
-                        }
-                    }
-                    .pickerStyle(MenuPickerStyle())
-                    .frame(width: 200, height: 30, alignment: .trailing)
+            Divider()
+            
+            HStack {
+                Text("语速:\(String(format: "%.2f",viewModel.voiceRate))").foregroundColor(.white).padding(.leading, 20).frame(width: 100, alignment: .leading)
+                
+                Spacer()
+                
+                Slider(value: $viewModel.voiceRate, in: 0...1, step: 0.01)
+                    .frame(maxWidth: 200, alignment: .trailing)
                     .padding(.trailing,30) // 右侧间距
                     .accentColor(.white)
-                }
-                Divider().colorInvert()
-            }.padding()
-            
-            VStack{
-                HStack {
-                    Text("音量大小").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
-                    
-                    Slider(value: $viewModel.volumeValue, in: 0.01...0.99)
-                        .frame(width: 200, height: 30, alignment: .trailing)
-                        .padding(.trailing,30) // 右侧间距
-                        .accentColor(.white)
-                }
-                Divider().colorInvert()
-            }.padding()
+            }.frame(height: 30)
+                
             
             Spacer()
         }
@@ -162,7 +178,7 @@ struct DeprecatedInfoView: View {
     }
 }
 
-class volumeSetting{
+class FunctionSetting{
     static let volumeUpDict: [Int: String] = [
         0: "无功能",
         1: "增加人数",
@@ -182,5 +198,16 @@ class volumeSetting{
         5: "开始暂停",
         6: "报下一轮",
         7: "切换音量上键功能"
+    ]
+    
+    static let blackModeDict: [Int: String] = [
+        0: "相机图像",
+        1: "正常黑屏",
+        2: "黑屏点击"
+    ]
+    
+    static let voiceDeviceDict: [Int: String] = [
+        0: "扬声器",
+        1: "耳机"
     ]
 }

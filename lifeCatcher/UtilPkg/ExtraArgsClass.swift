@@ -1775,7 +1775,13 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
     }
     
     //[[SpeakResultStruct]]--> 每一轮的结果 [
-    static func DatasetReporter(DatasetIndex: Int, inputSingleFeatures: [Int], cutSingleFeatureIndexList: [Int], diyDealStatus: [[Bool]], diyDealNum:[Int], newArgs: [Int], rankRules:[Int], suitRules:[Int], reportID: Int, cutNumSetting: Int, cutNumRangeSetting: [Int], targetPos: Int, coloringType: Int, consecutiveNum: Int) -> MultipleReportResultInfo{
+    static func DatasetReporter(DatasetIndex: Int, inputSingleFeatures: [Int], cutSingleFeatureIndexList: [Int], diyDealStatus: [[Bool]], diyDealNum:[Int], newArgs: [Int], rankRules:[Int], suitRules:[Int], reportID: Int, cutNumSetting: Int, cutNumRangeSetting: [Int], targetPos: Int, coloringTypeArg: Int, consecutiveNum: Int) -> MultipleReportResultInfo{
+        
+        //不打色默认正面打色
+        var coloringType = coloringTypeArg
+        if coloringTypeArg == 2{
+            coloringType = 0
+        }
         
         let DatasetFunctions:[Int: ([[Bool]],[Int], [Int], [Int], [Int], [Int]) -> ([DatasetReturnRCInfo], [Int])] = [
             0: TP.FindWinner,
@@ -2172,7 +2178,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             if upDownID == 0{
                                 if singlefeatureIndex == 0 {
                                     //正发正面打色，反发反面打色
-                                    if newArgs[1] == coloringType {
+                                    if newArgs[1] == coloringType{
                                         newInputSingleFeatures = coloringInputSingleFeatures
                                     //正发反面打色，反发正面打色
                                     } else if newArgs[1] != coloringType {

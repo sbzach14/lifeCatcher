@@ -26,7 +26,7 @@ struct SettingRecordView: View {
                         ForEach(0..<rules.count, id: \.self) { index in
                             
                             NavigationLink(
-                                destination: SettingRecordConfigView(DatasetType: rules[index].DatasetType, selectedSaveIndex: index)
+                                destination: SettingRecordConfigView(selectedSaveIndex: index)
                             ) {
                                 
                                 let name: String = rules[index].RuleName
@@ -83,7 +83,7 @@ struct SettingRecordView: View {
                         self.isNavigateToSelectDatasetView = true
                     }){
                         Image("icon_add").resizable().frame(width: 150, height: 60)
-                    }.background(NavigationLink(destination: NewSettingRecordView(),
+                    }.background(NavigationLink(destination:SettingRecordConfigView(selectedSaveIndex: -1),
                                                 isActive: $isNavigateToSelectDatasetView,
                                                 label: EmptyView.init).hidden()
                     )

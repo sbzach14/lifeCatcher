@@ -66,28 +66,28 @@ func createConfigJSON() {
     
     let intDict : [String: Int] = [
         "volumeUp": 0,
-        "volumeDown": 0
+        "volumeDown": 0,
+        "blackMode": 0,
+        "voiceDevice": 0,
     ]
     
     let floatDict : [String: Float] = [
-        "volumeValue": 0,
+        "volumeValue": 0.5,
+        "voiceRate": 0.6,
         "zoomFactor": 0,
         "focusFactor": 0.65
     ]
     
     let boolDict: [String: Bool] = [
-        "isBlack": false,
-        "isMute": false,
         "isBackCamera": false,
-        "isCameraHorizon": true,
-        "isRemote": true,
-        "isAutoFocus": true
+        "isCameraHorizon": true
     ]
     
     let configDict: [String: Any] = [
         "Int": intDict,
         "Float": floatDict,
-        "Bool": boolDict
+        "Bool": boolDict,
+        "Version": AuthManager.version
     ]
     
 
@@ -102,11 +102,17 @@ func createConfigJSON() {
         let fileURL = documentsURL.appendingPathComponent("config.json")
 
         // Check if config.json already exists
-        if !FileManager.default.fileExists(atPath: fileURL.path) {
+        if !FileManager.default.fileExists(atPath: fileURL.path){
             // Write the JSON Data to the config.json file
             try jsonData.write(to: fileURL)
             // print("config.json file created successfully")
         } else {
+            if let configData = readConfigJSON() {
+                let version = configData["Version"] as? String
+                if version != AuthManager.version{
+                    try jsonData.write(to: fileURL)
+                }
+            }
             // print("config.json file already exists, skipping write operation.")
         }
 

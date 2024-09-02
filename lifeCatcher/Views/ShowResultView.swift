@@ -6,6 +6,7 @@ struct ShowResultView: View {
     @EnvironmentObject var viewModel : CurrentVisionObjectRecognitionViewModel
     
     var body: some View {
+        
         VStack(alignment: .leading) {
             
             ScrollView {
@@ -134,7 +135,15 @@ struct ShowResultView: View {
         .background(Image("Newbg2").resizable()
             .scaledToFill()
             .ignoresSafeArea())
-        .navigationTitle("结果显示")
+        .gesture(
+            DragGesture(minimumDistance: 50)
+                .onChanged { value in
+                    if value.translation.width > 0 {
+                        // 左滑
+                        viewModel.isShowSingleFeature = false
+                    }
+                }
+        )
     }
     
 }

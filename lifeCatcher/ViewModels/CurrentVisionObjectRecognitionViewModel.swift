@@ -28,9 +28,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var cutArray : [Int] = []
     @Published var cutShowArray : [Int] = []
 
-    
-    //let detectModel = try! MLModel(contentsOf: AuthManager.det_model_url)
-    //let clsModel = try! MLModel(contentsOf: AuthManager.cls_model_url)
     let detectModel = try! detect_0719_trans()
     let clsModel_h = try! cls_0715_h_trans()
     let clsModel_v = try! cls_0727_v_trans()
@@ -74,7 +71,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     public var suitRules : [Int] = [3,2,1,0]
     public var allSingleFeatureIndex : [Int] = Array(0...51)
     public var minSingleFeatureNum : Int = 0
-    public var resultReportType : Int = 0
+    public var recgReport : Bool = false
     
     //测试用的定时器
     public var ding: Int = 0
@@ -123,16 +120,15 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     ]
     
     @Published var isBlack: Bool = false
-    @Published var isMute: Bool = false
+    
     @Published var isBackCamera: Bool = false
     @Published var isCameraHorizon: Bool = true
-    @Published var isRemote: Bool = true
-    @Published var isAutoFocus: Bool = true
-    @Published var activeDate: String = ""
-    @Published var uniqueID: String = ""
     @Published var volumeUp: Int = 0
     @Published var volumeDown: Int = 0
+    @Published var blackMode: Int = 0
+    @Published var voiceDevice: Int = 0
     @Published var volumeValue: Float = 0.5
+    @Published var voiceRate: Float = 0.5
     @Published var zoomFactor: Float = 0
     @Published var focusFactor: Float = 0.65
     
@@ -161,24 +157,30 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         // Load data from config.json
         if let configData = readConfigJSON() {
             let boolDict = configData["Bool"] as! [String : Bool]
-            self.isBlack = boolDict["isBlack"]!
-            self.isMute = boolDict["isMute"]!
             self.isBackCamera = boolDict["isBackCamera"]!
             self.isCameraHorizon = boolDict["isCameraHorizon"]!
-            self.isRemote = true
-            self.isAutoFocus = false
             
             let intDict = configData["Int"] as! [String : Int]
             self.volumeUp = intDict["volumeUp"]!
             self.volumeDown = intDict["volumeDown"]!
+            self.blackMode = intDict["blackMode"]!
+            self.voiceDevice = intDict["voiceDevice"]!
             
             let floatDict = configData["Float"] as! [String : Float]
             self.volumeValue = floatDict["volumeValue"]!
+            self.voiceRate = floatDict["voiceRate"]!
             self.zoomFactor = floatDict["zoomFactor"]!
             self.focusFactor = floatDict["focusFactor"]!
         }
         
         self.isWorking = true
+        
+        if self.blackMode == 1{
+            self.isBlack = true
+        }
+        
+        self.speechPerformer.voiceRate = self.voiceRate
+        
     }
 
     func initialize(saveRuleIndex: Int) {
@@ -347,7 +349,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             try self.captureDevice.lockForConfiguration()
             
             
-            if !self.isAutoFocus && captureDevice.isFocusPointOfInterestSupported && self.captureDevice.isFocusModeSupported(.locked){
+            if captureDevice.isFocusPointOfInterestSupported && self.captureDevice.isFocusModeSupported(.locked){
                 self.captureDevice.focusMode = .locked
                 self.captureDevice.setFocusModeLocked(lensPosition: self.focusFactor)
                 // print("对焦模式：手动对焦")
@@ -383,7 +385,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
     
     func changeCameraFrameRate(to frameRate: Int) {
-        guard let device = captureDevice else {
+        guard let device = self.captureDevice else {
             // print("相机设备未初始化")
             return
         }
@@ -396,12 +398,13 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             
             
             if frameRate == idleRate{
-                self.captureDevice.exposureMode = .continuousAutoExposure
-                self.captureDevice.setExposureTargetBias(0)
+                //device.exposureMode = .continuousAutoExposure
+                device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(self.setFrameRate)), iso: device.activeFormat.maxISO)
+                device.setExposureTargetBias(0)
             }
             else{
                 self.captureDevice.exposureMode = .autoExpose
-                self.captureDevice.setExposureTargetBias(1.5)
+                device.setExposureTargetBias(1.5)
             }
             
             device.unlockForConfiguration()
@@ -433,7 +436,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             timestamp = currentTimestamp
             // 重置计数器
             frameCount = 0
-            
         }
   
         if self.state != "idle"{
@@ -458,7 +460,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         let isTargetArea = self.isTargetArea
         var targetArea = Array(self.targetArea)
         
-        if !self.isShowSingleFeature && self.isWorking{
+        if self.isWorking{
             
             self.detectionQueue.async {
                 
@@ -477,7 +479,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
         }
         
-        if !self.isBlack 
+        if !self.isBlack
+            && !self.isShowSingleFeature
             && self.isWorking
             && (self.cameraFrameRate <= idleRate || self.taskIndex % indexGap == 0){
             backgroundQueue.async {
@@ -524,7 +527,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         
         var singlefeatureResult : [DetectionResult]
-        if !isTargetArea && self.isRemote{
+        if !isTargetArea{
             let result = try! self.detectModel.prediction(image: pixelBuffer, iouThreshold: 0.01, confidenceThreshold: confidenceThreshold)
             singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, iscls: false)
         }
@@ -581,7 +584,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         let isShuffle = detectNum == 2 && (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4)
         let isRiffle = detectNum == 1 && (self.shuffleMode == 1 || self.shuffleMode == 2 || self.shuffleMode == 3 || self.shuffleMode == 4)
-        var isCut = detectNum != 0 && (!self.cutDone || self.resultReportType == 1) && self.singlefeatureArray.count > 0
+        var isCut = detectNum != 0 && (!self.cutDone || self.recgReport) && self.singlefeatureArray.count > 0
         
         DispatchQueue.main.async{
             if self.state == "idle"{
@@ -601,10 +604,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         stateResult.append(singlefeatureResult[1].coordinate)
                     }
                     
-                    if self.isRemote{
-                        self.targetArea = self.computeTargetArea(stateResult: stateResult)
-                        self.isTargetArea = true
-                    }
+                    self.targetArea = self.computeTargetArea(stateResult: stateResult)
+                    self.isTargetArea = true
                     
                     if isCut{
                         self.detectNeedToCut = true
@@ -616,7 +617,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 
                 self.detectionQueue.async{
                     //未进入区域的帧 crop
-                    if self.isRemote && !isTargetArea && self.isTargetArea{
+                    if !isTargetArea && self.isTargetArea{
                         
                         var stateResult : [[Float]] = []
                         if singlefeatureResult[0].singlefeatureIndex[0] != -1{
@@ -702,7 +703,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         && detectConfidence >= detectConfidenceThreshold
                         && isCut
                         && (detectNum == 1 || (detectNum == 2 && singlefeatureResult[0].singlefeatureIndex[0] == singlefeatureResult[1].singlefeatureIndex[0])){
-                        if self.usedSingleFeatures.contains(detectSingleFeature) &&  self.resultReportType == 1 {
+                        if self.usedSingleFeatures.contains(detectSingleFeature) &&  self.recgReport {
                             self.computeNextRound()
                             self.detectNeedToCut = false
                         }
@@ -838,10 +839,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                     }
                     
-                    
-                    if self.isRemote{
-                        self.targetArea = self.updateTargetArea(coordinates: stateResult, targetArea: targetArea)
-                    }
+                    self.targetArea = self.updateTargetArea(coordinates: stateResult, targetArea: targetArea)
                 }
             }
         }
@@ -2336,7 +2334,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
     
     func speakText(input: Int){
-        let isSpeak = self.isHeadphonesConnected() == self.isMute
+        let isSpeak = (!self.isHeadphonesConnected() && self.voiceDevice == 0)
+                    || (self.isHeadphonesConnected() && self.voiceDevice == 1)
         
         if isSpeak{
             if input == 0{
@@ -2352,7 +2351,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
 
     func speakText(input: [[SpeakResultStruct]]) {
-        let isSpeak = self.isHeadphonesConnected() == self.isMute
+        let isSpeak = (!self.isHeadphonesConnected() && self.voiceDevice == 0)
+                    || (self.isHeadphonesConnected() && self.voiceDevice == 1)
         
         if isSpeak{
             self.speechPerformer.performSpeechSynthesis(speakResultStruct: input)
@@ -2360,7 +2360,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
     
     func speakText(input: String){
-        let isSpeak = self.isHeadphonesConnected() == self.isMute
+        let isSpeak = (!self.isHeadphonesConnected() && self.voiceDevice == 0)
+                    || (self.isHeadphonesConnected() && self.voiceDevice == 1)
         if isSpeak{
             let speechUtterance = AVSpeechUtterance(string: input)
             self.speechPerformer.performSpeechSynthesis(utterance: speechUtterance)
@@ -2414,13 +2415,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             speakText(input: "方案" + String(self.selectedSaveIndex+1))
         }
         else if self.volumeUp == 5{
-            isWorking.toggle()
-            if isWorking{
-                speakText(input: "开始")
-            }
-            else{
-                speakText(input: "暂停")
-            }
+            toggleWorking()
         }
         else if self.volumeUp == 6{
             computeNextRound()
@@ -2466,23 +2461,27 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             speakText(input: "方案" + String(self.selectedSaveIndex+1))
         }
         else if self.volumeDown == 5{
-            isWorking.toggle()
-            if isWorking{
-                speakText(input: "开始")
-            }
-            else{
-                speakText(input: "暂停")
-            }
+            toggleWorking()
         }
         else if self.volumeDown == 6{
             computeNextRound()
         }
         else if self.volumeDown == 7{
             self.volumeUp += 1
-            if self.volumeUp >= volumeSetting.volumeUpDict.count{
+            if self.volumeUp >= FunctionSetting.volumeUpDict.count{
                 self.volumeUp = 0
             }
-            speakText(input: volumeSetting.volumeUpDict[self.volumeUp]!)
+            speakText(input: FunctionSetting.volumeUpDict[self.volumeUp]!)
+        }
+    }
+    
+    public func toggleWorking(){
+        isWorking.toggle()
+        if isWorking{
+            speakText(input: "开始")
+        }
+        else{
+            speakText(input: "暂停")
         }
     }
     
@@ -2510,7 +2509,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         self.suitRules = rules.suitRanks
         self.rankRules = rules.rankRules
         self.minSingleFeatureNum = rules.minSingleFeatureNum
-        self.resultReportType = rules.resultReportType
+        self.recgReport = rules.recgReport
         
         self.laplacianDic = [[:],[:]]
         for key in self.allSingleFeatureIndex {
@@ -2606,21 +2605,20 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             let fileURL = documentsURL.appendingPathComponent("config.json")
 
             let boolDict: [String: Bool] = [
-                "isBlack": self.isBlack,
-                "isMute": self.isMute,
                 "isBackCamera" : self.isBackCamera,
-                "isCameraHorizon" : self.isCameraHorizon,
-                "isRemote" : self.isRemote,
-                "isAutoFocus": self.isAutoFocus
+                "isCameraHorizon" : self.isCameraHorizon
             ]
             
             let intDict : [String: Int] = [
                 "volumeUp": self.volumeUp,
-                "volumeDown": self.volumeDown
+                "volumeDown": self.volumeDown,
+                "blackMode": self.blackMode,
+                "voiceDevice": self.voiceDevice
             ]
             
             let floatDict : [String: Float] = [
                 "volumeValue": self.volumeValue,
+                "voiceRate": 0.6,
                 "zoomFactor": self.zoomFactor,
                 "focusFactor": self.focusFactor
             ]
@@ -2628,7 +2626,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             let configData: [String: Any] = [
                 "Int": intDict,
                 "Float": floatDict,
-                "Bool": boolDict
+                "Bool": boolDict,
+                "Version": AuthManager.version
             ]
 
             let jsonData = try JSONSerialization.data(withJSONObject: configData, options: .prettyPrinted)
@@ -2719,6 +2718,7 @@ class SpeakResultStruct{
 
 
 class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
+    var voiceRate: Float = 0.6
     let synthesizer = AVSpeechSynthesizer() // Your AVSpeechSynthesizer instance
     let chineseFemaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.Ting-Ting-compact")
     let chineseMaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.siri_male_zh-CN_compact")
@@ -2773,14 +2773,14 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
                     }
                     
                     if repeatIndex != 0 && turnIndex == 0 && reportIndex == 0{
-                        speechUtterance.preUtteranceDelay = 0.2
+                        speechUtterance.preUtteranceDelay = 0.05
                     }
-                    speechUtterance.postUtteranceDelay = 0.2
+                    speechUtterance.postUtteranceDelay = 0
                     
                     // print("播报的input \(reportResult.content)")
                     
                     speechUtterance.pitchMultiplier = 1
-                    speechUtterance.rate = 0.5
+                    speechUtterance.rate = self.voiceRate
                     
                     synthesizer.speak(speechUtterance)
                 }

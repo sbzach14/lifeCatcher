@@ -6,16 +6,14 @@ import CoreML
 
 class AuthManager {
     
-    static var det_model_url : URL = URL(fileURLWithPath: "")
-    static var cls_model_url : URL = URL(fileURLWithPath: "")
-    static var detectModel: MLModel?
-    
     static var isLoginServer: Bool = false
     static var loginStatus: Int = 0
     static var isActive: Bool = false
-    
     static var activeDate: String = ""
+    
+    static var version: String = "1.0.2"
  
+    //deprecated
     static func getUniqueID() -> String? {
         // 获取设备ID
         let keychainIdentifier = UIDevice.current.identifierForVendor!.uuidString
