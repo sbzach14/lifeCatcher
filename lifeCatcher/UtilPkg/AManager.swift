@@ -67,6 +67,53 @@ class AuthManager {
             storeAuthKey(newKey: input)
             
             //TODO: post active request
+                        
+            let url = URL(string: "http://1.94.17.30:8080/activate")!
+            var request = URLRequest(url: url)
+            request.httpMethod = "POST"
+            
+            let parameters: [String: Any] = [
+                "deviceID": AuthManager.retrieveUUID(),
+            ]
+            request.httpBody = try? JSONSerialization.data(withJSONObject: parameters, options: [])
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            
+            let task = URLSession.shared.dataTask(with: request) { data, response, error in
+                guard let data = data, error == nil else {
+                    DispatchQueue.main.async {
+                        print("Please check your network.")
+                    }
+                    return
+                }
+                let jsonResponse = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+                
+    //            # activate status
+    //            # 0, 设备未注册
+    //            # 1, 设备已激活
+    //            # 2, 激活成功
+                
+                let success = jsonResponse?["success"] as? Bool ?? false
+                let returnAccountStatus = jsonResponse?["activateStatus"] as? Int ?? -1
+                let returnExpiredTime = jsonResponse?["expiredTime"] as? Int ?? 0
+
+                DispatchQueue.main.async {
+                    if success {
+                        // 更新为已登录状态并保存用户信息
+                        isSuccess = true
+                        print("激活成功")
+                    //登陆失败
+                    } else {
+                        isSuccess = false
+                        if returnAccountStatus == 0{
+                            
+                        } else if returnAccountStatus == 1{
+                            
+                        }
+                    print("激活失败")
+                    }
+                }
+            }
+            task.resume()
         }
         return isSuccess
     }

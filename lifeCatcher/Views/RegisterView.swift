@@ -1,41 +1,70 @@
 import SwiftUI
+import Localize_Swift
 
 struct RegisterView: View {
     @State private var username: String = ""
     @State private var password: String = ""
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
+    
+    @EnvironmentObject var loginStatus: AppViewModel
 
     var body: some View {
         VStack{
             VStack(spacing: 20) {
                 
-                TextField("Enter your new username", text: $username)
+                TextField("Enter your new username".localized(), text: $username)
                     .padding()
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(10)
                     .padding(.horizontal, 20)
                 
-                SecureField("Enter your new password", text: $password)
+                SecureField("Enter your new password".localized(), text: $password)
                     .padding()
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(10)
                     .padding(.horizontal, 20)
+                
+                HStack{
+                    // 验证码输入框
+                    TextField("Verification Code ", text: $vericode)
+                        .padding()
+                        .background(Color.gray.opacity(0.2))
+                        .cornerRadius(10)
+                        .padding(.horizontal, 20)
+                    
+                    Text(loginStatus.vericode)
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(.black)
+                        .padding()
+                        .frame(width: 100)
+                        .background(Color.gray)
+                        .cornerRadius(10)
+                        .padding(.horizontal, 20)
+                        .contextMenu {
+                            Text("") // 空的contextMenu意味着禁用所有默认操作
+                        }
+                }
                 
                 Button(action: {
-                    if username == ""{
+                    if vericode != loginStatus.vericode{
                         showAlert = true
-                        alertMessage = "Username can not be empty."
+                        alertMessage = "Verification Code Error"
+                    }
+                    else if username == ""{
+                        showAlert = true
+                        alertMessage = "Username can not be empty.".localized()
                     }
                     else if password == ""{
                         showAlert = true
-                        alertMessage = "Password can not be empty."
+                        alertMessage = "Password can not be empty.".localized()
                     }
                     else{
                         registerUser(username: username, password: password)
                     }
+                    loginStatus.resetVericode()
                 }) {
-                    Text("Register")
+                    Text("Register".localized())
                         .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
@@ -54,9 +83,9 @@ struct RegisterView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
         )
-        .navigationTitle("Register")
+        .navigationTitle("Sign Up".localized())
         .alert(isPresented: $showAlert) {
-            Alert(title: Text("Registration Status"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+            Alert(title: Text("Registration Status".localized()), message: Text(alertMessage), dismissButton: .default(Text("OK")))
         }
     }
 
@@ -67,16 +96,12 @@ struct RegisterView: View {
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        //获取注册的时间
-        let timestamp = Int(Date().timeIntervalSince1970)
-
         //获取设备序列号
         
         let body: [String: Any] = [
             "deviceID": AuthManager.retrieveUUID(),
             "username": username,
             "password": password,
-            "registerTime": timestamp
         ]
         
         do {
@@ -90,7 +115,7 @@ struct RegisterView: View {
             if let error = error {
                 print("Error in registration: \(error)")
                 DispatchQueue.main.async {
-                    self.alertMessage = "Please check your network."
+                    self.alertMessage = "Please check your network.".localized()
                     self.showAlert = true
                 }
                 return
@@ -98,20 +123,25 @@ struct RegisterView: View {
 
             guard let data = data else {
                 DispatchQueue.main.async {
-                    self.alertMessage = "No data received."
+                    self.alertMessage = "No data received.".localized()
                     self.showAlert = true
                 }
                 return
             }
 
             do {
-                if let responseObject = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                   let success = responseObject["success"] as? Bool {
+                if let responseObject = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    let success = responseObject["success"] as? Bool ?? false
+                    let registerStatus = responseObject["registerStatus"] as? Int ?? -1
                     DispatchQueue.main.async {
                         if success {
-                            self.alertMessage = responseObject["message"] as? String ?? ""
+                            self.alertMessage = "register successfully".localized()
                         } else {
-                            self.alertMessage = responseObject["message"] as? String ?? ""
+                            if registerStatus == 0{
+                                self.alertMessage = "The device is registered".localized()
+                            } else if registerStatus == 2 {
+                                self.alertMessage = "Ilegal username".localized()
+                            }
                         }
                         self.showAlert = true
                     }
@@ -119,7 +149,7 @@ struct RegisterView: View {
             } catch {
                 print("Error in decoding response data: \(error)")
                 DispatchQueue.main.async {
-                    self.alertMessage = "Failed to parse server response."
+                    self.alertMessage = "Failed to parse server response.".localized()
                     self.showAlert = true
                 }
             }

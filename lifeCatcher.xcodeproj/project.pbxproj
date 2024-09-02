@@ -60,6 +60,8 @@
 		A89CDD882C70569400588273 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89CDD872C70569400588273 /* LoginView.swift */; };
 		A89CDD8A2C71B79500588273 /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89CDD892C71B79500588273 /* RegisterView.swift */; };
 		A89CDD8C2C76767300588273 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89CDD8B2C76767300588273 /* KeychainHelper.swift */; };
+		A89D91282C83E399009B7003 /* Localize_Swift in Frameworks */ = {isa = PBXBuildFile; productRef = A89D91272C83E399009B7003 /* Localize_Swift */; };
+		A89D912B2C854CD2009B7003 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A89D91292C854CD2009B7003 /* Localizable.strings */; };
 		A8FBC7C22A3F0A5C00EDDFD7 /* VisionUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8FBC7C12A3F0A5C00EDDFD7 /* VisionUtils.swift */; };
 		B058BE5F2B09FFC20078E792 /* CurrentBlurDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058BE5E2B09FFC20078E792 /* CurrentBlurDetector.swift */; };
 		D013E36D2C712F8D000F2B57 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D013E36C2C712F8D000F2B57 /* Assets.xcassets */; };
@@ -128,6 +130,8 @@
 		A89CDD872C70569400588273 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		A89CDD892C71B79500588273 /* RegisterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
 		A89CDD8B2C76767300588273 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
+		A89D912A2C854CD2009B7003 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A89D912C2C854FF4009B7003 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		A8FBC7C12A3F0A5C00EDDFD7 /* VisionUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionUtils.swift; sourceTree = "<group>"; };
 		B058BE5E2B09FFC20078E792 /* CurrentBlurDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentBlurDetector.swift; sourceTree = "<group>"; };
 		D013E3612C7129EE000F2B57 /* lifeCatcher.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = lifeCatcher.entitlements; sourceTree = "<group>"; };
@@ -155,6 +159,7 @@
 				18B7DA5C2C675E0000F37509 /* Algorithms in Frameworks */,
 				18B7DA642C675E2900F37509 /* _CryptoExtras in Frameworks */,
 				18B7DA5F2C675E1800F37509 /* Collections in Frameworks */,
+				A89D91282C83E399009B7003 /* Localize_Swift in Frameworks */,
 				18B7DA672C675E3F00F37509 /* AsyncAlgorithms in Frameworks */,
 				D0DAEF9C2C7E439E00D5938A /* CryptoSwift in Frameworks */,
 			);
@@ -269,6 +274,7 @@
 			children = (
 				D013E36C2C712F8D000F2B57 /* Assets.xcassets */,
 				50053F80284ACAED00C86BF4 /* Info.plist */,
+				A89D91292C854CD2009B7003 /* Localizable.strings */,
 				18CA14D0284AC42C00F90372 /* MyApp.swift */,
 				187A45822C39440800BB055C /* AppDelegate.swift */,
 			);
@@ -354,6 +360,7 @@
 				18B7DA662C675E3F00F37509 /* AsyncAlgorithms */,
 				D0DAEF9B2C7E439E00D5938A /* CryptoSwift */,
 				D0DAEF9E2C7E43AE00D5938A /* Zip */,
+				A89D91272C83E399009B7003 /* Localize_Swift */,
 			);
 			productName = CountMyActions;
 			productReference = 18CA1477284ABEC600F90372 /* lifeCatcher.app */;
@@ -393,6 +400,7 @@
 				18B7DA652C675E3F00F37509 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
 				D0DAEF9A2C7E439E00D5938A /* XCLocalSwiftPackageReference "../Downloads/CryptoSwift-main" */,
 				D0DAEF9D2C7E43AE00D5938A /* XCLocalSwiftPackageReference "../Downloads/Zip-master" */,
+				A89D91262C83E398009B7003 /* XCRemoteSwiftPackageReference "Localize-Swift" */,
 			);
 			productRefGroup = 18CA1478284ABEC600F90372 /* Products */;
 			projectDirPath = "";
@@ -411,6 +419,7 @@
 				187A45452C2DA26100BB055C /* success_voice.mp3 in Resources */,
 				187A45472C2DA26100BB055C /* fail_voice.mp3 in Resources */,
 				187A45462C2DA26100BB055C /* start_voice.mp3 in Resources */,
+				A89D912B2C854CD2009B7003 /* Localizable.strings in Resources */,
 				A838534C2ADA7C0200346038 /* BG.xcassets in Resources */,
 				D013E36D2C712F8D000F2B57 /* Assets.xcassets in Resources */,
 				18A7A51D2C14E5A50020138E /* IC.xcassets in Resources */,
@@ -483,6 +492,18 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		A89D91292C854CD2009B7003 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A89D912A2C854CD2009B7003 /* en */,
+				A89D912C2C854FF4009B7003 /* zh-Hans */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		18CA1483284ABEC700F90372 /* Debug */ = {
@@ -617,7 +638,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
-				DEVELOPMENT_TEAM = 6WK4Q32GMN;
+				DEVELOPMENT_TEAM = FYQ8UYQL3M;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = lifeCatcher/App/Info.plist;
@@ -641,7 +662,7 @@
 				);
 				MARKETING_VERSION = 1.0.2;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shuffle.lifeCatcher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -665,7 +686,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
-				DEVELOPMENT_TEAM = 6WK4Q32GMN;
+				DEVELOPMENT_TEAM = FYQ8UYQL3M;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = lifeCatcher/App/Info.plist;
@@ -689,7 +710,7 @@
 				);
 				MARKETING_VERSION = 1.0.2;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shuffle.lifeCatcher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -769,6 +790,14 @@
 				minimumVersion = 1.0.1;
 			};
 		};
+		A89D91262C83E398009B7003 /* XCRemoteSwiftPackageReference "Localize-Swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/marmelroy/Localize-Swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.2.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -796,6 +825,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 18B7DA652C675E3F00F37509 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
 			productName = AsyncAlgorithms;
+		};
+		A89D91272C83E399009B7003 /* Localize_Swift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A89D91262C83E398009B7003 /* XCRemoteSwiftPackageReference "Localize-Swift" */;
+			productName = Localize_Swift;
 		};
 		D0DAEF9B2C7E439E00D5938A /* CryptoSwift */ = {
 			isa = XCSwiftPackageProductDependency;

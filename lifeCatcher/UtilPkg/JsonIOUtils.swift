@@ -220,3 +220,53 @@ public func readRecordHistoryJSON() -> [String: [String]]? {
     }
     return nil
 }
+public func createLanguageJSON(){
+    // Create the config dictionary with default values
+    
+    let languageDict : [String: Int] = [
+        "languageSetting": 0,
+    ]
+
+    do {
+        // Convert the dictionary to JSON Data
+        let jsonData = try JSONSerialization.data(withJSONObject: languageDict, options: .prettyPrinted)
+
+        // Get the Documents directory path in the app's sandbox
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+
+        // Create the config.json file URL
+        let fileURL = documentsURL.appendingPathComponent("language.json")
+
+        // Check if config.json already exists
+        if !FileManager.default.fileExists(atPath: fileURL.path) {
+            // Write the JSON Data to the config.json file
+            try jsonData.write(to: fileURL)
+            // print("config.json file created successfully")
+        } else {
+            // print("config.json file already exists, skipping write operation.")
+        }
+
+
+    } catch {
+        // print("Error creating the config.json file: \(error)")
+    }
+}
+
+public func readLanguageJSON() -> [String: Any]? {
+    do {
+        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let fileURL = documentsURL.appendingPathComponent("language.json")
+
+        let jsonData = try Data(contentsOf: fileURL)
+        let jsonObject = try JSONSerialization.jsonObject(with: jsonData, options: [])
+
+        if let configData = jsonObject as? [String: Any] {
+            return configData
+        }
+    } catch {
+        // print("Error reading config.json: \(error)")
+    }
+    return nil
+}
+
+
