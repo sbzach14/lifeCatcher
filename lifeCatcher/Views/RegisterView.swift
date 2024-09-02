@@ -11,13 +11,13 @@ struct RegisterView: View {
         VStack{
             VStack(spacing: 20) {
                 
-                TextField("Enter your new username", text: $username)
+                TextField("Enter your new username".localized(), text: $username)
                     .padding()
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(10)
                     .padding(.horizontal, 20)
                 
-                SecureField("Enter your new password", text: $password)
+                SecureField("Enter your new password".localized(), text: $password)
                     .padding()
                     .background(Color.gray.opacity(0.2))
                     .cornerRadius(10)
@@ -26,17 +26,17 @@ struct RegisterView: View {
                 Button(action: {
                     if username == ""{
                         showAlert = true
-                        alertMessage = "Username can not be empty."
+                        alertMessage = "Username can not be empty.".localized()
                     }
                     else if password == ""{
                         showAlert = true
-                        alertMessage = "Password can not be empty."
+                        alertMessage = "Password can not be empty.".localized()
                     }
                     else{
                         registerUser(username: username, password: password)
                     }
                 }) {
-                    Text("Register")
+                    Text("Register".localized())
                         .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
@@ -55,14 +55,14 @@ struct RegisterView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
         )
-        .navigationTitle("Register")
+        .navigationTitle("Register".localized())
         .alert(isPresented: $showAlert) {
-            Alert(title: Text("Registration Status"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+            Alert(title: Text("Registration Status".localized()), message: Text(alertMessage), dismissButton: .default(Text("OK")))
         }
     }
 
     func registerUser(username: String, password: String) {
-        guard let url = URL(string: "http://1.94.17.30:8080/register") else { return }
+        guard let url = URL(string: "http://192.168.1.225:8080/register") else { return }
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -95,7 +95,7 @@ struct RegisterView: View {
 
             guard let data = data else {
                 DispatchQueue.main.async {
-                    self.alertMessage = "No data received."
+                    self.alertMessage = "No data received.".localized()
                     self.showAlert = true
                 }
                 return
@@ -121,7 +121,7 @@ struct RegisterView: View {
             } catch {
                 print("Error in decoding response data: \(error)")
                 DispatchQueue.main.async {
-                    self.alertMessage = "Failed to parse server response."
+                    self.alertMessage = "Failed to parse server response.".localized()
                     self.showAlert = true
                 }
             }

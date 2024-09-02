@@ -22,6 +22,15 @@ class SettingViewModel: ObservableObject {
     @Published var focusFactor: Float = 0.65
     @Published var language: Int = 0
     
+    var isLanguageToggleOn: Bool {
+            get {
+                return language == 1
+            }
+            set {
+                language = newValue ? 1 : 0
+            }
+        }
+    
     var dateKey : SymmetricKey?
     @Published var trueVersion : String = ""
     @Published var trueDate : String = ""
@@ -83,6 +92,8 @@ class SettingViewModel: ObservableObject {
             self.language = languageData["languageSetting"] as! Int
             
         }
+        self.isLanguageToggleOn = UserDefaults.standard.bool(forKey: "isLanguageToggleOn")
+
     }
 
     // Method to update the config.json file whenever any property changes

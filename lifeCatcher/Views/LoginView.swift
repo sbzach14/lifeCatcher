@@ -13,7 +13,7 @@ struct UserInfo {
 
 struct LoginView: View {
     @State private var username: String = UserDefaults.standard.string(forKey: "savedUsername") ?? ""    
-    @State private var rememberPassword = false
+    @State private var rememberPassword = UserDefaults.standard.bool(forKey: "savedRememberFlag")
     @State private var password: String = UserDefaults.standard.string(forKey: "savedPassword") ?? ""
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
@@ -129,7 +129,7 @@ struct LoginView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
         )
-        .navigationTitle("Account")
+        .navigationTitle("Account".localized())
 
     }
     
@@ -140,9 +140,8 @@ struct LoginView: View {
             return
         }
         
-        Localize.setCurrentLanguage("zh-Hans")
         
-        let url = URL(string: "http://1.94.17.30:8080/login")!
+        let url = URL(string: "http://192.168.1.225:8080/login")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         
@@ -151,6 +150,15 @@ struct LoginView: View {
             "username": username,
             "password": password,
         ]
+        
+        UserDefaults.standard.set(username, forKey: "savedUsername")
+        if rememberPassword {
+            UserDefaults.standard.set(password, forKey: "savedPassword")
+        } else {
+            UserDefaults.standard.set("", forKey: "savedPassword")
+        }
+        UserDefaults.standard.set(rememberPassword, forKey: "savedRememberFlag")
+        
         request.httpBody = try? JSONSerialization.data(withJSONObject: parameters, options: [])
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
@@ -182,13 +190,12 @@ struct LoginView: View {
                     loginStatus.userInfo = UserInfo(username: username)
                     AuthManager.isLoginServer = true
                     AuthManager.loginStatus = returnAccountStatus
-                    
-                    UserDefaults.standard.set(username, forKey: "savedUsername")
-                    if rememberPassword {
-                        UserDefaults.standard.set(password, forKey: "savedPassword")
-                    }
+                    let date = Date(timeIntervalSince1970: TimeInterval(returnExpiredTime))
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateFormat = "yyyy年MM月dd日"
+                    let dateString = dateFormatter.string(from: date)
+                    AuthManager.activeDate = dateString
 
-                    
                     if (returnAccountStatus == 1 && AuthManager.authOnline())
                         || AuthManager.authLocal(){
                         AuthManager.isActive = true

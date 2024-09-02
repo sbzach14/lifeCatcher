@@ -1,0 +1,41 @@
+/* 
+  Localizable.strings
+  lifeCatcher
+
+  Created by Zhangyi Chen on 9/2/24.
+  Copyright © 2024 Apple. All rights reserved.
+*/
+"Please check your network." = "请检查您的网络连接。";
+"Sign In" = "登录";
+"Sign Out" = "退出登录";
+"Wrong username" = "用户名错误";
+"Wrong password" = "密码错误";
+"Enter your new username" = "请输入新的用户名";
+"Enter your new password" = "请输入新的密码";
+"Username can not be empty." = "用户名不能为空";
+"Password can not be empty." = "密码不能为空";
+"Register" = "注册";
+"Please check your network." = "请检查您的网络连接。";
+"No data received." = "没有收到数据。";
+"register successfully" = "注册成功";
+"The device is registered" = "设备已注册";
+"Ilegal username" = "非法用户名";
+"Registration Status" = "注册状态";
+"OK" = "确定";
+"Failed to parse server response." = "解析服务器响应失败。";
+"Username" = "用户名";
+"Password" = "密码";
+"Sign In" = "登录";
+"Register" = "注册";
+"Remember Password" = "记住密码";
+"Sign Out" = "登出";
+"Account" = "账户";
+"Error" = "错误";
+"Please check your network." = "请检查您的网络。";
+"Wrong username" = "用户名错误";
+"Wrong password" = "密码错误";
+"username is expired" = "用户名已过期";
+"username does not exist" = "用户名不存在";
+"The device is locked" = "设备已锁定";
+"You have logged in" = "您已登录";
+

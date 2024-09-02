@@ -1,6 +1,7 @@
 
 
 import SwiftUI
+import Localize_Swift
 
 struct InfoView: View {
     @StateObject var viewModel = SettingViewModel()
@@ -89,6 +90,33 @@ struct DeprecatedInfoView: View {
     
     var body: some View {
         VStack{
+            VStack{
+                HStack {
+                    Text("语言")
+                        .foregroundColor(.white)
+                        .padding(.leading, 20)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    
+                    Toggle("", isOn: $viewModel.isLanguageToggleOn)
+                        .toggleStyle(CustomToggleStyle())
+                        .frame(width: 160, height: 30, alignment: .trailing)
+                        .padding(.trailing, 30)
+                        .accentColor(.white)
+                        .onChange(of: viewModel.isLanguageToggleOn) { newValue in
+                            if newValue {
+                                    Localize.setCurrentLanguage("zh-Hans")
+                                    UserDefaults.standard.set(true, forKey: "isLanguageToggleOn")
+                                } else {
+                                    Localize.setCurrentLanguage("en")
+                                    UserDefaults.standard.set(false, forKey: "isLanguageToggleOn")
+                                }
+                        }
+                }
+                Divider().colorInvert()
+
+
+            }.padding()
+            
             VStack{
                 HStack {
                     Text("黑屏").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)

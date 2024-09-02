@@ -70,7 +70,7 @@ class AuthManager {
             
             //TODO: post active request
                         
-            let url = URL(string: "http://1.94.17.30:8080/activate")!
+            let url = URL(string: "http://192.168.1.225:8080/activate")!
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
             
@@ -102,9 +102,16 @@ class AuthManager {
                     if success {
                         // 更新为已登录状态并保存用户信息
                         isSuccess = true
+                        print("激活成功")
                     //登陆失败
                     } else {
-                    isSuccess = false
+                        isSuccess = false
+                        if returnAccountStatus == 0{
+                            
+                        } else if returnAccountStatus == 1{
+                            
+                        }
+                    print("激活失败")
                     }
                 }
             }

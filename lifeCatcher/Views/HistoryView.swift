@@ -1,6 +1,7 @@
 
 
 import SwiftUI
+import Localize_Swift
 
 struct HistoryView: View {
     @State private var searchText = ""
@@ -72,9 +73,9 @@ struct HistoryView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
         )
-        .navigationBarTitle("History")
+        .navigationBarTitle("History".localized())
         .alert(isPresented: $showAlert) {
-            Alert(title: Text("激活成功"), message: Text(""), dismissButton: .default(Text("OK")))
+            Alert(title: Text("激活成功"), message: Text(""), dismissButton: .default(Text("OK".localized())))
         }
     }
 }
