@@ -141,7 +141,7 @@ struct LoginView: View {
         }
         
         
-        let url = URL(string: "http://192.168.1.225:8080/login")!
+        let url = URL(string: "http://1.94.17.30:8080/login")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         
