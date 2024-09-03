@@ -122,29 +122,43 @@ struct LoginView: View {
                         Alert(title: Text("Error".localized()), message: Text(alertMessage.localized()), dismissButton: .default(Text("OK")))
                     }
                 } else if case .loggedIn(username: loginStatus.userInfo?.username) = loginStatus.appState {
+                    
+                    VStack {
+                        // 显示当前登录账号，居中加粗
+                        if let username = loginStatus.userInfo?.username {
+                            Text(username)
+                                .font(.system(size: 24, weight: .bold))
+                                .foregroundColor(.black)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .multilineTextAlignment(.center)
+                        }
 
-                    Text("You have logged in".localized())
-                        .foregroundColor(.blue)
-                        .padding()
-                        .frame(maxWidth: .infinity)
-                        .background(Color.white)
-                        .cornerRadius(10)
-                        .padding(.horizontal, 20)
-
-                    Button(action: {
-                        // Perform sign out
-                        loginStatus.userInfo = nil // Clear username
-                        loginStatus.appState = .loggedOut // Set state to logged out
-                        AuthManager.isLoginServer = false
-                        AuthManager.loginStatus = -1
-                    }) {
-                        Text("Sign Out".localized())
-                            .foregroundColor(.white)
+                        // 登陆成功提示
+                        Text("You have logged in".localized())
+                            .foregroundColor(.blue)
                             .padding()
                             .frame(maxWidth: .infinity)
-                            .background(Color.red)
+                            .background(Color.white)
                             .cornerRadius(10)
                             .padding(.horizontal, 20)
+
+                        // 登出按钮
+                        Button(action: {
+                            // 执行登出操作
+                            loginStatus.userInfo = nil // 清除用户名
+                            loginStatus.appState = .loggedOut // 设置状态为已登出
+                            AuthManager.isLoginServer = false
+                            AuthManager.loginStatus = -1
+                        }) {
+                            Text("Sign Out".localized())
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color.red)
+                                .cornerRadius(10)
+                                .padding(.horizontal, 20)
+                        }
                     }
                 }
             }.padding(.top, 20)
@@ -225,11 +239,13 @@ struct LoginView: View {
 
                     if (returnAccountStatus == 1 && AuthManager.authOnline())
                         || AuthManager.authLocal(){
+                        print("正式版")
                         AuthManager.isActive = true
                     }
                     else if returnAccountStatus == 2{
                         AuthManager.isActive = true
                         AuthManager.autoQuit()
+                        print("测试版")
                     //todo: appleTest
                     } else if returnAccountStatus == 3 {
                         

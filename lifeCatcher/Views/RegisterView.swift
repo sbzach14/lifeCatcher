@@ -6,6 +6,9 @@ struct RegisterView: View {
     @State private var password: String = ""
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
+    @State private var vericode:String = ""
+    @State private var showPassword = false
+
     
     @EnvironmentObject var loginStatus: AppViewModel
 
@@ -19,11 +22,28 @@ struct RegisterView: View {
                     .cornerRadius(10)
                     .padding(.horizontal, 20)
                 
-                SecureField("Enter your new password".localized(), text: $password)
-                    .padding()
-                    .background(Color.gray.opacity(0.2))
-                    .cornerRadius(10)
-                    .padding(.horizontal, 20)
+                HStack {
+                    if showPassword {
+                        TextField("Enter your new password".localized(), text: $password)
+                            .padding()
+                            .background(Color.gray.opacity(0.2))
+                            .cornerRadius(10)
+                    } else {
+                        SecureField("Enter your new password".localized(), text: $password)
+                            .padding()
+                            .background(Color.gray.opacity(0.2))
+                            .cornerRadius(10)
+                    }
+                    
+                    Button(action: {
+                        showPassword.toggle()
+                    }) {
+                        Image(systemName: showPassword ? "eye.slash.fill" : "eye.fill")
+                            .foregroundColor(.gray)
+                    }
+                    .padding(.trailing, 20)
+                }
+                .padding(.horizontal, 20)
                 
                 HStack{
                     // 验证码输入框
@@ -88,6 +108,7 @@ struct RegisterView: View {
             Alert(title: Text("Registration Status".localized()), message: Text(alertMessage), dismissButton: .default(Text("OK")))
         }
     }
+
 
     func registerUser(username: String, password: String) {
         guard let url = URL(string: "http://1.94.17.30:8080/register") else { return }

@@ -23,16 +23,6 @@ class SettingViewModel: ObservableObject {
     @Published var voiceRate: Float = 0.6
     @Published var zoomFactor: Float = 0
     @Published var focusFactor: Float = 0.65
-    @Published var language: Int = 0
-    
-    var isLanguageToggleOn: Bool {
-            get {
-                return language == 1
-            }
-            set {
-                language = newValue ? 1 : 0
-            }
-        }
     
     var dateKey : SymmetricKey?
     @Published var trueVersion : String = ""
@@ -95,11 +85,6 @@ class SettingViewModel: ObservableObject {
                 self.trueVersion = "测试版"
             }
         }
-        if let languageData = readLanguageJSON(){
-            self.language = languageData["languageSetting"] as! Int
-            
-        }
-        self.isLanguageToggleOn = UserDefaults.standard.bool(forKey: "isLanguageToggleOn")
 
     }
 
@@ -135,16 +120,9 @@ class SettingViewModel: ObservableObject {
                 "Bool": boolDict,
                 "Version": AuthManager.version
             ]
-            
-            let languageDict : [String: Int] = [
-                "languageSetting": 0,
-            ]
 
             let jsonData = try JSONSerialization.data(withJSONObject: configData, options: .prettyPrinted)
             try jsonData.write(to: fileURL)
-            
-            let languageJsonData = try JSONSerialization.data(withJSONObject: languageDict, options: .prettyPrinted)
-            try languageJsonData.write(to: languageFileURL)
 
             // print("config.json file updated successfully")
         } catch {
