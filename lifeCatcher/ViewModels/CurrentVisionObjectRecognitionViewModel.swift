@@ -1278,7 +1278,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             //                let min_endIndex = min(leftLastTail, rightLastTail) + 3
             //                let max_endIndex = max(leftLastTail, rightLastTail) - 1
             //                endIndex = max(min_endIndex, max_endIndex)
-            //                
+            //
             //                let detectResultListIndex = sortedKeys[endIndex-1]
             //                if targetDetecResultList[detectResultListIndex]![0].nodeType == 3{
             //                    targetDetecResultList[detectResultListIndex]![0].nodeType = 2
