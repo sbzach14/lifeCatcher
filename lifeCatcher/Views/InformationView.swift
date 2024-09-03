@@ -1,5 +1,3 @@
-
-
 import SwiftUI
 import Localize_Swift
 

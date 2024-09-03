@@ -122,12 +122,7 @@ struct SettingRecordConfigView: View{
             self.rcNumList = selectedRule.rcNum
             
             self.cutNumRangeSetting = [1,5]
-            for singlefeatureIndex in 0...54{
-                if singlefeatureIndex != 52{
-                    self.singlefeatureToUse.append(singlefeatureIndex)
-                }
-            }
-           
+            
             self.args = DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![0]
             self.suitRules = DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![1]
             for rankIndex in 0...DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![2].count - 1 {
@@ -171,6 +166,7 @@ struct SettingRecordConfigView: View{
             self.recgReport = rules.recgReport
             
             self.currentNum = rcNumList[self.rcNum]
+            self.singlefeatureToUse = rules.singlefeatureToUse
         }
         
         self.editType = 1
@@ -544,11 +540,18 @@ struct SettingRecordConfigView: View{
     }
     
     private func handleDatasetTypeChange(){
-        self.rcNum = 2
         let selectedRule = ClassifierSettingArgs.targetSetting[self.DatasetType]!
         self.rcNumList = selectedRule.rcNum
         self.currentNum = self.rcNumList[rcNum]
         self.setting = 0
+        
+        self.args = DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![0]
+        self.suitRules = DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![1]
+        self.rankRules = []
+        for rankIndex in 0...DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![2].count - 1 {
+            self.rankRules.append(RankRulesSate(index: DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![2][rankIndex], isChecked: (DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![3][rankIndex] != 0)))
+        }
+        self.singlefeatureToUse = DatasetGetAllSingleFeatureIndex()
     }
     
     private func handleRCNumChange(rcNumIndex: Int){

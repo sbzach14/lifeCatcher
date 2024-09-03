@@ -38,7 +38,7 @@ struct RegisterView: View {
                     Button(action: {
                         showPassword.toggle()
                     }) {
-                        Image(systemName: showPassword ? "eye.slash.fill" : "eye.fill")
+                        Image(systemName: showPassword ? "eye.fill" : "eye.slash.fill")
                             .foregroundColor(.gray)
                     }
                     .padding(.trailing, 20)
@@ -47,7 +47,7 @@ struct RegisterView: View {
                 
                 HStack{
                     // 验证码输入框
-                    TextField("Verification Code ", text: $vericode)
+                    TextField("Verification Code".localized(), text: $vericode)
                         .padding()
                         .background(Color.gray.opacity(0.2))
                         .cornerRadius(10)

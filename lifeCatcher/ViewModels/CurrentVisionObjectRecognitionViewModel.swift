@@ -28,7 +28,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var cutArray : [Int] = []
     @Published var cutShowArray : [Int] = []
 
-    let detectModel = try! detect_0719_trans()
+    let detectModel = try! detect_0903()
     let clsModel_h = try! cls_0715_h_trans()
     let clsModel_v = try! cls_0727_v_trans()
     var originSize : [Float] = [1920, 1080] //相机图像大小
@@ -399,12 +399,14 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             
             if frameRate == idleRate{
                 //device.exposureMode = .continuousAutoExposure
-                device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(self.setFrameRate)), iso: device.activeFormat.maxISO)
-                device.setExposureTargetBias(0)
+                //device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(self.setFrameRate)), iso: device.activeFormat.maxISO)
+                device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(240)), iso: device.activeFormat.maxISO)
+                //device.setExposureTargetBias(0)
             }
             else{
-                self.captureDevice.exposureMode = .autoExpose
-                device.setExposureTargetBias(1.5)
+                //self.captureDevice.exposureMode = .autoExpose
+                device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(240)), iso: device.activeFormat.maxISO)
+                //device.setExposureTargetBias(1.5)
             }
             
             device.unlockForConfiguration()
@@ -884,15 +886,15 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         //去除重复帧
         for keyIndex in 0..<sortedKeys.count-1{
             
-            
-            
             let detectResultListIndex = sortedKeys[keyIndex]
             let nextDetectResultListIndex = sortedKeys[keyIndex+1]
             for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
                 let nowLaplacian = targetDetecResultList[detectResultListIndex]![numIndex].laplacianVariance
                 let nextLaplacian = targetDetecResultList[nextDetectResultListIndex]![numIndex].laplacianVariance
+                let nowNum = targetDetecResultList[detectResultListIndex]![numIndex].singlefeatureIndex[0]
+                let nextNum = targetDetecResultList[nextDetectResultListIndex]![numIndex].singlefeatureIndex[0]
                 
-                if abs(nowLaplacian - nextLaplacian) <= 0.000000001{
+                if abs(nowLaplacian - nextLaplacian) <= 0.000000001 && nowNum == nextNum{
                     deleteKeys.append(detectResultListIndex)
                 }
                 
@@ -1268,29 +1270,29 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 //                }
             }
         }
+        
         if !isShort{
-            
             endIndex = max(leftLastTail, rightLastTail) + 1
             
-//            if !isSingle{
-//                let min_endIndex = min(leftLastTail, rightLastTail) + 3
-//                let max_endIndex = max(leftLastTail, rightLastTail) - 1
-//                endIndex = max(min_endIndex, max_endIndex)
-//                
-//                let detectResultListIndex = sortedKeys[endIndex-1]
-//                if targetDetecResultList[detectResultListIndex]![0].nodeType == 3{
-//                    targetDetecResultList[detectResultListIndex]![0].nodeType = 2
-//                }
-//                else if targetDetecResultList[detectResultListIndex]![1].nodeType == 3{
-//                    targetDetecResultList[detectResultListIndex]![1].nodeType = 2
-//                }
-//                if targetDetecResultList[detectResultListIndex]![0].nodeType != 2{
-//                    targetDetecResultList[detectResultListIndex]![0].nodeType = 0
-//                }
-//                else if targetDetecResultList[detectResultListIndex]![1].nodeType != 2{
-//                    targetDetecResultList[detectResultListIndex]![1].nodeType = 0
-//                }
-//            }
+            //            if !isSingle{
+            //                let min_endIndex = min(leftLastTail, rightLastTail) + 3
+            //                let max_endIndex = max(leftLastTail, rightLastTail) - 1
+            //                endIndex = max(min_endIndex, max_endIndex)
+            //                
+            //                let detectResultListIndex = sortedKeys[endIndex-1]
+            //                if targetDetecResultList[detectResultListIndex]![0].nodeType == 3{
+            //                    targetDetecResultList[detectResultListIndex]![0].nodeType = 2
+            //                }
+            //                else if targetDetecResultList[detectResultListIndex]![1].nodeType == 3{
+            //                    targetDetecResultList[detectResultListIndex]![1].nodeType = 2
+            //                }
+            //                if targetDetecResultList[detectResultListIndex]![0].nodeType != 2{
+            //                    targetDetecResultList[detectResultListIndex]![0].nodeType = 0
+            //                }
+            //                else if targetDetecResultList[detectResultListIndex]![1].nodeType != 2{
+            //                    targetDetecResultList[detectResultListIndex]![1].nodeType = 0
+            //                }
+            //            }
         }
         
         var addEndIndex = min(leftLastTail, rightLastTail)
@@ -1391,7 +1393,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         
         let isShuffle = (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4) && !isSingle && !isShort
-        
         
         var lostNum = 0
         var addNum = 0
@@ -1608,16 +1609,16 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     if nodeType0 == 2{
                         detectSingleFeatureArray.insert(nowNum0, at: 0)
                     }
-//                    else if nodeType0 == 4 && detectResultNode0.confidence[0] > 0.9{
-//                        detectSingleFeatureArray.insert(nowNum0, at: 0)
-//                    }
+                    else if nodeType0 == 0 && nowNum0 != -1 && detectResultNode0.confidence[0] > 0.7{
+                        detectSingleFeatureArray.insert(nowNum0, at: 0)
+                    }
                 
                     if nodeType1 == 2{
                         detectSingleFeatureArray.insert(nowNum1, at: 0)
                     }
-//                    else if nodeType1 == 4 && detectResultNode1.confidence[0] > 0.9{
-//                        detectSingleFeatureArray.insert(nowNum1, at: 0)
-//                    }
+                    else if nodeType1 == 0 && nowNum1 != -1 && detectResultNode1.confidence[0] > 0.7{
+                        detectSingleFeatureArray.insert(nowNum1, at: 0)
+                    }
                 }
                 else{
                     if (nodeType0 == 2 || nodeType0 == 4)
@@ -1740,6 +1741,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 uniqueArray.append(singlefeature)
             }
         }
+        
+        isShort = uniqueArray.count < self.minSingleFeatureNum
+        
+        print("handle result \(uniqueArray.count) \(minSingleFeatureNum) \(isShort)")
         
         let result = DetectionState(detectionResult: uniqueArray, isSingle: isSingle, isShort: isShort, longestIndex: longestIndex)
         return result
