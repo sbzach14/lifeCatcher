@@ -54,7 +54,6 @@ struct LoginView: View {
                             showPassword.toggle()
                         }) {
                             Image(systemName: showPassword ? "eye.fill" : "eye.slash.fill")
-                                .foregroundColor(.gray)
                         }
                         .padding(.trailing, 20)
                     }

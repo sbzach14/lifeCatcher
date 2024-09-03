@@ -16,7 +16,7 @@ struct InfoView: View {
             
             // 序列号
             HStack {
-                Text("ID: \(viewModel.uniqueID)".localized())
+                Text("ID:".localized() + viewModel.uniqueID)
                     .textSelection(.enabled)
                     .padding()
                     .foregroundColor(.black)
@@ -52,26 +52,23 @@ struct InfoView: View {
             }
             
 //             声明信息
-            Text("Disclaimer: The use of this software is limited to image recognition and recording for daily life purposes. Any consequences and responsibilities resulting from the use of this program are borne by the user. Our company does not assume any responsibility for any consequences or liabilities arising from the use or sale of this software by users or agents beyond the permitted scope.".localized())
-                    .padding()
+            ScrollView{
+                Text("Disclaimer: The use of this software is limited to image recognition and recording for daily life purposes. Any consequences and responsibilities resulting from the use of this program are borne by the user. Our company does not assume any responsibility for any consequences or liabilities arising from the use or sale of this software by users or agents beyond the permitted scope.".localized())
                     .foregroundColor(.white)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color.black.opacity(0.3))
-                    )
-                    
+            }
+            .bubbleBackground()
                 
-                Spacer()
-                
-                Image("lifeCatcherTitle") // Replace with your image name
-                    .resizable()
-                    .scaledToFit()
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color.black.opacity(0.3))
-                    )
+            Spacer()
+            
+            Image("lifeCatcherTitle") // Replace with your image name
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color.black.opacity(0.3))
+                )
         }
         .background(
             Image("Newbg2")

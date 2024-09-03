@@ -27,22 +27,22 @@ struct RegisterView: View {
                             .padding()
                             .background(Color.gray.opacity(0.2))
                             .cornerRadius(10)
+                            .padding(.horizontal, 20)
                     } else {
                         SecureField("Enter your new password".localized(), text: $password)
                             .padding()
                             .background(Color.gray.opacity(0.2))
                             .cornerRadius(10)
+                            .padding(.horizontal, 20)
                     }
                     
                     Button(action: {
                         showPassword.toggle()
                     }) {
                         Image(systemName: showPassword ? "eye.fill" : "eye.slash.fill")
-                            .foregroundColor(.gray)
                     }
                     .padding(.trailing, 20)
                 }
-                .padding(.horizontal, 20)
                 
                 
                 Button(action: {
