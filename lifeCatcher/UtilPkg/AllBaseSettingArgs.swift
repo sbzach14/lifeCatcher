@@ -1281,14 +1281,14 @@ public class DetectSettingArgs{
                 break
             //三公
             case 4:
-                //常规三公
+                //常规三公310
                 let rule = ClassifierSettingArgs.targetSetting[i] as! TMDatasetRule
                 for j in 0...rule.setting.count - 1{
                     allPreSetRules[i]![j] = []
                 }
                 var handNum = 3
                 var communityNum = 0
-                var pointComparision = 0
+                var pointComparision = 1
                 var samePointComparision = 0
                 var isAAsMan = 0
                 var isCompareSuit = 0
