@@ -1,6 +1,7 @@
 import SwiftUI
 import AVFoundation
 import CryptoKit
+import Localize_Swift
 
 @main
 struct MyApp: App {
@@ -23,6 +24,7 @@ struct MyApp: App {
     var body: some Scene {
         WindowGroup {
             MainMenuView().onAppear {
+                Localize.setCurrentLanguage("en")
                 requestPermissions()
                 initFile()
             }
