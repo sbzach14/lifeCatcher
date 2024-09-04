@@ -191,7 +191,7 @@ class ClassifierSettingArgs {
         return resultList
     }
     
-    static func selectDataset(DatasetIndex: Int, inputSingleFeatures: [Int], rcNum: Int, args : [Int], rankRules : [Int], suitRules: [Int],dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], calModeArgs: [Int], cutNumSetting: Int, cutNumRangeSetting: [Int], consecutiveReport: Int, minSingleFeatureNum: Int, cutSingleFeatureIndexArray: [Int]) -> ReportManager.MultipleReportResultInfo {
+    static func selectDataset(DatasetIndex: Int, inputSingleFeatures: [Int], rcNum: Int, args : [Int], rankRules : [Int], suitRules: [Int],dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], calModeArgs: [Int], cutNumSetting: Int, cutNumRangeSetting: [Int], consecutiveReport: Int, minSingleFeatureNum: Int, cutSingleFeatureIndexArray: [Int], isUpWatch: Bool) -> ReportManager.MultipleReportResultInfo {
         
         //TODO dealType 0 正发，1 反发 搞清楚ui
         //cutNumSetting 点数设置
@@ -216,8 +216,7 @@ class ClassifierSettingArgs {
         // 定义一个字典，将游戏索引映射到游戏函数
         // 返回的result包括两个int数组，一个是按牌大小从大到小排序的玩家编号数组，一个是这一轮结束之后牌库里剩下的牌
 
-        
-        let multipleDatasetInfo =  ReportManager.DatasetReporter(DatasetIndex: DatasetIndex, inputSingleFeatures: inputSingleFeatures, cutSingleFeatureIndexList: cutSingleFeatureIndexArray, diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, newArgs: newArgs, rankRules: rankRules, suitRules: suitRules, reportID: calMode, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, targetPos: targetPos, coloringTypeArg: coloringType, consecutiveNum: consecutiveReport)
+        let multipleDatasetInfo =  ReportManager.DatasetReporter(DatasetIndex: DatasetIndex, inputSingleFeatures: inputSingleFeatures, cutSingleFeatureIndexList: cutSingleFeatureIndexArray, diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, newArgs: newArgs, rankRules: rankRules, suitRules: suitRules, reportID: calMode, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, targetPos: targetPos, coloringTypeArg: coloringType, consecutiveNum: consecutiveReport, isUpWatch: isUpWatch)
         
         return multipleDatasetInfo
     }

@@ -333,7 +333,6 @@
 				A87096FE2C8857A8003A4729 /* cls_0715_h_trans_copy.mlmodel */,
 				A87097002C8857B3003A4729 /* cls_0727_v_trans_copy.mlmodel */,
 				A87097022C8857BA003A4729 /* detect_0719_trans_copy.mlmodel */,
-				D03811A32C7542C000726B99 /* detect_0719_trans.mlmodel */,
 				D02717D72C8704AB00A29D43 /* detect_0903.mlmodel */,
 				187A45422C2DA25E00BB055C /* success_voice.mp3 */,
 				187A45442C2DA26100BB055C /* fail_voice.mp3 */,
@@ -647,7 +646,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
-				DEVELOPMENT_TEAM = 6WK4Q32GMN;
+				DEVELOPMENT_TEAM = FYQ8UYQL3M;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = lifeCatcher/App/Info.plist;
@@ -671,7 +670,7 @@
 				);
 				MARKETING_VERSION = 1.0.2;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shuffle.lifeCatcher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -695,7 +694,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
-				DEVELOPMENT_TEAM = 6WK4Q32GMN;
+				DEVELOPMENT_TEAM = FYQ8UYQL3M;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = lifeCatcher/App/Info.plist;
@@ -719,7 +718,7 @@
 				);
 				MARKETING_VERSION = 1.0.2;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shuffle.lifeCatcher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
