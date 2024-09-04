@@ -2289,7 +2289,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         self.cutShowArray = []
         
         //返回数组[最大切牌次数, 最大看色次数]
-        let cutTimesArray = getWatchColorNumber()
+        let maxCutTimes = getWatchColorNumber()
+        
+        
         
         if self.cutMode != 0{
             let cutSingleFeature : Int = self.singlefeatureArray.randomElement()!
@@ -2315,23 +2317,27 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         computeWinnerRC()
     }
     
-    func getWatchColorNumber() -> [Int]{
+    func getWatchColorNumber() -> Int{
         
         if let reportRule = DetectSettingArgs.allPreSetReportRules[self.calModeArgs[0]] {
             
             switch reportRule.cutSingleFeatureProcession {
+            //看手牌
             case 0:
-                return [0, 1]
+                return 0
+            // 看色两次
             case 1:
-                return [1, 2]
+                return 2
+            //看色一次
             case 2...5:
-                return [1, 1]
+                return 1
+            //不看
             default:
-                return [1, 0]
+                return 0
             }
 
         } else {
-            return [0,0]
+            return 0
         }
     }
     
