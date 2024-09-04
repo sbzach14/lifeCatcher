@@ -40,8 +40,8 @@ class generalRuleSetting{
     
     static let allSpecialCard: [Int:String] = [
         0:"无",
-        1:"第一张手牌",
-        2:"色牌",
+        1:"看手牌",
+        2:"看色牌",
     ]
     
     static let allDealType: [Int: String] = [
@@ -178,6 +178,7 @@ struct SettingRecordConfigView: View{
             
             self.currentNum = rcNumList[self.rcNum]
             self.singlefeatureToUse = rules.singlefeatureToUse
+            self.specialCard = rules.specialCard
         }
         
         self.editType = 1
@@ -302,13 +303,16 @@ struct SettingRecordConfigView: View{
                                 }.frame(height: 25)
                                 
                                 HStack{
-                                    Text("看特殊牌")
+                                    Text("特殊牌")
                                         .frame(width: 60, alignment: .leading)
                                         .foregroundColor(.white)
                                     
                                     if cutMode[0] == 3{
+                                        Spacer()
+                                        
                                         Text("无")
-                                            .frame(maxWidth: .infinity, alignment: .trailing)
+                                            .padding(.trailing, 10)
+                                            .foregroundColor(.white)
                                     }
                                     else{
                                         Picker("specialCard", selection: $specialCard[0]) {
@@ -362,13 +366,16 @@ struct SettingRecordConfigView: View{
                                 }.frame(height: 25)
                                 
                                 HStack{
-                                    Text("看特殊牌")
+                                    Text("特殊牌")
                                         .frame(width: 60, alignment: .leading)
                                         .foregroundColor(.white)
                                     
                                     if cutMode[1] == 3{
+                                        Spacer()
+                                        
                                         Text("无")
-                                            .frame(maxWidth: .infinity, alignment: .trailing)
+                                            .padding(.trailing, 10)
+                                            .foregroundColor(.white)
                                     }
                                     else{
                                         Picker("specialCard", selection: $specialCard[1]) {

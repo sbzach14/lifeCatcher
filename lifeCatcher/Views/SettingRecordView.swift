@@ -42,10 +42,10 @@ struct SettingRecordView: View {
                                             .foregroundColor(.white)
                                             .frame(maxWidth: 60, alignment: .leading)
                                     
-//                                    VStack(alignment: .leading, spacing: 5){
-//                                        Text(name)
-//                                            .foregroundColor(.white)
-//                                            .frame(height: 20, alignment: .leading)
+                                    VStack(alignment: .leading, spacing: 5){
+                                        Text(name)
+                                            .foregroundColor(.white)
+                                            .frame(height: 20, alignment: .leading)
 //                                        Text(shuffleMode)
 //                                            .foregroundColor(.white)
 //                                            .frame(height: 20, alignment: .leading)
@@ -56,7 +56,7 @@ struct SettingRecordView: View {
 //                                            .foregroundColor(.white)
 //                                            .frame(height: 20, alignment: .leading)
 //                                            .multilineTextAlignment(.leading)
-//                                    }
+                                    }
                                     
                                 }
                             }

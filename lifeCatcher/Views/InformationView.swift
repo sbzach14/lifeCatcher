@@ -24,7 +24,7 @@ struct InfoView: View {
                 Button(action: {
                     UIPasteboard.general.string = viewModel.uniqueID
                 }) {
-                    Text("复制")
+                    Text("Copy".localized())
                         .padding(.vertical, 4)
                         .padding(.horizontal, 8)
                         .foregroundColor(.white)
