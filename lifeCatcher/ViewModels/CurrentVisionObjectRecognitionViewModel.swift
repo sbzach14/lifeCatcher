@@ -28,9 +28,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var cutArray : [Int] = []
     @Published var cutShowArray : [Int] = []
 
-    let detectModel = try! detect_0719_trans()
-    let clsModel_h = try! cls_0715_h_trans()
-    let clsModel_v = try! cls_0727_v_trans()
+    let detectModel = try! detect_0719_trans_copy()
+    let clsModel_h = try! cls_0715_h_trans_copy()
+    let clsModel_v = try! cls_0727_v_trans_copy()
     var originSize : [Float] = [1920, 1080] //相机图像大小
     var imageSize : [Float] = [569, 320] //target area 截图大小
     var originImageSize : [Float] = [569, 320] //target area 原始截图大小

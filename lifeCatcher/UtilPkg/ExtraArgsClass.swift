@@ -1855,6 +1855,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         
         
         if let reportRule = DetectSettingArgs.allPreSetReportRules[reportID]{
+            
+            print("切的牌 \(cutSingleFeatureIndexList)")
 
         //是否切牌的位置，看手牌，切牌留色，切牌去色
         if cutSingleFeatureIndexList.count > 0 {
