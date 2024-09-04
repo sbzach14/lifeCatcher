@@ -1917,6 +1917,13 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         if cutStructList.count > 0 {
             
             
+            //如果看底看顶先操作
+            if cutStructList[cutStructList.count - 1].cutMode == 0 || cutStructList[cutStructList.count - 1].cutMode == 1 {
+                inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStructList[cutStructList.count - 1], colorTransform: -1)
+            }
+            
+            leftSingleFeatures = inputSingleFeatures
+
             //看手牌
             if reportRule.cutSingleFeatureProcession == 0{
                 if cutStructList[cutStructList.count - 1].cutMode == 3{
@@ -1932,6 +1939,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             //看色两次, 留色
             } else if reportRule.cutSingleFeatureProcession == 1{
                 if cutStructList.count < 2 || (cutStructList[cutStructList.count - 1].cutMode != 2 && cutStructList[cutStructList.count - 2].cutMode != 2) {
+                    
                     multipleResultInfo.leftSingleFeatures = leftSingleFeatures
                     return multipleResultInfo
                 }

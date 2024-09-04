@@ -2293,6 +2293,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         
         
+        
         if self.cutMode != 0{
             let cutSingleFeature : Int = self.singlefeatureArray.randomElement()!
             var cutIndex = self.singlefeatureArray.firstIndex(of: cutSingleFeature)!
