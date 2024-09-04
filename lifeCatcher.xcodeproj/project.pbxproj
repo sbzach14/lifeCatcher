@@ -15,11 +15,6 @@
 		187A45512C31BBB400BB055C /* AllBaseSettingArgs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187A454F2C31BBB400BB055C /* AllBaseSettingArgs.swift */; };
 		187A45832C39440800BB055C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 187A45822C39440800BB055C /* AppDelegate.swift */; };
 		18A7A51D2C14E5A50020138E /* IC.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 18A7A51C2C14E5A50020138E /* IC.xcassets */; };
-		18B7DA5C2C675E0000F37509 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 18B7DA5B2C675E0000F37509 /* Algorithms */; };
-		18B7DA5F2C675E1800F37509 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = 18B7DA5E2C675E1800F37509 /* Collections */; };
-		18B7DA622C675E2900F37509 /* Crypto in Frameworks */ = {isa = PBXBuildFile; productRef = 18B7DA612C675E2900F37509 /* Crypto */; };
-		18B7DA642C675E2900F37509 /* _CryptoExtras in Frameworks */ = {isa = PBXBuildFile; productRef = 18B7DA632C675E2900F37509 /* _CryptoExtras */; };
-		18B7DA672C675E3F00F37509 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = 18B7DA662C675E3F00F37509 /* AsyncAlgorithms */; };
 		18C98CE52C15893200A8CD49 /* DeprecatedComponentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C98CE42C15893200A8CD49 /* DeprecatedComponentView.swift */; };
 		18C98D072C158F7B00A8CD49 /* CUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C98CEB2C158F7B00A8CD49 /* CUtils.swift */; };
 		18C98D0B2C158F7B00A8CD49 /* BZi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18C98CF12C158F7B00A8CD49 /* BZi.swift */; };
@@ -63,22 +58,26 @@
 		A89CDD882C70569400588273 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89CDD872C70569400588273 /* LoginView.swift */; };
 		A89CDD8A2C71B79500588273 /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89CDD892C71B79500588273 /* RegisterView.swift */; };
 		A89CDD8C2C76767300588273 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89CDD8B2C76767300588273 /* KeychainHelper.swift */; };
-		A89D91282C83E399009B7003 /* Localize_Swift in Frameworks */ = {isa = PBXBuildFile; productRef = A89D91272C83E399009B7003 /* Localize_Swift */; };
 		A89D912B2C854CD2009B7003 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A89D91292C854CD2009B7003 /* Localizable.strings */; };
 		A8FBC7C22A3F0A5C00EDDFD7 /* VisionUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8FBC7C12A3F0A5C00EDDFD7 /* VisionUtils.swift */; };
 		B058BE5F2B09FFC20078E792 /* CurrentBlurDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058BE5E2B09FFC20078E792 /* CurrentBlurDetector.swift */; };
 		D013E36D2C712F8D000F2B57 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D013E36C2C712F8D000F2B57 /* Assets.xcassets */; };
+		D02717C82C86E39100A29D43 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = D02717C72C86E39100A29D43 /* Collections */; };
+		D02717CB2C86E3C700A29D43 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = D02717CA2C86E3C700A29D43 /* Algorithms */; };
+		D02717CE2C86E3DF00A29D43 /* AsyncAlgorithms in Frameworks */ = {isa = PBXBuildFile; productRef = D02717CD2C86E3DF00A29D43 /* AsyncAlgorithms */; };
+		D02717D12C86E40800A29D43 /* Crypto in Frameworks */ = {isa = PBXBuildFile; productRef = D02717D02C86E40800A29D43 /* Crypto */; };
+		D02717D32C86E40800A29D43 /* _CryptoExtras in Frameworks */ = {isa = PBXBuildFile; productRef = D02717D22C86E40800A29D43 /* _CryptoExtras */; };
+		D02717D62C86E59A00A29D43 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = D02717D52C86E59A00A29D43 /* CryptoSwift */; };
+		D02717D82C8704AB00A29D43 /* detect_0903.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D02717D72C8704AB00A29D43 /* detect_0903.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/detect_0903.mlmodelkey"; }; };
 		D03811A22C75401200726B99 /* cls_main.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D03811A12C75401200726B99 /* cls_main.mlmodel */; };
-		D03811A62C7542C300726B99 /* detect_0719_trans.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D03811A32C7542C000726B99 /* detect_0719_trans.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/detect_0719_trans.mlmodelkey"; }; };
 		D03811A72C7542C300726B99 /* cls_0727_v_trans.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D03811A42C7542C200726B99 /* cls_0727_v_trans.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/cls_0727_v_trans.mlmodelkey"; }; };
 		D03811A82C7542C300726B99 /* cls_0715_h_trans.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/cls_0715_h_trans.mlmodelkey"; }; };
 		D03811AA2C76904D00726B99 /* OriginObjectRegView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D03811A92C76904D00726B99 /* OriginObjectRegView.swift */; };
+		D0CD59FD2C86DEF50030A939 /* Localize_Swift in Frameworks */ = {isa = PBXBuildFile; productRef = D0CD59FC2C86DEF50030A939 /* Localize_Swift */; };
 		D0DAEF912C77657400D5938A /* ReportSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF902C77657400D5938A /* ReportSettingView.swift */; };
 		D0DAEF932C77664100D5938A /* HistoryItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF922C77664100D5938A /* HistoryItemView.swift */; };
 		D0DAEF952C7766D900D5938A /* UsedFeatureSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF942C7766D900D5938A /* UsedFeatureSelectView.swift */; };
 		D0DAEF992C7768DD00D5938A /* SettingRecordConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF982C7768DD00D5938A /* SettingRecordConfigView.swift */; };
-		D0DAEF9C2C7E439E00D5938A /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = D0DAEF9B2C7E439E00D5938A /* CryptoSwift */; };
-		D0DAEF9F2C7E43AE00D5938A /* Zip in Frameworks */ = {isa = PBXBuildFile; productRef = D0DAEF9E2C7E43AE00D5938A /* Zip */; };
 		D0DAEFA12C7EC46200D5938A /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEFA02C7EC46200D5938A /* AppViewModel.swift */; };
 /* End PBXBuildFile section */
 
@@ -142,8 +141,8 @@
 		B058BE5E2B09FFC20078E792 /* CurrentBlurDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentBlurDetector.swift; sourceTree = "<group>"; };
 		D013E3612C7129EE000F2B57 /* lifeCatcher.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = lifeCatcher.entitlements; sourceTree = "<group>"; };
 		D013E36C2C712F8D000F2B57 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D02717D72C8704AB00A29D43 /* detect_0903.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = detect_0903.mlmodel; sourceTree = "<group>"; };
 		D03811A12C75401200726B99 /* cls_main.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_main.mlmodel; sourceTree = "<group>"; };
-		D03811A32C7542C000726B99 /* detect_0719_trans.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = detect_0719_trans.mlmodel; sourceTree = "<group>"; };
 		D03811A42C7542C200726B99 /* cls_0727_v_trans.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0727_v_trans.mlmodel; sourceTree = "<group>"; };
 		D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0715_h_trans.mlmodel; sourceTree = "<group>"; };
 		D03811A92C76904D00726B99 /* OriginObjectRegView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OriginObjectRegView.swift; sourceTree = "<group>"; };
@@ -160,14 +159,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D0DAEF9F2C7E43AE00D5938A /* Zip in Frameworks */,
-				18B7DA622C675E2900F37509 /* Crypto in Frameworks */,
-				18B7DA5C2C675E0000F37509 /* Algorithms in Frameworks */,
-				18B7DA642C675E2900F37509 /* _CryptoExtras in Frameworks */,
-				18B7DA5F2C675E1800F37509 /* Collections in Frameworks */,
-				A89D91282C83E399009B7003 /* Localize_Swift in Frameworks */,
-				18B7DA672C675E3F00F37509 /* AsyncAlgorithms in Frameworks */,
-				D0DAEF9C2C7E439E00D5938A /* CryptoSwift in Frameworks */,
+				D02717D12C86E40800A29D43 /* Crypto in Frameworks */,
+				D02717CB2C86E3C700A29D43 /* Algorithms in Frameworks */,
+				D02717D32C86E40800A29D43 /* _CryptoExtras in Frameworks */,
+				D02717C82C86E39100A29D43 /* Collections in Frameworks */,
+				D0CD59FD2C86DEF50030A939 /* Localize_Swift in Frameworks */,
+				D02717CE2C86E3DF00A29D43 /* AsyncAlgorithms in Frameworks */,
+				D02717D62C86E59A00A29D43 /* CryptoSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -336,6 +334,7 @@
 				A87097002C8857B3003A4729 /* cls_0727_v_trans_copy.mlmodel */,
 				A87097022C8857BA003A4729 /* detect_0719_trans_copy.mlmodel */,
 				D03811A32C7542C000726B99 /* detect_0719_trans.mlmodel */,
+				D02717D72C8704AB00A29D43 /* detect_0903.mlmodel */,
 				187A45422C2DA25E00BB055C /* success_voice.mp3 */,
 				187A45442C2DA26100BB055C /* fail_voice.mp3 */,
 				187A45432C2DA25F00BB055C /* start_voice.mp3 */,
@@ -362,14 +361,13 @@
 			);
 			name = lifeCatcher;
 			packageProductDependencies = (
-				18B7DA5B2C675E0000F37509 /* Algorithms */,
-				18B7DA5E2C675E1800F37509 /* Collections */,
-				18B7DA612C675E2900F37509 /* Crypto */,
-				18B7DA632C675E2900F37509 /* _CryptoExtras */,
-				18B7DA662C675E3F00F37509 /* AsyncAlgorithms */,
-				D0DAEF9B2C7E439E00D5938A /* CryptoSwift */,
-				D0DAEF9E2C7E43AE00D5938A /* Zip */,
-				A89D91272C83E399009B7003 /* Localize_Swift */,
+				D0CD59FC2C86DEF50030A939 /* Localize_Swift */,
+				D02717C72C86E39100A29D43 /* Collections */,
+				D02717CA2C86E3C700A29D43 /* Algorithms */,
+				D02717CD2C86E3DF00A29D43 /* AsyncAlgorithms */,
+				D02717D02C86E40800A29D43 /* Crypto */,
+				D02717D22C86E40800A29D43 /* _CryptoExtras */,
+				D02717D52C86E59A00A29D43 /* CryptoSwift */,
 			);
 			productName = CountMyActions;
 			productReference = 18CA1477284ABEC600F90372 /* lifeCatcher.app */;
@@ -403,13 +401,12 @@
 			);
 			mainGroup = 18CA146E284ABEC600F90372;
 			packageReferences = (
-				18B7DA5A2C675E0000F37509 /* XCRemoteSwiftPackageReference "swift-algorithms" */,
-				18B7DA5D2C675E1800F37509 /* XCRemoteSwiftPackageReference "swift-collections" */,
-				18B7DA602C675E2900F37509 /* XCRemoteSwiftPackageReference "swift-crypto" */,
-				18B7DA652C675E3F00F37509 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
-				D0DAEF9A2C7E439E00D5938A /* XCLocalSwiftPackageReference "../Downloads/CryptoSwift-main" */,
-				D0DAEF9D2C7E43AE00D5938A /* XCLocalSwiftPackageReference "../Downloads/Zip-master" */,
-				A89D91262C83E398009B7003 /* XCRemoteSwiftPackageReference "Localize-Swift" */,
+				D0CD59FB2C86DEF50030A939 /* XCRemoteSwiftPackageReference "Localize-Swift" */,
+				D02717C62C86E39100A29D43 /* XCRemoteSwiftPackageReference "swift-collections" */,
+				D02717C92C86E3C700A29D43 /* XCRemoteSwiftPackageReference "swift-algorithms" */,
+				D02717CC2C86E3DF00A29D43 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
+				D02717CF2C86E40800A29D43 /* XCRemoteSwiftPackageReference "swift-crypto" */,
+				D02717D42C86E59A00A29D43 /* XCRemoteSwiftPackageReference "CryptoSwift" */,
 			);
 			productRefGroup = 18CA1478284ABEC600F90372 /* Products */;
 			projectDirPath = "";
@@ -457,6 +454,7 @@
 				D0DAEF992C7768DD00D5938A /* SettingRecordConfigView.swift in Sources */,
 				A88EFE0B2A7FC05900897243 /* JsonIOUtils.swift in Sources */,
 				18C98D0C2C158F7B00A8CD49 /* CNin.swift in Sources */,
+				D02717D82C8704AB00A29D43 /* detect_0903.mlmodel in Sources */,
 				18C98CE52C15893200A8CD49 /* DeprecatedComponentView.swift in Sources */,
 				18C98D172C158F7B00A8CD49 /* TWat.swift in Sources */,
 				D0DAEF932C77664100D5938A /* HistoryItemView.swift in Sources */,
@@ -470,7 +468,6 @@
 				18C98D1B2C158F7B00A8CD49 /* TNin.swift in Sources */,
 				1824EF672C3EB4990029836C /* AuthTestView.swift in Sources */,
 				18C98D0D2C158F7B00A8CD49 /* CBat.swift in Sources */,
-				D03811A62C7542C300726B99 /* detect_0719_trans.mlmodel in Sources */,
 				D03811A72C7542C300726B99 /* cls_0727_v_trans.mlmodel in Sources */,
 				D03811A82C7542C300726B99 /* cls_0715_h_trans.mlmodel in Sources */,
 				D03811A22C75401200726B99 /* cls_main.mlmodel in Sources */,
@@ -650,7 +647,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
-				DEVELOPMENT_TEAM = FYQ8UYQL3M;
+				DEVELOPMENT_TEAM = 6WK4Q32GMN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = lifeCatcher/App/Info.plist;
@@ -674,7 +671,7 @@
 				);
 				MARKETING_VERSION = 1.0.2;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.shuffle.lifeCatcher;
+				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -698,7 +695,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
-				DEVELOPMENT_TEAM = FYQ8UYQL3M;
+				DEVELOPMENT_TEAM = 6WK4Q32GMN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = lifeCatcher/App/Info.plist;
@@ -722,7 +719,7 @@
 				);
 				MARKETING_VERSION = 1.0.2;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.shuffle.lifeCatcher;
+				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -758,19 +755,16 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		D0DAEF9A2C7E439E00D5938A /* XCLocalSwiftPackageReference "../Downloads/CryptoSwift-main" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = "../Downloads/CryptoSwift-main";
-		};
-		D0DAEF9D2C7E43AE00D5938A /* XCLocalSwiftPackageReference "../Downloads/Zip-master" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = "../Downloads/Zip-master";
-		};
-/* End XCLocalSwiftPackageReference section */
-
 /* Begin XCRemoteSwiftPackageReference section */
-		18B7DA5A2C675E0000F37509 /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
+		D02717C62C86E39100A29D43 /* XCRemoteSwiftPackageReference "swift-collections" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-collections.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.3;
+			};
+		};
+		D02717C92C86E3C700A29D43 /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-algorithms.git";
 			requirement = {
@@ -778,23 +772,7 @@
 				minimumVersion = 1.2.0;
 			};
 		};
-		18B7DA5D2C675E1800F37509 /* XCRemoteSwiftPackageReference "swift-collections" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-collections.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.1.2;
-			};
-		};
-		18B7DA602C675E2900F37509 /* XCRemoteSwiftPackageReference "swift-crypto" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-crypto.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 3.6.0;
-			};
-		};
-		18B7DA652C675E3F00F37509 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */ = {
+		D02717CC2C86E3DF00A29D43 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/apple/swift-async-algorithms.git";
 			requirement = {
@@ -802,9 +780,25 @@
 				minimumVersion = 1.0.1;
 			};
 		};
-		A89D91262C83E398009B7003 /* XCRemoteSwiftPackageReference "Localize-Swift" */ = {
+		D02717CF2C86E40800A29D43 /* XCRemoteSwiftPackageReference "swift-crypto" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/marmelroy/Localize-Swift.git";
+			repositoryURL = "https://github.com/apple/swift-crypto.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.6.1;
+			};
+		};
+		D02717D42C86E59A00A29D43 /* XCRemoteSwiftPackageReference "CryptoSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/krzyzanowskim/CryptoSwift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.8.3;
+			};
+		};
+		D0CD59FB2C86DEF50030A939 /* XCRemoteSwiftPackageReference "Localize-Swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/marmelroy/Localize-Swift";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 3.2.0;
@@ -813,43 +807,40 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		18B7DA5B2C675E0000F37509 /* Algorithms */ = {
+		D02717C72C86E39100A29D43 /* Collections */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 18B7DA5A2C675E0000F37509 /* XCRemoteSwiftPackageReference "swift-algorithms" */;
-			productName = Algorithms;
-		};
-		18B7DA5E2C675E1800F37509 /* Collections */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 18B7DA5D2C675E1800F37509 /* XCRemoteSwiftPackageReference "swift-collections" */;
+			package = D02717C62C86E39100A29D43 /* XCRemoteSwiftPackageReference "swift-collections" */;
 			productName = Collections;
 		};
-		18B7DA612C675E2900F37509 /* Crypto */ = {
+		D02717CA2C86E3C700A29D43 /* Algorithms */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 18B7DA602C675E2900F37509 /* XCRemoteSwiftPackageReference "swift-crypto" */;
-			productName = Crypto;
+			package = D02717C92C86E3C700A29D43 /* XCRemoteSwiftPackageReference "swift-algorithms" */;
+			productName = Algorithms;
 		};
-		18B7DA632C675E2900F37509 /* _CryptoExtras */ = {
+		D02717CD2C86E3DF00A29D43 /* AsyncAlgorithms */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 18B7DA602C675E2900F37509 /* XCRemoteSwiftPackageReference "swift-crypto" */;
-			productName = _CryptoExtras;
-		};
-		18B7DA662C675E3F00F37509 /* AsyncAlgorithms */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 18B7DA652C675E3F00F37509 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
+			package = D02717CC2C86E3DF00A29D43 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */;
 			productName = AsyncAlgorithms;
 		};
-		A89D91272C83E399009B7003 /* Localize_Swift */ = {
+		D02717D02C86E40800A29D43 /* Crypto */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = A89D91262C83E398009B7003 /* XCRemoteSwiftPackageReference "Localize-Swift" */;
-			productName = Localize_Swift;
+			package = D02717CF2C86E40800A29D43 /* XCRemoteSwiftPackageReference "swift-crypto" */;
+			productName = Crypto;
 		};
-		D0DAEF9B2C7E439E00D5938A /* CryptoSwift */ = {
+		D02717D22C86E40800A29D43 /* _CryptoExtras */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = D02717CF2C86E40800A29D43 /* XCRemoteSwiftPackageReference "swift-crypto" */;
+			productName = _CryptoExtras;
+		};
+		D02717D52C86E59A00A29D43 /* CryptoSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D02717D42C86E59A00A29D43 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
 			productName = CryptoSwift;
 		};
-		D0DAEF9E2C7E43AE00D5938A /* Zip */ = {
+		D0CD59FC2C86DEF50030A939 /* Localize_Swift */ = {
 			isa = XCSwiftPackageProductDependency;
-			productName = Zip;
+			package = D0CD59FB2C86DEF50030A939 /* XCRemoteSwiftPackageReference "Localize-Swift" */;
+			productName = Localize_Swift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

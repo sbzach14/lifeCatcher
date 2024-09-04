@@ -53,21 +53,20 @@ struct LoginView: View {
                         Button(action: {
                             showPassword.toggle()
                         }) {
-                            Image(systemName: showPassword ? "eye.slash" : "eye")
-                                .foregroundColor(.gray)
+                            Image(systemName: showPassword ? "eye.fill" : "eye.slash.fill")
                         }
                         .padding(.trailing, 20)
                     }
 
                     // Remember Password checkbox
                     Toggle(isOn: $rememberPassword) {
-                        Text("Remember Password".localized())
+                        Text("Remember Password".localized()).foregroundColor(.gray)
                     }
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, 30)
 
                     HStack{
                         // 验证码输入框
-                        TextField("Verification Code ", text: $vericode)
+                        TextField("Verification Code".localized(), text: $vericode)
                             .padding()
                             .background(Color.gray.opacity(0.2))
                             .cornerRadius(10)
@@ -249,11 +248,7 @@ struct LoginView: View {
                         AuthManager.isActive = true
                         AuthManager.autoQuit()
                         print("测试版")
-                    //todo: appleTest
-                    } else if returnAccountStatus == 3 {
-                        
                     }
-                    
                 //登陆失败
                 } else {
                     

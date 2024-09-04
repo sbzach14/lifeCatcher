@@ -1,7 +1,7 @@
 import UIKit
 import CoreML
 import CryptoSwift
-import Zip
+//import Zip
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -71,46 +71,46 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 
-    // 解密并解压 ZIP 文件
-    func decryptAndUnzip(encryptedZipFile: String, decryptionKey: String, decryptionIV: String) throws -> URL  {
-        let fileManager = FileManager()
-        
-        let encryptedZipPath = Bundle.main.path(forResource: encryptedZipFile, ofType: "enc")!
-        let encryptedURL = URL(fileURLWithPath: encryptedZipPath)
-        
-        // Get the Documents directory path in the app's sandbox
-        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-
-        // Create the config.json file URL
-        let tempDirectoryURL = documentsURL.appendingPathComponent("model")
-        
-        let decryptedZipURL = tempDirectoryURL.appendingPathComponent(encryptedZipFile).appendingPathExtension("zip")
-        
-        // 读取加密的 ZIP 文件数据
-        let encryptedData = try Data(contentsOf: encryptedURL)
-        
-        let keybytes = decryptionKey.md5().hexToBytes()!
-        let ivbytes = decryptionIV.md5().hexToBytes()!
-        
-        // 使用 AES 解密 ZIP 文件数据
-        let decryptedData = try AES(key: keybytes, blockMode: CBC(iv: ivbytes), padding: .pkcs7).decrypt(encryptedData.bytes)
-        
-        // 写入解密后的 ZIP 文件数据
-        try Data(decryptedData).write(to: decryptedZipURL)
-        
-        do {
-            try Zip.unzipFile(decryptedZipURL, destination: tempDirectoryURL, overwrite: true, password: "password", progress: { (progress) -> () in
-                    // print(progress)
-                }) // Unzip
-        } catch {
-            // print("解压缩失败: \(error.localizedDescription)")
-        }
-        
-        // 删除解密后的 ZIP 文件
-        try fileManager.removeItem(at: decryptedZipURL)
-        
-        return decryptedZipURL.deletingPathExtension()
-    }
+//    // 解密并解压 ZIP 文件
+//    func decryptAndUnzip(encryptedZipFile: String, decryptionKey: String, decryptionIV: String) throws -> URL  {
+//        let fileManager = FileManager()
+//        
+//        let encryptedZipPath = Bundle.main.path(forResource: encryptedZipFile, ofType: "enc")!
+//        let encryptedURL = URL(fileURLWithPath: encryptedZipPath)
+//        
+//        // Get the Documents directory path in the app's sandbox
+//        let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+//
+//        // Create the config.json file URL
+//        let tempDirectoryURL = documentsURL.appendingPathComponent("model")
+//        
+//        let decryptedZipURL = tempDirectoryURL.appendingPathComponent(encryptedZipFile).appendingPathExtension("zip")
+//        
+//        // 读取加密的 ZIP 文件数据
+//        let encryptedData = try Data(contentsOf: encryptedURL)
+//        
+//        let keybytes = decryptionKey.md5().hexToBytes()!
+//        let ivbytes = decryptionIV.md5().hexToBytes()!
+//        
+//        // 使用 AES 解密 ZIP 文件数据
+//        let decryptedData = try AES(key: keybytes, blockMode: CBC(iv: ivbytes), padding: .pkcs7).decrypt(encryptedData.bytes)
+//        
+//        // 写入解密后的 ZIP 文件数据
+//        try Data(decryptedData).write(to: decryptedZipURL)
+//        
+//        do {
+//            try Zip.unzipFile(decryptedZipURL, destination: tempDirectoryURL, overwrite: true, password: "password", progress: { (progress) -> () in
+//                    // print(progress)
+//                }) // Unzip
+//        } catch {
+//            // print("解压缩失败: \(error.localizedDescription)")
+//        }
+//        
+//        // 删除解密后的 ZIP 文件
+//        try fileManager.removeItem(at: decryptedZipURL)
+//        
+//        return decryptedZipURL.deletingPathExtension()
+//    }
 }
 
 extension String {

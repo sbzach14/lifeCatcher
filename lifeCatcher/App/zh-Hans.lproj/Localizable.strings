@@ -32,12 +32,13 @@
 "The device is locked" = "设备已锁定";
 "You have logged in" = "您已登录";
 "Information" = "信息";
-"Version:" = "版本:";
+"Version:" = "软件版本:";
 "ID:" = "序列号:";
 "History" = "历史";
-"LifeCatcher" = "生活记录";
+"LifeCatcher" = "随时抓拍";
 "Disclaimer: The use of this software is limited to image recognition and recording for daily life purposes. Any consequences and responsibilities resulting from the use of this program are borne by the user. Our company does not assume any responsibility for any consequences or liabilities arising from the use or sale of this software by users or agents beyond the permitted scope." = "声明:本软件的使用范围仅限于日常生活图像识别与记录用途，使用本程序造成的任何后果及责任由使用者承担，本公司不承担因用户或代理商在非允许使用范围内使用或销售而导致的任何后果及相关责任。";
-"Collect" = "收集美好";
+"Collect" = "采集";
+"Verification Code" = "验证码";
 
 
 

@@ -6,7 +6,6 @@ struct RegisterView: View {
     @State private var password: String = ""
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
-    @State private var vericode:String = ""
     @State private var showPassword = false
 
     
@@ -28,50 +27,26 @@ struct RegisterView: View {
                             .padding()
                             .background(Color.gray.opacity(0.2))
                             .cornerRadius(10)
+                            .padding(.horizontal, 20)
                     } else {
                         SecureField("Enter your new password".localized(), text: $password)
                             .padding()
                             .background(Color.gray.opacity(0.2))
                             .cornerRadius(10)
+                            .padding(.horizontal, 20)
                     }
                     
                     Button(action: {
                         showPassword.toggle()
                     }) {
-                        Image(systemName: showPassword ? "eye.slash.fill" : "eye.fill")
-                            .foregroundColor(.gray)
+                        Image(systemName: showPassword ? "eye.fill" : "eye.slash.fill")
                     }
                     .padding(.trailing, 20)
                 }
-                .padding(.horizontal, 20)
                 
-                HStack{
-                    // 验证码输入框
-                    TextField("Verification Code ", text: $vericode)
-                        .padding()
-                        .background(Color.gray.opacity(0.2))
-                        .cornerRadius(10)
-                        .padding(.horizontal, 20)
-                    
-                    Text(loginStatus.vericode)
-                        .font(.system(size: 20, weight: .bold))
-                        .foregroundColor(.black)
-                        .padding()
-                        .frame(width: 100)
-                        .background(Color.gray)
-                        .cornerRadius(10)
-                        .padding(.horizontal, 20)
-                        .contextMenu {
-                            Text("") // 空的contextMenu意味着禁用所有默认操作
-                        }
-                }
                 
                 Button(action: {
-                    if vericode != loginStatus.vericode{
-                        showAlert = true
-                        alertMessage = "Verification Code Error"
-                    }
-                    else if username == ""{
+                    if username == ""{
                         showAlert = true
                         alertMessage = "Username can not be empty.".localized()
                     }
@@ -82,9 +57,8 @@ struct RegisterView: View {
                     else{
                         registerUser(username: username, password: password)
                     }
-                    loginStatus.resetVericode()
                 }) {
-                    Text("Register".localized())
+                    Text("Sign Up".localized())
                         .foregroundColor(.white)
                         .padding()
                         .frame(maxWidth: .infinity)
@@ -103,7 +77,7 @@ struct RegisterView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
         )
-        .navigationTitle("Sign Up".localized())
+        .navigationTitle("Register".localized())
         .alert(isPresented: $showAlert) {
             Alert(title: Text("Registration Status".localized()), message: Text(alertMessage), dismissButton: .default(Text("OK")))
         }

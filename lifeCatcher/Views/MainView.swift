@@ -14,7 +14,7 @@ struct MainMenuView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 200, height: 200)
-                        .background(RoundedRectangle(cornerRadius: 10).fill(Color.gray.opacity(0.3)))
+                        .bubbleBackground()
 
                     Spacer()
 
@@ -104,7 +104,6 @@ struct MainMenuView: View {
                     .scaledToFill()
                     .ignoresSafeArea()
             )
-            .navigationTitle("LifeCatcher".localized())
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: toggleLanguage) {
@@ -116,6 +115,8 @@ struct MainMenuView: View {
             .onAppear {
                 Localize.setCurrentLanguage(appLanguage)
             }
+            .navigationTitle("LifeCatcher".localized())
+            
         }
     }
 
