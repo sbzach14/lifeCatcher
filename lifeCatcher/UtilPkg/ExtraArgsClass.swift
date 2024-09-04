@@ -1241,19 +1241,19 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
 
         """,
             221: """
-        又名【切牌为色报最大】:照色牌，去掉色牌和色牌上面部分。报哪家最大。Y=1:色牌和色牌上部分的牌补到底部。Y>1色牌和色牌上部分的牌不补到底部。支持切牌上部分反发报最大(Y=1.反发)
+        又名【切牌为色报最大】:照色牌，去掉色牌和色牌上面部分。报哪家最大。Y=1:色牌和色牌上部分的牌补到底部。Y>1色牌和色牌上部分的牌不补到底部。
         """,
             222: """
-        又名【切牌为色报最大次大】:照色牌，去掉色牌和色牌上面部分。报哪家最大。Y=1:色牌和色牌上部分的牌补到底部。Y>1色牌和色牌上部分的牌不补到底部。支持切牌上部分反发报最大(Y=1.反发)
+        又名【切牌为色报最大次大】:照色牌，去掉色牌和色牌上面部分。报哪家最大。Y=1:色牌和色牌上部分的牌补到底部。Y>1色牌和色牌上部分的牌不补到底部。
         """,
             223: """
-        又名【切牌为色报最小】:照色牌，去掉色牌和色牌上面部分。报哪家最大。Y1:色牌和色牌上部分的牌补到底部。Y>1色牌和色牌上部分的牌不补到底部。支持切牌上部分反发报最小(Y=1,反发)
+        又名【切牌为色报最小】:照色牌，去掉色牌和色牌上面部分。报哪家最大。Y1:色牌和色牌上部分的牌补到底部。Y>1色牌和色牌上部分的牌不补到底部。
         """,
             224: """
-        又名【切牌为色报最小次小】:照色牌，去掉色牌和色牌上面部分。报哪家最大。Y=1:色牌和色牌上部分的牌补到底部。Y>1色牌和色牌上部分的牌不补到底部。支持切牌上部分反发报最小次小(Y=1,反发)
+        又名【切牌为色报最小次小】:照色牌，去掉色牌和色牌上面部分。报哪家最大。Y=1:色牌和色牌上部分的牌补到底部。Y>1色牌和色牌上部分的牌不补到底部。
         """,
             225: """
-        又名【切牌为色报最排名】:照色牌，去掉色牌和色牌止面部分。报哪家最大。Y1:色牌和色牌上部分的牌补到底部。Y>1色牌和色牌上部分的牌不补到底部。支持切牌上部分反发报排名(Y=1，反发)
+        又名【切牌为色报最排名】:照色牌，去掉色牌和色牌止面部分。报哪家最大。Y1:色牌和色牌上部分的牌补到底部。Y>1色牌和色牌上部分的牌不补到底部。
         """,
             226: """
         固定第几张牌通过Y参数设定
@@ -1486,7 +1486,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
     
     
     
-    static func GetSingleFeatureRank(reportRule:ReportClass, cutNumSetting: Int, cutNumRangeSetting: [Int], inputSingleFeatures: [Int], singlefeatureIndex: Int, specialSingleFeaturePos: Int, cutSingleFeatureIndexList:[Int], upDownID: Int) -> (Int, [Int]){
+    static func GetSingleFeatureRank(reportRule:ReportClass, cutNumSetting: Int, cutNumRangeSetting: [Int], inputSingleFeatures: [Int], singlefeatureIndex: Int, specialSingleFeaturePos: Int,upDownID: Int, cutStructList: [cutStruct]) -> (Int, [Int]){
+        
         //色点设置
         var singlefeatureRank: Int = 0
         var singlefeatureIndex: Int = singlefeatureIndex
@@ -1559,16 +1560,16 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             break
         //看色，色牌 + 上X张为色
         case 11:
-            let cutPos = searchSingleFeaturePos(inputSingleFeatures: inputSingleFeatures, singlefeatureIndex: cutSingleFeatureIndexList[cutSingleFeatureIndexList.count - 1])
+            let cutPos = searchSingleFeaturePos(inputSingleFeatures: inputSingleFeatures, singlefeatureIndex: cutStructList[cutStructList.count - 1].cutcardIndex)
             let colorPos = max(0, cutPos - cutNumRangeSetting[0])
             
-            singlefeatureRank = cutRankConvert(cutNumSetting: cutNumSetting, singlefeatureIndex: inputSingleFeatures[colorPos]) + cutRankConvert(cutNumSetting: cutNumSetting, singlefeatureIndex: cutSingleFeatureIndexList[cutSingleFeatureIndexList.count - 1])
+            singlefeatureRank = cutRankConvert(cutNumSetting: cutNumSetting, singlefeatureIndex: inputSingleFeatures[colorPos]) + cutRankConvert(cutNumSetting: cutNumSetting, singlefeatureIndex: cutStructList[cutStructList.count - 1].cutcardIndex)
             
             if cutNumRangeSetting[1] == 10 {
                 singlefeatureRank = singlefeatureRank % 10
             }
             
-            colorSingleFeatureIndexList.append(cutSingleFeatureIndexList[cutSingleFeatureIndexList.count - 1])
+            colorSingleFeatureIndexList.append(cutStructList[cutStructList.count - 1].cutcardIndex)
             colorSingleFeatureIndexList.append(inputSingleFeatures[colorPos])
             
             break
@@ -1588,16 +1589,16 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             break
         //17，看牌为色
         case 17:
-            let length = cutSingleFeatureIndexList.count
-            singlefeatureRank = cutRankConvert(cutNumSetting: cutNumSetting, singlefeatureIndex: cutSingleFeatureIndexList[length - 1])
-            colorSingleFeatureIndexList.append(cutSingleFeatureIndexList[length - 1])
+            let length = cutStructList.count
+            singlefeatureRank = cutRankConvert(cutNumSetting: cutNumSetting, singlefeatureIndex: cutStructList[length - 1].cutcardIndex)
+            colorSingleFeatureIndexList.append(cutStructList[length - 1].cutcardIndex)
             break
         //18，看牌两次和为色
         case 18:
-            let length = cutSingleFeatureIndexList.count
-            singlefeatureRank = (cutRankConvert(cutNumSetting: cutNumSetting, singlefeatureIndex: cutSingleFeatureIndexList[length - 1]) + cutRankConvert(cutNumSetting: cutNumSetting, singlefeatureIndex: cutSingleFeatureIndexList[length - 2])) % 10
-            colorSingleFeatureIndexList.append(cutSingleFeatureIndexList[length - 1])
-            colorSingleFeatureIndexList.append(cutSingleFeatureIndexList[length - 2])
+            let length = cutStructList.count
+            singlefeatureRank = (cutRankConvert(cutNumSetting: cutNumSetting, singlefeatureIndex: cutStructList[cutStructList.count - 1].cutcardIndex) + cutRankConvert(cutNumSetting: cutNumSetting, singlefeatureIndex: cutStructList[cutStructList.count - 2].cutcardIndex)) % 10
+            colorSingleFeatureIndexList.append(cutStructList[cutStructList.count - 1].cutcardIndex)
+            colorSingleFeatureIndexList.append(cutStructList[cutStructList.count - 2].cutcardIndex)
             break
 
             
@@ -1774,10 +1775,61 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         return leftNum
     }
     
-    //[[SpeakResultStruct]]--> 每一轮的结果 [
-    static func DatasetReporter(DatasetIndex: Int, inputSingleFeatures: [Int], cutSingleFeatureIndexList: [Int], diyDealStatus: [[Bool]], diyDealNum:[Int], newArgs: [Int], rankRules:[Int], suitRules:[Int], reportID: Int, cutNumSetting: Int, cutNumRangeSetting: [Int], targetPos: Int, coloringTypeArg: Int, consecutiveNum: Int, isUpWatch: Bool) -> MultipleReportResultInfo{
+    static func cutSingleFeatures(inputSingleFeatures: [Int], inputCutStruct: cutStruct, colorTransform: Int) -> [Int]{
         
-        var cutSingleFeatureIndexList : [Int] = cutSingleFeatureIndexList
+        let pos = searchSingleFeaturePos(inputSingleFeatures: inputSingleFeatures, singlefeatureIndex: inputCutStruct.cutcardIndex)
+        let length = inputSingleFeatures.count
+        
+        var returnSingleFeatures : [Int] = inputSingleFeatures
+        //0，看底，1，看顶，2，看色，3，看手
+        switch inputCutStruct.cutMode{
+        //看底
+        case 0:
+            returnSingleFeatures = Array(inputSingleFeatures[(pos + 1)...]) + Array(inputSingleFeatures[0...pos])
+            break
+        //看顶
+        case 1:
+            //看顶
+            var watchSingleFeatureIndexPos = pos + 1
+            if pos == inputSingleFeatures.count - 1{
+                watchSingleFeatureIndexPos = 0
+            }
+            print("看顶的位置 \(watchSingleFeatureIndexPos) 底牌的位置 \(watchSingleFeatureIndexPos)")
+            returnSingleFeatures = Array(inputSingleFeatures[(pos + 1)...]) + Array(inputSingleFeatures[0...pos])
+            break
+        //看色
+        case 2:
+            //留色
+            if colorTransform == 0{
+            //去色
+            } else if colorTransform == 1 {
+                returnSingleFeatures = Array(inputSingleFeatures[(pos + 1)...])
+            //去色1张
+            } else if colorTransform == 2 {
+                returnSingleFeatures.remove(at: pos)
+            //色先发
+            } else if colorTransform == 3{
+                let colorSingleFeature = returnSingleFeatures.remove(at: pos)
+                returnSingleFeatures = [colorSingleFeature] + returnSingleFeatures
+            //切牌
+            } else if colorTransform == 4{
+                returnSingleFeatures = Array(inputSingleFeatures[(pos + 1)...]) + Array(inputSingleFeatures[0...pos])
+                
+            } else {
+                print("look color error")
+            }
+            break
+        default:
+            break
+        }
+        
+        return returnSingleFeatures
+    }
+    
+    
+    
+    //[[SpeakResultStruct]]--> 每一轮的结果 [
+    static func DatasetReporter(DatasetIndex: Int, inputSingleFeatures: [Int], diyDealStatus: [[Bool]], diyDealNum:[Int], newArgs: [Int], rankRules:[Int], suitRules:[Int], reportID: Int, cutNumSetting: Int, cutNumRangeSetting: [Int], targetPos: Int, coloringTypeArg: Int, consecutiveNum: Int, cutStructList: [cutStruct]) -> MultipleReportResultInfo{
         
         //不打色默认正面打色
         var coloringType = coloringTypeArg
@@ -1858,69 +1910,113 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         
         if let reportRule = DetectSettingArgs.allPreSetReportRules[reportID]{
             
-            print("切的牌 \(cutSingleFeatureIndexList)")
+            print("切的牌 \(cutStructList)")
             print("当前的牌组 \(inputSingleFeatures)")
             
         //是否切牌的位置，看手牌，切牌留色，切牌去色
-        if cutSingleFeatureIndexList.count > 0 {
+        if cutStructList.count > 0 {
             
-            let cutSingleFeatureIndex = cutSingleFeatureIndexList[cutSingleFeatureIndexList.count - 1]
-            let pos = searchSingleFeaturePos(inputSingleFeatures: inputSingleFeatures, singlefeatureIndex: cutSingleFeatureIndex)
-            var watchSingleFeatureIndexPos = 0
-            
-            if isUpWatch{
-                watchSingleFeatureIndexPos = pos + 1
-                if pos == inputSingleFeatures.count - 1{
-                    watchSingleFeatureIndexPos = 0
-                }
-            }
-            
-            print("看顶的位置 \(watchSingleFeatureIndexPos) 底牌的位置 \(watchSingleFeatureIndexPos)")
             
             //看手牌
             if reportRule.cutSingleFeatureProcession == 0{
-                let handSingleFeatureIndex = cutSingleFeatureIndexList[cutSingleFeatureIndexList.count - 1]
-                let pos = searchSingleFeaturePos(inputSingleFeatures: inputSingleFeatures, singlefeatureIndex: handSingleFeatureIndex)
-                if pos == inputSingleFeatures.count - 1 {
-                    inputSingleFeatures = [inputSingleFeatures[pos]] + Array(inputSingleFeatures[0..<pos])
-                } else if pos != 0 {
-                    inputSingleFeatures = Array(inputSingleFeatures[pos...]) + Array(inputSingleFeatures[0...(pos - 1)])
+                if cutStructList[cutStructList.count - 1].cutMode == 3{
+
+                    let handSingleFeatureIndex = cutStructList[cutStructList.count - 1].cutcardIndex
+                    let pos = searchSingleFeaturePos(inputSingleFeatures: inputSingleFeatures, singlefeatureIndex: handSingleFeatureIndex)
+                    if pos == inputSingleFeatures.count - 1 {
+                        inputSingleFeatures = [inputSingleFeatures[pos]] + Array(inputSingleFeatures[0..<pos])
+                    } else if pos != 0 {
+                        inputSingleFeatures = Array(inputSingleFeatures[pos...]) + Array(inputSingleFeatures[0...(pos - 1)])
+                    }
                 }
-            //看色两次
+            //看色两次, 留色
             } else if reportRule.cutSingleFeatureProcession == 1{
-                if cutSingleFeatureIndexList.count < 2 {
+                if cutStructList.count < 2 || (cutStructList[cutStructList.count - 1].cutMode != 2 && cutStructList[cutStructList.count - 2].cutMode != 2) {
                     multipleResultInfo.leftSingleFeatures = leftSingleFeatures
                     return multipleResultInfo
                 }
+                
+                for cutStruct in cutStructList{
+                    if cutStruct.cutMode == 2 {
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 0)
+                    } else {
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1)
+                    }
+                }
             //看色留色
             } else if reportRule.cutSingleFeatureProcession == 2{
-            //看色去色(不和看顶一起用)
+                if cutStructList[cutStructList.count - 1].cutMode != 2 {
+                    multipleResultInfo.leftSingleFeatures = leftSingleFeatures
+                    return multipleResultInfo
+                }
+                
+                for cutStruct in cutStructList{
+                    if cutStruct.cutMode == 2 {
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 0)
+                    } else {
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1)
+                    }
+                }
+                
+
+            //看色去色
             } else if reportRule.cutSingleFeatureProcession == 3{
                 
-                if cutNumRangeSetting[1] == 1 {
-                    inputSingleFeatures = Array(inputSingleFeatures[(pos + 1)...]) + Array(inputSingleFeatures[0...pos])
-                } else {
-                    inputSingleFeatures = Array(inputSingleFeatures[(pos + 1)...])
+                if cutStructList[cutStructList.count - 1].cutMode != 2 {
+                    multipleResultInfo.leftSingleFeatures = leftSingleFeatures
+                    return multipleResultInfo
+                }
+                
+                for cutStruct in cutStructList{
+                    if cutStruct.cutMode == 2 {
+                        if cutNumRangeSetting[1] > 1{
+                            inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 1)
+                            
+                        } else {
+                            inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 1)
+                        }
+                    } else {
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1)
+                    }
                 }
                 
             //飞二张去色1张
             } else if reportRule.cutSingleFeatureProcession == 4 {
                 
-                inputSingleFeatures.remove(at: pos)
+                if cutStructList[cutStructList.count - 1].cutMode != 2 {
+                    multipleResultInfo.leftSingleFeatures = leftSingleFeatures
+                    return multipleResultInfo
+                }
+                
+                for cutStruct in cutStructList{
+                    if cutStruct.cutMode == 2 {
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 2)
+                    } else {
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1)
+                    }
+                }
                 
             //飞2张色先发
             } else if reportRule.cutSingleFeatureProcession == 5 {
-                let colorSingleFeature = inputSingleFeatures.remove(at: pos)
-                inputSingleFeatures = [colorSingleFeature] + inputSingleFeatures
+                if cutStructList[cutStructList.count - 1].cutMode != 2 {
+                    multipleResultInfo.leftSingleFeatures = leftSingleFeatures
+                    return multipleResultInfo
+                }
+                
+                for cutStruct in cutStructList{
+                    if cutStruct.cutMode == 2 {
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 3)
+                    } else {
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1)
+                    }
+                }
             //普通切牌
             } else {
-                print("普通切牌")
-                let cutSingleFeatureIndex = cutSingleFeatureIndexList[cutSingleFeatureIndexList.count - 1]
-                let pos = searchSingleFeaturePos(inputSingleFeatures: inputSingleFeatures, singlefeatureIndex: cutSingleFeatureIndex)
-                if isUpWatch {
-                    cutSingleFeatureIndexList[cutSingleFeatureIndexList.count - 1] = inputSingleFeatures[watchSingleFeatureIndexPos]
+                
+                for cutStruct in cutStructList{
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1)
+                    
                 }
-                inputSingleFeatures = Array(inputSingleFeatures[(pos + 1)...]) + Array(inputSingleFeatures[0...pos])
             }
         }
             
@@ -2133,7 +2229,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         var singlefeatureRank: Int = 0
                         var colorSingleFeatureIndexList: [Int] = []
                         
-                        (singlefeatureRank, colorSingleFeatureIndexList) = GetSingleFeatureRank(reportRule: reportRule, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, inputSingleFeatures: coloringInputSingleFeatures, singlefeatureIndex: singlefeatureIndex, specialSingleFeaturePos: specialSingleFeaturePos, cutSingleFeatureIndexList: cutSingleFeatureIndexList, upDownID: upDownID)
+                        (singlefeatureRank, colorSingleFeatureIndexList) = GetSingleFeatureRank(reportRule: reportRule, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, inputSingleFeatures: coloringInputSingleFeatures, singlefeatureIndex: singlefeatureIndex, specialSingleFeaturePos: specialSingleFeaturePos, upDownID: upDownID, cutStructList: cutStructList)
 
                         
                         var newInputSingleFeatures: [Int] = []

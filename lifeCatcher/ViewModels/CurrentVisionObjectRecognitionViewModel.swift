@@ -26,8 +26,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var leftSingleFeatures: [Int] = []
     @Published var usedSingleFeatures: [Int] = []
     @Published var cutArray : [Int] = []
+    @Published var cutStructArray: [cutStruct] = []
     @Published var cutShowArray : [Int] = []
-    @Published var upWatch: Bool = false
 
     let detectModel = try! detect_0719_trans_copy()
     let clsModel_h = try! cls_0715_h_trans_copy()
@@ -713,7 +713,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         else if self.singlefeatureArray.contains(detectSingleFeature) && !self.cutDone {
                             
                             var cutIndex = self.singlefeatureArray.firstIndex(of: detectSingleFeature)!
-                            self.upWatch = false
                             if self.cutMode == 1{
                                 //看底
                                 self.cutArray = [detectSingleFeature]
@@ -721,7 +720,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             }
                             else if self.cutMode == 2{
                                 //看顶
-                                self.upWatch = true
                                 cutIndex -= 1
                                 if cutIndex < 0 {
                                     cutIndex = self.singlefeatureArray.count - 1
@@ -2291,14 +2289,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         self.cutShowArray = []
         
         if self.cutMode != 0{
-            self.upWatch = false
             let cutSingleFeature : Int = self.singlefeatureArray.randomElement()!
             var cutIndex = self.singlefeatureArray.firstIndex(of: cutSingleFeature)!
             if self.cutMode == 1{
                 self.cutArray = [self.singlefeatureArray[cutIndex]]
             }
             else if self.cutMode == 2{
-                self.upWatch = true
                 cutIndex -= 1
                 if cutIndex < 0 {
                     cutIndex = self.singlefeatureArray.count - 1
@@ -2318,7 +2314,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     
     func computeWinnerRC() {
         if singlefeatureArray.count >= minSingleFeatureNum && singlefeatureArray.count > cutNumRangeSetting[0] && singlefeatureArray.count > cutNumRangeSetting[1] - minSingleFeatureNum{
-            multipleDatasetRCInfos = ClassifierSettingArgs.selectDataset(DatasetIndex: ruleIndex, inputSingleFeatures: singlefeatureArray, rcNum: (ClassifierSettingArgs.targetSetting[ruleIndex]?.rcNum[rcNum])!, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, minSingleFeatureNum: minSingleFeatureNum, cutSingleFeatureIndexArray: cutArray, isUpWatch: self.upWatch)
+            multipleDatasetRCInfos = ClassifierSettingArgs.selectDataset(DatasetIndex: ruleIndex, inputSingleFeatures: singlefeatureArray, rcNum: (ClassifierSettingArgs.targetSetting[ruleIndex]?.rcNum[rcNum])!, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, minSingleFeatureNum: minSingleFeatureNum, cutStructList: cutStructArray)
             
             self.singlefeatureArray = multipleDatasetRCInfos.returnSingleFeatureArray
             
