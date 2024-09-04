@@ -141,23 +141,6 @@ struct LoginView: View {
                             .background(Color.white)
                             .cornerRadius(10)
                             .padding(.horizontal, 20)
-
-                        // 登出按钮
-                        Button(action: {
-                            // 执行登出操作
-                            loginStatus.userInfo = nil // 清除用户名
-                            loginStatus.appState = .loggedOut // 设置状态为已登出
-                            AuthManager.isLoginServer = false
-                            AuthManager.loginStatus = -1
-                        }) {
-                            Text("Sign Out".localized())
-                                .foregroundColor(.white)
-                                .padding()
-                                .frame(maxWidth: .infinity)
-                                .background(Color.red)
-                                .cornerRadius(10)
-                                .padding(.horizontal, 20)
-                        }
                     }
                 }
             }.padding(.top, 20)

@@ -31,32 +31,32 @@ struct SettingRecordView: View {
                                 
                                 let name: String = rules[index].RuleName
                                 
-                                let shuffleMode = generalRuleSetting.allShuffleMode[rules[index].shuffleMode]!
-                                
-                                let cutMode = generalRuleSetting.allCutMode[rules[index].cutMode]!
-                                
-                                let reportSetting = ReportManager.allReportName[rules[index].reportSetting]!
+//                                let shuffleMode = generalRuleSetting.allShuffleMode[rules[index].shuffleMode]!
+//                                
+//                                let cutMode = generalRuleSetting.allCutMode[rules[index].cutMode]!
+//                                
+//                                let reportSetting = ReportManager.allReportName[rules[index].reportSetting]!
                                 
                                 HStack(spacing: 20) {
                                     Text("方案\(index+1)")
                                             .foregroundColor(.white)
                                             .frame(maxWidth: 60, alignment: .leading)
                                     
-                                    VStack(alignment: .leading, spacing: 5){
-                                        Text(name)
-                                            .foregroundColor(.white)
-                                            .frame(height: 20, alignment: .leading)
-                                        Text(shuffleMode)
-                                            .foregroundColor(.white)
-                                            .frame(height: 20, alignment: .leading)
-                                        Text(cutMode)
-                                            .foregroundColor(.white)
-                                            .frame(height: 20, alignment: .leading)
-                                        Text(reportSetting)
-                                            .foregroundColor(.white)
-                                            .frame(height: 20, alignment: .leading)
-                                            .multilineTextAlignment(.leading)
-                                    }
+//                                    VStack(alignment: .leading, spacing: 5){
+//                                        Text(name)
+//                                            .foregroundColor(.white)
+//                                            .frame(height: 20, alignment: .leading)
+//                                        Text(shuffleMode)
+//                                            .foregroundColor(.white)
+//                                            .frame(height: 20, alignment: .leading)
+//                                        Text(cutMode)
+//                                            .foregroundColor(.white)
+//                                            .frame(height: 20, alignment: .leading)
+//                                        Text(reportSetting)
+//                                            .foregroundColor(.white)
+//                                            .frame(height: 20, alignment: .leading)
+//                                            .multilineTextAlignment(.leading)
+//                                    }
                                     
                                 }
                             }

@@ -29,9 +29,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var cutShowArray : [Int] = []
     @Published var upWatch: Bool = false
 
-    let detectModel = try! detect_0719_trans_copy()
-    let clsModel_h = try! cls_0715_h_trans_copy()
-    let clsModel_v = try! cls_0727_v_trans_copy()
+    let detectModel = try! detect_0903()
+    let clsModel_h = try! cls_0715_h_trans()
+    let clsModel_v = try! cls_0727_v_trans()
     var originSize : [Float] = [1920, 1080] //相机图像大小
     var imageSize : [Float] = [569, 320] //target area 截图大小
     var originImageSize : [Float] = [569, 320] //target area 原始截图大小
@@ -52,15 +52,15 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     
 
     public var state : String = "idle"
-    public var shuffleMode : Int = 0
-    public var cutMode : Int = 0
+    public var shuffleMode : [Int] = [1,0]
+    public var cutMode : [Int] = [0,0]
     public var rcNum: Int = 0
     public var dealNum: Int = 0
     public var coloringType: Int = 0
     public var dealType: Int = 0
     public var diyDealNum: [Int] = []
     public var diyDealStatus: [[Bool]] = []
-    public var calModeArgs : [Int] = [0, 0, 1]
+    public var calModeArgs : [[Int]] = [[0, 0], [0, 0]]
     public var cutNumSetting: Int = 0
     public var cutNumRangeSetting: [Int] = [2,10]
     public var consecutiveReport: Int = 0
@@ -73,6 +73,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     public var allSingleFeatureIndex : [Int] = Array(0...51)
     public var minSingleFeatureNum : Int = 0
     public var recgReport : Bool = false
+    public var specialCard:[Int] = [0,0]
     
     //测试用的定时器
     public var ding: Int = 0
@@ -111,6 +112,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     
     private var laplacianDic: [[Int:Float]] = [[:],[:]]
     
+    var shuffleOrRiffle: Int = 0 //-1未知 0洗牌 1拨牌
+    
     let singlefeatureLabelDic : [Int:String] = [
         0: "♠️A ", 1: "♠️2", 2: "♠️3", 3: "♠️4", 4: "♠️5 ", 5: "♠️6 ", 6: "♠️7 ", 7: "♠️8 ", 8: "♠️9 ", 9: "♠️10 ",
         10: "♠️J ", 11: "♠️Q ", 12: "♠️K ", 13: "♥️A ", 14: "♥️2 ", 15: "♥️3 ", 16: "♥️4 ", 17: "♥️5 ", 18: "♥️6 ",
@@ -145,11 +148,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     
     let speechPerformer = SpeechPerformer()
     
-    //单次流程的牌切了吗
-    var cutDone : Bool = true
     //单次识别是否等待识别切牌
     var detectNeedToCut : Bool = false
-    var detectSet : Set<Int> = []
     
     override init(){
         
@@ -198,23 +198,22 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     private func initDetectResult(){
         detectResultList = [:]
         stateCounter = 0
-        detectSet = []
-        detectNeedToCut = false
         isDetect = false
+        
+        if (self.shuffleMode[0] != 0 && self.cutMode[0] != 0)
+            || (self.shuffleMode[1] != 0 && self.cutMode[1] != 0
+            || self.recgReport){
+            self.detectNeedToCut = true
+        }
     }
     
     private func initShuffle(){
+        
         singlefeatureArray = []
         cutArray = []
         cutShowArray = []
         self.leftSingleFeatures = []
         self.usedSingleFeatures = []
-        if self.cutMode != 0{
-            self.cutDone = false
-        }
-        else{
-            self.cutDone = true
-        }
         multipleDatasetRCInfos = ReportManager.MultipleReportResultInfo()
     }
     
@@ -584,14 +583,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
        
         
-        
-        let isShuffle = detectNum == 2 && (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4)
-        let isRiffle = detectNum == 1 && (self.shuffleMode == 1 || self.shuffleMode == 2 || self.shuffleMode == 3 || self.shuffleMode == 4)
-        var isCut = detectNum != 0 && (!self.cutDone || self.recgReport) && self.singlefeatureArray.count > 0
-        
         DispatchQueue.main.async{
             if self.state == "idle"{
-                if (isShuffle || isRiffle || isCut) && self.stateCounter >= 1{
+                if detectNum > 0 && self.stateCounter >= 1{
                     
                     // print("进入识别")
                     
@@ -609,10 +603,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     
                     self.targetArea = self.computeTargetArea(stateResult: stateResult)
                     self.isTargetArea = true
-                    
-                    if isCut{
-                        self.detectNeedToCut = true
-                    }
                 }
             }
         
@@ -670,6 +660,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     var detectSingleFeature = -1
                     var detectConfidence:Float = -1
                     
+                    let isSame = singlefeatureResult[0].singlefeatureIndex[0] != -1 &&
+                                singlefeatureResult[0].singlefeatureIndex[0] == singlefeatureResult[1].singlefeatureIndex[0]
+                    
                     if singlefeatureResult[0].singlefeatureIndex[0] != -1{
                         leftDetectSingleFeature = singlefeatureResult[0].singlefeatureIndex[0]
                         leftConfidence = singlefeatureResult[0].confidence[0]
@@ -688,11 +681,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         detectSingleFeature = rightDetectSingleFeature
                     }
                     
-                    if !self.isDetect && detectConfidence >= detectConfidenceThreshold{
-                        self.isDetect = true
-                        self.speakText(input: 0)
-                    }
-                    
                     if detectConfidence < detectEndThreshold{
                         self.stateCounter += 1
                         detectNum = 0
@@ -701,49 +689,63 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         self.stateCounter = 0
                     }
                     
+                    let isShuffle = detectNum == 2 && self.shuffleMode[0] != 0 && !isSame
+                    let isRiffle = detectNum == 1 && self.shuffleMode[1] != 0
+                    let isCut = (detectNum == 1 || (detectNum == 2 && isSame)) && self.detectNeedToCut
+                    
+                    if !self.isDetect
+                        && detectConfidence >= detectConfidenceThreshold{
+                        self.isDetect = true
+                        if isShuffle || isRiffle{
+                            self.speakText(input: 0)
+                        }
+                    }
                     
                     if self.detectNeedToCut
                         && detectConfidence >= detectConfidenceThreshold
                         && isCut
-                        && (detectNum == 1 || (detectNum == 2 && singlefeatureResult[0].singlefeatureIndex[0] == singlefeatureResult[1].singlefeatureIndex[0])){
-                        if self.usedSingleFeatures.contains(detectSingleFeature) &&  self.recgReport {
+                        && (detectNum == 1 || (detectNum == 2 && isSame)){
+                        if self.usedSingleFeatures.contains(detectSingleFeature) && self.recgReport {
                             self.computeNextRound()
                             self.detectNeedToCut = false
                         }
-                        else if self.singlefeatureArray.contains(detectSingleFeature) && !self.cutDone {
+                        else if self.singlefeatureArray.contains(detectSingleFeature){
                             
                             var cutIndex = self.singlefeatureArray.firstIndex(of: detectSingleFeature)!
                             self.upWatch = false
-                            if self.cutMode == 1{
-                                //看底
-                                self.cutArray = [detectSingleFeature]
-                                self.cutDone = true
-                            }
-                            else if self.cutMode == 2{
-                                //看顶
-                                self.upWatch = true
-                                cutIndex -= 1
-                                if cutIndex < 0 {
-                                    cutIndex = self.singlefeatureArray.count - 1
-                                }
-                                self.cutArray = [self.singlefeatureArray[cutIndex]]
-                                self.cutDone = true
-                            }
-                            else if self.cutMode == 3{
-                                //连续切牌
-                                self.cutArray.append(detectSingleFeature)
-                            }
-                            else if self.cutMode == 4{
-                                //看手
-                                self.cutArray.append(detectSingleFeature)
-                                self.cutDone = true
-                            }
                             
-                            self.detectNeedToCut = false
-                            self.cutShowArray.append(detectSingleFeature)
-                            self.detectSet.insert(detectSingleFeature)
-                            self.computeWinnerRC()
-                            self.computeSingleFeatures()
+                            
+                                if self.cutMode[self.shuffleOrRiffle] == 0{
+                                    self.cutArray.append(detectSingleFeature)
+                                }
+                                else if self.cutMode[self.shuffleOrRiffle] == 1{
+                                    //看底
+                                    self.cutArray.append(detectSingleFeature)
+                                }
+                                else if self.cutMode[self.shuffleOrRiffle] == 2{
+                                    //看顶
+                                    self.upWatch = true
+                                    cutIndex -= 1
+                                    if cutIndex < 0 {
+                                        cutIndex = self.singlefeatureArray.count - 1
+                                    }
+                                    self.cutArray = [self.singlefeatureArray[cutIndex]]
+                                }
+                                else if self.cutMode[self.shuffleOrRiffle] == 3{
+                                    //连续切牌
+                                    self.cutArray.append(detectSingleFeature)
+                                }
+                                else if self.cutMode[self.shuffleOrRiffle] == 4{
+                                    //看手
+                                    self.cutArray.append(detectSingleFeature)
+                                }
+                                
+                                self.detectNeedToCut = false
+                                self.cutShowArray.append(detectSingleFeature)
+                                
+                                self.computeWinnerRC(reportSettingTarget: self.shuffleOrRiffle)
+                                
+                                self.computeSingleFeatures()
                         }
                     }
                 }
@@ -757,9 +759,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     self.initBoxes()
                     self.initDetectResult()
                     
-                    if !detectState.isSingle && !detectState.isShort
-                        && (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4){
+                    if !detectState.isSingle && !detectState.isShort && self.shuffleMode[0] != 0{
                         //洗牌
+                        self.shuffleOrRiffle = 0
                         self.initShuffle()
                         self.singlefeatureArray = detectState.detectionResult
                         
@@ -770,20 +772,18 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             self.speakText(input: 2)
                         }
                         
-                        if self.cutMode == 0 || self.cutMode == 3{
-                            self.computeWinnerRC()
+                        if self.cutMode[0] == 0 || self.cutMode[0] == 3{
+                            self.computeWinnerRC(reportSettingTarget: 0)
                             self.computeSingleFeatures()
-
                         }
-                        
                     }
-                    else if detectState.isSingle && !detectState.isShort
-                                && (self.shuffleMode == 1 || self.shuffleMode == 2 || self.shuffleMode == 3 || self.shuffleMode == 4){
+                    else if detectState.isSingle && !detectState.isShort && self.shuffleMode[1] != 0{
                         //拨牌
+                        self.shuffleOrRiffle = 1
                         self.initShuffle()
                         self.singlefeatureArray = detectState.detectionResult
  
-                        if(self.shuffleMode == 1 || self.shuffleMode == 3){
+                        if self.shuffleMode[1] == 1{
                             //拨到顶
                             if self.singlefeatureArray.count >= self.minSingleFeatureNum{
                                 //self.speakText(input: 1)
@@ -793,7 +793,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             }
                         }
                         
-                        else if(self.shuffleMode == 2 || self.shuffleMode == 4){
+                        else if self.shuffleMode[1] == 2{
                             //拨中间
                             if self.singlefeatureArray.count > 0{
                                 self.singlefeatureArray.remove(at: 0)
@@ -807,10 +807,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             }
                         }
                         
-                        if self.cutMode == 0 || self.cutMode == 3{
-                            self.computeWinnerRC()
+                        
+                        if self.cutMode[1] == 0 || self.cutMode[1] == 3{
+                            self.computeWinnerRC(reportSettingTarget: 1)
                             self.computeSingleFeatures()
-
                         }
                     }
                 }
@@ -821,7 +821,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     && singlefeatureResult[0].singlefeatureIndex[0] != -1
                     && singlefeatureResult[1].singlefeatureIndex[0] != -1
                     
-                    if isShuffle && shuffleCheck && self.detectResultList.count > 60{
+                    if self.shuffleMode[0] != 0 && shuffleCheck && self.detectResultList.count > 60{
                         self.state = "shuffle"
                         self.detectNeedToCut = false
                     }
@@ -1395,7 +1395,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
         }
         
-        let isShuffle = (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4) && !isSingle && !isShort
+        let isShuffle = self.shuffleMode[0] != 0 && !isSingle && !isShort
         
         var lostNum = 0
         var addNum = 0
@@ -1785,8 +1785,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             
             if self.isCameraHorizon{
                 
-                if minW < 3 * minH &&
-                    (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4){
+                if minW < 3 * minH && self.shuffleMode[0] != 0{
                     boxfactor = 5
                 }
                 else{
@@ -1824,8 +1823,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
             
             else{
-                if minH < 3 * minW &&
-                    (self.shuffleMode == 0 || self.shuffleMode == 3 || self.shuffleMode == 4){
+                if minH < 3 * minW && self.shuffleMode[0] != 0{
                     boxfactor = 5
                 }
                 else{
@@ -2290,35 +2288,37 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         self.cutArray = []
         self.cutShowArray = []
         
-        if self.cutMode != 0{
-            self.upWatch = false
-            let cutSingleFeature : Int = self.singlefeatureArray.randomElement()!
-            var cutIndex = self.singlefeatureArray.firstIndex(of: cutSingleFeature)!
-            if self.cutMode == 1{
-                self.cutArray = [self.singlefeatureArray[cutIndex]]
-            }
-            else if self.cutMode == 2{
-                self.upWatch = true
-                cutIndex -= 1
-                if cutIndex < 0 {
-                    cutIndex = self.singlefeatureArray.count - 1
-                }
-                self.cutArray = [self.singlefeatureArray[cutIndex]]            }
-            else if self.cutMode == 3{
-                self.cutArray.append(cutSingleFeature)
-            }
-            else if self.cutMode == 4{
-                self.cutArray.append(cutSingleFeature)
-            }
-            self.cutShowArray.append(cutSingleFeature)
-        }
+        var target = self.shuffleOrRiffle
         
-        computeWinnerRC()
+        
+        let cutSingleFeature : Int = self.singlefeatureArray.randomElement()!
+        var cutIndex = self.singlefeatureArray.firstIndex(of: cutSingleFeature)!
+        
+        if self.cutMode[target] == 1{
+            self.cutArray = [self.singlefeatureArray[cutIndex]]
+        }
+        else if self.cutMode[target] == 2{
+            self.upWatch = true
+            cutIndex -= 1
+            if cutIndex < 0 {
+                cutIndex = self.singlefeatureArray.count - 1
+            }
+            self.cutArray = [self.singlefeatureArray[cutIndex]]
+        }
+        else if self.cutMode[target] == 3{
+            self.cutArray.append(cutSingleFeature)
+        }
+        else if self.cutMode[target] == 4{
+            self.cutArray.append(cutSingleFeature)
+        }
+        self.cutShowArray.append(cutSingleFeature)
+        
+        computeWinnerRC(reportSettingTarget: target)
     }
     
-    func computeWinnerRC() {
+    func computeWinnerRC(reportSettingTarget: Int) {
         if singlefeatureArray.count >= minSingleFeatureNum && singlefeatureArray.count > cutNumRangeSetting[0] && singlefeatureArray.count > cutNumRangeSetting[1] - minSingleFeatureNum{
-            multipleDatasetRCInfos = ClassifierSettingArgs.selectDataset(DatasetIndex: ruleIndex, inputSingleFeatures: singlefeatureArray, rcNum: (ClassifierSettingArgs.targetSetting[ruleIndex]?.rcNum[rcNum])!, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, minSingleFeatureNum: minSingleFeatureNum, cutSingleFeatureIndexArray: cutArray, isUpWatch: self.upWatch)
+            multipleDatasetRCInfos = ClassifierSettingArgs.selectDataset(DatasetIndex: ruleIndex, inputSingleFeatures: singlefeatureArray, rcNum: (ClassifierSettingArgs.targetSetting[ruleIndex]?.rcNum[rcNum])!, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs[reportSettingTarget], cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, minSingleFeatureNum: minSingleFeatureNum, cutSingleFeatureIndexArray: cutArray, isUpWatch: self.upWatch)
             
             self.singlefeatureArray = multipleDatasetRCInfos.returnSingleFeatureArray
             
@@ -2337,7 +2337,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     func computeNextRound(){
         if (self.leftSingleFeatures.count > 0){
             self.singlefeatureArray = self.leftSingleFeatures
-            computeWinnerRC()
+            computeWinnerRC(reportSettingTarget: self.shuffleOrRiffle)
             self.computeSingleFeatures()
         }
     }
@@ -2401,19 +2401,20 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         else if self.volumeUp == 2{
             let currentNum = selectedRule.rcNum[self.rcNum]
-            var positionSetting = self.calModeArgs[1] + 1
+            var positionSetting = self.calModeArgs[0][1] + 1
             if positionSetting >= currentNum{
                 positionSetting = 0
             }
-            self.calModeArgs[1] = positionSetting
+            self.calModeArgs[0][1] = positionSetting
+            self.calModeArgs[1][1] = positionSetting
             speakText(input: "位置" + String(positionSetting+1))
         }
         else if self.volumeUp == 3{
-            self.shuffleMode += 1
-            if self.shuffleMode >= generalRuleSetting.allShuffleMode.count{
-                self.shuffleMode = 0
+            self.shuffleMode[0] += 1
+            if self.shuffleMode[0] >= generalRuleSetting.allShuffleMode.count{
+                self.shuffleMode[0] = 0
             }
-            speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode]!)
+            speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode[0]]!)
         }
         else if self.volumeUp == 4{
             self.selectedSaveIndex += 1
@@ -2447,19 +2448,20 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         else if self.volumeDown == 2{
             let currentNum = selectedRule.rcNum[self.rcNum]
-            var positionSetting = self.calModeArgs[1] - 1
+            var positionSetting = self.calModeArgs[0][1] - 1
             if positionSetting < 0{
                 positionSetting = currentNum - 1
             }
-            self.calModeArgs[1] = positionSetting
+            self.calModeArgs[0][1] = positionSetting
+            self.calModeArgs[1][1] = positionSetting
             speakText(input: "位置" + String(positionSetting+1))
         }
         else if self.volumeDown == 3{
-            self.shuffleMode -= 1
-            if self.shuffleMode < 0{
-                self.shuffleMode = generalRuleSetting.allShuffleMode.count - 1
+            self.shuffleMode[1] -= 1
+            if self.shuffleMode[1] < 0{
+                self.shuffleMode[1] = generalRuleSetting.allRiffleMode.count - 1
             }
-            speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode]!)
+            speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
         }
         else if self.volumeDown == 4{
             self.selectedSaveIndex -= 1
@@ -2510,7 +2512,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         self.allSingleFeatureIndex = rules.singlefeatureToUse
         self.cutNumSetting = rules.cutNumSetting
         self.cutNumRangeSetting = rules.cutNumRangeSetting
-        self.calModeArgs = [rules.reportSetting, rules.positionSetting]
+        self.calModeArgs = [[rules.reportSetting[0], rules.positionSetting], [rules.reportSetting[1], rules.positionSetting]]
         self.consecutiveReport = rules.consecutiveReport
         self.reportNumber = rules.reportNumber
         self.voiceReport = rules.voiceReport
@@ -2519,6 +2521,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         self.rankRules = rules.rankRules
         self.minSingleFeatureNum = rules.minSingleFeatureNum
         self.recgReport = rules.recgReport
+        self.specialCard = rules.specialCard
         
         self.laplacianDic = [[:],[:]]
         for key in self.allSingleFeatureIndex {
@@ -2627,7 +2630,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             
             let floatDict : [String: Float] = [
                 "volumeValue": self.volumeValue,
-                "voiceRate": 0.6,
+                "voiceRate": self.voiceRate,
                 "zoomFactor": self.zoomFactor,
                 "focusFactor": self.focusFactor
             ]
@@ -2727,7 +2730,7 @@ class SpeakResultStruct{
 
 
 class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
-    var voiceRate: Float = 0.6
+    var voiceRate: Float = 0.55
     let synthesizer = AVSpeechSynthesizer() // Your AVSpeechSynthesizer instance
     let chineseFemaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.Ting-Ting-compact")
     let chineseMaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.siri_male_zh-CN_compact")

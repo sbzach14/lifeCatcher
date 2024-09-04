@@ -1,7 +1,10 @@
 import SwiftUI
 
 struct ReportSettingView: View {
-    @Binding var reportSetting: Int
+
+    @Binding var reportSetting: [Int]
+    
+    var target: Int
     
     @Environment(\.presentationMode) var presentationMode
     
@@ -23,7 +26,7 @@ struct ReportSettingView: View {
             ScrollView{
                 VStack { // 垂直间距
                     HStack {
-                        Text(ReportManager.allReportName[reportSetting]! + "\n" + ReportManager.allReportInfo[reportSetting]!)
+                        Text(ReportManager.allReportName[reportSetting[target]]! + "\n" + ReportManager.allReportInfo[reportSetting[target]]!)
                             .foregroundColor(.black)
                             .lineLimit(nil) // 可以显示多行文本
                             .fixedSize(horizontal: false, vertical: true) // 允许垂直方向上的大小自适应
@@ -47,7 +50,7 @@ struct ReportSettingView: View {
                            .frame(maxWidth: .infinity, alignment: .leading)
                            .padding(.vertical, 10)
                            .onTapGesture {
-                               reportSetting = currentIndex
+                               reportSetting[target] = currentIndex
                                self.presentationMode.wrappedValue.dismiss()
                             }
                            

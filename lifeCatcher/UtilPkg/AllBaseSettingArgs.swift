@@ -3628,11 +3628,11 @@ struct DatasetRule: Codable{
     var diyDealNum: [Int] = []
     var diyDealStatus: [[Bool]] = []
     var rcNum: Int = 0
-    var shuffleMode: Int = 0
-    var cutMode: Int = 0
+    var shuffleMode: [Int] = [1,0]
+    var cutMode: [Int] = [0,0]
     var singlefeatureToUse: [Int] = []
     var cutNumSetting: Int = 0
-    var reportSetting: Int = 0
+    var reportSetting: [Int] = [0,0]
     var cutNumRangeSetting: [Int] = []
     var positionSetting: Int = 0
     var consecutiveReport: Int = 0
@@ -3644,7 +3644,9 @@ struct DatasetRule: Codable{
     var rankRuleChecked: [Int] = []
     var minSingleFeatureNum: Int
     var recgReport: Bool
-    init(RuleName: String, DatasetType: Int, setting: Int, dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], rcNum: Int, shuffleMode: Int, cutMode: Int, singlefeatureToUse: [Int], cutNumSetting : Int, reportSetting: Int, cutNumRangeSetting: [Int], positionSetting: Int, consecutiveReport: Int, reportNumber: Int, voiceReport: Int, args: [Int], suitRanks: [Int], rankRules: [Int], rankRuleChecked: [Int], minSingleFeatureNum: Int, recgReport: Bool) {
+    var specialCard: [Int]
+    
+    init(RuleName: String, DatasetType: Int, setting: Int, dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], rcNum: Int, shuffleMode: [Int], cutMode: [Int], singlefeatureToUse: [Int], cutNumSetting : Int, reportSetting: [Int], cutNumRangeSetting: [Int], positionSetting: Int, consecutiveReport: Int, reportNumber: Int, voiceReport: Int, args: [Int], suitRanks: [Int], rankRules: [Int], rankRuleChecked: [Int], minSingleFeatureNum: Int, recgReport: Bool, specialCard: [Int]) {
         self.RuleName = RuleName
         self.DatasetType = DatasetType
         self.setting = setting
@@ -3670,6 +3672,7 @@ struct DatasetRule: Codable{
         self.rankRuleChecked = rankRuleChecked
         self.minSingleFeatureNum = minSingleFeatureNum
         self.recgReport = recgReport
+        self.specialCard = specialCard
     }
 }
 

@@ -109,7 +109,7 @@ class SettingViewModel: ObservableObject {
             
             let floatDict : [String: Float] = [
                 "volumeValue": self.volumeValue,
-                "voiceRate": 0.6,
+                "voiceRate": self.voiceRate,
                 "zoomFactor": self.zoomFactor,
                 "focusFactor": self.focusFactor
             ]

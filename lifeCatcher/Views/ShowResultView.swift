@@ -124,13 +124,23 @@ struct ShowResultView: View {
             
             HStack{
                 Spacer()
+                
                 Button {
                     viewModel.generateTestResult()
                 } label: {
                     Image("icon_test").resizable().frame(width: 150, height: 60)
                 }
+                
                 Spacer()
-            }
+                
+                Button {
+                    viewModel.isShowSingleFeature = false
+                } label: {
+                    Image("icon_back").resizable().frame(width: 150, height: 60)
+                }
+                
+                Spacer()
+            }.frame(height: 60, alignment: .bottom)
         }
         .background(Image("Newbg2").resizable()
             .scaledToFill()

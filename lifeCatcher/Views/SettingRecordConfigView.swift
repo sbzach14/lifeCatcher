@@ -21,19 +21,29 @@ class generalRuleSetting{
         16:"十三水"
     ]
     static let allShuffleMode: [Int:String] = [
-        0:"洗牌",
+        0:"不洗牌",
+        1:"洗牌"
+    ]
+    
+    static let allRiffleMode: [Int: String] = [
+        0:"不拨牌",
         1:"拨到顶",
         2:"拨中间",
-        3:"洗牌+拨到顶",
-        4:"洗牌+拨中间"
     ]
+    
     static let allCutMode: [Int:String] = [
         0:"不切牌",
         1:"看底",
         2:"看顶",
-        3:"连续切牌",
-        4:"看手牌"
+        3:"连续看底"
     ]
+    
+    static let allSpecialCard: [Int:String] = [
+        0:"无",
+        1:"看手牌",
+        2:"看色牌",
+    ]
+    
     static let allDealType: [Int: String] = [
         0:"默认每轮发一张",
         1:"自定义"
@@ -86,12 +96,13 @@ struct SettingRecordConfigView: View{
     @State private var diyDealNum: [Int] = []
     @State private var diyDealStatus: [[Bool]] = []
     @State private var rcNum: Int = 2
-    @State private var shuffleMode: Int = 0
-    @State private var cutMode: Int = 0
+    @State private var shuffleMode: [Int] = [1,0]
+    @State private var cutMode: [Int] = [1,0]
+    @State private var specialCard: [Int] = [0, 0]
     @State private var singlefeatureToUse: [Int] = []
     //色点设置
     @State private var cutNumSetting: Int = 0
-    @State private var reportSetting: Int = 0
+    @State private var reportSetting: [Int] = [0,0]
     //打色范围
     @State private var cutNumRangeSetting: [Int] = [1,5]
     @State private var positionSetting: Int = 0
@@ -254,48 +265,157 @@ struct SettingRecordConfigView: View{
                         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 5) {
                             
                             VStack(spacing: 5){
-                                Text("识别设置")
+                                Text("洗牌识别")
                                     .frame(height: 30, alignment: .leading)
                                     .foregroundColor(.white)
                                     .bold()
                                 
                                 Divider()
                                 
-                                Picker("shuffleMode", selection: $shuffleMode) {
-                                    ForEach(0...generalRuleSetting.allShuffleMode.count - 1, id: \.self){
-                                        index in Text(generalRuleSetting.allShuffleMode[index]!).tag(index)
+                                HStack{
+                                    Text("手法")
+                                        .frame(width: 40, alignment: .leading)
+                                        .foregroundColor(.white)
+                                    
+                                    Picker("shuffleMode", selection: $shuffleMode[0]) {
+                                        ForEach(0...generalRuleSetting.allShuffleMode.count - 1, id: \.self){
+                                            index in Text(generalRuleSetting.allShuffleMode[index]!).tag(index)
+                                        }
                                     }
-                                }
-                                .pickerStyle(MenuPickerStyle())
-                                .frame(height: 25)
-                                .accentColor(.blue)
+                                    .pickerStyle(MenuPickerStyle())
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                                    .accentColor(.blue)
+                                }.frame(height: 25)
                                 
-                                Picker("cutMode", selection: $cutMode) {
-                                    ForEach(0...generalRuleSetting.allCutMode.count - 1, id: \.self){
-                                        index in Text(generalRuleSetting.allCutMode[index]!).tag(index)
+                                HStack{
+                                    Text("切牌")
+                                        .frame(width: 40, alignment: .leading)
+                                        .foregroundColor(.white)
+                                    Picker("cutMode", selection: $cutMode[0]) {
+                                        ForEach(0...generalRuleSetting.allCutMode.count - 1, id: \.self){
+                                            index in Text(generalRuleSetting.allCutMode[index]!).tag(index)
+                                        }
                                     }
-                                }
-                                .pickerStyle(MenuPickerStyle()).frame(height: 25)
-                                .accentColor(.blue)
+                                    .pickerStyle(MenuPickerStyle())
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                                    .accentColor(.blue)
+                                }.frame(height: 25)
                                 
-                                NavigationLink(destination: UsedFeatureSelectView(singlefeatureToUse: $singlefeatureToUse)){
-                                    Text("识别\(singlefeatureToUse.count)张")
-                                        .frame(height: 25)
-                                }
+                                HStack{
+                                    Text("特殊牌")
+                                        .frame(width: 60, alignment: .leading)
+                                        .foregroundColor(.white)
+                                    Picker("specialCard", selection: $specialCard[0]) {
+                                        ForEach(0...generalRuleSetting.allSpecialCard.count - 1, id: \.self){
+                                            index in Text(generalRuleSetting.allSpecialCard[index]!).tag(index)
+                                        }
+                                    }
+                                    .pickerStyle(MenuPickerStyle())
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                                    .accentColor(.blue)
+                                }.frame(height: 25)
+                                
+                            }.bluebubbleBackground().frame(width: 180)
+                            
+                            VStack(spacing: 5){
+                                Text("拨牌识别")
+                                    .frame(height: 30, alignment: .leading)
+                                    .foregroundColor(.white)
+                                
+                                Divider()
+                                
+                                HStack{
+                                    Text("手法")
+                                        .frame(width: 40, alignment: .leading)
+                                        .foregroundColor(.white)
+                                    Picker("riffleMode", selection: $shuffleMode[1]) {
+                                        ForEach(0...generalRuleSetting.allRiffleMode.count - 1, id: \.self){
+                                            index in Text(generalRuleSetting.allRiffleMode[index]!).tag(index)
+                                        }
+                                    }
+                                    .pickerStyle(MenuPickerStyle())
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                                    .accentColor(.blue)
+                                }.frame(height: 25)
+                                
+                                HStack{
+                                    Text("切牌")
+                                        .frame(width: 40, alignment: .leading)
+                                        .foregroundColor(.white)
+                                    Picker("cutMode", selection: $cutMode[1]) {
+                                        ForEach(0...generalRuleSetting.allCutMode.count - 1, id: \.self){
+                                            index in Text(generalRuleSetting.allCutMode[index]!).tag(index)
+                                        }
+                                    }
+                                    .pickerStyle(MenuPickerStyle())
+                                    .accentColor(.blue)
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                                }.frame(height: 25)
+                                
+                                HStack{
+                                    Text("特殊牌")
+                                        .frame(width: 60, alignment: .leading)
+                                        .foregroundColor(.white)
+                                    Picker("specialCard", selection: $specialCard[0]) {
+                                        ForEach(0...generalRuleSetting.allSpecialCard.count - 1, id: \.self){
+                                            index in Text(generalRuleSetting.allSpecialCard[index]!).tag(index)
+                                        }
+                                    }
+                                    .pickerStyle(MenuPickerStyle())
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                                    .accentColor(.blue)
+                                }.frame(height: 25)
+                                
                             }.bluebubbleBackground().frame(width: 180)
                             
                             
-                            VStack(spacing: 5){
-                                Text("发牌设置")
+                            VStack(spacing:5){
+                                Text("洗牌报法")
                                     .frame(height: 25)
                                     .foregroundColor(.white)
                                     .bold()
                                 
                                 Divider()
                                 
+                                NavigationLink(destination:  ReportSettingView(reportSetting: $reportSetting, target : 0)){
+                                    let text = ReportManager.allReportName[reportSetting[0]]!
+                                    Text(text).multilineTextAlignment(.leading)
+                                }
+                                .frame(height: 75)
+                                
+                            }.bluebubbleBackground().frame(width: 180)
+                            
+                            VStack(spacing:5){
+                                Text("拨牌报法")
+                                    .frame(height: 25)
+                                    .foregroundColor(.white)
+                                    .bold()
+                                
+                                Divider()
+                                
+                                NavigationLink(destination:  ReportSettingView(reportSetting: $reportSetting, target : 1)){
+                                        let text = ReportManager.allReportName[reportSetting[1]]!
+                                        Text(text).multilineTextAlignment(.leading)
+                                }.frame(height: 75)
+                                
+                            }.bluebubbleBackground().frame(width: 180)
+                            
+                            VStack(spacing: 0){
+                                Text("牌堆设置")
+                                    .frame(height: 25)
+                                    .foregroundColor(.white)
+                                    .bold()
+                                
+                                Divider()
+                                
+                                NavigationLink(destination: UsedFeatureSelectView(singlefeatureToUse: $singlefeatureToUse)){
+                                    Text("识别\(singlefeatureToUse.count)张")
+                                        .frame(height: 25)
+                                }
+                                
                                 NavigationLink(destination: TurnSettingView(dealNum: $dealNum, coloringType: $coloringType, dealType: $dealType, diyDealNum: $diyDealNum, diyDealStatus: $diyDealStatus)){
-                                    Text("\(generalRuleSetting.allDealType[dealNum]!)\n\(DealClass.dealDic[dealType]!)\n\(DealClass.coloringDic[coloringType]!)")
-                                }.frame(height:85)
+                                    Text("\(generalRuleSetting.allDealType[dealNum]!)\n\(DealClass.dealDic[dealType]!)  \(DealClass.coloringDic[coloringType]!)")
+                                }.frame(height:60)
                                 
                             }.bluebubbleBackground().frame(width: 180)
                             
@@ -339,24 +459,7 @@ struct SettingRecordConfigView: View{
                                 }
                                 
                             }.bluebubbleBackground().frame(width: 180)
-                            
-                            
-                            VStack(spacing:5){
-                                Text("报法设置")
-                                    .frame(height: 25)
-                                    .foregroundColor(.white)
-                                    .bold()
-                                
-                                Divider()
-                                
-                                NavigationLink(destination:  ReportSettingView(reportSetting: $reportSetting)){
-                                    let text = ReportManager.allReportName[reportSetting]!
-                                    Text(text).frame(height: 75)
-                                        .multilineTextAlignment(.leading)
-                                }
-                                
-                            }.bluebubbleBackground().frame(width: 180)
-                            
+                             
                             
                             VStack(spacing: 5){
                                 
@@ -447,19 +550,7 @@ struct SettingRecordConfigView: View{
             Spacer()
             
             HStack {
-                
-                Spacer()
-                
-                Button(action: {self.saveData(isShowAlert: true)}){
-                    Image("icon_save").resizable().frame(width: 150, height: 60)
-                }.alert(isPresented: $saveSuccessAlert) {
-                    Alert(
-                        title: Text("保存成功"),
-                        message: Text(alertMessage),
-                        dismissButton: .default(Text("OK"))
-                    )
-                }
-                
+     
                 Spacer()
                 
                 Button(action: {
@@ -490,6 +581,19 @@ struct SettingRecordConfigView: View{
                 )
                 
                 Spacer()
+                
+                Button(action: {self.saveData(isShowAlert: true)}){
+                    Image("icon_save").resizable().frame(width: 150, height: 60)
+                }.alert(isPresented: $saveSuccessAlert) {
+                    Alert(
+                        title: Text("保存成功"),
+                        message: Text(alertMessage),
+                        dismissButton: .default(Text("OK"))
+                    )
+                }
+                
+                
+                Spacer()
             }.frame(height: 60, alignment: .bottom)
             
         }
@@ -517,7 +621,7 @@ struct SettingRecordConfigView: View{
             }
         }
         
-        let ruleToAdd = DatasetRule(RuleName: selectedRule!.setting[setting]!, DatasetType: DatasetType, setting: setting, dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, rcNum: rcNum, shuffleMode: shuffleMode, cutMode: cutMode,  singlefeatureToUse: singlefeatureToUse, cutNumSetting: cutNumSetting, reportSetting: reportSetting, cutNumRangeSetting: cutNumRangeSetting, positionSetting: positionSetting, consecutiveReport: consecutiveReport, reportNumber: reportNumber, voiceReport: voiceReport, args: args, suitRanks: suitRules, rankRules: rankRulesToAdd, rankRuleChecked: rankRuleToAddChecked, minSingleFeatureNum: minSingleFeatureNum, recgReport: recgReport)
+        let ruleToAdd = DatasetRule(RuleName: selectedRule!.setting[setting]!, DatasetType: DatasetType, setting: setting, dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, rcNum: rcNum, shuffleMode: shuffleMode, cutMode: cutMode,  singlefeatureToUse: singlefeatureToUse, cutNumSetting: cutNumSetting, reportSetting: reportSetting, cutNumRangeSetting: cutNumRangeSetting, positionSetting: positionSetting, consecutiveReport: consecutiveReport, reportNumber: reportNumber, voiceReport: voiceReport, args: args, suitRanks: suitRules, rankRules: rankRulesToAdd, rankRuleChecked: rankRuleToAddChecked, minSingleFeatureNum: minSingleFeatureNum, recgReport: recgReport, specialCard: specialCard)
         if _selectedSaveIndex == -1{
             DetectSettingArgs.allUsersDatasetRule.append(ruleToAdd)
             _selectedSaveIndex = DetectSettingArgs.allUsersDatasetRule.count - 1

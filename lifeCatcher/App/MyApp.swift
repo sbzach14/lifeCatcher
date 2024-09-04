@@ -41,6 +41,10 @@ struct MyApp: App {
                 // print("camera access success")
             }
         }
+        
+        fetchInternetCurrentDate { internetDate in
+            print("network success")
+        }
     }
     
     public func initFile(){

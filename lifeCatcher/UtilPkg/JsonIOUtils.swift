@@ -73,7 +73,7 @@ func createConfigJSON() {
     
     let floatDict : [String: Float] = [
         "volumeValue": 0.5,
-        "voiceRate": 0.6,
+        "voiceRate": 0.55,
         "zoomFactor": 0,
         "focusFactor": 0.65
     ]
