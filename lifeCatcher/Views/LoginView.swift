@@ -235,6 +235,9 @@ struct LoginView: View {
                     dateFormatter.dateFormat = "yyyy年MM月dd日"
                     let dateString = dateFormatter.string(from: date)
                     AuthManager.activeDate = dateString
+                    
+                    print("过期时间 \(returnExpiredTime) \(dateString)")
+
 
                     if (returnAccountStatus == 1 && AuthManager.authOnline())
                         || AuthManager.authLocal(){
