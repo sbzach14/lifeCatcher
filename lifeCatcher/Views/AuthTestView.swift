@@ -29,6 +29,12 @@ struct AuthTestView: View {
                     .fontWeight(.bold)
                     .padding()
                     
-        }
+        }.background(
+            Image("Newbg2")
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+        )
+        .navigationTitle("Auth".localized())
     }
 }
