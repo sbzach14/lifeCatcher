@@ -25,9 +25,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var multipleDatasetRCInfos: ReportManager.MultipleReportResultInfo = ReportManager.MultipleReportResultInfo()
     @Published var leftSingleFeatures: [Int] = []
     @Published var usedSingleFeatures: [Int] = []
-    @Published var cutArray : [Int] = []
+    @Published var cutStructArray: [cutStruct] = []
     @Published var cutShowArray : [Int] = []
-    @Published var upWatch: Bool = false
 
     let detectModel = try! detect_0903()
     let clsModel_h = try! cls_0715_h_trans()
@@ -193,6 +192,13 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         self.initShuffle()
         self.initDetectResult()
         self.initBoxes()
+        
+        if self.shuffleMode[0] != 0{
+            shuffleOrRiffle = 0
+        }
+        else if self.shuffleMode[1] != 0 {
+            shuffleOrRiffle = 1
+        }
     }
 
     private func initDetectResult(){
@@ -210,7 +216,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     private func initShuffle(){
         
         singlefeatureArray = []
-        cutArray = []
+        cutStructArray = []
         cutShowArray = []
         self.leftSingleFeatures = []
         self.usedSingleFeatures = []
@@ -712,45 +718,58 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         else if self.singlefeatureArray.contains(detectSingleFeature){
                             
                             var cutIndex = self.singlefeatureArray.firstIndex(of: detectSingleFeature)!
-                            self.upWatch = false
+                            var isCutDone = false
                             
-                            
-                                if self.cutMode[self.shuffleOrRiffle] == 0{
-                                    self.cutArray.append(detectSingleFeature)
+                            if self.cutMode[self.shuffleOrRiffle] == 0{
+                                
+                            }
+                            else if self.cutMode[self.shuffleOrRiffle] == 1{
+                                //看底
+                                if self.cutStructArray.count == 0{
+                                    self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 0))
+                                    isCutDone = true
                                 }
-                                else if self.cutMode[self.shuffleOrRiffle] == 1{
-                                    //看底
-                                    self.cutArray.append(detectSingleFeature)
-                                }
-                                else if self.cutMode[self.shuffleOrRiffle] == 2{
-                                    //看顶
-                                    self.upWatch = true
+                            }
+                            else if self.cutMode[self.shuffleOrRiffle] == 2{
+                                //看顶
+                                if self.cutStructArray.count == 0{
                                     cutIndex -= 1
                                     if cutIndex < 0 {
                                         cutIndex = self.singlefeatureArray.count - 1
                                     }
-                                    self.cutArray = [self.singlefeatureArray[cutIndex]]
+                                    self.cutStructArray.append(cutStruct(cutcardIndex: self.singlefeatureArray[cutIndex], cutMode: 1))
+                                    isCutDone = true
                                 }
-                                else if self.cutMode[self.shuffleOrRiffle] == 3{
-                                    //连续切牌
-                                    self.cutArray.append(detectSingleFeature)
-                                }
-                                else if self.cutMode[self.shuffleOrRiffle] == 4{
+                            }
+                            else if self.cutMode[self.shuffleOrRiffle] == 3{
+                                //连续切牌
+                                self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 0))
+                                isCutDone = true
+                            }
+                            
+                            if !isCutDone{
+                                if self.specialCard[self.shuffleOrRiffle] == 1{
                                     //看手
-                                    self.cutArray.append(detectSingleFeature)
+                                    self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 3))
                                 }
-                                
-                                self.detectNeedToCut = false
-                                self.cutShowArray.append(detectSingleFeature)
-                                
-                                self.computeWinnerRC(reportSettingTarget: self.shuffleOrRiffle)
-                                
+                                else if self.specialCard[self.shuffleOrRiffle] == 2{
+                                    //看色
+                                    self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 2))
+                                }
+                            }
+                            
+                            if isCutDone{
+                                self.computeWinnerRC()
                                 self.computeSingleFeatures()
+                            }
+                            
+                            self.cutShowArray.append(detectSingleFeature)
+                            self.detectNeedToCut = false
                         }
                     }
                 }
                 
-                if self.stateCounter >= 3{
+                if self.stateCounter >= 5{
                     
                     self.stateCounter = 0
                     self.state = "idle"
@@ -773,7 +792,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                         
                         if self.cutMode[0] == 0 || self.cutMode[0] == 3{
-                            self.computeWinnerRC(reportSettingTarget: 0)
+                            self.computeWinnerRC()
                             self.computeSingleFeatures()
                         }
                     }
@@ -809,7 +828,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         
                         
                         if self.cutMode[1] == 0 || self.cutMode[1] == 3{
-                            self.computeWinnerRC(reportSettingTarget: 1)
+                            self.computeWinnerRC()
                             self.computeSingleFeatures()
                         }
                     }
@@ -2285,40 +2304,69 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         testArray.shuffle()
         self.singlefeatureArray = testArray
         
-        self.cutArray = []
+        self.cutStructArray = []
         self.cutShowArray = []
         
-        var target = self.shuffleOrRiffle
-        
+        //返回数组[最大切牌次数, 最大看色次数]
+        let maxCutTimes = getWatchColorNumber()
         
         let cutSingleFeature : Int = self.singlefeatureArray.randomElement()!
         var cutIndex = self.singlefeatureArray.firstIndex(of: cutSingleFeature)!
         
-        if self.cutMode[target] == 1{
-            self.cutArray = [self.singlefeatureArray[cutIndex]]
+        if self.cutMode[self.shuffleOrRiffle] == 1{
+            self.cutStructArray.append(cutStruct(cutcardIndex: cutSingleFeature, cutMode: 0))
         }
-        else if self.cutMode[target] == 2{
-            self.upWatch = true
+        else if self.cutMode[self.shuffleOrRiffle] == 2{
             cutIndex -= 1
             if cutIndex < 0 {
                 cutIndex = self.singlefeatureArray.count - 1
             }
-            self.cutArray = [self.singlefeatureArray[cutIndex]]
+            self.cutStructArray.append(cutStruct(cutcardIndex: self.singlefeatureArray[cutIndex], cutMode: 1))
         }
-        else if self.cutMode[target] == 3{
-            self.cutArray.append(cutSingleFeature)
+        else if self.cutMode[self.shuffleOrRiffle] == 3{
+            self.cutStructArray.append(cutStruct(cutcardIndex: cutSingleFeature, cutMode: 0))
         }
-        else if self.cutMode[target] == 4{
-            self.cutArray.append(cutSingleFeature)
-        }
-        self.cutShowArray.append(cutSingleFeature)
         
-        computeWinnerRC(reportSettingTarget: target)
+        if self.cutMode[self.shuffleOrRiffle] != 3{
+            if self.specialCard[self.shuffleOrRiffle] == 1{
+                self.cutStructArray.append(cutStruct(cutcardIndex: cutSingleFeature, cutMode: 3))
+            }
+            else if self.specialCard[self.shuffleOrRiffle] == 2{
+                self.cutStructArray.append(cutStruct(cutcardIndex: cutSingleFeature, cutMode: 2))
+            }
+        }
+        
+        self.cutShowArray.append(cutSingleFeature)
+        computeWinnerRC()
     }
     
-    func computeWinnerRC(reportSettingTarget: Int) {
+    func getWatchColorNumber() -> Int{
+        
+        if let reportRule = DetectSettingArgs.allPreSetReportRules[self.calModeArgs[self.shuffleOrRiffle][0]] {
+            
+            switch reportRule.cutSingleFeatureProcession {
+            //看手牌
+            case 0:
+                return 0
+            // 看色两次
+            case 1:
+                return 2
+            //看色一次
+            case 2...5:
+                return 1
+            //不看
+            default:
+                return 0
+            }
+
+        } else {
+            return 0
+        }
+    }
+    
+    func computeWinnerRC() {
         if singlefeatureArray.count >= minSingleFeatureNum && singlefeatureArray.count > cutNumRangeSetting[0] && singlefeatureArray.count > cutNumRangeSetting[1] - minSingleFeatureNum{
-            multipleDatasetRCInfos = ClassifierSettingArgs.selectDataset(DatasetIndex: ruleIndex, inputSingleFeatures: singlefeatureArray, rcNum: (ClassifierSettingArgs.targetSetting[ruleIndex]?.rcNum[rcNum])!, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs[reportSettingTarget], cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, minSingleFeatureNum: minSingleFeatureNum, cutSingleFeatureIndexArray: cutArray, isUpWatch: self.upWatch)
+            multipleDatasetRCInfos = ClassifierSettingArgs.selectDataset(DatasetIndex: ruleIndex, inputSingleFeatures: singlefeatureArray, rcNum: (ClassifierSettingArgs.targetSetting[ruleIndex]?.rcNum[rcNum])!, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs[self.shuffleOrRiffle], cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, minSingleFeatureNum: minSingleFeatureNum, cutStructList: cutStructArray)
             
             self.singlefeatureArray = multipleDatasetRCInfos.returnSingleFeatureArray
             
@@ -2337,7 +2385,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     func computeNextRound(){
         if (self.leftSingleFeatures.count > 0){
             self.singlefeatureArray = self.leftSingleFeatures
-            computeWinnerRC(reportSettingTarget: self.shuffleOrRiffle)
+            computeWinnerRC()
             self.computeSingleFeatures()
         }
     }

@@ -101,3 +101,9 @@ extension Array {
         return result
     }
 }
+
+struct cutStruct{
+    var cutcardIndex: Int = 0
+    //0，看底，1，看顶，2，看色，3，看手
+    var cutMode: Int = 0
+}

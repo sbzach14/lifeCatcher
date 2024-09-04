@@ -56,6 +56,7 @@ struct InfoView: View {
                 Text("Disclaimer: The use of this software is limited to image recognition and recording for daily life purposes. Any consequences and responsibilities resulting from the use of this program are borne by the user. Our company does not assume any responsibility for any consequences or liabilities arising from the use or sale of this software by users or agents beyond the permitted scope.".localized())
                     .foregroundColor(.white)
             }
+            .frame(maxWidth: .infinity)
             .bubbleBackground()
                 
             Spacer()

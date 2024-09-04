@@ -32,7 +32,7 @@ class generalRuleSetting{
     ]
     
     static let allCutMode: [Int:String] = [
-        0:"不切牌",
+        0:"无",
         1:"看底",
         2:"看顶",
         3:"连续看底"
@@ -40,8 +40,8 @@ class generalRuleSetting{
     
     static let allSpecialCard: [Int:String] = [
         0:"无",
-        1:"看手牌",
-        2:"看色牌",
+        1:"第一张手牌",
+        2:"色牌",
     ]
     
     static let allDealType: [Int: String] = [
@@ -288,7 +288,7 @@ struct SettingRecordConfigView: View{
                                 }.frame(height: 25)
                                 
                                 HStack{
-                                    Text("切牌")
+                                    Text("看底")
                                         .frame(width: 40, alignment: .leading)
                                         .foregroundColor(.white)
                                     Picker("cutMode", selection: $cutMode[0]) {
@@ -302,25 +302,34 @@ struct SettingRecordConfigView: View{
                                 }.frame(height: 25)
                                 
                                 HStack{
-                                    Text("特殊牌")
+                                    Text("看特殊牌")
                                         .frame(width: 60, alignment: .leading)
                                         .foregroundColor(.white)
-                                    Picker("specialCard", selection: $specialCard[0]) {
-                                        ForEach(0...generalRuleSetting.allSpecialCard.count - 1, id: \.self){
-                                            index in Text(generalRuleSetting.allSpecialCard[index]!).tag(index)
-                                        }
+                                    
+                                    if cutMode[0] == 3{
+                                        Text("无")
+                                            .frame(maxWidth: .infinity, alignment: .trailing)
                                     }
-                                    .pickerStyle(MenuPickerStyle())
-                                    .frame(maxWidth: .infinity, alignment: .trailing)
-                                    .accentColor(.blue)
+                                    else{
+                                        Picker("specialCard", selection: $specialCard[0]) {
+                                            ForEach(0...generalRuleSetting.allSpecialCard.count - 1, id: \.self){
+                                                index in Text(generalRuleSetting.allSpecialCard[index]!).tag(index)
+                                            }
+                                        }
+                                        .pickerStyle(MenuPickerStyle())
+                                        .frame(maxWidth: .infinity, alignment: .trailing)
+                                        .accentColor(.blue)
+                                    }
                                 }.frame(height: 25)
                                 
                             }.bluebubbleBackground().frame(width: 180)
                             
                             VStack(spacing: 5){
-                                Text("拨牌识别")
+                                Text("拨切牌识别")
                                     .frame(height: 30, alignment: .leading)
                                     .foregroundColor(.white)
+                                    .bold()
+                                
                                 
                                 Divider()
                                 
@@ -339,7 +348,7 @@ struct SettingRecordConfigView: View{
                                 }.frame(height: 25)
                                 
                                 HStack{
-                                    Text("切牌")
+                                    Text("看底")
                                         .frame(width: 40, alignment: .leading)
                                         .foregroundColor(.white)
                                     Picker("cutMode", selection: $cutMode[1]) {
@@ -353,17 +362,24 @@ struct SettingRecordConfigView: View{
                                 }.frame(height: 25)
                                 
                                 HStack{
-                                    Text("特殊牌")
+                                    Text("看特殊牌")
                                         .frame(width: 60, alignment: .leading)
                                         .foregroundColor(.white)
-                                    Picker("specialCard", selection: $specialCard[0]) {
-                                        ForEach(0...generalRuleSetting.allSpecialCard.count - 1, id: \.self){
-                                            index in Text(generalRuleSetting.allSpecialCard[index]!).tag(index)
-                                        }
+                                    
+                                    if cutMode[1] == 3{
+                                        Text("无")
+                                            .frame(maxWidth: .infinity, alignment: .trailing)
                                     }
-                                    .pickerStyle(MenuPickerStyle())
-                                    .frame(maxWidth: .infinity, alignment: .trailing)
-                                    .accentColor(.blue)
+                                    else{
+                                        Picker("specialCard", selection: $specialCard[1]) {
+                                            ForEach(0...generalRuleSetting.allSpecialCard.count - 1, id: \.self){
+                                                index in Text(generalRuleSetting.allSpecialCard[index]!).tag(index)
+                                            }
+                                        }
+                                        .pickerStyle(MenuPickerStyle())
+                                        .frame(maxWidth: .infinity, alignment: .trailing)
+                                        .accentColor(.blue)
+                                    }
                                 }.frame(height: 25)
                                 
                             }.bluebubbleBackground().frame(width: 180)
