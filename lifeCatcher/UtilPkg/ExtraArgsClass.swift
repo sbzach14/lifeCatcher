@@ -1778,7 +1778,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
     static func cutSingleFeatures(inputSingleFeatures: [Int], inputCutStruct: cutStruct, colorTransform: Int) -> [Int]{
         
         let pos = searchSingleFeaturePos(inputSingleFeatures: inputSingleFeatures, singlefeatureIndex: inputCutStruct.cutcardIndex)
-        let length = inputSingleFeatures.count
         
         var returnSingleFeatures : [Int] = inputSingleFeatures
         //0，看底，1，看顶，2，看色，3，看手
@@ -1911,25 +1910,29 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         if let reportRule = DetectSettingArgs.allPreSetReportRules[reportID]{
             
             print("切的牌 \(cutStructList)")
-            print("当前的牌组 \(inputSingleFeatures)")
+            print("当前的牌组 \(inputSingleFeatures)--\(inputSingleFeatures.count)")
             
         //是否切牌的位置，看手牌，切牌留色，切牌去色
             if cutStructList.count > 0 {
-                
                 //如果看底看顶先操作
                 if cutStructList[cutStructList.count - 1].cutMode == 0 || cutStructList[cutStructList.count - 1].cutMode == 1 {
                     inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStructList[cutStructList.count - 1], colorTransform: -1)
                 }
-                
             }
-            
+            print("提前操作之后的牌组 \(inputSingleFeatures) --\(inputSingleFeatures.count)")
             leftSingleFeatures = inputSingleFeatures
             multipleResultInfo.returnSingleFeatureArray = inputSingleFeatures
 
 
             //看手牌
             if reportRule.cutSingleFeatureProcession == 0{
+            
                 if cutStructList[cutStructList.count - 1].cutMode == 3{
+                    if cutStructList.count < 1 || cutStructList[cutStructList.count - 1].cutMode != 3 {
+                        print("看手牌留色，剩余牌 \(leftSingleFeatures)")
+                        multipleResultInfo.leftSingleFeatures = leftSingleFeatures
+                        return multipleResultInfo
+                    }
 
                     let handSingleFeatureIndex = cutStructList[cutStructList.count - 1].cutcardIndex
                     let pos = searchSingleFeaturePos(inputSingleFeatures: inputSingleFeatures, singlefeatureIndex: handSingleFeatureIndex)
@@ -1941,6 +1944,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 }
             //看色两次, 留色
             } else if reportRule.cutSingleFeatureProcession == 1{
+                
                 if cutStructList.count < 2 || (cutStructList[cutStructList.count - 1].cutMode != 2 && cutStructList[cutStructList.count - 2].cutMode != 2) {
                     
                     multipleResultInfo.leftSingleFeatures = leftSingleFeatures
@@ -1995,7 +1999,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 
             //飞二张去色1张
             } else if reportRule.cutSingleFeatureProcession == 4 {
-                
+                print("去色1张 \(inputSingleFeatures) --\(inputSingleFeatures.count)")
                 if cutStructList.count < 1 || cutStructList[cutStructList.count - 1].cutMode != 2 {
                     multipleResultInfo.leftSingleFeatures = leftSingleFeatures
                     return multipleResultInfo

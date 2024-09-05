@@ -721,6 +721,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             self.detectNeedToCut = false
                         }
                         else if self.singlefeatureArray.contains(detectSingleFeature){
+                            self.detectNeedToCut = false
                             
                             var cutIndex = self.singlefeatureArray.firstIndex(of: detectSingleFeature)!
                             var isCutDone = false
@@ -774,7 +775,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             }
                             
                             self.cutShowArray.append(detectSingleFeature)
-                            self.detectNeedToCut = false
                         }
                     }
                 }
