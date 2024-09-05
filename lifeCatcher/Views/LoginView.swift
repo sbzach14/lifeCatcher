@@ -87,9 +87,17 @@ struct LoginView: View {
                     
                     // Sign In button
                     Button(action: {
-                        if vericode != loginStatus.vericode{
+                        if username == ""{
                             showAlert = true
-                            alertMessage = "Verification Code Error"
+                            alertMessage = "Username can not be empty.".localized()
+                        }
+                        else if password == ""{
+                            showAlert = true
+                            alertMessage = "Password can not be empty.".localized()
+                        }
+                        else if vericode != loginStatus.vericode{
+                            showAlert = true
+                            alertMessage = "Verification code error.".localized()
                         }
                         else{
                             loginUser()
@@ -105,8 +113,25 @@ struct LoginView: View {
                             .padding(.horizontal, 20)
                     }
 
-                    // Register button
-                    NavigationLink(destination: RegisterView().environmentObject(loginStatus)) {
+                    // Sign Up button
+                    Button(action: {
+                        if username == ""{
+                            showAlert = true
+                            alertMessage = "Username can not be empty.".localized()
+                        }
+                        else if password == ""{
+                            showAlert = true
+                            alertMessage = "Password can not be empty.".localized()
+                        }
+                        else if vericode != loginStatus.vericode{
+                            showAlert = true
+                            alertMessage = "Verification code error.".localized()
+                        }
+                        else{
+                            registerUser()
+                        }
+                        loginStatus.resetVericode()
+                    }) {
                         Text("Sign Up".localized())
                             .foregroundColor(.white)
                             .padding()
@@ -114,11 +139,6 @@ struct LoginView: View {
                             .background(Color.blue)
                             .cornerRadius(10)
                             .padding(.horizontal, 20)
-                    }
-
-                    // Error alert
-                    .alert(isPresented: $showAlert) {
-                        Alert(title: Text("Error".localized()), message: Text(alertMessage.localized()), dismissButton: .default(Text("OK")))
                     }
                 } else if case .loggedIn(username: loginStatus.userInfo?.username) = loginStatus.appState {
                     
@@ -154,17 +174,14 @@ struct LoginView: View {
                 .ignoresSafeArea()
         )
         .navigationTitle("Account".localized())
+        .alert(isPresented: $showAlert) {
+            Alert(title: Text(alertMessage.localized()),dismissButton: .default(Text("OK")))
+        }
 
     }
     
     // 登录逻辑
     func loginUser() {
-        guard !username.isEmpty, !password.isEmpty else {
-            showAlert = true
-            return
-        }
-        
-        
         let url = URL(string: "http://1.94.17.30:8080/login")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -253,6 +270,75 @@ struct LoginView: View {
                 }
             }
         }
+        task.resume()
+    }
+    
+    func registerUser() {
+        guard let url = URL(string: "http://1.94.17.30:8080/register") else { return }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        //获取设备序列号
+        
+        let body: [String: Any] = [
+            "deviceID": AuthManager.retrieveUUID(),
+            "username": username,
+            "password": password,
+        ]
+        
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: body, options: .prettyPrinted)
+        } catch {
+            print("Error in encoding request body: \(error)")
+            return
+        }
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error in registration: \(error)")
+                DispatchQueue.main.async {
+                    self.alertMessage = "Please check your network.".localized()
+                    self.showAlert = true
+                }
+                return
+            }
+
+            guard let data = data else {
+                DispatchQueue.main.async {
+                    self.alertMessage = "No data received.".localized()
+                    self.showAlert = true
+                }
+                return
+            }
+
+            do {
+                if let responseObject = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    let success = responseObject["success"] as? Bool ?? false
+                    let registerStatus = responseObject["registerStatus"] as? Int ?? -1
+                    DispatchQueue.main.async {
+                        if success {
+                            self.alertMessage = "register successfully".localized()
+                        } else {
+                            if registerStatus == 0{
+                                self.alertMessage = "The device is registered".localized()
+                            } else if registerStatus == 2 {
+                                self.alertMessage = "Ilegal username".localized()
+                            }
+                        }
+                        self.showAlert = true
+                    }
+                }
+            } catch {
+                print("Error in decoding response data: \(error)")
+                DispatchQueue.main.async {
+                    self.alertMessage = "Failed to parse server response.".localized()
+                    self.showAlert = true
+                }
+            }
+        }
+
         task.resume()
     }
 }

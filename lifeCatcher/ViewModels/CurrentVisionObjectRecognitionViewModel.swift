@@ -521,6 +521,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     func processImageOrigin(_ pixelBuffer: CVPixelBuffer, taskIndex: Int, isTargetArea: Bool, targetArea: [Float]){
         
         let detectConfidenceThreshold:Float = 0.85
+        let detectConfidenceMinThreshold:Float = 0.7
         let detectEndThreshold:Float = 0.3
         var confidenceThreshold = 0.05
         if self.state == "idle"{
@@ -606,8 +607,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     self.targetArea = self.computeTargetArea(stateResult: stateResult)
                     self.isTargetArea = true
                     
-                    if self.cutMode[self.shuffleOrRiffle] != 0 ||
-                        self.specialCard[self.shuffleOrRiffle] != 0
+                    if self.cutMode[self.shuffleOrRiffle] != 0 
+                        || self.specialCard[self.shuffleOrRiffle] != 0
                         || self.recgReport{
                         self.detectNeedToCut = true
                     }
@@ -662,11 +663,11 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 let isCut = (detectNum == 1 || (detectNum == 2 && isSame)) && self.detectNeedToCut
                 
                 if !self.isDetect{
-                    if (detectConfidence >= detectConfidenceThreshold && isRiffle){
+                    if detectConfidence >= detectConfidenceThreshold && isRiffle{
                         self.isDetect = true
                         self.speakText(input: 0)
                     }
-                    else if minDetectConfidence >= detectConfidenceThreshold && isShuffle {
+                    else if minDetectConfidence >= detectConfidenceMinThreshold && isShuffle {
                         self.isDetect = true
                         self.speakText(input: 0)
                         self.detectNeedToCut = false
@@ -725,8 +726,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                         
                         if isCutDone{
-                            self.computeWinnerRC()
-                            self.computeSingleFeatures()
+                            self.computeWinnerRC(isReset: true)
                         }
                         
                         self.cutShowArray.append(detectSingleFeature)
@@ -757,8 +757,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                         
                         if (self.cutMode[0] == 0  && self.specialCard[0] == 0) || self.cutMode[0] == 3{
-                            self.computeWinnerRC()
-                            self.computeSingleFeatures()
+                            self.computeWinnerRC(isReset: true)
                         }
                     }
                     else if detectState.isSingle && !detectState.isShort && self.shuffleMode[1] != 0{
@@ -793,8 +792,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         
                         
                         if (self.cutMode[1] == 0 && self.specialCard[1] == 0) || self.cutMode[1] == 3 {
-                            self.computeWinnerRC()
-                            self.computeSingleFeatures()
+                            self.computeWinnerRC(isReset: true)
                         }
                     }
                 }
@@ -2302,7 +2300,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         
         self.cutShowArray.append(cutSingleFeature)
-        computeWinnerRC()
+        computeWinnerRC(isReset: true)
     }
     
     func getWatchColorNumber() -> Int{
@@ -2329,26 +2327,32 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
     }
     
-    func computeWinnerRC() {
+    func computeWinnerRC(isReset: Bool) {
         if singlefeatureArray.count >= minSingleFeatureNum && singlefeatureArray.count > cutNumRangeSetting[0] && singlefeatureArray.count > cutNumRangeSetting[1] - minSingleFeatureNum{
             multipleDatasetRCInfos = ClassifierSettingArgs.selectDataset(DatasetIndex: ruleIndex, inputSingleFeatures: singlefeatureArray, rcNum: (ClassifierSettingArgs.targetSetting[ruleIndex]?.rcNum[rcNum])!, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs[self.shuffleOrRiffle], cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, minSingleFeatureNum: minSingleFeatureNum, cutStructList: cutStructArray)
             
             self.singlefeatureArray = multipleDatasetRCInfos.returnSingleFeatureArray
+            computeSingleFeatures(isReset: isReset)
             
             print("计算后的singlefeaturearray \(self.singlefeatureArray)")
+            print("计算后的leftSingleFeatures \(self.leftSingleFeatures)")
             
             speakText(input: multipleDatasetRCInfos.reportResult)
         }
     }
     
-    func computeSingleFeatures(){
+    func computeSingleFeatures(isReset: Bool){
         if self.singlefeatureArray.count >= self.minSingleFeatureNum && self.singlefeatureArray.count > self.cutNumRangeSetting[0] && self.singlefeatureArray.count > self.cutNumRangeSetting[1] - self.minSingleFeatureNum{
             self.leftSingleFeatures = multipleDatasetRCInfos.leftSingleFeatures
             let usedNum = self.singlefeatureArray.count - self.leftSingleFeatures.count
             if usedNum == 0{
                 self.usedSingleFeatures = []
-            } else {
+            } 
+            else if isReset{
                 self.usedSingleFeatures = Array(self.singlefeatureArray[0...(usedNum - 1)])
+            }
+            else{
+                self.usedSingleFeatures += Array(self.singlefeatureArray[0...(usedNum - 1)])
             }
             
         }
@@ -2357,8 +2361,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     func computeNextRound(){
         if (self.leftSingleFeatures.count > 0){
             self.singlefeatureArray = self.leftSingleFeatures
-            computeWinnerRC()
-            self.computeSingleFeatures()
+            computeWinnerRC(isReset: false)
         }
     }
     

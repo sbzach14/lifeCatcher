@@ -10,7 +10,6 @@
 "Password can not be empty." = "密码不能为空";
 "Register" = "注册";
 "Sign Up" = "注册";
-"Please check your network." = "请检查您的网络连接。";
 "No data received." = "没有收到数据。";
 "register successfully" = "注册成功";
 "The device is registered" = "设备已注册";
@@ -26,7 +25,6 @@
 "Sign Out" = "登出";
 "Account" = "账户";
 "Error" = "错误";
-"Please check your network." = "请检查您的网络。";
 "username is expired" = "用户名已过期";
 "username does not exist" = "用户名不存在";
 "The device is locked" = "设备已锁定";
@@ -40,6 +38,8 @@
 "Collect" = "采集";
 "Verification Code" = "验证码";
 "Copy" = "复制";
+"Verification code error." = "验证码错误";
+"Message" = "提示";
 
 
 
