@@ -1914,15 +1914,18 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             print("当前的牌组 \(inputSingleFeatures)")
             
         //是否切牌的位置，看手牌，切牌留色，切牌去色
-        if cutStructList.count > 0 {
-            
-            
-            //如果看底看顶先操作
-            if cutStructList[cutStructList.count - 1].cutMode == 0 || cutStructList[cutStructList.count - 1].cutMode == 1 {
-                inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStructList[cutStructList.count - 1], colorTransform: -1)
+            if cutStructList.count > 0 {
+                
+                //如果看底看顶先操作
+                if cutStructList[cutStructList.count - 1].cutMode == 0 || cutStructList[cutStructList.count - 1].cutMode == 1 {
+                    inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStructList[cutStructList.count - 1], colorTransform: -1)
+                }
+                
             }
             
             leftSingleFeatures = inputSingleFeatures
+            multipleResultInfo.returnSingleFeatureArray = inputSingleFeatures
+
 
             //看手牌
             if reportRule.cutSingleFeatureProcession == 0{
@@ -1953,7 +1956,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 }
             //看色留色
             } else if reportRule.cutSingleFeatureProcession == 2{
-                if cutStructList[cutStructList.count - 1].cutMode != 2 {
+                print("看色留色")
+                if cutStructList.count < 1 || cutStructList[cutStructList.count - 1].cutMode != 2 {
+                    print("看色留色，剩余牌 \(leftSingleFeatures)")
                     multipleResultInfo.leftSingleFeatures = leftSingleFeatures
                     return multipleResultInfo
                 }
@@ -1970,7 +1975,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             //看色去色
             } else if reportRule.cutSingleFeatureProcession == 3{
                 
-                if cutStructList[cutStructList.count - 1].cutMode != 2 {
+                if cutStructList.count < 1 || cutStructList[cutStructList.count - 1].cutMode != 2 {
                     multipleResultInfo.leftSingleFeatures = leftSingleFeatures
                     return multipleResultInfo
                 }
@@ -1991,7 +1996,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             //飞二张去色1张
             } else if reportRule.cutSingleFeatureProcession == 4 {
                 
-                if cutStructList[cutStructList.count - 1].cutMode != 2 {
+                if cutStructList.count < 1 || cutStructList[cutStructList.count - 1].cutMode != 2 {
                     multipleResultInfo.leftSingleFeatures = leftSingleFeatures
                     return multipleResultInfo
                 }
@@ -2006,7 +2011,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 
             //飞2张色先发
             } else if reportRule.cutSingleFeatureProcession == 5 {
-                if cutStructList[cutStructList.count - 1].cutMode != 2 {
+                if cutStructList.count < 1 || cutStructList[cutStructList.count - 1].cutMode != 2 {
                     multipleResultInfo.leftSingleFeatures = leftSingleFeatures
                     return multipleResultInfo
                 }
@@ -2015,18 +2020,18 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     if cutStruct.cutMode == 2 {
                         inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 3)
                     } else {
-                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1)
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: 
+                                                                    cutStruct, colorTransform: -1)
                     }
                 }
             //普通切牌
-            } else {
-                
+            } else if cutStructList.count > 0 {
                 for cutStruct in cutStructList{
                         inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1)
                     
                 }
             }
-        }
+        
             
             leftSingleFeatures = inputSingleFeatures
             multipleResultInfo.returnSingleFeatureArray = inputSingleFeatures
