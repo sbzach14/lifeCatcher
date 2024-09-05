@@ -2165,7 +2165,10 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         lookHandSingleFeatures.append(originalSingleFeatures)
                     }
                     
-                    print()
+                    print("看手牌的牌组 \(lookHandSingleFeatures.count)")
+
+                    
+                    
                     break
                 //看手牌比第一张牌从最大牌继续发, 从第一轮开始报
                 case 2:
@@ -2231,6 +2234,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     currentResultInfo.singlefeatureIndexToConfirmMaxMin.append([])
                     currentResultInfo.singlefeatureIndexToConfirmAliveDeath.append([])
                     currentResultInfo.XorYMax.append([])
+                    print("cuRange \(cutRange1)  \(cutRange2)")
                     
                     for singlefeatureIndex in cutRange1...cutRange2{
                         // print("发牌位置 \(singlefeatureIndex)")
@@ -2603,10 +2607,11 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         if coloringType == 1 {
                             newInputSingleFeatures = newInputSingleFeatures.reversed()
                         }
-                        
+                        print("before left \(newInputSingleFeatures)")
                         let (winnersInfo, currentLeftSingleFeatures) = DatasetFunction!(diyDealStatus, diyDealNum, newInputSingleFeatures, newArgs, rankRules, suitRules)
                         
                         leftSingleFeatures = currentLeftSingleFeatures
+                        print("later left \(leftSingleFeatures)")
                         if winnersInfo.count != 0 {
                             
                             //重新按照rcID排序
@@ -2909,6 +2914,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         switch reportRule.reportTarget{
                         //报大小
                         case 0:
+                            print("RC加入了 \(resultPos)")
                             currentResultInfo.targetRCList.append(resultPos)
                             
                             if colorSingleFeatureIndexList.count > 0 {
@@ -3104,13 +3110,14 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         }
                         
                         //剩余的牌不够用
-                        if leftSingleFeatures.count == 0 {
+                        if leftSingleFeatures.count == 0 && reportRule.differentDeal == -1 {
                             break
                         }
                     }
                     upDownID += 1
                 }
                 multipleResultInfo.singleResultList.append(currentResultInfo)
+                
             }
         }
         
