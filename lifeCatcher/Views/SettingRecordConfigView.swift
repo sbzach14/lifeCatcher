@@ -266,7 +266,7 @@ struct SettingRecordConfigView: View{
                         LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 5) {
                             
                             VStack(spacing: 5){
-                                Text("洗牌识别")
+                                Text("洗牌设置")
                                     .frame(height: 30, alignment: .leading)
                                     .foregroundColor(.white)
                                     .bold()
@@ -289,7 +289,7 @@ struct SettingRecordConfigView: View{
                                 }.frame(height: 25)
                                 
                                 HStack{
-                                    Text("看底")
+                                    Text("切牌")
                                         .frame(width: 40, alignment: .leading)
                                         .foregroundColor(.white)
                                     Picker("cutMode", selection: $cutMode[0]) {
@@ -300,6 +300,9 @@ struct SettingRecordConfigView: View{
                                     .pickerStyle(MenuPickerStyle())
                                     .frame(maxWidth: .infinity, alignment: .trailing)
                                     .accentColor(.blue)
+                                    .onChange(of: cutMode) { _ in
+                                        handleCutModeChange()
+                                    }
                                 }.frame(height: 25)
                                 
                                 HStack{
@@ -329,7 +332,7 @@ struct SettingRecordConfigView: View{
                             }.bluebubbleBackground().frame(width: 180)
                             
                             VStack(spacing: 5){
-                                Text("拨切牌识别")
+                                Text("拨牌设置")
                                     .frame(height: 30, alignment: .leading)
                                     .foregroundColor(.white)
                                     .bold()
@@ -352,7 +355,7 @@ struct SettingRecordConfigView: View{
                                 }.frame(height: 25)
                                 
                                 HStack{
-                                    Text("看底")
+                                    Text("切牌")
                                         .frame(width: 40, alignment: .leading)
                                         .foregroundColor(.white)
                                     Picker("cutMode", selection: $cutMode[1]) {
@@ -363,6 +366,9 @@ struct SettingRecordConfigView: View{
                                     .pickerStyle(MenuPickerStyle())
                                     .accentColor(.blue)
                                     .frame(maxWidth: .infinity, alignment: .trailing)
+                                    .onChange(of: cutMode) { _ in
+                                        handleCutModeChange()
+                                    }
                                 }.frame(height: 25)
                                 
                                 HStack{
@@ -432,7 +438,7 @@ struct SettingRecordConfigView: View{
                                 Divider()
                                 
                                 NavigationLink(destination: UsedFeatureSelectView(singlefeatureToUse: $singlefeatureToUse)){
-                                    Text("识别\(singlefeatureToUse.count)张")
+                                    Text("使用\(singlefeatureToUse.count)张牌")
                                         .frame(height: 25)
                                 }
                                 
@@ -654,6 +660,15 @@ struct SettingRecordConfigView: View{
         DetectSettingArgs.saveDatasetRule()
         if isShowAlert{
             self.saveSuccessAlert = true
+        }
+    }
+    
+    private func handleCutModeChange(){
+        if cutMode[0] == 3{
+            specialCard[0] = 0
+        }
+        if cutMode[1] == 3{
+            specialCard[1] = 0
         }
     }
     
