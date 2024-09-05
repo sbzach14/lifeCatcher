@@ -63,7 +63,8 @@ class AuthManager {
     
     static func activeAccount(input: String) -> Bool{
         var isSuccess = false
-        let transInput = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        let transInput = input.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+        print(transInput)
         if authKey(input: transInput, uniqueID: retrieveUUID()) && isLoginServer && loginStatus == 0{
             storeAuthKey(newKey: transInput)
             
