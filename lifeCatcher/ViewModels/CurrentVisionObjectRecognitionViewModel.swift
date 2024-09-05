@@ -211,20 +211,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
     
     private func initShuffle(){
-        
         singlefeatureArray = []
         cutStructArray = []
         cutShowArray = []
         self.leftSingleFeatures = []
         self.usedSingleFeatures = []
         multipleDatasetRCInfos = ReportManager.MultipleReportResultInfo()
-        
-        if self.cutMode[self.shuffleOrRiffle] != 0 ||
-            self.specialCard[self.shuffleOrRiffle] != 0
-            || self.recgReport{
-            
-            self.detectNeedToCut = true
-        }
     }
     
     private func initBoxes(){
@@ -613,161 +605,135 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     
                     self.targetArea = self.computeTargetArea(stateResult: stateResult)
                     self.isTargetArea = true
+                    
+                    if self.cutMode[self.shuffleOrRiffle] != 0 ||
+                        self.specialCard[self.shuffleOrRiffle] != 0
+                        || self.recgReport{
+                        self.detectNeedToCut = true
+                    }
                 }
             }
         
             if self.state != "idle" && isTargetArea && self.isTargetArea{
                 
-//                self.detectionQueue.async{
-//                    //未进入区域的帧 crop
-//                    if !isTargetArea && self.isTargetArea{
-//                        
-//                        var stateResult : [[Float]] = []
-//                        if singlefeatureResult[0].singlefeatureIndex[0] != -1{
-//                            stateResult.append(singlefeatureResult[0].coordinate)
-//                        }
-//                        if singlefeatureResult[1].singlefeatureIndex[0] != -1{
-//                            stateResult.append(singlefeatureResult[1].coordinate)
-//                        }
-//                        
-//                        let newTargetArea = self.computeTargetArea(stateResult: stateResult)
-//                        
-//                        let cut_ciImage = CIImage(cvPixelBuffer: pixelBuffer)
-//                        let cvPixelBuffer_cut = createCVPixelBuffer(ciImage: cut_ciImage, targetSize: CGSize(width: self.inputSize[0], height: self.inputSize[1]), targetArea: newTargetArea)!
-//                        
-//                        if self.isCameraHorizon{
-//                            let cut_result = try! self.clsModel_h.prediction(image: cvPixelBuffer_cut, iouThreshold: 0.01, confidenceThreshold: confidenceThreshold)
-//                            singlefeatureResult = self.getSingleFeature(from: cut_result.confidence, from: cut_result.coordinates, from: cvPixelBuffer_cut)
-//                        }
-//                        else{
-//                            let cut_result = try! self.clsModel_v.prediction(image: cvPixelBuffer_cut, iouThreshold: 0.01, confidenceThreshold: confidenceThreshold)
-//                            singlefeatureResult = self.getSingleFeature(from: cut_result.confidence, from: cut_result.coordinates, from: cvPixelBuffer_cut)
-//                        }
-//
-//                        self.targetArea = newTargetArea
-//                    }
-                    
-                    var leftDetectSingleFeature = -1
-                    var leftConfidence:Float = -1
-                    var rightDetectSingleFeature = -1
-                    var rightConfidence:Float = -1
-                    
-                    var detectSingleFeature = -1
-                    var detectConfidence:Float = -1
-                    
-                    let isSame = singlefeatureResult[0].singlefeatureIndex[0] != -1 &&
-                                singlefeatureResult[0].singlefeatureIndex[0] == singlefeatureResult[1].singlefeatureIndex[0]
-                    
-                    if singlefeatureResult[0].singlefeatureIndex[0] != -1{
-                        leftDetectSingleFeature = singlefeatureResult[0].singlefeatureIndex[0]
-                        leftConfidence = singlefeatureResult[0].confidence[0]
-                    }
-                    if singlefeatureResult[1].singlefeatureIndex[0] != -1{
-                        rightDetectSingleFeature = singlefeatureResult[1].singlefeatureIndex[0]
-                        rightConfidence = singlefeatureResult[1].confidence[0]
-                    }
+                var leftDetectSingleFeature = -1
+                var leftConfidence:Float = -1
+                var rightDetectSingleFeature = -1
+                var rightConfidence:Float = -1
                 
-                    
-                    
-                    if leftConfidence > rightConfidence{
-                        detectConfidence = leftConfidence
-                        detectSingleFeature = leftDetectSingleFeature
-                    }
-                    else if leftConfidence < rightConfidence{
-                        detectConfidence = rightConfidence
-                        detectSingleFeature = rightDetectSingleFeature
-                    }
-                    
-                    if detectConfidence < detectEndThreshold{
-                        self.stateCounter += 1
-                        detectNum = 0
-                    }
-                    else{
-                        self.stateCounter = 0
-                    }
-                    
-                    let isShuffle = detectNum == 2 && self.shuffleMode[0] != 0 && !isSame
-                    let isRiffle = detectNum == 1 && self.shuffleMode[1] != 0
-                    let isCut = (detectNum == 1 || (detectNum == 2 && isSame)) && self.detectNeedToCut
-                    
-                    if !self.isDetect
-                        && detectConfidence >= detectConfidenceThreshold{
+                var detectSingleFeature = -1
+                var detectConfidence:Float = -1
+                var minDetectConfidence: Float = -1
+                
+                let isSame = singlefeatureResult[0].singlefeatureIndex[0] != -1 &&
+                singlefeatureResult[0].singlefeatureIndex[0] == singlefeatureResult[1].singlefeatureIndex[0]
+                
+                if singlefeatureResult[0].singlefeatureIndex[0] != -1{
+                    leftDetectSingleFeature = singlefeatureResult[0].singlefeatureIndex[0]
+                    leftConfidence = singlefeatureResult[0].confidence[0]
+                }
+                if singlefeatureResult[1].singlefeatureIndex[0] != -1{
+                    rightDetectSingleFeature = singlefeatureResult[1].singlefeatureIndex[0]
+                    rightConfidence = singlefeatureResult[1].confidence[0]
+                }
+                
+                
+                if leftConfidence > rightConfidence{
+                    detectConfidence = leftConfidence
+                    detectSingleFeature = leftDetectSingleFeature
+                    minDetectConfidence = rightConfidence
+                }
+                else if leftConfidence < rightConfidence{
+                    detectConfidence = rightConfidence
+                    detectSingleFeature = rightDetectSingleFeature
+                    minDetectConfidence = leftConfidence
+                }
+                
+                if detectConfidence < detectEndThreshold{
+                    self.stateCounter += 1
+                    detectNum = 0
+                }
+                else{
+                    self.stateCounter = 0
+                }
+                
+                let isShuffle = detectNum == 2 && self.shuffleMode[0] != 0 && !isSame
+                let isRiffle = detectNum == 1 && self.shuffleMode[1] != 0
+                let isCut = (detectNum == 1 || (detectNum == 2 && isSame)) && self.detectNeedToCut
+                
+                if !self.isDetect{
+                    if (detectConfidence >= detectConfidenceThreshold && isRiffle){
                         self.isDetect = true
-                    }
-                    
-                    if self.isDetect && (isShuffle || isRiffle) && !self.isStartHintPlayed{
-                        self.isStartHintPlayed = true
                         self.speakText(input: 0)
                     }
-                    
-                    print("进入iscut之前，\(self.detectNeedToCut) \(isCut) \(detectConfidence >= detectConfidenceThreshold) \((detectNum == 1 || (detectNum == 2 && isSame)))")
-                    if self.detectNeedToCut
-                        && detectConfidence >= detectConfidenceThreshold
-                        && isCut
-                        && (detectNum == 1 || (detectNum == 2 && isSame)){
-                        print("进入包含之前的 \(self.singlefeatureArray)")
-                        if self.usedSingleFeatures.contains(detectSingleFeature) && self.recgReport {
-                            self.computeNextRound()
-                            self.detectNeedToCut = false
+                    else if minDetectConfidence >= detectConfidenceThreshold && isShuffle {
+                        self.isDetect = true
+                        self.speakText(input: 0)
+                        self.detectNeedToCut = false
+                    }
+                }
+                
+                if self.detectNeedToCut
+                    && detectConfidence >= detectConfidenceThreshold{
+                    if self.usedSingleFeatures.contains(detectSingleFeature) && self.recgReport {
+                        self.computeNextRound()
+                        self.detectNeedToCut = false
+                    }
+                    else if self.singlefeatureArray.contains(detectSingleFeature){
+                        
+                        var cutIndex = self.singlefeatureArray.firstIndex(of: detectSingleFeature)!
+                        var isCutDone = false
+                        
+                        if self.cutMode[self.shuffleOrRiffle] == 0{
+                            
                         }
-                        else if self.singlefeatureArray.contains(detectSingleFeature){
-                            self.detectNeedToCut = false
-                            
-                            var cutIndex = self.singlefeatureArray.firstIndex(of: detectSingleFeature)!
-                            var isCutDone = false
-                            
-                            if self.cutMode[self.shuffleOrRiffle] == 0{
-                                
-                            }
-                            else if self.cutMode[self.shuffleOrRiffle] == 1{
-                                //看底
-                                if self.cutStructArray.count == 0{
-                                    self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 0))
-                                    isCutDone = true
-                                }
-                            }
-                            else if self.cutMode[self.shuffleOrRiffle] == 2{
-                                //看顶
-                                if self.cutStructArray.count == 0{
-                                    cutIndex -= 1
-                                    if cutIndex < 0 {
-                                        cutIndex = self.singlefeatureArray.count - 1
-                                    }
-                                    self.cutStructArray.append(cutStruct(cutcardIndex: self.singlefeatureArray[cutIndex], cutMode: 1))
-                                    isCutDone = true
-                                }
-                            }
-                            else if self.cutMode[self.shuffleOrRiffle] == 3{
-                                //连续切牌
+                        else if self.cutMode[self.shuffleOrRiffle] == 1{
+                            //看底
+                            if self.cutStructArray.count == 0{
                                 self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 0))
                                 isCutDone = true
                             }
-                            
-                            print(" 看手看色之前的参数 \(self.specialCard[self.shuffleOrRiffle])")
-                            
-                            if !isCutDone{
-                                if self.specialCard[self.shuffleOrRiffle] == 1{
-                                    //看手
-                                    self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 3))
-                                    isCutDone = true
-                                }
-                                else if self.specialCard[self.shuffleOrRiffle] == 2{
-                                    //看色
-                                    print("进入切牌看色")
-                                    self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 2))
-                                    isCutDone = true
-                                }
-                            }
-                            
-                            if isCutDone{
-                                self.computeWinnerRC()
-                                self.computeSingleFeatures()
-                            }
-                            
-                            self.cutShowArray.append(detectSingleFeature)
                         }
+                        else if self.cutMode[self.shuffleOrRiffle] == 2{
+                            //看顶
+                            if self.cutStructArray.count == 0{
+                                cutIndex -= 1
+                                if cutIndex < 0 {
+                                    cutIndex = self.singlefeatureArray.count - 1
+                                }
+                                self.cutStructArray.append(cutStruct(cutcardIndex: self.singlefeatureArray[cutIndex], cutMode: 1))
+                                isCutDone = true
+                            }
+                        }
+                        else if self.cutMode[self.shuffleOrRiffle] == 3{
+                            //连续切牌
+                            self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 0))
+                            isCutDone = true
+                        }
+                        
+                        if !isCutDone{
+                            if self.specialCard[self.shuffleOrRiffle] == 1{
+                                //看手
+                                self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 3))
+                                isCutDone = true
+                            }
+                            else if self.specialCard[self.shuffleOrRiffle] == 2{
+                                //看色
+                                self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 2))
+                                isCutDone = true
+                            }
+                        }
+                        
+                        if isCutDone{
+                            self.computeWinnerRC()
+                            self.computeSingleFeatures()
+                        }
+                        
+                        self.cutShowArray.append(detectSingleFeature)
+                        self.detectNeedToCut = false
                     }
-                
+                }
+            
                 if self.stateCounter >= 5{
                     
                     self.stateCounter = 0
