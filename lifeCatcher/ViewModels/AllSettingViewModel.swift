@@ -76,7 +76,7 @@ class SettingViewModel: ObservableObject {
                     
                 }
             }
-            else if AuthManager.loginStatus == 1 && AuthManager.authOnline(){
+            else if AuthManager.loginStatus == 1 && AuthManager.authOnline(onlineKey: ""){
                 self.trueDate = AuthManager.activeDate
                 self.trueVersion = "正式版"
             }

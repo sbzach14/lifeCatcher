@@ -182,7 +182,7 @@ struct LoginView: View {
     
     // 登录逻辑
     func loginUser() {
-        let url = URL(string: "http://1.94.17.30:8080/login")!
+        let url = URL(string: "http://192.168.1.224:8080/login")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         
@@ -222,6 +222,8 @@ struct LoginView: View {
             let returnLoginStatus = jsonResponse?["loginStatus"] as? Int ?? -1
             let returnAccountStatus = jsonResponse?["accountStatus"] as? Int ?? -1
             let returnExpiredTime = jsonResponse?["expiredTime"] as? Int ?? 0
+            let returnActiveCode = jsonResponse?["active_code"] as? String ?? ""
+            
 
             DispatchQueue.main.async {
                 if success {
@@ -238,8 +240,7 @@ struct LoginView: View {
                     
                     print("过期时间 \(returnExpiredTime) \(dateString)")
 
-
-                    if (returnAccountStatus == 1 && AuthManager.authOnline())
+                    if (returnAccountStatus == 1 && AuthManager.authOnline(onlineKey: returnActiveCode))
                         || AuthManager.authLocal(){
                         print("正式版")
                         AuthManager.isActive = true
@@ -274,7 +275,7 @@ struct LoginView: View {
     }
     
     func registerUser() {
-        guard let url = URL(string: "http://1.94.17.30:8080/register") else { return }
+        guard let url = URL(string: "http://192.168.1.224:8080/register") else { return }
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"

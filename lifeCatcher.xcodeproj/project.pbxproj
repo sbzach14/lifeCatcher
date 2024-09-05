@@ -42,6 +42,10 @@
 		18FFC40A2BB9587A00029B0D /* OriginBlurDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FFC4092BB9587900029B0D /* OriginBlurDetector.swift */; };
 		A838534C2ADA7C0200346038 /* BG.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A838534B2ADA7C0200346038 /* BG.xcassets */; };
 		A83853532ADA918000346038 /* CustomUIComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83853522ADA918000346038 /* CustomUIComponent.swift */; };
+		A870970D2C8A18BB003A4729 /* cls_0715_h_trans_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A870970A2C8A18BB003A4729 /* cls_0715_h_trans_copy.mlmodel */; };
+		A870970E2C8A18BB003A4729 /* cls_0727_v_trans_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A870970B2C8A18BB003A4729 /* cls_0727_v_trans_copy.mlmodel */; };
+		A870970F2C8A18BB003A4729 /* detect_0903_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A870970C2C8A18BB003A4729 /* detect_0903_copy.mlmodel */; };
+		A87097112C8A5D1E003A4729 /* UserHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87097102C8A5D1E003A4729 /* UserHelper.swift */; };
 		A887167F2A0623E500B7F2CD /* AManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887167E2A0623E500B7F2CD /* AManager.swift */; };
 		A887B6502A7FE1AF009F488F /* ShowResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B64F2A7FE1AF009F488F /* ShowResultView.swift */; };
 		A887B6522A8104BC009F488F /* TimeAuthUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B6512A8104BC009F488F /* TimeAuthUtils.swift */; };
@@ -116,6 +120,10 @@
 		50053F80284ACAED00C86BF4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A838534B2ADA7C0200346038 /* BG.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = BG.xcassets; sourceTree = "<group>"; };
 		A83853522ADA918000346038 /* CustomUIComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomUIComponent.swift; sourceTree = "<group>"; };
+		A870970A2C8A18BB003A4729 /* cls_0715_h_trans_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0715_h_trans_copy.mlmodel; sourceTree = "<group>"; };
+		A870970B2C8A18BB003A4729 /* cls_0727_v_trans_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0727_v_trans_copy.mlmodel; sourceTree = "<group>"; };
+		A870970C2C8A18BB003A4729 /* detect_0903_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = detect_0903_copy.mlmodel; sourceTree = "<group>"; };
+		A87097102C8A5D1E003A4729 /* UserHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserHelper.swift; sourceTree = "<group>"; };
 		A887167E2A0623E500B7F2CD /* AManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AManager.swift; sourceTree = "<group>"; };
 		A887B64F2A7FE1AF009F488F /* ShowResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowResultView.swift; sourceTree = "<group>"; };
 		A887B6512A8104BC009F488F /* TimeAuthUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeAuthUtils.swift; sourceTree = "<group>"; };
@@ -307,6 +315,7 @@
 				A887B6512A8104BC009F488F /* TimeAuthUtils.swift */,
 				18FFC4092BB9587900029B0D /* OriginBlurDetector.swift */,
 				B058BE5E2B09FFC20078E792 /* CurrentBlurDetector.swift */,
+				A87097102C8A5D1E003A4729 /* UserHelper.swift */,
 			);
 			path = UtilPkg;
 			sourceTree = "<group>";
@@ -324,6 +333,9 @@
 				D03811A12C75401200726B99 /* cls_main.mlmodel */,
 				D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */,
 				D03811A42C7542C200726B99 /* cls_0727_v_trans.mlmodel */,
+				A870970A2C8A18BB003A4729 /* cls_0715_h_trans_copy.mlmodel */,
+				A870970B2C8A18BB003A4729 /* cls_0727_v_trans_copy.mlmodel */,
+				A870970C2C8A18BB003A4729 /* detect_0903_copy.mlmodel */,
 				D02717D72C8704AB00A29D43 /* detect_0903.mlmodel */,
 				187A45422C2DA25E00BB055C /* success_voice.mp3 */,
 				187A45442C2DA26100BB055C /* fail_voice.mp3 */,
@@ -453,6 +465,7 @@
 				A88EFDC82A7D249C00897243 /* CurrentObjectRegView.swift in Sources */,
 				187A45512C31BBB400BB055C /* AllBaseSettingArgs.swift in Sources */,
 				18C98D0E2C158F7B00A8CD49 /* FCar.swift in Sources */,
+				A870970F2C8A18BB003A4729 /* detect_0903_copy.mlmodel in Sources */,
 				A887B6522A8104BC009F488F /* TimeAuthUtils.swift in Sources */,
 				18C98D0F2C158F7B00A8CD49 /* JJBao.swift in Sources */,
 				18C98D1B2C158F7B00A8CD49 /* TNin.swift in Sources */,
@@ -472,6 +485,7 @@
 				18CA14DB284AC42C00F90372 /* MyApp.swift in Sources */,
 				18C98D1C2C158F7B00A8CD49 /* TCar.swift in Sources */,
 				18C98D142C158F7B00A8CD49 /* TPFive.swift in Sources */,
+				A870970D2C8A18BB003A4729 /* cls_0715_h_trans_copy.mlmodel in Sources */,
 				A88EFE092A7FAD1100897243 /* AllSettingViewModel.swift in Sources */,
 				18C98D202C15902700A8CD49 /* CurrentVisionObjectRecognitionViewModel.swift in Sources */,
 				18C98D222C15906100A8CD49 /* SettingRecordView.swift in Sources */,
@@ -479,7 +493,9 @@
 				A88EFE0D2A7FDC9500897243 /* HistoryView.swift in Sources */,
 				18C98D102C158F7B00A8CD49 /* NPoi.swift in Sources */,
 				18CA14D6284AC42C00F90372 /* CameraImageView.swift in Sources */,
+				A87097112C8A5D1E003A4729 /* UserHelper.swift in Sources */,
 				A83853532ADA918000346038 /* CustomUIComponent.swift in Sources */,
+				A870970E2C8A18BB003A4729 /* cls_0727_v_trans_copy.mlmodel in Sources */,
 				A887B6502A7FE1AF009F488F /* ShowResultView.swift in Sources */,
 				A88EFDC42A7D217200897243 /* OriginVisionObjectRecognitionViewModel.swift in Sources */,
 				D03811AA2C76904D00726B99 /* OriginObjectRegView.swift in Sources */,
@@ -634,7 +650,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
-				DEVELOPMENT_TEAM = 6WK4Q32GMN;
+				DEVELOPMENT_TEAM = FYQ8UYQL3M;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = lifeCatcher/App/Info.plist;
@@ -658,7 +674,7 @@
 				);
 				MARKETING_VERSION = 1.0.3;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shuffle.lifeCatcher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -682,7 +698,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
-				DEVELOPMENT_TEAM = 6WK4Q32GMN;
+				DEVELOPMENT_TEAM = FYQ8UYQL3M;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = lifeCatcher/App/Info.plist;
@@ -706,7 +722,7 @@
 				);
 				MARKETING_VERSION = 1.0.3;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
+				PRODUCT_BUNDLE_IDENTIFIER = com.shuffle.lifeCatcher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

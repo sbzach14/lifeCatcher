@@ -69,7 +69,7 @@ class AuthManager {
             
             //TODO: post active request
                         
-            let url = URL(string: "http://1.94.17.30:8080/activate")!
+            let url = URL(string: "http://192.168.1.224:8080/activate")!
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
             
@@ -128,11 +128,17 @@ class AuthManager {
     }
     
     
-    static func authOnline() -> Bool{
+    static func authOnline(onlineKey: String) -> Bool{
         let uniqueID = retrieveUUID()
         let uniqueKey = retrieveAuthKey()
         if uniqueID != "" && uniqueKey != ""{
             return authKey(input: uniqueKey, uniqueID: uniqueID)
+        } else if uniqueID != "" && uniqueKey == ""{
+            let verifySuccess = authKey(input: onlineKey, uniqueID: uniqueID)
+            if verifySuccess == true {
+                storeAuthKey(newKey: onlineKey)
+            }
+            return verifySuccess
         }
         else{
             return false

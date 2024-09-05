@@ -28,12 +28,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var cutStructArray: [cutStruct] = []
     @Published var cutShowArray : [Int] = []
 
-//    let detectModel = try! detect_0903_copy()
-//    let clsModel_h = try! cls_0715_h_trans_copy()
-//    let clsModel_v = try! cls_0727_v_trans_copy()
-    let detectModel = try! detect_0903()
-    let clsModel_h = try! cls_0715_h_trans()
-    let clsModel_v = try! cls_0727_v_trans()
+    let detectModel = try! detect_0903_copy()
+    let clsModel_h = try! cls_0715_h_trans_copy()
+    let clsModel_v = try! cls_0727_v_trans_copy()
+//    let detectModel = try! detect_0903()
+//    let clsModel_h = try! cls_0715_h_trans()
+//    let clsModel_v = try! cls_0727_v_trans()
     var originSize : [Float] = [1920, 1080] //相机图像大小
     var imageSize : [Float] = [569, 320] //target area 截图大小
     var originImageSize : [Float] = [569, 320] //target area 原始截图大小
@@ -2276,7 +2276,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         //返回数组[最大切牌次数, 最大看色次数]
         let maxCutTimes = getWatchColorNumber()
         
-        let cutSingleFeature : Int = self.singlefeatureArray.randomElement()!
+        var cutSingleFeature : Int = self.singlefeatureArray.randomElement()!
         var cutIndex = self.singlefeatureArray.firstIndex(of: cutSingleFeature)!
         
         if self.cutMode[self.shuffleOrRiffle] == 1{
@@ -2298,7 +2298,13 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 self.cutStructArray.append(cutStruct(cutcardIndex: cutSingleFeature, cutMode: 3))
             }
             else if self.specialCard[self.shuffleOrRiffle] == 2{
-                self.cutStructArray.append(cutStruct(cutcardIndex: cutSingleFeature, cutMode: 2))
+                
+                for i in 0..<maxCutTimes {
+                    cutSingleFeature = self.singlefeatureArray.randomElement()!
+                    self.cutStructArray.append(cutStruct(cutcardIndex: cutSingleFeature, cutMode: 2))
+                    self.cutShowArray.append(cutSingleFeature)
+                }
+                self.cutShowArray.removeLast()
             }
         }
         
@@ -2315,7 +2321,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             case 0:
                 return 0
             // 看色两次
-            case 1:
+            case 1, 6:
                 return 2
             //看色一次
             case 2...5:
