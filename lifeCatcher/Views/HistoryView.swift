@@ -34,7 +34,7 @@ struct HistoryView: View {
                     }
                 } label: {
                     Label("ShowSingleFeature", systemImage: "magnifyingglass")
-                        .foregroundColor(.black)
+                        .foregroundColor(.white)
                         .labelStyle(.iconOnly)
                 }
                 .frame(width: 20, height: 20)
@@ -52,14 +52,14 @@ struct HistoryView: View {
                                 ) {
                                     HStack {
                                         Text(key)
-                                            .foregroundColor(.black)
+                                            .foregroundColor(.white)
                                         Spacer()
                                         Text("\(value)")
-                                            .foregroundColor(.black)
+                                            .foregroundColor(.white)
                                         
                                     }
-                                    .padding()
-                                    .bubbleBackground()
+                                    .frame(width: 180, height: 60)
+                                    .bluebubbleBackground()
                                 }
                             }
                         }

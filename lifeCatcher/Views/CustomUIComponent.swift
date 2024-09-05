@@ -122,8 +122,8 @@ extension View {
         self.padding(5)
             .background {
                 RoundedRectangle(cornerRadius: 10)
-                    .foregroundColor(.blue)
-                    .opacity(0.3)
+                    .foregroundColor(.black)
+                    .opacity(0.7)
             }
     }
     

@@ -37,12 +37,12 @@ struct SettingRecordView: View {
                                 VStack(spacing: 5) {
                                     HStack{
                                         Text("方案\(index+1)")
-                                            .foregroundColor(.black)
+                                            .foregroundColor(.white)
                                             .frame(width: 80, alignment: .leading)
                                             .font(.system(size: 20, weight: .bold))
                                 
                                         Text(name)
-                                            .foregroundColor(.black)
+                                            .foregroundColor(.white)
                                             .frame(maxWidth: .infinity, alignment: .leading)
                                             .font(.system(size: 20, weight: .bold))
                                         
@@ -122,7 +122,10 @@ struct SettingRecordView: View {
         let reportSetting1 = ReportManager.allReportName[rules[index].reportSetting[1]]!
         
         if rules[index].shuffleMode[1] != 0{
-            settingWord += "\n\n" + shuffleMode1 + "  "
+            if settingWord != "\n"{
+                settingWord += "\n\n"
+            }
+            settingWord += shuffleMode1 + "  "
             if rules[index].cutMode[1] != 0{
                 settingWord += cutMode1 + "  "
             }

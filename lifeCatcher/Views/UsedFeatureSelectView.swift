@@ -6,6 +6,7 @@ struct UsedFeatureSelectView: View {
     private let rowCount = 6
     var body: some View {
         VStack{
+            Divider().colorInvert()
             ScrollView {
                 VStack(spacing: 15) {
                     ForEach(0...allSingleFeatureList.count / rowCount, id: \.self) { rowIndex in
@@ -40,7 +41,7 @@ struct UsedFeatureSelectView: View {
                         }
                     }
                 }
-            }.padding()
+            }
             Spacer()
         }.background(Image("Newbg2")
             .resizable()

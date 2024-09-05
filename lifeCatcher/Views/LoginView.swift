@@ -28,26 +28,54 @@ struct LoginView: View {
             VStack(spacing: 20) {
                 if case .loggedOut = loginStatus.appState {
                     // Username input
-                    TextField("Username".localized(), text: $username)
-                        .padding()
-                        .background(Color.gray.opacity(0.2))
-                        .cornerRadius(10)
-                        .padding(.horizontal, 20)
+                    ZStack(alignment: .leading){
+                        if username == ""{
+                            Text("Username".localized())
+                                .foregroundColor(.white) // 占位符文本颜色
+                                .opacity(0.5) // 仅在没有输入时显示占位符
+                                .padding(.leading, 40)
+                        }
+                        TextField("", text: $username)
+                            .padding()
+                            .background(Color.gray.opacity(0.2))
+                            .cornerRadius(10)
+                            .padding(.horizontal, 20)
+                            .foregroundColor(.white)
+                    }
 
                     // Password input with visibility toggle
                     HStack {
                         if showPassword {
-                            TextField("Password".localized(), text: $password)
-                                .padding()
-                                .background(Color.gray.opacity(0.2))
-                                .cornerRadius(10)
-                                .padding(.horizontal, 20)
+                            ZStack(alignment: .leading){
+                                if password == ""{
+                                    Text("Password".localized())
+                                        .foregroundColor(.white) // 占位符文本颜色
+                                        .opacity(0.5) // 仅在没有输入时显示占位符
+                                        .padding(.leading, 40)
+                                }
+                                TextField("", text: $password)
+                                    .padding()
+                                    .background(Color.gray.opacity(0.2))
+                                    .cornerRadius(10)
+                                    .padding(.horizontal, 20)
+                                    .foregroundColor(.white)
+                            }
                         } else {
-                            SecureField("Password".localized(), text: $password)
-                                .padding()
-                                .background(Color.gray.opacity(0.2))
-                                .cornerRadius(10)
-                                .padding(.horizontal, 20)
+                            ZStack(alignment: .leading){
+                                if password == ""{
+                                    Text("Password".localized())
+                                        .foregroundColor(.white) // 占位符文本颜色
+                                        .opacity(0.5) // 仅在没有输入时显示占位符
+                                        .padding(.leading, 40)
+                                }
+                                
+                                SecureField("", text: $password)
+                                    .padding()
+                                    .background(Color.gray.opacity(0.2))
+                                    .cornerRadius(10)
+                                    .padding(.horizontal, 20)
+                                    .foregroundColor(.white)
+                            }
                         }
                         
                         Button(action: {
@@ -65,12 +93,21 @@ struct LoginView: View {
                     .padding(.horizontal, 30)
 
                     HStack{
-                        // 验证码输入框
-                        TextField("Verification Code".localized(), text: $vericode)
-                            .padding()
-                            .background(Color.gray.opacity(0.2))
-                            .cornerRadius(10)
-                            .padding(.horizontal, 20)
+                        ZStack(alignment: .leading){
+                            if vericode == ""{
+                                Text("Verification Code".localized())
+                                    .foregroundColor(.white) // 占位符文本颜色
+                                    .opacity(0.5) // 仅在没有输入时显示占位符
+                                    .padding(.leading, 40)
+                            }
+                            // 验证码输入框
+                            TextField("", text: $vericode)
+                                .padding()
+                                .background(Color.gray.opacity(0.2))
+                                .cornerRadius(10)
+                                .padding(.horizontal, 20)
+                                .foregroundColor(.white)
+                        }
                         
                         Text(loginStatus.vericode)
                             .font(.system(size: 20, weight: .bold))
@@ -147,7 +184,7 @@ struct LoginView: View {
                         if let username = loginStatus.userInfo?.username {
                             Text(username)
                                 .font(.system(size: 24, weight: .bold))
-                                .foregroundColor(.black)
+                                .foregroundColor(.white)
                                 .padding()
                                 .frame(maxWidth: .infinity)
                                 .multilineTextAlignment(.center)
