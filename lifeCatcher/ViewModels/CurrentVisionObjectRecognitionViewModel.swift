@@ -150,6 +150,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     //单次识别是否等待识别切牌
     var detectNeedToCut : Bool = false
     
+    var isStartHintPlayed : Bool = false
+    
     override init(){
         
         super.init()
@@ -205,8 +207,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         detectResultList = [:]
         stateCounter = 0
         isDetect = false
-        
-        
+        isStartHintPlayed = false
     }
     
     private func initShuffle(){
@@ -615,51 +616,36 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 }
             }
         
-            if self.state != "idle"{
+            if self.state != "idle" && isTargetArea && self.isTargetArea{
                 
-                self.detectionQueue.async{
-                    //未进入区域的帧 crop
-                    if !isTargetArea && self.isTargetArea{
-                        
-                        var stateResult : [[Float]] = []
-                        if singlefeatureResult[0].singlefeatureIndex[0] != -1{
-                            stateResult.append(singlefeatureResult[0].coordinate)
-                        }
-                        if singlefeatureResult[1].singlefeatureIndex[0] != -1{
-                            stateResult.append(singlefeatureResult[1].coordinate)
-                        }
-                        
-                        let newTargetArea = self.computeTargetArea(stateResult: stateResult)
-                        
-                        let cut_ciImage = CIImage(cvPixelBuffer: pixelBuffer)
-                        let cvPixelBuffer_cut = createCVPixelBuffer(ciImage: cut_ciImage, targetSize: CGSize(width: self.inputSize[0], height: self.inputSize[1]), targetArea: newTargetArea)!
-                        
-                        if self.isCameraHorizon{
-                            let cut_result = try! self.clsModel_h.prediction(image: cvPixelBuffer_cut, iouThreshold: 0.01, confidenceThreshold: confidenceThreshold)
-                            singlefeatureResult = self.getSingleFeature(from: cut_result.confidence, from: cut_result.coordinates, from: cvPixelBuffer_cut)
-                        }
-                        else{
-                            let cut_result = try! self.clsModel_v.prediction(image: cvPixelBuffer_cut, iouThreshold: 0.01, confidenceThreshold: confidenceThreshold)
-                            singlefeatureResult = self.getSingleFeature(from: cut_result.confidence, from: cut_result.coordinates, from: cvPixelBuffer_cut)
-                        }
-                        
-//                        // 创建输入
-//                        let cut_input = try! DetectionInput(image: cvPixelBuffer_cut,
-//                                                       iouThreshold: 0.45,
-//                                                       confidenceThreshold: confidenceThreshold)
+//                self.detectionQueue.async{
+//                    //未进入区域的帧 crop
+//                    if !isTargetArea && self.isTargetArea{
 //                        
-//                        // 进行预测
-//                        let cut_prediction = try! mlmodel.prediction(from: cut_input)
+//                        var stateResult : [[Float]] = []
+//                        if singlefeatureResult[0].singlefeatureIndex[0] != -1{
+//                            stateResult.append(singlefeatureResult[0].coordinate)
+//                        }
+//                        if singlefeatureResult[1].singlefeatureIndex[0] != -1{
+//                            stateResult.append(singlefeatureResult[1].coordinate)
+//                        }
+//                        
+//                        let newTargetArea = self.computeTargetArea(stateResult: stateResult)
+//                        
+//                        let cut_ciImage = CIImage(cvPixelBuffer: pixelBuffer)
+//                        let cvPixelBuffer_cut = createCVPixelBuffer(ciImage: cut_ciImage, targetSize: CGSize(width: self.inputSize[0], height: self.inputSize[1]), targetArea: newTargetArea)!
+//                        
+//                        if self.isCameraHorizon{
+//                            let cut_result = try! self.clsModel_h.prediction(image: cvPixelBuffer_cut, iouThreshold: 0.01, confidenceThreshold: confidenceThreshold)
+//                            singlefeatureResult = self.getSingleFeature(from: cut_result.confidence, from: cut_result.coordinates, from: cvPixelBuffer_cut)
+//                        }
+//                        else{
+//                            let cut_result = try! self.clsModel_v.prediction(image: cvPixelBuffer_cut, iouThreshold: 0.01, confidenceThreshold: confidenceThreshold)
+//                            singlefeatureResult = self.getSingleFeature(from: cut_result.confidence, from: cut_result.coordinates, from: cvPixelBuffer_cut)
+//                        }
 //
-//                        // 处理预测结果
-//                        let cut_confidence = cut_prediction.featureValue(for: "confidence")!.multiArrayValue!
-//                        let cut_coordinates = cut_prediction.featureValue(for: "coordinates")!.multiArrayValue!
-//                        // 处理置信度和坐标数组
-//                        singlefeatureResult = self.getSingleFeature(from: cut_confidence, from: cut_coordinates, from: cvPixelBuffer_cut)
-                        
-                        
-                        self.targetArea = newTargetArea
-                    }
+//                        self.targetArea = newTargetArea
+//                    }
                     
                     var leftDetectSingleFeature = -1
                     var leftConfidence:Float = -1
@@ -680,6 +666,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         rightDetectSingleFeature = singlefeatureResult[1].singlefeatureIndex[0]
                         rightConfidence = singlefeatureResult[1].confidence[0]
                     }
+                
+                    
                     
                     if leftConfidence > rightConfidence{
                         detectConfidence = leftConfidence
@@ -705,9 +693,11 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     if !self.isDetect
                         && detectConfidence >= detectConfidenceThreshold{
                         self.isDetect = true
-                        if isShuffle || isRiffle{
-                            self.speakText(input: 0)
-                        }
+                    }
+                    
+                    if self.isDetect && (isShuffle || isRiffle) && !self.isStartHintPlayed{
+                        self.isStartHintPlayed = true
+                        self.speakText(input: 0)
                     }
                     
                     print("进入iscut之前，\(self.detectNeedToCut) \(isCut) \(detectConfidence >= detectConfidenceThreshold) \((detectNum == 1 || (detectNum == 2 && isSame)))")
@@ -777,7 +767,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             self.cutShowArray.append(detectSingleFeature)
                         }
                     }
-                }
                 
                 if self.stateCounter >= 5{
                     
