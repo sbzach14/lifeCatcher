@@ -28,9 +28,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var cutStructArray: [cutStruct] = []
     @Published var cutShowArray : [Int] = []
 
-    let detectModel = try! detect_0903()
-    let clsModel_h = try! cls_0715_h_trans()
-    let clsModel_v = try! cls_0727_v_trans()
+    let detectModel = try! detect_0903_copy()
+    let clsModel_h = try! cls_0715_h_trans_copy()
+    let clsModel_v = try! cls_0727_v_trans_copy()
     var originSize : [Float] = [1920, 1080] //相机图像大小
     var imageSize : [Float] = [569, 320] //target area 截图大小
     var originImageSize : [Float] = [569, 320] //target area 原始截图大小
@@ -206,11 +206,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         stateCounter = 0
         isDetect = false
         
-        if (self.shuffleMode[0] != 0 && self.cutMode[0] != 0)
-            || (self.shuffleMode[1] != 0 && self.cutMode[1] != 0
-            || self.recgReport){
-            self.detectNeedToCut = true
-        }
+        
     }
     
     private func initShuffle(){
@@ -221,6 +217,13 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         self.leftSingleFeatures = []
         self.usedSingleFeatures = []
         multipleDatasetRCInfos = ReportManager.MultipleReportResultInfo()
+        
+        if self.cutMode[self.shuffleOrRiffle] != 0 ||
+            self.specialCard[self.shuffleOrRiffle] != 0
+            || self.recgReport{
+            
+            self.detectNeedToCut = true
+        }
     }
     
     private func initBoxes(){
@@ -707,10 +710,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                     }
                     
+                    print("进入iscut之前，\(self.detectNeedToCut) \(isCut) \(detectConfidence >= detectConfidenceThreshold) \((detectNum == 1 || (detectNum == 2 && isSame)))")
                     if self.detectNeedToCut
                         && detectConfidence >= detectConfidenceThreshold
                         && isCut
                         && (detectNum == 1 || (detectNum == 2 && isSame)){
+                        print("进入包含之前的 \(self.singlefeatureArray)")
                         if self.usedSingleFeatures.contains(detectSingleFeature) && self.recgReport {
                             self.computeNextRound()
                             self.detectNeedToCut = false
@@ -747,14 +752,19 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                 isCutDone = true
                             }
                             
+                            print(" 看手看色之前的参数 \(self.specialCard[self.shuffleOrRiffle])")
+                            
                             if !isCutDone{
                                 if self.specialCard[self.shuffleOrRiffle] == 1{
                                     //看手
                                     self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 3))
+                                    isCutDone = true
                                 }
                                 else if self.specialCard[self.shuffleOrRiffle] == 2{
                                     //看色
+                                    print("进入切牌看色")
                                     self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 2))
+                                    isCutDone = true
                                 }
                             }
                             
@@ -2370,6 +2380,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             
             self.singlefeatureArray = multipleDatasetRCInfos.returnSingleFeatureArray
             
+            print("计算后的singlefeaturearray \(self.singlefeatureArray)")
+            
             speakText(input: multipleDatasetRCInfos.reportResult)
         }
     }
@@ -2378,7 +2390,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         if self.singlefeatureArray.count >= self.minSingleFeatureNum && self.singlefeatureArray.count > self.cutNumRangeSetting[0] && self.singlefeatureArray.count > self.cutNumRangeSetting[1] - self.minSingleFeatureNum{
             self.leftSingleFeatures = multipleDatasetRCInfos.leftSingleFeatures
             let usedNum = self.singlefeatureArray.count - self.leftSingleFeatures.count
-            self.usedSingleFeatures = Array(self.singlefeatureArray[0...(usedNum - 1)])
+            if usedNum == 0{
+                self.usedSingleFeatures = []
+            } else {
+                self.usedSingleFeatures = Array(self.singlefeatureArray[0...(usedNum - 1)])
+            }
+            
         }
     }
     
