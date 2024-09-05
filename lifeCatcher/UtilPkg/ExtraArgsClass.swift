@@ -2164,6 +2164,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         }
                         lookHandSingleFeatures.append(originalSingleFeatures)
                     }
+                    
+                    print()
                     break
                 //看手牌比第一张牌从最大牌继续发, 从第一轮开始报
                 case 2:
