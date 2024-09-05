@@ -198,7 +198,7 @@ struct SettingRecordConfigView: View{
                             HStack{
                                 Text("游戏选择")
                                     .frame(width: 100, alignment: .leading)
-                                    .foregroundColor(.black)
+                                    .foregroundColor(.white)
                                     .font(.system(size: 20))
                                     .bold()
                                 
@@ -216,15 +216,14 @@ struct SettingRecordConfigView: View{
                                 .onChange(of: DatasetType) { _ in
                                     handleDatasetTypeChange()
                                 }
-                                .accentColor(.black)
+                                .accentColor(.white)
                             }
                             .frame(height: 40)
                             
                             HStack{
                                 Text("玩法选择")
                                     .frame(width: 100, alignment: .leading)
-                                    .foregroundColor(.black
-                                    )
+                                    .foregroundColor(.white)
                                     .font(.system(size: 20))
                                     .bold()
                                 
@@ -239,7 +238,7 @@ struct SettingRecordConfigView: View{
                                 .onChange(of: setting) { _ in
                                     handleSettingChange()
                                 }
-                                .accentColor(.black)
+                                .accentColor(.white)
                                 
                             }
                             .frame(height: 40)
@@ -251,7 +250,7 @@ struct SettingRecordConfigView: View{
                                 .foregroundColor(.white)
                                 .bold()
                             
-                            Divider()
+                            Divider().colorInvert()
                             
                             ScrollView{
                                 Text(selectedRule!.ruleInfo[self.setting] ?? "")
@@ -271,7 +270,7 @@ struct SettingRecordConfigView: View{
                                     .foregroundColor(.white)
                                     .bold()
                                 
-                                Divider()
+                                Divider().colorInvert()
                                 
                                 HStack{
                                     Text("手法")
@@ -338,7 +337,7 @@ struct SettingRecordConfigView: View{
                                     .bold()
                                 
                                 
-                                Divider()
+                                Divider().colorInvert()
                                 
                                 HStack{
                                     Text("手法")
@@ -404,7 +403,7 @@ struct SettingRecordConfigView: View{
                                     .foregroundColor(.white)
                                     .bold()
                                 
-                                Divider()
+                                Divider().colorInvert()
                                 
                                 NavigationLink(destination:  ReportSettingView(reportSetting: $reportSetting, target : 0)){
                                     let text = ReportManager.allReportName[reportSetting[0]]!
@@ -420,7 +419,7 @@ struct SettingRecordConfigView: View{
                                     .foregroundColor(.white)
                                     .bold()
                                 
-                                Divider()
+                                Divider().colorInvert()
                                 
                                 NavigationLink(destination:  ReportSettingView(reportSetting: $reportSetting, target : 1)){
                                         let text = ReportManager.allReportName[reportSetting[1]]!
@@ -435,7 +434,7 @@ struct SettingRecordConfigView: View{
                                     .foregroundColor(.white)
                                     .bold()
                                 
-                                Divider()
+                                Divider().colorInvert()
                                 
                                 NavigationLink(destination: UsedFeatureSelectView(singlefeatureToUse: $singlefeatureToUse)){
                                     Text("使用\(singlefeatureToUse.count)张牌")
@@ -454,7 +453,7 @@ struct SettingRecordConfigView: View{
                                     .foregroundColor(.white)
                                     .bold()
                                 
-                                Divider()
+                                Divider().colorInvert()
                                 
                                 HStack{
                                     Text("人数")
@@ -497,7 +496,7 @@ struct SettingRecordConfigView: View{
                                     .foregroundColor(.white)
                                     .bold()
                                 
-                                Divider()
+                                Divider().colorInvert()
                                 
                                 if coloringType == 2{
                                     HStack{
@@ -544,7 +543,7 @@ struct SettingRecordConfigView: View{
                                     .foregroundColor(.white)
                                     .bold()
                                 
-                                Divider()
+                                Divider().colorInvert()
                                 
                                 HStack{
                                     Text("连报轮数")

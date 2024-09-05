@@ -14,8 +14,9 @@ import Accelerate
 import AudioToolbox
 import MediaPlayer
 
+
 /// - Tag: ViewModel
-class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBufferDelegate, AVAudioPlayerDelegate {
+class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBufferDelegate, AVAudioPlayerDelegate{
     
     @Published var cameraImage : CGImage?
     @Published var isShowSingleFeature : Bool = false
@@ -154,7 +155,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     var detectNeedToCut : Bool = false
     
     var isStartHintPlayed : Bool = false
-    
+
     override init(){
         
         super.init()
@@ -526,6 +527,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         let detectConfidenceThreshold:Float = 0.85
         let detectConfidenceMinThreshold:Float = 0.7
         let detectEndThreshold:Float = 0.3
+        
         var confidenceThreshold = 0.05
         if self.state == "idle"{
             confidenceThreshold = 0.7
@@ -717,14 +719,30 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         
                         if !isCutDone{
                             if self.specialCard[self.shuffleOrRiffle] == 1{
+                                var cnt = 0
+                                for lastCutStrucht in self.cutStructArray{
+                                    if lastCutStrucht.cutMode == 3{
+                                        cnt += 1
+                                    }
+                                }
                                 //看手
-                                self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 3))
-                                isCutDone = true
+                                if cnt == 0{
+                                    self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 3))
+                                    isCutDone = true
+                                }
                             }
                             else if self.specialCard[self.shuffleOrRiffle] == 2{
                                 //看色
-                                self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 2))
-                                isCutDone = true
+                                var cnt = 0
+                                for lastCutStrucht in self.cutStructArray{
+                                    if lastCutStrucht.cutMode == 2{
+                                        cnt += 1
+                                    }
+                                }
+                                if cnt < self.getWatchColorNumber(){
+                                    self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 2))
+                                    isCutDone = true
+                                }
                             }
                         }
                         
@@ -1771,7 +1789,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             if self.isCameraHorizon{
                 
                 if minW < 3 * minH && self.shuffleMode[0] != 0{
-                    boxfactor = 5
+                    boxfactor = 6
                 }
                 else{
                     boxfactor = 2.5
@@ -1809,7 +1827,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             
             else{
                 if minH < 3 * minW && self.shuffleMode[0] != 0{
-                    boxfactor = 5
+                    boxfactor = 6
                 }
                 else{
                     boxfactor = 2.5
@@ -1955,7 +1973,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         let targetY = targetArea[1] * self.originSize[1]
         let targetW = targetArea[2] * self.originSize[0]
         let targetH = targetArea[3] * self.originSize[1]
-        
         
         var stateResult : [[Float]] = []
         
@@ -2375,6 +2392,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         if isSpeak{
             if input == 0{
                 self.startAudioRC?.play()
+                self.speechPerformer.stopSpeechSynthesis()
             }
             else if input == 1{
                 self.successAudioRC?.play()
@@ -2757,7 +2775,7 @@ class SpeakResultStruct{
 
 class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
     var voiceRate: Float = 0.55
-    let synthesizer = AVSpeechSynthesizer() // Your AVSpeechSynthesizer instance
+    var synthesizer = AVSpeechSynthesizer() // Your AVSpeechSynthesizer instance
     let chineseFemaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.Ting-Ting-compact")
     let chineseMaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.siri_male_zh-CN_compact")
     
@@ -2783,6 +2801,13 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
         synthesizer.speak(utterance)
     }
     
+    func stopSpeechSynthesis(){
+        synthesizer.stopSpeaking(at: .immediate)
+        lock.lock()
+        isPlaying = false
+        lock.unlock()
+    }
+    
     func performSpeechSynthesis(speakResultStruct: [[SpeakResultStruct]]) {
         lock.lock()
         guard !isPlaying else {
@@ -2792,6 +2817,9 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
 
         isPlaying = true
         lock.unlock()
+        
+        self.synthesizer = AVSpeechSynthesizer()
+        self.synthesizer.delegate = self
         
         for repeatIndex in 0..<2{
             for (turnIndex, turnResult) in speakResultStruct.enumerated() {

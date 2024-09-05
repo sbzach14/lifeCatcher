@@ -10,16 +10,16 @@ struct InfoView: View {
             // 版本信息
             Text("Version:".localized() + AuthManager.version)
                 .padding()
-                .foregroundColor(.black)
+                .foregroundColor(.white)
             
-            Divider()
+            Divider().colorInvert()
             
             // 序列号
             HStack {
                 Text("ID:".localized() + viewModel.uniqueID)
                     .textSelection(.enabled)
                     .padding()
-                    .foregroundColor(.black)
+                    .foregroundColor(.white)
                 
                 Button(action: {
                     UIPasteboard.general.string = viewModel.uniqueID
@@ -32,23 +32,23 @@ struct InfoView: View {
                         .cornerRadius(5)
                 }
             }
-            Divider()
+            Divider().colorInvert()
             
             // 激活日期（如果激活）
             if viewModel.trueVersion != ""{
                 Text("激活版本:" + viewModel.trueVersion)
                     .padding()
-                    .foregroundColor(.black)
+                    .foregroundColor(.white)
                 
-                Divider()
+                Divider().colorInvert()
             }
             
             if viewModel.trueDate != ""{
                 Text("有效日期:" + viewModel.trueDate)
                     .padding()
-                    .foregroundColor(.black)
+                    .foregroundColor(.white)
                 
-                Divider()
+                Divider().colorInvert()
             }
             
 //             声明信息
@@ -66,10 +66,7 @@ struct InfoView: View {
                 .scaledToFit()
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(Color.black.opacity(0.3))
-                )
+                .cornerRadius(10)
         }
         .background(
             Image("Newbg2")
@@ -88,7 +85,7 @@ struct DeprecatedInfoView: View {
     var body: some View {
         VStack{
             
-            Divider()
+            Divider().colorInvert()
             
             HStack {
                 Text("屏幕显示").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
@@ -102,7 +99,7 @@ struct DeprecatedInfoView: View {
                 .frame(width: 200, height: 30, alignment: .trailing)
                 .padding(.trailing,30) // 右侧间距
             }
-            Divider()
+            Divider().colorInvert()
         
             
             HStack {
@@ -117,7 +114,7 @@ struct DeprecatedInfoView: View {
                 .frame(width: 200, height: 30, alignment: .trailing)
                 .padding(.trailing,30) // 右侧间距
             }
-            Divider()
+            Divider().colorInvert()
         
             HStack {
                 Text("音量下键功能").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
@@ -131,7 +128,7 @@ struct DeprecatedInfoView: View {
                 .frame(width: 200, height: 30, alignment: .trailing)
                 .padding(.trailing,30) // 右侧间距
             }
-            Divider()
+            Divider().colorInvert()
             
             HStack {
                 Text("播放设备").foregroundColor(.white).padding(.leading, 20)
@@ -147,7 +144,7 @@ struct DeprecatedInfoView: View {
                 .padding(.trailing,30) // 右侧间距
             }
             
-            Divider()
+            Divider().colorInvert()
         
             HStack {
                 Text("音量:\(String(format: "%.2f",viewModel.volumeValue))").foregroundColor(.white).padding(.leading, 20).frame(width: 100, alignment: .leading)
@@ -160,7 +157,7 @@ struct DeprecatedInfoView: View {
                     .accentColor(.white)
             }.frame(height: 30)
             
-            Divider()
+            Divider().colorInvert()
             
             HStack {
                 Text("语速:\(String(format: "%.2f",viewModel.voiceRate))").foregroundColor(.white).padding(.leading, 20).frame(width: 100, alignment: .leading)

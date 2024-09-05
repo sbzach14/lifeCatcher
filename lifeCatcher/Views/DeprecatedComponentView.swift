@@ -28,7 +28,7 @@ struct TurnSettingView: View {
     @Binding var diyDealStatus: [[Bool]] // [[0，派牌，1，公牌， 2， 去牌]]
     var body: some View {
         VStack{
-            Divider()
+            Divider().colorInvert()
             
             HStack{
                 Text("发牌模式").frame(maxWidth: .infinity, alignment: .leading)
@@ -46,7 +46,7 @@ struct TurnSettingView: View {
                 
             }
             
-            Divider()
+            Divider().colorInvert()
             
             HStack{
                 Text("发牌方向").frame(maxWidth: .infinity, alignment: .leading)
@@ -63,7 +63,7 @@ struct TurnSettingView: View {
                 .accentColor(.white)
             }
             
-            Divider()
+            Divider().colorInvert()
             
             HStack{
                 Text("打色方向").frame(maxWidth: .infinity, alignment: .leading)
@@ -81,7 +81,7 @@ struct TurnSettingView: View {
                 .accentColor(.white)
             }
             
-            Divider()
+            Divider().colorInvert()
             
             if dealNum == 1{
                 Group{

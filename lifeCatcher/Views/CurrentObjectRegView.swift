@@ -1,6 +1,7 @@
 import SwiftUI
 import MediaPlayer
 import Combine
+import AVFoundation
 
 struct CurrentVisionObjectRecognitionView: View {
     var saveRuleIndex : Int
@@ -242,6 +243,7 @@ class ButtonViewController: UIViewController {
     let minVolumeChangeInterval: TimeInterval = 0.5
     var isFirst: Bool = true
     var volumeValue: Float = 0.5
+    var voiceDevice: Int = 1
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -257,17 +259,17 @@ class ButtonViewController: UIViewController {
         if let configData = readConfigJSON() {
             let floatDict = configData["Float"] as! [String : Float]
             self.volumeValue = floatDict["volumeValue"]!
-        } else {
-            self.volumeValue = 0.5
+            let intDict = configData["Int"] as! [String : Int]
+            self.voiceDevice = intDict["voiceDevice"]!
         }
-        
         viewModel.viewController = self
         self.currentVolume = self.volumeValue
     }
-    
+
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         NotificationCenter.default.addObserver(self, selector: #selector(volumeChanged(_:)), name: NSNotification.Name(rawValue: "SystemVolumeDidChange"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(handleRouteChange(_:)), name: AVAudioSession.routeChangeNotification, object: AVAudioSession.sharedInstance())
         setSystemVolume(volume: self.volumeValue)
     }
     
@@ -279,6 +281,7 @@ class ButtonViewController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: "SystemVolumeDidChange"), object: nil)
+        NotificationCenter.default.removeObserver(self, name: AVAudioSession.routeChangeNotification, object: AVAudioSession.sharedInstance())
     }
     
     func setSystemVolume(volume: Float) {
@@ -292,6 +295,24 @@ class ButtonViewController: UIViewController {
         return true
     }
     
+    @objc func handleRouteChange(_ notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let reasonValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? Int,
+              let reason = AVAudioSession.RouteChangeReason(rawValue: UInt(reasonValue)) else {
+            return
+        }
+        
+        if reason == .oldDeviceUnavailable && self.voiceDevice == 1 {
+            print("Earphones or other audio device was disconnected")
+            // 在这里处理耳机断开的逻辑
+            setSystemVolume(volume: 0)
+        }
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: AVAudioSession.routeChangeNotification, object: AVAudioSession.sharedInstance())
+    }
+    
     
     @objc func volumeChanged(_ notification: NSNotification) {
         guard let userInfo = notification.userInfo,
@@ -300,7 +321,7 @@ class ButtonViewController: UIViewController {
             return
         }
 
-        if reason == "ExplicitVolumeChange" && volume != currentVolume{
+        if reason == "ExplicitVolumeChange" && volume != currentVolume && volume != 0{
             guard let sequenceNumber = userInfo["SequenceNumber"] as? Int else {
                 return
             }

@@ -27,7 +27,7 @@ struct ReportSettingView: View {
                 VStack { // 垂直间距
                     HStack {
                         Text(ReportManager.allReportName[reportSetting[target]]! + "\n" + ReportManager.allReportInfo[reportSetting[target]]!)
-                            .foregroundColor(.black)
+                            .foregroundColor(.blue)
                             .lineLimit(nil) // 可以显示多行文本
                             .fixedSize(horizontal: false, vertical: true) // 允许垂直方向上的大小自适应
                     }
@@ -36,7 +36,7 @@ struct ReportSettingView: View {
                     .onTapGesture {
                         self.presentationMode.wrappedValue.dismiss()
                      }
-                    Divider()
+                    Divider().colorInvert()
                     
                     ForEach(0..<filteredReportSettings.count, id: \.self) { index in
                             let currentIndex = filteredReportSettings[index]
@@ -54,7 +54,7 @@ struct ReportSettingView: View {
                                self.presentationMode.wrappedValue.dismiss()
                             }
                            
-                           Divider()
+                           Divider().colorInvert()
                        }
                    }
             }.padding()

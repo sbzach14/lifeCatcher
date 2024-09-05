@@ -640,6 +640,7 @@
 				INFOPLIST_FILE = lifeCatcher/App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = LifeCatcher;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "LifeCatcher需要蓝牙权限管理耳机音量";
 				INFOPLIST_KEY_NSCameraUsageDescription = "LifeCatcher need camera access right for users to take and save photos correctly.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "";
@@ -688,6 +689,7 @@
 				INFOPLIST_FILE = lifeCatcher/App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = LifeCatcher;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
+				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "LifeCatcher需要蓝牙权限管理耳机音量";
 				INFOPLIST_KEY_NSCameraUsageDescription = "LifeCatcher need camera access right for users to take and save photos correctly.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "";

@@ -33,16 +33,16 @@ struct HistoryItemView: View {
                                         .frame(width: 150, height: 150) // 设置图片的大小
                                         .cornerRadius(10)
                                 } else {
-                                    Color.black // 如果加载图片失败，显示黑色背景
+                                    Color.white // 如果加载图片失败，显示黑色背景
                                         .frame(width: 100, height: 100)
                                         .cornerRadius(10)
                                 }
                             }
                            
-                            Text(imageName)
+                            Text(imageName).foregroundColor(.white)
                     }
                         
-                    Divider()
+                    Divider().colorInvert()
                 }
             }
             .padding(16)

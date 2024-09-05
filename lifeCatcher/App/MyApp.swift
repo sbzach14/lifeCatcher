@@ -14,7 +14,7 @@ struct MyApp: App {
         appearance.titlePositionAdjustment = .zero // 将标题文本居中
         appearance.titleTextAttributes = [.foregroundColor: UIColor.white] // 标题文本颜色
         appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white] // 大标题文本颜色
-        appearance.backgroundImage = UIImage(named: "Newbg2") // 自定义背景图片
+        appearance.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.3)
         
         // 应用全局导航栏样式
         UINavigationBar.appearance().standardAppearance = appearance

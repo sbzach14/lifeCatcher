@@ -13,7 +13,7 @@ struct MainMenuView: View {
                     Image("sampleImage")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 200, height: 200)
+                        .frame(height: 200)
                         .bubbleBackground()
 
                     Spacer()
@@ -110,8 +110,9 @@ struct MainMenuView: View {
                         .scaledToFit()
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(RoundedRectangle(cornerRadius: 10).fill(Color.black.opacity(0.3)))
                         .padding(.bottom, 20)
+                        .cornerRadius(10)
+                    
                 }
             }
             .background(
