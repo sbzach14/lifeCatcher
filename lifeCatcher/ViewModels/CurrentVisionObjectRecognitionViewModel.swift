@@ -653,7 +653,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     var rightConfidence:Float = -1
                     
                     var detectSingleFeature = -1
-                    var maxDetectConfidence:Float = -1
+                    var detectConfidence:Float = -1
                     
                     let isSame = singlefeatureResult[0].singlefeatureIndex[0] != -1 &&
                                 singlefeatureResult[0].singlefeatureIndex[0] == singlefeatureResult[1].singlefeatureIndex[0]
