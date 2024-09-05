@@ -336,16 +336,16 @@ class PB{
             result = Array(0...51)
             break
         case 1:
-            result = Array(0...51) + [53,54]
+            result = Array(0...51)
             break
         case 2:
-            result = Array(0...51) + [53,54]
+            result = Array(0...51)
             break
         case 3:
             result = Array(0...8) + Array(13...21) + Array(26...34) + Array(39...47)
             break
         case 4:
-            result = Array(0...51) + [53,54]
+            result = Array(0...51)
             break
         case 5:
             result = Array(0...51) + [53,54]
@@ -366,7 +366,7 @@ class PB{
             result = Array(0...51)
             break
         case 11:
-            result = Array(0...51) + [53,54]
+            result = Array(0...51)
             break
         case 12:
             result = Array(0...51)

@@ -116,25 +116,25 @@ class TCPDataset{
         var result : [Int] = []
         switch setting{
         case 0:
-            result = Array(0...51) + [53,54]
+            result = Array(0...51)
             break
         case 1:
-            result = Array(0...51) + [53,54]
+            result = Array(0...51)
             break
         case 2:
-            result = Array(0...51) + [53,54]
+            result = Array(0...51)
             break
         case 3:
-            result = Array(0...51) + [53,54]
+            result = Array(0...51)
             break
         case 4:
-            result = Array(0...51) + [53,54]
+            result = Array(0...51)
             break
         case 5:
-            result = Array(0...51) + [53,54]
+            result = Array(0...51)
             break
         default:
-            result = Array(0...51) + [53,54]
+            result = Array(0...51)
             break
             
         }
