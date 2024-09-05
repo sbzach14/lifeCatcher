@@ -81,8 +81,8 @@ struct SettingRecordView: View {
                                                 isActive: $isNavigateToSelectDatasetView,
                                                 label: EmptyView.init).hidden()
                     )
-                }
-            }.frame(height: 60, alignment: .bottom)
+                }.frame(height: 60, alignment: .bottom)
+            }
 
         }
         .background(
