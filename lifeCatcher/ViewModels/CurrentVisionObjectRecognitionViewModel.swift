@@ -151,10 +151,15 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     
     let speechPerformer = SpeechPerformer()
     
+    var detectSet: Set<Int> = []
+    
     //单次识别是否等待识别切牌
     var detectNeedToCut : Bool = false
     
-    var isStartHintPlayed : Bool = false
+    var startSoundURL: URL?
+    var successSoundURL: URL?
+    var failSoundURL: URL?
+    var hintVoiceIndex: Int = -1
 
     override init(){
         
@@ -211,7 +216,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         detectResultList = [:]
         stateCounter = 0
         isDetect = false
-        isStartHintPlayed = false
+        detectSet = []
     }
     
     private func initShuffle(){
@@ -241,22 +246,22 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             // print("Failed to set up audio session: \(error)")
         }
         
-        let startSoundURL = Bundle.main.url(forResource: "start_voice", withExtension: "mp3")
-        let successSoundURL = Bundle.main.url(forResource: "success_voice", withExtension: "mp3")
-        let failSoundURL = Bundle.main.url(forResource: "fail_voice", withExtension: "mp3")
-        do {
-            startAudioRC = try AVAudioPlayer(contentsOf: startSoundURL!)
-            startAudioRC?.delegate = self
-            startAudioRC?.prepareToPlay()
-            successAudioRC = try AVAudioPlayer(contentsOf: successSoundURL!)
-            successAudioRC?.delegate = self
-            successAudioRC?.prepareToPlay()
-            failAudioRC = try AVAudioPlayer(contentsOf: failSoundURL!)
-            failAudioRC?.delegate = self
-            failAudioRC?.prepareToPlay()
-        } catch {
-            // print("Error playing sound: \(error.localizedDescription)")
-        }
+        self.startSoundURL = Bundle.main.url(forResource: "start_voice", withExtension: "mp3")
+        self.successSoundURL = Bundle.main.url(forResource: "success_voice", withExtension: "mp3")
+        self.failSoundURL = Bundle.main.url(forResource: "fail_voice", withExtension: "mp3")
+//        do {
+//            startAudioRC = try AVAudioPlayer(contentsOf: startSoundURL!)
+//            startAudioRC?.delegate = self
+//            startAudioRC?.prepareToPlay()
+//            successAudioRC = try AVAudioPlayer(contentsOf: successSoundURL!)
+//            successAudioRC?.delegate = self
+//            successAudioRC?.prepareToPlay()
+//            failAudioRC = try AVAudioPlayer(contentsOf: failSoundURL!)
+//            failAudioRC?.delegate = self
+//            failAudioRC?.prepareToPlay()
+//        } catch {
+//            // print("Error playing sound: \(error.localizedDescription)")
+//        }
     }
 
     func setupAVCapture(){
@@ -524,8 +529,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
  
     func processImageOrigin(_ pixelBuffer: CVPixelBuffer, taskIndex: Int, isTargetArea: Bool, targetArea: [Float]){
         
-        let detectConfidenceThreshold:Float = 0.85
-        let detectConfidenceMinThreshold:Float = 0.7
+        let detectConfidenceThreshold:Float = 0.8
+        let detectConfidenceMinThreshold:Float = 0.5
         let detectEndThreshold:Float = 0.3
         
         var confidenceThreshold = 0.05
@@ -612,7 +617,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     self.targetArea = self.computeTargetArea(stateResult: stateResult)
                     self.isTargetArea = true
                     
-                    if self.cutMode[self.shuffleOrRiffle] != 0 
+                    if self.cutMode[self.shuffleOrRiffle] != 0
                         || self.specialCard[self.shuffleOrRiffle] != 0
                         || self.recgReport{
                         self.detectNeedToCut = true
@@ -665,7 +670,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 
                 let isShuffle = detectNum == 2 && self.shuffleMode[0] != 0 && !isSame
                 let isRiffle = detectNum == 1 && self.shuffleMode[1] != 0
-                let isCut = (detectNum == 1 || (detectNum == 2 && isSame)) && self.detectNeedToCut
+                
+                //一边够大，另一边小或者一样
+                let isCut = detectConfidence >= detectConfidenceThreshold
+                            && self.detectNeedToCut
+                            //&& (minDetectConfidence < detectConfidenceMinThreshold || isSame)
+                            
                 
                 if !self.isDetect{
                     if detectConfidence >= detectConfidenceThreshold && isRiffle{
@@ -675,15 +685,16 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     else if minDetectConfidence >= detectConfidenceMinThreshold && isShuffle {
                         self.isDetect = true
                         self.speakText(input: 0)
-                        self.detectNeedToCut = false
+                        self.state = "shuffle"
                     }
                 }
                 
-                if self.detectNeedToCut
-                    && detectConfidence >= detectConfidenceThreshold{
+                if isCut{
+                    
+                    self.detectNeedToCut = false
+                    
                     if self.usedSingleFeatures.contains(detectSingleFeature) && self.recgReport {
                         self.computeNextRound()
-                        self.detectNeedToCut = false
                     }
                     else if self.singlefeatureArray.contains(detectSingleFeature){
                         
@@ -698,6 +709,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             if self.cutStructArray.count == 0{
                                 self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 0))
                                 isCutDone = true
+                                self.cutShowArray.append(detectSingleFeature)
                             }
                         }
                         else if self.cutMode[self.shuffleOrRiffle] == 2{
@@ -709,12 +721,14 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                 }
                                 self.cutStructArray.append(cutStruct(cutcardIndex: self.singlefeatureArray[cutIndex], cutMode: 1))
                                 isCutDone = true
+                                self.cutShowArray.append(detectSingleFeature)
                             }
                         }
                         else if self.cutMode[self.shuffleOrRiffle] == 3{
                             //连续切牌
                             self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 0))
                             isCutDone = true
+                            self.cutShowArray.append(detectSingleFeature)
                         }
                         
                         if !isCutDone{
@@ -729,6 +743,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                 if cnt == 0{
                                     self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 3))
                                     isCutDone = true
+                                    self.cutShowArray.append(detectSingleFeature)
                                 }
                             }
                             else if self.specialCard[self.shuffleOrRiffle] == 2{
@@ -750,8 +765,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             self.computeWinnerRC(isReset: true)
                         }
                         
-                        self.cutShowArray.append(detectSingleFeature)
-                        self.detectNeedToCut = false
                     }
                 }
             
@@ -820,15 +833,19 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 
                 //识别过程
                 else if taskIndex >= 0 && self.isDetect{
-                    let shuffleCheck = singlefeatureResult[0].singlefeatureIndex[0] != singlefeatureResult[1].singlefeatureIndex[0]
-                    && singlefeatureResult[0].singlefeatureIndex[0] != -1
-                    && singlefeatureResult[1].singlefeatureIndex[0] != -1
                     
-                    if self.shuffleMode[0] != 0 && shuffleCheck && self.detectResultList.count > 60{
-                        self.state = "shuffle"
-                        self.detectNeedToCut = false
+                    if leftConfidence > detectConfidenceMinThreshold{
+                        self.detectSet.insert(leftDetectSingleFeature)
+                    }
+                    if rightConfidence > detectConfidenceMinThreshold{
+                        self.detectSet.insert(rightDetectSingleFeature)
                     }
                     
+                    if self.detectSet.count >= 10
+                    {
+                        self.speechPerformer.stopSpeechSynthesis()
+                        self.detectNeedToCut = false
+                    }
                     
                     self.detectResultList[taskIndex] = singlefeatureResult
                     
@@ -910,9 +927,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 let nowN0 = dRNode0.singlefeatureIndex[0]
                 let nowN1 = dRNode1.singlefeatureIndex[0]
             
-//                // print("index ", detectResultListIndex,
-//                      singlefeatureLabelDic[nowN0] ?? "none", dRNode0.nodeType, dRNode0.laplacianVariance, dRNode0.confidence[0], detectResultListIndex,
-//                      singlefeatureLabelDic[nowN1] ?? "none", dRNode1.nodeType, dRNode1.laplacianVariance, dRNode1.confidence[0])
+                print("index ", detectResultListIndex,
+                      singlefeatureLabelDic[nowN0] ?? "none", dRNode0.nodeType, dRNode0.laplacianVariance, dRNode0.confidence[0], detectResultListIndex,
+                      singlefeatureLabelDic[nowN1] ?? "none", dRNode1.nodeType, dRNode1.laplacianVariance, dRNode1.confidence[0])
             }
         }
         
@@ -979,9 +996,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             let nowNum1 = targetDetecResultList[detectResultListIndex]![1].singlefeatureIndex[0]
             let nodeType1 = targetDetecResultList[detectResultListIndex]![1].nodeType
             
-            print("index ", keyIndex,
-                  singlefeatureLabelDic[nowNum0] ?? "none", detectResultNode0.nodeType, detectResultNode0.laplacianVariance, detectResultNode0.confidence[0], detectResultListIndex,
-                  singlefeatureLabelDic[nowNum1] ?? "none", detectResultNode1.nodeType, detectResultNode1.laplacianVariance, detectResultNode1.confidence[0])
+//            print("index ", keyIndex,
+//                  singlefeatureLabelDic[nowNum0] ?? "none", detectResultNode0.nodeType, detectResultNode0.laplacianVariance, detectResultNode0.confidence[0], detectResultListIndex,
+//                  singlefeatureLabelDic[nowNum1] ?? "none", detectResultNode1.nodeType, detectResultNode1.laplacianVariance, detectResultNode1.confidence[0])
             
             if targetDetecResultList[detectResultListIndex]![0].singlefeatureIndex[0] != -1
                 && targetDetecResultList[detectResultListIndex]![1].singlefeatureIndex[0] != -1{
@@ -1774,7 +1791,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         var w = self.imageSize[0]
         var h = self.imageSize[1]
         
-        var boxfactor:Float = 1.5
+        var boxfactor:Float = 2.5
         
         if originBoxes.count == 1{
 
@@ -1788,11 +1805,27 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             
             if self.isCameraHorizon{
                 
-                if minW < 3 * minH && self.shuffleMode[0] != 0{
-                    boxfactor = 6
-                }
-                else{
+                //如果不洗牌 只拨牌
+                if self.shuffleMode[0] == 0 && self.shuffleMode[1] != 0{
                     boxfactor = 2.5
+                }
+                //如果不拨牌 只洗牌
+                else if self.shuffleMode[0] != 0 && self.shuffleMode[1] == 0{
+                    if detectNeedToCut{
+                        boxfactor = 5
+                    }
+                    else{
+                        boxfactor = 10
+                    }
+                }
+                //要要洗或拨
+                else{
+                    if shuffleOrRiffle == 0 || minW < 2 * minH{
+                        boxfactor = 5
+                    }
+                    else{
+                        boxfactor = 2.5
+                    }
                 }
                 
                 minW = max(minW,minH) * boxfactor
@@ -1826,11 +1859,27 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
             
             else{
-                if minH < 3 * minW && self.shuffleMode[0] != 0{
-                    boxfactor = 6
-                }
-                else{
+                //如果不洗牌 只拨牌
+                if self.shuffleMode[0] == 0 && self.shuffleMode[1] != 0{
                     boxfactor = 2.5
+                }
+                //如果不拨牌 只洗牌
+                else if self.shuffleMode[0] != 0 && self.shuffleMode[1] == 0{
+                    if detectNeedToCut{
+                        boxfactor = 5
+                    }
+                    else{
+                        boxfactor = 10
+                    }
+                }
+                //要要洗或拨
+                else{
+                    if shuffleOrRiffle == 0 || minH < 2 * minW{
+                        boxfactor = 5
+                    }
+                    else{
+                        boxfactor = 2.5
+                    }
                 }
                 
                 minH = max(minW,minH) * boxfactor
@@ -2124,6 +2173,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         
         else{
+            
             let newCIImage = CIImage(cvImageBuffer: pixelBuffer)
             let cgImage = CIContext().createCGImage(newCIImage, from: newCIImage.extent)!
             
@@ -2298,6 +2348,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         if self.cutMode[self.shuffleOrRiffle] == 1{
             self.cutStructArray.append(cutStruct(cutcardIndex: cutSingleFeature, cutMode: 0))
+            self.cutShowArray.append(cutSingleFeature)
         }
         else if self.cutMode[self.shuffleOrRiffle] == 2{
             cutIndex -= 1
@@ -2305,27 +2356,27 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 cutIndex = self.singlefeatureArray.count - 1
             }
             self.cutStructArray.append(cutStruct(cutcardIndex: self.singlefeatureArray[cutIndex], cutMode: 1))
+            self.cutShowArray.append(cutSingleFeature)
         }
         else if self.cutMode[self.shuffleOrRiffle] == 3{
             self.cutStructArray.append(cutStruct(cutcardIndex: cutSingleFeature, cutMode: 0))
+            self.cutShowArray.append(cutSingleFeature)
         }
         
         if self.cutMode[self.shuffleOrRiffle] != 3{
             if self.specialCard[self.shuffleOrRiffle] == 1{
                 self.cutStructArray.append(cutStruct(cutcardIndex: cutSingleFeature, cutMode: 3))
+                self.cutShowArray.append(cutSingleFeature)
             }
             else if self.specialCard[self.shuffleOrRiffle] == 2{
                 
                 for i in 0..<maxCutTimes {
                     cutSingleFeature = self.singlefeatureArray.randomElement()!
                     self.cutStructArray.append(cutStruct(cutcardIndex: cutSingleFeature, cutMode: 2))
-                    self.cutShowArray.append(cutSingleFeature)
                 }
-                self.cutShowArray.removeLast()
             }
         }
         
-        self.cutShowArray.append(cutSingleFeature)
         computeWinnerRC(isReset: true)
     }
     
@@ -2396,15 +2447,43 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     || (self.isHeadphonesConnected() && self.voiceDevice == 1)
         
         if isSpeak{
-            if input == 0{
-                self.startAudioRC?.play()
-                self.speechPerformer.stopSpeechSynthesis()
+            if hintVoiceIndex == 0{
+                self.startAudioRC?.stop()
             }
-            else if input == 1{
-                self.successAudioRC?.play()
+            else if hintVoiceIndex == 1{
+                self.successAudioRC?.stop()
             }
-            else if input == 2{
-                self.failAudioRC?.play()
+            else if hintVoiceIndex == 2{
+                self.failAudioRC?.stop()
+            }
+            
+            do{
+                if input == 0{
+                    self.startAudioRC = try AVAudioPlayer(contentsOf: startSoundURL!)
+                    self.startAudioRC?.delegate = self
+                    self.startAudioRC?.prepareToPlay()
+                    self.startAudioRC?.play()
+                    print("hint:play!")
+                }
+                else if input == 1{
+                    self.successAudioRC = try AVAudioPlayer(contentsOf: successSoundURL!)
+                    self.successAudioRC?.delegate = self
+                    self.successAudioRC?.prepareToPlay()
+                    self.successAudioRC?.play()
+                    print("hint:success!")
+                }
+                else if input == 2{
+                    self.failAudioRC = try AVAudioPlayer(contentsOf: failSoundURL!)
+                    self.failAudioRC?.delegate = self
+                    self.failAudioRC?.prepareToPlay()
+                    self.failAudioRC?.play()
+                    print("hint:fail!")
+                }
+                
+                hintVoiceIndex = input
+            }
+            catch{
+                
             }
         }
     }

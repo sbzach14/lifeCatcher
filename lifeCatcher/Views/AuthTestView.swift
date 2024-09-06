@@ -68,6 +68,8 @@ struct AuthTestView: View {
     private func sendActivateRequest() {
         guard let url = URL(string: "http://1.94.17.30:8080/activate") else { return }
         
+        self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
+        
         let json: [String: Any] = [
             "activate_code": activeKey,
             "passCode": passcode,

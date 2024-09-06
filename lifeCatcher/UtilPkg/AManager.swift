@@ -11,7 +11,7 @@ class AuthManager {
     static var isActive: Bool = false
     static var activeDate: String = ""
     
-    static var version: String = "1.0.4"
+    static var version: String = "1.0.5"
  
     //deprecated
     static func getUniqueID() -> String? {
@@ -135,9 +135,9 @@ class AuthManager {
             return authKey(input: uniqueKey, uniqueID: uniqueID)
         } else if uniqueID != "" && uniqueKey == ""{
             let verifySuccess = authKey(input: onlineKey, uniqueID: uniqueID)
-            if verifySuccess == true {
-                storeAuthKey(newKey: onlineKey)
-            }
+//            if verifySuccess == true {
+//                storeAuthKey(newKey: onlineKey)
+//            }
             return verifySuccess
         }
         else{

@@ -91,7 +91,7 @@ struct SettingRecordConfigView: View{
     @State private var DatasetType: Int = 0
     @State private var setting: Int = 0
     @State private var dealNum: Int = 0
-    @State private var coloringType: Int = 2
+    @State private var coloringType: Int = 0
     @State private var dealType: Int = 0
     @State private var diyDealNum: [Int] = []
     @State private var diyDealStatus: [[Bool]] = []
@@ -111,7 +111,7 @@ struct SettingRecordConfigView: View{
     @State private var voiceReport: Int = 0
     @State private var args:[Int] = []
     @State private var suitRules: [Int] = []
-    @State private var rankRules: [RankRulesSate] = []
+    @State private var rankRules: [Int] = []
     
     @State private var showAlert = false
     @State private var showRuleInfo = false
@@ -136,8 +136,12 @@ struct SettingRecordConfigView: View{
             
             self.args = DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![0]
             self.suitRules = DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![1]
+            self.rankRules = []
             for rankIndex in 0...DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![2].count - 1 {
-                self.rankRules.append(RankRulesSate(index: DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![2][rankIndex], isChecked: (DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![3][rankIndex] != 0)))
+                let isChecked = DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![3][rankIndex] == 1
+                if isChecked{
+                    self.rankRules.append( DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![2][rankIndex])
+                }
             }
             self.singlefeatureToUse = DatasetGetAllSingleFeatureIndex()
             
@@ -170,9 +174,7 @@ struct SettingRecordConfigView: View{
             self.voiceReport = rules.voiceReport
             self.args = rules.args
             self.suitRules = rules.suitRanks
-            for i in 0...rules.rankRules.count - 1{
-                self.rankRules.append(RankRulesSate(index: rules.rankRules[i], isChecked: (rules.rankRuleChecked[i] != 0)))
-            }
+            self.rankRules = rules.rankRules
             self.minSingleFeatureNum = minSingleFeatureNum
             self.recgReport = rules.recgReport
             
@@ -636,20 +638,10 @@ struct SettingRecordConfigView: View{
     }
     
     private func saveData(isShowAlert: Bool){
-        var rankRulesToAdd: [Int] = []
-        var rankRuleToAddChecked: [Int] = []
         let selectedRule = ClassifierSettingArgs.targetSetting[DatasetType]
         self.minSingleFeatureNum = self.DatasetGetMinSingleFeatureNum()
-        for i in rankRules{
-            rankRulesToAdd.append(i.index)
-            if i.isChecked{
-                rankRuleToAddChecked.append(1)
-            } else {
-                rankRuleToAddChecked.append(0)
-            }
-        }
         
-        let ruleToAdd = DatasetRule(RuleName: selectedRule!.setting[setting]!, DatasetType: DatasetType, setting: setting, dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, rcNum: rcNum, shuffleMode: shuffleMode, cutMode: cutMode,  singlefeatureToUse: singlefeatureToUse, cutNumSetting: cutNumSetting, reportSetting: reportSetting, cutNumRangeSetting: cutNumRangeSetting, positionSetting: positionSetting, consecutiveReport: consecutiveReport, reportNumber: reportNumber, voiceReport: voiceReport, args: args, suitRanks: suitRules, rankRules: rankRulesToAdd, rankRuleChecked: rankRuleToAddChecked, minSingleFeatureNum: minSingleFeatureNum, recgReport: recgReport, specialCard: specialCard)
+        let ruleToAdd = DatasetRule(RuleName: selectedRule!.setting[setting]!, DatasetType: DatasetType, setting: setting, dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, rcNum: rcNum, shuffleMode: shuffleMode, cutMode: cutMode,  singlefeatureToUse: singlefeatureToUse, cutNumSetting: cutNumSetting, reportSetting: reportSetting, cutNumRangeSetting: cutNumRangeSetting, positionSetting: positionSetting, consecutiveReport: consecutiveReport, reportNumber: reportNumber, voiceReport: voiceReport, args: args, suitRanks: suitRules, rankRules: rankRules, minSingleFeatureNum: minSingleFeatureNum, recgReport: recgReport, specialCard: specialCard)
         if _selectedSaveIndex == -1{
             DetectSettingArgs.allUsersDatasetRule.append(ruleToAdd)
             _selectedSaveIndex = DetectSettingArgs.allUsersDatasetRule.count - 1
@@ -677,27 +669,24 @@ struct SettingRecordConfigView: View{
         args = DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![0]
         singlefeatureToUse = DatasetGetAllSingleFeatureIndex()
         suitRules = DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![1]
-        rankRules.removeAll()
-        for index in 0...DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![2].count - 1{
-            rankRules.append(RankRulesSate(index: DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![2][index], isChecked: (DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![3][index] != 0)))
+        rankRules = []
+        
+        for rankIndex in 0...DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![2].count - 1{
+            let isChecked = DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![3][rankIndex] == 1
+            if isChecked{
+                self.rankRules.append( DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![2][rankIndex])
+            }
         }
     }
     
     private func handleDatasetTypeChange(){
         let selectedRule = ClassifierSettingArgs.targetSetting[self.DatasetType]!
+        self.rcNum = 2
         self.rcNumList = selectedRule.rcNum
-        self.currentNum = self.rcNumList[rcNum]
+        self.currentNum = self.rcNumList[self.rcNum]
         self.setting = 0
         
-        self.args = DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![0]
-        self.suitRules = DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![1]
-        self.rankRules = []
-        for rankIndex in 0...DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![2].count - 1 {
-            self.rankRules.append(RankRulesSate(index: DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![2][rankIndex], isChecked: (DetectSettingArgs.allPreSetRules[self.DatasetType]![self.setting]![3][rankIndex] != 0)))
-        }
-        
-        
-        self.singlefeatureToUse = DatasetGetAllSingleFeatureIndex()
+        handleSettingChange()
     }
     
     private func handleRCNumChange(rcNumIndex: Int){
@@ -846,8 +835,11 @@ struct SettingRecordConfigView: View{
     private func alertMessageCheck()-> String{
         var alertMessage:String = ""
         if cutNumRangeSetting[0] > self.singlefeatureToUse.count || cutNumRangeSetting[1] > self.singlefeatureToUse.count || cutNumRangeSetting[0] > cutNumRangeSetting[1]{
-            alertMessage += "打色范围设置超出可用牌范围，或X值>Y值，请重新设置"
+            alertMessage = "打色范围设置超出可用牌范围，或X值>Y值，请重新设置"
             
+        }
+        else if dealNum == 1 && diyDealNum.count == 0{
+            alertMessage = "自定义发牌为空"
         }
         return alertMessage
     }
