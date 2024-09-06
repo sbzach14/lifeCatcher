@@ -25,6 +25,12 @@ struct AuthTestView: View {
 
             Button(action: {
                 self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
+            }, label: {
+                Text("Generate")
+            })
+            .padding()
+            
+            Button(action: {
                 sendActivateRequest()
             }, label: {
                 Text("Authorize")
@@ -60,7 +66,7 @@ struct AuthTestView: View {
     }
 
     private func sendActivateRequest() {
-        guard let url = URL(string: "http://192.168.1.224:8080/activate") else { return }
+        guard let url = URL(string: "http://1.94.17.30:8080/activate") else { return }
         
         let json: [String: Any] = [
             "activate_code": activeKey,
