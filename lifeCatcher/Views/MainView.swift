@@ -11,6 +11,8 @@ struct MainMenuView: View {
         NavigationView {
             ZStack{
                 VStack {
+                    Divider().colorInvert()
+                    
                     Image("sampleImage")
                         .resizable()
                         .scaledToFit()
@@ -36,7 +38,9 @@ struct MainMenuView: View {
                             Button(action: {
 //                                if true{
 //                                    historyNavigate = 1
+//                                    return
 //                                }
+                                
                                 AutoLogin(username: "", password: "")
                                 
                                 if !AuthManager.isLoginServer{

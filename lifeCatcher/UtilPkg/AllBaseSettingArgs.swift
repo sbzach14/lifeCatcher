@@ -3655,12 +3655,11 @@ struct DatasetRule: Codable{
     var args: [Int] = []
     var suitRanks: [Int] = []
     var rankRules: [Int] = []
-    var rankRuleChecked: [Int] = []
     var minSingleFeatureNum: Int
     var recgReport: Bool
     var specialCard: [Int]
     
-    init(RuleName: String, DatasetType: Int, setting: Int, dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], rcNum: Int, shuffleMode: [Int], cutMode: [Int], singlefeatureToUse: [Int], cutNumSetting : Int, reportSetting: [Int], cutNumRangeSetting: [Int], positionSetting: Int, consecutiveReport: Int, reportNumber: Int, voiceReport: Int, args: [Int], suitRanks: [Int], rankRules: [Int], rankRuleChecked: [Int], minSingleFeatureNum: Int, recgReport: Bool, specialCard: [Int]) {
+    init(RuleName: String, DatasetType: Int, setting: Int, dealNum: Int, coloringType: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]], rcNum: Int, shuffleMode: [Int], cutMode: [Int], singlefeatureToUse: [Int], cutNumSetting : Int, reportSetting: [Int], cutNumRangeSetting: [Int], positionSetting: Int, consecutiveReport: Int, reportNumber: Int, voiceReport: Int, args: [Int], suitRanks: [Int], rankRules: [Int], minSingleFeatureNum: Int, recgReport: Bool, specialCard: [Int]) {
         self.RuleName = RuleName
         self.DatasetType = DatasetType
         self.setting = setting
@@ -3683,7 +3682,6 @@ struct DatasetRule: Codable{
         self.args = args
         self.suitRanks = suitRanks
         self.rankRules = rankRules
-        self.rankRuleChecked = rankRuleChecked
         self.minSingleFeatureNum = minSingleFeatureNum
         self.recgReport = recgReport
         self.specialCard = specialCard

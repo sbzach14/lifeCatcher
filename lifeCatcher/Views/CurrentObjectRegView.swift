@@ -213,6 +213,7 @@ struct CurrentVisionObjectRecognitionView: View {
         }
         .onDisappear {
             viewModel.stopCamera()
+            viewModel.speechPerformer.stopSpeechSynthesis()
         }
         .toolbarBackground(.hidden)
         .navigationTitle("")

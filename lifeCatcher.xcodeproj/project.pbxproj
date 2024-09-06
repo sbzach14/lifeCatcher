@@ -650,13 +650,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
-				DEVELOPMENT_TEAM = FYQ8UYQL3M;
+				DEVELOPMENT_TEAM = 6WK4Q32GMN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = lifeCatcher/App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = LifeCatcher;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
-				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "LifeCatcher需要蓝牙权限管理耳机音量";
 				INFOPLIST_KEY_NSCameraUsageDescription = "LifeCatcher need camera access right for users to take and save photos correctly.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "";
@@ -673,9 +672,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.3;
+				MARKETING_VERSION = 1.0.5;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.shuffle.lifeCatcher;
+				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -699,13 +698,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
-				DEVELOPMENT_TEAM = FYQ8UYQL3M;
+				DEVELOPMENT_TEAM = 6WK4Q32GMN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = lifeCatcher/App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = LifeCatcher;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
-				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "LifeCatcher需要蓝牙权限管理耳机音量";
 				INFOPLIST_KEY_NSCameraUsageDescription = "LifeCatcher need camera access right for users to take and save photos correctly.";
 				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "";
@@ -722,9 +720,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.3;
+				MARKETING_VERSION = 1.0.5;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.shuffle.lifeCatcher;
+				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

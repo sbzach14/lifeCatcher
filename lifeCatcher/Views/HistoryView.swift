@@ -30,7 +30,7 @@ struct HistoryView: View {
                     
                     // 等待键盘收回后再执行搜索操作
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        showAlert = AuthManager.activeAccount(input: searchText)
+                        //showAlert = AuthManager.activeAccount(input: searchText)
                     }
                 } label: {
                     Label("ShowSingleFeature", systemImage: "magnifyingglass")

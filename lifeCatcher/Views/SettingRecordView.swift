@@ -30,9 +30,7 @@ struct SettingRecordView: View {
                             ) {
                                 
                                 let name: String = rules[index].RuleName
-                                
-                                
-                                
+                        
                                 
                                 VStack(spacing: 5) {
                                     HStack{
