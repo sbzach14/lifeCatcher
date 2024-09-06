@@ -570,33 +570,35 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 //            let coordinates = prediction.featureValue(for: "coordinates")!.multiArrayValue!
 //            singlefeatureResult = getSingleFeature(from: confidence, from: coordinates, from: pixelBuffer)
 
-        
-        if self.state == "idle"{
-            if singlefeatureResult[0].singlefeatureIndex[0] == self.stateSingleFeature[0]
-                && singlefeatureResult[1].singlefeatureIndex[0] == self.stateSingleFeature[1]{
-                stateCounter += 1
-            }
-            else{
-                stateCounter = 0
-            }
-        }
-        
-        self.stateSingleFeature[0] = singlefeatureResult[0].singlefeatureIndex[0]
-        self.stateSingleFeature[1] = singlefeatureResult[1].singlefeatureIndex[0]
-        
-        self.centerPos = [(singlefeatureResult[0].coordinate[0] + singlefeatureResult[1].coordinate[0])/2, (singlefeatureResult[0].coordinate[1] + singlefeatureResult[1].coordinate[1])/2]
-        self.lastBoxes = [singlefeatureResult[0].coordinate,singlefeatureResult[1].coordinate]
-
-        var detectNum = 0
-        if singlefeatureResult[0].singlefeatureIndex[0] != -1{
-            detectNum += 1
-        }
-        if singlefeatureResult[1].singlefeatureIndex[0] != -1{
-            detectNum += 1
-        }
        
         
         DispatchQueue.main.async{
+            
+            if self.state == "idle"{
+                if singlefeatureResult[0].singlefeatureIndex[0] == self.stateSingleFeature[0]
+                    && singlefeatureResult[1].singlefeatureIndex[0] == self.stateSingleFeature[1]{
+                    self.stateCounter += 1
+                }
+                else{
+                    self.stateCounter = 0
+                }
+            }
+            
+            self.stateSingleFeature[0] = singlefeatureResult[0].singlefeatureIndex[0]
+            self.stateSingleFeature[1] = singlefeatureResult[1].singlefeatureIndex[0]
+            
+            self.centerPos = [(singlefeatureResult[0].coordinate[0] + singlefeatureResult[1].coordinate[0])/2, (singlefeatureResult[0].coordinate[1] + singlefeatureResult[1].coordinate[1])/2]
+            self.lastBoxes = [singlefeatureResult[0].coordinate,singlefeatureResult[1].coordinate]
+
+            var detectNum = 0
+            if singlefeatureResult[0].singlefeatureIndex[0] != -1{
+                detectNum += 1
+            }
+            if singlefeatureResult[1].singlefeatureIndex[0] != -1{
+                detectNum += 1
+            }
+            
+            
             if self.state == "idle"{
                 if detectNum > 0 && self.stateCounter >= 1{
                     
