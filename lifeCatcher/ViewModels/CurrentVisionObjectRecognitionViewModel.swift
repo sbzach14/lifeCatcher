@@ -531,14 +531,13 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         let detectConfidenceThreshold:Float = 0.8
         let detectConfidenceMinThreshold:Float = 0.5
-        let detectEndThreshold:Float = 0.3
         
-        var confidenceThreshold = 0.05
+        var confidenceThreshold: Double = 0
         if self.state == "idle"{
             confidenceThreshold = 0.7
         }
         else{
-            confidenceThreshold = 0.05
+            confidenceThreshold = 0.2
         }
         
         var singlefeatureResult : [DetectionResult]
@@ -660,9 +659,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     minDetectConfidence = leftConfidence
                 }
                 
-                if detectConfidence < detectEndThreshold{
+                if detectNum == 0{
                     self.stateCounter += 1
-                    detectNum = 0
                 }
                 else{
                     self.stateCounter = 0
@@ -677,8 +675,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             //&& (minDetectConfidence < detectConfidenceMinThreshold || isSame)
                             
                 
-                if !self.isDetect{
-                    if detectConfidence >= detectConfidenceThreshold && isRiffle{
+                if !self.isDetect && detectConfidence >= detectConfidenceThreshold{
+                    if isRiffle{
                         self.isDetect = true
                         self.speakText(input: 0)
                     }
@@ -920,17 +918,17 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 if abs(nowLaplacian - nextLaplacian) <= 0.000000001 && nowNum == nextNum{
                     deleteKeys.append(detectResultListIndex)
                 }
-                
-                let dRNode0 = targetDetecResultList[detectResultListIndex]![0]
-                let dRNode1 = targetDetecResultList[detectResultListIndex]![1]
-                
-                let nowN0 = dRNode0.singlefeatureIndex[0]
-                let nowN1 = dRNode1.singlefeatureIndex[0]
-            
-                print("index ", detectResultListIndex,
-                      singlefeatureLabelDic[nowN0] ?? "none", dRNode0.nodeType, dRNode0.laplacianVariance, dRNode0.confidence[0], detectResultListIndex,
-                      singlefeatureLabelDic[nowN1] ?? "none", dRNode1.nodeType, dRNode1.laplacianVariance, dRNode1.confidence[0])
             }
+            
+            let dRNode0 = targetDetecResultList[detectResultListIndex]![0]
+            let dRNode1 = targetDetecResultList[detectResultListIndex]![1]
+            
+            let nowN0 = dRNode0.singlefeatureIndex[0]
+            let nowN1 = dRNode1.singlefeatureIndex[0]
+        
+            print("index ", detectResultListIndex,
+                  singlefeatureLabelDic[nowN0] ?? "none", dRNode0.nodeType, dRNode0.laplacianVariance, dRNode0.confidence[0], detectResultListIndex,
+                  singlefeatureLabelDic[nowN1] ?? "none", dRNode1.nodeType, dRNode1.laplacianVariance, dRNode1.confidence[0])
         }
         
         sortedKeys = sortedKeys.filter { !deleteKeys.contains($0) }
@@ -968,6 +966,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         var leftTailCnt = 0
         var rightTailCnt = 0
+        
+        var leftTailLong = -1
+        var rightTailLong = -1
         
         var singleCnt = 0
         var doubleCnt = 0
@@ -1025,40 +1026,32 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         if leftFirstHead == -1 && keyIndex > longHeadIndex{
                             leftFirstHead = keyIndex
                         }
+                        leftTailCnt += 1
                     }
                     if numIndex == 1{
                         if rightFirstHead == -1 && keyIndex > longHeadIndex{
                             rightFirstHead = keyIndex
                         }
+                        rightTailCnt += 1
                     }
                 }
                 
                 if detectResultNode.nodeType == 2{
-                    if numIndex == 0 && leftTailCnt < 5{
+                    if numIndex == 0{
                         leftLastTail = keyIndex
+                        if leftTailCnt >= 3{
+                            leftTailLong = keyIndex
+                        }
                         leftTailCnt = 0
                     }
-                    if numIndex == 1 && rightTailCnt < 5{
+                    if numIndex == 1{
                         rightLastTail = keyIndex
+                        if rightTailCnt >= 2{
+                            rightTailLong = keyIndex
+                        }
                         rightTailCnt = 0
                     }
                 }
-//                else if detectResultNode.nodeType == 0 || detectResultNode.nodeType == 5{
-//                    if numIndex == 0{
-//                        leftTailCnt += 1
-//                    }
-//                    if numIndex == 1{
-//                        rightTailCnt += 1
-//                    }
-//                }
-//                else{
-//                    if numIndex == 0 && leftTailCnt < 5{
-//                        leftTailCnt = 0
-//                    }
-//                    if numIndex == 1 && rightTailCnt < 5{
-//                        rightTailCnt = 0
-//                    }
-//                }
             }
         }
         
@@ -1088,35 +1081,16 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         break
                     }
                 }
+                endIndex = max(leftLastTail, rightLastTail) + 1
             }
             else if leftSideCnt > rightSideCnt && leftFirstHead != -1{
                 beginIndex = leftFirstHead
+                endIndex = leftTailLong + 1
             }
             else if leftSideCnt < rightSideCnt && rightFirstHead != -1{
                 beginIndex = rightFirstHead
+                endIndex = rightTailLong + 1
             }
-            
-            endIndex = max(leftLastTail, rightLastTail) + 1
-
-//            if !isSingle{
-//                let min_endIndex = min(leftLastTail, rightLastTail) + 3
-//                let max_endIndex = max(leftLastTail, rightLastTail) - 1
-//                endIndex = max(min_endIndex, max_endIndex)
-//                
-//                let detectResultListIndex = sortedKeys[endIndex-1]
-//                if targetDetecResultList[detectResultListIndex]![0].nodeType == 3{
-//                    targetDetecResultList[detectResultListIndex]![0].nodeType = 2
-//                }
-//                else if targetDetecResultList[detectResultListIndex]![1].nodeType == 3{
-//                    targetDetecResultList[detectResultListIndex]![1].nodeType = 2
-//                }
-//                if targetDetecResultList[detectResultListIndex]![0].nodeType != 2{
-//                    targetDetecResultList[detectResultListIndex]![0].nodeType = 0
-//                }
-//                else if targetDetecResultList[detectResultListIndex]![1].nodeType != 2{
-//                    targetDetecResultList[detectResultListIndex]![1].nodeType = 0
-//                }
-//            }
         }
 
         if beginIndex >= endIndex{
@@ -1266,59 +1240,36 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
                 
                 if detectResultNode.nodeType == 2{
-                    if numIndex == 0 && leftTailCnt < 5{
+                    if numIndex == 0{
                         leftLastTail = keyIndex
-                        leftTailCnt = 0
                     }
-                    if numIndex == 1 && rightTailCnt < 5{
+                    if numIndex == 1{
                         rightLastTail = keyIndex
-                        rightTailCnt = 0
                     }
                 }
-//                else if detectResultNode.nodeType == 0 || detectResultNode.nodeType == 5{
-//                    if numIndex == 0{
-//                        leftTailCnt += 1
-//                    }
-//                    if numIndex == 1{
-//                        rightTailCnt += 1
-//                    }
-//                }
-//                else{
-//                    if numIndex == 0 && leftTailCnt < 5{
-//                        leftTailCnt = 0
-//                    }
-//                    if numIndex == 1 && rightTailCnt < 5{
-//                        rightTailCnt = 0
-//                    }
-//                }
             }
         }
         
-        if !isShort{
+        var addEndIndex = 0
+        
+        if !isSingle{
             endIndex = max(leftLastTail, rightLastTail) + 1
-            
-            //            if !isSingle{
-            //                let min_endIndex = min(leftLastTail, rightLastTail) + 3
-            //                let max_endIndex = max(leftLastTail, rightLastTail) - 1
-            //                endIndex = max(min_endIndex, max_endIndex)
-            //
-            //                let detectResultListIndex = sortedKeys[endIndex-1]
-            //                if targetDetecResultList[detectResultListIndex]![0].nodeType == 3{
-            //                    targetDetecResultList[detectResultListIndex]![0].nodeType = 2
-            //                }
-            //                else if targetDetecResultList[detectResultListIndex]![1].nodeType == 3{
-            //                    targetDetecResultList[detectResultListIndex]![1].nodeType = 2
-            //                }
-            //                if targetDetecResultList[detectResultListIndex]![0].nodeType != 2{
-            //                    targetDetecResultList[detectResultListIndex]![0].nodeType = 0
-            //                }
-            //                else if targetDetecResultList[detectResultListIndex]![1].nodeType != 2{
-            //                    targetDetecResultList[detectResultListIndex]![1].nodeType = 0
-            //                }
-            //            }
+            addEndIndex = min(leftLastTail, rightLastTail)
+        }
+        else if leftSideCnt > rightSideCnt{
+            endIndex = leftTailLong + 1
+            addEndIndex = leftTailLong
+        }
+        else if leftSideCnt < rightSideCnt{
+            endIndex = rightTailLong + 1
+            addEndIndex = leftTailLong
         }
         
-        var addEndIndex = min(leftLastTail, rightLastTail)
+        if beginIndex >= endIndex{
+            let result = DetectionState(detectionResult: [], isSingle: false, isShort: false, longestIndex: -1)
+            return result
+        }
+        
         if addEndIndex <= beginIndex{
             addEndIndex = beginIndex + 1
         }
@@ -1913,6 +1864,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
             
         }
+        
         else if originBoxes.count == 2{
             
             if self.isCameraHorizon
