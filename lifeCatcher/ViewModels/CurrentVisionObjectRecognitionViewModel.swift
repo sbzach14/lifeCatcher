@@ -1742,7 +1742,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         var w = self.imageSize[0]
         var h = self.imageSize[1]
         
-        var boxfactor:Float = 2.5
+        var boxfactor:Float = 1.5
         
         if originBoxes.count == 1{
 
@@ -1766,7 +1766,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         boxfactor = 5
                     }
                     else{
-                        boxfactor = 10
+                        boxfactor = 7.5
                     }
                 }
                 //要要洗或拨
@@ -1820,7 +1820,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         boxfactor = 5
                     }
                     else{
-                        boxfactor = 10
+                        boxfactor = 7.5
                     }
                 }
                 //要要洗或拨
