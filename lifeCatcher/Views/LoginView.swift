@@ -259,7 +259,7 @@ struct LoginView: View {
             let returnLoginStatus = jsonResponse?["loginStatus"] as? Int ?? -1
             let returnAccountStatus = jsonResponse?["accountStatus"] as? Int ?? -1
             let returnExpiredTime = jsonResponse?["expiredTime"] as? Int ?? 0
-            let returnActiveCode = jsonResponse?["active_code"] as? String ?? ""
+            let returnActiveCode = jsonResponse?["activated_code"] as? String ?? ""
             
 
             DispatchQueue.main.async {
