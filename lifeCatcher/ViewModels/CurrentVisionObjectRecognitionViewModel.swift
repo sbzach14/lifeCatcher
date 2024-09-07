@@ -686,7 +686,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     }
                 }
                 
-//                print("\(self.singlefeatureLabelDic[leftDetectSingleFeature] ?? "null")  \(leftConfidence)  \(self.singlefeatureLabelDic[rightDetectSingleFeature] ?? "null")  \(rightConfidence) detectNeedToCut\(self.detectNeedToCut)")
+                print("\(self.singlefeatureLabelDic[leftDetectSingleFeature] ?? "null")  \(leftConfidence)  \(self.singlefeatureLabelDic[rightDetectSingleFeature] ?? "null")  \(rightConfidence) detectNeedToCut\(self.detectNeedToCut)")
                 
                 if isCut{
                     
@@ -1095,7 +1095,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
 
         if beginIndex >= endIndex{
-            let result = DetectionState(detectionResult: [], isSingle: false, isShort: false, longestIndex: -1)
+            let result = DetectionState(detectionResult: [], isSingle: true, isShort: true, longestIndex: -1)
             return result
         }
         
@@ -1256,7 +1256,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         
         if beginIndex >= endIndex{
-            let result = DetectionState(detectionResult: [], isSingle: false, isShort: false, longestIndex: -1)
+            let result = DetectionState(detectionResult: [], isSingle: true, isShort: true, longestIndex: -1)
             return result
         }
         
