@@ -3395,7 +3395,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 let voiceType = 1
                 var currentSpeakStruct: [SpeakResultStruct] = []
                 for rcID in resultInfo.targetRCList[0] {
-                    reportString = String(rcID)
+                    reportString = String(rcID + 1)
                     currentSpeakStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
                 }
                 
