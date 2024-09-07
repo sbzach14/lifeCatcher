@@ -22,27 +22,35 @@ struct AuthTestView: View {
             TextField("Enter your Passcode here", text: $passcode)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
-
-            Button(action: {
-                self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
-            }, label: {
-                Text("Generate")
-            })
-            .padding()
             
-            Button(action: {
-                self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
-                sendActivateRequest()
-            }, label: {
-                Text("Authorize")
-            })
-            .padding()
-
-            Text(activeKey)
-                .textSelection(.enabled)
-                .font(.title)
-                .fontWeight(.bold)
+            HStack{
+                
+                Button(action: {
+                    self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
+                }, label: {
+                    Text("Generate")
+                })
                 .padding()
+                
+                Spacer()
+                
+                Button(action: {
+                    self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
+                    sendActivateRequest()
+                }, label: {
+                    Text("Authorize")
+                })
+                .padding()
+            }
+            
+            ScrollView{
+                Text(activeKey)
+                    .textSelection(.enabled)
+                    .font(.title)
+                    .fontWeight(.bold)
+                    .padding()
+                    .foregroundColor(.white)
+            }
 
             
             Text("Activation Status: \(activateStatus)")

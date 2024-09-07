@@ -408,7 +408,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             
             if frameRate == idleRate{
                 //device.exposureMode = .continuousAutoExposure
-                //device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(self.setFrameRate)), iso: device.activeFormat.maxISO)
                 device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(240)), iso: device.activeFormat.maxISO)
                 //device.setExposureTargetBias(0)
             }
@@ -535,7 +534,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             confidenceThreshold = 0.7
         }
         else{
-            confidenceThreshold = 0.2
+            confidenceThreshold = 0.1
         }
         
         var singlefeatureResult : [DetectionResult]
@@ -686,6 +685,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         self.state = "shuffle"
                     }
                 }
+                
+//                print("\(self.singlefeatureLabelDic[leftDetectSingleFeature] ?? "null")  \(leftConfidence)  \(self.singlefeatureLabelDic[rightDetectSingleFeature] ?? "null")  \(rightConfidence) detectNeedToCut\(self.detectNeedToCut)")
                 
                 if isCut{
                     
@@ -1793,12 +1794,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 }
                 //要要洗或拨
                 else{
-                    if shuffleOrRiffle == 0 || minW < 2 * minH{
-                        boxfactor = 5
-                    }
-                    else{
-                        boxfactor = 2.5
-                    }
+                    boxfactor = 5
                 }
                 
                 minW = max(minW,minH) * boxfactor
@@ -1847,12 +1843,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 }
                 //要要洗或拨
                 else{
-                    if shuffleOrRiffle == 0 || minH < 2 * minW{
-                        boxfactor = 5
-                    }
-                    else{
-                        boxfactor = 2.5
-                    }
+                    boxfactor = 5
                 }
                 
                 minH = max(minW,minH) * boxfactor

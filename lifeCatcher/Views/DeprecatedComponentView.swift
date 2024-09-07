@@ -91,12 +91,9 @@ struct TurnSettingView: View {
 
                         HStack{
                             
-                            Text("轮").frame(maxWidth: 40, alignment: .leading)
-                                .foregroundColor(.white)
-                                .padding(.leading,30)
-                            
                             Text("牌数").frame(maxWidth: 40, alignment: .leading)
                                 .foregroundColor(.white)
+                                .padding(.leading,30)
                             
                             Spacer()
                             
@@ -114,16 +111,15 @@ struct TurnSettingView: View {
                             ForEach(diyDealNum.indices, id:\.self){
                                 index in
                                 HStack{
-                                    
-                                    Text("  \(index + 1)").frame(maxWidth: 40, alignment: .leading)
+                               
+                                    Stepper("\(diyDealNum[index])", value: $diyDealNum[index]).frame(maxWidth: 150, alignment: .leading)
                                         .foregroundColor(.white)
-                                        .padding(.leading,30)
-                                    
-                                    
-                                    
-                                    Stepper("\(diyDealNum[index])", value: $diyDealNum[index]).frame(maxWidth: 200, alignment: .leading)
-                                        .foregroundColor(.white)
-                                        .padding(.leading,20)
+                                        .padding(.leading,40)
+                                        .onChange(of: diyDealNum[index]) { newValue in
+                                            if newValue <= 0 {
+                                                diyDealNum[index] = 1 // 确保值始终大于0
+                                            }
+                                        }
                                     
                                     Spacer()
                                     

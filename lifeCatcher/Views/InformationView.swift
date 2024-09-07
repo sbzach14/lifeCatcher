@@ -182,7 +182,7 @@ struct DeprecatedInfoView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
         )
-        .navigationBarTitle("设置")
+        .navigationBarTitle("功能设置")
     }
 }
 
