@@ -1839,7 +1839,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 //如果不拨牌 只洗牌
                 else if self.shuffleMode[0] != 0 && self.shuffleMode[1] == 0{
                     if detectNeedToCut{
-                        boxfactor = 2.5
+                        boxfactor = 5
                     }
                     else{
                         boxfactor = 7.5
@@ -1848,7 +1848,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 //要要洗或拨
                 else{
                     if shuffleOrRiffle == 0 || minH < 2 * minW{
-                        boxfactor = 2.5
+                        boxfactor = 5
                     }
                     else{
                         boxfactor = 2.5
