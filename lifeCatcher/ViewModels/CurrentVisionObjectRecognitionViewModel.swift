@@ -804,7 +804,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                 //self.speakText(input: 1)
                             }
                             else{
-                                self.speakText(input: 2)
+                                //self.speakText(input: 2)
                             }
                         }
                         
@@ -818,7 +818,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                 //self.speakText(input: 1)
                             }
                             else{
-                                self.speakText(input: 2)
+                                //self.speakText(input: 2)
                             }
                         }
                         
@@ -1102,7 +1102,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             let detectResultListIndex = sortedKeys[keyIndex]
             for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
                 let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
-                if detectResultNode.nodeType == 1{
+                if detectResultNode.nodeType == 2{
                     confidenceDic[detectResultNode.singlefeatureIndex[0]] = 100
                 }
             }
@@ -1128,9 +1128,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                         && end != -1{
                                 head = keyIndex
                                 
-                                let isClose = head - end <= 5
+                                let isClose = head - end <= 3
 
-                                var isSameNum = head - end <= 10
+                                var isSameNum = head - end <= 5
                                 var middleNum = -1
                                 for updateIndex in end+1...head-1{
                                     let updateNodeIndex = sortedKeys[updateIndex]
@@ -1156,17 +1156,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                         targetDetecResultList[updateNodeIndex]![numIndex].nodeType = 3
                                     }
                                 }
-                                else{
-                                    for updateIndex in head..<endIndex{
-                                        let updateNodeIndex = sortedKeys[updateIndex]
-                                        if targetDetecResultList[updateNodeIndex]![numIndex].singlefeatureIndex[0] == nowNum{
-                                            targetDetecResultList[updateNodeIndex]![numIndex].nodeType = 0
-                                        }
-                                        else{
-                                            break
-                                        }
-                                    }
-                                }
                             }
                         }
                     }
@@ -1182,7 +1171,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
                         let nowNum = targetDetecResultList[detectResultListIndex]![numIndex].singlefeatureIndex[0]
                         let nodeType = targetDetecResultList[detectResultListIndex]![numIndex].nodeType
-                        if nowNum == key && nodeType == 1 {
+                        if nowNum == key && nodeType == 2 {
                             isChain = true
                         }
                     }
@@ -1377,6 +1366,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
         }
         
+        //补牌
         if isShuffle && beginIndex < addEndIndex && lostNum <= 2{
             
             let numIndexList : [Int] = [0, 1]
@@ -1488,6 +1478,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
         }
         
+        //补链头尾
         for keyIndex in beginIndex..<endIndex{
             let detectResultListIndex = sortedKeys[keyIndex]
             let lastDetectResultListIndex = sortedKeys[keyIndex-1]
@@ -1547,7 +1538,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
         }
         
-        var detectSingleFeatureArray : [Int] = []
+        var detectSingleFeatureArray : [InsertCard] = []
         
         var noneCnt = 0
         var headCnt = 0
@@ -1561,6 +1552,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             let nextDetectResultListIndex = sortedKeys[keyIndex+1]
             let nextnextDetectResultListIndex = sortedKeys[keyIndex+2]
             if targetDetecResultList[detectResultListIndex]!.count == 2{
+                
                 
                 let detectResultNode0 = targetDetecResultList[detectResultListIndex]![0]
                 let detectResultNode1 = targetDetecResultList[detectResultListIndex]![1]
@@ -1579,19 +1571,40 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 let nowNum1 = targetDetecResultList[detectResultListIndex]![1].singlefeatureIndex[0]
                 let nodeType1 = targetDetecResultList[detectResultListIndex]![1].nodeType
                 
+//                print("index ", detectResultListIndex,
+//                      singlefeatureLabelDic[nowNum0] ?? "none", detectResultNode0.nodeType, detectResultNode0.laplacianVariance, detectResultNode0.confidence[0], detectResultListIndex,
+//                      singlefeatureLabelDic[nowNum1] ?? "none", detectResultNode1.nodeType, detectResultNode1.laplacianVariance, detectResultNode1.confidence[0])
+                
+                var insertCard0 : InsertCard
+                var insertCard1 : InsertCard
+                
+                if nodeType0 == 2{
+                    insertCard0 = InsertCard(cardIndex: nowNum0, confidence: max(lastDetectResultNode0.confidence[0], detectResultNode0.confidence[0]))
+                }
+                else{
+                    insertCard0 = InsertCard(cardIndex: nowNum0, confidence: detectResultNode0.confidence[0])
+                }
+                
+                if nodeType1 == 2{
+                    insertCard1 = InsertCard(cardIndex: nowNum1, confidence: max(lastDetectResultNode1.confidence[0], detectResultNode1.confidence[0]))
+                }
+                else{
+                    insertCard1 = InsertCard(cardIndex: nowNum1, confidence: detectResultNode1.confidence[0])
+                }
+                
                 if isSingle{
                     if nodeType0 == 2{
-                        detectSingleFeatureArray.insert(nowNum0, at: 0)
+                        detectSingleFeatureArray.insert(insertCard0, at: 0)
                     }
                     else if nodeType0 == 0 && nowNum0 != -1 && detectResultNode0.confidence[0] > 0.7{
-                        detectSingleFeatureArray.insert(nowNum0, at: 0)
+                        detectSingleFeatureArray.insert(insertCard0, at: 0)
                     }
                 
                     if nodeType1 == 2{
-                        detectSingleFeatureArray.insert(nowNum1, at: 0)
+                        detectSingleFeatureArray.insert(insertCard1, at: 0)
                     }
                     else if nodeType1 == 0 && nowNum1 != -1 && detectResultNode1.confidence[0] > 0.7{
-                        detectSingleFeatureArray.insert(nowNum1, at: 0)
+                        detectSingleFeatureArray.insert(insertCard1, at: 0)
                     }
                 }
                 else{
@@ -1608,7 +1621,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             leftLaplacianPercent = detectResultNode0.laplacianVariance / self.laplacianDic[0][nowNum0]!
                         }
                         
-                        
                         if nodeType1 == 2{
                             rightLaplacianPercent = detectResultNode1.laplacianVariance / lastDetectResultNode1.laplacianVariance
                         }
@@ -1617,28 +1629,28 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                         
                         if nextDetectResultNode0.nodeType == 5 && nextDetectResultNode1.nodeType != 5{
-                            detectSingleFeatureArray.insert(nowNum1, at: 0)
-                            detectSingleFeatureArray.insert(nowNum0, at: 0)
+                            detectSingleFeatureArray.insert(insertCard1, at: 0)
+                            detectSingleFeatureArray.insert(insertCard0, at: 0)
                         }
                         else if nextDetectResultNode0.nodeType != 5 && nextDetectResultNode1.nodeType == 5{
-                            detectSingleFeatureArray.insert(nowNum0, at: 0)
-                            detectSingleFeatureArray.insert(nowNum1, at: 0)
+                            detectSingleFeatureArray.insert(insertCard0, at: 0)
+                            detectSingleFeatureArray.insert(insertCard1, at: 0)
                         }
                         else if nextDetectResultNode0.nodeType == 0 && nextDetectResultNode1.nodeType != 0{
-                            detectSingleFeatureArray.insert(nowNum1, at: 0)
-                            detectSingleFeatureArray.insert(nowNum0, at: 0)
+                            detectSingleFeatureArray.insert(insertCard1, at: 0)
+                            detectSingleFeatureArray.insert(insertCard0, at: 0)
                         }
                         else if nextDetectResultNode0.nodeType != 0 && nextDetectResultNode1.nodeType == 0{
-                            detectSingleFeatureArray.insert(nowNum0, at: 0)
-                            detectSingleFeatureArray.insert(nowNum1, at: 0)
+                            detectSingleFeatureArray.insert(insertCard0, at: 0)
+                            detectSingleFeatureArray.insert(insertCard1, at: 0)
                         }
                         else if leftLaplacianPercent < blurThreshold && rightLaplacianPercent >= blurThreshold{
-                            detectSingleFeatureArray.insert(nowNum0, at: 0)
-                            detectSingleFeatureArray.insert(nowNum1, at: 0)
+                            detectSingleFeatureArray.insert(insertCard0, at: 0)
+                            detectSingleFeatureArray.insert(insertCard1, at: 0)
                         }
                         else if rightLaplacianPercent < blurThreshold && leftLaplacianPercent >= blurThreshold{
-                            detectSingleFeatureArray.insert(nowNum1, at: 0)
-                            detectSingleFeatureArray.insert(nowNum0, at: 0)
+                            detectSingleFeatureArray.insert(insertCard1, at: 0)
+                            detectSingleFeatureArray.insert(insertCard0, at: 0)
                         }
                         else{
                             var leftNextLaplacianPercent : Float = 1
@@ -1665,32 +1677,32 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             }
                             
                             if leftNextLaplacianPercent < blurThreshold && rightNextLaplacianPercent >= blurThreshold{
-                                detectSingleFeatureArray.insert(nowNum1, at: 0)
-                                detectSingleFeatureArray.insert(nowNum0, at: 0)
+                                detectSingleFeatureArray.insert(insertCard1, at: 0)
+                                detectSingleFeatureArray.insert(insertCard0, at: 0)
                             }
                             else if rightNextLaplacianPercent < blurThreshold && leftNextLaplacianPercent >= blurThreshold{
-                                detectSingleFeatureArray.insert(nowNum0, at: 0)
-                                detectSingleFeatureArray.insert(nowNum1, at: 0)
+                                detectSingleFeatureArray.insert(insertCard0, at: 0)
+                                detectSingleFeatureArray.insert(insertCard1, at: 0)
                             }
                             //上一张和下一张两边都不模糊 直接比较上一张两边模糊程度
                             else if leftLaplacianPercent < blurThreshold && rightLaplacianPercent < blurThreshold{
                                 if leftLaplacianPercent < rightLaplacianPercent{
-                                    detectSingleFeatureArray.insert(nowNum0, at: 0)
-                                    detectSingleFeatureArray.insert(nowNum1, at: 0)
+                                    detectSingleFeatureArray.insert(insertCard0, at: 0)
+                                    detectSingleFeatureArray.insert(insertCard1, at: 0)
                                 }
                                 else{
-                                    detectSingleFeatureArray.insert(nowNum1, at: 0)
-                                    detectSingleFeatureArray.insert(nowNum0, at: 0)
+                                    detectSingleFeatureArray.insert(insertCard1, at: 0)
+                                    detectSingleFeatureArray.insert(insertCard0, at: 0)
                                 }
                             }
                             else{
                                 if leftNextLaplacianPercent < rightNextLaplacianPercent{
-                                    detectSingleFeatureArray.insert(nowNum1, at: 0)
-                                    detectSingleFeatureArray.insert(nowNum0, at: 0)
+                                    detectSingleFeatureArray.insert(insertCard1, at: 0)
+                                    detectSingleFeatureArray.insert(insertCard0, at: 0)
                                 }
                                 else{
-                                    detectSingleFeatureArray.insert(nowNum0, at: 0)
-                                    detectSingleFeatureArray.insert(nowNum1, at: 0)
+                                    detectSingleFeatureArray.insert(insertCard0, at: 0)
+                                    detectSingleFeatureArray.insert(insertCard1, at: 0)
                                 }
                             }
                             
@@ -1699,10 +1711,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     
                     else{
                         if nodeType0 == 4 || nodeType0 == 2{
-                            detectSingleFeatureArray.insert(nowNum0, at: 0)
+                            detectSingleFeatureArray.insert(insertCard0, at: 0)
                         }
                         if nodeType1 == 4 || nodeType1 == 2{
-                            detectSingleFeatureArray.insert(nowNum1, at: 0)
+                            detectSingleFeatureArray.insert(insertCard1, at: 0)
                         }
                     }
                 }
@@ -1710,15 +1722,25 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         
         var uniqueArray: [Int] = []
+        print(detectSingleFeatureArray.count)
         for singlefeature in detectSingleFeatureArray {
-            if !uniqueArray.contains(singlefeature) {
-                uniqueArray.append(singlefeature)
+            if let existIndex = uniqueArray.firstIndex(of: singlefeature.cardIndex){
+                if singlefeature.confidence > confidenceDic[singlefeature.cardIndex] ?? 0{
+                    confidenceDic[singlefeature.cardIndex] = singlefeature.confidence
+                    uniqueArray.append(singlefeature.cardIndex)
+                    uniqueArray.remove(at: existIndex)
+                    print("delete chain \(detectSingleFeatureArray._index(at: singlefeature.cardIndex)) \(existIndex)/\(uniqueArray.count) \(singlefeatureLabelDic[singlefeature.cardIndex]!)")
+                }
+            }
+            else {
+                confidenceDic[singlefeature.cardIndex] = singlefeature.confidence
+                uniqueArray.append(singlefeature.cardIndex)
             }
         }
         
         isShort = uniqueArray.count < self.minSingleFeatureNum
         
-        print("handle result \(uniqueArray.count) \(minSingleFeatureNum) \(isShort)")
+        print("handle result \(uniqueArray.count) \(minSingleFeatureNum) isShort\(isShort)")
         
         let result = DetectionState(detectionResult: uniqueArray, isSingle: isSingle, isShort: isShort, longestIndex: longestIndex)
         return result
@@ -2796,6 +2818,16 @@ class DetectionState{
         self.isSingle = isSingle
         self.isShort = isShort
         self.longestIndex = longestIndex
+    }
+}
+
+class InsertCard{
+    var cardIndex: Int
+    var confidence: Float
+    
+    init(cardIndex: Int, confidence: Float) {
+        self.cardIndex = cardIndex
+        self.confidence = confidence
     }
 }
 
