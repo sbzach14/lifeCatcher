@@ -31,6 +31,7 @@ struct AuthTestView: View {
             .padding()
             
             Button(action: {
+                self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
                 sendActivateRequest()
             }, label: {
                 Text("Authorize")
