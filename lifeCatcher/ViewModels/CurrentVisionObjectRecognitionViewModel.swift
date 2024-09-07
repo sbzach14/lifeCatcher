@@ -147,8 +147,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     var selectedSaveIndex : Int = 0
     var isWorking: Bool = true
     
-    var viewController: ButtonViewController?
-    
     let speechPerformer = SpeechPerformer()
     
     var detectSet: Set<Int> = []
@@ -928,9 +926,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             let nowN0 = dRNode0.singlefeatureIndex[0]
             let nowN1 = dRNode1.singlefeatureIndex[0]
         
-            print("index ", detectResultListIndex,
-                  singlefeatureLabelDic[nowN0] ?? "none", dRNode0.nodeType, dRNode0.laplacianVariance, dRNode0.confidence[0], detectResultListIndex,
-                  singlefeatureLabelDic[nowN1] ?? "none", dRNode1.nodeType, dRNode1.laplacianVariance, dRNode1.confidence[0])
+//            print("index ", detectResultListIndex,
+//                  singlefeatureLabelDic[nowN0] ?? "none", dRNode0.nodeType, dRNode0.laplacianVariance, dRNode0.confidence[0], detectResultListIndex,
+//                  singlefeatureLabelDic[nowN1] ?? "none", dRNode1.nodeType, dRNode1.laplacianVariance, dRNode1.confidence[0])
         }
         
         sortedKeys = sortedKeys.filter { !deleteKeys.contains($0) }
@@ -2430,6 +2428,11 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 self.successAudioRC?.stop()
             }
             else if hintVoiceIndex == 2{
+                self.failAudioRC?.stop()
+            }
+            else{
+                self.startAudioRC?.stop()
+                self.successAudioRC?.stop()
                 self.failAudioRC?.stop()
             }
             
