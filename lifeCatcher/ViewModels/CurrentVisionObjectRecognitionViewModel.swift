@@ -29,12 +29,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var cutStructArray: [cutStruct] = []
     @Published var cutShowArray : [Int] = []
 
-    let detectModel = try! detect_0903_copy()
-    let clsModel_h = try! cls_0715_h_trans_copy()
-    let clsModel_v = try! cls_0727_v_trans_copy()
-//    let detectModel = try! detect_0903()
-//    let clsModel_h = try! cls_0715_h_trans()
-//    let clsModel_v = try! cls_0727_v_trans()
+//    let detectModel = try! detect_0903_copy()
+//    let clsModel_h = try! cls_0715_h_trans_copy()
+//    let clsModel_v = try! cls_0727_v_trans_copy()
+    let detectModel = try! detect_0903()
+    let clsModel_h = try! cls_0715_h_trans()
+    let clsModel_v = try! cls_0727_v_trans()
     var originSize : [Float] = [1920, 1080] //相机图像大小
     var imageSize : [Float] = [569, 320] //target area 截图大小
     var originImageSize : [Float] = [569, 320] //target area 原始截图大小
@@ -1819,7 +1819,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 //如果不拨牌 只洗牌
                 else if self.shuffleMode[0] != 0 && self.shuffleMode[1] == 0{
                     if detectNeedToCut{
-                        boxfactor = 5
+                        boxfactor = 2.5
                     }
                     else{
                         boxfactor = 7.5
@@ -1828,7 +1828,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 //要要洗或拨
                 else{
                     if shuffleOrRiffle == 0 || minH < 2 * minW{
-                        boxfactor = 5
+                        boxfactor = 2.5
                     }
                     else{
                         boxfactor = 2.5
