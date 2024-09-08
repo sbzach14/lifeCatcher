@@ -3662,7 +3662,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             
                         } else {
                             voiceType = 1
-                            reportString = String(singlefeatureIndex - 1)
+                            reportString += String(singlefeatureIndex - 1) + " "
                         }
                     }
                     currentSpeakStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
@@ -3690,7 +3690,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             
                         } else {
                             voiceType = 1
-                            reportString = String(singlefeatureIndex - 1) + "活门" + String(resultInfo.aliveNumber)
+                            reportString += String(singlefeatureIndex - 1) + "活门" + String(resultInfo.aliveNumber) + " "
                         }
                     }
                     currentSpeakStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
@@ -3719,9 +3719,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             
                         } else {
                             voiceType = 1
-                            reportString += String(singlefeatureIndex - 1)
+                            reportString += String(singlefeatureIndex - 1) + " "
                         }
-                        reportString += "活门" + String(resultInfo.aliveNumber)
+                        reportString += "活门" + String(resultInfo.aliveNumber) + " "
                     }
                     currentSpeakStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
                     //报最大家
@@ -3752,7 +3752,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             let voiceType: Int = 1
             var reportString: String = ""
             reportString += String(multipleReportResultInfo.singlefeatureIndexForMultipleRound) + " "
-            reportString += multipleReportResultInfo.winRoundIndex.reduce("") { $0 + "\($1)" }
+            reportString += multipleReportResultInfo.winRoundIndex.reduce("") { $0 + "\($1)" } + " "
             reportResult.append([SpeakResultStruct(voiceType: voiceType, content: reportString)])
             break
 //        49:"[81]:上10张去牌保位置最小无对子",
@@ -3770,7 +3770,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     for j in 0..<resultInfo.singlefeatureIndexToConfirmMaxMin[i].count {
                         reportString += String(resultInfo.singlefeatureIndexToConfirmMaxMin[i][j])
                         if resultInfo.XorYMax[i].count > 0{
-                            reportString += String(resultInfo.XorYMax[i][j])
+                            reportString += String(resultInfo.XorYMax[i][j]) + " "
                         }
                     }
                     currentSpeakStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
@@ -3797,7 +3797,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 }
                 
                 for singlefeatureIndex in resultInfo.singlefeatureIndexToConfirmMaxMin[0] {
-                    reportString += String(singlefeatureIndex - 1)
+                    reportString += String(singlefeatureIndex - 1) + " "
                 }
 
                 reportResult.append([SpeakResultStruct(voiceType: voiceType, content: reportString)])
@@ -4160,6 +4160,16 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             break
             
         }
+
+        
+        //jq替换
+        for speakContent in reportResult {
+            for contentStruct in speakContent {
+                contentStruct.content = contentStruct.content.replacingOccurrences(of: "J", with: "勾")
+                contentStruct.content = contentStruct.content.replacingOccurrences(of: "Q", with: "圈")
+            }
+        }
+        
         return reportResult
         
     }
