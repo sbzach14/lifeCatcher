@@ -147,8 +147,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     var selectedSaveIndex : Int = 0
     var isWorking: Bool = true
     
-    var viewController: ButtonViewController?
-    
     let speechPerformer = SpeechPerformer()
     
     var detectSet: Set<Int> = []
@@ -410,7 +408,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             
             if frameRate == idleRate{
                 //device.exposureMode = .continuousAutoExposure
-                //device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(self.setFrameRate)), iso: device.activeFormat.maxISO)
                 device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(240)), iso: device.activeFormat.maxISO)
                 //device.setExposureTargetBias(0)
             }
@@ -537,7 +534,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             confidenceThreshold = 0.7
         }
         else{
-            confidenceThreshold = 0.2
+            confidenceThreshold = 0.1
         }
         
         var singlefeatureResult : [DetectionResult]
@@ -688,6 +685,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         self.state = "shuffle"
                     }
                 }
+                
+//                print("\(self.singlefeatureLabelDic[leftDetectSingleFeature] ?? "null")  \(leftConfidence)  \(self.singlefeatureLabelDic[rightDetectSingleFeature] ?? "null")  \(rightConfidence) detectNeedToCut\(self.detectNeedToCut)")
                 
                 if isCut{
                     
@@ -928,9 +927,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             let nowN0 = dRNode0.singlefeatureIndex[0]
             let nowN1 = dRNode1.singlefeatureIndex[0]
         
-            print("index ", detectResultListIndex,
-                  singlefeatureLabelDic[nowN0] ?? "none", dRNode0.nodeType, dRNode0.laplacianVariance, dRNode0.confidence[0], detectResultListIndex,
-                  singlefeatureLabelDic[nowN1] ?? "none", dRNode1.nodeType, dRNode1.laplacianVariance, dRNode1.confidence[0])
+//            print("index ", detectResultListIndex,
+//                  singlefeatureLabelDic[nowN0] ?? "none", dRNode0.nodeType, dRNode0.laplacianVariance, dRNode0.confidence[0], detectResultListIndex,
+//                  singlefeatureLabelDic[nowN1] ?? "none", dRNode1.nodeType, dRNode1.laplacianVariance, dRNode1.confidence[0])
         }
         
         sortedKeys = sortedKeys.filter { !deleteKeys.contains($0) }
@@ -1795,12 +1794,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 }
                 //要要洗或拨
                 else{
-                    if shuffleOrRiffle == 0 || minW < 2 * minH{
-                        boxfactor = 5
-                    }
-                    else{
-                        boxfactor = 2.5
-                    }
+                    boxfactor = 5
                 }
                 
                 minW = max(minW,minH) * boxfactor
@@ -1849,12 +1843,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 }
                 //要要洗或拨
                 else{
-                    if shuffleOrRiffle == 0 || minH < 2 * minW{
-                        boxfactor = 5
-                    }
-                    else{
-                        boxfactor = 2.5
-                    }
+                    boxfactor = 5
                 }
                 
                 minH = max(minW,minH) * boxfactor
@@ -2430,6 +2419,11 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 self.successAudioRC?.stop()
             }
             else if hintVoiceIndex == 2{
+                self.failAudioRC?.stop()
+            }
+            else{
+                self.startAudioRC?.stop()
+                self.successAudioRC?.stop()
                 self.failAudioRC?.stop()
             }
             

@@ -248,13 +248,12 @@ class ButtonViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.view.addSubview(volumeView)
     }
     
     init(viewModel: CurrentVisionObjectRecognitionViewModel) {
         super.init(nibName: nil, bundle: nil)
-        
         self.viewModel = viewModel
-        self.view.addSubview(self.volumeView)
         
         // Load data from config.json
         if let configData = readConfigJSON() {
@@ -263,10 +262,9 @@ class ButtonViewController: UIViewController {
             let intDict = configData["Int"] as! [String : Int]
             self.voiceDevice = intDict["voiceDevice"]!
         }
-        viewModel.viewController = self
         self.currentVolume = self.volumeValue
     }
-
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         NotificationCenter.default.addObserver(self, selector: #selector(volumeChanged(_:)), name: NSNotification.Name(rawValue: "SystemVolumeDidChange"), object: nil)
@@ -274,13 +272,16 @@ class ButtonViewController: UIViewController {
         setSystemVolume(volume: self.volumeValue)
     }
     
-    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        // 移除自定义视图
+        volumeView.removeFromSuperview()
+        
+        // 移除通知观察者
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: "SystemVolumeDidChange"), object: nil)
         NotificationCenter.default.removeObserver(self, name: AVAudioSession.routeChangeNotification, object: AVAudioSession.sharedInstance())
     }
@@ -306,14 +307,17 @@ class ButtonViewController: UIViewController {
         if reason == .oldDeviceUnavailable && self.voiceDevice == 1 {
             print("Earphones or other audio device was disconnected")
             // 在这里处理耳机断开的逻辑
+            viewModel?.speechPerformer.stopSpeechSynthesis()
+            viewModel?.speakText(input: -1)
             setSystemVolume(volume: 0)
         }
     }
 
     deinit {
+        volumeView.removeFromSuperview()
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: "SystemVolumeDidChange"), object: nil)
         NotificationCenter.default.removeObserver(self, name: AVAudioSession.routeChangeNotification, object: AVAudioSession.sharedInstance())
     }
-    
     
     @objc func volumeChanged(_ notification: NSNotification) {
         guard let userInfo = notification.userInfo,
@@ -322,7 +326,7 @@ class ButtonViewController: UIViewController {
             return
         }
 
-        if reason == "ExplicitVolumeChange" && volume != currentVolume && volume != 0{
+        if reason == "ExplicitVolumeChange" && volume != currentVolume && volume != 0 {
             guard let sequenceNumber = userInfo["SequenceNumber"] as? Int else {
                 return
             }
@@ -354,7 +358,6 @@ class ButtonViewController: UIViewController {
             } else {
                 viewModel?.handleVolumeDecrease()
             }
-            
         }
     }
 }
