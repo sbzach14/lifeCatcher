@@ -43,9 +43,6 @@
 		A838534C2ADA7C0200346038 /* BG.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A838534B2ADA7C0200346038 /* BG.xcassets */; };
 		A83853532ADA918000346038 /* CustomUIComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83853522ADA918000346038 /* CustomUIComponent.swift */; };
 		A87097112C8A5D1E003A4729 /* UserHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87097102C8A5D1E003A4729 /* UserHelper.swift */; };
-		A87097212C8C1E81003A4729 /* cls_0715_h_trans_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A870971E2C8C1E81003A4729 /* cls_0715_h_trans_copy.mlmodel */; };
-		A87097222C8C1E81003A4729 /* cls_0727_v_trans_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A870971F2C8C1E81003A4729 /* cls_0727_v_trans_copy.mlmodel */; };
-		A87097232C8C1E81003A4729 /* detect_0903_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A87097202C8C1E81003A4729 /* detect_0903_copy.mlmodel */; };
 		A887167F2A0623E500B7F2CD /* AManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887167E2A0623E500B7F2CD /* AManager.swift */; };
 		A887B6502A7FE1AF009F488F /* ShowResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B64F2A7FE1AF009F488F /* ShowResultView.swift */; };
 		A887B6522A8104BC009F488F /* TimeAuthUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B6512A8104BC009F488F /* TimeAuthUtils.swift */; };
@@ -121,9 +118,6 @@
 		A838534B2ADA7C0200346038 /* BG.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = BG.xcassets; sourceTree = "<group>"; };
 		A83853522ADA918000346038 /* CustomUIComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomUIComponent.swift; sourceTree = "<group>"; };
 		A87097102C8A5D1E003A4729 /* UserHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserHelper.swift; sourceTree = "<group>"; };
-		A870971E2C8C1E81003A4729 /* cls_0715_h_trans_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0715_h_trans_copy.mlmodel; sourceTree = "<group>"; };
-		A870971F2C8C1E81003A4729 /* cls_0727_v_trans_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0727_v_trans_copy.mlmodel; sourceTree = "<group>"; };
-		A87097202C8C1E81003A4729 /* detect_0903_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = detect_0903_copy.mlmodel; sourceTree = "<group>"; };
 		A887167E2A0623E500B7F2CD /* AManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AManager.swift; sourceTree = "<group>"; };
 		A887B64F2A7FE1AF009F488F /* ShowResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowResultView.swift; sourceTree = "<group>"; };
 		A887B6512A8104BC009F488F /* TimeAuthUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeAuthUtils.swift; sourceTree = "<group>"; };
@@ -333,9 +327,6 @@
 				D03811A12C75401200726B99 /* cls_main.mlmodel */,
 				D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */,
 				D03811A42C7542C200726B99 /* cls_0727_v_trans.mlmodel */,
-				A870971E2C8C1E81003A4729 /* cls_0715_h_trans_copy.mlmodel */,
-				A870971F2C8C1E81003A4729 /* cls_0727_v_trans_copy.mlmodel */,
-				A87097202C8C1E81003A4729 /* detect_0903_copy.mlmodel */,
 				D02717D72C8704AB00A29D43 /* detect_0903.mlmodel */,
 				187A45422C2DA25E00BB055C /* success_voice.mp3 */,
 				187A45442C2DA26100BB055C /* fail_voice.mp3 */,
@@ -464,8 +455,6 @@
 				18C98D1D2C158F7B00A8CD49 /* TEGan.swift in Sources */,
 				A88EFDC82A7D249C00897243 /* CurrentObjectRegView.swift in Sources */,
 				187A45512C31BBB400BB055C /* AllBaseSettingArgs.swift in Sources */,
-				A87097212C8C1E81003A4729 /* cls_0715_h_trans_copy.mlmodel in Sources */,
-				A87097232C8C1E81003A4729 /* detect_0903_copy.mlmodel in Sources */,
 				18C98D0E2C158F7B00A8CD49 /* FCar.swift in Sources */,
 				A887B6522A8104BC009F488F /* TimeAuthUtils.swift in Sources */,
 				18C98D0F2C158F7B00A8CD49 /* JJBao.swift in Sources */,
@@ -498,7 +487,6 @@
 				A887B6502A7FE1AF009F488F /* ShowResultView.swift in Sources */,
 				A88EFDC42A7D217200897243 /* OriginVisionObjectRecognitionViewModel.swift in Sources */,
 				D03811AA2C76904D00726B99 /* OriginObjectRegView.swift in Sources */,
-				A87097222C8C1E81003A4729 /* cls_0727_v_trans_copy.mlmodel in Sources */,
 				18C98D182C158F7B00A8CD49 /* TCPoi.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -650,7 +638,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
-				DEVELOPMENT_TEAM = FYQ8UYQL3M;
+				DEVELOPMENT_TEAM = 6WK4Q32GMN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = lifeCatcher/App/Info.plist;
@@ -674,7 +662,7 @@
 				);
 				MARKETING_VERSION = 1.0.4;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.shuffle.lifeCatcher;
+				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -698,7 +686,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
-				DEVELOPMENT_TEAM = FYQ8UYQL3M;
+				DEVELOPMENT_TEAM = 6WK4Q32GMN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = lifeCatcher/App/Info.plist;
@@ -722,7 +710,7 @@
 				);
 				MARKETING_VERSION = 1.0.4;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.shuffle.lifeCatcher;
+				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
