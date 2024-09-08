@@ -789,7 +789,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             self.speakText(input: 2)
                         }
                         
-                        if (self.cutMode[0] == 0  && self.specialCard[0] == 0) || self.cutMode[0] == 3{
+                        if self.cutMode[0] == 0  && self.specialCard[0] == 0{
                             self.computeWinnerRC(isReset: true)
                         }
                     }
@@ -824,7 +824,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                         
                         
-                        if (self.cutMode[1] == 0 && self.specialCard[1] == 0) || self.cutMode[1] == 3 {
+                        if self.cutMode[1] == 0 && self.specialCard[1] == 0{
                             self.computeWinnerRC(isReset: true)
                         }
                     }
