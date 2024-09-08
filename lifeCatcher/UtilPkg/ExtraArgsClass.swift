@@ -2352,7 +2352,11 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             break
                         //1，去色再根据色牌点数去牌
                         case 1:
-                            newInputSingleFeatures = Array(coloringInputSingleFeatures[(singlefeatureRank  + singlefeatureIndex + 1)...]) + Array(coloringInputSingleFeatures[0...singlefeatureIndex])
+                            if singlefeatureRank < coloringInputSingleFeatures.count - 1 {
+                                newInputSingleFeatures = Array(coloringInputSingleFeatures[(singlefeatureRank  + singlefeatureIndex + 1)...]) + Array(coloringInputSingleFeatures[0...singlefeatureIndex])
+                            } else {
+                                newInputSingleFeatures = []
+                            }
                             break
                         //2，留色
                         case 2:
@@ -3108,6 +3112,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 currentResultInfo.NoBullOrMaxOneBull = 2
                                 reportTargetFlag = 1
                             }
+                            
                             if reportTargetFlag == 1 {
                                 currentResultInfo.singlefeatureIndexToConfirmMaxMin[upDownID].append(singlefeatureIndex + 1)
                             }
@@ -3786,9 +3791,11 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 } else if resultInfo.NoBullOrMaxOneBull == 2 {
                     voiceType = 1
                 }
+                
                 if resultInfo.singlefeatureIndexToConfirmMaxMin[0].count == 0 {
-                    reportString = "无"
+                    reportString = "有牛"
                 }
+                
                 for singlefeatureIndex in resultInfo.singlefeatureIndexToConfirmMaxMin[0] {
                     reportString += String(singlefeatureIndex - 1)
                 }
@@ -3825,7 +3832,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     var voiceType: Int = 1
                     var reportString: String = ""
                     if subArray.count == 0 {
-                        voiceType = 0
+                        voiceType = 1
                         reportString += "0"
                     }
                     for i in subArray{
@@ -3849,7 +3856,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     var voiceType: Int = 1
                     var reportString: String = ""
                     if subArray.count == 0{
-                        voiceType = 0
+                        voiceType = 1
                         reportString += "0"
                     }
                     for i in subArray{
