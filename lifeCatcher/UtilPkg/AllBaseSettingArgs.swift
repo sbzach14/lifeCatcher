@@ -100,6 +100,7 @@ class ClassifierSettingArgs {
         let rule14 = TPFiveDatasetRule(ruleIndex: 14, ruleName: "十点半")
         let rule15 = CBDatasetRule(ruleIndex: 15, ruleName: "比鸡")
         let rule16 = TWDatasetRule(ruleIndex: 16, ruleName: "十三水")
+        let rule17 = AinRule(ruleIndex: 17, ruleName: "梭哈")
         return [rule0.ruleIndex: rule0, rule1.ruleIndex: rule1, rule2.ruleIndex: rule2, rule3.ruleIndex: rule3, rule4.ruleIndex: rule4, rule5.ruleIndex: rule5, rule6.ruleIndex: rule6, rule7.ruleIndex: rule7, rule8.ruleIndex: rule8, rule9.ruleIndex: rule9,rule10.ruleIndex:rule10, rule11.ruleIndex: rule11,rule12.ruleIndex:rule12, rule13.ruleIndex:rule13, rule14.ruleIndex: rule14, rule15.ruleIndex: rule15, rule16.ruleIndex: rule16]
     }()
     
@@ -455,6 +456,9 @@ public class DetectSettingArgs{
         allPreSetReportRules[134] = ReportClass.init(reportName: "[339]:范围切牌打色去色1张保位置最小次小", reportID: 134, rankReport: 4, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 0, reportTarget: 9, singlefeaturesTransformation: 5, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: 0, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, reportFormation: -1, cutSingleFeatureProcession: -1)
         allPreSetReportRules[135] = ReportClass.init(reportName: "[342]:范围切牌打色色先发保位置最小", reportID: 135, rankReport: 3, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 0, reportTarget: 9, singlefeaturesTransformation: 6, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: 0, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, reportFormation: -1, cutSingleFeatureProcession: -1)
         allPreSetReportRules[136] = ReportClass.init(reportName: "[343]:范围切牌打色色先发保位置最小次小", reportID: 136, rankReport: 4, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 0, reportTarget: 9, singlefeaturesTransformation: 6, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: 0, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, reportFormation: -1, cutSingleFeatureProcession: -1)
+        allPreSetReportRules[145] = ReportClass.init(reportName: "[420]:随意混合打色保位置最大次大", reportID: 145, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 16, reportTarget: 18, singlefeaturesTransformation: 31, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: 17, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: 99, reportFormation: -1, cutSingleFeatureProcession: 2)
+        allPreSetReportRules[146] = ReportClass.init(reportName: "[421]:随意混合打色保位置最小次小", reportID: 146, rankReport: 4, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 16, reportTarget: 18, singlefeaturesTransformation: 31, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: 17, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: 99, reportFormation: -1, cutSingleFeatureProcession: 2)
+        allPreSetReportRules[147] = ReportClass.init(reportName: "[422]:随意混合打色报大1大2小1小2", reportID: 147, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 15, reportTarget: 17, singlefeaturesTransformation: 30, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: 17, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: 99, reportFormation: -1, cutSingleFeatureProcession: 2)
         //todo 137-147
         allPreSetReportRules[148] = ReportClass.init(reportName: "[450]:指定底牌报最大次大", reportID: 148, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: -1, reportTarget: 0, singlefeaturesTransformation: 11, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: -1, hasSpecialSingleFeature: 0, specifiedRCHand: -1, differentDeal: -1, reportFormation: -1, cutSingleFeatureProcession: -1)
         allPreSetReportRules[149] = ReportClass.init(reportName: "[451]:指定底牌报最大", reportID: 148, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: -1, reportTarget: 0, singlefeaturesTransformation: 11, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: -1, hasSpecialSingleFeature: 0, specifiedRCHand: -1, differentDeal: -1, reportFormation: -1, cutSingleFeatureProcession: -1)
@@ -494,6 +498,7 @@ public class DetectSettingArgs{
         allPreSetReportRules[184] = ReportClass.init(reportName: "[542]:面为色去色报位置最小次小", reportID: 182, rankReport: 2, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: -1, reportTarget: 0, singlefeaturesTransformation: 3, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: 9, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, reportFormation: -1, cutSingleFeatureProcession: -1)
         allPreSetReportRules[185] = ReportClass.init(reportName: "[543]:面为色去色报位置最小", reportID: 185, rankReport: 3, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: -1, reportTarget: 0, singlefeaturesTransformation: 3, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: 9, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, reportFormation: -1, cutSingleFeatureProcession: -1)
         allPreSetReportRules[186] = ReportClass.init(reportName: "[544]:面为色去色报排名", reportID: 186, rankReport: 5, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: -1, reportTarget: 0, singlefeaturesTransformation: 3, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: 9, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, reportFormation: -1, cutSingleFeatureProcession: -1)
+        allPreSetReportRules[187] = ReportClass.init(reportName: "[670]:报四张单张", reportID: 187, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: -1, reportTarget: 19, singlefeaturesTransformation: -1, consecutiveReport: -1, positionToReport: -1, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, reportFormation: -1, cutSingleFeatureProcession: -1)
         //todo 187-192
         allPreSetReportRules[193] = ReportClass.init(reportName: "[700]:去掉14张面牌报哪家最大", reportID: 193, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: -1, reportTarget: 0, singlefeaturesTransformation: 13, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, reportFormation: -1, cutSingleFeatureProcession: -1)
         allPreSetReportRules[194] = ReportClass.init(reportName: "[701]:去掉14张面牌报哪家最小", reportID: 194, rankReport: 3, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: -1, reportTarget: 0, singlefeaturesTransformation: 13, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, reportFormation: -1, cutSingleFeatureProcession: -1)
@@ -648,14 +653,14 @@ public class DetectSettingArgs{
 //                handUseType = 0
 //                handUseNum = 0
 
-                args = [5,5,0,1,0,0,0]
-                suitRules = [3,2,1,0]
-                rankRules = [11,10,9,8,7,6,2,1,0]
-                rankRuleChecked = [1,1,1,1,1,1,1,1,1]
-                allPreSetRules[i]![4]!.append(args)
-                allPreSetRules[i]![4]!.append(suitRules)
-                allPreSetRules[i]![4]!.append(rankRules)
-                allPreSetRules[i]![4]!.append(rankRuleChecked)
+//                args = [5,5,0,1,0,0,0]
+//                suitRules = [3,2,1,0]
+//                rankRules = [11,10,9,8,7,6,2,1,0]
+//                rankRuleChecked = [1,1,1,1,1,1,1,1,1]
+//                allPreSetRules[i]![4]!.append(args)
+//                allPreSetRules[i]![4]!.append(suitRules)
+//                allPreSetRules[i]![4]!.append(rankRules)
+//                allPreSetRules[i]![4]!.append(rankRuleChecked)
                 
                 break
             //牛牛预设规则

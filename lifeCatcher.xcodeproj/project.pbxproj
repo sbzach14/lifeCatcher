@@ -42,6 +42,7 @@
 		18FFC40A2BB9587A00029B0D /* OriginBlurDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FFC4092BB9587900029B0D /* OriginBlurDetector.swift */; };
 		A838534C2ADA7C0200346038 /* BG.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A838534B2ADA7C0200346038 /* BG.xcassets */; };
 		A83853532ADA918000346038 /* CustomUIComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83853522ADA918000346038 /* CustomUIComponent.swift */; };
+		A86459282C90B59E00AF0BA9 /* Ain.swift in Sources */ = {isa = PBXBuildFile; fileRef = A86459272C90B59E00AF0BA9 /* Ain.swift */; };
 		A87097112C8A5D1E003A4729 /* UserHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87097102C8A5D1E003A4729 /* UserHelper.swift */; };
 		A87097212C8C1E81003A4729 /* cls_0715_h_trans_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A870971E2C8C1E81003A4729 /* cls_0715_h_trans_copy.mlmodel */; };
 		A87097222C8C1E81003A4729 /* cls_0727_v_trans_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A870971F2C8C1E81003A4729 /* cls_0727_v_trans_copy.mlmodel */; };
@@ -120,6 +121,7 @@
 		50053F80284ACAED00C86BF4 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A838534B2ADA7C0200346038 /* BG.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = BG.xcassets; sourceTree = "<group>"; };
 		A83853522ADA918000346038 /* CustomUIComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomUIComponent.swift; sourceTree = "<group>"; };
+		A86459272C90B59E00AF0BA9 /* Ain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ain.swift; sourceTree = "<group>"; };
 		A87097102C8A5D1E003A4729 /* UserHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserHelper.swift; sourceTree = "<group>"; };
 		A870971E2C8C1E81003A4729 /* cls_0715_h_trans_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0715_h_trans_copy.mlmodel; sourceTree = "<group>"; };
 		A870971F2C8C1E81003A4729 /* cls_0727_v_trans_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0727_v_trans_copy.mlmodel; sourceTree = "<group>"; };
@@ -201,6 +203,7 @@
 				18C98D012C158F7B00A8CD49 /* TNin.swift */,
 				18C98D022C158F7B00A8CD49 /* TCar.swift */,
 				18C98D032C158F7B00A8CD49 /* TEGan.swift */,
+				A86459272C90B59E00AF0BA9 /* Ain.swift */,
 			);
 			path = DatasetPkg;
 			sourceTree = "<group>";
@@ -489,6 +492,7 @@
 				A88EFE092A7FAD1100897243 /* AllSettingViewModel.swift in Sources */,
 				18C98D202C15902700A8CD49 /* CurrentVisionObjectRecognitionViewModel.swift in Sources */,
 				18C98D222C15906100A8CD49 /* SettingRecordView.swift in Sources */,
+				A86459282C90B59E00AF0BA9 /* Ain.swift in Sources */,
 				A8FBC7C22A3F0A5C00EDDFD7 /* VisionUtils.swift in Sources */,
 				A88EFE0D2A7FDC9500897243 /* HistoryView.swift in Sources */,
 				18C98D102C158F7B00A8CD49 /* NPoi.swift in Sources */,
@@ -650,7 +654,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
-				DEVELOPMENT_TEAM = FYQ8UYQL3M;
+				DEVELOPMENT_TEAM = 6TV8BJJFTF;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = lifeCatcher/App/Info.plist;
@@ -674,7 +678,7 @@
 				);
 				MARKETING_VERSION = 1.0.4;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.shuffle.lifeCatcher;
+				PRODUCT_BUNDLE_IDENTIFIER = com.life.lifeCatcher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -698,7 +702,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
-				DEVELOPMENT_TEAM = FYQ8UYQL3M;
+				DEVELOPMENT_TEAM = 6TV8BJJFTF;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = lifeCatcher/App/Info.plist;
@@ -722,7 +726,7 @@
 				);
 				MARKETING_VERSION = 1.0.4;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.shuffle.lifeCatcher;
+				PRODUCT_BUNDLE_IDENTIFIER = com.life.lifeCatcher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
