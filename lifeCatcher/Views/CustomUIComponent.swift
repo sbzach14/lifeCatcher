@@ -99,11 +99,14 @@ struct SingleIconView: View{
             Rectangle()
                 .foregroundColor(Color.white)
                 .aspectRatio(contentMode: .fit)
-                .cornerRadius(5)
                 .shadow(radius: 2)
-                .frame(width: 27, height: 27)
-            Text(ClassifierSettingArgs.singlefeatureLabelDic[index]!)
-                .font(.system(size: 10)).foregroundColor(Color.black)
+                .frame(width: 30, height: 30)
+            HStack(spacing: 0){
+                Text(ClassifierSettingArgs.singlefeatureLabelDic[index]!.prefix(1))
+                    .font(.system(size: 10)).foregroundColor(Color.black)
+                Text(ClassifierSettingArgs.singlefeatureLabelDic[index]!.dropFirst())
+                    .font(.system(size: 15)).foregroundColor(Color.black)
+            }
         }
     }
 }

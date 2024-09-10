@@ -407,13 +407,20 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             
             
             if frameRate == idleRate{
-                //device.exposureMode = .continuousAutoExposure
-                device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(240)), iso: device.activeFormat.maxISO)
+                device.exposureMode = .continuousAutoExposure
+                //device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(60)), iso: device.activeFormat.maxISO/2)
                 //device.setExposureTargetBias(0)
             }
             else{
                 //self.captureDevice.exposureMode = .autoExpose
-                device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(240)), iso: device.activeFormat.maxISO)
+                
+                //不拨牌 且是前置
+                if frameRate == 120 && self.shuffleMode[1] != 0{
+                    device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(180)), iso: device.activeFormat.maxISO)
+                }
+                else{
+                    device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(frameRate)), iso: device.activeFormat.maxISO)
+                }
                 //device.setExposureTargetBias(1.5)
             }
             
@@ -920,6 +927,14 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     deleteKeys.append(detectResultListIndex)
                 }
             }
+            
+            let nowConfidence0 = targetDetecResultList[detectResultListIndex]![0].confidence[0]
+            let nowConfidence1 = targetDetecResultList[detectResultListIndex]![1].confidence[0]
+            if nowConfidence0 < 0.1 && nowConfidence1 < 0.1{
+                deleteKeys.append(detectResultListIndex)
+            }
+            
+            
             
             let dRNode0 = targetDetecResultList[detectResultListIndex]![0]
             let dRNode1 = targetDetecResultList[detectResultListIndex]![1]
@@ -1597,14 +1612,14 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     if nodeType0 == 2{
                         detectSingleFeatureArray.insert(insertCard0, at: 0)
                     }
-                    else if nodeType0 == 0 && nowNum0 != -1 && detectResultNode0.confidence[0] > 0.7{
+                    else if (nodeType0 == 0 || nodeType0 == 4) && nowNum0 != -1 && detectResultNode0.confidence[0] > 0.8{
                         detectSingleFeatureArray.insert(insertCard0, at: 0)
                     }
                 
                     if nodeType1 == 2{
                         detectSingleFeatureArray.insert(insertCard1, at: 0)
                     }
-                    else if nodeType1 == 0 && nowNum1 != -1 && detectResultNode1.confidence[0] > 0.7{
+                    else if (nodeType1 == 0 || nodeType1 == 4) && nowNum1 != -1 && detectResultNode1.confidence[0] > 0.8{
                         detectSingleFeatureArray.insert(insertCard1, at: 0)
                     }
                 }
