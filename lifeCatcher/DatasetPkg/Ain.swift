@@ -1,7 +1,14 @@
+//
+//  Ain.swift
+//  lifeCatcher
+//
+//  Created by Zhangyi Chen on 9/11/24.
+//  Copyright © 2024 Apple. All rights reserved.
+//
 
 import Foundation
 
-class TPRule : Rule{
+class AinRule : Rule{
     //Test to be deleted
     let isCompareSuit : [Int: String] = [
         0: "否",
@@ -85,7 +92,7 @@ class TPRule : Rule{
 }
 
 
-class TP{
+class Ain{
     
 
     static func FindWinner(diyDealStatus: [[Bool]], diyDealNum:[Int], inputSingleFeatures:[Int], args: [Int], rankRules: [Int], suitRules: [Int]) -> ([DatasetReturnRCInfo], [Int]) {
@@ -96,7 +103,7 @@ class TP{
             inputString += ClassifierSettingArgs.singlefeatureLabelDic[inputSingleFeatures[i]]!
         }
         
-        let (resultInfoList,leftSingleFeatures) = TPDataset.calResult(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, singlefeatureArray: inputSingleFeatures, args: args, rankRules: rankRules, suitRules: suitRules)
+        let (resultInfoList,leftSingleFeatures) = AinDataset.calResult(diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, singlefeatureArray: inputSingleFeatures, args: args, rankRules: rankRules, suitRules: suitRules)
         return (resultInfoList, leftSingleFeatures)
     }
     
@@ -163,7 +170,7 @@ class TP{
 }
 
 
-class TexasRC {
+class AinRC {
     var rcSingleFeature = [SingleFeature]()
     var evaluateFlag = 0
     var singlefeaturesType: String = ""
@@ -175,7 +182,7 @@ class TexasRC {
     }
 }
 
-class TPDataset {
+class AinDataset {
 //    #args
 //    #0 rcNum
 //    #1 isCompareSuit 0/1
@@ -192,7 +199,7 @@ class TPDataset {
         }
     
     static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], FeatureList: inout [SingleFeature], args: [Int], rankRules: [Int]) -> ([DatasetReturnRCInfo],[Int]) {
-        let rule = ClassifierSettingArgs.targetSetting[0] as! TPRule
+        let rule = ClassifierSettingArgs.targetSetting[0] as! AinRule
         let dealNum = args[0]
         let dealType = args[1]
         let rcNum = args[2]
@@ -206,7 +213,7 @@ class TPDataset {
         
         var returnRCInfos: [DatasetReturnRCInfo] = []
 
-        var allPlaySingleFeatures = [TexasRC]()
+        var allPlaySingleFeatures = [AinRC]()
         var community = [SingleFeature]()
         if FeatureList.count < TP.getMinSingleFeatureNum(rcNum: rcNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
             return ([],[])
@@ -214,7 +221,7 @@ class TPDataset {
         
         
         for _ in 0..<rcNum {
-            allPlaySingleFeatures.append(TexasRC())
+            allPlaySingleFeatures.append(AinRC())
         }
         
         // 发牌
@@ -277,7 +284,7 @@ class TPDataset {
         
         for i in 0..<rcNum {
             
-            (allPlaySingleFeatures[i].evaluateFlag, allPlaySingleFeatures[i].singlefeaturesType) = HandAnalyst.evalHand(singlefeatures: allPlaySingleFeatures[i].rcSingleFeature, community: community, isCompareSuit: isCompareSuit, isAceStraight: isAceStraight, minRank: minRank, handUseType: handUseType, handUseNum: handUseNum, rankRules: rankRules)
+            (allPlaySingleFeatures[i].evaluateFlag, allPlaySingleFeatures[i].singlefeaturesType) = AinHandAnalyst.evalHand(singlefeatures: allPlaySingleFeatures[i].rcSingleFeature, community: community, isCompareSuit: isCompareSuit, isAceStraight: isAceStraight, minRank: minRank, handUseType: handUseType, handUseNum: handUseNum, rankRules: rankRules)
         }
         
         for rcID in 0..<allPlaySingleFeatures.count {
@@ -306,7 +313,7 @@ class TPDataset {
     }
 }
 
-class HandAnalyst {
+class AinHandAnalyst {
     
     static func evalHand(singlefeatures: [SingleFeature], community: [SingleFeature], isCompareSuit: Bool, isAceStraight: Bool, minRank: Int, handUseType: Int, handUseNum: Int, rankRules: [Int]) -> (Int, String) {
         let suitRules :[Int] = [3,2,1,0]
@@ -436,7 +443,7 @@ class HandAnalyst {
         
         var rankResult = 0
         var singlefeatureType: String = ""
-        let rule = ClassifierSettingArgs.targetSetting[0] as! TPRule
+        let rule = ClassifierSettingArgs.targetSetting[0] as! AinRule
         for (index, ruleIndex) in rankRules.enumerated() {
             let rankFlag = 1 << (rankRules.count - index + 23)
             rankResult = ruleDict[ruleIndex]!(sortedSingleFeatures, singlefeaturesLength)
