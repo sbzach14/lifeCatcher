@@ -29,12 +29,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var cutStructArray: [cutStruct] = []
     @Published var cutShowArray : [Int] = []
 
-    let detectModel = try! detect_0903_copy()
-    let clsModel_h = try! cls_0715_h_trans_copy()
-    let clsModel_v = try! cls_0727_v_trans_copy()
-//    let detectModel = try! detect_0903()
-//    let clsModel_h = try! cls_0715_h_trans()
-//    let clsModel_v = try! cls_0727_v_trans()
+//    let detectModel = try! detect_0903_copy()
+//    let clsModel_h = try! cls_0715_h_trans_copy()
+//    let clsModel_v = try! cls_0727_v_trans_copy()
+    let detectModel = try! detect_0903()
+    let clsModel_h = try! cls_0715_h_trans()
+    let clsModel_v = try! cls_0727_v_trans()
     var originSize : [Float] = [1920, 1080] //相机图像大小
     var imageSize : [Float] = [569, 320] //target area 截图大小
     var originImageSize : [Float] = [569, 320] //target area 原始截图大小
@@ -686,7 +686,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     }
                 }
                 
-//                print("\(self.singlefeatureLabelDic[leftDetectSingleFeature] ?? "null")  \(leftConfidence)  \(self.singlefeatureLabelDic[rightDetectSingleFeature] ?? "null")  \(rightConfidence) detectNeedToCut\(self.detectNeedToCut)")
+                print("\(self.singlefeatureLabelDic[leftDetectSingleFeature] ?? "null")  \(leftConfidence)  \(self.singlefeatureLabelDic[rightDetectSingleFeature] ?? "null")  \(rightConfidence) detectNeedToCut\(self.detectNeedToCut)")
                 
                 if isCut{
                     
@@ -789,7 +789,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             self.speakText(input: 2)
                         }
                         
-                        if (self.cutMode[0] == 0  && self.specialCard[0] == 0) || self.cutMode[0] == 3{
+                        if self.cutMode[0] == 0  && self.specialCard[0] == 0{
                             self.computeWinnerRC(isReset: true)
                         }
                     }
@@ -824,7 +824,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                         
                         
-                        if (self.cutMode[1] == 0 && self.specialCard[1] == 0) || self.cutMode[1] == 3 {
+                        if self.cutMode[1] == 0 && self.specialCard[1] == 0{
                             self.computeWinnerRC(isReset: true)
                         }
                     }
@@ -1095,7 +1095,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
 
         if beginIndex >= endIndex{
-            let result = DetectionState(detectionResult: [], isSingle: false, isShort: false, longestIndex: -1)
+            let result = DetectionState(detectionResult: [], isSingle: true, isShort: true, longestIndex: -1)
             return result
         }
         
@@ -1256,7 +1256,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         
         if beginIndex >= endIndex{
-            let result = DetectionState(detectionResult: [], isSingle: false, isShort: false, longestIndex: -1)
+            let result = DetectionState(detectionResult: [], isSingle: true, isShort: true, longestIndex: -1)
             return result
         }
         
