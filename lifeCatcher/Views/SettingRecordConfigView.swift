@@ -18,7 +18,8 @@ class generalRuleSetting{
         13:"3张",
         14:"10点半",
         15:"比鸡",
-        16:"十三水"
+        16:"十三水",
+        17:"梭哈",
     ]
     static let allShuffleMode: [Int:String] = [
         0:"不洗牌",
@@ -749,6 +750,9 @@ struct SettingRecordConfigView: View{
         case 16:
             allSingleFeatureIndex = TWDataset.getAllSingleFeatureIndex(setting: self.setting)
             break
+        case 17:
+            allSingleFeatureIndex = Ain.getAllSingleFeatureIndex(minRank: args[2])
+            break
         default:
             print("error")
         }
@@ -826,6 +830,9 @@ struct SettingRecordConfigView: View{
             let selectedRule = ClassifierSettingArgs.targetSetting[DatasetType] as! TWDatasetRule
             minSingleFeatureNum = TWDataset.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
+        case 17:
+            let selectedRule = ClassifierSettingArgs.targetSetting[DatasetType] as! AinRule
+            minSingleFeatureNum = Ain.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
         default:
             print("error")
         }

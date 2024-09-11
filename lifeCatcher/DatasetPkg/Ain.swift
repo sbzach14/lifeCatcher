@@ -46,46 +46,21 @@ class AinRule : Rule{
         ]
         self.rcNum = [2,3,4,5,6,7,8,9,10,11,12,13,14,15]
         self.setting = [
-            0: "德州扑克[701]",
-            1: "短牌德州",
-            2: "德州扑克清比葫芦大[702]",
-            3: "德州扑克[550]",
+            0: "梭哈",
         ]
         self.ruleInfo = [
             0:"""
-    5张德州扑克:
-    不需要自定义发牌
-    52张牌，不要大小王，每人先发2张牌，再一次发3张1张1张公共牌，然后每次发公共牌之前都要烧一张牌。
-    先比牌型，再比主要部分牌大小，不分花色。
-    同花顺
-    四条
-    葫芦，三条带一对
-    同花
-    顺子
-    三条
-    两对
-    一对
-    高牌
-    """,
-            1:"""
-    不需要自定义发牌
-    使用一副去掉 2、3、4和5的牌，共36张牌。
-    短牌皇家同花顺：A-6-7-8-9 的同花顺。
-    短牌同花顺：任意五张同花的连续牌。
-    四条：四张相同的牌。
-    满堂红：三张相同的牌加上一对。
-    短牌同花：五张同花但非连续的牌。
-    短牌顺子：A-6-7-8-9 或更高的五张连续牌。
-    三条：三张相同的牌。
-    两对：两对不同的牌。
-    一对：两张相同的牌。
-    高牌：没有其他组合时，最大的牌。
-    """,
-            2:"""
-            和标准德州相同，同花比葫芦大，不需要自定义发牌
-            """,
-            3:"""
             没有公牌，其他和标准德州规则相同，需要在选择规则后在发牌设置里选择自定义发牌然后设置成一人发五张
+            先比牌型，再比主要部分牌大小，不分花色。
+            同花顺
+            四条
+            葫芦，三条带一对
+            同花
+            顺子
+            三条
+            两对
+            一对
+            高牌
             """,
         ]
     }
@@ -148,7 +123,7 @@ class Ain{
     static func getMinSingleFeatureNum(rcNum: Int, handNum: Int, communityNum: Int, dealType: Int, diyDealNum: [Int], diyDealStatus: [[Bool]]) -> Int{
         
         if dealType == 0 || dealType == 1{
-            return rcNum * handNum + communityNum + 3
+            return rcNum * handNum
         } else {
             var minNum = 0
             for i in 0..<diyDealNum.count {
@@ -199,7 +174,7 @@ class AinDataset {
         }
     
     static func calWinners(diyDealStatus:[[Bool]], diyDealNum:[Int], FeatureList: inout [SingleFeature], args: [Int], rankRules: [Int]) -> ([DatasetReturnRCInfo],[Int]) {
-        let rule = ClassifierSettingArgs.targetSetting[0] as! AinRule
+        let rule = ClassifierSettingArgs.targetSetting[17] as! AinRule
         let dealNum = args[0]
         let dealType = args[1]
         let rcNum = args[2]
@@ -237,21 +212,21 @@ class AinDataset {
                     allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeFirst())
                 }
             }
-            if communityNum == 3 {
-                FeatureList.removeFirst()
-                for _ in 0..<3 {
-                    community.append(FeatureList.removeFirst())
-                }
-            } else if communityNum == 5 {
-                FeatureList.removeFirst()
-                for _ in 0..<3 {
-                    community.append(FeatureList.removeFirst())
-                }
-                for _ in 0..<2 {
-                    FeatureList.removeFirst()
-                    community.append(FeatureList.removeFirst())
-                }
-            }
+//            if communityNum == 3 {
+//                FeatureList.removeFirst()
+//                for _ in 0..<3 {
+//                    community.append(FeatureList.removeFirst())
+//                }
+//            } else if communityNum == 5 {
+//                FeatureList.removeFirst()
+//                for _ in 0..<3 {
+//                    community.append(FeatureList.removeFirst())
+//                }
+//                for _ in 0..<2 {
+//                    FeatureList.removeFirst()
+//                    community.append(FeatureList.removeFirst())
+//                }
+//            }
         }
         // 自定义发牌 dealNum = 2
         else {
@@ -443,7 +418,7 @@ class AinHandAnalyst {
         
         var rankResult = 0
         var singlefeatureType: String = ""
-        let rule = ClassifierSettingArgs.targetSetting[0] as! AinRule
+        let rule = ClassifierSettingArgs.targetSetting[17] as! AinRule
         for (index, ruleIndex) in rankRules.enumerated() {
             let rankFlag = 1 << (rankRules.count - index + 23)
             rankResult = ruleDict[ruleIndex]!(sortedSingleFeatures, singlefeaturesLength)
