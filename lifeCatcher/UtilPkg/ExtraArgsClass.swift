@@ -4234,7 +4234,10 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     reportString = String(flyTCNode.X + 1) + " "
                     reportString += String(flyTCNode.Y + 1)
                     currentSpeakStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
-                    
+                }
+                if resultInfo.flyTCSolution.count == 0{
+                    reportString += "没有"
+                    currentSpeakStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
                 }
                 reportResult.append(currentSpeakStruct)
             }
