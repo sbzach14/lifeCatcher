@@ -4454,7 +4454,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             for contentStruct in speakContent {
                 contentStruct.content = contentStruct.content.replacingOccurrences(of: "J", with: "勾")
                 contentStruct.content = contentStruct.content.replacingOccurrences(of: "Q", with: "圈")
-                contentStruct.content = contentStruct.content.replacingOccurrences(of: "A", with: "诶")
+                contentStruct.content = contentStruct.content.replacingOccurrences(of: "A", with: "尖")
             }
         }
         
