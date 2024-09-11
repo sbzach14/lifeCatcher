@@ -1612,14 +1612,14 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     if nodeType0 == 2{
                         detectSingleFeatureArray.insert(insertCard0, at: 0)
                     }
-                    else if (nodeType0 == 0 || nodeType0 == 4) && nowNum0 != -1 && detectResultNode0.confidence[0] > 0.8{
+                    else if (nodeType0 == 0 || nodeType0 == 4) && nowNum0 != -1 && detectResultNode0.confidence[0] > 0.75{
                         detectSingleFeatureArray.insert(insertCard0, at: 0)
                     }
                 
                     if nodeType1 == 2{
                         detectSingleFeatureArray.insert(insertCard1, at: 0)
                     }
-                    else if (nodeType1 == 0 || nodeType1 == 4) && nowNum1 != -1 && detectResultNode1.confidence[0] > 0.8{
+                    else if (nodeType1 == 0 || nodeType1 == 4) && nowNum1 != -1 && detectResultNode1.confidence[0] > 0.75{
                         detectSingleFeatureArray.insert(insertCard1, at: 0)
                     }
                 }
