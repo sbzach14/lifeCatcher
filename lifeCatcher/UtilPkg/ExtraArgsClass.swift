@@ -1756,7 +1756,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
     }
     
     
-    static func FlyTCsSolution(rcNum: Int, round: Int) -> [[FlyTCsNode]]{
+    static func FlyTCsSolution(rcNum: Int, round: Int, everyDealNum: [Int]) -> [[FlyTCsNode]]{
         
         var returnSolutionSet: [[FlyTCsNode]] = []
         var FlyTCResultMatrix : [[FlyTCsNode]] = []
@@ -1764,7 +1764,11 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         
         for i in 0..<round {
             FlyTCResultMatrix.append([])
-            for j in 0..<rcNum {
+            for j in 0..<(rcNum * everyDealNum[i]) {
+//                第一轮的第一张, 不飞
+                if i == 0 && j == 0 {
+                    continue
+                }
                 FlyTCResultMatrix[i].append(FlyTCsNode(X: i, Y: j))
             }
         }
@@ -1783,7 +1787,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             let nodesSet = allCombinations(combination)
             returnSolutionSet += nodesSet
         }
-        
         return returnSolutionSet
     }
     
@@ -2213,19 +2216,24 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 //14, 飞2张
                 case 14:
                     //每轮默认发一张牌
-                    
+                    var everyDealNum: [Int] = []
                     if newArgs[0] == 0 {
-                        flyTCSolution = FlyTCsSolution(rcNum: rcNum, round: handNum)
+                        for _ in 0..<handNum {
+                            everyDealNum.append(1)
+                        }
+                        flyTCSolution = FlyTCsSolution(rcNum: rcNum, round: handNum, everyDealNum: everyDealNum)
                     } else {
                         var dealRoundNum = 0
                         for i in 0..<diyDealStatus.count {
                             if diyDealStatus[i][0] == true {
                                 dealRoundNum += 1
+                                everyDealNum.append(diyDealNum[i])
                             }
                         }
-                        
-                        flyTCSolution = FlyTCsSolution(rcNum: rcNum, round: dealRoundNum)
+                        flyTCSolution = FlyTCsSolution(rcNum: rcNum, round: dealRoundNum, everyDealNum: everyDealNum)
                     }
+                    
+                    flyTCSolution.insert([FlyTCsNode(X: -1, Y: -1)], at: 0)
                     if flyTCSolution.count > 0 {
                         cutList.append([0, flyTCSolution.count - 1])
                     }
@@ -2723,45 +2731,62 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         //飞2张
                         if reportRule.differentDeal == 4 {
                             //正发，反面打色，反发正面打色, 调整成发牌顺序
-                            if newArgs[0] != newArgs[1] {
+                            if newArgs[1] != coloringType {
                                 newInputSingleFeatures = newInputSingleFeatures.reversed()
                             }
                             
                             currentFlyTCSolution = flyTCSolution[singlefeatureIndex]
                             
                             for dealNode in currentFlyTCSolution {
-                                //每轮发一张
-                                var round = dealNode.X
-                                var dealOrder = dealNode.Y
+                                
+                                let round = dealNode.X
+                                let dealOrder = dealNode.Y
                                 var singlefeatureIndex: Int = 0
-                                if newArgs[0] == 0{
-                                    singlefeatureIndex = round * rcNum + dealOrder
-                                    var temp = newInputSingleFeatures[singlefeatureIndex]
-                                    newInputSingleFeatures[singlefeatureIndex] = newInputSingleFeatures[singlefeatureIndex + 1]
-                                    newInputSingleFeatures[singlefeatureIndex + 1] = temp
+                                //默认每轮发一张
+                                if round == -1 && dealOrder == -1 {
+                                    print("第一种情况牌组不变 \(newInputSingleFeatures)")
                                 } else {
-                                    var currentDealRound = -1
-                                    var otherNum = 0
-                                    for i in 0..<diyDealStatus.count {
-                                        if diyDealStatus[i][0] == true {
-                                            currentDealRound += 1
-                                            if currentDealRound == round {
-                                                singlefeatureIndex = round * rcNum + dealOrder + diyDealNum[i] + otherNum
-                                                var temp = newInputSingleFeatures[singlefeatureIndex]
-                                                newInputSingleFeatures[singlefeatureIndex] = newInputSingleFeatures[singlefeatureIndex + 1]
-                                                newInputSingleFeatures[singlefeatureIndex + 1] = temp
+                                    
+                                    if newArgs[0] == 0{
+                                        singlefeatureIndex = round * rcNum + dealOrder
+                                        let temp = newInputSingleFeatures[singlefeatureIndex]
+                                        newInputSingleFeatures[singlefeatureIndex] = newInputSingleFeatures[singlefeatureIndex + 1]
+                                        newInputSingleFeatures[singlefeatureIndex + 1] = temp
+                                    } else {
+                                        var currentDealRound = -1
+                                        var otherNum = 0
+                                        for i in 0..<diyDealStatus.count {
+                                            if diyDealStatus[i][0] == true {
+                                                //每轮发牌
+                                                currentDealRound += 1
+                                                let currentRoundDealNum = diyDealNum[i] * rcNum
+                                                for j in 0..<currentRoundDealNum{
+                                                    if currentDealRound == round && j == dealOrder {
+                                                        singlefeatureIndex = otherNum
+                                                        let temp = newInputSingleFeatures[singlefeatureIndex]
+                                                        newInputSingleFeatures[singlefeatureIndex] = newInputSingleFeatures[singlefeatureIndex + 1]
+                                                        newInputSingleFeatures[singlefeatureIndex + 1] = temp
+                                                        print("飞2张之后的牌堆 \(newInputSingleFeatures)")
+                                                    }
+                                                    otherNum += 1
+                                                }
+                                            } else {
+                                                otherNum += diyDealNum[i]
                                             }
-                                        } else {
-                                            otherNum += diyDealNum[i]
                                         }
                                     }
+                                    
                                 }
+
                             }
-                            
-                            if newArgs[0] != newArgs[1] {
+                            if newArgs[1] != coloringType {
                                 newInputSingleFeatures = newInputSingleFeatures.reversed()
                             }
                         }
+                        
+//                        if reportRule.differentDeal == 4 {
+//                            print("飞2张之后的牌堆 \(newInputSingleFeatures)")
+//                        }
                         
                         //返回游戏的结果
                         
