@@ -101,7 +101,7 @@ class ClassifierSettingArgs {
         let rule15 = CBDatasetRule(ruleIndex: 15, ruleName: "比鸡")
         let rule16 = TWDatasetRule(ruleIndex: 16, ruleName: "十三水")
         let rule17 = AinRule(ruleIndex: 17, ruleName: "梭哈")
-        return [rule0.ruleIndex: rule0, rule1.ruleIndex: rule1, rule2.ruleIndex: rule2, rule3.ruleIndex: rule3, rule4.ruleIndex: rule4, rule5.ruleIndex: rule5, rule6.ruleIndex: rule6, rule7.ruleIndex: rule7, rule8.ruleIndex: rule8, rule9.ruleIndex: rule9,rule10.ruleIndex:rule10, rule11.ruleIndex: rule11,rule12.ruleIndex:rule12, rule13.ruleIndex:rule13, rule14.ruleIndex: rule14, rule15.ruleIndex: rule15, rule16.ruleIndex: rule16]
+        return [rule0.ruleIndex: rule0, rule1.ruleIndex: rule1, rule2.ruleIndex: rule2, rule3.ruleIndex: rule3, rule4.ruleIndex: rule4, rule5.ruleIndex: rule5, rule6.ruleIndex: rule6, rule7.ruleIndex: rule7, rule8.ruleIndex: rule8, rule9.ruleIndex: rule9,rule10.ruleIndex:rule10, rule11.ruleIndex: rule11,rule12.ruleIndex:rule12, rule13.ruleIndex:rule13, rule14.ruleIndex: rule14, rule15.ruleIndex: rule15, rule16.ruleIndex: rule16, rule17.ruleIndex: rule17]
     }()
     
     static func cutRankConvert(cutNumSetting: Int, singlefeatureIndex: Int)->Int{
@@ -3629,6 +3629,40 @@ public class DetectSettingArgs{
                 allPreSetRules[i]![7]!.append(suitRules)
                 allPreSetRules[i]![7]!.append(rankRules)
                 allPreSetRules[i]![7]!.append(rankRuleChecked)
+                break
+                //梭哈预设规则
+                case 17:
+                    //德州扑克[701]
+    //                handNum = 2
+    //                communityNum = 5
+    //                isCompareSuit = 0
+    //                isAceStraight = 1
+    //                minRank = 0
+    //                handUseType = 0
+    //                handUseNum = 0
+                    let rule = ClassifierSettingArgs.targetSetting[i] as! AinRule
+                    for j in 0...rule.setting.count - 1{
+                        allPreSetRules[i]![j] = []
+                    }
+    //                梭哈
+    //                handNum = 5
+    //                communityNum = 0
+    //                isCompareSuit = 0
+    //                isAceStraight = 1
+    //                minRank = 0
+    //                handUseType = 0
+    //                handUseNum = 0
+
+                    args = [5,0,0,1,0,0,0]
+                    suitRules = [3,2,1,0]
+                    rankRules = [11,10,9,8,7,6,2,1,0]
+                    rankRuleChecked = [1,1,1,1,1,1,1,1,1]
+                    allPreSetRules[i]![0]!.append(args)
+                    allPreSetRules[i]![0]!.append(suitRules)
+                    allPreSetRules[i]![0]!.append(rankRules)
+                    allPreSetRules[i]![0]!.append(rankRuleChecked)
+                    
+                    break
                 
             default:
                 break

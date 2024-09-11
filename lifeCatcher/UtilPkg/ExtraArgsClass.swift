@@ -1919,6 +1919,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             14: TPFiveDataset.FindWinner(diyDealStatus:diyDealNum:inputSingleFeatures:args:rankRules:suitRules:),
             15: CBDataset.FindWinner(diyDealStatus:diyDealNum:inputSingleFeatures:args:rankRules:suitRules:),
             16: TWDataset.FindWinner,
+            17: Ain.FindWinner(diyDealStatus:diyDealNum:inputSingleFeatures:args:rankRules:suitRules:),
         ]
         
         let minSingleFeatureFunctions: [Int: (Int, Int, Int, Int,[Int], [[Bool]]) -> Int] = [
@@ -1939,6 +1940,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             14: TPFiveDataset.getMinSingleFeatureNum,
             15: CBDataset.getMinSingleFeatureNum,
             16: TWDataset.getMinSingleFeatureNum,
+            17: Ain.getMinSingleFeatureNum,
             
         ]
         
@@ -3453,13 +3455,17 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 for i in 0..<featureNum{
                                     
                                     let currentFeaturePos = i * gapNum + XValue - 1
+                                    if currentFeaturePos > tempInputFeatures.count - 1 || currentFeaturePos < 0{
+                                        continue
+                                    }
                                     let currentFeatureIndex = tempInputFeatures[currentFeaturePos]
-                                    let currentPoint = currentFeatureIndex % 13 + 1
-                                    let currentColor = 3 - currentFeatureIndex % 13
+                                    let currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[currentFeatureIndex % 13 + 1]
+                                    
+                                    let currentColor = 3 - (currentFeatureIndex / 13)
                                     if YValue == 10 {
-                                        currentResultInfo.fourCardReport += "\(currentPoint)" + " "
+                                        currentResultInfo.fourCardReport += currentPoint! + " "
                                     } else {
-                                        currentResultInfo.fourCardReport += "\(currentPoint) \(ClassifierSettingArgs.SuitReportDix[currentColor])" + " "
+                                        currentResultInfo.fourCardReport +=  ClassifierSettingArgs.SuitReportDix[currentColor]! + currentPoint! + " "
                                     }
                                 }
                                 break
@@ -4434,6 +4440,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 var reportString: String = ""
                 reportString = resultInfo.fourCardReport
                 reportResult.append([SpeakResultStruct(voiceType: 1, content: reportString)])
+                print("670 报法\(reportString)")
             }
             break
         default:
@@ -4447,6 +4454,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             for contentStruct in speakContent {
                 contentStruct.content = contentStruct.content.replacingOccurrences(of: "J", with: "勾")
                 contentStruct.content = contentStruct.content.replacingOccurrences(of: "Q", with: "圈")
+                contentStruct.content = contentStruct.content.replacingOccurrences(of: "A", with: "诶")
             }
         }
         
