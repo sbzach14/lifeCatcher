@@ -741,7 +741,7 @@ class PBDataset {
             bullFeatureList.append(PBSingleFeature.init(singlefeature: singlefeature, numberChangeArray: numberChangeArray, isNoSuit: noSuit, specialfeatureMinZero: specialfeatureMinZero, suitRules: suitRules))
         }
 
-        var allRCs: [BullRC] = (0..<rcNum).map { BullRC(rcIndex: $0) }
+        let allRCs: [BullRC] = (0..<rcNum).map { BullRC(rcIndex: $0) }
         var community = [PBSingleFeature]()
         var returnRCInfos: [DatasetReturnRCInfo] = []
         

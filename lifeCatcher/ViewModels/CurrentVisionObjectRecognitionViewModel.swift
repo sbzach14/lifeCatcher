@@ -2335,7 +2335,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
             else if self.specialCard[self.shuffleOrRiffle] == 2{
                 
-                for i in 0..<maxCutTimes {
+                for _ in 0..<maxCutTimes {
                     cutSingleFeature = self.singlefeatureArray.randomElement()!
                     self.cutStructArray.append(cutStruct(cutcardIndex: cutSingleFeature, cutMode: 2))
                 }
