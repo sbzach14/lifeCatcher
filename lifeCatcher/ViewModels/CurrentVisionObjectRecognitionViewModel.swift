@@ -705,16 +705,14 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     }
                     else if minDetectConfidence >= detectConfidenceMinThreshold && isShuffle {
                         if leftDetectSingleFeature == self.stateSingleFeature[0]
-                            && rightDetectSingleFeature == self.stateSingleFeature[1]
-                            && leftDetectSingleFeature != rightDetectSingleFeature
-                            && leftDetectSingleFeature != -1{
+                            && rightDetectSingleFeature == self.stateSingleFeature[1]{
                             self.shuffleStartCounter += 1
                         }
                         else{
                             self.shuffleStartCounter = 0
                         }
                         
-                        if self.shuffleStartCounter > 5{
+                        if self.shuffleStartCounter >= 5{
                             self.isDetect = true
                             self.speechPerformer.stopSpeechSynthesis()
                             self.detectNeedToCut = false
@@ -737,7 +735,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 }
                 
                 
-                if self.shuffleResetCounter > 10{
+                if self.shuffleResetCounter > 5{
                     self.initDetectResult()
                 }
                 
@@ -1830,7 +1828,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         var w = self.imageSize[0]
         var h = self.imageSize[1]
         
-        var boxfactor:Float = 1.2
+        var boxfactor:Float = 1.5
         
         if originBoxes.count == 1{
             
@@ -2078,8 +2076,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
     
     func targetAreaMove(initTargetArea: [Float], targetArea: [Float]) -> Bool{
-        if abs(initTargetArea[0] - targetArea[0]) > (initTargetArea[2] + targetArea[2]) / 4
-    || abs(initTargetArea[1] - targetArea[1]) > (initTargetArea[3] + targetArea[3]) / 4
+        if abs(initTargetArea[0] - targetArea[0]) > (initTargetArea[2] + targetArea[2]) / 5
+    || abs(initTargetArea[1] - targetArea[1]) > (initTargetArea[3] + targetArea[3]) / 3
     || targetArea[1] / initTargetArea[1] > 1.5{
             return true
         }
