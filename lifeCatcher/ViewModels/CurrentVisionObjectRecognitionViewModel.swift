@@ -29,12 +29,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var cutStructArray: [cutStruct] = []
     @Published var cutShowArray : [Int] = []
     
-    //    let detectModel = try! detect_0903_copy()
-    //    let clsModel_h = try! cls_0715_h_trans_copy()
-    //    let clsModel_v = try! cls_0727_v_trans_copy()
-    let detectModel = try! detect_0903()
-    let clsModel_h = try! cls_0715_h_trans()
-    let clsModel_v = try! cls_0727_v_trans()
+    let detectModel = try! detect_0903_copy()
+    let clsModel_h = try! cls_0715_h_trans_copy()
+    let clsModel_v = try! cls_0727_v_trans_copy()
+//    let detectModel = try! detect_0903()
+//    let clsModel_h = try! cls_0715_h_trans()
+//    let clsModel_v = try! cls_0727_v_trans()
     var originSize : [Float] = [1920, 1080] //相机图像大小
     var imageSize : [Float] = [569, 320] //target area 截图大小
     var originImageSize : [Float] = [569, 320] //target area 原始截图大小
@@ -548,7 +548,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     func processImageOrigin(_ pixelBuffer: CVPixelBuffer, taskIndex: Int, isTargetArea: Bool, targetArea: [Float]){
         
         let detectConfidenceThreshold:Float = 0.8
-        let detectConfidenceMinThreshold:Float = 0.7
+        let detectConfidenceMinThreshold:Float = 0.5
         
         var confidenceThreshold: Float = 0
         if self.state == "idle"{
@@ -2078,9 +2078,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
     
     func targetAreaMove(initTargetArea: [Float], targetArea: [Float]) -> Bool{
-        if abs(initTargetArea[0] - targetArea[0]) > (initTargetArea[2] + targetArea[2]) / 6
-    || abs(initTargetArea[1] - targetArea[1]) > (initTargetArea[3] + targetArea[3]) / 6
-    || targetArea[1] / initTargetArea[1] > 1.25{
+        if abs(initTargetArea[0] - targetArea[0]) > (initTargetArea[2] + targetArea[2]) / 4
+    || abs(initTargetArea[1] - targetArea[1]) > (initTargetArea[3] + targetArea[3]) / 4
+    || targetArea[1] / initTargetArea[1] > 1.5{
             return true
         }
         else{
