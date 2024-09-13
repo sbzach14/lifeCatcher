@@ -20,9 +20,9 @@ class SettingViewModel: ObservableObject {
     @Published var voiceDevice: Int = 0
     
     @Published var volumeValue: Float = 0.5
-    @Published var voiceRate: Float = 0.6
+    @Published var voiceRate: Float = 0.5
     @Published var zoomFactor: Float = 0
-    @Published var focusFactor: Float = 0.65
+    @Published var focusFactor: Float = 0.6
     
     var dateKey : SymmetricKey?
     @Published var trueVersion : String = ""

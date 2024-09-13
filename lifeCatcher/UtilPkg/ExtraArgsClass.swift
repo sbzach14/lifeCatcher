@@ -312,7 +312,7 @@ class ReportManager{
             119: "[299_1]:范围切牌保位置最大",
             120: "[299]:范围切牌保位置最大次大",
             121: "[300]:范围打色留色保位置最大",
-            122: "[3011:范围打色留色保位置最大次大",
+            122: "[301]:范围打色留色保位置最大次大",
             123: "[304]:范围打色去色全部保位置最大",
             124: "[305]:范围打色去色全部保位置最大次大",
             125: "[310]:范围打色去色1张保位置最大",
@@ -1878,48 +1878,51 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
     static func cutSingleFeatures(inputSingleFeatures: [Int], inputCutStruct: cutStruct, colorTransform: Int) -> [Int]{
         
         let pos = searchSingleFeaturePos(inputSingleFeatures: inputSingleFeatures, singlefeatureIndex: inputCutStruct.cutcardIndex)
-        
         var returnSingleFeatures : [Int] = inputSingleFeatures
-        //0，看底，1，看顶，2，看色，3，看手
-        switch inputCutStruct.cutMode{
-        //看底
-        case 0:
-            returnSingleFeatures = Array(inputSingleFeatures[(pos + 1)...]) + Array(inputSingleFeatures[0...pos])
-            break
-        //看顶
-        case 1:
-            //看顶
-            var watchSingleFeatureIndexPos = pos + 1
-            if pos == inputSingleFeatures.count - 1{
-                watchSingleFeatureIndexPos = 0
-            }
-            print("看顶的位置 \(watchSingleFeatureIndexPos) 底牌的位置 \(watchSingleFeatureIndexPos)")
-            returnSingleFeatures = Array(inputSingleFeatures[(pos + 1)...]) + Array(inputSingleFeatures[0...pos])
-            break
-        //看色
-        case 2:
-            //留色
-            if colorTransform == 0{
-            //去色
-            } else if colorTransform == 1 {
-                returnSingleFeatures = Array(inputSingleFeatures[(pos + 1)...])
-            //去色1张
-            } else if colorTransform == 2 {
-                returnSingleFeatures.remove(at: pos)
-            //色先发
-            } else if colorTransform == 3{
-                let colorSingleFeature = returnSingleFeatures.remove(at: pos)
-                returnSingleFeatures = [colorSingleFeature] + returnSingleFeatures
-            //切牌
-            } else if colorTransform == 4{
+        
+        if pos != -1{
+            
+            //0，看底，1，看顶，2，看色，3，看手
+            switch inputCutStruct.cutMode{
+                //看底
+            case 0:
                 returnSingleFeatures = Array(inputSingleFeatures[(pos + 1)...]) + Array(inputSingleFeatures[0...pos])
+                break
+                //看顶
+            case 1:
+                //看顶
+                var watchSingleFeatureIndexPos = pos + 1
+                if pos == inputSingleFeatures.count - 1{
+                    watchSingleFeatureIndexPos = 0
+                }
+                print("看顶的位置 \(watchSingleFeatureIndexPos) 底牌的位置 \(watchSingleFeatureIndexPos)")
+                returnSingleFeatures = Array(inputSingleFeatures[(pos + 1)...]) + Array(inputSingleFeatures[0...pos])
+                break
+                //看色
+            case 2:
+                //留色
+                if colorTransform == 0{
+                    //去色
+                } else if colorTransform == 1 {
+                    returnSingleFeatures = Array(inputSingleFeatures[(pos + 1)...])
+                    //去色1张
+                } else if colorTransform == 2 {
+                    returnSingleFeatures.remove(at: pos)
+                    //色先发
+                } else if colorTransform == 3{
+                    let colorSingleFeature = returnSingleFeatures.remove(at: pos)
+                    returnSingleFeatures = [colorSingleFeature] + returnSingleFeatures
+                    //切牌
+                } else if colorTransform == 4{
+                    returnSingleFeatures = Array(inputSingleFeatures[(pos + 1)...]) + Array(inputSingleFeatures[0...pos])
+                }
+                else {
+                    print("look color error")
+                }
+                break
+            default:
+                break
             }
-            else {
-                print("look color error")
-            }
-            break
-        default:
-            break
         }
         
         return returnSingleFeatures
@@ -4402,7 +4405,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
 //            119: "[299_1]:范围切牌保位置最大",
 //            120: "[299]:范围切牌保位置最大次大",
 //            121: "[300]:范围打色留色保位置最大",
-//            122: "[3011:范围打色留色保位置最大次大",
+//            122: "[301]:范围打色留色保位置最大次大",
 //            123: "[304]:范围打色去色全部保位置最大",
 //            124: "[305]:范围打色去色全部保位置最大次大",
 //            125: "[310]:范围打色去色1张保位置最大",
@@ -4632,7 +4635,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             for contentStruct in speakContent {
                 contentStruct.content = contentStruct.content.replacingOccurrences(of: "J", with: "勾")
                 contentStruct.content = contentStruct.content.replacingOccurrences(of: "Q", with: "圈")
-                contentStruct.content = contentStruct.content.replacingOccurrences(of: "A", with: "诶")
+                contentStruct.content = contentStruct.content.replacingOccurrences(of: "A", with: "尖")
             }
         }
         

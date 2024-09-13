@@ -24,16 +24,34 @@ func drawRectanglesOnPixelBuffer(pixelBuffer: CVPixelBuffer, rectList: [[Float]]
     context.setStrokeColor(UIColor.red.cgColor)
     context.setLineWidth(2.0)
     
-    for coor in rectList{
-        let x = Int((coor[0] - coor[2]/2)*Float(width))
-        let y = Int(((1 - coor[1]) - coor[3]/2)*Float(height))
-        let w = Int(coor[2]*Float(width))
-        let h = Int(coor[3]*Float(height))
-        
-        let firstRect = CGRect(x: x, y: y, width: w, height: h)
-        context.addRect(firstRect)
-        context.strokePath()
-    }
+    
+    let coor = rectList[2]
+    let x = Int((coor[0] - coor[2]/2)*Float(width))
+    let y = Int(((1 - coor[1]) - coor[3]/2)*Float(height))
+    let w = Int(coor[2]*Float(width))
+    let h = Int(coor[3]*Float(height))
+    
+    let firstRect = CGRect(x: x, y: y, width: w, height: h)
+    context.addRect(firstRect)
+    
+    let coor1 = rectList[0]
+    let x1 = Int((coor1[0] - coor1[2]/2)*Float(w) + Float(x))
+    let y1 = Int(((1 - coor1[1]) - coor1[3]/2)*Float(h) + Float(y))
+    let w1 = Int(coor1[2]*Float(w))
+    let h1 = Int(coor1[3]*Float(h))
+    let firstRect1 = CGRect(x: x1, y: y1, width: w1, height: h1)
+    context.addRect(firstRect1)
+    
+    let coor2 = rectList[1]
+    let x2 = Int((coor2[0] - coor2[2]/2)*Float(w) + Float(x))
+    let y2 = Int(((1 - coor2[1]) - coor2[3]/2)*Float(h) + Float(y))
+    let w2 = Int(coor2[2]*Float(w))
+    let h2 = Int(coor2[3]*Float(h))
+    let firstRect2 = CGRect(x: x2, y: y2, width: w2, height: h2)
+    context.addRect(firstRect2)
+    
+    
+    context.strokePath()
     
     CVPixelBufferUnlockBaseAddress(pixelBuffer, CVPixelBufferLockFlags(rawValue: 0))
     

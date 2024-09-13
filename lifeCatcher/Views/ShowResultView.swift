@@ -11,11 +11,11 @@ struct ShowResultView: View {
             
             ScrollView {
                 
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 27))]) {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 30)), count: 10)) {
                     ForEach(viewModel.singlefeatureArray, id: \.self) { index in
                         SingleIconView(index: index)
                     }
-                }.padding()
+                }.padding(3)
                 
                 Divider().colorInvert()
               
@@ -100,7 +100,7 @@ struct ShowResultView: View {
                                         
                                         let handSingleFeatureList = Array(0...rankList[posIndex].RCSingleFeatures.count - 1)
                                         
-                                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 27))]){
+                                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 30))]){
                                             
                                             ForEach(handSingleFeatureList, id: \.self) { handSingleFeatureIndex in
                                                 SingleIconView(index: rankList[posIndex].RCSingleFeatures[handSingleFeatureIndex].singlefeatureIndex)
