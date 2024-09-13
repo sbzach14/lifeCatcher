@@ -36,9 +36,6 @@ struct MainMenuView: View {
 
                         VStack {
                             Button(action: {
-                                
-                                AutoLogin(username: "", password: "")
-                                
                                 if !AuthManager.isLoginServer{
                                     historyNavigate = 0
                                 } else if AuthManager.isActive{
@@ -133,6 +130,7 @@ struct MainMenuView: View {
             }
             .onAppear {
                 Localize.setCurrentLanguage(appLanguage)
+                AutoLogin(username: "", password: "")
             }
             .navigationTitle("LifeCatcher".localized())
             

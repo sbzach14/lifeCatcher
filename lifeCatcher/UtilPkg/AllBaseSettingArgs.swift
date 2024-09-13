@@ -626,41 +626,6 @@ public class DetectSettingArgs{
                 allPreSetRules[i]![2]!.append(suitRules)
                 allPreSetRules[i]![2]!.append(rankRules)
                 allPreSetRules[i]![2]!.append(rankRuleChecked)
-//                德州扑克[550]
-//                handNum = 5
-//                communityNum = 0
-//                isCompareSuit = 0
-//                isAceStraight = 1
-//                minRank = 0
-//                handUseType = 0
-//                handUseNum = 0
-
-                args = [5,0,0,1,0,0,0]
-                suitRules = [3,2,1,0]
-                rankRules = [11,10,9,8,7,6,2,1,0]
-                rankRuleChecked = [1,1,1,1,1,1,1,1,1]
-                allPreSetRules[i]![3]!.append(args)
-                allPreSetRules[i]![3]!.append(suitRules)
-                allPreSetRules[i]![3]!.append(rankRules)
-                allPreSetRules[i]![3]!.append(rankRuleChecked)
-                
-//                德州扑克10选5[1020]
-//                handNum = 5
-//                communityNum = 5
-//                isCompareSuit = 0
-//                isAceStraight = 1
-//                minRank = 0
-//                handUseType = 0
-//                handUseNum = 0
-
-//                args = [5,5,0,1,0,0,0]
-//                suitRules = [3,2,1,0]
-//                rankRules = [11,10,9,8,7,6,2,1,0]
-//                rankRuleChecked = [1,1,1,1,1,1,1,1,1]
-//                allPreSetRules[i]![4]!.append(args)
-//                allPreSetRules[i]![4]!.append(suitRules)
-//                allPreSetRules[i]![4]!.append(rankRules)
-//                allPreSetRules[i]![4]!.append(rankRuleChecked)
                 
                 break
             //牛牛预设规则
@@ -3632,14 +3597,6 @@ public class DetectSettingArgs{
                 break
                 //梭哈预设规则
                 case 17:
-                    //德州扑克[701]
-    //                handNum = 2
-    //                communityNum = 5
-    //                isCompareSuit = 0
-    //                isAceStraight = 1
-    //                minRank = 0
-    //                handUseType = 0
-    //                handUseNum = 0
                     let rule = ClassifierSettingArgs.targetSetting[i] as! AinRule
                     for j in 0...rule.setting.count - 1{
                         allPreSetRules[i]![j] = []

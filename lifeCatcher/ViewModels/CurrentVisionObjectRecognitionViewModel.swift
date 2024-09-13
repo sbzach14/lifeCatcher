@@ -28,10 +28,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var usedSingleFeatures: [Int] = []
     @Published var cutStructArray: [cutStruct] = []
     @Published var cutShowArray : [Int] = []
-
-//    let detectModel = try! detect_0903_copy()
-//    let clsModel_h = try! cls_0715_h_trans_copy()
-//    let clsModel_v = try! cls_0727_v_trans_copy()
+    
+    //    let detectModel = try! detect_0903_copy()
+    //    let clsModel_h = try! cls_0715_h_trans_copy()
+    //    let clsModel_v = try! cls_0727_v_trans_copy()
     let detectModel = try! detect_0903()
     let clsModel_h = try! cls_0715_h_trans()
     let clsModel_v = try! cls_0727_v_trans()
@@ -53,7 +53,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     
     let lock = NSLock()
     
-
+    
     public var state : String = "idle"
     public var shuffleMode : [Int] = [1,0]
     public var cutMode : [Int] = [0,0]
@@ -77,6 +77,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     public var minSingleFeatureNum : Int = 0
     public var recgReport : Bool = false
     public var specialCard:[Int] = [0,0]
+    public var isAddCard: Bool = false
     
     //测试用的定时器
     public var ding: Int = 0
@@ -97,6 +98,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     var centerPos : [Float] = [0.5, 0.5]
     var lastBoxes : [[Float]] = [[0.02, 0.02, 0.01, 0.05], [0.98, 0.98, 0.01, 0.01]]
     var targetArea : [Float] = [0, 0, 0, 0]
+    var initTargetArea: [Float] = [0, 0, 0, 0]
     var isTargetArea : Bool = false
     var isDetect: Bool = false
     
@@ -111,6 +113,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     private var requests = [VNRequest]()
     
     private var stateCounter : Int = 0
+    private var shuffleStartCounter : Int = 0
+    private var shuffleResetCounter : Int = 0
     private var stateSingleFeature : [Int] = [-1, -1]
     
     private var laplacianDic: [[Int:Float]] = [[:],[:]]
@@ -137,7 +141,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var volumeValue: Float = 0.5
     @Published var voiceRate: Float = 0.5
     @Published var zoomFactor: Float = 0
-    @Published var focusFactor: Float = 0.65
+    @Published var focusFactor: Float = 0.6
     
     var setFrameRate: Float64 = 120.0
     var cameraFrameRate: Int = 0
@@ -158,11 +162,11 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     var successSoundURL: URL?
     var failSoundURL: URL?
     var hintVoiceIndex: Int = -1
-
+    
     override init(){
         
         super.init()
-              
+        
         // Load data from config.json
         if let configData = readConfigJSON() {
             let boolDict = configData["Bool"] as! [String : Bool]
@@ -191,7 +195,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         self.speechPerformer.voiceRate = self.voiceRate
         
     }
-
+    
     func initialize(saveRuleIndex: Int) {
         
         setupAVCapture()
@@ -209,12 +213,14 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             shuffleOrRiffle = 1
         }
     }
-
+    
     private func initDetectResult(){
-        detectResultList = [:]
+        detectResultList.removeAll()
         stateCounter = 0
+        shuffleStartCounter = 0
+        shuffleResetCounter = 0
         isDetect = false
-        detectSet = []
+        detectSet.removeAll()
     }
     
     private func initShuffle(){
@@ -230,6 +236,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         centerPos = [0.5, 0.5]
         lastBoxes = [[0.02, 0.02, 0.01, 0.01], [0.98, 0.98, 0.02, 0.02]]
         targetArea = [0,0,0,0]
+        initTargetArea = [0, 0, 0, 0]
         imageSize[0] = min(originSize[0], originImageSize[0] * (1 + self.zoomFactor * self.maxZoomScale))
         imageSize[1] = min(originSize[1], originImageSize[1] * (1 + self.zoomFactor * self.maxZoomScale))
         isTargetArea = false
@@ -247,21 +254,21 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         self.startSoundURL = Bundle.main.url(forResource: "start_voice", withExtension: "mp3")
         self.successSoundURL = Bundle.main.url(forResource: "success_voice", withExtension: "mp3")
         self.failSoundURL = Bundle.main.url(forResource: "fail_voice", withExtension: "mp3")
-//        do {
-//            startAudioRC = try AVAudioPlayer(contentsOf: startSoundURL!)
-//            startAudioRC?.delegate = self
-//            startAudioRC?.prepareToPlay()
-//            successAudioRC = try AVAudioPlayer(contentsOf: successSoundURL!)
-//            successAudioRC?.delegate = self
-//            successAudioRC?.prepareToPlay()
-//            failAudioRC = try AVAudioPlayer(contentsOf: failSoundURL!)
-//            failAudioRC?.delegate = self
-//            failAudioRC?.prepareToPlay()
-//        } catch {
-//            // print("Error playing sound: \(error.localizedDescription)")
-//        }
+        //        do {
+        //            startAudioRC = try AVAudioPlayer(contentsOf: startSoundURL!)
+        //            startAudioRC?.delegate = self
+        //            startAudioRC?.prepareToPlay()
+        //            successAudioRC = try AVAudioPlayer(contentsOf: successSoundURL!)
+        //            successAudioRC?.delegate = self
+        //            successAudioRC?.prepareToPlay()
+        //            failAudioRC = try AVAudioPlayer(contentsOf: failSoundURL!)
+        //            failAudioRC?.delegate = self
+        //            failAudioRC?.prepareToPlay()
+        //        } catch {
+        //            // print("Error playing sound: \(error.localizedDescription)")
+        //        }
     }
-
+    
     func setupAVCapture(){
         
         if self.isBackCamera{
@@ -283,7 +290,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             for input in session.inputs {
                 session.removeInput(input)
             }
-
+            
             // 移除所有的输出
             for output in session.outputs {
                 session.removeOutput(output)
@@ -301,7 +308,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 let ranges = format.videoSupportedFrameRateRanges
                 let dimensions = CMVideoFormatDescriptionGetDimensions(format.formatDescription)
                 return dimensions.width == 1920
-                    && ranges.contains { range in
+                && ranges.contains { range in
                     return range.maxFrameRate >= self.setFrameRate
                 }
             }) else {
@@ -368,7 +375,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 self.captureDevice.focusMode = .continuousAutoFocus
                 // print("对焦模式：自动对焦")
             }
-                    
+            
             self.captureDevice.unlockForConfiguration()
         }
         catch{
@@ -407,15 +414,15 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             
             
             if frameRate == idleRate{
-                device.exposureMode = .continuousAutoExposure
-                //device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(60)), iso: device.activeFormat.maxISO/2)
+                //device.exposureMode = .continuousAutoExposure
+                device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(60)), iso: device.activeFormat.maxISO/4)
                 //device.setExposureTargetBias(0)
             }
             else{
                 //self.captureDevice.exposureMode = .autoExpose
                 
                 //不拨牌 且是前置
-                if frameRate == 120 && self.shuffleMode[1] != 0{
+                if frameRate == 120{
                     device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(180)), iso: device.activeFormat.maxISO)
                 }
                 else{
@@ -435,11 +442,11 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
     }
     
-
+    
     // MARK: capture output
     // AVCaptureVideoDataOutputSampleBufferDelegate 方法
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-      
+        
         let currentTimestamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer).seconds
         
         // 计算时间差
@@ -454,7 +461,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             // 重置计数器
             frameCount = 0
         }
-  
+        
         if self.state != "idle"{
             self.taskIndex += 1
         }
@@ -466,7 +473,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         // 处理视频帧数据
         let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!
-      
+        
         let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
         
         var indexGap = 4
@@ -502,6 +509,13 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             && (self.cameraFrameRate <= idleRate || self.taskIndex % indexGap == 0){
             backgroundQueue.async {
                 do{
+//                    var rectList : [[Float]] = []
+//                    rectList.append(self.lastBoxes[0])
+//                    rectList.append(self.lastBoxes[1])
+//                    rectList.append(self.targetArea)
+//                    let drawcvpixelbuffer = drawRectanglesOnPixelBuffer(pixelBuffer: pixelBuffer, rectList: rectList)!
+//                    ciImage = CIImage(cvPixelBuffer: drawcvpixelbuffer)
+                
                     let transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
                     
                     let rotationTransform = CGAffineTransform(rotationAngle: -.pi / 2)  // 顺时针旋转90度
@@ -528,52 +542,52 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         // 释放视频帧资源
         CMSampleBufferInvalidate(sampleBuffer)
-
+        
     }
- 
+    
     func processImageOrigin(_ pixelBuffer: CVPixelBuffer, taskIndex: Int, isTargetArea: Bool, targetArea: [Float]){
         
         let detectConfidenceThreshold:Float = 0.8
-        let detectConfidenceMinThreshold:Float = 0.5
+        let detectConfidenceMinThreshold:Float = 0.7
         
-        var confidenceThreshold: Double = 0
+        var confidenceThreshold: Float = 0
         if self.state == "idle"{
             confidenceThreshold = 0.7
         }
         else{
-            confidenceThreshold = 0.1
+            confidenceThreshold = 0.2
         }
         
         var singlefeatureResult : [DetectionResult]
         if !isTargetArea{
-            let result = try! self.detectModel.prediction(image: pixelBuffer, iouThreshold: 0.01, confidenceThreshold: confidenceThreshold)
+            let result = try! self.detectModel.prediction(image: pixelBuffer, iouThreshold: 0.01, confidenceThreshold: Double(confidenceThreshold))
             singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, iscls: false)
         }
         else if self.isCameraHorizon{
-            let result = try! self.clsModel_h.prediction(image: pixelBuffer, iouThreshold: 0.01, confidenceThreshold: confidenceThreshold)
+            let result = try! self.clsModel_h.prediction(image: pixelBuffer, iouThreshold: 0.01, confidenceThreshold: Double(confidenceThreshold))
             singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer)
         }
         else{
-            let result = try! self.clsModel_v.prediction(image: pixelBuffer, iouThreshold: 0.01, confidenceThreshold: confidenceThreshold)
+            let result = try! self.clsModel_v.prediction(image: pixelBuffer, iouThreshold: 0.01, confidenceThreshold: Double(confidenceThreshold))
             singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer)
         }
         
         
         
-//            // 创建输入
-//            let input = try! DetectionInput(image: pixelBuffer,
-//                                           iouThreshold: 0.45,
-//                                           confidenceThreshold: confidenceThreshold)
-//            
-//            // 进行预测
-//            let prediction = try! mlmodel.prediction(from: input)
-//
-//            // 处理预测结果
-//            let confidence = prediction.featureValue(for: "confidence")!.multiArrayValue!
-//            let coordinates = prediction.featureValue(for: "coordinates")!.multiArrayValue!
-//            singlefeatureResult = getSingleFeature(from: confidence, from: coordinates, from: pixelBuffer)
-
-       
+        //            // 创建输入
+        //            let input = try! DetectionInput(image: pixelBuffer,
+        //                                           iouThreshold: 0.45,
+        //                                           confidenceThreshold: confidenceThreshold)
+        //
+        //            // 进行预测
+        //            let prediction = try! mlmodel.prediction(from: input)
+        //
+        //            // 处理预测结果
+        //            let confidence = prediction.featureValue(for: "confidence")!.multiArrayValue!
+        //            let coordinates = prediction.featureValue(for: "coordinates")!.multiArrayValue!
+        //            singlefeatureResult = getSingleFeature(from: confidence, from: coordinates, from: pixelBuffer)
+        
+        
         
         DispatchQueue.main.async{
             
@@ -590,9 +604,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             self.stateSingleFeature[0] = singlefeatureResult[0].singlefeatureIndex[0]
             self.stateSingleFeature[1] = singlefeatureResult[1].singlefeatureIndex[0]
             
-            self.centerPos = [(singlefeatureResult[0].coordinate[0] + singlefeatureResult[1].coordinate[0])/2, (singlefeatureResult[0].coordinate[1] + singlefeatureResult[1].coordinate[1])/2]
+            if singlefeatureResult[0].singlefeatureIndex[0] != -1 && singlefeatureResult[1].singlefeatureIndex[0] != -1{
+                self.centerPos = [(singlefeatureResult[0].coordinate[0] + singlefeatureResult[1].coordinate[0])/2, (singlefeatureResult[0].coordinate[1] + singlefeatureResult[1].coordinate[1])/2]
+            }
             self.lastBoxes = [singlefeatureResult[0].coordinate,singlefeatureResult[1].coordinate]
-
+            
+            
             var detectNum = 0
             if singlefeatureResult[0].singlefeatureIndex[0] != -1{
                 detectNum += 1
@@ -610,7 +627,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     self.stateCounter = 0
                     self.state = "detecting"//cut or riffle
                     self.changeCameraFrameRate(to: Int(self.setFrameRate))
-                    
+                    //self.changeCameraFrameRate(to: Int(30))
                     var stateResult : [[Float]] = []
                     if singlefeatureResult[0].singlefeatureIndex[0] != -1{
                         stateResult.append(singlefeatureResult[0].coordinate)
@@ -629,7 +646,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     }
                 }
             }
-        
+            
             if self.state != "idle" && isTargetArea && self.isTargetArea{
                 
                 var leftDetectSingleFeature = -1
@@ -665,7 +682,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     minDetectConfidence = leftConfidence
                 }
                 
-                if detectNum == 0{
+                if detectNum == 0 || detectConfidence < confidenceThreshold{
                     self.stateCounter += 1
                 }
                 else{
@@ -677,9 +694,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 
                 //一边够大，另一边小或者一样
                 let isCut = detectConfidence >= detectConfidenceThreshold
-                            && self.detectNeedToCut
-                            //&& (minDetectConfidence < detectConfidenceMinThreshold || isSame)
-                            
+                && self.detectNeedToCut
+                //&& (minDetectConfidence < detectConfidenceMinThreshold || isSame)
+                
                 
                 if !self.isDetect && detectConfidence >= detectConfidenceThreshold{
                     if isRiffle{
@@ -687,13 +704,44 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         self.speakText(input: 0)
                     }
                     else if minDetectConfidence >= detectConfidenceMinThreshold && isShuffle {
-                        self.isDetect = true
-                        self.speakText(input: 0)
-                        self.state = "shuffle"
+                        if leftDetectSingleFeature == self.stateSingleFeature[0]
+                            && rightDetectSingleFeature == self.stateSingleFeature[1]
+                            && leftDetectSingleFeature != rightDetectSingleFeature
+                            && leftDetectSingleFeature != -1{
+                            self.shuffleStartCounter += 1
+                        }
+                        else{
+                            self.shuffleStartCounter = 0
+                        }
+                        
+                        if self.shuffleStartCounter > 5{
+                            self.isDetect = true
+                            self.speechPerformer.stopSpeechSynthesis()
+                            self.detectNeedToCut = false
+                            self.speakText(input: 0)
+                            self.state = "shuffle"
+                            self.initTargetArea = self.updateTargetArea(coordinates: [singlefeatureResult[0].coordinate, singlefeatureResult[1].coordinate], targetArea: targetArea)
+                            
+                        }
                     }
                 }
                 
-                print("\(self.singlefeatureLabelDic[leftDetectSingleFeature] ?? "null")  \(leftConfidence)  \(self.singlefeatureLabelDic[rightDetectSingleFeature] ?? "null")  \(rightConfidence) detectNeedToCut\(self.detectNeedToCut)")
+                if self.isDetect && self.state == "shuffle" && self.targetAreaMove(initTargetArea: self.initTargetArea, targetArea: targetArea) && self.detectSet.count < 10{
+                    self.shuffleResetCounter += 1
+                }
+                else if self.isDetect && self.state == "shuffle" && (detectNum != 2 || minDetectConfidence < confidenceThreshold) && self.detectSet.count < 10{
+                    self.shuffleResetCounter += 1
+                }
+                else if self.isDetect && self.state == "shuffle"{
+                    self.shuffleResetCounter = 0
+                }
+                
+                
+                if self.shuffleResetCounter > 10{
+                    self.initDetectResult()
+                }
+                
+//                print("\(self.singlefeatureLabelDic[leftDetectSingleFeature] ?? "null")  \(leftConfidence)  \(self.singlefeatureLabelDic[rightDetectSingleFeature] ?? "null")  \(rightConfidence) detectNeedToCut\(self.detectNeedToCut)")
                 
                 if isCut{
                     
@@ -773,7 +821,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         
                     }
                 }
-            
+                
                 if self.stateCounter >= 5{
                     
                     self.stateCounter = 0
@@ -805,7 +853,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         self.shuffleOrRiffle = 1
                         self.initShuffle()
                         self.singlefeatureArray = detectState.detectionResult
- 
+                        
                         if self.shuffleMode[1] == 1{
                             //拨到顶
                             if self.singlefeatureArray.count >= self.minSingleFeatureNum{
@@ -849,17 +897,17 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     
                     if self.detectSet.count >= 10
                     {
-                        self.speechPerformer.stopSpeechSynthesis()
-                        self.detectNeedToCut = false
+                        self.initTargetArea = self.targetArea
                     }
                     
                     self.detectResultList[taskIndex] = singlefeatureResult
                     
                     var stateResult : [[Float]] = []
                     
-                    if self.state == "shuffle"{
+                    if self.state == "shuffle" && leftDetectSingleFeature != -1 && rightDetectSingleFeature != -1{
                         stateResult.append(singlefeatureResult[0].coordinate)
                         stateResult.append(singlefeatureResult[1].coordinate)
+                        self.targetArea = self.updateTargetArea(coordinates: stateResult, targetArea: targetArea)
                     }
                     else{
                         if singlefeatureResult[0].singlefeatureIndex[0] != -1{
@@ -868,17 +916,16 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         if singlefeatureResult[1].singlefeatureIndex[0] != -1{
                             stateResult.append(singlefeatureResult[1].coordinate)
                         }
+                        self.targetArea = self.updateTargetArea(coordinates: stateResult, targetArea: targetArea)
                     }
-                    
-                    self.targetArea = self.updateTargetArea(coordinates: stateResult, targetArea: targetArea)
                 }
             }
         }
         
-//        let modelCIImage = CIImage(cvPixelBuffer: pixelBuffer)
-//        let cgImage = CIContext().createCGImage(modelCIImage, from: modelCIImage.extent)
-//        let savedUIImage = UIImage(cgImage: cgImage!)
-//        UIImageWriteToSavedPhotosAlbum(savedUIImage, self, #selector(self.imageSaved(_:didFinishSavingWithError:contextInfo:)), nil)
+        //        let modelCIImage = CIImage(cvPixelBuffer: pixelBuffer)
+        //        let cgImage = CIContext().createCGImage(modelCIImage, from: modelCIImage.extent)
+        //        let savedUIImage = UIImage(cgImage: cgImage!)
+        //        UIImageWriteToSavedPhotosAlbum(savedUIImage, self, #selector(self.imageSaved(_:didFinishSavingWithError:contextInfo:)), nil)
     }
     
     @objc private func imageSaved(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeMutableRawPointer?) {
@@ -903,7 +950,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         let longHeadIndex = 5
         
         // print("检测sortedKeys \(sortedKeys)")
-
+        
         if sortedKeys.count <= 1{
             let result = DetectionState(detectionResult: [], isSingle: true, isShort: true, longestIndex: -1)
             return result
@@ -941,10 +988,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             
             let nowN0 = dRNode0.singlefeatureIndex[0]
             let nowN1 = dRNode1.singlefeatureIndex[0]
-        
-//            print("index ", detectResultListIndex,
-//                  singlefeatureLabelDic[nowN0] ?? "none", dRNode0.nodeType, dRNode0.laplacianVariance, dRNode0.confidence[0], detectResultListIndex,
-//                  singlefeatureLabelDic[nowN1] ?? "none", dRNode1.nodeType, dRNode1.laplacianVariance, dRNode1.confidence[0])
+            
+            //            print("index ", detectResultListIndex,
+            //                  singlefeatureLabelDic[nowN0] ?? "none", dRNode0.nodeType, dRNode0.laplacianVariance, dRNode0.confidence[0], detectResultListIndex,
+            //                  singlefeatureLabelDic[nowN1] ?? "none", dRNode1.nodeType, dRNode1.laplacianVariance, dRNode1.confidence[0])
         }
         
         sortedKeys = sortedKeys.filter { !deleteKeys.contains($0) }
@@ -989,6 +1036,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         var singleCnt = 0
         var doubleCnt = 0
         
+        endIndex += 1
         
         for keyIndex in beginIndex..<endIndex{
             let detectResultListIndex = sortedKeys[keyIndex]
@@ -1007,15 +1055,15 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             
             let nextnextDetectResultNode0 = targetDetecResultList[nextnextDetectResultListIndex]![0]
             let nextnextDetectResultNode1 = targetDetecResultList[nextnextDetectResultListIndex]![1]
-                
+            
             let nowNum0 = targetDetecResultList[detectResultListIndex]![0].singlefeatureIndex[0]
             let nodeType0 = targetDetecResultList[detectResultListIndex]![0].nodeType
             let nowNum1 = targetDetecResultList[detectResultListIndex]![1].singlefeatureIndex[0]
             let nodeType1 = targetDetecResultList[detectResultListIndex]![1].nodeType
             
-//            print("index ", keyIndex,
-//                  singlefeatureLabelDic[nowNum0] ?? "none", detectResultNode0.nodeType, detectResultNode0.laplacianVariance, detectResultNode0.confidence[0], detectResultListIndex,
-//                  singlefeatureLabelDic[nowNum1] ?? "none", detectResultNode1.nodeType, detectResultNode1.laplacianVariance, detectResultNode1.confidence[0])
+            //            print("index ", keyIndex,
+            //                  singlefeatureLabelDic[nowNum0] ?? "none", detectResultNode0.nodeType, detectResultNode0.laplacianVariance, detectResultNode0.confidence[0], detectResultListIndex,
+            //                  singlefeatureLabelDic[nowNum1] ?? "none", detectResultNode1.nodeType, detectResultNode1.laplacianVariance, detectResultNode1.confidence[0])
             
             if targetDetecResultList[detectResultListIndex]![0].singlefeatureIndex[0] != -1
                 && targetDetecResultList[detectResultListIndex]![1].singlefeatureIndex[0] != -1{
@@ -1097,6 +1145,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         break
                     }
                 }
+                
+                print("tail \(leftLastTail) \(rightLastTail)")
                 endIndex = max(leftLastTail, rightLastTail) + 1
             }
             else if leftSideCnt > rightSideCnt && leftFirstHead != -1{
@@ -1108,7 +1158,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 endIndex = rightTailLong + 1
             }
         }
-
+        
         if beginIndex >= endIndex{
             let result = DetectionState(detectionResult: [], isSingle: true, isShort: true, longestIndex: -1)
             return result
@@ -1145,7 +1195,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                 head = keyIndex
                                 
                                 let isClose = head - end <= 3
-
+                                
                                 var isSameNum = head - end <= 5
                                 var middleNum = -1
                                 for updateIndex in end+1...head-1{
@@ -1200,15 +1250,15 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 }
             }
         }
-
+        
         for keyIndex in beginIndex..<endIndex{
             let detectResultListIndex = sortedKeys[keyIndex]
             for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
                 let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
-
+                
                 if detectResultNode.nodeType == 0
                     && detectResultNode.singlefeatureIndex[0] != -1{
-
+                    
                     var newSingleFeatureIndex : [Int] = []
                     var newConfidence : [Float] = []
                     for i in 0..<detectResultNode.singlefeatureIndex.count{
@@ -1220,13 +1270,13 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             }
                         }
                     }
-
+                    
                     if newSingleFeatureIndex.count == 0{
                         newSingleFeatureIndex.append(-1)
                         newConfidence.append(1)
                         detectResultNode.nodeType = 5
                     }
-
+                    
                     detectResultNode.singlefeatureIndex = newSingleFeatureIndex
                     detectResultNode.confidence = newConfidence
                 }
@@ -1294,20 +1344,20 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                     }
                 }
-                if nodeIndex.count > 0{
+                if nodeIndex.count > 0 && (isAddCard || confidenceDic[key]! > 0.7){
                     targetDetecResultList[nodeIndex[0]]![nodeIndex[1]].nodeType = 4
                 }
             }
         }
-
+        
         for keyIndex in beginIndex..<endIndex{
             let detectResultListIndex = sortedKeys[keyIndex]
             for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
                 let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
-
+                
                 if detectResultNode.nodeType == 0
                     && detectResultNode.singlefeatureIndex[0] != -1{
-
+                    
                     var newSingleFeatureIndex : [Int] = []
                     var newConfidence : [Float] = []
                     for i in 0..<detectResultNode.singlefeatureIndex.count{
@@ -1316,19 +1366,19 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             newConfidence.append(detectResultNode.confidence[i])
                         }
                     }
-
+                    
                     if newSingleFeatureIndex.count == 0{
                         newSingleFeatureIndex.append(-1)
                         newConfidence.append(1)
                         detectResultNode.nodeType = 5//所有可能的数字去除，标记为融合牌
                     }
-
+                    
                     detectResultNode.singlefeatureIndex = newSingleFeatureIndex
                     detectResultNode.confidence = newConfidence
                 }
             }
         }
-
+        
         for key in confidenceDic.keys{
             if confidenceDic[key] == 0{
                 var nodeIndex : [Int] = []
@@ -1344,14 +1394,14 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                     }
                 }
-                if nodeIndex.count > 0{
+                if nodeIndex.count > 0 && (isAddCard || confidenceDic[key]! > 0.7){
                     targetDetecResultList[nodeIndex[0]]![nodeIndex[1]].nodeType = 4
                 }
             }
         }
         
         let isCut = isShort && isSingle
-
+        
         //统计标准模糊度(非切牌下）
         if !isCut{
             for keyIndex in beginIndex..<endIndex{
@@ -1383,13 +1433,13 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         
         //补牌
-        if isShuffle && beginIndex < addEndIndex && lostNum <= 2{
+        if isAddCard && isShuffle && beginIndex < addEndIndex && lostNum <= 2{
             
             let numIndexList : [Int] = [0, 1]
             
             for key in confidenceDic.keys{
                 if confidenceDic[key] == 0{
-
+                    
                     for keyIndex in beginIndex..<addEndIndex{
                         let detectResultListIndex = sortedKeys[keyIndex]
                         let nextDetectResultListIndex = sortedKeys[keyIndex+1]
@@ -1495,13 +1545,13 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         
         //补链头尾
-        for keyIndex in beginIndex..<endIndex{
+        for keyIndex in beginIndex..<addEndIndex{
             let detectResultListIndex = sortedKeys[keyIndex]
             let lastDetectResultListIndex = sortedKeys[keyIndex-1]
             let lastlastDetectResultListIndex = sortedKeys[keyIndex-2]
             let nextDetectResultListIndex = sortedKeys[keyIndex+1]
             let nextnextDetectResultListIndex = sortedKeys[keyIndex+2]
-            
+
             for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
                 let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
                 let sideDetectResultNode = targetDetecResultList[detectResultListIndex]![1-numIndex]
@@ -1509,47 +1559,47 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 let lastlastDetectResultNode = targetDetecResultList[lastlastDetectResultListIndex]![numIndex]
                 let nextDetectResultNode = targetDetecResultList[nextDetectResultListIndex]![numIndex]
                 let nextnextDetectResultNode = targetDetecResultList[nextnextDetectResultListIndex]![numIndex]
-                
+
                 if (detectResultNode.nodeType == 5 || detectResultNode.nodeType == 0)
                     && sideDetectResultNode.nodeType == 2
                     && detectResultNode.laplacianVariance < lastDetectResultNode.laplacianVariance{
-                    
+
                     if lastDetectResultNode.nodeType == 2
                         && lastDetectResultNode.laplacianVariance / lastlastDetectResultNode.laplacianVariance > blurThreshold
                         && detectResultNode.laplacianVariance / lastDetectResultNode.laplacianVariance < blurThreshold{
                         lastDetectResultNode.nodeType = 3
                         detectResultNode.nodeType = 2
                         detectResultNode.singlefeatureIndex[0] = lastDetectResultNode.singlefeatureIndex[0]
-                        
+
                     }
-                    
+
                     else if lastDetectResultNode.nodeType == 4{
                         lastDetectResultNode.nodeType = 1
                         detectResultNode.nodeType = 2
                         detectResultNode.singlefeatureIndex[0] = lastDetectResultNode.singlefeatureIndex[0]
                     }
-                    
+
                 }
-                
+
                 if (detectResultNode.nodeType == 5 || detectResultNode.nodeType == 0)
                     && sideDetectResultNode.nodeType == 1
                     && detectResultNode.laplacianVariance < nextDetectResultNode.laplacianVariance{
-                    
+
                     if nextDetectResultNode.nodeType == 1
                         && nextDetectResultNode.laplacianVariance / nextnextDetectResultNode.laplacianVariance > blurThreshold
                         && detectResultNode.laplacianVariance / nextDetectResultNode.laplacianVariance < blurThreshold{
                         nextDetectResultNode.nodeType = 3
                         detectResultNode.nodeType = 1
                         detectResultNode.singlefeatureIndex[0] = nextDetectResultNode.singlefeatureIndex[0]
-                        
+
                     }
-                    
+
                     else if nextDetectResultNode.nodeType == 4{
                         nextDetectResultNode.nodeType = 2
                         detectResultNode.nodeType = 1
                         detectResultNode.singlefeatureIndex[0] = nextDetectResultNode.singlefeatureIndex[0]
                     }
-                    
+
                 }
             }
         }
@@ -1581,15 +1631,15 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 
                 let nextnextDetectResultNode0 = targetDetecResultList[nextnextDetectResultListIndex]![0]
                 let nextnextDetectResultNode1 = targetDetecResultList[nextnextDetectResultListIndex]![1]
-                    
+                
                 let nowNum0 = targetDetecResultList[detectResultListIndex]![0].singlefeatureIndex[0]
                 let nodeType0 = targetDetecResultList[detectResultListIndex]![0].nodeType
                 let nowNum1 = targetDetecResultList[detectResultListIndex]![1].singlefeatureIndex[0]
                 let nodeType1 = targetDetecResultList[detectResultListIndex]![1].nodeType
                 
-//                print("index ", detectResultListIndex,
-//                      singlefeatureLabelDic[nowNum0] ?? "none", detectResultNode0.nodeType, detectResultNode0.laplacianVariance, detectResultNode0.confidence[0], detectResultListIndex,
-//                      singlefeatureLabelDic[nowNum1] ?? "none", detectResultNode1.nodeType, detectResultNode1.laplacianVariance, detectResultNode1.confidence[0])
+                print("index ", detectResultListIndex,
+                      singlefeatureLabelDic[nowNum0] ?? "none", "type\(detectResultNode0.nodeType)", detectResultNode0.laplacianVariance, detectResultNode0.confidence[0], detectResultListIndex,
+                      singlefeatureLabelDic[nowNum1] ?? "none", "type\(detectResultNode1.nodeType)", detectResultNode1.laplacianVariance, detectResultNode1.confidence[0])
                 
                 var insertCard0 : InsertCard
                 var insertCard1 : InsertCard
@@ -1615,7 +1665,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     else if (nodeType0 == 0 || nodeType0 == 4) && nowNum0 != -1 && detectResultNode0.confidence[0] > 0.75{
                         detectSingleFeatureArray.insert(insertCard0, at: 0)
                     }
-                
+                    
                     if nodeType1 == 2{
                         detectSingleFeatureArray.insert(insertCard1, at: 0)
                     }
@@ -1769,7 +1819,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             singlefeatureArray.insert(contentsOf: elementsToMove, at: 0)
         }
     }
-
+    
     
     // MARK: compute targetArea
     func computeTargetArea(stateResult: [[Float]])-> [Float]{
@@ -1780,10 +1830,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         var w = self.imageSize[0]
         var h = self.imageSize[1]
         
-        var boxfactor:Float = 1.5
+        var boxfactor:Float = 1.2
         
         if originBoxes.count == 1{
-
+            
             let minX = self.originSize[0] * (originBoxes[0][0] - originBoxes[0][2] / 2)
             let maxX = self.originSize[0] * (originBoxes[0][0] + originBoxes[0][2] / 2)
             let minY = self.originSize[1] * (originBoxes[0][1] - originBoxes[0][3] / 2)
@@ -2025,6 +2075,17 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         
         return computeTargetArea(stateResult: stateResult)
+    }
+    
+    func targetAreaMove(initTargetArea: [Float], targetArea: [Float]) -> Bool{
+        if abs(initTargetArea[0] - targetArea[0]) > (initTargetArea[2] + targetArea[2]) / 6
+    || abs(initTargetArea[1] - targetArea[1]) > (initTargetArea[3] + targetArea[3]) / 6
+    || targetArea[1] / initTargetArea[1] > 1.25{
+            return true
+        }
+        else{
+            return false
+        }
     }
 
     func getSingleFeature(from singlefeatureArray: MLMultiArray, from boxArray : MLMultiArray, from pixelBuffer : CVPixelBuffer, iscls : Bool = true) -> [DetectionResult] {
@@ -2854,7 +2915,7 @@ class SpeakResultStruct{
 
 
 class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
-    var voiceRate: Float = 0.55
+    var voiceRate: Float = 0.5
     var synthesizer = AVSpeechSynthesizer() // Your AVSpeechSynthesizer instance
     let chineseFemaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.Ting-Ting-compact")
     let chineseMaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.siri_male_zh-CN_compact")
