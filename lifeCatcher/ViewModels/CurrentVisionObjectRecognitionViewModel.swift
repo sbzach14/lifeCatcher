@@ -2077,7 +2077,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     
     func targetAreaMove(initTargetArea: [Float], targetArea: [Float]) -> Bool{
         if abs(initTargetArea[0] - targetArea[0]) > (initTargetArea[2] + targetArea[2]) / 5
-    || abs(initTargetArea[1] - targetArea[1]) > (initTargetArea[3] + targetArea[3]) / 3
+            || abs(initTargetArea[1] - targetArea[1]) > (initTargetArea[3] + targetArea[3]) / 2.5
     || targetArea[1] / initTargetArea[1] > 1.5{
             return true
         }
