@@ -595,7 +595,8 @@ class CBDatasetHandAnalyst{
                 rank = rank << 4 | threeSingleFeatureRank
                 rank = rank << 2 | threeSingleFeatureSuit
                 
-                let singlefeatureType = "豹子" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[2]].originRank]!
+//                let singlefeatureType = "豹子" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[2]].originRank]!
+                let singlefeatureType = "豹子"
                 
                 rankList.append(rank)
                 singlefeatureTypeList.append(singlefeatureType)
@@ -646,8 +647,9 @@ class CBDatasetHandAnalyst{
                     
                     var rank = straightRankList[i] >> 2
                     
-                    let singlefeatureType = "顺金" + String(rank)
-                    rank = rank << 2 | suit
+//                    let singlefeatureType = "顺金" + String(rank)
+//                    rank = rank << 2 | suit
+                    let singlefeatureType = "顺金"
                     
                     rankList.append(rank)
                     singlefeatureTypeList.append(singlefeatureType)
@@ -703,7 +705,8 @@ class CBDatasetHandAnalyst{
                 }
                 rank = rank << 2 | suit
                 
-                let singlefeatureType = "金花" + String(singlefeatures[currentUsedSingleFeatureIndex[0]].rank)
+//                let singlefeatureType = "金花" + String(singlefeatures[currentUsedSingleFeatureIndex[0]].rank)
+                let singlefeatureType = "金花"
                 
                 rankList.append(rank)
                 singlefeatureTypeList.append(singlefeatureType)
@@ -840,7 +843,8 @@ class CBDatasetHandAnalyst{
                 rank = rank << 4 | headRank
                 rank = rank << 2 | headSuit
 
-                let singlefeatureType = "顺子" + String(headRank)
+//                let singlefeatureType = "顺子" + String(headRank)
+                let singlefeatureType = "顺子"
                 
                 rankList.append(rank)
                 singlefeatureTypeList.append(singlefeatureType)
@@ -888,7 +892,8 @@ class CBDatasetHandAnalyst{
                 rank = rank << 2 | pairsuit
                 
                 
-                let singlefeatureType = "对子" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[1]].originRank]!
+//                let singlefeatureType = "对子" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[1]].originRank]!
+                let singlefeatureType = "对子"
                 
                 rankList.append(rank)
                 singlefeatureTypeList.append(singlefeatureType)

@@ -332,7 +332,8 @@ class TCDatasetHandAnalyst{
     
     func eval_isPair(singlefeatures:[TCSingleFeature]) -> (Int, String, Int){
         if singlefeatures[0].rank == singlefeatures[1].rank{
-            let singlefeatureType: String = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+//            let singlefeatureType: String = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+            let singlefeatureType: String = "对子"
             return (singlefeatures[0].rank, singlefeatureType, 1)
         } else if singlefeatures[0].originalRank > 13 && singlefeatures[1].originalRank > 13{
             return (singlefeatures[0].rank, "对王", 1)
@@ -341,7 +342,8 @@ class TCDatasetHandAnalyst{
     }
     
     func eval_isHighSingleFeature(singlefeatures: [TCSingleFeature]) -> (Int, String, Int){
-        let singlefeatureType: String = "单牌" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+        let singlefeatureType: String = "单牌"
+//        let singlefeatureType: String = "单牌" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
         return (singlefeatures[0].rank, singlefeatureType, 0)
     }
     

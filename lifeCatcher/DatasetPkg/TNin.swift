@@ -310,7 +310,8 @@ class TNDatasetHandAnalyst{
     
     func isPair(singlefeatures: [SingleFeature]) -> (Bool, Int, String, Int){
         if singlefeatures[0].rank == singlefeatures[1].rank {
-            let singlefeatureType: String = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].rank]!
+            let singlefeatureType: String = "对子"
+//            let singlefeatureType: String = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].rank]!
             return (true, singlefeatures[0].rank, singlefeatureType, 1)
         }
         return (false, 0, "", 0)

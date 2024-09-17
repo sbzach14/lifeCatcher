@@ -212,21 +212,6 @@ class AinDataset {
                     allPlaySingleFeatures[i].insertSingleFeature(singlefeature: FeatureList.removeFirst())
                 }
             }
-//            if communityNum == 3 {
-//                FeatureList.removeFirst()
-//                for _ in 0..<3 {
-//                    community.append(FeatureList.removeFirst())
-//                }
-//            } else if communityNum == 5 {
-//                FeatureList.removeFirst()
-//                for _ in 0..<3 {
-//                    community.append(FeatureList.removeFirst())
-//                }
-//                for _ in 0..<2 {
-//                    FeatureList.removeFirst()
-//                    community.append(FeatureList.removeFirst())
-//                }
-//            }
         }
         // 自定义发牌 dealNum = 2
         else {

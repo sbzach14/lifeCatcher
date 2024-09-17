@@ -324,14 +324,16 @@ class FCDatasetHandAnalyst{
     
     func eval_isPair(singlefeatures:[FCSingleFeature]) -> (Int, String, Int){
         if singlefeatures[0].rank == singlefeatures[1].rank{
-            let singlefeatureType: String = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+//            let singlefeatureType: String = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+            let singlefeatureType: String = "对子"
             return (singlefeatures[0].rank, singlefeatureType, 1)
         }
         return (0, "", 0)
     }
     
     func eval_isHighSingleFeature(singlefeatures: [FCSingleFeature]) -> (Int, String, Int) {
-        let singlefeatureType: String = "高牌" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+//        let singlefeatureType: String = "高牌" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+        let singlefeatureType: String = "单牌"
         return (singlefeatures[0].rank, singlefeatureType, 0)
     }
     

@@ -407,7 +407,8 @@ class TEGDatasetHandAnalyst{
     func eval_isPair(singlefeatures: [SingleFeature]) -> (Int, String, Int){
         if singlefeatures[0].rank == singlefeatures[1].rank {
             
-            let singlefeatureType: String = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+            let singlefeatureType: String = "对子"
+//            let singlefeatureType: String = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
             
             if self.samePointComparision == 1{
                 return (singlefeatures[0].rank << 2 | (self.blackRedJudger(singlefeature: singlefeatures[0]) + self.blackRedJudger(singlefeature: singlefeatures[1])), singlefeatureType, 1)
@@ -423,9 +424,9 @@ class TEGDatasetHandAnalyst{
     func eval_is28(singlefeatures:[SingleFeature]) -> (Int, String, Int) {
         if singlefeatures[0].rank == 8 && singlefeatures[1].rank == 2{
             if self.samePointComparision == 1 {
-                return (self.blackRedJudger(singlefeature: singlefeatures[0]) + self.blackRedJudger(singlefeature: singlefeatures[1]) + 1, "28", 0)
+                return (self.blackRedJudger(singlefeature: singlefeatures[0]) + self.blackRedJudger(singlefeature: singlefeatures[1]) + 1, "2 8", 0)
             } else {
-                return (1, "28", 0)
+                return (1, "2 8", 0)
             }
         }
         return (0, "", 0)
