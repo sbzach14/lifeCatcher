@@ -251,7 +251,6 @@ struct ButtonViewControllerWrapper: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: ButtonViewController, context: Context) {
-        // 可选：在这里更新视图控制器的状态
     }
 }
 

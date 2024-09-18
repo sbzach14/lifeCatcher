@@ -135,6 +135,7 @@ struct MainMenuView: View {
             }
             .navigationTitle("LifeCatcher".localized())
         }
+        .persistentSystemOverlays(.hidden)
     }
 
     private func toggleLanguage() {

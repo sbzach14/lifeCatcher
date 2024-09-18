@@ -31,12 +31,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var cutStructArray: [cutStruct] = []
     @Published var cutShowArray : [Int] = []
     
-    let detectModel = try! detect_0903_copy()
-    let clsModel_h = try! cls_0715_h_trans_copy()
-    let clsModel_v = try! cls_0727_v_trans_copy()
-//    let detectModel = try! detect_0903()
-//    let clsModel_h = try! cls_0715_h_trans()
-//    let clsModel_v = try! cls_0727_v_trans()
+//    let detectModel = try! detect_0903_copy()
+//    let clsModel_h = try! cls_0715_h_trans_copy()
+//    let clsModel_v = try! cls_0727_v_trans_copy()
+    let detectModel = try! detect_0903()
+    let clsModel_h = try! cls_0715_h_trans()
+    let clsModel_v = try! cls_0727_v_trans()
     var originSize : [Float] = [1920, 1080] //相机图像大小
     var imageSize : [Float] = [569, 320] //target area 截图大小
     var originImageSize : [Float] = [569, 320] //target area 原始截图大小
@@ -182,6 +182,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     
     private var showTimeModeText: Bool = false
     private var timerWorkItem: DispatchWorkItem?
+    
+    var isProcessNeedToCut: Bool = false
         
     
 
@@ -270,6 +272,14 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         self.leftSingleFeatures = []
         self.usedSingleFeatures = []
         multipleDatasetRCInfos = ReportManager.MultipleReportResultInfo()
+        
+        if (self.shuffleMode[0] != 0 && (self.cutMode[0] != 0 || self.specialCard[0] != 0))
+            || (self.shuffleMode[1] != 0 && (self.cutMode[1] != 0 || self.specialCard[1] != 0)){
+            self.isProcessNeedToCut = true
+        }
+        else{
+            self.isProcessNeedToCut = false
+        }
     }
     
     private func initBoxes(){
@@ -448,19 +458,28 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             
             
             if frameRate == idleRate{
-                device.exposureMode = .continuousAutoExposure
-                device.setExposureTargetBias(0)
-//                device.exposureMode = .custom
-//                device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(60)), iso: AVCaptureDevice.currentISO)
+                //detectneedtocut
+                if (self.isProcessNeedToCut || self.recgReport) && self.singlefeatureArray.count > 0{
+                    if frameRate == 120{
+                        device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(150)), iso: AVCaptureDevice.currentISO)
+                    }
+                    else{
+                        device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(240)), iso: AVCaptureDevice.currentISO)
+                    }
+                }
+                else{
+                    device.exposureMode = .continuousAutoExposure
+                    device.setExposureTargetBias(0)
+                }
             }
             else{
                 //不拨牌 且是前置
                 device.exposureMode = .custom
-                if frameRate == 120 && self.shuffleMode[1] != 0{
-                    device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(180)), iso: AVCaptureDevice.currentISO)
+                if frameRate == 120{
+                    device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(150)), iso: AVCaptureDevice.currentISO)
                 }
                 else{
-                    device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(frameRate)), iso: AVCaptureDevice.currentISO)
+                    device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(240)), iso: AVCaptureDevice.currentISO)
                 }
             }
             
@@ -637,7 +656,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         let detectConfidenceMinThreshold:Float = 0.5
         
         var confidenceThreshold: Float = 0
-        if self.state == "idle"{
+        if !isTargetArea{
             confidenceThreshold = 0.7
         }
         else{
@@ -704,16 +723,26 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 detectNum += 1
             }
             
-            
-            if self.state == "idle"{
-                if detectNum > 0 && self.stateCounter >= 1{
+            if self.state == "reloading"{
+                
+            }
+            else if self.state == "idle" && !self.isTargetArea && !isTargetArea{
+                
+                if (self.isProcessNeedToCut || self.recgReport) && self.singlefeatureArray.count > 0{
+                    self.detectNeedToCut = true
+                }
+                else{
+                    self.detectNeedToCut = false
+                }
+                
+                if ((detectNum == 1 && (self.shuffleMode[1] != 0 || self.detectNeedToCut))
+                    || (detectNum == 2 && self.shuffleMode[0] != 0))
+                    && self.stateCounter >= 1{
                     
-                    // print("进入识别")
+                    print("状态：进入识别")
                     
                     self.stateCounter = 0
-                    self.state = "detecting"//cut or riffle
-                    self.changeCameraFrameRate(to: Int(self.setFrameRate))
-                    //self.changeCameraFrameRate(to: Int(30))
+                    
                     var stateResult : [[Float]] = []
                     if singlefeatureResult[0].singlefeatureIndex[0] != -1{
                         stateResult.append(singlefeatureResult[0].coordinate)
@@ -725,15 +754,18 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     self.targetArea = self.computeTargetArea(stateResult: stateResult)
                     self.isTargetArea = true
                     
-                    if self.cutMode[self.shuffleOrRiffle] != 0
-                        || self.specialCard[self.shuffleOrRiffle] != 0
-                        || self.recgReport{
-                        self.detectNeedToCut = true
+                    if(detectNum == 2 && self.shuffleMode[0] != 0){
+                        self.initTargetArea = self.targetArea
+                        self.speakText(input: 0)
+                        self.speechPerformer.stopSpeechSynthesis()
                     }
+                    
+                    self.state = "detecting"
+                    
+                    self.changeCameraFrameRate(to: Int(self.setFrameRate))
                 }
             }
-            
-            if self.state != "idle" && isTargetArea && self.isTargetArea{
+            else if isTargetArea && self.isTargetArea{
                 
                 var leftDetectSingleFeature = -1
                 var leftConfidence:Float = -1
@@ -768,67 +800,39 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     minDetectConfidence = leftConfidence
                 }
                 
-                if detectNum == 0 || detectConfidence < confidenceThreshold{
+                if self.shuffleMode[0] != 0 
+                    && self.shuffleMode[1] == 0
+                    && (detectNum < 2 || minDetectConfidence < confidenceThreshold)
+                    && self.state == "detecting"{
                     self.stateCounter += 1
                 }
-                else{
-                    self.stateCounter = 0
+                else if self.state != "detecting"{
+                    if detectNum == 0 || detectConfidence < confidenceThreshold{
+                        self.stateCounter += 1
+                    }
+                    else{
+                        self.stateCounter = 0
+                    }
                 }
+                
+                var stateResult : [[Float]] = []
+                if singlefeatureResult[0].singlefeatureIndex[0] != -1{
+                    stateResult.append(singlefeatureResult[0].coordinate)
+                }
+                if singlefeatureResult[1].singlefeatureIndex[0] != -1{
+                    stateResult.append(singlefeatureResult[1].coordinate)
+                }
+                self.targetArea = self.updateTargetArea(coordinates: stateResult, targetArea: targetArea)
                 
                 let isShuffle = detectNum == 2 && self.shuffleMode[0] != 0 && !isSame
                 let isRiffle = detectNum == 1 && self.shuffleMode[1] != 0
                 
-                //一边够大，另一边小或者一样
                 let isCut = detectConfidence >= detectConfidenceThreshold
-                && self.detectNeedToCut
-                //&& (minDetectConfidence < detectConfidenceMinThreshold || isSame)
-                
-                
-                if !self.isDetect && detectConfidence >= detectConfidenceThreshold{
-                    if isRiffle{
-                        self.isDetect = true
-                        self.speakText(input: 0)
-                    }
-                    else if minDetectConfidence >= detectConfidenceMinThreshold && isShuffle {
-                        if leftDetectSingleFeature == self.stateSingleFeature[0]
-                            && rightDetectSingleFeature == self.stateSingleFeature[1]{
-                            self.shuffleStartCounter += 1
-                        }
-                        else{
-                            self.shuffleStartCounter = 0
-                        }
-                        
-                        if self.shuffleStartCounter >= 5{
-                            self.isDetect = true
-                            self.speechPerformer.stopSpeechSynthesis()
-                            self.detectNeedToCut = false
-                            self.speakText(input: 0)
-                            self.state = "shuffle"
-                            self.initTargetArea = self.updateTargetArea(coordinates: [singlefeatureResult[0].coordinate, singlefeatureResult[1].coordinate], targetArea: targetArea)
-                            
-                        }
-                    }
-                }
-                
-                if self.isDetect && self.state == "shuffle" && self.targetAreaMove(initTargetArea: self.initTargetArea, targetArea: targetArea) && self.detectSet.count < 10{
-                    self.shuffleResetCounter += 1
-                }
-                else if self.isDetect && self.state == "shuffle" && (detectNum != 2 || minDetectConfidence < confidenceThreshold) && self.detectSet.count < 10{
-                    self.shuffleResetCounter += 1
-                }
-                else if self.isDetect && self.state == "shuffle"{
-                    self.shuffleResetCounter = 0
-                }
-                
-                
-                if self.shuffleResetCounter > 5{
-                    self.initDetectResult()
-                }
-                
-//                print("\(self.singlefeatureLabelDic[leftDetectSingleFeature] ?? "null")  \(leftConfidence)  \(self.singlefeatureLabelDic[rightDetectSingleFeature] ?? "null")  \(rightConfidence) detectNeedToCut\(self.detectNeedToCut)")
+                                && self.detectNeedToCut
                 
                 if isCut{
-                    
+                    self.stopCurrentAudio()
+                    self.initTargetArea = [0,0,0,0]
                     self.detectNeedToCut = false
                     
                     if self.usedSingleFeatures.contains(detectSingleFeature) && self.recgReport {
@@ -848,6 +852,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                 self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 0))
                                 isCutDone = true
                                 self.cutShowArray.append(detectSingleFeature)
+                                self.isProcessNeedToCut = false
                             }
                         }
                         else if self.cutMode[self.shuffleOrRiffle] == 2{
@@ -860,6 +865,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                 self.cutStructArray.append(cutStruct(cutcardIndex: self.singlefeatureArray[cutIndex], cutMode: 1))
                                 isCutDone = true
                                 self.cutShowArray.append(detectSingleFeature)
+                                self.isProcessNeedToCut = false
                             }
                         }
                         else if self.cutMode[self.shuffleOrRiffle] == 3{
@@ -882,6 +888,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                     self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 3))
                                     isCutDone = true
                                     self.cutShowArray.append(detectSingleFeature)
+                                    self.isProcessNeedToCut = false
                                 }
                             }
                             else if self.specialCard[self.shuffleOrRiffle] == 2{
@@ -895,6 +902,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                 if cnt < self.getWatchColorNumber(){
                                     self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 2))
                                     isCutDone = true
+                                    cnt += 1
+                                }
+                                if cnt == self.getWatchColorNumber(){
+                                    self.isProcessNeedToCut = false
                                 }
                             }
                         }
@@ -906,14 +917,119 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     }
                 }
                 
+                if !self.isDetect && detectConfidence >= detectConfidenceThreshold{
+                    if isRiffle{
+                        self.isDetect = true
+                        self.state = "riffle"
+                        self.speakText(input: 0)
+                    }
+                    else if minDetectConfidence >= detectConfidenceThreshold && isShuffle {
+                        if leftDetectSingleFeature == self.stateSingleFeature[0]
+                            && rightDetectSingleFeature == self.stateSingleFeature[1]{
+                            self.shuffleStartCounter += 1
+                        }
+                        else{
+                            self.shuffleStartCounter = 0
+                        }
+                        
+                        if self.shuffleStartCounter >= 3{
+                            self.isDetect = true
+                            self.detectNeedToCut = false
+                            self.state = "shuffle"
+                            
+                            if self.targetAreaMove(initTargetArea: self.initTargetArea, targetArea: targetArea){
+                                self.speakText(input: 0)
+                                self.speechPerformer.stopSpeechSynthesis()
+                            }
+                            
+                            self.initTargetArea = self.targetArea
+                        }
+                    }
+                }
+                
+                
+                
+                if self.isDetect && self.state == "shuffle" && self.targetAreaMove(initTargetArea: self.initTargetArea, targetArea: targetArea) && self.detectSet.count < 5{
+                    self.shuffleResetCounter += 1
+                }
+                else if self.isDetect && self.state == "shuffle" && (detectNum != 2 || minDetectConfidence < confidenceThreshold) && self.detectSet.count < 5{
+                    self.shuffleResetCounter += 1
+                }
+                else if self.isDetect && self.state == "shuffle"{
+                    self.shuffleResetCounter = 0
+                }
+                
+                      
                 if self.stateCounter >= 5{
+                    self.isTargetArea = false
+                    self.targetArea = [0,0,0,0]
                     
                     self.stateCounter = 0
-                    self.state = "idle"
+                    print("状态：切换为检测")
+                    
+                }
+                else if self.shuffleResetCounter > 5{
+                    self.initDetectResult()
+                }
+                
+                //识别过程
+                else if taskIndex >= 0 && self.isDetect{
+                    
+                    if leftConfidence > detectConfidenceMinThreshold{
+                        self.detectSet.insert(leftDetectSingleFeature)
+                    }
+                    if rightConfidence > detectConfidenceMinThreshold{
+                        self.detectSet.insert(rightDetectSingleFeature)
+                    }
+                    
+                    if self.detectSet.count >= 5
+                    {
+                        self.initTargetArea = self.targetArea
+                    }
+                    
+                    self.detectResultList[taskIndex] = singlefeatureResult
+                    
+                    var stateResult : [[Float]] = []
+                    
+                    if self.state == "shuffle" && leftDetectSingleFeature != -1 && rightDetectSingleFeature != -1{
+                        stateResult.append(singlefeatureResult[0].coordinate)
+                        stateResult.append(singlefeatureResult[1].coordinate)
+                        self.targetArea = self.updateTargetArea(coordinates: stateResult, targetArea: targetArea)
+                    }
+                    else{
+                        if singlefeatureResult[0].singlefeatureIndex[0] != -1{
+                            stateResult.append(singlefeatureResult[0].coordinate)
+                        }
+                        if singlefeatureResult[1].singlefeatureIndex[0] != -1{
+                            stateResult.append(singlefeatureResult[1].coordinate)
+                        }
+                        self.targetArea = self.updateTargetArea(coordinates: stateResult, targetArea: targetArea)
+                    }
+                }
+            }
+            else if !self.isTargetArea && !isTargetArea{
+                if self.stateCounter >= 3{
+                    print("状态：退出检测")
+                    
+                    self.stateCounter = 0
                     self.changeCameraFrameRate(to: self.idleRate)
                     let detectState = self.handleDetecResultList(targetDetecResultList: self.detectResultList)
                     self.initBoxes()
                     self.initDetectResult()
+                    
+                    if !detectState.isShort{
+                        self.state = "reloading"
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            if(self.state == "reloading"){
+                                self.state = "idle"
+                                self.changeCameraFrameRate(to: self.idleRate)
+                            }
+                        }
+                    }
+                    else{
+                        self.state = "idle"
+                    }
+                    
                     
                     if !detectState.isSingle && !detectState.isShort && self.shuffleMode[0] != 0{
                         //洗牌
@@ -969,40 +1085,35 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                     }
                 }
-                
-                //识别过程
-                else if taskIndex >= 0 && self.isDetect{
-                    
-                    if leftConfidence > detectConfidenceMinThreshold{
-                        self.detectSet.insert(leftDetectSingleFeature)
-                    }
-                    if rightConfidence > detectConfidenceMinThreshold{
-                        self.detectSet.insert(rightDetectSingleFeature)
-                    }
-                    
-                    if self.detectSet.count >= 10
-                    {
-                        self.initTargetArea = self.targetArea
-                    }
-                    
-                    self.detectResultList[taskIndex] = singlefeatureResult
+                else if ((detectNum == 1 && (self.shuffleMode[1] != 0 || self.detectNeedToCut))
+                    || (detectNum == 2 && self.shuffleMode[0] != 0)){
                     
                     var stateResult : [[Float]] = []
-                    
-                    if self.state == "shuffle" && leftDetectSingleFeature != -1 && rightDetectSingleFeature != -1{
+                    if singlefeatureResult[0].singlefeatureIndex[0] != -1{
                         stateResult.append(singlefeatureResult[0].coordinate)
+                    }
+                    if singlefeatureResult[1].singlefeatureIndex[0] != -1{
                         stateResult.append(singlefeatureResult[1].coordinate)
-                        self.targetArea = self.updateTargetArea(coordinates: stateResult, targetArea: targetArea)
                     }
-                    else{
-                        if singlefeatureResult[0].singlefeatureIndex[0] != -1{
-                            stateResult.append(singlefeatureResult[0].coordinate)
-                        }
-                        if singlefeatureResult[1].singlefeatureIndex[0] != -1{
-                            stateResult.append(singlefeatureResult[1].coordinate)
-                        }
-                        self.targetArea = self.updateTargetArea(coordinates: stateResult, targetArea: targetArea)
+                    
+                    self.targetArea = self.computeTargetArea(stateResult: stateResult)
+                    self.isTargetArea = true
+                    
+                    if (detectNum == 2 && self.shuffleMode[0] != 0)
+                    && self.targetAreaMove(initTargetArea: self.initTargetArea, targetArea: self.targetArea){
+                        self.speakText(input: 0)
+                        self.speechPerformer.stopSpeechSynthesis()
                     }
+                    
+                    self.initTargetArea = self.targetArea
+                    
+                    self.initDetectResult()
+                    
+                    self.state = "detecting"
+                    print("状态：重新进入识别")
+                }
+                else if detectNum == 0{
+                    self.stateCounter += 1
                 }
             }
         }
@@ -2166,7 +2277,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         if self.isCameraHorizon{
             if abs(initTargetArea[0] - targetArea[0]) > (initTargetArea[2] + targetArea[2]) / 5
                 || abs(initTargetArea[1] - targetArea[1]) > (initTargetArea[3] + targetArea[3]) / 2.5
-                || targetArea[1] / initTargetArea[1] > 1.5{
+                || targetArea[2] / initTargetArea[2] > 1.5
+                || initTargetArea[2] / targetArea[2] > 1.5{
                 return true
             }
             else{
@@ -2176,7 +2288,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         else{
             if abs(initTargetArea[0] - targetArea[0]) > (initTargetArea[2] + targetArea[2]) / 2.5
                 || abs(initTargetArea[1] - targetArea[1]) > (initTargetArea[3] + targetArea[3]) / 5
-                || targetArea[1] / initTargetArea[1] > 1.5{
+                || targetArea[2] / initTargetArea[2] > 1.5
+                || initTargetArea[2] / targetArea[2] > 1.5{
                 return true
             }
             else{
@@ -2191,7 +2304,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         var result : [DetectionResult] = []
         
         
-        if self.state == "idle"{
+        if self.state != "shuffle"{
             for i in 0..<cnt {
                 var maxVal: Float32 = singlefeatureArray[i * n].floatValue
                 var confidenceSum : Float = 0

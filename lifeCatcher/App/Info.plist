@@ -24,5 +24,7 @@
 	<array/>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>Indi</key>
+	<string></string>
 </dict>
 </plist>
