@@ -2064,6 +2064,12 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             print("提前操作之后的牌组 \(inputSingleFeatures) --\(inputSingleFeatures.count)")
             leftSingleFeatures = inputSingleFeatures
             multipleResultInfo.returnSingleFeatureArray = inputSingleFeatures
+            
+            var structString : String = "切牌结构"
+            for cutStruct in cutStructList {
+                structString += "\(cutStruct.cutMode)"
+            }
+            print(structString)
 
 
             //看手牌
@@ -2115,6 +2121,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 if cutStructList.count < 1 || cutStructList[cutStructList.count - 1].cutMode != 2 {
                     
                     if cutStructList.count > 0 && cutStructList[cutStructList.count - 1].cutMode != 2 {
+                        
                         multipleResultInfo.reportResult = [[SpeakResultStruct(voiceType: 1, content: "已完成")]]
                     }
                     
@@ -2197,8 +2204,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 }
             //飞2张看色留色再看底
             } else if reportRule.cutSingleFeatureProcession == 6{
-                if cutStructList.count < 2 || cutStructList[cutStructList.count - 1].cutMode != 2 {
-                    if cutStructList.count > 0 && (cutStructList.count == 1 || (cutStructList.count > 1 && cutStructList[cutStructList.count - 2].cutMode != 2)) {
+                if cutStructList.count < 2 || cutStructList[cutStructList.count - 2].cutMode != 2 {
+                    if cutStructList.count > 0 && (cutStructList.count == 1 || (cutStructList.count == 2 && cutStructList[cutStructList.count - 2].cutMode != 2)) {
                         
                         multipleResultInfo.reportResult = [[SpeakResultStruct(voiceType: 1, content: "已完成")]]
                     }
