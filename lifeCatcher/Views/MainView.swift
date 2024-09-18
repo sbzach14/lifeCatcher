@@ -4,11 +4,12 @@ import Localize_Swift
 struct MainMenuView: View {
     @StateObject var loginStatus = AppViewModel()
     @State private var historyNavigate: Int? = -1
-
+    
     @AppStorage("appLanguage") private var appLanguage: String = "en"
 
     var body: some View {
         NavigationView {
+            
             ZStack{
                 VStack {
                     Divider().colorInvert()
@@ -18,9 +19,9 @@ struct MainMenuView: View {
                         .scaledToFit()
                         .frame(height: 200)
                         .bubbleBackground()
-
+                    
                     Spacer()
-
+                    
                     LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
                         NavigationLink(destination: OriginVisionObjectRecognitionView()) {
                             VStack {
@@ -33,7 +34,7 @@ struct MainMenuView: View {
                             .padding()
                             .background(RoundedRectangle(cornerRadius: 10).fill(Color.blue.opacity(0.8)).frame(width: 150, height: 100, alignment: .center))
                         }
-
+                        
                         VStack {
                             Button(action: {
                                 if !AuthManager.isLoginServer{
@@ -64,7 +65,7 @@ struct MainMenuView: View {
                                 NavigationLink(destination: HistoryView(), tag: 2, selection: $historyNavigate) { EmptyView() }
                             )
                         }
-
+                        
                         NavigationLink(destination: InfoView()) {
                             VStack {
                                 Image(systemName: "info.circle")
@@ -76,7 +77,7 @@ struct MainMenuView: View {
                             .padding()
                             .background(RoundedRectangle(cornerRadius: 10).fill(Color.orange.opacity(0.8)).frame(width: 150, height: 100, alignment: .center))
                         }
-
+                        
                         NavigationLink(destination: LoginView().environmentObject(loginStatus)) {
                             VStack {
                                 Image(systemName: "person.crop.circle.fill")
@@ -101,9 +102,9 @@ struct MainMenuView: View {
 //                            .background(RoundedRectangle(cornerRadius: 10).fill(Color.red.opacity(0.8)).frame(width: 150, height: 100, alignment: .center))
 //                        }
                     }
-
+                    
                     Spacer()
-
+                    
                     Image("lifeCatcherTitle")
                         .resizable()
                         .scaledToFit()
@@ -133,7 +134,6 @@ struct MainMenuView: View {
                 AutoLogin(username: "", password: "")
             }
             .navigationTitle("LifeCatcher".localized())
-            
         }
     }
 

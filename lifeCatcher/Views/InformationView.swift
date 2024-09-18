@@ -88,21 +88,6 @@ struct DeprecatedInfoView: View {
             Divider().colorInvert()
             
             HStack {
-                Text("屏幕显示").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
-                
-                Picker("blackMode", selection: $viewModel.blackMode) {
-                    ForEach(0...FunctionSetting.blackModeDict.count - 1, id: \.self){
-                        index in Text(FunctionSetting.blackModeDict[index]!).tag(index)
-                    }
-                }
-                .pickerStyle(MenuPickerStyle())
-                .frame(width: 200, height: 30, alignment: .trailing)
-                .padding(.trailing,30) // 右侧间距
-            }
-            Divider().colorInvert()
-        
-            
-            HStack {
                 Text("音量上键功能").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
                 
                 Picker("volumeUp", selection: $viewModel.volumeUp) {
@@ -147,7 +132,7 @@ struct DeprecatedInfoView: View {
             Divider().colorInvert()
         
             HStack {
-                Text("音量:\(String(format: "%.2f",viewModel.volumeValue))").foregroundColor(.white).padding(.leading, 20).frame(width: 100, alignment: .leading)
+                Text("音量\(String(format: "%.2f",viewModel.volumeValue))").foregroundColor(.white).padding(.leading, 20).frame(width: 100, alignment: .leading)
                 
                 Spacer()
                 
@@ -160,11 +145,54 @@ struct DeprecatedInfoView: View {
             Divider().colorInvert()
             
             HStack {
-                Text("语速:\(String(format: "%.2f",viewModel.voiceRate))").foregroundColor(.white).padding(.leading, 20).frame(width: 100, alignment: .leading)
+                Text("语速\(String(format: "%.2f",viewModel.voiceRate))").foregroundColor(.white).padding(.leading, 20).frame(width: 100, alignment: .leading)
                 
                 Spacer()
                 
                 Slider(value: $viewModel.voiceRate, in: 0...1, step: 0.01)
+                    .frame(maxWidth: 200, alignment: .trailing)
+                    .padding(.trailing,30) // 右侧间距
+                    .accentColor(.white)
+            }.frame(height: 30)
+            
+            Divider().colorInvert()
+            
+            HStack {
+                Text("屏幕显示").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
+                
+                Picker("blackMode", selection: $viewModel.blackMode) {
+                    ForEach(0...FunctionSetting.blackModeDict.count - 1, id: \.self){
+                        index in Text(FunctionSetting.blackModeDict[index]!).tag(index)
+                    }
+                }
+                .pickerStyle(MenuPickerStyle())
+                .frame(width: 200, height: 30, alignment: .trailing)
+                .padding(.trailing,30) // 右侧间距
+            }
+
+            Divider().colorInvert()
+            
+            HStack {
+                Text("时间模式").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
+                
+                Picker("blackMode", selection: $viewModel.timeMode) {
+                    ForEach(0...FunctionSetting.timeModeDict.count - 1, id: \.self){
+                        index in Text(FunctionSetting.timeModeDict[index]!).tag(index)
+                    }
+                }
+                .pickerStyle(MenuPickerStyle())
+                .frame(width: 200, height: 30, alignment: .trailing)
+                .padding(.trailing,30) // 右侧间距
+            }
+            
+            Divider().colorInvert()
+            
+            HStack {
+                Text("亮度\(String(format: "%.2f",viewModel.blackFactor))").foregroundColor(.white).padding(.leading, 20).frame(width: 100, alignment: .leading)
+                
+                Spacer()
+                
+                Slider(value: $viewModel.blackFactor, in: 0...1, step: 0.01)
                     .frame(maxWidth: 200, alignment: .trailing)
                     .padding(.trailing,30) // 右侧间距
                     .accentColor(.white)
@@ -217,5 +245,11 @@ class FunctionSetting{
     static let voiceDeviceDict: [Int: String] = [
         0: "扬声器",
         1: "耳机"
+    ]
+    
+    static let timeModeDict: [Int: String] = [
+        0: "无",
+        1: "HH:MM",
+        2: "HH:MM:SS"
     ]
 }

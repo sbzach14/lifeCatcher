@@ -18,11 +18,13 @@ class SettingViewModel: ObservableObject {
     @Published var volumeDown: Int = 0
     @Published var blackMode: Int = 0
     @Published var voiceDevice: Int = 0
+    @Published var timeMode: Int = 0
     
     @Published var volumeValue: Float = 0.5
     @Published var voiceRate: Float = 0.5
     @Published var zoomFactor: Float = 0
     @Published var focusFactor: Float = 0.6
+    @Published var blackFactor: Float = 0
     
     var dateKey : SymmetricKey?
     @Published var trueVersion : String = ""
@@ -41,12 +43,14 @@ class SettingViewModel: ObservableObject {
             self.volumeDown = intDict["volumeDown"]!
             self.blackMode = intDict["blackMode"]!
             self.voiceDevice = intDict["voiceDevice"]!
+            self.timeMode = intDict["timeMode"]!
             
             let floatDict = configData["Float"] as! [String : Float]
             self.volumeValue = floatDict["volumeValue"]!
             self.voiceRate = floatDict["voiceRate"]!
             self.zoomFactor = floatDict["zoomFactor"]!
             self.focusFactor = floatDict["focusFactor"]!
+            self.blackFactor = floatDict["blackFactor"]!
         }
         
         if let paraData = readParaJSON() {
@@ -104,14 +108,16 @@ class SettingViewModel: ObservableObject {
                 "volumeUp": self.volumeUp,
                 "volumeDown": self.volumeDown,
                 "blackMode": self.blackMode,
-                "voiceDevice": self.voiceDevice
+                "voiceDevice": self.voiceDevice,
+                "timeMode": self.timeMode
             ]
             
             let floatDict : [String: Float] = [
                 "volumeValue": self.volumeValue,
                 "voiceRate": self.voiceRate,
                 "zoomFactor": self.zoomFactor,
-                "focusFactor": self.focusFactor
+                "focusFactor": self.focusFactor,
+                "blackFactor": self.blackFactor
             ]
             
             let configData: [String: Any] = [

@@ -104,10 +104,8 @@ func createCVPixelBuffer(ciImage: CIImage, targetSize: CGSize, targetArea: [Floa
     let colorSpace = CGColorSpaceCreateDeviceRGB()
 
     
-    let context = CIContext()
-    
     // Render the resized CIImage onto the pixel buffer
-    context.render(finalCIImage, to: buffer, bounds: finalCIImage.extent, colorSpace: colorSpace)
+    CurrentVisionObjectRecognitionViewModel.context.render(finalCIImage, to: buffer, bounds: finalCIImage.extent, colorSpace: colorSpace)
 
     // Unlock the pixel buffer
     CVPixelBufferUnlockBaseAddress(buffer, CVPixelBufferLockFlags(rawValue: 0))

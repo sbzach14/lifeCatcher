@@ -286,6 +286,8 @@ struct LoginView: View {
                         AuthManager.isActive = true
                         AuthManager.autoQuit()
                         print("测试版")
+                        showAlert = true
+                        alertMessage = "五分钟后将自动退出"
                     }
                 //登陆失败
                 } else {

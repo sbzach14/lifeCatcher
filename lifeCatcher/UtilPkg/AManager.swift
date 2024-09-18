@@ -11,7 +11,7 @@ class AuthManager {
     static var isActive: Bool = false
     static var activeDate: String = ""
     
-    static var version: String = "1.0.6"
+    static var version: String = "1.0.7"
  
     //deprecated
     static func getUniqueID() -> String? {

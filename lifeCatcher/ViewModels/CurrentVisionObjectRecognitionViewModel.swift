@@ -18,6 +18,8 @@ import MediaPlayer
 /// - Tag: ViewModel
 class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBufferDelegate, AVAudioPlayerDelegate{
     
+    public static let context = CIContext()
+    
     @Published var cameraImage : CGImage?
     @Published var isShowSingleFeature : Bool = false
     @Published var isCamereSetting : Bool = false
@@ -84,7 +86,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     public var ciimageQueue: [CIImage] = []
     
     let idleRate = 30
-    let context = CIContext()
     var taskImageArray : [String] = []
     
     var isSavedImage : Bool = true
@@ -138,10 +139,15 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var volumeDown: Int = 0
     @Published var blackMode: Int = 0
     @Published var voiceDevice: Int = 0
+    @Published var timeMode: Int = 0
     @Published var volumeValue: Float = 0.5
     @Published var voiceRate: Float = 0.5
     @Published var zoomFactor: Float = 0
     @Published var focusFactor: Float = 0.6
+    @Published var blackFactor: Float = 0
+    
+    @Published var currentDate: Date = Date()
+    @Published var timeModeText: String = ""
     
     var setFrameRate: Float64 = 120.0
     var cameraFrameRate: Int = 0
@@ -163,6 +169,22 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     var failSoundURL: URL?
     var hintVoiceIndex: Int = -1
     
+    var displayTimer: Timer?
+    var latestFrame: CVPixelBuffer?
+    var combinedTransform: CGAffineTransform!
+    
+    var timeModeTimer: Timer?
+
+    // Maintain a single reference to the current audio player
+    private var currentAudioPlayer: AVAudioPlayer?
+    
+    private var soundURLs: [URL?]?
+    
+    private var showTimeModeText: Bool = false
+    private var timerWorkItem: DispatchWorkItem?
+        
+    
+
     override init(){
         
         super.init()
@@ -178,12 +200,14 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             self.volumeDown = intDict["volumeDown"]!
             self.blackMode = intDict["blackMode"]!
             self.voiceDevice = intDict["voiceDevice"]!
+            self.timeMode = intDict["timeMode"]!
             
             let floatDict = configData["Float"] as! [String : Float]
             self.volumeValue = floatDict["volumeValue"]!
             self.voiceRate = floatDict["voiceRate"]!
             self.zoomFactor = floatDict["zoomFactor"]!
             self.focusFactor = floatDict["focusFactor"]!
+            self.blackFactor = floatDict["blackFactor"]!
         }
         
         self.isWorking = true
@@ -200,6 +224,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         setupAVCapture()
         configureAudioSession()
+        initializeTransform()
         
         self.loadSaveRule(saveRuleIndex: saveRuleIndex)
         self.initShuffle()
@@ -213,6 +238,21 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             shuffleOrRiffle = 1
         }
     }
+    
+    // 在初始化时预计算变换矩阵
+    func initializeTransform() {
+        
+        let scaleTransform = CGAffineTransform(scaleX: 0.4, y: 0.4)
+        let rotationTransform = CGAffineTransform(rotationAngle: -.pi / 2)
+        let xOffset = self.originSize[1] * 0.4
+        let translationTransform = CGAffineTransform(translationX: CGFloat(xOffset), y: 0)
+        
+        // 合并所有变换操作
+        combinedTransform = rotationTransform
+            .concatenating(scaleTransform)
+            .concatenating(translationTransform)
+    }
+
     
     private func initDetectResult(){
         detectResultList.removeAll()
@@ -254,19 +294,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         self.startSoundURL = Bundle.main.url(forResource: "start_voice", withExtension: "mp3")
         self.successSoundURL = Bundle.main.url(forResource: "success_voice", withExtension: "mp3")
         self.failSoundURL = Bundle.main.url(forResource: "fail_voice", withExtension: "mp3")
-        //        do {
-        //            startAudioRC = try AVAudioPlayer(contentsOf: startSoundURL!)
-        //            startAudioRC?.delegate = self
-        //            startAudioRC?.prepareToPlay()
-        //            successAudioRC = try AVAudioPlayer(contentsOf: successSoundURL!)
-        //            successAudioRC?.delegate = self
-        //            successAudioRC?.prepareToPlay()
-        //            failAudioRC = try AVAudioPlayer(contentsOf: failSoundURL!)
-        //            failAudioRC?.delegate = self
-        //            failAudioRC?.prepareToPlay()
-        //        } catch {
-        //            // print("Error playing sound: \(error.localizedDescription)")
-        //        }
+        self.soundURLs = [startSoundURL, successSoundURL, failSoundURL]
     }
     
     func setupAVCapture(){
@@ -334,9 +362,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             
             session.commitConfiguration()
             
-            // 获取当前帧率
-            let videoFrameRate = format.videoSupportedFrameRateRanges.first!.maxFrameRate
-            // print("设定帧率: \(videoFrameRate)")
             changeCameraFrameRate(to: idleRate)
         } catch {
             // print("配置前置摄像头时发生错误: \(error)")
@@ -386,18 +411,27 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     func prestartCamera() {
         session.startRunning()
         changeCameraFrameRate(to: Int(self.setFrameRate))
-        // print("开启相机")
+        stopCamera()
+        startCamera()
     }
     
     func startCamera() {
         session.startRunning()
         changeCameraFrameRate(to: self.idleRate)
-        // print("开启相机")
+        startDisplayTimer()
+        
+        if self.timeMode != 0 && self.blackMode != 0{
+            startTimeModeTimer()
+        }
     }
     
     func stopCamera() {
         session.stopRunning()
-        // print("关闭相机")
+        stopDisplayTimer()
+        
+        if self.timeMode != 0 && self.blackMode != 0{
+            stopTimeModeTimer()
+        }
     }
     
     func changeCameraFrameRate(to frameRate: Int) {
@@ -414,21 +448,20 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             
             
             if frameRate == idleRate{
-                //device.exposureMode = .continuousAutoExposure
-                device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(60)), iso: device.activeFormat.maxISO/4)
-                //device.setExposureTargetBias(0)
+                device.exposureMode = .continuousAutoExposure
+                device.setExposureTargetBias(0)
+//                device.exposureMode = .custom
+//                device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(60)), iso: AVCaptureDevice.currentISO)
             }
             else{
-                //self.captureDevice.exposureMode = .autoExpose
-                
                 //不拨牌 且是前置
-                if frameRate == 120{
-                    device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(180)), iso: device.activeFormat.maxISO)
+                device.exposureMode = .custom
+                if frameRate == 120 && self.shuffleMode[1] != 0{
+                    device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(180)), iso: AVCaptureDevice.currentISO)
                 }
                 else{
-                    device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(frameRate)), iso: device.activeFormat.maxISO)
+                    device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(frameRate)), iso: AVCaptureDevice.currentISO)
                 }
-                //device.setExposureTargetBias(1.5)
             }
             
             device.unlockForConfiguration()
@@ -442,6 +475,97 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
     }
     
+    // 启动定时器以每秒 1 次的频率更新日期
+    func startTimeModeTimer() {
+        timeModeTimer?.invalidate() // 确保之前的定时器被取消
+        timeModeTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            self?.updateCurrentDate()
+        }
+    }
+
+    // 停止定时器
+    func stopTimeModeTimer() {
+        timeModeTimer?.invalidate()
+        timeModeTimer = nil
+    }
+    
+    func updateCurrentDate(){
+        self.currentDate = Date()
+        if !self.showTimeModeText{
+            if self.timeMode == 1{
+                self.timeModeText = TimeModeFormatter.timeFormatter1.string(from: self.currentDate)
+            }
+            else if self.timeMode == 2{
+                self.timeModeText = TimeModeFormatter.timeFormatter2.string(from: self.currentDate)
+            }
+        }
+    }
+    
+    func scheduleHideTimeModeText() {
+        // 取消之前的定时任务（如果存在）
+        timerWorkItem?.cancel()
+        
+        // 创建新的定时任务
+        let workItem = DispatchWorkItem {
+            self.showTimeModeText = false
+        }
+        
+        // 保存新的定时任务
+        self.timerWorkItem = workItem
+        
+        // 调度新的定时任务
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: workItem)
+    }
+    
+    // 启动定时器以每秒 30 次的频率更新图像
+    func startDisplayTimer() {
+        displayTimer?.invalidate() // 确保之前的定时器被取消
+        displayTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 30.0, repeats: true) { [weak self] _ in
+            self?.displayLatestFrame()
+        }
+    }
+
+    // 停止定时器
+    func stopDisplayTimer() {
+        displayTimer?.invalidate()
+        displayTimer = nil
+    }
+    
+    func displayLatestFrame() {
+        guard let frame = latestFrame else {
+            return
+        }
+
+        if !self.isBlack && !self.isShowSingleFeature && self.isWorking {
+            backgroundQueue.async {
+                do {
+                    //                    var rectList : [[Float]] = []
+                    //                    rectList.append(self.lastBoxes[0])
+                    //                    rectList.append(self.lastBoxes[1])
+                    //                    rectList.append(self.targetArea)
+                    //                    let drawcvpixelbuffer = drawRectanglesOnPixelBuffer(pixelBuffer: pixelBuffer, rectList: rectList)!
+                    //                    ciImage = CIImage(cvPixelBuffer: drawcvpixelbuffer)
+                    
+                    let ciImage = CIImage(cvPixelBuffer: frame)
+
+                    // 使用预先计算的变换矩阵
+                    let translatedImage = ciImage.transformed(by: self.combinedTransform)
+
+                    guard let outputCGImage = CurrentVisionObjectRecognitionViewModel.context.createCGImage(translatedImage, from: translatedImage.extent) else {
+                        return
+                    }
+
+                    // 更新 UI 在主线程
+                    DispatchQueue.main.async {
+                        self.cameraImage = outputCGImage
+                    }
+                } catch {
+                    // 错误处理
+                }
+            }
+        }
+    }
+
     
     // MARK: capture output
     // AVCaptureVideoDataOutputSampleBufferDelegate 方法
@@ -473,16 +597,17 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         // 处理视频帧数据
         let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!
+        // 释放视频帧资源
+        CMSampleBufferInvalidate(sampleBuffer)
+        
+        // 保存最新的一帧
+        latestFrame = pixelBuffer
         
         let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
         
-        var indexGap = 4
-        if self.isBackCamera{
-            indexGap = 8
-        }
-        
         let isTargetArea = self.isTargetArea
         var targetArea = Array(self.targetArea)
+    
         
         if self.isWorking{
             
@@ -503,45 +628,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
         }
         
-        if !self.isBlack
-            && !self.isShowSingleFeature
-            && self.isWorking
-            && (self.cameraFrameRate <= idleRate || self.taskIndex % indexGap == 0){
-            backgroundQueue.async {
-                do{
-//                    var rectList : [[Float]] = []
-//                    rectList.append(self.lastBoxes[0])
-//                    rectList.append(self.lastBoxes[1])
-//                    rectList.append(self.targetArea)
-//                    let drawcvpixelbuffer = drawRectanglesOnPixelBuffer(pixelBuffer: pixelBuffer, rectList: rectList)!
-//                    ciImage = CIImage(cvPixelBuffer: drawcvpixelbuffer)
-                
-                    let transform = CGAffineTransform(scaleX: 0.5, y: 0.5)
-                    
-                    let rotationTransform = CGAffineTransform(rotationAngle: -.pi / 2)  // 顺时针旋转90度
-                    
-                    let xOffset = ciImage.extent.size.height * 0.5
-                    let translationTransform = CGAffineTransform(translationX: xOffset, y: CGFloat(0))
-                    
-                    let combinedTransform = rotationTransform.concatenating(translationTransform)
-                    
-                    let translatedImage = ciImage.transformed(by: combinedTransform)
-                    
-                    let outputCGImage = self.context.createCGImage(translatedImage, from: translatedImage.extent)
-                    
-                    DispatchQueue.main.async {
-                        self.cameraImage = outputCGImage
-                    }
-                }
-                
-                catch{
-                    // print("Error: \(error)")
-                }
-            }
-        }
-        
-        // 释放视频帧资源
-        CMSampleBufferInvalidate(sampleBuffer)
         
     }
     
@@ -865,10 +951,11 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         else if self.shuffleMode[1] == 2{
                             //拨中间
                             if self.singlefeatureArray.count > 0{
+                                self.singlefeatureArray.append(self.singlefeatureArray[0])
                                 self.singlefeatureArray.remove(at: 0)
                             }
                             
-                            if self.singlefeatureArray.count >= self.minSingleFeatureNum{
+                            if self.singlefeatureArray.count >= self.minSingleFeatureNum + 1{
                                 //self.speakText(input: 1)
                             }
                             else{
@@ -2076,13 +2163,25 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
     
     func targetAreaMove(initTargetArea: [Float], targetArea: [Float]) -> Bool{
-        if abs(initTargetArea[0] - targetArea[0]) > (initTargetArea[2] + targetArea[2]) / 5
-            || abs(initTargetArea[1] - targetArea[1]) > (initTargetArea[3] + targetArea[3]) / 2.5
-    || targetArea[1] / initTargetArea[1] > 1.5{
-            return true
+        if self.isCameraHorizon{
+            if abs(initTargetArea[0] - targetArea[0]) > (initTargetArea[2] + targetArea[2]) / 5
+                || abs(initTargetArea[1] - targetArea[1]) > (initTargetArea[3] + targetArea[3]) / 2.5
+                || targetArea[1] / initTargetArea[1] > 1.5{
+                return true
+            }
+            else{
+                return false
+            }
         }
         else{
-            return false
+            if abs(initTargetArea[0] - targetArea[0]) > (initTargetArea[2] + targetArea[2]) / 2.5
+                || abs(initTargetArea[1] - targetArea[1]) > (initTargetArea[3] + targetArea[3]) / 5
+                || targetArea[1] / initTargetArea[1] > 1.5{
+                return true
+            }
+            else{
+                return false
+            }
         }
     }
 
@@ -2214,7 +2313,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         else{
             
             let newCIImage = CIImage(cvImageBuffer: pixelBuffer)
-            let cgImage = CIContext().createCGImage(newCIImage, from: newCIImage.extent)!
+            let cgImage = CurrentVisionObjectRecognitionViewModel.context.createCGImage(newCIImage, from: newCIImage.extent)!
             
             /// The 8-bit-per-channel, 4-channel source pixel buffer.
             let sourceBuffer8 = try! vImage.PixelBuffer<vImage.Interleaved8x4>(
@@ -2481,56 +2580,43 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
     }
     
-    func speakText(input: Int){
+    func speakText(input: Int) {
         let isSpeak = (!self.isHeadphonesConnected() && self.voiceDevice == 0)
                     || (self.isHeadphonesConnected() && self.voiceDevice == 1)
         
-        if isSpeak{
-            if hintVoiceIndex == 0{
-                self.startAudioRC?.stop()
-            }
-            else if hintVoiceIndex == 1{
-                self.successAudioRC?.stop()
-            }
-            else if hintVoiceIndex == 2{
-                self.failAudioRC?.stop()
-            }
-            else{
-                self.startAudioRC?.stop()
-                self.successAudioRC?.stop()
-                self.failAudioRC?.stop()
+        if isSpeak {
+            stopCurrentAudio()
+            
+            guard input >= 0 && input < soundURLs!.count, let url = soundURLs![input] else {
+                print("Invalid input or sound URL")
+                return
             }
             
-            do{
-                if input == 0{
-                    self.startAudioRC = try AVAudioPlayer(contentsOf: startSoundURL!)
-                    self.startAudioRC?.delegate = self
-                    self.startAudioRC?.prepareToPlay()
-                    self.startAudioRC?.play()
-                    print("hint:play!")
+            do {
+                // Reuse existing player if possible
+                if let player = currentAudioPlayer {
+                    player.stop()
                 }
-                else if input == 1{
-                    self.successAudioRC = try AVAudioPlayer(contentsOf: successSoundURL!)
-                    self.successAudioRC?.delegate = self
-                    self.successAudioRC?.prepareToPlay()
-                    self.successAudioRC?.play()
-                    print("hint:success!")
-                }
-                else if input == 2{
-                    self.failAudioRC = try AVAudioPlayer(contentsOf: failSoundURL!)
-                    self.failAudioRC?.delegate = self
-                    self.failAudioRC?.prepareToPlay()
-                    self.failAudioRC?.play()
-                    print("hint:fail!")
-                }
+                
+                currentAudioPlayer = try AVAudioPlayer(contentsOf: url)
+                currentAudioPlayer?.delegate = self
+                currentAudioPlayer?.prepareToPlay()
+                currentAudioPlayer?.play()
                 
                 hintVoiceIndex = input
-            }
-            catch{
                 
+                print("hint:\(input == 0 ? "play" : input == 1 ? "success" : "fail")!")
+            } catch {
+                print("Error initializing audio player: \(error)")
             }
         }
     }
+
+    private func stopCurrentAudio() {
+        currentAudioPlayer?.stop()
+        currentAudioPlayer = nil
+    }
+
 
     func speakText(input: [[SpeakResultStruct]]) {
         let isSpeak = (!self.isHeadphonesConnected() && self.voiceDevice == 0)
@@ -2538,6 +2624,44 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         if isSpeak{
             self.speechPerformer.performSpeechSynthesis(speakResultStruct: input)
+        }
+        if self.timeMode != 0{
+            var reportTextList : [String] = []
+            for (turnIndex, turnResult) in input.enumerated() {
+                for (reportIndex, reportResult) in turnResult.enumerated() {
+                    var speakString = reportResult.content
+                    // 去除非数字字符
+                    let filteredString = speakString.filter { $0.isNumber }
+                    // 补充到两位
+                    let paddedString = String(repeating: "0", count: max(0, 2 - filteredString.count)) + filteredString
+                    reportTextList.insert(paddedString, at: 0)
+                }
+            }
+            
+            var reportLength = 0
+            if timeMode == 1{
+                reportLength = 2
+            }
+            else if timeMode == 2{
+                reportLength = 3
+            }
+            
+            if reportTextList.count > reportLength {
+                // 如果长度大于2，则保留最后两个元素
+                reportTextList = Array(reportTextList.suffix(reportLength))
+            } else {
+                // 如果长度小于2，则用 "00" 补齐到2
+                let count = reportTextList.count
+                while reportTextList.count < reportLength {
+                    reportTextList.insert("00", at: 0)
+                }
+            }
+            
+            self.timeModeText = reportTextList.joined(separator: ":")
+            self.showTimeModeText = true
+            scheduleHideTimeModeText()
+            print(self.timeModeText)
+            
         }
     }
     
@@ -2798,14 +2922,16 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 "volumeUp": self.volumeUp,
                 "volumeDown": self.volumeDown,
                 "blackMode": self.blackMode,
-                "voiceDevice": self.voiceDevice
+                "voiceDevice": self.voiceDevice,
+                "timeMode": self.timeMode
             ]
             
             let floatDict : [String: Float] = [
                 "volumeValue": self.volumeValue,
                 "voiceRate": self.voiceRate,
                 "zoomFactor": self.zoomFactor,
-                "focusFactor": self.focusFactor
+                "focusFactor": self.focusFactor,
+                "blackFactor": self.blackFactor
             ]
             
             let configData: [String: Any] = [

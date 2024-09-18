@@ -69,13 +69,15 @@ func createConfigJSON() {
         "volumeDown": 0,
         "blackMode": 0,
         "voiceDevice": 0,
+        "timeMode": 0,
     ]
     
     let floatDict : [String: Float] = [
         "volumeValue": 0.5,
         "voiceRate": 0.5,
         "zoomFactor": 0,
-        "focusFactor": 0.6
+        "focusFactor": 0.6,
+        "blackFactor": 0
     ]
     
     let boolDict: [String: Bool] = [

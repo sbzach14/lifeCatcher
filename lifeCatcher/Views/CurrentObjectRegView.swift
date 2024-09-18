@@ -13,22 +13,40 @@ struct CurrentVisionObjectRecognitionView: View {
             ButtonViewControllerWrapper(viewmodel: viewModel)
              
             if viewModel.isBlack {
-                ZStack {
-                    Color.black
-                        .edgesIgnoringSafeArea(.all)
-                        .opacity(1.0)
-                        .onTapGesture{
-                            if viewModel.blackMode == 2{
-                                viewModel.toggleWorking()
-                            }
+                VStack (spacing: 0){
+                    if viewModel.timeMode != 0{
+                        // 公历日期和农历日期显示
+                        Text("\(TimeModeFormatter.dateFormatter.string(from: viewModel.currentDate).replacingOccurrences(of: "星期", with: "周")) · \(TimeModeFormatter.lunarDateString(from: viewModel.currentDate))")
+                            .font(.system(size: 22))
+                            .bold()
+                            .padding(.top, 40)
+                            .foregroundColor(.white)
+                        
+                        if viewModel.timeMode == 1{
+                            // 显示时间
+                            Text(viewModel.timeModeText)
+                                .bold()
+                                .foregroundColor(.white)
+                                .font(.system(size: 100))
                         }
+                        else if viewModel.timeMode == 2{
+                            // 显示时间
+                            Text(viewModel.timeModeText)
+                                .bold()
+                                .foregroundColor(.white)
+                                .font(.system(size: 70))
+                        }
+                        
+                        Spacer()
+                    }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)  // 让 VStack 填充整个可用空间
+                .background(
+                    Color.black
+                    .edgesIgnoringSafeArea(.all)
+                    .opacity(1.0))
                 .onAppear {
-                    UIScreen.main.brightness = 0.0
-                }
-                .onDisappear {
-                    
-                    UIScreen.main.brightness = 1.0
+                    UIScreen.main.brightness = CGFloat(viewModel.blackFactor)
                 }
                 .navigationBarBackButtonHidden(true)
             } 
@@ -36,7 +54,6 @@ struct CurrentVisionObjectRecognitionView: View {
                 ShowResultView().environmentObject(viewModel)
             }
             else {
-                
                 if let cameraImage = viewModel.cameraImage{
                     Image(cameraImage, scale: 1.0, label: Text("Camera"))
                         .resizable()
@@ -89,7 +106,7 @@ struct CurrentVisionObjectRecognitionView: View {
                                         
                                         viewModel.stopCamera()
                                         viewModel.setupAVCapture()
-                                        viewModel.startCamera()
+                                        viewModel.prestartCamera()
                                         viewModel.updateConfigJSON()
                                     }
                                 
@@ -208,12 +225,16 @@ struct CurrentVisionObjectRecognitionView: View {
             viewModel.isShowSingleFeature = false
             viewModel.isCamereSetting = false
             viewModel.prestartCamera()
-            viewModel.stopCamera()
-            viewModel.startCamera()
         }
         .onDisappear {
             viewModel.stopCamera()
             viewModel.speechPerformer.stopSpeechSynthesis()
+        }
+        .onTapGesture{
+            if viewModel.blackMode == 2 && viewModel.isBlack{
+                viewModel.toggleWorking()
+                //viewModel.generateTestResult()
+            }
         }
         .toolbarBackground(.hidden)
         .navigationTitle("")
@@ -267,9 +288,9 @@ class ButtonViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        setSystemVolume(volume: self.volumeValue)
         NotificationCenter.default.addObserver(self, selector: #selector(volumeChanged(_:)), name: NSNotification.Name(rawValue: "SystemVolumeDidChange"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleRouteChange(_:)), name: AVAudioSession.routeChangeNotification, object: AVAudioSession.sharedInstance())
-        setSystemVolume(volume: self.volumeValue)
     }
     
     required init?(coder: NSCoder) {
@@ -320,43 +341,51 @@ class ButtonViewController: UIViewController {
     }
     
     @objc func volumeChanged(_ notification: NSNotification) {
-        guard let userInfo = notification.userInfo,
-              let volume = userInfo["Volume"] as? Float,
-              let reason = userInfo["Reason"] as? String else {
-            return
-        }
-
-        if reason == "ExplicitVolumeChange" && volume != currentVolume && volume != 0 {
-            guard let sequenceNumber = userInfo["SequenceNumber"] as? Int else {
+        
+        DispatchQueue.main.async {
+            guard let userInfo = notification.userInfo,
+                  let volume = userInfo["Volume"] as? Float,
+                  let reason = userInfo["Reason"] as? String else {
                 return
             }
             
-            if sequenceNumber == lastVolumeNotificationSequenceNumber {
-                return
-            }
-            
-            let currentTime = Date()
-            let timeSinceLastChange = currentTime.timeIntervalSince(lastVolumeChangeTime)
-            if timeSinceLastChange < minVolumeChangeInterval {
-                return
-            }
-            lastVolumeChangeTime = currentTime
-            
-            var isUp = true
-            if volume == 1 || currentVolume < volume {
-                isUp = true
-            } else if volume == 0 || currentVolume > volume {
-                isUp = false
-            }
-            currentVolume = self.volumeValue
-            
-            lastVolumeNotificationSequenceNumber = sequenceNumber
-            setSystemVolume(volume: self.volumeValue)
-            
-            if isUp {
-                viewModel?.handleVolumeIncrease()
-            } else {
-                viewModel?.handleVolumeDecrease()
+            if reason == "ExplicitVolumeChange"{
+                guard let sequenceNumber = userInfo["SequenceNumber"] as? Int else {
+                    return
+                }
+                
+                if sequenceNumber == self.lastVolumeNotificationSequenceNumber {
+                    return
+                }
+                self.lastVolumeNotificationSequenceNumber = sequenceNumber
+                
+                let currentTime = Date()
+                let timeSinceLastChange = currentTime.timeIntervalSince(self.lastVolumeChangeTime)
+                if timeSinceLastChange < self.minVolumeChangeInterval {
+                    return
+                }
+                self.lastVolumeChangeTime = currentTime
+                
+                if self.isFirst{
+                    self.isFirst = false
+                    return
+                }
+                
+                var isUp = true
+                if volume == 1 || self.currentVolume < volume {
+                    isUp = true
+                } else if volume == 0 || self.currentVolume > volume {
+                    isUp = false
+                }
+                self.currentVolume = self.volumeValue
+                
+                self.setSystemVolume(volume: self.volumeValue)
+                
+                if isUp {
+                    self.viewModel?.handleVolumeIncrease()
+                } else {
+                    self.viewModel?.handleVolumeDecrease()
+                }
             }
         }
     }

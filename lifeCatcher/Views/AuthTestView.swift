@@ -53,10 +53,10 @@ struct AuthTestView: View {
             }
 
             
-            Text("Activation Status: \(activateStatus)")
+            Text("Activation Status: \(activateStatus)").foregroundColor(.white)
             
 
-            Text("Expired Time: \(expiredTime)")
+            Text("Expired Time: \(expiredTime)").foregroundColor(.white)
             
 
             if showError {
