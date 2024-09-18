@@ -553,7 +553,8 @@ class TWDatasetHandAnalyst{
                 rank = rank << 4 | fourSingleFeatureRank
                 rank = rank << 2 | foursinglefeatureSuit
                 
-                let singlefeatureType = "炸弹" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[2]].originRank]!
+//                let singlefeatureType = "炸弹" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[2]].originRank]!
+                let singlefeatureType = "炸弹"
                 
                 rankList.append(rank)
                 singlefeatureTypeList.append(singlefeatureType)
@@ -619,7 +620,8 @@ class TWDatasetHandAnalyst{
                 rank = rank << 2 | threesinglefeatureSuit
                 rank = rank << 2 | pairSuit
                 
-                let singlefeatureType = "三带二" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[2]].originRank]!
+//                let singlefeatureType = "三带二" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[2]].originRank]!
+                let singlefeatureType = "三带二"
                 
                 rankList.append(rank)
                 singlefeatureTypeList.append(singlefeatureType)
@@ -672,7 +674,8 @@ class TWDatasetHandAnalyst{
                 }
                 rank = rank << 2 | suit
                 
-                let singlefeatureType = "同花" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[0]].originRank]!
+//                let singlefeatureType = "同花" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[0]].originRank]!
+                let singlefeatureType = "同花"
                 
                 rankList.append(rank)
                 singlefeatureTypeList.append(singlefeatureType)
@@ -810,10 +813,10 @@ class TWDatasetHandAnalyst{
                 rank = rank << 2 | headSuit
 
                 var singlefeatureType = "顺子"
-                for currentSingleFeatureIndex in currentCombination{
-                    let currentSingleFeature = singlefeatures[currentSingleFeatureIndex]
-                    singlefeatureType += String(currentSingleFeature.rank) + " "
-                }
+//                for currentSingleFeatureIndex in currentCombination{
+//                    let currentSingleFeature = singlefeatures[currentSingleFeatureIndex]
+//                    singlefeatureType += String(currentSingleFeature.rank) + " "
+//                }
                 
                 rankList.append(rank)
                 singlefeatureTypeList.append(singlefeatureType)
@@ -865,7 +868,8 @@ class TWDatasetHandAnalyst{
                     rank = rank << 4 | threeSingleFeatureRank
                     rank = rank << 2 | threeSingleFeatureSuit
                     
-                    let singlefeatureType = "三条炸弹" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[2]].originRank]!
+//                    let singlefeatureType = "三条炸弹" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[2]].originRank]!
+                    let singlefeatureType = "三条炸弹"
                     
                     rankList.append(rank)
                     singlefeatureTypeList.append(singlefeatureType)
@@ -916,7 +920,8 @@ class TWDatasetHandAnalyst{
                 rank = rank << 4 | threeSingleFeatureRank
                 rank = rank << 2 | threeSingleFeatureSuit
                 
-                let singlefeatureType = "三条" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[2]].originRank]!
+//                let singlefeatureType = "三条" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[2]].originRank]!
+                let singlefeatureType = "三条"
                 
                 rankList.append(rank)
                 singlefeatureTypeList.append(singlefeatureType)
@@ -985,7 +990,8 @@ class TWDatasetHandAnalyst{
                 rank = rank << 2 | firstPairSuit
                 
                 
-                let singlefeatureType = "两对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[1]].originRank]! + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[3]].originRank]!
+//                let singlefeatureType = "两对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[1]].originRank]! + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[3]].originRank]!
+                let singlefeatureType = "两对"
                 
                 rankList.append(rank)
                 singlefeatureTypeList.append(singlefeatureType)
@@ -1033,7 +1039,8 @@ class TWDatasetHandAnalyst{
                 rank = rank << 2 | pairsuit
                 
                 
-                let singlefeatureType = "对子" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[1]].originRank]!
+                let singlefeatureType = "对子"
+//                let singlefeatureType = "对子" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[1]].originRank]!
                 
                 rankList.append(rank)
                 singlefeatureTypeList.append(singlefeatureType)

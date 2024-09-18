@@ -149,7 +149,10 @@ class PBRule : Rule{
         43:"铁板牛牛+牛",
         44:"三条牛+牛",
         45:"三条牛牛 + 牛牛",
-        46:"三条"
+        46:"三条",
+        47:"牛或五张相加(9876)",
+        48:"牛+对5",
+        49:"牛+对10",
     ]
     override init(ruleIndex: Int, ruleName: String) {
         super.init(ruleIndex: ruleIndex, ruleName: ruleName)
@@ -170,7 +173,10 @@ class PBRule : Rule{
             11: "斗牛4条3条[509]",
             12: "斗牛5大5小[510]",
             13: "斗牛-40张同点一样大[511]",
-            14: "斗牛-40张第二轮有公牌[512]*"
+            14: "斗牛-40张第二轮有公牌[512]*",
+            15: "斗牛-炸弹葫芦[515]",
+            16: "斗牛-10算1点[514]",
+            17: "40张斗牛三同对10最大[516]",
         ]
         self.ruleInfo = [
             0: """
@@ -294,7 +300,32 @@ class PBRule : Rule{
             1.9版本:
             2个人玩玩4轮没有公牌，
             3个人玩3轮，第3轮每人两张去掉一张3张公牌
-            """
+            """,
+            15:"""
+            用牌40张：1-10
+            1）炸弹10101010>9999>...111
+            2) 葫芦 101010>999>...111
+            3) 牛10>牛9>牛8>...牛1，同牛比最大牌，同牌一样大
+            4）无牛比最大牌，同牌一样大
+""",
+            16:"""
+            人数扑克张数:40张。用牌1-10 三条算牛 10算1点,同点一样大
+            1)5个1
+            2)5张相加=10
+            3)牛牛>5张相加为9>牛9>5张相加为8>牛8>5张相加为7>牛7>5张相加为6>牛6>牛5>牛4>牛3>牛2>牛1
+            4)同点同牛无牛一样大
+""",
+            17:"""
+            40张斗牛用牌1到10
+            1.三同牛对10 普通牛对10一样大 如111和对10 999和对10 235和对10 118和对10一样大
+            2.三同牛对5 普通牛对5一样大 (比如111和对5 999和对5 235和对5 118和对5都是一样大)
+            3.牛牛 三同牛和普通牛都一样大
+            4.有牛+对子 有牛+99>有牛+88>有牛+77>有牛+66>有牛
+            +44>有牛+33>有牛+22>有牛+11,三同牛和普通牛一样大
+            5.牛9最大 牛1最小三同牛和普通牛
+            一样大 同点一样大不分花色
+            6.无斗的都一样
+""",
         ]
     }
 }
@@ -375,6 +406,15 @@ class PB{
             result = Array(0...8) + Array(13...21) + Array(26...34) + Array(39...47) + [10, 23, 36, 49]
             break
         case 14:
+            result = Array(0...9) + Array(13...22) + Array(26...35) + Array(39...48)
+            break
+        case 15:
+            result = Array(0...9) + Array(13...22) + Array(26...35) + Array(39...48)
+            break
+        case 16:
+            result = Array(0...9) + Array(13...22) + Array(26...35) + Array(39...48)
+            break
+        case 17:
             result = Array(0...9) + Array(13...22) + Array(26...35) + Array(39...48)
             break
         default:
@@ -741,7 +781,7 @@ class PBDataset {
             bullFeatureList.append(PBSingleFeature.init(singlefeature: singlefeature, numberChangeArray: numberChangeArray, isNoSuit: noSuit, specialfeatureMinZero: specialfeatureMinZero, suitRules: suitRules))
         }
 
-        var allRCs: [BullRC] = (0..<rcNum).map { BullRC(rcIndex: $0) }
+        let allRCs: [BullRC] = (0..<rcNum).map { BullRC(rcIndex: $0) }
         var community = [PBSingleFeature]()
         var returnRCInfos: [DatasetReturnRCInfo] = []
         
@@ -958,7 +998,10 @@ class BullHandAnalyst {
         43: isIronBullPlusBull,
         44: isThreeSingleFeatureBullPlusBull,
         45: isThreeSingleFeatureBullBUllPlusBullBull,
-        46: Is_threeSingleFeature(singlefeatures:)
+        46: Is_threeSingleFeature(singlefeatures:),
+        47: Is_bullOrFiveFeaturePoints(singlefeatures:),
+        48: isBullPlusPairFive(singlefeatures:),
+        49: isBullPlusPairTen(singlefeatures:),
             ]
     
     static var TEN_CARDS_RANK_RULE_DIC: [Int: ([PBDataset.PBSingleFeature]) -> (Bool, Int)] = [:]
@@ -1037,6 +1080,9 @@ class BullHandAnalyst {
                     allBulls += " \(singlefeature.rank1Value) \(singlefeature.trueRank) "
                 }
             }
+            
+//            print("所有的牛 \(bulls)")
+            
             return bulls
         }
         //Tested
@@ -2197,7 +2243,7 @@ class BullHandAnalyst {
         rank2 = rank2>>18
 
         if flag1 == true && flag2 == true{
-            if (rank1>>18) < (rank2>>18){
+            if rank1 > rank2{
                 return (flag1, (rank1 << 19) | secondRank1, singlefeatureType1)
             } else {
                 return (flag2, (((rank2 << 1) | 1)<<18 | secondRank2), singlefeatureType2)
@@ -2228,7 +2274,7 @@ class BullHandAnalyst {
 
         self.bullRules = tempBullRules
         if flag1 == true && flag2 == true{
-            if rank1 < rank2{
+            if rank1 > rank2{
                 return (flag1, (rank1 << 19) | secondRank1, singlefeatureType1)
             } else {
                 return (flag2, (((rank2 << 1) | 1)<<18 | secondRank2), singlefeatureType2)
@@ -2253,6 +2299,133 @@ class BullHandAnalyst {
         }
         return (false, 0, "")
     }
+    
+    static func Is_bullOrFiveFeaturePoints(singlefeatures: [PBDataset.PBSingleFeature]) -> (Bool, Int, String){
+        let mask = 0b111111111111111111
+
+        var (flag1, rank1, singlefeatureType1) = self.isBull(singlefeatures: singlefeatures)
+        let secondRank1 = rank1 & mask
+        var rank2 = self.sumAllBullSingleFeature(combination: singlefeatures, rank: 1)
+        let secondRank2 = 1
+
+        rank1 = rank1>>18
+        var flag2 = false
+        let singlefeatureType2: String = "5张相加\(rank2)"
+        if rank2 > 5 && rank2 < 10 {
+            flag2 = true
+        }
+        
+        print("牛：\(singlefeatureType1) 五张点数和 \(rank2)")
+        if flag1 == true && flag2 == true{
+            if rank1 > rank2{
+                return (flag1, (rank1 << 19) | secondRank1, singlefeatureType1)
+            } else {
+                return (flag2, (((rank2 << 1) | 1)<<18 | secondRank2), singlefeatureType2)
+            }
+        } else if flag1 == false && flag2 == true {
+            return (flag2, (((rank2 << 1) | 1)<<18 | secondRank2), singlefeatureType2)
+            
+        } else if flag2 == false && flag1 == true {
+            return (flag1, (rank1 << 19) | secondRank1, singlefeatureType1)
+        }
+        return (false, 0, "")
+    }
+    
+    static func isBullPlusPairFive(singlefeatures: [PBDataset.PBSingleFeature]) -> (Bool, Int,String) {
+        var allbulls: [[[PBDataset.PBSingleFeature]]] = []
+        var rank = 0
+        
+        // find out all bull
+        for index in self.bullRules {
+            let bullFunc = self.IS_BULL_DIC[index]!
+            let bulls = bullFunc(singlefeatures)
+            if !bulls.isEmpty {
+                allbulls.append(bulls)
+            }
+        }
+        
+        if allbulls.isEmpty {
+            return (false, 0, "")
+        }
+        var singlefeatureType: String = ""
+        for bulls in allbulls {
+            for bull in bulls {
+                if bull.count == 5 {
+                    continue
+                }
+                if bull.count == 3 {
+                    var otherSingleFeatures: [PBDataset.PBSingleFeature] = []
+                    for singlefeature in singlefeatures {
+                        if self.hasSingleFeature(combination: bull, searchSingleFeature: singlefeature) == false {
+                            otherSingleFeatures.append(singlefeature)
+                        }
+                    }
+                    rank = 0
+                    if otherSingleFeatures[0].trueRank == otherSingleFeatures[1].trueRank && otherSingleFeatures[0].trueRank == 5{
+                        
+                        let currentRank = (otherSingleFeatures[0].trueRank << 18) | self.rankForSameBullSamePoint(singlefeatures: singlefeatures, otherSingleFeatures: otherSingleFeatures)
+                        if currentRank > rank{
+                            rank = currentRank
+                            singlefeatureType = "牛加对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[otherSingleFeatures[0].trueRank]!
+                        }
+                    }
+                }
+            }
+        }
+        if rank == 0 {
+            return (false, 0,"")
+        }
+        return (true, rank, singlefeatureType)
+    }
+    
+    static func isBullPlusPairTen(singlefeatures: [PBDataset.PBSingleFeature]) -> (Bool, Int,String) {
+        var allbulls: [[[PBDataset.PBSingleFeature]]] = []
+        var rank = 0
+        
+        // find out all bull
+        for index in self.bullRules {
+            let bullFunc = self.IS_BULL_DIC[index]!
+            let bulls = bullFunc(singlefeatures)
+            if !bulls.isEmpty {
+                allbulls.append(bulls)
+            }
+        }
+        
+        if allbulls.isEmpty {
+            return (false, 0, "")
+        }
+        var singlefeatureType: String = ""
+        for bulls in allbulls {
+            for bull in bulls {
+                if bull.count == 5 {
+                    continue
+                }
+                if bull.count == 3 {
+                    var otherSingleFeatures: [PBDataset.PBSingleFeature] = []
+                    for singlefeature in singlefeatures {
+                        if self.hasSingleFeature(combination: bull, searchSingleFeature: singlefeature) == false {
+                            otherSingleFeatures.append(singlefeature)
+                        }
+                    }
+                    rank = 0
+                    if otherSingleFeatures[0].trueRank == otherSingleFeatures[1].trueRank && otherSingleFeatures[0].trueRank == 10{
+                        
+                        let currentRank = (otherSingleFeatures[0].trueRank << 18) | self.rankForSameBullSamePoint(singlefeatures: singlefeatures, otherSingleFeatures: otherSingleFeatures)
+                        if currentRank > rank{
+                            rank = currentRank
+                            singlefeatureType = "牛加对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[otherSingleFeatures[0].trueRank]!
+                        }
+                    }
+                }
+            }
+        }
+        if rank == 0 {
+            return (false, 0,"")
+        }
+        return (true, rank, singlefeatureType)
+    }
+
+
 
     // ... (other rank rule functions)
     //

@@ -438,7 +438,8 @@ class NPDatasetHandAnalyst{
     
     func eval_isPair(singlefeatures: [NPSingleFeature]) -> (Int, String, Int){
         if singlefeatures[0].rank == singlefeatures[1].rank{
-            let singlefeatureType: String = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+//            let singlefeatureType: String = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+            let singlefeatureType: String = "对子"
             return (singlefeatures[0].rank, singlefeatureType, 1)
         }
         return (0, "", 0)

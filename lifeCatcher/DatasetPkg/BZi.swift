@@ -502,9 +502,9 @@ class BZDatasetHandAnalyst{
     func eval_isSameColorPair(singlefeatures:[BZSingleFeature]) -> (Int, String, Int){
         if self.blackRedJudger(singlefeature: singlefeatures[0]) == self.blackRedJudger(singlefeature: singlefeatures[1]) && singlefeatures[0].originalRank == singlefeatures[1].originalRank {
             var colorRank = 1
-            var singlefeatureType: String = "黑对"
+            var singlefeatureType: String = "黑对子"
             if self.blackRedJudger(singlefeature: singlefeatures[0]) == 1{
-                singlefeatureType = "红对"
+                singlefeatureType = "红对子"
                 colorRank = 0
             }
             
@@ -518,7 +518,8 @@ class BZDatasetHandAnalyst{
     func eval_isPair(singlefeatures:[BZSingleFeature]) -> (Int, String, Int){
         if singlefeatures[0].originalRank == singlefeatures[1].originalRank {
             
-            let singlefeatureType: String = "对" + String(singlefeatures[0].originalRank)
+//            let singlefeatureType: String = "对" + String(singlefeatures[0].originalRank)
+            let singlefeatureType: String = "对子"
             
             if self.PairRank == 0 {
                 if self.samePointComparision == 3{
@@ -556,7 +557,7 @@ class BZDatasetHandAnalyst{
     
     func eval_isspecialfeaturePlusA(singlefeatures:[BZSingleFeature]) -> (Int, String, Int){
         if max(singlefeatures[0].originalRank, singlefeatures[1].originalRank) > 13 && min(singlefeatures[0].originalRank, singlefeatures[1].originalRank) == 1 {
-            return (1, "王加A", 0)
+            return (1, "王加尖", 0)
         }
         return (0, "", 0)
     }

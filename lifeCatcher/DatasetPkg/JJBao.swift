@@ -358,21 +358,24 @@ class JJBDatasetHandAnalyst{
     }
     func eval_IsRedPair(singlefeatures: [JJBSingleFeature]) -> (Int, String, Int) {
         if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].suit == 1{
-            let singlefeatureType: String = "红对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+//            let singlefeatureType: String = "红对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+            let singlefeatureType: String = "红对子"
             return (singlefeatures[0].rank, singlefeatureType, 1)
         }
         return (0, "", 0)
     }
     func eval_IsBlackPair(singlefeatures: [JJBSingleFeature]) -> (Int, String, Int) {
         if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].suit == 0{
-            let singlefeatureType: String = "黑对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+//            let singlefeatureType: String = "黑对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+            let singlefeatureType: String = "黑对子"
             return (singlefeatures[0].rank, singlefeatureType, 1)
         }
         return (0, "", 0)
     } 
     func eval_IsMixPair(singlefeatures: [JJBSingleFeature]) -> (Int, String, Int) {
         if singlefeatures[0].rank == singlefeatures[1].rank + 13 && singlefeatures[0].suit != singlefeatures[1].suit{
-            let singlefeatureType: String = "混对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+//            let singlefeatureType: String = "混对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+            let singlefeatureType: String = "混对子"
             return (singlefeatures[0].rank, singlefeatureType, 1)
         }
         return (0, "", 0)

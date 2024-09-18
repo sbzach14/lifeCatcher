@@ -620,7 +620,22 @@ class ZJHDatasetHandAnalyst {
         var rankResult = 0
         var singlefeatureType: String = ""
         var isPair: Int = 0
-        var ruleDict: [Int: ([SingleFeature]) -> (Int, String, Int)] = [
+//        13: "对王",
+//        12: "豹子",
+//        11: "金花235",
+//        10: "235",
+//        9: "金花AKJ",
+//        8: "AKJ",
+//        7: "三公",
+//        6: "顺金",
+//        5: "同花对子",
+//        4: "金花",
+//        3: "顺子",
+//        2: "真对子",
+//        1: "对子",
+//        0: "散牌"
+        
+        let ruleDict: [Int: ([SingleFeature]) -> (Int, String, Int)] = [
             0  : self.eval_holesinglefeature,
             1  : self.eval_onepair,
             2  : self.eval_truepair,
@@ -717,7 +732,8 @@ class ZJHDatasetHandAnalyst {
         }
         
         if rank > 0{
-            singlefeatureType = "三条" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+            singlefeatureType = "豹子"
+//            singlefeatureType =  ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]! + "豹子"
 
         }
 
@@ -767,7 +783,7 @@ class ZJHDatasetHandAnalyst {
                 rank = rank << 2 | targetSuit
             }
         }
-        return (rank, "同花235", 0)
+        return (rank, "金花235", 0)
     }
 
     func eval_235(singlefeatures: [SingleFeature]) -> (Int, String, Int) {
@@ -840,7 +856,7 @@ class ZJHDatasetHandAnalyst {
                 rank = rank << 2 | targetSuit
             }
         }
-        return (rank, "同花AKJ", 0)
+        return (rank, "金花AKJ", 0)
     }
     
     func eval_akj(singlefeatures: [SingleFeature]) -> (Int, String, Int) {
@@ -978,7 +994,8 @@ class ZJHDatasetHandAnalyst {
         }
         
         if rank > 0 {
-            singlefeatureType = ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]! + "同花顺"
+            singlefeatureType = "顺金"
+//            singlefeatureType = ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]! + "顺金"
         }
         
         
@@ -1015,11 +1032,13 @@ class ZJHDatasetHandAnalyst {
             if rankList[0] == rankList[1] {
                 pairRank = rankList[0]
                 singleRank = rankList[2]
-                singlefeatureType = "同花对" +  ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+                singlefeatureType = "同花对"
+//                singlefeatureType = "同花对" +  ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
             } else if rankList[1] == rankList[2] {
                 pairRank = rankList[1]
                 singleRank = rankList[0]
-                singlefeatureType = "同花对" +  ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[1].originalRank]!
+                singlefeatureType = "同花对"
+//                singlefeatureType = "同花对" +  ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[1].originalRank]!
             }
         }
 
@@ -1090,7 +1109,7 @@ class ZJHDatasetHandAnalyst {
                 rank = rank << 2 | targetSuit
             }
         }
-        return (rank, "同花", 0)
+        return (rank, "金花", 0)
     }
 
     func eval_straight(singlefeatures: [SingleFeature]) -> (Int, String, Int) {
@@ -1174,7 +1193,8 @@ class ZJHDatasetHandAnalyst {
         }
         var singlefeatureType: String = ""
         if rank > 0 {
-            singlefeatureType = ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]! + "顺子"
+//            singlefeatureType = ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]! + "顺子"
+            singlefeatureType = "顺子"
         }
 
         return (rank, singlefeatureType, 0)
@@ -1234,14 +1254,16 @@ class ZJHDatasetHandAnalyst {
                 suitList.append(singlefeatures[0].suit[0])
                 suitList.append(singlefeatures[0].suit[0])
                 suitList.append(singlefeatures[1].suit[0])
-                singlefeatureType = "真对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+                singlefeatureType = "真对子"
+//                singlefeatureType = "真对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
             } else if singlefeatures[1].suit.contains(singlefeatures[2].suit[0]) {
                 pairRank = singlefeatures[1].rank
                 singleRank = singlefeatures[0].rank
                 suitList.append(singlefeatures[1].suit[0])
                 suitList.append(singlefeatures[1].suit[0])
                 suitList.append(singlefeatures[0].suit[0])
-                singlefeatureType = "真对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[1].originalRank]!
+                singlefeatureType = "真对子"
+//                singlefeatureType = "真对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[1].originalRank]!
             }
         } else {
             if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].suit.contains(singlefeatures[1].suit[0]) {
@@ -1250,7 +1272,8 @@ class ZJHDatasetHandAnalyst {
                 suitList.append(singlefeatures[0].suit[0])
                 suitList.append(singlefeatures[0].suit[0])
                 suitList.append(singlefeatures[2].suit[0])
-                singlefeatureType = "真对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+                singlefeatureType = "真对子"
+//                singlefeatureType = "真对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
             }
 
             if singlefeatures[1].rank == singlefeatures[2].rank && singlefeatures[1].suit.contains(singlefeatures[2].suit[0]) {
@@ -1259,7 +1282,8 @@ class ZJHDatasetHandAnalyst {
                 suitList.append(singlefeatures[1].suit[0])
                 suitList.append(singlefeatures[1].suit[0])
                 suitList.append(singlefeatures[0].suit[0])
-                singlefeatureType = "真对" +  ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[1].originalRank]!
+                singlefeatureType = "真对子"
+//                singlefeatureType = "真对" +  ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[1].originalRank]!
             }
         }
 
@@ -1315,14 +1339,16 @@ class ZJHDatasetHandAnalyst {
                 suitList.append(singlefeatures[0].suit[0])
                 suitList.append(singlefeatures[1].suit[0])
                 suitList.append(singlefeatures[2].suit[0])
-                singlefeatureType = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+                singlefeatureType = "对子"
+//                singlefeatureType = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
             } else if singlefeatures[1].rank == singlefeatures[2].rank {
                 pairRank = singlefeatures[1].rank
                 singleRank = singlefeatures[0].rank
                 suitList.append(singlefeatures[1].suit[0])
                 suitList.append(singlefeatures[2].suit[0])
                 suitList.append(singlefeatures[0].suit[0])
-                singlefeatureType = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[1].originalRank]!
+                singlefeatureType = "对子"
+//                singlefeatureType = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[1].originalRank]!
             }
         }
 

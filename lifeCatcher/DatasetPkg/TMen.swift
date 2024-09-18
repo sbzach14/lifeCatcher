@@ -462,7 +462,8 @@ class TMDatasetHandAnalyst{
         if (singlefeatures[0].rank == 15 || singlefeatures[0].rank == 14) && singlefeatures[1].rank == singlefeatures[2].rank {
             return (1, "对子加王", 1)
         } else if (singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[1].rank == singlefeatures[2].rank) && (singlefeatures[0].rank > 10 && singlefeatures[1].rank > 10 && singlefeatures[2].rank > 10){
-            var singlefeatureType: String = "三条" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].rank]!
+            var singlefeatureType: String = "三条"
+//            var singlefeatureType: String = "三条" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].rank]!
             return (1, singlefeatureType, 0)
         }
         return (0, "", 0)
@@ -499,7 +500,8 @@ class TMDatasetHandAnalyst{
     func eval_threesinglefeature(_ singlefeatures: [SingleFeature]) -> (Int, String, Int) {
         var rank = 0
         if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].rank == singlefeatures[2].rank{
-            let singlefeatureType: String = "三条" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+            let singlefeatureType: String = "三条"
+//            let singlefeatureType: String = "三条" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
             if self.threeSingleFeatureComparision == 0 {
                 return (singlefeatures[0].rank, singlefeatureType, 0)
             } else if self.threeSingleFeatureComparision == 1 {

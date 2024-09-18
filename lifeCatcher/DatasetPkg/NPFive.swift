@@ -463,28 +463,28 @@ class NPFiveDatasetHandAnalyst{
     
     func eval_black8PlusRedspecialfeature(singlefeatures: [NPFiveSingleFeature]) -> (Int, String, Int) {
         if (singlefeatures[0].rank == 15 && singlefeatures[1].rank == 8 && self.blackRedJudger(singlefeature: singlefeatures[1]) == 1){
-            return (1, "黑8加大王", 0)
+            return (1, "黑8大王", 0)
         }
         return (0, "", 0)
     }
     
     func eval_black8PlusBlackspecialfeature(singlefeatures: [NPFiveSingleFeature]) -> (Int, String, Int){
         if (singlefeatures[0].rank == 14 && singlefeatures[1].rank == 8 && self.blackRedJudger(singlefeature: singlefeatures[1]) == 1){
-            return (1, "黑8加小王", 0)
+            return (1, "黑8小王", 0)
         }
         return (0, "", 0)
     }
     
     func eval_red8PlusRedspecialfeature(singlefeatures: [NPFiveSingleFeature]) -> (Int, String, Int) {
         if (singlefeatures[0].rank == 15 && singlefeatures[1].rank == 8 && self.blackRedJudger(singlefeature: singlefeatures[1]) == 0){
-            return (1, "红8加大王", 0)
+            return (1, "红8大王", 0)
         }
         return (0, "", 0)
     }
     
     func eval_red8PlusBlackspecialfeature(singlefeatures: [NPFiveSingleFeature]) -> (Int, String, Int){
         if (singlefeatures[0].rank == 14 && singlefeatures[1].rank == 8 && self.blackRedJudger(singlefeature: singlefeatures[1]) == 0){
-            return (1, "红8加小王", 0)
+            return (1, "红8小王", 0)
         }
         return (0, "", 0)
     }
@@ -510,7 +510,8 @@ class NPFiveDatasetHandAnalyst{
         var singlefeatureType: String = ""
         if self.pairRequirement == 0 {
             if singlefeatures[0].rank == singlefeatures[1].rank {
-                singlefeatureType = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].rank]!
+//                singlefeatureType = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].rank]!
+                singlefeatureType = "对子"
                 if self.isPairRank == 0{
                     return (singlefeatures[0].rank, singlefeatureType, 1)
                 } else if self.isPairRank == 1 {
@@ -520,7 +521,8 @@ class NPFiveDatasetHandAnalyst{
             }
         } else if self.pairRequirement == 1 {
             if singlefeatures[0].rank == singlefeatures[1].rank && self.blackRedJudger(singlefeature: singlefeatures[0]) == self.blackRedJudger(singlefeature: singlefeatures[1]){
-                singlefeatureType = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].rank]!
+//                singlefeatureType = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].rank]!
+                singlefeatureType = "对子"
                 if self.isPairRank == 0 {
                     return (singlefeatures[0].rank, singlefeatureType, 1)
                 } else {

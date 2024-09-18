@@ -8,6 +8,10 @@ struct AuthTestView: View {
     @State private var activateStatus = -1
     @State private var expiredTime = 0
     @State private var showError = false
+    @State private var timeLimit = "One" // Add the state variable for timeLimit
+    @State private var isTimeLimited = false // Add this state variable to track Toggle state
+
+
 
     var body: some View {
         VStack {
@@ -22,7 +26,14 @@ struct AuthTestView: View {
             TextField("Enter your Passcode here", text: $passcode)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
-            
+            // Add the Toggle here
+                    Toggle(isOn: $isTimeLimited) {
+                        Text("Enable Time Limit")
+                    }
+                    .padding()
+                    .onChange(of: isTimeLimited) { value in
+                        timeLimit = value ? "half" : "One"
+                    }
             HStack{
                 
                 Button(action: {
@@ -82,7 +93,8 @@ struct AuthTestView: View {
         let json: [String: Any] = [
             "activate_code": activeKey,
             "passCode": passcode,
-            "deviceID": userInput
+            "deviceID": userInput,
+            "timeLimit": timeLimit
         ]
 
         let jsonData = try! JSONSerialization.data(withJSONObject: json)
@@ -108,6 +120,10 @@ struct AuthTestView: View {
                             let returnExpiredTime = jsonResponse["expiredTime"] as? Int ?? 0
                             self.activateStatus = jsonResponse["activateStatus"] as? Int ?? -1
                             self.expiredTime = jsonResponse["expiredTime"] as? Int ?? 0
+                            
+                            
+                            
+                            
                         }
                     } else {
                         DispatchQueue.main.async {
