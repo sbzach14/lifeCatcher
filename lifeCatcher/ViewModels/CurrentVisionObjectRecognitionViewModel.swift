@@ -2411,6 +2411,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 
                 for _ in 0..<maxCutTimes {
                     cutSingleFeature = self.singlefeatureArray.randomElement()!
+                    cutSingleFeature = self.singlefeatureArray[1]
                     self.cutStructArray.append(cutStruct(cutcardIndex: cutSingleFeature, cutMode: 2))
                 }
             }
