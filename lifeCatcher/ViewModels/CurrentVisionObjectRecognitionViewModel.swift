@@ -185,7 +185,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     private var timerWorkItem: DispatchWorkItem?
     
     var isProcessNeedToCut: Bool = false
-        
+    var reloadingTime: Double = 0
     
 
     override init(){
@@ -725,10 +725,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 detectNum += 1
             }
             
-            if self.speechPerformer.isReportingNextRound{
-                
-            }
-            else if self.state == "reloading"{
+            if self.state == "reloading"{
                 
             }
             else if self.state == "idle" && !self.isTargetArea && !isTargetArea{
@@ -743,6 +740,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 if ((detectNum == 1 && (self.shuffleMode[1] != 0 || self.detectNeedToCut))
                     || (detectNum == 2 && self.shuffleMode[0] != 0))
                     && self.stateCounter >= 1{
+                    
+                    self.reloadingTime = 0
                     
                     print("状态：进入识别")
                     
@@ -847,7 +846,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     self.detectNeedToCut = false
                     
                     if self.usedSingleFeatures.contains(detectSingleFeature) && self.recgReport {
-                        self.speechPerformer.isReportingNextRound = true
+                        self.stateCounter = 100
+                        self.reloadingTime = 1
                         self.computeNextRound()
                     }
                     else if self.singlefeatureArray.contains(detectSingleFeature){
@@ -931,7 +931,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         
                         if isCutDone{
                             if self.recgReport{
-                                self.speechPerformer.isReportingNextRound = true
+                                self.stateCounter = 100
+                                self.reloadingTime = 1
                             }
                             self.computeWinnerRC(isReset: true)
                         }
@@ -988,7 +989,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     self.isTargetArea = false
                     self.targetArea = [0,0,0,0]
                     
-                    self.stateCounter = 0
                     print("状态：切换为检测")
                     
                 }
@@ -1032,28 +1032,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 }
             }
             else if !self.isTargetArea && !isTargetArea{
-                if self.stateCounter >= 3{
+                if self.stateCounter >= 5 + 3{
                     print("状态：退出检测")
                     
-                    self.stateCounter = 0
-                    self.changeCameraFrameRate(to: self.idleRate)
                     let detectState = self.handleDetecResultList(targetDetecResultList: self.detectResultList)
-                    self.initBoxes()
-                    self.initDetectResult()
-                    
-                    if !detectState.isShort{
-                        self.state = "reloading"
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                            if(self.state == "reloading"){
-                                self.state = "idle"
-                                self.changeCameraFrameRate(to: self.idleRate)
-                            }
-                        }
-                    }
-                    else{
-                        self.state = "idle"
-                    }
-                    
                     
                     if !detectState.isSingle && !detectState.isShort && self.shuffleMode[0] != 0{
                         //洗牌
@@ -1070,7 +1052,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         
                         if self.cutMode[0] == 0  && self.specialCard[0] == 0{
                             if self.recgReport{
-                                self.speechPerformer.isReportingNextRound = true
+                                self.reloadingTime = 1
                             }
                             self.computeWinnerRC(isReset: true)
                         }
@@ -1109,11 +1091,17 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         
                         if self.cutMode[1] == 0 && self.specialCard[1] == 0{
                             if self.recgReport{
-                                self.speechPerformer.isReportingNextRound = true
+                                self.reloadingTime = 1
                             }
                             self.computeWinnerRC(isReset: true)
                         }
                     }
+                    
+                    if !detectState.isShort && self.reloadingTime == 0{
+                        self.reloadingTime = 0.5
+                    }
+                    
+                    self.quitDetect(reloadingTime: self.reloadingTime)
                 }
                 else if ((detectNum == 1 && (self.shuffleMode[1] != 0 || self.detectNeedToCut))
                     || (detectNum == 2 && self.shuffleMode[0] != 0)){
@@ -1158,6 +1146,25 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         //        let cgImage = CIContext().createCGImage(modelCIImage, from: modelCIImage.extent)
         //        let savedUIImage = UIImage(cgImage: cgImage!)
         //        UIImageWriteToSavedPhotosAlbum(savedUIImage, self, #selector(self.imageSaved(_:didFinishSavingWithError:contextInfo:)), nil)
+    }
+    
+    private func quitDetect(reloadingTime: Double){
+        self.stateCounter = 0
+        self.changeCameraFrameRate(to: self.idleRate)
+        self.initBoxes()
+        self.initDetectResult()
+        
+        if reloadingTime == 0{
+            self.state = "idle"
+        }
+        else{
+            self.state = "reloading"
+            DispatchQueue.main.asyncAfter(deadline: .now() + reloadingTime) {
+                if(self.state == "reloading"){
+                    self.state = "idle"
+                }
+            }
+        }
     }
     
     @objc private func imageSaved(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeMutableRawPointer?) {
@@ -3261,8 +3268,7 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
     
     private let lock = NSLock()
     private var isPlaying = false
-    public var isReportingNextRound = false
-
+    
     override init() {
         super.init()
         synthesizer.delegate = self
@@ -3342,7 +3348,6 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
         isPlaying = false
         lock.unlock()
         // Perform any action you want after speech synthesis finishes
-        self.isReportingNextRound = false
     }
 }
 
