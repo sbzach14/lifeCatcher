@@ -757,9 +757,16 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     self.isTargetArea = true
                     
                     if(detectNum == 2 && self.shuffleMode[0] != 0){
-                        self.initTargetArea = self.targetArea
-                        self.speakText(input: 0)
-                        self.speechPerformer.stopSpeechSynthesis()
+                        //防止切牌语音被重进识别打断
+                        //如果两个框距离小于一定范围，不直接响，等洗牌判定再响
+                        //这个范围需要够大，使切牌不响
+                        //这个范围需要够小，能识别出正常洗牌
+                        //即切牌两个框范围<判定范围<洗牌正常识别范围
+                        if !self.judgeCutRange(stateResult: stateResult){
+                            self.initTargetArea = self.targetArea
+                            self.speakText(input: 0)
+                            self.speechPerformer.stopSpeechSynthesis()
+                        }
                     }
                     
                     self.state = "detecting"
@@ -833,14 +840,17 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                 && self.detectNeedToCut
                 
                 if isCut{
-                    self.stopCurrentAudio()
                     self.initTargetArea = [0,0,0,0]
                     self.detectNeedToCut = false
                     
                     if self.usedSingleFeatures.contains(detectSingleFeature) && self.recgReport {
-                        self.computeNextRound()
+                        if !self.speechPerformer.isReportingNextRound{
+                            self.speechPerformer.isReportingNextRound = true
+                            self.computeNextRound()
+                        }
                     }
                     else if self.singlefeatureArray.contains(detectSingleFeature){
+                        self.stopCurrentAudio()
                         
                         var cutIndex = self.singlefeatureArray.firstIndex(of: detectSingleFeature)!
                         var isCutDone = false
@@ -919,6 +929,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                         
                         if isCutDone{
+                            if self.recgReport{
+                                self.speechPerformer.isReportingNextRound = true
+                            }
                             self.computeWinnerRC(isReset: true)
                         }
                         
@@ -1055,6 +1068,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                         
                         if self.cutMode[0] == 0  && self.specialCard[0] == 0{
+                            if self.recgReport{
+                                self.speechPerformer.isReportingNextRound = true
+                            }
+                            
                             self.computeWinnerRC(isReset: true)
                         }
                     }
@@ -1091,6 +1108,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         
                         
                         if self.cutMode[1] == 0 && self.specialCard[1] == 0{
+                            if self.recgReport{
+                                self.speechPerformer.isReportingNextRound = true
+                            }
+                            
                             self.computeWinnerRC(isReset: true)
                         }
                     }
@@ -3241,6 +3262,7 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
     
     private let lock = NSLock()
     private var isPlaying = false
+    public var isReportingNextRound = false
 
     override init() {
         super.init()
@@ -3262,10 +3284,12 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
     }
     
     func stopSpeechSynthesis(){
-        synthesizer.stopSpeaking(at: .immediate)
-        lock.lock()
-        isPlaying = false
-        lock.unlock()
+        if !isReportingNextRound{
+            synthesizer.stopSpeaking(at: .immediate)
+            lock.lock()
+            isPlaying = false
+            lock.unlock()
+        }
     }
     
     func performSpeechSynthesis(speakResultStruct: [[SpeakResultStruct]]) {
@@ -3321,6 +3345,7 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
         isPlaying = false
         lock.unlock()
         // Perform any action you want after speech synthesis finishes
+        self.isReportingNextRound = false
     }
 }
 
