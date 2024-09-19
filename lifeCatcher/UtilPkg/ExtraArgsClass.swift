@@ -200,7 +200,6 @@ class ReportManager{
         7:"[8]:报最大次大和生死门",
         8:"[8_1]:报最大次大活门半活门平点对子",
         9:"[10]:报最大和最大家牌型",
-//        261:"[11]:报最大和最大家牌（点数)*",
         10:"[12]:报排名",
         11:"[13]:报原始排名 4432和生死门",
         12:"[14]:报最大次大不打几平点对子",
@@ -451,7 +450,9 @@ class ReportManager{
         261: "[1001]: 底为色色牌点数去牌报最大",
         262: "[1002]: 底为色色牌点数去牌报最小",
         263: "[1003]: 底为色色牌点数去牌报最大次大",
-        264: "[1004]: 底为色色牌点数去牌报最小次小"
+        264: "[1004]: 底为色色牌点数去牌报最小次小",
+        265:"[11]:报最大和最大家牌（点数)",
+
     ]
     static let allReportInfo: [Int: String] = [
         0:"""
@@ -484,7 +485,6 @@ class ReportManager{
         9:"""
 报哪家最大和最大家是什么牌型。
 """,
-//        261:"报哪家最大和最大家是什么牌。Y=10报点数。 Y不等于10:报点数和花色",
         10:"""
 报各家大小排名，人数超过6家只报前6家
 """,
@@ -1477,8 +1477,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
 """,264:"""
                 底牌为色，再根据色牌的点数去面牌，报最小次小
 
-"""
-        
+""",
+    265:"报哪家最大和最大家是什么牌。Y=10报点数。 Y不等于10:报点数和花色",
     ]
     
     static func cutRankConvert(cutNumSetting: Int, singlefeatureIndex: Int)->Int{
@@ -3767,7 +3767,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         //报指定玩家手里牌
                         case 24:
                             let XValue = cutNumRangeSetting[0]
-                            //如果反发
+                            
                             let currentFeatures = currentResultInfo.RCReturnInfoList[targets[0]].RCSingleFeatures
 
                             for i in currentFeatures{
@@ -3784,6 +3784,17 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 }
                             }
                             break
+                        case 25:
+                            print("RC加入了 \(resultPos)")
+                            currentResultInfo.targetRCList.append(resultPos)
+                            
+                            if colorSingleFeatureIndexList.count > 0 {
+                                currentResultInfo.ColorSingleFeatures = colorSingleFeatureIndexList
+                            }
+                            
+                            break
+                            
+                            
                         default:
                             break
                         }
@@ -4776,7 +4787,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 reportResult.append(currentSpeakStruct)
             }
             break
-            break
+            
 //            145: "[420]:随意混合打色保位置最大次大",
 //            146: "[421]:随意混合打色保位置最小次小",
         case 145...146:
@@ -4902,6 +4913,40 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 reportString = resultInfo.dealTypeReport
                 reportResult.append([SpeakResultStruct(voiceType: 1, content: reportString)])
                 print("发牌方式报法\(reportString)")
+            }
+            break
+//            265:"报哪家最大和最大家是什么牌。Y=10报点数。 Y不等于10:报点数和花色",
+        case 265:
+            for resultInfo in multipleReportResultInfo.singleResultList{
+                var reportString = ""
+                let voiceType = 1
+                var currentSpeakStruct: [SpeakResultStruct] = []
+                for rcID in resultInfo.targetRCList[0] {
+                    reportString = String(rcID + 1) + " "
+                    currentSpeakStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                    
+                    let YValue = cutNumRangeSetting[1]
+                    
+                    let currentFeatures = resultInfo.RCReturnInfoList[rcID].RCSingleFeatures
+
+                    reportString = ""
+                    for i in currentFeatures{
+                        
+                        let currentFeatureIndex = i.singlefeatureIndex
+                        let currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[currentFeatureIndex % 13 + 1]
+                        
+                        let currentColor = 3 - (currentFeatureIndex / 13)
+                        
+                        if YValue == 10 {
+                            reportString += currentPoint! + " "
+                        } else {
+                            reportString +=  ClassifierSettingArgs.SuitReportDix[currentColor]! + currentPoint! + " "
+                        }
+                    }                    
+                    currentSpeakStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                }
+                
+                reportResult.append(currentSpeakStruct)
             }
             break
         default:
