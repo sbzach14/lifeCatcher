@@ -2742,7 +2742,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 self.usedSingleFeatures = Array(self.singlefeatureArray[0...(usedNum - 1)])
             }
             else{
-                self.usedSingleFeatures += Array(self.singlefeatureArray[0...(usedNum - 1)])
+                self.usedSingleFeatures = Array(self.singlefeatureArray[0...(usedNum - 1)])
             }
             
         }

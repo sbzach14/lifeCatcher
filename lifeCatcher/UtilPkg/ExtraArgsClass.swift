@@ -2213,9 +2213,12 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     return multipleResultInfo
                 }
                 print("看色留色再看底 \(inputSingleFeatures)")
-                cutStructList = Array(cutStructList.reversed())
+//                cutStructList = Array(cutStructList.reversed())
                 
-                cutStructList[0].cutMode = 0
+                cutStructList[cutStructList.count - 1].cutMode = 0
+                var temp = cutStructList[cutStructList.count - 2]
+                cutStructList[cutStructList.count - 2] = cutStructList[cutStructList.count - 1]
+                cutStructList[cutStructList.count - 1] = temp
                 
                 print("操作 \(cutStructList[0].cutcardIndex) \(cutStructList[1].cutcardIndex)")
                 for cutStruct in cutStructList{
@@ -3835,7 +3838,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         var reportResult = reportStringGenerator(reportID: reportID, multipleReportResultInfo: multipleResultInfo, cutNumRangeSetting: cutNumRangeSetting, rcNum: rcNum)
         
         if currentRoundID > 1 {
-            reportResult.insert([SpeakResultStruct(voiceType: 0, content: "第\(currentRoundID)轮")], at: 0)
+            reportResult.insert([SpeakResultStruct(voiceType: 1, content: "第\(currentRoundID)轮")], at: 0)
         }
         
         multipleResultInfo.reportResult = reportResult
