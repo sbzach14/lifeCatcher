@@ -741,7 +741,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     || (detectNum == 2 && self.shuffleMode[0] != 0))
                     && self.stateCounter >= 1{
                     
-                    self.reloadingTime = 0
+                    self.reloadingTime = 0.5
                     
                     print("状态：进入识别")
                     
@@ -1097,9 +1097,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                     }
                     
-                    if !detectState.isShort && self.reloadingTime == 0{
-                        self.reloadingTime = 0.5
-                    }
+//                    if !detectState.isShort && self.reloadingTime == 0{
+//                        self.reloadingTime = 0.5
+//                    }
                     
                     self.quitDetect(reloadingTime: self.reloadingTime)
                 }
