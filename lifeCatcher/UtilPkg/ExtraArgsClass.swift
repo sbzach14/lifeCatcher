@@ -1962,7 +1962,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
     
     
     //[[SpeakResultStruct]]--> 每一轮的结果 [
-    static func DatasetReporter(DatasetIndex: Int, inputSingleFeatures: [Int], diyDealStatus: [[Bool]], diyDealNum:[Int], newArgs: [Int], rankRules:[Int], suitRules:[Int], reportID: Int, cutNumSetting: Int, cutNumRangeSetting: [Int], targetPos: Int, coloringTypeArg: Int, consecutiveNum: Int, cutStructList: [cutStruct]) -> MultipleReportResultInfo{
+    static func DatasetReporter(DatasetIndex: Int, inputSingleFeatures: [Int], diyDealStatus: [[Bool]], diyDealNum:[Int], newArgs: [Int], rankRules:[Int], suitRules:[Int], reportID: Int, cutNumSetting: Int, cutNumRangeSetting: [Int], targetPos: Int, coloringTypeArg: Int, consecutiveNum: Int, cutStructList: [cutStruct], currentRoundID: Int) -> MultipleReportResultInfo{
         
         //不打色默认正面打色
         var coloringType = coloringTypeArg
@@ -3830,8 +3830,13 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         }
         
         
+        
         //结果整合，把需要的元素填入结果整合的函数中，最后合成一段reportResult字符串
-        let reportResult = reportStringGenerator(reportID: reportID, multipleReportResultInfo: multipleResultInfo, cutNumRangeSetting: cutNumRangeSetting, rcNum: rcNum)
+        var reportResult = reportStringGenerator(reportID: reportID, multipleReportResultInfo: multipleResultInfo, cutNumRangeSetting: cutNumRangeSetting, rcNum: rcNum)
+        
+        if currentRoundID > 1 {
+            reportResult.insert([SpeakResultStruct(voiceType: 0, content: "第\(currentRoundID)轮")], at: 0)
+        }
         
         multipleResultInfo.reportResult = reportResult
         

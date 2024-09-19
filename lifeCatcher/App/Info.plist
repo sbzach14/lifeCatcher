@@ -15,6 +15,8 @@
 			<string>None</string>
 		</dict>
 	</array>
+	<key>Indi</key>
+	<string></string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
@@ -24,7 +26,5 @@
 	<array/>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>Indi</key>
-	<string></string>
 </dict>
 </plist>
