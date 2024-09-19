@@ -126,10 +126,8 @@ struct SettingRecordConfigView: View{
     @State private var recgReport: Bool = false
     
     private func SetUpAll(){
-        if self.selectedSaveIndex == -1 && self.editType == 0{
+        if (self.selectedSaveIndex == -1 && _selectedSaveIndex == -1) && self.editType == 0{
             
-            _selectedSaveIndex = self.selectedSaveIndex
-
             let selectedRule = ClassifierSettingArgs.targetSetting[DatasetType]!
             self.rcNumList = selectedRule.rcNum
             
@@ -147,10 +145,13 @@ struct SettingRecordConfigView: View{
             self.singlefeatureToUse = DatasetGetAllSingleFeatureIndex()
             
             self.currentNum = rcNumList[self.rcNum]
-        }else if self.selectedSaveIndex > -1 && editType == 0{
-            _selectedSaveIndex = self.selectedSaveIndex
+        }else if (self.selectedSaveIndex > -1 || self._selectedSaveIndex > -1) && editType == 0{
+            
+            if self._selectedSaveIndex == -1{
+                _selectedSaveIndex = self.selectedSaveIndex
+            }
 
-            let rules = DetectSettingArgs.allUsersDatasetRule[self.selectedSaveIndex]
+            let rules = DetectSettingArgs.allUsersDatasetRule[self._selectedSaveIndex]
             
             self.DatasetType = rules.DatasetType
             let selectedRule = ClassifierSettingArgs.targetSetting[DatasetType]!
@@ -592,6 +593,7 @@ struct SettingRecordConfigView: View{
                     }
                     else {
                         self.saveData(isShowAlert: false)
+                        self.editType = 0
                         self.isNavigateToMainContentView = true
                     }
                     

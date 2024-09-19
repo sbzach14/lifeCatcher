@@ -461,7 +461,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 //detectneedtocut
                 if (self.isProcessNeedToCut || self.recgReport) && self.singlefeatureArray.count > 0{
                     if frameRate == 120{
-                        device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(150)), iso: AVCaptureDevice.currentISO)
+                        device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(180)), iso: AVCaptureDevice.currentISO)
                     }
                     else{
                         device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(240)), iso: AVCaptureDevice.currentISO)
@@ -476,7 +476,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 //不拨牌 且是前置
                 device.exposureMode = .custom
                 if frameRate == 120{
-                    device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(150)), iso: AVCaptureDevice.currentISO)
+                    device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(180)), iso: AVCaptureDevice.currentISO)
                 }
                 else{
                     device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(240)), iso: AVCaptureDevice.currentISO)
@@ -852,7 +852,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                 self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 0))
                                 isCutDone = true
                                 self.cutShowArray.append(detectSingleFeature)
-                                self.isProcessNeedToCut = false
+                                
+                                if self.specialCard[self.shuffleOrRiffle] == 0{
+                                    self.isProcessNeedToCut = false
+                                }
                             }
                         }
                         else if self.cutMode[self.shuffleOrRiffle] == 2{
@@ -865,7 +868,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                 self.cutStructArray.append(cutStruct(cutcardIndex: self.singlefeatureArray[cutIndex], cutMode: 1))
                                 isCutDone = true
                                 self.cutShowArray.append(detectSingleFeature)
-                                self.isProcessNeedToCut = false
+                                
+                                if self.specialCard[self.shuffleOrRiffle] == 0{
+                                    self.isProcessNeedToCut = false
+                                }
                             }
                         }
                         else if self.cutMode[self.shuffleOrRiffle] == 3{
@@ -936,6 +942,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             self.isDetect = true
                             self.detectNeedToCut = false
                             self.state = "shuffle"
+                            
+                            print("shuffle \(leftDetectSingleFeature) \(rightDetectSingleFeature)")
                             
                             if self.targetAreaMove(initTargetArea: self.initTargetArea, targetArea: targetArea){
                                 self.speakText(input: 0)
@@ -1098,14 +1106,20 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     
                     self.targetArea = self.computeTargetArea(stateResult: stateResult)
                     self.isTargetArea = true
-                    
+
                     if (detectNum == 2 && self.shuffleMode[0] != 0)
                     && self.targetAreaMove(initTargetArea: self.initTargetArea, targetArea: self.targetArea){
-                        self.speakText(input: 0)
-                        self.speechPerformer.stopSpeechSynthesis()
+                        //防止切牌语音被重进识别打断
+                        //如果两个框距离小于一定范围，不直接响，等洗牌判定再响
+                        //这个范围需要够大，使切牌不响
+                        //这个范围需要够小，能识别出正常洗牌
+                        //即切牌两个框范围<判定范围<洗牌正常识别范围
+                        if !self.judgeCutRange(stateResult: stateResult){
+                            self.speakText(input: 0)
+                            self.speechPerformer.stopSpeechSynthesis()
+                            self.initTargetArea = self.targetArea
+                        }
                     }
-                    
-                    self.initTargetArea = self.targetArea
                     
                     self.initDetectResult()
                     
@@ -2016,6 +2030,29 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
     }
     
+    func judgeCutRange(stateResult: [[Float]]) -> Bool{
+        if self.isCameraHorizon{
+            let xDistance = abs(stateResult[0][0] - stateResult[1][0]) - (stateResult[0][2] - stateResult[1][2])/2
+            let maxX = max(stateResult[0][2], stateResult[1][2])
+            if xDistance < 3 * maxX{
+                return true
+            }
+            else{
+                return false
+            }
+        }
+        else{
+            let yDistance = abs(stateResult[0][1] - stateResult[1][1]) - (stateResult[0][3] - stateResult[1][3])/2
+            let maxY = max(stateResult[0][3], stateResult[1][3])
+            
+            if yDistance < 3 * maxY{
+                return true
+            }
+            else{
+                return false
+            }
+        }
+    }
     
     // MARK: compute targetArea
     func computeTargetArea(stateResult: [[Float]])-> [Float]{
@@ -2730,6 +2767,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         currentAudioPlayer?.stop()
         currentAudioPlayer = nil
     }
+    
+    func isOnlyDigits(_ input: String) -> Bool {
+        let digitsPattern = "^[0-9\\s]+$"
+        let predicate = NSPredicate(format: "SELF MATCHES %@", digitsPattern)
+        return predicate.evaluate(with: input)
+    }
 
 
     func speakText(input: [[SpeakResultStruct]]) {
@@ -2744,11 +2787,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             for (turnIndex, turnResult) in input.enumerated() {
                 for (reportIndex, reportResult) in turnResult.enumerated() {
                     var speakString = reportResult.content
-                    // 去除非数字字符
-                    let filteredString = speakString.filter { $0.isNumber }
-                    // 补充到两位
-                    let paddedString = String(repeating: "0", count: max(0, 2 - filteredString.count)) + filteredString
-                    reportTextList.insert(paddedString, at: 0)
+                    speakString = speakString.replacingOccurrences(of: " ", with: "")
+                    if speakString.count > 0 && isOnlyDigits(speakString){
+                        // 补充到两位
+                        let paddedString = String(repeating: "0", count: max(0, 2 - speakString.count)) + speakString
+                        reportTextList.insert(paddedString, at: 0)
+                    }
                 }
             }
             
@@ -2809,6 +2853,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
             self.minSingleFeatureNum = DatasetGetMinSingleFeatureNum()
             speakText(input: "人数" + String(selectedRule.rcNum[self.rcNum]))
+            saveData()
         }
         else if self.volumeUp == 2{
             let currentNum = selectedRule.rcNum[self.rcNum]
@@ -2819,6 +2864,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             self.calModeArgs[0][1] = positionSetting
             self.calModeArgs[1][1] = positionSetting
             speakText(input: "位置" + String(positionSetting+1))
+            saveData()
         }
         else if self.volumeUp == 3{
             self.shuffleMode[0] += 1
@@ -2826,6 +2872,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 self.shuffleMode[0] = 0
             }
             speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode[0]]!)
+            saveData()
         }
         else if self.volumeUp == 4{
             self.selectedSaveIndex += 1
@@ -2855,7 +2902,21 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 self.rcNum = playNumList.count - 1
             }
             self.minSingleFeatureNum = DatasetGetMinSingleFeatureNum()
-            speakText(input: "人数" + String(selectedRule.rcNum[self.rcNum]))
+            
+            var speakString = "人数" + String(selectedRule.rcNum[self.rcNum])
+            
+            let currentNum = selectedRule.rcNum[self.rcNum]
+            var positionSetting = self.calModeArgs[0][1]
+            if positionSetting >= currentNum{
+                positionSetting = currentNum - 1
+                self.calModeArgs[0][1] = positionSetting
+                self.calModeArgs[1][1] = positionSetting
+                speakString += "位置" + String(positionSetting+1)
+            }
+            
+            speakText(input: speakString)
+            
+            saveData()
         }
         else if self.volumeDown == 2{
             let currentNum = selectedRule.rcNum[self.rcNum]
@@ -2866,6 +2927,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             self.calModeArgs[0][1] = positionSetting
             self.calModeArgs[1][1] = positionSetting
             speakText(input: "位置" + String(positionSetting+1))
+            saveData()
         }
         else if self.volumeDown == 3{
             self.shuffleMode[1] -= 1
@@ -2873,6 +2935,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 self.shuffleMode[1] = generalRuleSetting.allRiffleMode.count - 1
             }
             speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
+            saveData()
         }
         else if self.volumeDown == 4{
             self.selectedSaveIndex -= 1
@@ -2905,6 +2968,16 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         else{
             speakText(input: "暂停")
         }
+    }
+    
+    private func saveData(){
+        let selectedRule = ClassifierSettingArgs.targetSetting[self.ruleIndex]!
+        let rules = DetectSettingArgs.allUsersDatasetRule[self.selectedSaveIndex]
+        self.minSingleFeatureNum = self.DatasetGetMinSingleFeatureNum()
+        
+        let ruleToAdd = DatasetRule(RuleName: selectedRule.setting[rules.setting]!, DatasetType: self.ruleIndex, setting: rules.setting, dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus, rcNum: rcNum, shuffleMode: shuffleMode, cutMode: cutMode,  singlefeatureToUse: self.allSingleFeatureIndex, cutNumSetting: cutNumSetting, reportSetting: [self.calModeArgs[0][0],self.calModeArgs[1][0]], cutNumRangeSetting: cutNumRangeSetting, positionSetting: self.calModeArgs[0][1], consecutiveReport: consecutiveReport, reportNumber: reportNumber, voiceReport: voiceReport, args: args, suitRanks: suitRules, rankRules: rankRules, minSingleFeatureNum: minSingleFeatureNum, recgReport: recgReport, specialCard: specialCard)
+        DetectSettingArgs.allUsersDatasetRule[self.selectedSaveIndex] = ruleToAdd
+        DetectSettingArgs.saveDatasetRule()
     }
     
     private func loadSaveRule(saveRuleIndex: Int){
@@ -3016,9 +3089,13 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             let selectedRule = ClassifierSettingArgs.targetSetting[DatasetType] as! TWDatasetRule
             minSingleFeatureNum = TWDataset.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
             break
+        case 17:
+            let selectedRule = ClassifierSettingArgs.targetSetting[DatasetType] as! AinRule
+            minSingleFeatureNum = Ain.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
         default:
             print("DatasetType error")
         }
+        print("minSingleFeatureNum\(minSingleFeatureNum)")
         return minSingleFeatureNum
     }
     

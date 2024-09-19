@@ -190,7 +190,7 @@ class AinDataset {
 
         var allPlaySingleFeatures = [AinRC]()
         var community = [SingleFeature]()
-        if FeatureList.count < TP.getMinSingleFeatureNum(rcNum: rcNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+        if FeatureList.count < Ain.getMinSingleFeatureNum(rcNum: rcNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
             return ([],[])
         }
         
@@ -265,7 +265,7 @@ class AinDataset {
             leftSingleFeatures.append(singlefeature.singlefeatureIndex)
         }
         
-        if leftSingleFeatures.count < TP.getMinSingleFeatureNum(rcNum: rcNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
+        if leftSingleFeatures.count < Ain.getMinSingleFeatureNum(rcNum: rcNum, handNum: handNum, communityNum: communityNum, dealType: dealType, diyDealNum: diyDealNum, diyDealStatus: diyDealStatus){
             leftSingleFeatures = []
         }
         
