@@ -725,7 +725,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 detectNum += 1
             }
             
-            if self.state == "reloading"{
+            if self.speechPerformer.isReportingNextRound{
+                
+            }
+            else if self.state == "reloading"{
                 
             }
             else if self.state == "idle" && !self.isTargetArea && !isTargetArea{
@@ -844,10 +847,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     self.detectNeedToCut = false
                     
                     if self.usedSingleFeatures.contains(detectSingleFeature) && self.recgReport {
-                        if !self.speechPerformer.isReportingNextRound{
-                            self.speechPerformer.isReportingNextRound = true
-                            self.computeNextRound()
-                        }
+                        self.speechPerformer.isReportingNextRound = true
+                        self.computeNextRound()
                     }
                     else if self.singlefeatureArray.contains(detectSingleFeature){
                         self.stopCurrentAudio()
@@ -938,7 +939,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     }
                 }
                 
-                if !self.isDetect && detectConfidence >= detectConfidenceThreshold{
+                else if !self.isDetect && detectConfidence >= detectConfidenceThreshold{
                     if isRiffle{
                         self.isDetect = true
                         self.state = "riffle"
@@ -1071,7 +1072,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             if self.recgReport{
                                 self.speechPerformer.isReportingNextRound = true
                             }
-                            
                             self.computeWinnerRC(isReset: true)
                         }
                     }
@@ -1111,7 +1111,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             if self.recgReport{
                                 self.speechPerformer.isReportingNextRound = true
                             }
-                            
                             self.computeWinnerRC(isReset: true)
                         }
                     }
@@ -3284,12 +3283,10 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
     }
     
     func stopSpeechSynthesis(){
-        if !isReportingNextRound{
-            synthesizer.stopSpeaking(at: .immediate)
-            lock.lock()
-            isPlaying = false
-            lock.unlock()
-        }
+        synthesizer.stopSpeaking(at: .immediate)
+        lock.lock()
+        isPlaying = false
+        lock.unlock()
     }
     
     func performSpeechSynthesis(speakResultStruct: [[SpeakResultStruct]]) {
