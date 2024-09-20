@@ -438,6 +438,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
     
     func stopCamera() {
+        timerWorkItem?.cancel()
+        print("timer work item cancel")
+
         session.stopRunning()
         stopDisplayTimer()
         
@@ -506,6 +509,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 
     // 停止定时器
     func stopTimeModeTimer() {
+        print("停止定时器")
         timeModeTimer?.invalidate()
         timeModeTimer = nil
     }
@@ -524,13 +528,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     
     func scheduleHideTimeModeText() {
         // 取消之前的定时任务（如果存在）
-        timerWorkItem?.cancel()
         
         // 创建新的定时任务
-        let workItem = DispatchWorkItem {
-            self.showTimeModeText = false
+        let workItem = DispatchWorkItem { [weak self] in
+            self?.showTimeModeText = false
         }
-        
+
         // 保存新的定时任务
         self.timerWorkItem = workItem
         
@@ -2657,6 +2660,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         self.cutStructArray = []
         self.cutShowArray = []
+        
+        self.singlefeatureArray = [0,27,15,3,17,5,6,7,8,9,10]
         
         //返回数组[最大切牌次数, 最大看色次数]
         let maxCutTimes = getWatchColorNumber()

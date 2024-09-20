@@ -136,6 +136,7 @@ class OriginVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCapt
     
     func stopCamera() {
         session.stopRunning()
+
     }
     
     func configureAudioSession() {
