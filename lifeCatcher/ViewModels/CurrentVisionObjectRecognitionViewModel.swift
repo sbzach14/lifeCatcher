@@ -443,7 +443,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 
         session.stopRunning()
         stopDisplayTimer()
-        
+        timerWorkItem?.cancel()
         if self.timeMode != 0 && self.blackMode != 0{
             stopTimeModeTimer()
         }
@@ -1023,7 +1023,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         stateResult.append(singlefeatureResult[1].coordinate)
                         self.targetArea = self.updateTargetArea(coordinates: stateResult, targetArea: targetArea)
                     }
-                    else{
+                    else if self.state != "shuffle"{
                         if singlefeatureResult[0].singlefeatureIndex[0] != -1{
                             stateResult.append(singlefeatureResult[0].coordinate)
                         }
