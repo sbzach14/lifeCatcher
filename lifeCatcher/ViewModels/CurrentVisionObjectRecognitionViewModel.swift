@@ -31,12 +31,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var cutStructArray: [cutStruct] = []
     @Published var cutShowArray : [Int] = []
     
-    let detectModel = try! detect_0903_copy()
-    let clsModel_h = try! cls_0715_h_trans_copy()
-    let clsModel_v = try! cls_0727_v_trans_copy()
-//    let detectModel = try! detect_0903()
-//    let clsModel_h = try! cls_0715_h_trans()
-//    let clsModel_v = try! cls_0727_v_trans()
+//    let detectModel = try! detect_0903_copy()
+//    let clsModel_h = try! cls_0715_h_trans_copy()
+//    let clsModel_v = try! cls_0727_v_trans_copy()
+    let detectModel = try! detect_0903()
+    let clsModel_h = try! cls_0715_h_trans()
+    let clsModel_v = try! cls_0727_v_trans()
     var originSize : [Float] = [1920, 1080] //相机图像大小
     var imageSize : [Float] = [569, 320] //target area 截图大小
     var originImageSize : [Float] = [569, 320] //target area 原始截图大小
@@ -440,7 +440,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     func stopCamera() {
         session.stopRunning()
         stopDisplayTimer()
-        
+        timerWorkItem?.cancel()
         if self.timeMode != 0 && self.blackMode != 0{
             stopTimeModeTimer()
         }
@@ -528,7 +528,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         // 创建新的定时任务
         let workItem = DispatchWorkItem {
-            self.showTimeModeText = false
+            [weak self] in
+                self?.showTimeModeText = false
         }
         
         // 保存新的定时任务
@@ -741,7 +742,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     || (detectNum == 2 && self.shuffleMode[0] != 0))
                     && self.stateCounter >= 1{
                     
-                    self.reloadingTime = 0.5
+                    self.reloadingTime = 0
                     
                     print("状态：进入识别")
                     
@@ -1020,7 +1021,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         stateResult.append(singlefeatureResult[1].coordinate)
                         self.targetArea = self.updateTargetArea(coordinates: stateResult, targetArea: targetArea)
                     }
-                    else{
+                    else if self.state != "shuffle"{
                         if singlefeatureResult[0].singlefeatureIndex[0] != -1{
                             stateResult.append(singlefeatureResult[0].coordinate)
                         }
@@ -1097,9 +1098,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                     }
                     
-//                    if !detectState.isShort && self.reloadingTime == 0{
-//                        self.reloadingTime = 0.5
-//                    }
+                    if !detectState.isShort && self.reloadingTime == 0{
+                        self.reloadingTime = 0.5
+                    }
                     
                     self.quitDetect(reloadingTime: self.reloadingTime)
                 }

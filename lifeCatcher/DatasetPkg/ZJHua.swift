@@ -965,7 +965,15 @@ class ZJHDatasetHandAnalyst {
 
         if targetSuit != -1 {
             if straightHead == self.minRank + 1 {
-                if self.isAceStraight == 2 {
+                if self.isAceStraight == 1{
+                    for i in 0..<3 {
+                        rank = rank << 4 | (straightHead - i)
+                    }
+                    for _ in 0..<3 {
+                        rank = rank << 2 | targetSuit
+                    }
+                }
+                else if self.isAceStraight == 2 {
                     rank = rank << 4 | (self.maxRank + 1)
                     for i in 1..<3 {
                         rank = rank << 4 | (straightHead - i)
@@ -983,7 +991,7 @@ class ZJHDatasetHandAnalyst {
                     }
                 }
             }
-            if straightHead != -1 {
+            else if straightHead != -1 {
                 for i in 0..<3 {
                     rank = rank << 4 | (straightHead - i)
                 }
@@ -1166,7 +1174,15 @@ class ZJHDatasetHandAnalyst {
         }
 
         if straightHead == self.minRank + 1 {
-            if self.isAceStraight == 2 {
+            if self.isAceStraight == 1{
+                for i in 0..<3 {
+                    rank = rank << 4 | (straightHead - i)
+                }
+                for i in 0..<3 {
+                    rank = rank << 2 | suitList[i]
+                }
+            }
+            else if self.isAceStraight == 2 {
                 rank = rank << 4 | self.maxRank + 1
                 for i in 1..<3 {
                     rank = rank << 4 | (straightHead - i)
