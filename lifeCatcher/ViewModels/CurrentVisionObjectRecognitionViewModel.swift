@@ -742,7 +742,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     || (detectNum == 2 && self.shuffleMode[0] != 0))
                     && self.stateCounter >= 1{
                     
-                    self.reloadingTime = 0
+                    self.reloadingTime = 0.5
                     
                     print("状态：进入识别")
                     
@@ -848,7 +848,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     
                     if self.usedSingleFeatures.contains(detectSingleFeature) && self.recgReport {
                         self.stateCounter = 100
-                        self.reloadingTime = 1
+                        self.reloadingTime = 0.5
+                        self.state = "waitingEnd"
                         self.computeNextRound()
                     }
                     else if self.singlefeatureArray.contains(detectSingleFeature){
@@ -933,7 +934,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         if isCutDone{
                             if self.recgReport{
                                 self.stateCounter = 100
-                                self.reloadingTime = 1
+                                self.reloadingTime = 0.5
+                                self.state = "waitingEnd"
                             }
                             self.computeWinnerRC(isReset: true)
                         }
@@ -968,7 +970,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                 self.speechPerformer.stopSpeechSynthesis()
                             }
                             
-                            self.initTargetArea = self.targetArea
+                            self.initTargetArea = targetArea
                         }
                     }
                 }
@@ -989,7 +991,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 if self.stateCounter >= 5{
                     self.isTargetArea = false
                     self.targetArea = [0,0,0,0]
-                    
+                    self.stateCounter = 0
                     print("状态：切换为检测")
                     
                 }
@@ -1033,7 +1035,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 }
             }
             else if !self.isTargetArea && !isTargetArea{
-                if self.stateCounter >= 5 + 3{
+                if self.stateCounter >= 5{
                     print("状态：退出检测")
                     
                     let detectState = self.handleDetecResultList(targetDetecResultList: self.detectResultList)
@@ -1105,7 +1107,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     self.quitDetect(reloadingTime: self.reloadingTime)
                 }
                 else if ((detectNum == 1 && (self.shuffleMode[1] != 0 || self.detectNeedToCut))
-                    || (detectNum == 2 && self.shuffleMode[0] != 0)){
+                    || (detectNum == 2 && self.shuffleMode[0] != 0))
+                    && self.state != "waitingEnd"{
                     
                     var stateResult : [[Float]] = []
                     if singlefeatureResult[0].singlefeatureIndex[0] != -1{
@@ -1137,8 +1140,13 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     self.state = "detecting"
                     print("状态：重新进入识别")
                 }
-                else if detectNum == 0{
-                    self.stateCounter += 1
+                else{
+                    if detectNum == 0{
+                        self.stateCounter += 1
+                    }
+                    else{
+                        self.stateCounter = 0
+                    }
                 }
             }
         }
@@ -2820,6 +2828,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 for (reportIndex, reportResult) in turnResult.enumerated() {
                     var speakString = reportResult.content
                     speakString = speakString.replacingOccurrences(of: " ", with: "")
+                    speakString = String(speakString.reversed())
                     if speakString.count > 0 && isOnlyDigits(speakString){
                         // 补充到两位
                         let paddedString = String(repeating: "0", count: max(0, 2 - speakString.count)) + speakString
@@ -2919,6 +2928,22 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         else if self.volumeUp == 6{
             computeNextRound()
+        }
+        else if self.volumeUp == 7{
+            let playNumList = selectedRule.rcNum
+            self.rcNum += 1
+            if self.rcNum >= playNumList.count{
+                self.rcNum = 0
+            }
+            self.minSingleFeatureNum = DatasetGetMinSingleFeatureNum()
+            
+            let currentNum = selectedRule.rcNum[self.rcNum]
+            var positionSetting = currentNum - 1
+            self.calModeArgs[0][1] = positionSetting
+            self.calModeArgs[1][1] = positionSetting
+            
+            saveData()
+            speakText(input: "人数" + String(selectedRule.rcNum[self.rcNum]) + "位置" + String(positionSetting+1))
         }
     }
     

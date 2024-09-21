@@ -222,7 +222,8 @@ class FunctionSetting{
         3: "下一个洗牌手法",
         4: "下一个方案",
         5: "开始暂停",
-        6: "报下一轮"
+        6: "报下一轮",
+        7: "增加位置和人数"
     ]
     
     static let volumeDownDict: [Int: String] = [
