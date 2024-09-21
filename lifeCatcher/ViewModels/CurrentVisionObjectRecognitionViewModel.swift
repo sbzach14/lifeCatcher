@@ -31,12 +31,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var cutStructArray: [cutStruct] = []
     @Published var cutShowArray : [Int] = []
     
-//    let detectModel = try! detect_0903_copy()
-//    let clsModel_h = try! cls_0715_h_trans_copy()
-//    let clsModel_v = try! cls_0727_v_trans_copy()
-    let detectModel = try! detect_0903()
-    let clsModel_h = try! cls_0715_h_trans()
-    let clsModel_v = try! cls_0727_v_trans()
+    let detectModel = try! detect_0903_copy()
+    let clsModel_h = try! cls_0715_h_trans_copy()
+    let clsModel_v = try! cls_0727_v_trans_copy()
+//    let detectModel = try! detect_0903()
+//    let clsModel_h = try! cls_0715_h_trans()
+//    let clsModel_v = try! cls_0727_v_trans()
     var originSize : [Float] = [1920, 1080] //相机图像大小
     var imageSize : [Float] = [569, 320] //target area 截图大小
     var originImageSize : [Float] = [569, 320] //target area 原始截图大小
@@ -438,6 +438,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
     
     func stopCamera() {
+        timerWorkItem?.cancel()
+        print("timer work item cancel")
+
         session.stopRunning()
         stopDisplayTimer()
         timerWorkItem?.cancel()
@@ -506,6 +509,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 
     // 停止定时器
     func stopTimeModeTimer() {
+        print("停止定时器")
         timeModeTimer?.invalidate()
         timeModeTimer = nil
     }
@@ -524,14 +528,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     
     func scheduleHideTimeModeText() {
         // 取消之前的定时任务（如果存在）
-        timerWorkItem?.cancel()
         
         // 创建新的定时任务
-        let workItem = DispatchWorkItem {
-            [weak self] in
-                self?.showTimeModeText = false
+        let workItem = DispatchWorkItem { [weak self] in
+            self?.showTimeModeText = false
         }
-        
+
         // 保存新的定时任务
         self.timerWorkItem = workItem
         
@@ -2667,6 +2669,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         self.cutStructArray = []
         self.cutShowArray = []
         
+        self.singlefeatureArray = [0,27,15,3,17,5,6,7,8,9,10]
+        
         //返回数组[最大切牌次数, 最大看色次数]
         let maxCutTimes = getWatchColorNumber()
         
@@ -2750,7 +2754,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         if self.singlefeatureArray.count >= self.minSingleFeatureNum && self.singlefeatureArray.count > self.cutNumRangeSetting[0] && self.singlefeatureArray.count > self.cutNumRangeSetting[1] - self.minSingleFeatureNum{
             self.leftSingleFeatures = multipleDatasetRCInfos.leftSingleFeatures
             let usedNum = self.singlefeatureArray.count - self.leftSingleFeatures.count
-            if usedNum == 0{
+            if usedNum == 0 || self.leftSingleFeatures.count == 0{
                 self.usedSingleFeatures = []
             } 
             else if isReset{
@@ -2759,7 +2763,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             else{
                 self.usedSingleFeatures = Array(self.singlefeatureArray[0...(usedNum - 1)])
             }
-            
+            print("上一轮使用的牌 \(self.usedSingleFeatures)")
         }
     }
     

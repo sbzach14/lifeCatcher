@@ -1172,6 +1172,8 @@ class ZJHDatasetHandAnalyst {
                 }
             }
         }
+        
+        print("金花 ranklist \(rankList) minrank \(self.minRank)")
 
         if straightHead == self.minRank + 1 {
             if self.isAceStraight == 1{
