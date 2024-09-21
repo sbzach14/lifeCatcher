@@ -2669,7 +2669,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         self.cutStructArray = []
         self.cutShowArray = []
         
-        self.singlefeatureArray = [0,27,15,3,17,5,6,7,8,9,10]
+//        self.singlefeatureArray = [0,27,15,3,17,5,6,7,8,9,10]
         
         //返回数组[最大切牌次数, 最大看色次数]
         let maxCutTimes = getWatchColorNumber()
