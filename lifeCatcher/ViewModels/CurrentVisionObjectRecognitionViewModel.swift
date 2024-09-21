@@ -2746,7 +2746,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         if self.singlefeatureArray.count >= self.minSingleFeatureNum && self.singlefeatureArray.count > self.cutNumRangeSetting[0] && self.singlefeatureArray.count > self.cutNumRangeSetting[1] - self.minSingleFeatureNum{
             self.leftSingleFeatures = multipleDatasetRCInfos.leftSingleFeatures
             let usedNum = self.singlefeatureArray.count - self.leftSingleFeatures.count
-            if usedNum == 0{
+            if usedNum == 0 || self.leftSingleFeatures.count == 0{
                 self.usedSingleFeatures = []
             } 
             else if isReset{
@@ -2755,7 +2755,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             else{
                 self.usedSingleFeatures = Array(self.singlefeatureArray[0...(usedNum - 1)])
             }
-            
+            print("上一轮使用的牌 \(self.usedSingleFeatures)")
         }
     }
     
