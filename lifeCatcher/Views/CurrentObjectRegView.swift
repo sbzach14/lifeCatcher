@@ -290,6 +290,7 @@ class ButtonViewController: UIViewController {
         setSystemVolume(volume: self.volumeValue)
         NotificationCenter.default.addObserver(self, selector: #selector(volumeChanged(_:)), name: NSNotification.Name(rawValue: "SystemVolumeDidChange"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleRouteChange(_:)), name: AVAudioSession.routeChangeNotification, object: AVAudioSession.sharedInstance())
+        self.isFirst = false
     }
     
     required init?(coder: NSCoder) {
