@@ -486,6 +486,102 @@ class CBDataset{
         }
         return (returnRCInfos, leftSingleFeatures)
     }
+    
+    
+    static func sortSingleFeatures(originSingleFeatures: [SingleFeature], args: [Int], rankRules: [Int], suitRules: [Int]) -> [SingleFeature]{
+        let AStraightMin = args[6]
+        let specialfeatureChangeSetting = args[7]
+        let specialfeatureThreeSingleFeatureSetting = args[8]
+        
+        var sortSingleFeatures : [[SingleFeature]] = [[],[],[],[]]
+        
+        var turn1SingleFeatures:[CBDatasetSingleFeature] = []
+        
+        for singlefeature in originSingleFeatures {
+            turn1SingleFeatures.append(CBDatasetSingleFeature(singlefeature: singlefeature, specialfeatureChangeSetting: specialfeatureChangeSetting))
+        }
+        turn1SingleFeatures = turn1SingleFeatures.sorted(by: {$0.rank > $1.rank})
+        
+        let (rank1, singlefeaturetype1, isPair1, usedSingleFeatureIndex1) = CBDatasetHandAnalyst(
+            rankRules: rankRules,
+            suitRules: suitRules,
+            AStraightMin: AStraightMin,
+            specialfeatureThreeSingleFeatureSetting: specialfeatureThreeSingleFeatureSetting
+        ).evalHand(singlefeatures: turn1SingleFeatures)
+        
+        var turn2SingleFeatures:[CBDatasetSingleFeature] = []
+        for singlefeatureIndex in 0..<turn1SingleFeatures.count {
+            if !usedSingleFeatureIndex1.contains(singlefeatureIndex){
+                turn2SingleFeatures.append(turn1SingleFeatures[singlefeatureIndex])
+            }
+            else{
+                sortSingleFeatures[0].append(SingleFeature(suit: [turn1SingleFeatures[singlefeatureIndex].originRank], rank: 0, singlefeatureIndex: turn1SingleFeatures[singlefeatureIndex].singleFeatureIndex))
+            }
+        }
+            
+        let (rank2, singlefeaturetype2, isPair2, usedSingleFeatureIndex2) = CBDatasetHandAnalyst(
+            rankRules: rankRules,
+            suitRules: suitRules,
+            AStraightMin: AStraightMin,
+            specialfeatureThreeSingleFeatureSetting: specialfeatureThreeSingleFeatureSetting
+        ).evalHand(singlefeatures: turn2SingleFeatures)
+            
+                
+        var turn3SingleFeatures:[CBDatasetSingleFeature] = []
+        for singlefeatureIndex in 0..<turn2SingleFeatures.count {
+            if !usedSingleFeatureIndex2.contains(singlefeatureIndex){
+                turn3SingleFeatures.append(turn2SingleFeatures[singlefeatureIndex])
+            }
+            else{
+                sortSingleFeatures[1].append(SingleFeature(suit: [turn2SingleFeatures[singlefeatureIndex].originRank], rank: 0, singlefeatureIndex: turn2SingleFeatures[singlefeatureIndex].singleFeatureIndex))
+            }
+        }
+        
+        let (rank3, singlefeaturetype3, isPair3, usedSingleFeatureIndex3) = CBDatasetHandAnalyst(
+            rankRules: rankRules,
+            suitRules: suitRules,
+            AStraightMin: AStraightMin,
+            specialfeatureThreeSingleFeatureSetting: specialfeatureThreeSingleFeatureSetting
+        ).evalHand(singlefeatures: turn3SingleFeatures)
+        
+        
+        for singlefeatureIndex in 0..<turn3SingleFeatures.count {
+            if !usedSingleFeatureIndex3.contains(singlefeatureIndex){
+                sortSingleFeatures[3].append(SingleFeature(suit: [turn3SingleFeatures[singlefeatureIndex].originRank], rank: 0, singlefeatureIndex: turn3SingleFeatures[singlefeatureIndex].singleFeatureIndex))
+            }
+            else{
+                sortSingleFeatures[2].append(SingleFeature(suit: [turn3SingleFeatures[singlefeatureIndex].originRank], rank: 0, singlefeatureIndex: turn3SingleFeatures[singlefeatureIndex].singleFeatureIndex))
+            }
+        }
+        
+        var result: [SingleFeature] = []
+        for i in 0..<3{
+            if i < sortSingleFeatures[0].count{
+                result.append(sortSingleFeatures[0][i])
+            }
+            else{
+                result.append(sortSingleFeatures[3].removeFirst())
+            }
+        }
+        for i in 0..<3{
+            if i < sortSingleFeatures[1].count{
+                result.append(sortSingleFeatures[1][i])
+            }
+            else{
+                result.append(sortSingleFeatures[3].removeFirst())
+            }
+        }
+        for i in 0..<3{
+            if i < sortSingleFeatures[2].count{
+                result.append(sortSingleFeatures[2][i])
+            }
+            else{
+                result.append(sortSingleFeatures[3].removeFirst())
+            }
+        }
+        
+        return result
+    }
 }
 
 class CBDatasetHandAnalyst{
@@ -941,9 +1037,11 @@ class CBDatasetSingleFeature{
     var rank: Int = 0
     var suit: Int = 0
     var originRank : Int = 0
+    var singleFeatureIndex : Int = 0
     
     init(singlefeature: SingleFeature, specialfeatureChangeSetting: Int){
         self.originRank = singlefeature.rank
+        self.singleFeatureIndex = singlefeature.singlefeatureIndex
         
         if singlefeature.rank == 14 {
             if specialfeatureChangeSetting == 0{

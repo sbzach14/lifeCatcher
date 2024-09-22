@@ -2744,6 +2744,22 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             print("计算后的singlefeaturearray \(self.singlefeatureArray)")
             print("计算后的leftSingleFeatures \(self.leftSingleFeatures)")
             
+            //摆牌
+            if self.ruleIndex == 15{
+                for resultIndex in 0..<multipleDatasetRCInfos.singleResultList.count{
+                    for posIndex in 0..<multipleDatasetRCInfos.singleResultList[resultIndex].RCReturnInfoList.count{
+                        multipleDatasetRCInfos.singleResultList[resultIndex].RCReturnInfoList[posIndex].RCSingleFeatures = CBDataset.sortSingleFeatures(originSingleFeatures: multipleDatasetRCInfos.singleResultList[resultIndex].RCReturnInfoList[posIndex].RCSingleFeatures, args: [dealNum, dealType] + [rcNum] + args, rankRules: rankRules, suitRules: suitRules)
+                    }
+                }
+            }
+            else if self.ruleIndex == 16{
+                for resultIndex in 0..<multipleDatasetRCInfos.singleResultList.count{
+                    for posIndex in 0..<multipleDatasetRCInfos.singleResultList[resultIndex].RCReturnInfoList.count{
+                        multipleDatasetRCInfos.singleResultList[resultIndex].RCReturnInfoList[posIndex].RCSingleFeatures = TWDataset.sortSingleFeatures(originSingleFeatures: multipleDatasetRCInfos.singleResultList[resultIndex].RCReturnInfoList[posIndex].RCSingleFeatures, args: [dealNum, dealType] + [rcNum] + args, rankRules: rankRules, suitRules: suitRules)
+                    }
+                }
+            }
+            
             speakText(input: multipleDatasetRCInfos.reportResult)
         }
     }
@@ -2845,14 +2861,17 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             if word.count == 1 && word != " " {
                                 speakString = word + speakString
                             }
-                            if speakString.count >= 2{
-                                break
+                            if speakString.count == 2{
+                                reportTextList.insert(speakString, at: 0)
+                                speakString = ""
                             }
                         }
                         
-                        // 补充到两位
-                        let paddedString = String(repeating: "0", count: max(0, 2 - speakString.count)) + speakString
-                        reportTextList.insert(paddedString, at: 0)
+                        if speakString != ""{
+                            // 补充到两位
+                            let paddedString = String(repeating: "0", count: max(0, 2 - speakString.count)) + speakString
+                            reportTextList.insert(paddedString, at: 0)
+                        }
                     }
                 }
             }
