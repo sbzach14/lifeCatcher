@@ -3615,7 +3615,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 }
                             }
                             break
-                        //报xy大，多轮报一轮
+                        //报xy大，多轮报一个
                         case 16:
                             var X: Int = 0
                             var Y: Int = 0
@@ -3660,6 +3660,13 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 currentResultInfo.singlefeatureIndexToConfirmMaxMin[upDownID].append(singlefeatureIndex)
                                 currentResultInfo.flyTCSolution = (currentFlyTCSolution)
                                 currentResultInfo.ColorSingleFeatures = colorSingleFeatureIndexList
+                                
+                                if firstCutSaved == false {
+                                    firstMultiCutFeatures = currentLeftSingleFeatures
+                                    firstMultiCutRCreturnInfo = currentResultInfo.RCReturnInfoList
+                                    firstMultiCutColorFeatures = currentResultInfo.ColorSingleFeatures
+                                    firstCutSaved = true
+                                }
                             }
                             break
                             
@@ -3725,6 +3732,13 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 }
                                 currentResultInfo.singlefeatureIndexToConfirmMaxMin[upDownID].append(singlefeatureIndex)
                                 currentResultInfo.ColorSingleFeatures = colorSingleFeatureIndexList
+                                
+                                if firstCutSaved == false {
+                                    firstMultiCutFeatures = currentLeftSingleFeatures
+                                    firstMultiCutRCreturnInfo = currentResultInfo.RCReturnInfoList
+                                    firstMultiCutColorFeatures = currentResultInfo.ColorSingleFeatures
+                                    firstCutSaved = true
+                                }
                             }
                             break
                         //发牌方式保最大
