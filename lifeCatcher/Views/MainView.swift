@@ -101,7 +101,7 @@ struct MainMenuView: View {
 //                            .padding()
 //                            .background(RoundedRectangle(cornerRadius: 10).fill(Color.red.opacity(0.8)).frame(width: 150, height: 100, alignment: .center))
 //                        }
-//                    }
+                    }
                     
                     Spacer()
                     
