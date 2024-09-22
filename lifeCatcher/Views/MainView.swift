@@ -90,18 +90,18 @@ struct MainMenuView: View {
                             .background(RoundedRectangle(cornerRadius: 10).fill(Color.red.opacity(0.8)).frame(width: 150, height: 100, alignment: .center))
                         }
                         
-                        NavigationLink(destination: AuthTestView()) {
-                            VStack {
-                                Image(systemName: "person.crop.circle.fill")
-                                    .font(.largeTitle)
-                                    .foregroundColor(.white)
-                                Text("Auth".localized())
-                                    .foregroundColor(.white)
-                            }
-                            .padding()
-                            .background(RoundedRectangle(cornerRadius: 10).fill(Color.red.opacity(0.8)).frame(width: 150, height: 100, alignment: .center))
-                        }
-                    }
+//                        NavigationLink(destination: AuthTestView()) {
+//                            VStack {
+//                                Image(systemName: "person.crop.circle.fill")
+//                                    .font(.largeTitle)
+//                                    .foregroundColor(.white)
+//                                Text("Auth".localized())
+//                                    .foregroundColor(.white)
+//                            }
+//                            .padding()
+//                            .background(RoundedRectangle(cornerRadius: 10).fill(Color.red.opacity(0.8)).frame(width: 150, height: 100, alignment: .center))
+//                        }
+//                    }
                     
                     Spacer()
                     

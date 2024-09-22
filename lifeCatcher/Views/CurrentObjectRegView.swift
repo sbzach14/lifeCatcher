@@ -290,7 +290,6 @@ class ButtonViewController: UIViewController {
         setSystemVolume(volume: self.volumeValue)
         NotificationCenter.default.addObserver(self, selector: #selector(volumeChanged(_:)), name: NSNotification.Name(rawValue: "SystemVolumeDidChange"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(handleRouteChange(_:)), name: AVAudioSession.routeChangeNotification, object: AVAudioSession.sharedInstance())
-        self.isFirst = false
     }
     
     required init?(coder: NSCoder) {
@@ -310,6 +309,9 @@ class ButtonViewController: UIViewController {
     func setSystemVolume(volume: Float) {
         DispatchQueue.main.async {
             let volumeViewSlider = self.volumeView.subviews.first(where: { $0 is UISlider }) as? UISlider
+            if volumeViewSlider?.value == volume && self.isFirst{
+                self.isFirst = false
+            }
             volumeViewSlider?.value = volume
         }
     }

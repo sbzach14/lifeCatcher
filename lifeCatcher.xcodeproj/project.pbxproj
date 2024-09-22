@@ -44,9 +44,9 @@
 		A83853532ADA918000346038 /* CustomUIComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83853522ADA918000346038 /* CustomUIComponent.swift */; };
 		A86459282C90B59E00AF0BA9 /* Ain.swift in Sources */ = {isa = PBXBuildFile; fileRef = A86459272C90B59E00AF0BA9 /* Ain.swift */; };
 		A87097112C8A5D1E003A4729 /* UserHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87097102C8A5D1E003A4729 /* UserHelper.swift */; };
-		A87DE1C12C9D4D0300B73DB6 /* cls_0727_v_trans_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A87DE1BE2C9D4D0300B73DB6 /* cls_0727_v_trans_copy.mlmodel */; };
-		A87DE1C22C9D4D0300B73DB6 /* detect_0903_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A87DE1BF2C9D4D0300B73DB6 /* detect_0903_copy.mlmodel */; };
-		A87DE1C32C9D4D0300B73DB6 /* cls_0715_h_trans_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A87DE1C02C9D4D0300B73DB6 /* cls_0715_h_trans_copy.mlmodel */; };
+		A87DE1C72C9F4F4400B73DB6 /* cls_0715_h_trans_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A87DE1C42C9F4F4400B73DB6 /* cls_0715_h_trans_copy.mlmodel */; };
+		A87DE1C82C9F4F4400B73DB6 /* cls_0727_v_trans_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A87DE1C52C9F4F4400B73DB6 /* cls_0727_v_trans_copy.mlmodel */; };
+		A87DE1C92C9F4F4400B73DB6 /* detect_0903_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A87DE1C62C9F4F4400B73DB6 /* detect_0903_copy.mlmodel */; };
 		A887167F2A0623E500B7F2CD /* AManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887167E2A0623E500B7F2CD /* AManager.swift */; };
 		A887B6502A7FE1AF009F488F /* ShowResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B64F2A7FE1AF009F488F /* ShowResultView.swift */; };
 		A887B6522A8104BC009F488F /* TimeAuthUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B6512A8104BC009F488F /* TimeAuthUtils.swift */; };
@@ -123,9 +123,9 @@
 		A83853522ADA918000346038 /* CustomUIComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomUIComponent.swift; sourceTree = "<group>"; };
 		A86459272C90B59E00AF0BA9 /* Ain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ain.swift; sourceTree = "<group>"; };
 		A87097102C8A5D1E003A4729 /* UserHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserHelper.swift; sourceTree = "<group>"; };
-		A87DE1BE2C9D4D0300B73DB6 /* cls_0727_v_trans_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0727_v_trans_copy.mlmodel; sourceTree = "<group>"; };
-		A87DE1BF2C9D4D0300B73DB6 /* detect_0903_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = detect_0903_copy.mlmodel; sourceTree = "<group>"; };
-		A87DE1C02C9D4D0300B73DB6 /* cls_0715_h_trans_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0715_h_trans_copy.mlmodel; sourceTree = "<group>"; };
+		A87DE1C42C9F4F4400B73DB6 /* cls_0715_h_trans_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0715_h_trans_copy.mlmodel; sourceTree = "<group>"; };
+		A87DE1C52C9F4F4400B73DB6 /* cls_0727_v_trans_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0727_v_trans_copy.mlmodel; sourceTree = "<group>"; };
+		A87DE1C62C9F4F4400B73DB6 /* detect_0903_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = detect_0903_copy.mlmodel; sourceTree = "<group>"; };
 		A887167E2A0623E500B7F2CD /* AManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AManager.swift; sourceTree = "<group>"; };
 		A887B64F2A7FE1AF009F488F /* ShowResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowResultView.swift; sourceTree = "<group>"; };
 		A887B6512A8104BC009F488F /* TimeAuthUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeAuthUtils.swift; sourceTree = "<group>"; };
@@ -334,11 +334,11 @@
 			isa = PBXGroup;
 			children = (
 				D03811A12C75401200726B99 /* cls_main.mlmodel */,
-				A87DE1C02C9D4D0300B73DB6 /* cls_0715_h_trans_copy.mlmodel */,
-				A87DE1BE2C9D4D0300B73DB6 /* cls_0727_v_trans_copy.mlmodel */,
-				A87DE1BF2C9D4D0300B73DB6 /* detect_0903_copy.mlmodel */,
 				D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */,
 				D03811A42C7542C200726B99 /* cls_0727_v_trans.mlmodel */,
+				A87DE1C42C9F4F4400B73DB6 /* cls_0715_h_trans_copy.mlmodel */,
+				A87DE1C52C9F4F4400B73DB6 /* cls_0727_v_trans_copy.mlmodel */,
+				A87DE1C62C9F4F4400B73DB6 /* detect_0903_copy.mlmodel */,
 				D02717D72C8704AB00A29D43 /* detect_0903.mlmodel */,
 				187A45422C2DA25E00BB055C /* success_voice.mp3 */,
 				187A45442C2DA26100BB055C /* fail_voice.mp3 */,
@@ -468,12 +468,13 @@
 				A88EFDC82A7D249C00897243 /* CurrentObjectRegView.swift in Sources */,
 				187A45512C31BBB400BB055C /* AllBaseSettingArgs.swift in Sources */,
 				18C98D0E2C158F7B00A8CD49 /* FCar.swift in Sources */,
-				A87DE1C22C9D4D0300B73DB6 /* detect_0903_copy.mlmodel in Sources */,
 				A887B6522A8104BC009F488F /* TimeAuthUtils.swift in Sources */,
 				18C98D0F2C158F7B00A8CD49 /* JJBao.swift in Sources */,
 				18C98D1B2C158F7B00A8CD49 /* TNin.swift in Sources */,
 				1824EF672C3EB4990029836C /* AuthTestView.swift in Sources */,
+				A87DE1C82C9F4F4400B73DB6 /* cls_0727_v_trans_copy.mlmodel in Sources */,
 				18C98D0D2C158F7B00A8CD49 /* CBat.swift in Sources */,
+				A87DE1C92C9F4F4400B73DB6 /* detect_0903_copy.mlmodel in Sources */,
 				D03811A72C7542C300726B99 /* cls_0727_v_trans.mlmodel in Sources */,
 				D03811A82C7542C300726B99 /* cls_0715_h_trans.mlmodel in Sources */,
 				D03811A22C75401200726B99 /* cls_main.mlmodel in Sources */,
@@ -494,6 +495,7 @@
 				A86459282C90B59E00AF0BA9 /* Ain.swift in Sources */,
 				A8FBC7C22A3F0A5C00EDDFD7 /* VisionUtils.swift in Sources */,
 				A88EFE0D2A7FDC9500897243 /* HistoryView.swift in Sources */,
+				A87DE1C72C9F4F4400B73DB6 /* cls_0715_h_trans_copy.mlmodel in Sources */,
 				18C98D102C158F7B00A8CD49 /* NPoi.swift in Sources */,
 				18CA14D6284AC42C00F90372 /* CameraImageView.swift in Sources */,
 				A87097112C8A5D1E003A4729 /* UserHelper.swift in Sources */,
@@ -501,9 +503,7 @@
 				A887B6502A7FE1AF009F488F /* ShowResultView.swift in Sources */,
 				A88EFDC42A7D217200897243 /* OriginVisionObjectRecognitionViewModel.swift in Sources */,
 				D03811AA2C76904D00726B99 /* OriginObjectRegView.swift in Sources */,
-				A87DE1C12C9D4D0300B73DB6 /* cls_0727_v_trans_copy.mlmodel in Sources */,
 				18C98D182C158F7B00A8CD49 /* TCPoi.swift in Sources */,
-				A87DE1C32C9D4D0300B73DB6 /* cls_0715_h_trans_copy.mlmodel in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

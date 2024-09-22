@@ -2669,8 +2669,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         self.cutStructArray = []
         self.cutShowArray = []
         
-//        self.singlefeatureArray = [0,27,15,3,17,5,6,7,8,9,10]
-        
         //返回数组[最大切牌次数, 最大看色次数]
         let maxCutTimes = getWatchColorNumber()
         
@@ -2830,10 +2828,28 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             var reportTextList : [String] = []
             for (turnIndex, turnResult) in input.enumerated() {
                 for (reportIndex, reportResult) in turnResult.enumerated() {
-                    var speakString = reportResult.content
-                    speakString = speakString.replacingOccurrences(of: " ", with: "")
-                    speakString = String(speakString.reversed())
-                    if speakString.count > 0 && isOnlyDigits(speakString){
+                    var originSpeakString = reportResult.content
+                    
+                    let checkSpeakString = originSpeakString.replacingOccurrences(of: " ", with: "")
+                    var speakString = ""
+                    
+                    if checkSpeakString == "没有"{
+                        speakString = "99"
+                        reportTextList.insert(speakString, at: 0)
+                    }
+                    else if checkSpeakString.count > 0 && isOnlyDigits(checkSpeakString){
+                        
+                        let wordsArray = originSpeakString.components(separatedBy: " ").filter { !$0.isEmpty }
+                        
+                        for word in wordsArray {
+                            if word.count == 1 && word != " " {
+                                speakString = word + speakString
+                            }
+                            if speakString.count >= 2{
+                                break
+                            }
+                        }
+                        
                         // 补充到两位
                         let paddedString = String(repeating: "0", count: max(0, 2 - speakString.count)) + speakString
                         reportTextList.insert(paddedString, at: 0)
