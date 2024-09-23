@@ -2294,7 +2294,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 switch reportRule.reportCutRange{
                 //XY张
                 case 0:
-                    cutList.append([cutNumRangeSetting[0] - 1, cutNumRangeSetting[1] - 1])
+                    let firstRange = min(inputSingleFeatures.count - 1, cutNumRangeSetting[0] - 1)
+                    let secondRange = min(inputSingleFeatures.count - 1, cutNumRangeSetting[1] - 1)
+                    cutList.append([firstRange, secondRange])
                     break
                 //上下5张，0-5张牌
                 case 1:
@@ -2303,7 +2305,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     break
                 //下XY张
                 case 2:
-                    cutList.append([cutNumRangeSetting[0] - 1, cutNumRangeSetting[1] - 1])
+                    let firstRange = min(inputSingleFeatures.count - 1, cutNumRangeSetting[0] - 1)
+                    let secondRange = min(inputSingleFeatures.count - 1, cutNumRangeSetting[1] - 1)
+                    cutList.append([firstRange, secondRange])
                     break
                 //上10张
                 case 3:
