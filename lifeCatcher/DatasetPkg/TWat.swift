@@ -26,10 +26,9 @@ class TWDatasetRule : Rule{
     override init(ruleIndex: Int, ruleName: String) {
         super.init(ruleIndex: ruleIndex, ruleName: ruleName)
         self.rankRules = [
-            9: "三条炸弹",
             8: "清顺",
             7: "炸弹",
-            6: "三带二",
+            6: "葫芦",
             5: "清一色",
             4: "顺子",
             3: "三条",
@@ -337,8 +336,7 @@ class TWDataset{
                             winNum *= 2
                         }
                         
-                        allPlaySingleFeatures[i].evaluateFlag += winNum
-                            
+                        allPlaySingleFeatures[currentRC].evaluateFlag += winNum
                     }
                 }
             }
@@ -392,6 +390,99 @@ class TWDataset{
         }
         return (returnRCInfos, leftSingleFeatures)
     }
+    
+    static func sortSingleFeatures(originSingleFeatures: [SingleFeature], args: [Int], rankRules: [Int], suitRules: [Int]) -> [SingleFeature]{
+        let AStraightMin = args[6]
+        
+        var sortSingleFeatures : [[SingleFeature]] = [[],[],[],[]]
+        
+        var turn1SingleFeatures:[TWSingleFeature] = []
+        
+        for singlefeature in originSingleFeatures {
+            turn1SingleFeatures.append(TWSingleFeature(singlefeature: singlefeature))
+        }
+        turn1SingleFeatures = turn1SingleFeatures.sorted(by: {$0.rank > $1.rank})
+        
+        let (rank1, singlefeaturetype1, isPair1, usedSingleFeatureIndex1) = TWDatasetHandAnalyst(
+            rankRules: rankRules,
+            suitRules: suitRules,
+            AStraightMin: AStraightMin,
+            turn: 1
+        ).evalHand(singlefeatures: turn1SingleFeatures)
+        
+        var turn2SingleFeatures:[TWSingleFeature] = []
+        for singlefeatureIndex in 0..<turn1SingleFeatures.count {
+            if !usedSingleFeatureIndex1.contains(singlefeatureIndex){
+                turn2SingleFeatures.append(turn1SingleFeatures[singlefeatureIndex])
+            }
+            else{
+                sortSingleFeatures[0].append(SingleFeature(suit: [turn1SingleFeatures[singlefeatureIndex].originRank], rank: 0, singlefeatureIndex: turn1SingleFeatures[singlefeatureIndex].singleFeatureIndex))
+            }
+        }
+            
+        let (rank2, singlefeaturetype2, isPair2, usedSingleFeatureIndex2) = TWDatasetHandAnalyst(
+            rankRules: rankRules,
+            suitRules: suitRules,
+            AStraightMin: AStraightMin,
+            turn: 2
+        ).evalHand(singlefeatures: turn2SingleFeatures)
+            
+                
+        var turn3SingleFeatures:[TWSingleFeature] = []
+        for singlefeatureIndex in 0..<turn2SingleFeatures.count {
+            if !usedSingleFeatureIndex2.contains(singlefeatureIndex){
+                turn3SingleFeatures.append(turn2SingleFeatures[singlefeatureIndex])
+            }
+            else{
+                sortSingleFeatures[1].append(SingleFeature(suit: [turn2SingleFeatures[singlefeatureIndex].originRank], rank: 0, singlefeatureIndex: turn2SingleFeatures[singlefeatureIndex].singleFeatureIndex))
+            }
+        }
+        
+        let (rank3, singlefeaturetype3, isPair3, usedSingleFeatureIndex3) = TWDatasetHandAnalyst(
+            rankRules: rankRules,
+            suitRules: suitRules,
+            AStraightMin: AStraightMin,
+            turn: 3
+        ).evalHand(singlefeatures: turn3SingleFeatures)
+        
+        
+        for singlefeatureIndex in 0..<turn3SingleFeatures.count {
+            if !usedSingleFeatureIndex3.contains(singlefeatureIndex){
+                sortSingleFeatures[3].append(SingleFeature(suit: [turn3SingleFeatures[singlefeatureIndex].originRank], rank: 0, singlefeatureIndex: turn3SingleFeatures[singlefeatureIndex].singleFeatureIndex))
+            }
+            else{
+                sortSingleFeatures[2].append(SingleFeature(suit: [turn3SingleFeatures[singlefeatureIndex].originRank], rank: 0, singlefeatureIndex: turn3SingleFeatures[singlefeatureIndex].singleFeatureIndex))
+            }
+        }
+        
+        var result: [SingleFeature] = []
+        for i in 0..<5{
+            if i < sortSingleFeatures[0].count{
+                result.append(sortSingleFeatures[0][i])
+            }
+            else{
+                result.append(sortSingleFeatures[3].removeFirst())
+            }
+        }
+        for i in 0..<5{
+            if i < sortSingleFeatures[1].count{
+                result.append(sortSingleFeatures[1][i])
+            }
+            else{
+                result.append(sortSingleFeatures[3].removeFirst())
+            }
+        }
+        for i in 0..<3{
+            if i < sortSingleFeatures[2].count{
+                result.append(sortSingleFeatures[2][i])
+            }
+            else{
+                result.append(sortSingleFeatures[3].removeFirst())
+            }
+        }
+        
+        return result
+    }
 }
 
 class TWDatasetHandAnalyst{
@@ -400,6 +491,7 @@ class TWDatasetHandAnalyst{
     var ruleDict: [Int: ([TWSingleFeature], Int) -> ([Int], [String], Int, [[Int]])] = [:]
     var AStraightMin: Int
     var turn: Int
+    var lastTurnRule: [Int]
     
     init(rankRules: [Int],
          suitRules: [Int],
@@ -409,6 +501,7 @@ class TWDatasetHandAnalyst{
         self.suitRules = suitRules
         self.AStraightMin = AStraightMin
         self.turn = turn
+        self.lastTurnRule = [0,1,3]
         
         self.ruleDict = [
             0:self.eval_holesinglefeature(singlefeatures:needSingleFeaturesNum:),
@@ -419,9 +512,10 @@ class TWDatasetHandAnalyst{
             5:self.eval_flush(singlefeatures:needSingleFeaturesNum:),
             6:self.eval_fullhouse(singlefeatures:needSingleFeaturesNum:),
             7:self.eval_foursinglefeature(_:needSingleFeaturesNum:),
-            8:self.eval_straightflush(singlefeatures:needSingleFeaturesNum:),
-            9:self.eval_threesinglefeature_turn3(singlefeatures:needSingleFeaturesNum:)
+            8:self.eval_straightflush(singlefeatures:needSingleFeaturesNum:)
         ]
+        
+        
     }
     
     //传入需要的参数
@@ -438,8 +532,14 @@ class TWDatasetHandAnalyst{
         
         var i = self.ruleDict.count + 1
         for ruleIndex in self.rankRules{
-            let (rankList, singlefeatureTypeList, isPair, usedSingleFeatureIndexList) = self.ruleDict[ruleIndex]!(singlefeatures, needSingleFeatureNum)
             i -= 1
+            
+            if turn == 3 && !self.lastTurnRule.contains(ruleIndex){
+                continue
+            }
+            
+            let (rankList, singlefeatureTypeList, isPair, usedSingleFeatureIndexList) = self.ruleDict[ruleIndex]!(singlefeatures, needSingleFeatureNum)
+            
             
             if rankList.count == 0{
                 continue
@@ -493,10 +593,6 @@ class TWDatasetHandAnalyst{
                     
                     var rank = straightRankList[i] >> 2
                     var singlefeatureType = "同花顺"
-                    for currentSingleFeatureIndex in currentStraightUsedSingleFeatureIndex{
-                        let currentSingleFeature = singlefeatures[currentSingleFeatureIndex]
-                        singlefeatureType += String(currentSingleFeature.rank) + " "
-                    }
                     
                     rank = rank << 2 | suit
                     
@@ -621,7 +717,7 @@ class TWDatasetHandAnalyst{
                 rank = rank << 2 | pairSuit
                 
 //                let singlefeatureType = "三带二" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[2]].originRank]!
-                let singlefeatureType = "三带二"
+                let singlefeatureType = "葫芦"
                 
                 rankList.append(rank)
                 singlefeatureTypeList.append(singlefeatureType)
@@ -827,59 +923,6 @@ class TWDatasetHandAnalyst{
         return (rankList, singlefeatureTypeList, 0, usedSingleFeatureIndexList)
     }
     
-    func eval_threesinglefeature_turn3(singlefeatures: [TWSingleFeature], needSingleFeaturesNum: Int) -> ([Int], [String], Int, [[Int]]) {
-        var rankList: [Int] = []
-        var singlefeatureTypeList: [String] = []
-        var usedSingleFeatureIndexList : [[Int]] = []
-        
-        if needSingleFeaturesNum == 3{
-            if singlefeatures[0].rank == 15 && singlefeatures[1].rank == 15{
-                for i in 2..<singlefeatures.count{
-                    usedSingleFeatureIndexList.append([0,1,i])
-                }
-            }
-            else if singlefeatures[0].rank == 15{
-                for i in 1..<singlefeatures.count-1{
-                    if singlefeatures[i].rank == singlefeatures[i+1].rank{
-                        usedSingleFeatureIndexList.append([0,i,i+1])
-                    }
-                }
-            }
-            else {
-                for i in 0..<singlefeatures.count-2{
-                    if singlefeatures[i].rank == singlefeatures[i+1].rank && singlefeatures[i].rank == singlefeatures[i+2].rank{
-                        usedSingleFeatureIndexList.append([i,i+1,i+2])
-                    }
-                }
-            }
-            
-            if usedSingleFeatureIndexList.count > 0 {
-                
-                for currentUsedSingleFeatureIndex in usedSingleFeatureIndexList{
-                    var rank = 0
-                    
-                    var threeSingleFeatureRank = singlefeatures[currentUsedSingleFeatureIndex[2]].rank
-                    var threeSingleFeatureSuit = singlefeatures[currentUsedSingleFeatureIndex[0]].rank
-                    
-                    if threeSingleFeatureSuit == -1{
-                        threeSingleFeatureSuit = 0
-                    }
-                    
-                    rank = rank << 4 | threeSingleFeatureRank
-                    rank = rank << 2 | threeSingleFeatureSuit
-                    
-//                    let singlefeatureType = "三条炸弹" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[2]].originRank]!
-                    let singlefeatureType = "三条炸弹"
-                    
-                    rankList.append(rank)
-                    singlefeatureTypeList.append(singlefeatureType)
-                }
-            }
-        }
-            
-        return (rankList, singlefeatureTypeList, 0, usedSingleFeatureIndexList)
-    }
-    
     func eval_threesinglefeature(singlefeatures: [TWSingleFeature], needSingleFeaturesNum: Int) -> ([Int], [String], Int, [[Int]]) {
         var rankList: [Int] = []
         var singlefeatureTypeList: [String] = []
@@ -1056,17 +1099,14 @@ class TWDatasetHandAnalyst{
         var rank: Int = 0
         var usedSingleFeatureIndexList : [Int] = []
         
-        usedSingleFeatureIndexList.append(0)
-        
-        for c in usedSingleFeatureIndexList {
+        for c in 0..<3 {
             if singlefeatures[c].rank == 15{
                 rank = rank << 4 | 14
-                rank = rank << 2 | 3
             }
             else{
                 rank = rank << 4 | singlefeatures[c].rank
-                rank = rank << 2 | singlefeatures[c].suit
             }
+            usedSingleFeatureIndexList.append(c)
         }
 
         return ([rank], ["单牌"], 0, [usedSingleFeatureIndexList])
@@ -1077,9 +1117,11 @@ class TWSingleFeature{
     var rank: Int = 0
     var suit: Int = 0
     var originRank : Int = 0
+    var singleFeatureIndex : Int = 0
     
     init(singlefeature: SingleFeature){
         self.originRank = singlefeature.rank
+        self.singleFeatureIndex = singlefeature.singlefeatureIndex
         
         if singlefeature.rank == 14 || singlefeature.rank == 15{
             self.rank = 15

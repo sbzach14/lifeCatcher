@@ -37,7 +37,7 @@ struct ShowResultView: View {
                             HStack{
                                 if viewModel.cutShowArray.count > 0{
                                     
-                                    Text("切牌").font(.system(size: 20)).foregroundColor(.white).bold()
+                                    Text("切牌").font(.system(size: 15)).foregroundColor(.white).bold()
                                     
                                     SingleIconView(index: viewModel.cutShowArray[viewModel.cutShowArray.count - 1])
                                 }
@@ -45,7 +45,7 @@ struct ShowResultView: View {
                                 
                                 if viewModel.multipleDatasetRCInfos.singleResultList[resultIndex].ColorSingleFeatures.count > 0{
                                     
-                                    Text("色牌").font(.system(size: 20)).foregroundColor(.white).bold()
+                                    Text("色牌").font(.system(size: 15)).foregroundColor(.white).bold()
                                     
                                     ForEach(viewModel.multipleDatasetRCInfos.singleResultList[resultIndex].ColorSingleFeatures, id: \.self) { colorSingleFeatureIndex in
                                         SingleIconView(index: colorSingleFeatureIndex)
@@ -58,7 +58,7 @@ struct ShowResultView: View {
                             HStack{
                                 if viewModel.multipleDatasetRCInfos.singleResultList[resultIndex].community.count > 0{
                                     
-                                    Text("公牌").font(.system(size: 20)).foregroundColor(.white).bold()
+                                    Text("公牌").font(.system(size: 15)).foregroundColor(.white).bold()
                                     
                                     let pubSingleFeatureList = viewModel.multipleDatasetRCInfos.singleResultList[resultIndex].community
                                     
@@ -71,13 +71,13 @@ struct ShowResultView: View {
                             }
                             
                             HStack{
-                                Text("位置").frame(width: 60, alignment: .leading).font(.system(size: 20)).foregroundColor(.white).bold()
+                                Text("位置").frame(width: 45, alignment: .leading).font(.system(size: 15)).foregroundColor(.white).bold()
                                 
-                                Text("排名").frame(width: 60, alignment: .leading).font(.system(size: 20)).foregroundColor(.white).bold()
+                                Text("排名").frame(width: 45, alignment: .leading).font(.system(size: 15)).foregroundColor(.white).bold()
                                 
-                                Text("牌型").frame(width: 60, alignment: .leading).font(.system(size: 20)).foregroundColor(.white).bold()
+                                Text("牌型").frame(width: 45, alignment: .leading).font(.system(size: 15)).foregroundColor(.white).bold()
                                 
-                                Text("手牌").frame(width: 60, alignment: .leading).font(.system(size: 20)).foregroundColor(.white).bold()
+                                Text("手牌").frame(width: 45, alignment: .leading).font(.system(size: 15)).foregroundColor(.white).bold()
                                 
                                 Spacer()
                             }
@@ -88,19 +88,19 @@ struct ShowResultView: View {
                                 var posList = (0...rankList.count - 1)
                                 ForEach(posList, id: \.self) { posIndex in
                                     HStack{
-                                        Text("\(posIndex+1)").frame(width: 60, alignment: .leading).font(.system(size: 20)).foregroundColor(.white)
+                                        Text("\(posIndex+1)").frame(width: 45, alignment: .leading).font(.system(size: 20)).foregroundColor(.white)
                                         
                                         let rate = rankList[posIndex].rcDatasetRank
                                         
-                                        Text("\(rate)").frame(width: 60, alignment: .leading).font(.system(size: 20)).foregroundColor(.white)
+                                        Text("\(rate)").frame(width: 45, alignment: .leading).font(.system(size: 20)).foregroundColor(.white)
                                         
                                         let singlefeatureRank = rankList[posIndex].rcSingleFeaturesType
 
-                                        Text(singlefeatureRank).frame(width: 60, alignment: .leading).font(.system(size: 20)).foregroundColor(.white)
+                                        Text(singlefeatureRank).frame(width: 45, alignment: .leading).font(.system(size: 15)).foregroundColor(.white)
                                         
                                         let handSingleFeatureList = Array(0...rankList[posIndex].RCSingleFeatures.count - 1)
                                         
-                                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 30))]){
+                                        LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 30)), count: 5)){
                                             
                                             ForEach(handSingleFeatureList, id: \.self) { handSingleFeatureIndex in
                                                 SingleIconView(index: rankList[posIndex].RCSingleFeatures[handSingleFeatureIndex].singlefeatureIndex)
