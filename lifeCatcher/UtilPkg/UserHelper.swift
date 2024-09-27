@@ -52,16 +52,9 @@ func AutoLogin(username: String, password: String) {
                 
                 print("过期时间 \(returnExpiredTime) \(dateString) 激活码 \(returnActiveCode)")
 
-
-                if (returnAccountStatus == 1 && AuthManager.authOnline(onlineKey: returnActiveCode))
-                    || AuthManager.authLocal(){
+                if (returnAccountStatus == 1 && AuthManager.authOnline(onlineKey: returnActiveCode)){
                     print("正式版")
                     AuthManager.isActive = true
-                }
-                else if returnAccountStatus == 2{
-                    AuthManager.isActive = true
-                    AuthManager.autoQuit()
-                    print("测试版")
                 }
             //登陆失败
             } else {

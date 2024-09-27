@@ -136,6 +136,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     
     @Published var isBackCamera: Bool = false
     @Published var isCameraHorizon: Bool = true
+    @Published var isHighHz:Bool = true
+    @Published var isMaxLightness:Bool = false
     @Published var volumeUp: Int = 0
     @Published var volumeDown: Int = 0
     @Published var blackMode: Int = 0
@@ -197,6 +199,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             let boolDict = configData["Bool"] as! [String : Bool]
             self.isBackCamera = boolDict["isBackCamera"]!
             self.isCameraHorizon = boolDict["isCameraHorizon"]!
+            self.isHighHz = boolDict["isHighHz"]!
+            self.isMaxLightness = boolDict["isMaxLightness"]!
             
             let intDict = configData["Int"] as! [String : Int]
             self.volumeUp = intDict["volumeUp"]!
@@ -461,30 +465,59 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             device.activeVideoMinFrameDuration = CMTime(value: 1, timescale: Int32(frameRate))
             device.activeVideoMaxFrameDuration = CMTime(value: 1, timescale: Int32(frameRate))
             
+            let highHz = 240
+            let lowHz = self.setFrameRate
             
             if frameRate == idleRate{
                 //detectneedtocut
                 if (self.isProcessNeedToCut || self.recgReport) && self.singlefeatureArray.count > 0{
-                    if frameRate == 120{
-                        device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(180)), iso: AVCaptureDevice.currentISO)
+                    device.exposureMode = .custom
+                    
+                    if self.isHighHz && self.isMaxLightness{
+                        device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(highHz)), iso: device.activeFormat.maxISO)
                     }
-                    else{
-                        device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(240)), iso: AVCaptureDevice.currentISO)
+                    else if !self.isHighHz && self.isMaxLightness{
+                        device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(lowHz)), iso: device.activeFormat.maxISO)
+                    }
+                    else if self.isHighHz && !self.isMaxLightness{
+                        device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(highHz)), iso: AVCaptureDevice.currentISO)
+                    }
+                    else if !self.isHighHz && !self.isMaxLightness{
+                        device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(lowHz)), iso: AVCaptureDevice.currentISO)
                     }
                 }
                 else{
-                    device.exposureMode = .continuousAutoExposure
-                    device.setExposureTargetBias(0)
+                    if self.isHighHz && self.isMaxLightness{
+                        device.exposureMode = .custom
+                        device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(highHz)), iso: device.activeFormat.maxISO)
+                    }
+                    else if !self.isHighHz && self.isMaxLightness{
+                        device.exposureMode = .custom
+                        device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(lowHz)), iso: device.activeFormat.maxISO)
+                    }
+                    else if self.isHighHz && !self.isMaxLightness{
+                        device.exposureMode = .continuousAutoExposure
+                        device.setExposureTargetBias(0)
+                    }
+                    else if !self.isHighHz && !self.isMaxLightness{
+                        device.exposureMode = .continuousAutoExposure
+                        device.setExposureTargetBias(0)
+                    }
                 }
             }
             else{
-                //不拨牌 且是前置
                 device.exposureMode = .custom
-                if frameRate == 120{
-                    device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(180)), iso: AVCaptureDevice.currentISO)
+                if self.isHighHz && self.isMaxLightness{
+                    device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(highHz)), iso: device.activeFormat.maxISO)
                 }
-                else{
-                    device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(240)), iso: AVCaptureDevice.currentISO)
+                else if !self.isHighHz && self.isMaxLightness{
+                    device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(lowHz)), iso: device.activeFormat.maxISO)
+                }
+                else if self.isHighHz && !self.isMaxLightness{
+                    device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(highHz)), iso: AVCaptureDevice.currentISO)
+                }
+                else if !self.isHighHz && !self.isMaxLightness{
+                    device.setExposureModeCustom(duration: CMTime(value: 1, timescale: Int32(lowHz)), iso: AVCaptureDevice.currentISO)
                 }
             }
             
@@ -604,7 +637,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         // 每秒更新一次帧率
         if deltaTime >= 1.0 {
             let frameRate = Double(frameCount) / deltaTime
-            print("实时帧率\(frameRate)fps")
+            print("实时帧率\(frameRate)fps \(self.captureDevice.iso)iso")
             timestamp = currentTimestamp
             // 重置计数器
             frameCount = 0
@@ -665,20 +698,22 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             confidenceThreshold = 0.7
         }
         else{
-            confidenceThreshold = 0.2
+            confidenceThreshold = 0.5
         }
+        
+        var iou: Double = 0.01
         
         var singlefeatureResult : [DetectionResult]
         if !isTargetArea{
-            let result = try! self.detectModel.prediction(image: pixelBuffer, iouThreshold: 0.01, confidenceThreshold: Double(confidenceThreshold))
-            singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, iscls: false)
+            let result = try! self.detectModel.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: Double(confidenceThreshold))
+            singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer)
         }
         else if self.isCameraHorizon{
-            let result = try! self.clsModel_h.prediction(image: pixelBuffer, iouThreshold: 0.01, confidenceThreshold: Double(confidenceThreshold))
+            let result = try! self.clsModel_h.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
             singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer)
         }
         else{
-            let result = try! self.clsModel_v.prediction(image: pixelBuffer, iouThreshold: 0.01, confidenceThreshold: Double(confidenceThreshold))
+            let result = try! self.clsModel_v.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
             singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer)
         }
         
@@ -699,7 +734,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         
         
-        DispatchQueue.main.async{
+        DispatchQueue.main.async{ [self] in
             
             if self.state == "idle"{
                 if singlefeatureResult[0].singlefeatureIndex[0] == self.stateSingleFeature[0]
@@ -741,8 +776,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 }
                 
                 if ((detectNum == 1 && (self.shuffleMode[1] != 0 || self.detectNeedToCut))
-                    || (detectNum == 2 && self.shuffleMode[0] != 0))
-                    && self.stateCounter >= 1{
+                    || (detectNum == 2 && self.shuffleMode[0] != 0)) && stateCounter >= 1{
                     
                     self.reloadingTime = 0.5
                     
@@ -1239,9 +1273,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             let nowN0 = dRNode0.singlefeatureIndex[0]
             let nowN1 = dRNode1.singlefeatureIndex[0]
             
-            //            print("index ", detectResultListIndex,
-            //                  singlefeatureLabelDic[nowN0] ?? "none", dRNode0.nodeType, dRNode0.laplacianVariance, dRNode0.confidence[0], detectResultListIndex,
-            //                  singlefeatureLabelDic[nowN1] ?? "none", dRNode1.nodeType, dRNode1.laplacianVariance, dRNode1.confidence[0])
+//                        print("index ", detectResultListIndex,
+//                              singlefeatureLabelDic[nowN0] ?? "none", dRNode0.nodeType, dRNode0.laplacianVariance, dRNode0.confidence[0], detectResultListIndex,
+//                              singlefeatureLabelDic[nowN1] ?? "none", dRNode1.nodeType, dRNode1.laplacianVariance, dRNode1.confidence[0])
         }
         
         sortedKeys = sortedKeys.filter { !deleteKeys.contains($0) }
@@ -1249,7 +1283,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         var beginIndex = 2
         var endIndex = sortedKeys.count-3
         
+        
         if beginIndex >= endIndex{
+            print("return1")
             let result = DetectionState(detectionResult: [], isSingle: true, isShort: true, longestIndex: -1)
             return result
         }
@@ -1410,6 +1446,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         
         if beginIndex >= endIndex{
+            print("return2")
             let result = DetectionState(detectionResult: [], isSingle: true, isShort: true, longestIndex: -1)
             return result
         }
@@ -1567,10 +1604,11 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         else if leftSideCnt < rightSideCnt{
             endIndex = rightTailLong + 1
-            addEndIndex = leftTailLong
+            addEndIndex = rightTailLong
         }
         
         if beginIndex >= endIndex{
+            print("return3")
             let result = DetectionState(detectionResult: [], isSingle: true, isShort: true, longestIndex: -1)
             return result
         }
@@ -2375,13 +2413,13 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
     }
 
-    func getSingleFeature(from singlefeatureArray: MLMultiArray, from boxArray : MLMultiArray, from pixelBuffer : CVPixelBuffer, iscls : Bool = true) -> [DetectionResult] {
+    func getSingleFeature(from singlefeatureArray: MLMultiArray, from boxArray : MLMultiArray, from pixelBuffer : CVPixelBuffer) -> [DetectionResult] {
         let cnt : Int = Int(singlefeatureArray.shape[0])
         let n : Int = Int(singlefeatureArray.shape[1])
         var result : [DetectionResult] = []
         
         
-        if self.state != "shuffle"{
+        if self.state != "shuffle" && self.state != "riffle"{
             for i in 0..<cnt {
                 var maxVal: Float32 = singlefeatureArray[i * n].floatValue
                 var confidenceSum : Float = 0
@@ -2398,7 +2436,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     
                     let trueIndex = j == 52 ? 54 : j
                     
-                    if value > 0 && (self.allSingleFeatureIndex.contains(trueIndex) || !iscls){
+                    if value > 0 && self.allSingleFeatureIndex.contains(trueIndex){
                         
                         if (value/confidenceSum>=0) {
                             singlefeatureIndex.append(j)
@@ -2442,20 +2480,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 }
             }
             
-            if result.count > 2 && iscls{
-                var uniqueSingleFeatureIndexes = Set<Int>()
-                
-                result = result.filter {
-                    let singlefeatureIndex0 = $0.singlefeatureIndex[0]
-                    if uniqueSingleFeatureIndexes.contains(singlefeatureIndex0) {
-                        return false
-                    } else {
-                        uniqueSingleFeatureIndexes.insert(singlefeatureIndex0)
-                        return true
-                    }
-                }
-            }
-            
             if result.count > 2{
                 result.sort{$0.confidence[0] > $1.confidence[0]}
                 result.removeLast(result.count - 2)
@@ -2463,30 +2487,15 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             
             
             if result.count == 2{
-                if self.isCameraHorizon && result[0].coordinate[0] > self.centerPos[0]{
+                if self.isCameraHorizon && result[0].coordinate[0] > result[1].coordinate[0]{
                         result.swapAt(0, 1)
                     }
-            else if !self.isCameraHorizon && result[0].coordinate[1] > self.centerPos[1]{
+            else if !self.isCameraHorizon && result[0].coordinate[1] > result[1].coordinate[1]{
                         result.swapAt(0, 1)
                     }
             }
             else if result.count == 1{
-                if self.isCameraHorizon{
-                    if result[0].coordinate[0] > self.centerPos[0]{
-                        result.insert(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
-                    }
-                    else{
-                        result.insert(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
-                    }
-                }
-                else{
-                    if result[0].coordinate[1] > self.centerPos[1]{
-                        result.insert(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
-                    }
-                    else{
-                        result.insert(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
-                    }
-                }
+                result.insert(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: result[0].coordinate, laplacianVariance: 0), at: 1)
             }
             else if result.count == 0{
                 result.append(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0))
@@ -2543,7 +2552,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     
                     let trueIndex = j == 52 ? 54 : j
                     
-                    if value > 0 && (self.allSingleFeatureIndex.contains(trueIndex) || !iscls){
+                    if value > 0 && self.allSingleFeatureIndex.contains(trueIndex){
                         
                         if (value/confidenceSum>=0) {
                             singlefeatureIndex.append(j)
@@ -2587,7 +2596,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 }
             }
             
-            if result.count > 2 && iscls{
+            if result.count > 2{
                 var uniqueSingleFeatureIndexes = Set<Int>()
                 
                 result = result.filter {
@@ -2609,30 +2618,35 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             
             if result.count == 2{
                 //横向排列
-                if self.isCameraHorizon && result[0].coordinate[0] > self.centerPos[0]{
+                if self.isCameraHorizon && result[0].coordinate[0] > result[1].coordinate[0]{
                         result.swapAt(0, 1)
                     }
                 //纵向排列
-            else if !self.isCameraHorizon && result[0].coordinate[1] > self.centerPos[1]{
+                else if !self.isCameraHorizon && result[0].coordinate[1] > result[1].coordinate[1]{
                         result.swapAt(0, 1)
                     }
             }
             else if result.count == 1{
-                if self.isCameraHorizon{
-                    if result[0].coordinate[0] > self.centerPos[0]{
-                        result.insert(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
+                if self.state == "shuffle"{
+                    if self.isCameraHorizon{
+                        if result[0].coordinate[0] > self.centerPos[0]{
+                            result.insert(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
+                        }
+                        else{
+                            result.insert(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
+                        }
                     }
                     else{
-                        result.insert(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
+                        if result[0].coordinate[1] > self.centerPos[1]{
+                            result.insert(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
+                        }
+                        else{
+                            result.insert(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
+                        }
                     }
                 }
                 else{
-                    if result[0].coordinate[1] > self.centerPos[1]{
-                        result.insert(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
-                    }
-                    else{
-                        result.insert(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[1], laplacianVariance: 0), at: 1)
-                    }
+                    result.insert(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: result[0].coordinate, laplacianVariance: 0), at: 1)
                 }
             }
             else if result.count == 0{
@@ -3202,7 +3216,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 
             let boolDict: [String: Bool] = [
                 "isBackCamera" : self.isBackCamera,
-                "isCameraHorizon" : self.isCameraHorizon
+                "isCameraHorizon" : self.isCameraHorizon,
+                "isHighHz": self.isHighHz,
+                "isMaxLightness": self.isMaxLightness
             ]
             
             let intDict : [String: Int] = [

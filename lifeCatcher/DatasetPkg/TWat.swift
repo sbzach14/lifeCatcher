@@ -39,7 +39,7 @@ class TWDatasetRule : Rule{
         self.setting = [
             0: "尾墩大13张[1302]",
             1: "道数13张翻倍[1301]",
-            2: "54张百变13张[1303]",
+            2: "54张百变13张尾墩大[1303]",
             3: "道数13张不翻倍[1300]",
             4: "道数13张不翻倍[1304]",
             5: "道数13张比两道[1305]",
@@ -56,6 +56,7 @@ class TWDatasetRule : Rule{
 52张牌，每人13张
 1.清顺 >炸弹>3带2>清一色>顺子>3不带>2对>1对
 2.保总道数最大
+3.翻倍规则：头道三条3倍；中道葫芦3倍，炸弹5倍，同花顺6倍；尾道炸弹5倍，同花顺6倍；赢同一家三道再全部翻倍，上限24。
 """,
             2: """
 54张牌，每人13张.王百变
@@ -258,6 +259,7 @@ class TWDataset{
         
         
         var rcRankList : [[Int]] = []
+        var rcTypeList : [[String]] = []
         
         for i in 0..<rcNum {
             
@@ -308,6 +310,7 @@ class TWDataset{
             ).evalHand(singlefeatures: turn3SingleFeatures)
             
             rcRankList.append([rank1, rank2, rank3])
+            rcTypeList.append([singlefeaturetype1, singlefeaturetype2, singlefeaturetype3])
         }
         
         //尾墩
@@ -323,20 +326,106 @@ class TWDataset{
                 for i in 0..<rcNum{
                     if currentRC != i{
                         var winNum = 0
+                        var pointNum = 0
                         for turn in 0..<3{
                             if rcRankList[currentRC][turn] > rcRankList[i][turn]{
                                 winNum += 1
+                                
+                                if isDouble == 1{
+                                    //5
+                                    if turn == 0{
+                                        if rcTypeList[currentRC][turn] == "同花顺"{
+                                            pointNum += 6
+                                        }
+                                        else if rcTypeList[currentRC][turn] == "炸弹"{
+                                            pointNum += 5
+                                        }
+                                        else{
+                                            pointNum += 1
+                                        }
+                                    }
+                                    //5
+                                    else if turn == 1{
+                                        if rcTypeList[currentRC][turn] == "同花顺"{
+                                            pointNum += 6
+                                        }
+                                        else if rcTypeList[currentRC][turn] == "炸弹"{
+                                            pointNum += 5
+                                        }
+                                        else if rcTypeList[currentRC][turn] == "葫芦"{
+                                            pointNum += 3
+                                        }
+                                        else{
+                                            pointNum += 1
+                                        }
+                                    }
+                                    //3
+                                    else{
+                                        if rcTypeList[currentRC][turn] == "三条"{
+                                            pointNum += 3
+                                        }
+                                        else{
+                                            pointNum += 1
+                                        }
+                                    }
+                                }
+                                else{
+                                    pointNum += 1
+                                }
                             }
                             else if rcRankList[currentRC][turn] < rcRankList[i][turn]{
                                 winNum -= 1
+                                
+                                if isDouble == 1{
+                                    //5
+                                    if turn == 0{
+                                        if rcTypeList[i][turn] == "同花顺"{
+                                            pointNum -= 6
+                                        }
+                                        else if rcTypeList[i][turn] == "炸弹"{
+                                            pointNum -= 5
+                                        }
+                                        else{
+                                            pointNum -= 1
+                                        }
+                                    }
+                                    //5
+                                    else if turn == 1{
+                                        if rcTypeList[i][turn] == "同花顺"{
+                                            pointNum -= 6
+                                        }
+                                        else if rcTypeList[i][turn] == "炸弹"{
+                                            pointNum -= 5
+                                        }
+                                        else if rcTypeList[i][turn] == "葫芦"{
+                                            pointNum -= 3
+                                        }
+                                        else{
+                                            pointNum -= 1
+                                        }
+                                    }
+                                    //3
+                                    else{
+                                        if rcTypeList[i][turn] == "三条"{
+                                            pointNum -= 3
+                                        }
+                                        else{
+                                            pointNum -= 1
+                                        }
+                                    }
+                                }
+                                else{
+                                    pointNum -= 1
+                                }
                             }
                         }
                         
                         if isDouble == 1 && (winNum == 3 || winNum == -3){
-                            winNum *= 2
+                            pointNum *= 2
+                            pointNum = min(pointNum, 24)
                         }
                         
-                        allPlaySingleFeatures[currentRC].evaluateFlag += winNum
+                        allPlaySingleFeatures[currentRC].evaluateFlag += pointNum
                     }
                 }
             }
