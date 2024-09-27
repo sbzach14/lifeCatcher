@@ -9,7 +9,7 @@
 import Foundation
 
 func AutoLogin(username: String, password: String) {
-    let url = URL(string: "http://1.94.17.30:8080/login")!
+    let url = URL(string: "http://192.168.1.224:8080/login")!
     var request = URLRequest(url: url)
     request.httpMethod = "POST"
     

@@ -4753,18 +4753,22 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 
                 var maxLength: Int = 0
                 var maxGapID: Int = 0
-                for gapID in 0..<allGaps.count - 1{
-                    if allGaps[gapID][1] - allGaps[gapID][0] >= maxLength {
-                        maxGapID = gapID
-                        maxLength = allGaps[gapID][1] - allGaps[gapID][0]
+                var currentSpeakStruct: [SpeakResultStruct] = []
+
+                if allGaps.count == 0 {
+                    currentSpeakStruct.append(SpeakResultStruct(voiceType: 1, content: "没有"))
+                } else {
+                    for gapID in 0..<allGaps.count - 1{
+                        if allGaps[gapID][1] - allGaps[gapID][0] >= maxLength {
+                            maxGapID = gapID
+                            maxLength = allGaps[gapID][1] - allGaps[gapID][0]
+                        }
+                    }
+                    
+                    for boundary in allGaps[maxGapID] {
+                        currentSpeakStruct.append(SpeakResultStruct(voiceType: 1, content: String(boundary)))
                     }
                 }
-                
-                var currentSpeakStruct: [SpeakResultStruct] = []
-                for boundary in allGaps[maxGapID] {
-                    currentSpeakStruct.append(SpeakResultStruct(voiceType: 1, content: String(boundary)))
-                }
-                
                 reportResult.append(currentSpeakStruct)
             }
             

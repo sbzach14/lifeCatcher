@@ -2500,7 +2500,7 @@ public class DetectSettingArgs{
                 allPreSetRules[i]![0]!.append(suitRules)
                 allPreSetRules[i]![0]!.append(rankRules)
                 allPreSetRules[i]![0]!.append(rankRuleChecked)
-//                1: "温州牌九[260]",
+//                1: "温州牌九[2601]",
                 handNum = 2
                 communityNum = 0
                 redspecialfeatureValueRange = 0
@@ -2512,12 +2512,12 @@ public class DetectSettingArgs{
                 samePointComparision = 0
                 AValueRange = 1
                 pairRank = 0
-                singlefeatureRankRule = 0
+                singlefeatureRankRule = 4
                 
                 args = [handNum, communityNum,redspecialfeatureValueRange, blackspecialfeatureValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, singlefeatureRankRule]
                 suitRules = [3,2,1,0]
-                rankRules = [8,9,10,11,3,2,1,0]
-                rankRuleChecked = [1,1,1,1,1,1,1,1]
+                rankRules = [43,8,9,17,18,44,45,35,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1,1,1,1,1]
                 allPreSetRules[i]![1]!.append(args)
                 allPreSetRules[i]![1]!.append(suitRules)
                 allPreSetRules[i]![1]!.append(rankRules)
@@ -2578,11 +2578,11 @@ public class DetectSettingArgs{
                 samePointComparision = 0
                 AValueRange = 0
                 pairRank = 0
-                singlefeatureRankRule = 0
+                singlefeatureRankRule = 4
                 
                 args = [handNum, communityNum,redspecialfeatureValueRange, blackspecialfeatureValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, singlefeatureRankRule]
                 suitRules = [3,2,1,0]
-                rankRules = [8,9,10,11,3,2,1,0]
+                rankRules = [46,8,9,17,18,29,30,35,0]
                 rankRuleChecked = [1,1,1,1,1,1,1,1]
                 allPreSetRules[i]![4]!.append(args)
                 allPreSetRules[i]![4]!.append(suitRules)

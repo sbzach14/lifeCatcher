@@ -44,7 +44,7 @@ class CNDatasetRule : Rule{
         1:"A>K>Q>J>...>2",
         2:"红Q>红2>红8>红4>红10>红6>黑4>黑八>黑10>红7>黑6>黑9>",
         3:"红Q>红2>红8>红4>红10>红6>黑4>黑J>黑10>红7>黑6>黑9>黑8>黑7>黑5>大王>小王",
-        4:"红Q>红2>红8>红4>红6(=红10=黑4)>红J(=黑10=红7=黑6)>红9(=黑8=黑7=红5=大王=黑桃A=黑桃3-红桃3)",
+        4:"红Q>红2>红8>红4>红6(=红10=黑4)>红J(=黑10=红7=黑6)>红9(=黑8=黑7=红5=大王=黑桃A=黑桃3=红桃3)",
         5:"黑2>红2>红8>红4>红10>红6>黑4>红1>黑10>红7>黑6>黑9>黑8>黑7>黑5>大王>小王"
     ]
     let handNum:[Int] = [2,4]
@@ -53,6 +53,10 @@ class CNDatasetRule : Rule{
     override init(ruleIndex: Int, ruleName: String) {
         super.init(ruleIndex: ruleIndex, ruleName: ruleName)
         self.rankRules = [
+            46: "红3+大王",
+            45:"对红J=黑10=红7=黑6",
+            44:"红6=红10=黑4",
+            43:"大王+黑3=大王+红三=黑A+黑3=黑A+红3",
             42:"对红1",
             41:"王+9",
             40:"同色对子",
@@ -99,10 +103,10 @@ class CNDatasetRule : Rule{
         ]
         self.setting = [
             0: "杭州小牌九",
-            1: "温州牌九[260]*",
+            1: "温州牌九[2601]",
             2: "通用四张-牌九大牌九1*",
             3: "52张小牌九[262]",
-            4: "宁波小牌九[263]*",
+            4: "宁波小牌九[263]",
             5: "杭州牌九[264]*",
             6: "32张牌9[456]*",
             7: "湖南牌九[265]*",
@@ -129,12 +133,18 @@ class CNDatasetRule : Rule{
     4）最大牌也相同时，庄家赢。
     """,
             1:"""
-    扑克张数:32张
-    用牌红对Q，两张红5，两张红9，两张红2，两张红J，对王，4个4/4个6/4个7/4个8/4个10
-    1)对红Q最大>对红2>黑A+黑3,.>对红5
-    2)红Q+红9>红Q+红8黑8>红2+红
-    8.....0点最小。
-    3) A=6点,同点比最大牌
+    牌数:34每家2张牌。(黑桃A、红桃2、手法红桃5、4个6、4个7、4个8、红桃9、方块2、黑桃3、红桃3、4个4、方块5、
+    方块9、4个10、红桃J,方块J,红桃Q、方块Q、大王)
+    规则:
+    1大小顺序(只区分黑、红，红桃=方块，黑桃=梅花)红Q>红2>红8>红4>红6(=
+    切牌9(=黑 8=黑7=红5=大王=黑红10=黑4) >红J(=黑10=红7=黑6)>红
+    A=黑 3=红3)
+    2)先比对子(黑A+黑3是算一对子)，对子一样大庄赢。大王+黑3=大王+红三
+    =黑A+黑3=黑A+红3>红Q>红2>红8>红4>红6(=红10=黑4)>红J(=黑10=红7=黑6)>红9(=黑8=黑7=红5)
+    3)不成对子时，红Q+红9最大>红Q+红8=红Q+黑8，接着红2+红8=红2+黑8
+    4)接下比点数。(Q=2点，J=1点，黑
+    报法 A=6点，大王=6点)，点数相同比较最大牌
+    5)最大牌相同时，庄家赢，同时0点一样大
     """,
             2:"""
 扑克张数:41张
@@ -568,6 +578,9 @@ class CNDatasetHandAnalyst{
             40:self.eval_isSameColorPair(singlefeatures:),
             41:self.eval_isspecialfeaturePlusNine(singlefeatures:),
             42:self.eval_isRedAPair(singlefeatures:),
+            43: self.eval_isRedJoJoOrBlackAThree,
+            44: self.eval_isRedSixTenBlackFourPair,
+            45: self.eval_isRedJSevenBlackTenSixPair,
             
         ]
     }
@@ -583,7 +596,7 @@ class CNDatasetHandAnalyst{
         let num2 = CNSingleFeature(singlefeature: singlefeatures[1], redspecialfeatureValueRange: redspecialfeatureValueRange, blackspecialfeatureValueRange: blackspecialfeatureValueRange, KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, AValueRange: AValueRange, suitRules: self.suitRules, singlefeatureRankRule: singlefeatureRankRule)
         
         var numList = [num1, num2]
-        numList = numList.sorted(by: {$0.rank > $1.rank})
+        numList = numList.sorted(by: {$0.originalRank > $1.originalRank})
         
         
         var score = 0
@@ -596,7 +609,6 @@ class CNDatasetHandAnalyst{
             } else {
                 score = (1 << (i + 10)) | rank
                 return (score, singlefeatureType, isPair)
-                break
             }
         }
         
@@ -604,6 +616,57 @@ class CNDatasetHandAnalyst{
     }
     
     //规则函数，返回(rank, singlefeatureType, isPair)
+    func eval_BlackThreeRedJoJo(singlefeatures:[CNSingleFeature]) -> (Int, String, Int) {
+        if singlefeatures[0].originalRank == 15 && singlefeatures[1].originalRank == 3 && singlefeatures[1].color == 0 {
+            return(0,"黑三大王", 0)
+        }
+        return (0, "", 0)
+    }
+//    "对红J=黑10=红7=黑6"
+    func eval_isRedJSevenBlackTenSixPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int) {
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank {
+            if singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 6 {
+                return (1,"黑对6",1)
+            }
+            if singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 10 {
+                return (1, "黑对10", 1)
+            }
+            if singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 11 {
+                return (1, "红对J", 1)
+            }
+            if singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 7 {
+                return (1, "红对7", 1)
+            }
+        }
+        
+        return (0,"", 0)
+    }
+    
+    func eval_isRedSixTenBlackFourPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int) {
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank {
+            if singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 6 {
+                return (1,"红对6",1)
+            }
+            if singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 10 {
+                return (1, "红对10", 1)
+            }
+            if singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 4 {
+                return (1, "黑对4", 1)
+            }
+        }
+        return (0, "", 0)
+    }
+    
+//    43:"大王+黑3=大王+红三=黑A+黑3=黑A+红3",
+    func eval_isRedJoJoOrBlackAThree(singlefeatures:[CNSingleFeature]) -> (Int, String, Int) {
+        if singlefeatures[0].originalRank == 15 && singlefeatures[1].originalRank == 3 {
+            return (1, "大王3", 1)
+        } else if singlefeatures[0].originalRank == 3 && singlefeatures[1].originalRank == 1 {
+            return (1, "黑A3", 1)
+        }
+        
+        return (0, "", 0)
+    }
     
     func eval_isRedAPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
         if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 1{
