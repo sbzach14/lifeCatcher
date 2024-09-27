@@ -115,6 +115,37 @@ struct CurrentVisionObjectRecognitionView: View {
                                     .frame(maxWidth: 40, alignment: .trailing)
                             }
                             
+                            Divider().colorInvert()
+                            
+                            HStack {
+                                Text("相机亮度")
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: 80, alignment: .leading)
+             
+                                Spacer()
+                                
+                                Text("自动")
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: 40, alignment: .trailing)
+                                
+                                Toggle("", isOn: $viewModel.isMaxLightness)
+                                    .toggleStyle(CustomToggleStyle_NoText())
+                                    .frame(width: 70, height: 30, alignment: .trailing)
+                                    .accentColor(.white)
+                                    .onChange(of: viewModel.isMaxLightness) {
+                                        newValue in
+                                        
+                                        viewModel.stopCamera()
+                                        viewModel.setupAVCapture()
+                                        viewModel.prestartCamera()
+                                        viewModel.updateConfigJSON()
+                                    }
+                                
+                                Text("最大")
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: 40, alignment: .trailing)
+                            }
+                            
                             if viewModel.isBackCamera{
                                 
                                 Divider().colorInvert()
@@ -162,6 +193,38 @@ struct CurrentVisionObjectRecognitionView: View {
                                             viewModel.updateFocusFactor()
                                             viewModel.updateConfigJSON()
                                     }
+                                }
+                            }
+                            else{
+                                Divider().colorInvert()
+                                
+                                HStack {
+                                    Text("刷新频率")
+                                        .foregroundColor(.white)
+                                        .frame(maxWidth: 80, alignment: .leading)
+                 
+                                    Spacer()
+                                    
+                                    Text("正常")
+                                        .foregroundColor(.white)
+                                        .frame(maxWidth: 40, alignment: .trailing)
+                                    
+                                    Toggle("", isOn: $viewModel.isHighHz)
+                                        .toggleStyle(CustomToggleStyle_NoText())
+                                        .frame(width: 70, height: 30, alignment: .trailing)
+                                        .accentColor(.white)
+                                        .onChange(of: viewModel.isHighHz) {
+                                            newValue in
+                                            
+                                            viewModel.stopCamera()
+                                            viewModel.setupAVCapture()
+                                            viewModel.prestartCamera()
+                                            viewModel.updateConfigJSON()
+                                        }
+                                    
+                                    Text("增强")
+                                        .foregroundColor(.white)
+                                        .frame(maxWidth: 40, alignment: .trailing)
                                 }
                             }
                             

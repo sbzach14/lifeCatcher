@@ -277,8 +277,7 @@ struct LoginView: View {
                     
                     print("过期时间 \(returnExpiredTime) \(dateString)")
 
-                    if (returnAccountStatus == 1 && AuthManager.authOnline(onlineKey: returnActiveCode))
-                        || AuthManager.authLocal(){
+                    if (returnAccountStatus == 1 && AuthManager.authOnline(onlineKey: returnActiveCode)){
                         print("正式版")
                         AuthManager.isActive = true
                     }
