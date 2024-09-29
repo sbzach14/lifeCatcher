@@ -32,6 +32,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var cutShowArray : [Int] = []
     
     let detectModel = try! detect_0903_copy()
+//    let clsModel_h = try! cls_0715_h_trans_copy()
+// 加载 clsModel_h 模型 (.mlpackage)
+
     let clsModel_h = try! cls_0715_h_trans_copy()
     let clsModel_v = try! cls_0727_v_trans_copy()
 //    let detectModel = try! detect_0903()
@@ -85,6 +88,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     //测试用的定时器
     public var ding: Int = 0
     public var ciimageQueue: [CIImage] = []
+    
+    //存图用的记录顺序
+    var saveOrderIndex: Int = 0
     
     let idleRate = 30
     var taskImageArray : [String] = []
@@ -1187,10 +1193,14 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
         }
         
-        //        let modelCIImage = CIImage(cvPixelBuffer: pixelBuffer)
-        //        let cgImage = CIContext().createCGImage(modelCIImage, from: modelCIImage.extent)
-        //        let savedUIImage = UIImage(cgImage: cgImage!)
-        //        UIImageWriteToSavedPhotosAlbum(savedUIImage, self, #selector(self.imageSaved(_:didFinishSavingWithError:contextInfo:)), nil)
+//        if self.state == "riffle" {
+//            let modelCIImage = CIImage(cvPixelBuffer: pixelBuffer)
+//            let cgImage = CIContext().createCGImage(modelCIImage, from: modelCIImage.extent)
+//            let savedUIImage = UIImage(cgImage: cgImage!)
+//            UIImageWriteToSavedPhotosAlbum(savedUIImage, self, #selector(self.imageSaved(_:didFinishSavingWithError:contextInfo:)), nil)
+//            print("image task \(taskIndex) saved \(self.saveOrderIndex)")
+//            self.saveOrderIndex += 1
+//        }
     }
     
     private func quitDetect(reloadingTime: Double){
