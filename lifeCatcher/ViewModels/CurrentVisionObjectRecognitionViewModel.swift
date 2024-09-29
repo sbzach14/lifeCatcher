@@ -698,13 +698,14 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         let detectConfidenceThreshold:Float = 0.8
         let detectConfidenceMinThreshold:Float = 0.5
+        let riffleDetectConfidenceThreshold:Float = 0.7
         
         var confidenceThreshold: Float = 0
         if !isTargetArea{
             confidenceThreshold = 0.7
         }
         else{
-            confidenceThreshold = 0.5
+            confidenceThreshold = 0.2
         }
         
         var iou: Double = 0.01
@@ -784,7 +785,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 if ((detectNum == 1 && (self.shuffleMode[1] != 0 || self.detectNeedToCut))
                     || (detectNum == 2 && self.shuffleMode[0] != 0)) && stateCounter >= 1{
                     
-                    self.reloadingTime = 0.5
+                    self.reloadingTime = 0.2
                     
                     print("状态：进入识别")
                     
@@ -890,7 +891,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     
                     if self.usedSingleFeatures.contains(detectSingleFeature) && self.recgReport {
                         self.stateCounter = 100
-                        self.reloadingTime = 0.5
+                        self.reloadingTime = 0.2
                         self.state = "waitingEnd"
                         self.computeNextRound()
                     }
@@ -976,7 +977,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         if isCutDone{
                             if self.recgReport{
                                 self.stateCounter = 100
-                                self.reloadingTime = 0.5
+                                self.reloadingTime = 0.2
                                 self.state = "waitingEnd"
                             }
                             self.computeWinnerRC(isReset: true)
@@ -985,7 +986,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     }
                 }
                 
-                else if !self.isDetect && detectConfidence >= detectConfidenceThreshold{
+                else if !self.isDetect && detectConfidence >= riffleDetectConfidenceThreshold{
                     if isRiffle{
                         self.isDetect = true
                         self.state = "riffle"
@@ -1143,7 +1144,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     }
                     
                     if !detectState.isShort && self.reloadingTime == 0{
-                        self.reloadingTime = 0.5
+                        self.reloadingTime = 0.2
                     }
                     
                     self.quitDetect(reloadingTime: self.reloadingTime)
@@ -1241,7 +1242,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         var sortedKeys = targetDetecResultList.keys.sorted()
         let blurThreshold : Float = 0.75
-        let longHeadIndex = 5
+        let longHeadIndex = 2
         
         // print("检测sortedKeys \(sortedKeys)")
         
@@ -1269,11 +1270,11 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 }
             }
             
-            let nowConfidence0 = targetDetecResultList[detectResultListIndex]![0].confidence[0]
-            let nowConfidence1 = targetDetecResultList[detectResultListIndex]![1].confidence[0]
-            if nowConfidence0 < 0.1 && nowConfidence1 < 0.1{
-                deleteKeys.append(detectResultListIndex)
-            }
+//            let nowConfidence0 = targetDetecResultList[detectResultListIndex]![0].confidence[0]
+//            let nowConfidence1 = targetDetecResultList[detectResultListIndex]![1].confidence[0]
+//            if nowConfidence0 < 0.1 && nowConfidence1 < 0.1{
+//                deleteKeys.append(detectResultListIndex)
+//            }
             
             
             
@@ -1465,7 +1466,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             let detectResultListIndex = sortedKeys[keyIndex]
             for numIndex in 0..<targetDetecResultList[detectResultListIndex]!.count{
                 let detectResultNode = targetDetecResultList[detectResultListIndex]![numIndex]
-                if detectResultNode.nodeType == 2{
+                if (detectResultNode.nodeType == 1 ||
+                    detectResultNode.nodeType == 2 ||
+                    detectResultNode.nodeType == 3)
+                    && detectResultNode.confidence[0] > 0.75{
                     confidenceDic[detectResultNode.singlefeatureIndex[0]] = 100
                 }
             }
@@ -1642,7 +1646,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                     }
                 }
-                if nodeIndex.count > 0 && (isAddCard || confidenceDic[key]! > 0.7){
+                if nodeIndex.count > 0 && (isAddCard || confidenceDic[key]! > 0.75){
                     targetDetecResultList[nodeIndex[0]]![nodeIndex[1]].nodeType = 4
                 }
             }
@@ -1692,7 +1696,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                     }
                 }
-                if nodeIndex.count > 0 && (isAddCard || confidenceDic[key]! > 0.7){
+                if nodeIndex.count > 0 && (isAddCard || confidenceDic[key]! > 0.75){
                     targetDetecResultList[nodeIndex[0]]![nodeIndex[1]].nodeType = 4
                 }
             }
@@ -1936,8 +1940,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 let nodeType1 = targetDetecResultList[detectResultListIndex]![1].nodeType
                 
                 print("index ", detectResultListIndex,
-                      singlefeatureLabelDic[nowNum0] ?? "none", "type\(detectResultNode0.nodeType)", detectResultNode0.laplacianVariance, detectResultNode0.confidence[0], detectResultListIndex,
-                      singlefeatureLabelDic[nowNum1] ?? "none", "type\(detectResultNode1.nodeType)", detectResultNode1.laplacianVariance, detectResultNode1.confidence[0])
+                      singlefeatureLabelDic[nowNum0] ?? "none", "type\(detectResultNode0.nodeType)", detectResultNode0.laplacianVariance, detectResultNode0.confidence[0], detectResultNode0.confidencePercent, detectResultListIndex,
+                      singlefeatureLabelDic[nowNum1] ?? "none", "type\(detectResultNode1.nodeType)", detectResultNode1.laplacianVariance, detectResultNode1.confidence[0], detectResultNode1.confidencePercent)
                 
                 var insertCard0 : InsertCard
                 var insertCard1 : InsertCard
@@ -1960,14 +1964,27 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     if nodeType0 == 2{
                         detectSingleFeatureArray.insert(insertCard0, at: 0)
                     }
-                    else if (nodeType0 == 0 || nodeType0 == 4) && nowNum0 != -1 && detectResultNode0.confidence[0] > 0.75{
+                    else if (nodeType0 == 0 || nodeType0 == 4) 
+                                && nowNum0 != -1
+                                && detectResultNode0.confidence[0] > 0.75
+                                && ((detectResultNode0.confidence[0] > lastDetectResultNode0.confidence[0] && detectResultNode0.confidence[0] > nextDetectResultNode0.confidence[0])
+                                    || detectResultNode0.laplacianVariance > lastDetectResultNode0.laplacianVariance
+                                    || detectResultNode0.laplacianVariance > nextDetectResultNode0.laplacianVariance)
+                    {
                         detectSingleFeatureArray.insert(insertCard0, at: 0)
                     }
                     
                     if nodeType1 == 2{
                         detectSingleFeatureArray.insert(insertCard1, at: 0)
                     }
-                    else if (nodeType1 == 0 || nodeType1 == 4) && nowNum1 != -1 && detectResultNode1.confidence[0] > 0.75{
+                    else if (nodeType1 == 0 || nodeType1 == 4) 
+                                && nowNum1 != -1
+                                && detectResultNode1.confidence[0] > 0.75
+                                && (detectResultNode1.confidence[0] > lastDetectResultNode1.confidence[0]
+                                    || detectResultNode1.confidence[0] > nextDetectResultNode1.confidence[0]
+                                    || detectResultNode1.laplacianVariance > lastDetectResultNode1.laplacianVariance
+                                    || detectResultNode1.laplacianVariance > nextDetectResultNode1.laplacianVariance)
+                    {
                         detectSingleFeatureArray.insert(insertCard1, at: 0)
                     }
                 }
@@ -2096,7 +2113,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     print("delete chain \(detectSingleFeatureArray._index(at: singlefeature.cardIndex)) \(existIndex)/\(uniqueArray.count) \(singlefeatureLabelDic[singlefeature.cardIndex]!)")
                 }
             }
-            else {
+            else if singlefeature.confidence > 0.75{
                 confidenceDic[singlefeature.cardIndex] = singlefeature.confidence
                 uniqueArray.append(singlefeature.cardIndex)
             }
