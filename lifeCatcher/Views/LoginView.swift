@@ -223,10 +223,13 @@ struct LoginView: View {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         
+        let timestamp = String(Date().timeIntervalSince1970)
+        
         let parameters: [String: Any] = [
             "deviceID": AuthManager.retrieveUUID(),
             "username": username,
             "password": password,
+            "timestamp": timestamp
         ]
         
         UserDefaults.standard.set(username, forKey: "savedUsername")
@@ -277,11 +280,11 @@ struct LoginView: View {
                     
                     print("过期时间 \(returnExpiredTime) \(dateString)")
 
-                    if (returnAccountStatus == 1 && AuthManager.authOnline(onlineKey: returnActiveCode)){
+                    if returnAccountStatus == 1 && AuthManager.authOnline(onlineKey: returnActiveCode) && AuthManager.authTime(){
                         print("正式版")
                         AuthManager.isActive = true
                     }
-                    else if returnAccountStatus == 2{
+                    else if returnAccountStatus == 2 && AuthManager.authTime(){
                         AuthManager.isActive = true
                         AuthManager.autoQuit()
                         print("测试版")

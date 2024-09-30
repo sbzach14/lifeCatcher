@@ -699,7 +699,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             confidenceThreshold = 0.7
         }
         else{
-            confidenceThreshold = 0.2
+            confidenceThreshold = 0.5
         }
         
         var iou: Double = 0.01
@@ -884,9 +884,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     self.detectNeedToCut = false
                     
                     if self.usedSingleFeatures.contains(detectSingleFeature) && self.recgReport {
-                        self.stateCounter = 100
-                        self.reloadingTime = 0.2
-                        self.state = "waitingEnd"
+//                        self.stateCounter = 100
+//                        self.reloadingTime = 0.2
+//                        self.state = "waitingEnd"
                         self.computeNextRound()
                     }
                     else if self.singlefeatureArray.contains(detectSingleFeature){
@@ -969,11 +969,11 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                         
                         if isCutDone{
-                            if self.recgReport{
-                                self.stateCounter = 100
-                                self.reloadingTime = 0.2
-                                self.state = "waitingEnd"
-                            }
+//                            if self.recgReport{
+//                                self.stateCounter = 100
+//                                self.reloadingTime = 0.2
+//                                self.state = "waitingEnd"
+//                            }
                             self.computeWinnerRC(isReset: true)
                         }
                         
@@ -1091,9 +1091,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                         
                         if self.cutMode[0] == 0  && self.specialCard[0] == 0{
-                            if self.recgReport{
-                                self.reloadingTime = 1
-                            }
+//                            if self.recgReport{
+//                                self.reloadingTime = 1
+//                            }
                             self.computeWinnerRC(isReset: true)
                         }
                     }
@@ -1130,9 +1130,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         
                         
                         if self.cutMode[1] == 0 && self.specialCard[1] == 0{
-                            if self.recgReport{
-                                self.reloadingTime = 1
-                            }
+//                            if self.recgReport{
+//                                self.reloadingTime = 1
+//                            }
                             self.computeWinnerRC(isReset: true)
                         }
                     }
@@ -1960,26 +1960,29 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     {
                         var confidenceFlag = 0
                         var blurFlag = 0
-                        if detectResultNode0.confidence[0] > lastDetectResultNode0.confidence[0]{
+                        if detectResultNode0.confidence[0] > lastDetectResultNode0.confidence[0] && detectResultNode0.laplacianVariance > lastDetectResultNode0.laplacianVariance{
                             confidenceFlag += 1
                         }
-                        if detectResultNode0.confidence[0] > nextDetectResultNode0.confidence[0]{
+                        if detectResultNode0.confidence[0] > nextDetectResultNode0.confidence[0]
+                            && detectResultNode0.laplacianVariance > nextDetectResultNode0.laplacianVariance{
                             confidenceFlag += 1
                         }
-                        if lastDetectResultNode0.confidence[0] < 0.75{
+                        if lastDetectResultNode0.confidence[0] < 0.75 && lastDetectResultNode0.nodeType != 2{
                             confidenceFlag += 1
                         }
-                        if nextDetectResultNode0.confidence[0] < 0.75{
+                        if nextDetectResultNode0.confidence[0] < 0.75 && nextDetectResultNode0.nodeType != 1{
                             confidenceFlag += 1
                         }
-                        if detectResultNode0.laplacianVariance > lastDetectResultNode0.laplacianVariance{
-                            blurFlag += 1
+                        if detectResultNode0.laplacianVariance > lastDetectResultNode0.laplacianVariance
+                            && detectResultNode0.laplacianVariance > nextDetectResultNode0.laplacianVariance{
+                            confidenceFlag += 1
                         }
-                        if detectResultNode0.laplacianVariance > nextDetectResultNode0.laplacianVariance{
-                            blurFlag += 1
+                        if detectResultNode0.confidence[0] > lastDetectResultNode0.confidence[0]
+                            && detectResultNode0.confidence[0] > nextDetectResultNode0.confidence[0]{
+                            confidenceFlag += 1
                         }
                         
-                        if confidenceFlag + blurFlag >= 2{
+                        if confidenceFlag + blurFlag >= 1{
                             detectSingleFeatureArray.insert(insertCard0, at: 0)
                         }
                     }
@@ -1993,26 +1996,29 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     {
                         var confidenceFlag = 0
                         var blurFlag = 0
-                        if detectResultNode1.confidence[0] > lastDetectResultNode1.confidence[0]{
+                        if detectResultNode1.confidence[0] > lastDetectResultNode1.confidence[0] && detectResultNode1.laplacianVariance > lastDetectResultNode1.laplacianVariance{
                             confidenceFlag += 1
                         }
-                        if detectResultNode1.confidence[0] > nextDetectResultNode1.confidence[0]{
+                        if detectResultNode1.confidence[0] > nextDetectResultNode1.confidence[0]
+                            && detectResultNode1.laplacianVariance > nextDetectResultNode1.laplacianVariance{
                             confidenceFlag += 1
                         }
-                        if lastDetectResultNode1.confidence[0] < 0.75{
+                        if lastDetectResultNode1.confidence[0] < 0.75 && lastDetectResultNode1.nodeType != 2{
                             confidenceFlag += 1
                         }
-                        if nextDetectResultNode1.confidence[0] < 0.75{
+                        if nextDetectResultNode1.confidence[0] < 0.75 && nextDetectResultNode1.nodeType != 1{
                             confidenceFlag += 1
                         }
-                        if detectResultNode1.laplacianVariance > lastDetectResultNode1.laplacianVariance{
-                            blurFlag += 1
+                        if detectResultNode1.laplacianVariance > lastDetectResultNode1.laplacianVariance
+                            && detectResultNode1.laplacianVariance > nextDetectResultNode1.laplacianVariance{
+                            confidenceFlag += 1
                         }
-                        if detectResultNode1.laplacianVariance > nextDetectResultNode1.laplacianVariance{
-                            blurFlag += 1
+                        if detectResultNode1.confidence[0] > lastDetectResultNode1.confidence[0]
+                            && detectResultNode1.confidence[0] > nextDetectResultNode1.confidence[0]{
+                            confidenceFlag += 1
                         }
                         
-                        if confidenceFlag + blurFlag >= 2{
+                        if confidenceFlag + blurFlag >= 1{
                             detectSingleFeatureArray.insert(insertCard1, at: 0)
                         }
                     }

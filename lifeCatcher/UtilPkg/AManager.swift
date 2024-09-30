@@ -127,6 +127,9 @@ class AuthManager {
         return hash == input
     }
     
+    static func authTime() -> Bool{
+        return true
+    }
     
     static func authOnline(onlineKey: String) -> Bool{
         let uniqueID = retrieveUUID()

@@ -1,10 +1,3 @@
-//
-//  UserHelper.swift
-//  lifeCatcher
-//
-//  Created by Zhangyi Chen on 9/6/24.
-//  Copyright © 2024 Apple. All rights reserved.
-//
 
 import Foundation
 
@@ -12,11 +5,14 @@ func AutoLogin(username: String, password: String) {
     let url = URL(string: "http://1.94.17.30:8080/login")!
     var request = URLRequest(url: url)
     request.httpMethod = "POST"
+    let timestamp = String(Date().timeIntervalSince1970)
+
     
     let parameters: [String: Any] = [
         "deviceID": AuthManager.retrieveUUID(),
         "username": username,
         "password": password,
+        "timestamp": timestamp
     ]
     
     request.httpBody = try? JSONSerialization.data(withJSONObject: parameters, options: [])
@@ -52,7 +48,7 @@ func AutoLogin(username: String, password: String) {
                 
                 print("过期时间 \(returnExpiredTime) \(dateString) 激活码 \(returnActiveCode)")
 
-                if (returnAccountStatus == 1 && AuthManager.authOnline(onlineKey: returnActiveCode)){
+                if returnAccountStatus == 1 && AuthManager.authOnline(onlineKey: returnActiveCode) && AuthManager.authTime(){
                     print("正式版")
                     AuthManager.isActive = true
                 }

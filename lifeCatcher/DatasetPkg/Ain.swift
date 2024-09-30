@@ -1,10 +1,3 @@
-//
-//  Ain.swift
-//  lifeCatcher
-//
-//  Created by Zhangyi Chen on 9/11/24.
-//  Copyright © 2024 Apple. All rights reserved.
-//
 
 import Foundation
 
