@@ -1957,11 +1957,31 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     else if (nodeType0 == 0 || nodeType0 == 4) 
                                 && nowNum0 != -1
                                 && detectResultNode0.confidence[0] > 0.75
-                                && ((detectResultNode0.confidence[0] > lastDetectResultNode0.confidence[0] && detectResultNode0.confidence[0] > nextDetectResultNode0.confidence[0])
-                                    || detectResultNode0.laplacianVariance > lastDetectResultNode0.laplacianVariance
-                                    || detectResultNode0.laplacianVariance > nextDetectResultNode0.laplacianVariance)
                     {
-                        detectSingleFeatureArray.insert(insertCard0, at: 0)
+                        var confidenceFlag = 0
+                        var blurFlag = 0
+                        if detectResultNode0.confidence[0] > lastDetectResultNode0.confidence[0]{
+                            confidenceFlag += 1
+                        }
+                        if detectResultNode0.confidence[0] > nextDetectResultNode0.confidence[0]{
+                            confidenceFlag += 1
+                        }
+                        if lastDetectResultNode0.confidence[0] < 0.75{
+                            confidenceFlag += 1
+                        }
+                        if nextDetectResultNode0.confidence[0] < 0.75{
+                            confidenceFlag += 1
+                        }
+                        if detectResultNode0.laplacianVariance > lastDetectResultNode0.laplacianVariance{
+                            blurFlag += 1
+                        }
+                        if detectResultNode0.laplacianVariance > nextDetectResultNode0.laplacianVariance{
+                            blurFlag += 1
+                        }
+                        
+                        if confidenceFlag + blurFlag >= 2{
+                            detectSingleFeatureArray.insert(insertCard0, at: 0)
+                        }
                     }
                     
                     if nodeType1 == 2{
@@ -1970,12 +1990,31 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     else if (nodeType1 == 0 || nodeType1 == 4) 
                                 && nowNum1 != -1
                                 && detectResultNode1.confidence[0] > 0.75
-                                && (detectResultNode1.confidence[0] > lastDetectResultNode1.confidence[0]
-                                    || detectResultNode1.confidence[0] > nextDetectResultNode1.confidence[0]
-                                    || detectResultNode1.laplacianVariance > lastDetectResultNode1.laplacianVariance
-                                    || detectResultNode1.laplacianVariance > nextDetectResultNode1.laplacianVariance)
                     {
-                        detectSingleFeatureArray.insert(insertCard1, at: 0)
+                        var confidenceFlag = 0
+                        var blurFlag = 0
+                        if detectResultNode1.confidence[0] > lastDetectResultNode1.confidence[0]{
+                            confidenceFlag += 1
+                        }
+                        if detectResultNode1.confidence[0] > nextDetectResultNode1.confidence[0]{
+                            confidenceFlag += 1
+                        }
+                        if lastDetectResultNode1.confidence[0] < 0.75{
+                            confidenceFlag += 1
+                        }
+                        if nextDetectResultNode1.confidence[0] < 0.75{
+                            confidenceFlag += 1
+                        }
+                        if detectResultNode1.laplacianVariance > lastDetectResultNode1.laplacianVariance{
+                            blurFlag += 1
+                        }
+                        if detectResultNode1.laplacianVariance > nextDetectResultNode1.laplacianVariance{
+                            blurFlag += 1
+                        }
+                        
+                        if confidenceFlag + blurFlag >= 2{
+                            detectSingleFeatureArray.insert(insertCard1, at: 0)
+                        }
                     }
                 }
                 else{
@@ -2103,7 +2142,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     print("delete chain \(detectSingleFeatureArray._index(at: singlefeature.cardIndex)) \(existIndex)/\(uniqueArray.count) \(singlefeatureLabelDic[singlefeature.cardIndex]!)")
                 }
             }
-            else if singlefeature.confidence > 0.75{
+            else if singlefeature.confidence >= 0.5{
                 confidenceDic[singlefeature.cardIndex] = singlefeature.confidence
                 uniqueArray.append(singlefeature.cardIndex)
             }
