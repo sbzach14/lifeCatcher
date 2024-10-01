@@ -12,8 +12,15 @@ struct ShowResultView: View {
             ScrollView {
                 
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 30)), count: 10)) {
+                    if viewModel.shuffleOrRiffle == 1 && viewModel.shuffleMode[1] == 2 && viewModel.singlefeatureArray.count > 0{
+                        SingleIconView(index: viewModel.singlefeatureArray[viewModel.singlefeatureArray.count-1])
+                    }
                     ForEach(viewModel.singlefeatureArray, id: \.self) { index in
-                        SingleIconView(index: index)
+                        if !(viewModel.shuffleOrRiffle == 1
+                             && viewModel.shuffleMode[1] == 2
+                             && index == viewModel.singlefeatureArray[viewModel.singlefeatureArray.count-1]){
+                            SingleIconView(index: index)
+                        }
                     }
                 }.padding(3)
                 
