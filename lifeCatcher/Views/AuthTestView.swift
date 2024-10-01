@@ -144,9 +144,11 @@ struct AuthTestView: View {
         
         self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
         
+        let encrypt_passcode = try! AuthManager.encrypt(self.passcode, key: AuthManager.passCodeKey)
+
         let json: [String: Any] = [
             "activate_code": activeKey,
-            "passCode": passcode,
+            "passCode": encrypt_passcode,
             "deviceID": userInput,
             "timeLimit": timeLimit
         ]
@@ -170,8 +172,6 @@ struct AuthTestView: View {
                 if let jsonResponse = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
                     if let success = jsonResponse["success"] as? Bool, success {
                         DispatchQueue.main.async {
-                            let returnActivateStatus = jsonResponse["activateStatus"] as? Int ?? -1
-                            let returnExpiredTime = jsonResponse["expiredTime"] as? Int ?? 0
                             self.activateStatus = jsonResponse["activateStatus"] as? Int ?? -1
                             self.expiredTime = jsonResponse["expiredTime"] as? Int ?? 0
                         }

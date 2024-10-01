@@ -3163,6 +3163,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                                 drawSize = "大"
                                             } else if setPos == rankedWinnersInfo.count - 1 {
                                                 drawSize = "小"
+                                            } else {
+                                                drawSize = "中"
                                             }
                                         } else {
                                             drawType = 1
@@ -3170,6 +3172,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                                 drawSize = "大"
                                             } else if setPos == rankedWinnersInfo.count - 1 {
                                                 drawSize = "小"
+                                            } else {
+                                                drawSize = "中"
                                             }
                                         }
                                         currentResultInfo.drawID = rankSet[0].rcID
@@ -3182,13 +3186,15 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                     }
                                     setPos += 1
                                 }
-                                //1,平点，2杂平点，3双平点，4三大一小，5三小一大
-                                
+                                //1,平点，2杂平点，3单双平点，4三大一小，5三小一大, 6连续双平点
                                 currentResultInfo.drawSize = drawSize
-
-                                //双平点
-                                if drawNum == 2{
+                                
+                                //单双平点
+                                if drawNum == 2 && drawType == 2{
                                     currentResultInfo.drawType = 3
+                                //连续双平点
+                                } else if drawNum == 2 && drawType == 1 {
+                                    currentResultInfo.drawType = 6
                                 //三大一小
                                 } else if drawType == 4{
                                     currentResultInfo.drawType = 4
@@ -4168,56 +4174,92 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             
             for resultInfo in multipleReportResultInfo.singleResultList{
                 var reportString = ""
-                let voiceType = 1
-                var currentResult : [SpeakResultStruct] = []
-                for rcID in resultInfo.targetRCList[0] {
-                    reportString = String(rcID + 1)
-                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                var voiceType = 1
+                if resultInfo.drawType > 0 {
+                    print("有平点")
+                    voiceType = 0
                 }
-                //1,平点，2杂平点，3双平点，4三大一小，5三小一大
+                
+                var currentResult : [SpeakResultStruct] = []
+                var tempNum: Int = 0
+                var bullString: String = ""
+                var allTargetList: [Int] = []
+                for rcID in resultInfo.targetRCList[0] {
+                    if tempNum > 1 && resultInfo.drawType != 3{
+                        break
+                    }
+                    reportString = String(rcID + 1)
+                    allTargetList.append(rcID + 1)
+                    if resultInfo.RCReturnInfoList[rcID].rcSingleFeaturesType.hasPrefix("牛"){
+                        bullString += resultInfo.RCReturnInfoList[rcID].rcSingleFeaturesType + " "
+                    }
+                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                    tempNum += 1
+                }
 
                 // 不打几
-                if resultInfo.drawType != 3 && resultInfo.drawType != 5 {
+                if resultInfo.drawType != 3 && resultInfo.drawType != 5 && resultInfo.drawType != 6 {
                     reportString = "不打"
                     reportString += String(resultInfo.NoColorNum)
                     currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
                 }
+                //如果是牛牛就报牛几
                 
+                if bullString != ""{
+                    reportString = bullString
+                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                }
+                
+                //pingdian
+                //1,平点，2杂平点，3单双平点，4三大一小，5三小一大, 6连续双平点
+                switch resultInfo.drawType{
+                case 1:
+                    reportString = resultInfo.drawSize
+                    reportString += "平点"
+//                    reportString += String(resultInfo.drawID + 1) + resultInfo.drawSize
+                    print("平点 \(reportString)")
+                    break
+                case 2:
+                    if resultInfo.drawSize == "大"{
+                        reportString = ""
+                    } else if resultInfo.drawSize == "中"{
+                        reportString = "杂平点"
+                    } else if resultInfo.drawSize == "小"{
+                        if allTargetList.contains(1){
+                            reportString = "双平点"
+                        } else if allTargetList.contains(2) {
+                            reportString = "单平点"
+                        }
+                    }
+                    break
+                case 3:
+                    if allTargetList[0] == 1 {
+                        reportString = "单双平点"
+                    } else {
+                        reportString = "双单平点"
+                    }
+                    break
+                case 4:
+                    reportString = "三平点"
+                case 5:
+                    reportString = "三平点" + String(allTargetList[0]) + "门"
+                    break
+                case 6:
+                    reportString = "连续双平点"
+                    break
+                default:
+                    break
+                }
+                
+                if resultInfo.drawType != 0 && reportString != ""{
+                    
+                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                }
                 
                 //对子
                 reportString = "对子"
                 reportString += String(resultInfo.pairNum)
                 if resultInfo.pairNum != 0 {
-                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
-                }
-                
-                //pingdian
-                switch resultInfo.drawType{
-                case 1:
-                    reportString = "平点"
-//                    reportString += String(resultInfo.drawID + 1) + resultInfo.drawSize
-                    reportString += resultInfo.drawSize
-                    print("平点 \(reportString)")
-                    break
-                case 2:
-                    reportString = "杂平点"
-                    
-//                    reportString += String(resultInfo.drawID + 1) + resultInfo.drawSize
-                    reportString += resultInfo.drawSize
-                    print("杂平点 \(reportString)")
-
-                    break
-                case 3:
-                    reportString = "双平点"
-                    break
-                case 4,5:
-                    reportString = "三平点"
-                    break
-                default:
-                    break
-                }
-                if resultInfo.drawType != 0 {
-                    
                     currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
                 }
 

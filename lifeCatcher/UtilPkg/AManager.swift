@@ -12,6 +12,9 @@ class AuthManager {
     static var activeDate: String = ""
     
     static var version: String = "2.0.1"
+    
+    static let passCodeKey = SymmetricKey(data: Data("CARNEGIEMELLONUNIVERSITY".utf8))
+
  
     //deprecated
     static func getUniqueID() -> String? {
