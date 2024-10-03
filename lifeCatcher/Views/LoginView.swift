@@ -263,7 +263,7 @@ struct LoginView: View {
             let returnAccountStatus = jsonResponse?["accountStatus"] as? Int ?? -1
             let returnExpiredTime = jsonResponse?["expiredTime"] as? Int ?? 0
             let returnActiveCode = jsonResponse?["activated_code"] as? String ?? ""
-            
+            let returnAuthKey = jsonResponse?["hash"] as? String ?? ""
 
             DispatchQueue.main.async {
                 if success {
@@ -278,13 +278,13 @@ struct LoginView: View {
                     let dateString = dateFormatter.string(from: date)
                     AuthManager.activeDate = dateString
                     
-                    print("过期时间 \(returnExpiredTime) \(dateString)")
+                    print("过期时间 \(returnExpiredTime)  验证码\(returnAuthKey)")
 
-                    if returnAccountStatus == 1 && AuthManager.authOnline(onlineKey: returnActiveCode) && AuthManager.authTime(){
+                    if returnAccountStatus == 1 && AuthManager.authOnline(onlineKey: returnActiveCode) && AuthManager.authTime(onlineKey: returnAuthKey, localKey: timestamp + AuthManager.retrieveUUID()){
                         print("正式版")
                         AuthManager.isActive = true
                     }
-                    else if returnAccountStatus == 2 && AuthManager.authTime(){
+                    else if returnAccountStatus == 2 && AuthManager.authTime(onlineKey: returnAuthKey, localKey: timestamp + AuthManager.retrieveUUID()){
                         AuthManager.isActive = true
                         AuthManager.autoQuit()
                         print("测试版")

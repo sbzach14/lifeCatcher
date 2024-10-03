@@ -226,7 +226,7 @@ class ReportManager{
         33:"[67]:上10张打色色牌先发保位置最大次大",
         34:"[68]:上10张打色色牌先发保位置最小",
         35:"[69]:上10张打色色牌先发保位置最小次小",
-        36:"[70]:上10张去牌保多轮位置最大次大次数最多*",
+        36:"[70]:上10张去牌保多轮位置最大次大次数最多",
         37:"[71]:上10张去牌保位置最大",
         38:"[71_1]:上10张去牌保位置最大对优先*",
         39:"[72]:上10张去牌保位置最大次大",
@@ -237,14 +237,14 @@ class ReportManager{
         44:"[77]:上10张去牌保多轮同点报最大次大生死门*",
         45:"[78_1]:上10张去牌保多轮同点且无9点*",
         46:"[78]:上10张去牌保多轮同点且无对子*",
-        47:"[79]:上10张去牌面为色去色保位置最大次大次数最多*",
+        47:"[79]:上10张去牌面为色去色保位置最大次大次数最多",
         48:"[80]:上10张去牌底为色保位置最大次大",
         49:"[81]:上10张去牌保位置最小无对子*",
         50:"[82]:上10张去牌保34门有最大报最大",
         51:"[83]:上10张去牌保34门有最大次大",
         52:"[84]:上10张抽面牌保位置最大",
         53:"[84_1]:上10张抽面牌保位置最小",
-        54:"[85]:上10张去牌保多轮位置最大次数最多*",
+        54:"[85]:上10张去牌保多轮位置最大次数最多",
         55:"[86]:上10张去牌面为色色先发保位置最大次大",
         56:"[87]:上10张去牌面为色色先发保位置最大",
         57:"[88]:上10张去牌面为色色先发保位置最小",
@@ -1575,7 +1575,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         }
         
         switch reportRule.colorSingleFeaturePos {
-            //面牌为色牌
+            //遍历位置为色牌
         case 0:
             singlefeatureRank = cutRankConvert(cutNumSetting: cutNumSetting, singlefeatureIndex: inputSingleFeatures[singlefeatureIndex])
             colorSingleFeatureIndexList.append(inputSingleFeatures[singlefeatureIndex])
@@ -1780,7 +1780,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         var fourCardReport: String = ""
         //报发牌方式
         var dealTypeReport: String = ""
-        
+
     }
     
     struct MultipleReportResultInfo{
@@ -1804,7 +1804,10 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         var leftSingleFeatures: [Int] = []
         //存放保多轮的结果
         var multiRoundInfo : [multiRoundInfoStruct] = []
-        
+        //看手牌的最大剩牌
+        var maxLookHandLeftCards: [Int] = []
+        //看手牌的最小剩牌
+        var minLookHandLeftCards: [Int] = []
     }
     //多轮不同情况的结果
     struct multiRoundInfoStruct{
@@ -2070,6 +2073,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 structString += "\(cutStruct.cutMode)"
             }
             print(structString)
+            
+            
 
 
             //看手牌
@@ -2080,7 +2085,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         print("看手牌留色，剩余牌 \(leftSingleFeatures)")
                         if cutStructList.count >= 1 && cutStructList[cutStructList.count - 1].cutMode != 3{
                             multipleResultInfo.reportResult = [[SpeakResultStruct(voiceType: 1, content: "已完成")]]
-                            
                         }
                         
                         multipleResultInfo.leftSingleFeatures = leftSingleFeatures
@@ -2281,7 +2285,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 
                 
                 
-                if inputSingleFeatures.count == 0{
+                if inputSingleFeatures.count == 0 && reportRule.consecutiveReport == -1{
                     break
                 }
             
@@ -2417,6 +2421,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 //1, 看手牌报下轮，传入下一轮牌堆
                 case 1:
                     for orderNum in 0..<rcNum{
+                        
                         let leftNum = LeftDealCardCal(startIndex: orderNum, diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, dealType: newArgs[0], handNum: handNum, minimumCardsNum: minSingleFeatureNum)
                         var originalSingleFeatures: [Int] = []
                         // print("剩余没发的牌数量 \(leftNum)")
@@ -2533,9 +2538,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             coloringInputSingleFeatures = lookHandSingleFeatures[singlefeatureIndex]
                         }
                         
-                        //随意打色位置
                         var randomColorPos = singlefeatureIndex
-                        print("随意打色位置 \(randomColorPos)")
                         
                         //反向打色
                         if coloringType == 1 {
@@ -2545,6 +2548,11 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         
                         var singlefeatureRank: Int = 0
                         var colorSingleFeatureIndexList: [Int] = []
+                        
+                        //如果当前的输入的牌组是空，则遍历下一个
+                        if coloringInputSingleFeatures.count == 0 {
+                            continue
+                        }
                         
                         (singlefeatureRank, colorSingleFeatureIndexList) = GetSingleFeatureRank(reportRule: reportRule, cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, inputSingleFeatures: coloringInputSingleFeatures, singlefeatureIndex: singlefeatureIndex, specialSingleFeaturePos: specialSingleFeaturePos, upDownID: upDownID, cutStructList: cutStructList, randomColorPos: randomColorPos)
 
@@ -2931,7 +2939,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 newInputSingleFeatures = coloringInputSingleFeatures + [colorSingleFeatureIndex]
                             }
                             break
-                        //多轮去牌,X-Y
+                        //多轮去牌,X-Y, 留色
                         case 35:
                             //第一轮才去牌不然就不变
                             if roundID == 1 {
@@ -2946,7 +2954,15 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 newInputSingleFeatures = Array(coloringInputSingleFeatures[10...])
                             }
                             break
-                            
+                        //多轮去牌,X-Y, 面为色去色
+                        case 37:
+                            //第一轮才去牌不然就不变
+                            if roundID == 1 {
+                                newInputSingleFeatures = Array(coloringInputSingleFeatures[singlefeatureIndex...])
+                            } else {
+                                newInputSingleFeatures = coloringInputSingleFeatures
+                            }
+                            newInputSingleFeatures.remove(at: 0)
                         default:
                             newInputSingleFeatures = coloringInputSingleFeatures
                             break
@@ -3373,6 +3389,25 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             break
                         }
                         
+//                      看手牌
+                        if reportRule.differentDeal == 1 || reportRule.differentDeal == 2 {
+                            //所有的用牌
+                            if singlefeatureIndex == 0 {
+                                let num1 = newInputSingleFeatures.count
+                                let num2 = leftSingleFeatures.count
+                                multipleResultInfo.maxLookHandLeftCards = Array(newInputSingleFeatures[0...(num1 - num2 - 1)])
+                                print("第一张时候的用牌 \(multipleResultInfo.maxLookHandLeftCards)")
+                            
+                            }
+                            
+                            if singlefeatureIndex == cutRange2 {
+                                let num1 = newInputSingleFeatures.count
+                                let num2 = leftSingleFeatures.count
+                                multipleResultInfo.minLookHandLeftCards = Array(newInputSingleFeatures[0...(num1 - num2 - 1)])
+                                print("最后一张时候的用牌 \(multipleResultInfo.minLookHandLeftCards)")
+                            }
+                        }
+                        
                         var reportTargetFlag: Int = 0
                         //报什么
                         switch reportRule.reportTarget{
@@ -3783,11 +3818,13 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             break
                         //保多轮位置最大次大次数最多
                         case 23:
+                            print("当前去牌\(singlefeatureIndex) 当前轮数 \(roundID)")
                             if resultPos.contains(where: {$0 == targets[0]}) {
+                                
                                 multipleResultInfo.multiRoundInfo[singlefeatureIndex].targetRoundID.append(roundID)
                                 multipleResultInfo.multiRoundInfo[singlefeatureIndex].targetTimes += 1
-                                
                                 currentResultInfo.ColorSingleFeatures = colorSingleFeatureIndexList
+                                print("去牌 \(singlefeatureIndex) 轮数 \(roundID) 结果 \(multipleResultInfo.multiRoundInfo[singlefeatureIndex].targetTimes) \(multipleResultInfo.multiRoundInfo[singlefeatureIndex].targetRoundID)")
                             }
                             multipleResultInfo.multiRoundInfo[singlefeatureIndex].leftFeatures = leftSingleFeatures
                             break
@@ -3870,7 +3907,11 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         if firstMultiCutFeatures.count != 0 {
             multipleResultInfo.leftSingleFeatures = firstMultiCutFeatures
             
-        } else {
+        } else if multipleResultInfo.minLookHandLeftCards.count != 0{
+            multipleResultInfo.leftSingleFeatures = multipleResultInfo.minLookHandLeftCards + leftSingleFeatures
+            print("看手牌的最后剩余的牌 \(multipleResultInfo.leftSingleFeatures)")
+            
+        }else {
             multipleResultInfo.leftSingleFeatures = leftSingleFeatures
         }
         
@@ -4015,7 +4056,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     reportString = "活门" + String(resultInfo.aliveNumber)
                     break
                 case 3, 1:
-                    reportString = "活门" + String(resultInfo.aliveNumber + 1)
+                    reportString = "半活门" + String(resultInfo.aliveNumber + 1)
                     voiceType = 0
                 default:
                     reportString = "0"
@@ -4025,9 +4066,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 if resultInfo.pairIDList.count > 0{
                     reportString = "对子"
                     voiceType = 0
-                    for pairID in resultInfo.pairIDList {
-                        reportString += String(pairID + 1)
-                    }
                     currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
                 }
                 
@@ -4041,9 +4079,15 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 var reportString = ""
                 var voiceType = 1
                 var currentResult : [SpeakResultStruct] = []
+                var reportNum: Int = 0
                 for rcID in resultInfo.targetRCList[0] {
+                    if reportNum > 1 {
+                        break
+                    }
                     reportString = String(rcID + 1)
                     currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                    reportNum += 1
+                    
                 }
                 
                 switch resultInfo.aliveNumber {
@@ -4061,9 +4105,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 if resultInfo.pairIDList.count > 0{
                     reportString = "对子"
                     voiceType = 0
-                    for pairID in resultInfo.pairIDList {
-                        reportString += String(pairID + 1)
-                    }
                     currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
                 }
                 
@@ -4086,9 +4127,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 if resultInfo.aliveNumber != 0 {
                     reportString += "活门" + String(resultInfo.aliveNumber)
                     
-                } else {
-                    reportString = "0"
                 }
+                
                 currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
 
                 reportResult.append(currentResult)
@@ -4216,7 +4256,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 case 1:
                     reportString = resultInfo.drawSize
                     reportString += "平点"
-//                    reportString += String(resultInfo.drawID + 1) + resultInfo.drawSize
                     print("平点 \(reportString)")
                     break
                 case 2:
@@ -4342,7 +4381,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
 //            40:"[73]:上10张去牌保位置最小",
 //            41:"[74]:上10张去牌保位置最小次小",
         // 报法格式 去牌张数 女0 不用去牌，男0去多少张都没用
-        case 37...41, 48, 52...57, 213, 251:
+        case 37...41, 48, 52...53, 55...57, 213, 251:
             for resultInfo in multipleReportResultInfo.singleResultList{
                 var currentSpeakStruct: [SpeakResultStruct] = []
 
@@ -4449,8 +4488,22 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         case 47,54:
             let voiceType: Int = 1
             var reportString: String = ""
-            reportString += String(multipleReportResultInfo.singlefeatureIndexForMultipleRound) + " "
-            reportString += multipleReportResultInfo.winRoundIndex.reduce("") { $0 + "\($1)" } + " "
+            var maxInfo: multiRoundInfoStruct = multiRoundInfoStruct(leftFeatures: [], targetTimes: 0, targetRoundID: [])
+            var index: Int = 0
+            var maxIndex: Int = 0
+            
+            for multiRoundInfo in multipleReportResultInfo.multiRoundInfo {
+                if multiRoundInfo.targetTimes > maxInfo.targetTimes {
+                    maxInfo = multiRoundInfo
+                    maxIndex = index
+                }
+                index += 1
+            }
+            reportString += String(maxIndex) + " "
+            for roundID in maxInfo.targetRoundID{
+                reportString += String(roundID) + " "
+            }
+            
             reportResult.append([SpeakResultStruct(voiceType: voiceType, content: reportString)])
             break
 //        49:"[81]:上10张去牌保位置最小无对子",
@@ -4766,7 +4819,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 
                 
                 
-                var reportString: String = ""
+                var _: String = ""
                 
                 var allGaps: [[Int]] = []
                 var cutIndexList: [Int] = []

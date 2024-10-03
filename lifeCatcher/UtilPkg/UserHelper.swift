@@ -34,6 +34,7 @@ func AutoLogin(username: String, password: String) {
         let returnAccountStatus = jsonResponse?["accountStatus"] as? Int ?? -1
         let returnExpiredTime = jsonResponse?["expiredTime"] as? Int ?? 0
         let returnActiveCode = jsonResponse?["activated_code"] as? String ?? ""
+        let returnAuthKey = jsonResponse?["hash"] as? String ?? ""
 
 //        DispatchQueue.main.async {
             if success {
@@ -46,9 +47,9 @@ func AutoLogin(username: String, password: String) {
                 let dateString = dateFormatter.string(from: date)
                 AuthManager.activeDate = dateString
                 
-                print("过期时间 \(returnExpiredTime) \(dateString) 激活码 \(returnActiveCode)")
+                print("过期时间 \(returnExpiredTime) \(dateString) 激活码 \(returnActiveCode) 验证码\(returnAuthKey)")
 
-                if returnAccountStatus == 1 && AuthManager.authOnline(onlineKey: returnActiveCode) && AuthManager.authTime(){
+                if returnAccountStatus == 1 && AuthManager.authOnline(onlineKey: returnActiveCode) && AuthManager.authTime(onlineKey: returnAuthKey, localKey: timestamp + AuthManager.retrieveUUID()){
                     print("正式版")
                     AuthManager.isActive = true
                 }

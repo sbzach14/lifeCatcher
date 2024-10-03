@@ -7,16 +7,13 @@ struct AuthTestView: View {
     @State private var isAuthorized = false
     @State private var activateStatus = -1
     @State private var expiredTime = 0
-    @State private var showError = false
+    @State private var showAlert = false
+    @State private var alertMessage = ""
     @State private var timeLimit = "One" // Add the state variable for timeLimit
     @State private var isTimeLimited = false // Add this state variable to track Toggle state
 
     var body: some View {
         VStack {
-            Text("Please enter your Auth Key:")
-                .font(.headline)
-                .padding()
-
             TextField("Enter your Key here", text: $userInput)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
@@ -24,18 +21,17 @@ struct AuthTestView: View {
             TextField("Enter your Passcode here", text: $passcode)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
-            // Add the Toggle here
-                    Toggle(isOn: $isTimeLimited) {
-                        Text("Enable Time Limit")
-                    }
-                    .padding()
-                    .onChange(of: isTimeLimited) { value in
-                        timeLimit = value ? "half" : "One"
-                    }
+            
             HStack{
                 
                 Button(action: {
-                    self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
+                    if containsOnlyHalfWidthUppercaseAndDigits(self.userInput){
+                        self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
+                    }
+                    else{
+                        showAlert = true
+                        alertMessage = "非法序列号，请手动输入。"
+                    }
                 }, label: {
                     Text("Generate")
                 })
@@ -44,8 +40,14 @@ struct AuthTestView: View {
                 Spacer()
                 
                 Button(action: {
-                    self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
-                    sendActivateRequest()
+                    if containsOnlyHalfWidthUppercaseAndDigits(self.userInput){
+                        self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
+                        sendActivateRequest()
+                    }
+                    else{
+                        showAlert = true
+                        alertMessage = "非法序列号，请手动输入。"
+                    }
                 }, label: {
                     Text("Authorize")
                 })
@@ -76,13 +78,13 @@ struct AuthTestView: View {
             
 
             Text("Expired Time: \(expiredTime)").foregroundColor(.white)
-            
-
-            if showError {
-                Text("Wrong passCode")
-                    .foregroundColor(.red)
-            }
-
+        }
+        .alert(isPresented: $showAlert) {
+            Alert(
+                title: Text(alertMessage),
+                message: Text(""),
+                dismissButton: .default(Text("OK"))
+            )
         }
         .background(
             Image("Newbg2")
@@ -94,7 +96,7 @@ struct AuthTestView: View {
     }
     
     private func sendDeleteRequest() {
-        guard let url = URL(string: "http://192.168.1.224:8080/delete_user") else { return }
+        guard let url = URL(string: "http://1.94.17.30:8080/delete_user") else { return }
                 
         let json: [String: Any] = [
             "deviceID": userInput,
@@ -110,7 +112,7 @@ struct AuthTestView: View {
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             guard let data = data, error == nil else {
                 DispatchQueue.main.async {
-                    self.showError = true
+                    self.showAlert = true
                 }
                 return
             }
@@ -126,13 +128,13 @@ struct AuthTestView: View {
                         DispatchQueue.main.async {
                             let deleteStatus = jsonResponse["deleteStatus"] as? Int ?? -1
                             self.activateStatus = deleteStatus
-                            self.showError = true
+                            self.showAlert = true
                         }
                     }
                 }
             } catch {
                 DispatchQueue.main.async {
-                    self.showError = true
+                    self.showAlert = true
                 }
             }
         }
@@ -144,11 +146,11 @@ struct AuthTestView: View {
         
         self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
         
-        let encrypt_passcode = try! AuthManager.encrypt(self.passcode, key: AuthManager.passCodeKey)
-
+        
+        
         let json: [String: Any] = [
             "activate_code": activeKey,
-            "passCode": encrypt_passcode,
+            "passCode": self.passcode,
             "deviceID": userInput,
             "timeLimit": timeLimit
         ]
@@ -163,7 +165,8 @@ struct AuthTestView: View {
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             guard let data = data, error == nil else {
                 DispatchQueue.main.async {
-                    self.showError = true
+                    self.showAlert = true
+                    self.alertMessage = "激活失败"
                 }
                 return
             }
@@ -174,20 +177,37 @@ struct AuthTestView: View {
                         DispatchQueue.main.async {
                             self.activateStatus = jsonResponse["activateStatus"] as? Int ?? -1
                             self.expiredTime = jsonResponse["expiredTime"] as? Int ?? 0
+                          
                         }
                     } else {
                         DispatchQueue.main.async {
-                            self.showError = true
+                            self.showAlert = true
+                            self.alertMessage = "激活失败"
                         }
                     }
                 }
             } catch {
                 DispatchQueue.main.async {
-                    self.showError = true
+                    self.showAlert = true
+                    self.alertMessage = "激活失败"
                 }
             }
         }
 
         task.resume()
     }
+    
+    func containsOnlyHalfWidthUppercaseAndDigits(_ input: String) -> Bool {
+        return input.allSatisfy { char in
+            if let scalar = char.unicodeScalars.first {
+                // 检查是否是半角大写字母、数字或 '-'
+                return (scalar.value >= 0x41 && scalar.value <= 0x5A) || // A-Z
+                       (scalar.value >= 0x30 && scalar.value <= 0x39) || // 0-9
+                       (char == "-") // -
+            }
+            return false
+        }
+    }
 }
+
+

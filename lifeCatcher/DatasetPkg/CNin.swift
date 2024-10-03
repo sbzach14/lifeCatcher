@@ -45,7 +45,8 @@ class CNDatasetRule : Rule{
         2:"红Q>红2>红8>红4>红10>红6>黑4>黑八>黑10>红7>黑6>黑9>",
         3:"红Q>红2>红8>红4>红10>红6>黑4>黑J>黑10>红7>黑6>黑9>黑8>黑7>黑5>大王>小王",
         4:"红Q>红2>红8>红4>红6(=红10=黑4)>红J(=黑10=红7=黑6)>红9(=黑8=黑7=红5=大王=黑桃A=黑桃3=红桃3)",
-        5:"黑2>红2>红8>红4>红10>红6>黑4>红1>黑10>红7>黑6>黑9>黑8>黑7>黑5>大王>小王"
+        5:"黑2>红2>红8>红4>红10>红6>黑4>红1>黑10>红7>黑6>黑9>黑8>黑7>黑5>大王>小王",
+        6:"红Q>红2>红8>红4>红6(=红10=黑4)>红J(=黑10=红7=黑6)>红9(=黑8=黑7=红5=大王=黑桃A=黑桃3=红桃3)"
     ]
     let handNum:[Int] = [2,4]
     
@@ -581,7 +582,7 @@ class CNDatasetHandAnalyst{
             43: self.eval_isRedJoJoOrBlackAThree,
             44: self.eval_isRedSixTenBlackFourPair,
             45: self.eval_isRedJSevenBlackTenSixPair,
-            
+            46: self.eval_RedThreeRedJoJo(singlefeatures:),
         ]
     }
     
@@ -615,6 +616,12 @@ class CNDatasetHandAnalyst{
         return (score, "", 0)
     }
     
+    func eval_RedThreeRedJoJo(singlefeatures:[CNSingleFeature]) -> (Int, String, Int) {
+        if singlefeatures[0].originalRank == 15 && singlefeatures[1].originalRank == 3 && singlefeatures[1].color == 1 {
+            return(0,"红三大王", 0)
+        }
+        return (0, "", 0)
+    }
     //规则函数，返回(rank, singlefeatureType, isPair)
     func eval_BlackThreeRedJoJo(singlefeatures:[CNSingleFeature]) -> (Int, String, Int) {
         if singlefeatures[0].originalRank == 15 && singlefeatures[1].originalRank == 3 && singlefeatures[1].color == 0 {
