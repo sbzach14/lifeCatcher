@@ -48,6 +48,7 @@
 		A87DE1CE2CA47A0900B73DB6 /* detect_0903_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A87DE1CB2CA47A0900B73DB6 /* detect_0903_copy.mlmodel */; };
 		A87DE1CF2CA47A0900B73DB6 /* cls_0727_v_trans_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A87DE1CC2CA47A0900B73DB6 /* cls_0727_v_trans_copy.mlmodel */; };
 		A87DE1D12CA7349900B73DB6 /* 0926_cls_h.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = A87DE1D02CA7349900B73DB6 /* 0926_cls_h.mlpackage */; };
+		A87DE1D32CAF05EC00B73DB6 /* riffle_1002_h.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A87DE1D22CAF05EC00B73DB6 /* riffle_1002_h.mlmodel */; };
 		A887167F2A0623E500B7F2CD /* AManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887167E2A0623E500B7F2CD /* AManager.swift */; };
 		A887B6502A7FE1AF009F488F /* ShowResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B64F2A7FE1AF009F488F /* ShowResultView.swift */; };
 		A887B6522A8104BC009F488F /* TimeAuthUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B6512A8104BC009F488F /* TimeAuthUtils.swift */; };
@@ -128,6 +129,7 @@
 		A87DE1CB2CA47A0900B73DB6 /* detect_0903_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = detect_0903_copy.mlmodel; sourceTree = "<group>"; };
 		A87DE1CC2CA47A0900B73DB6 /* cls_0727_v_trans_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0727_v_trans_copy.mlmodel; sourceTree = "<group>"; };
 		A87DE1D02CA7349900B73DB6 /* 0926_cls_h.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = 0926_cls_h.mlpackage; sourceTree = "<group>"; };
+		A87DE1D22CAF05EC00B73DB6 /* riffle_1002_h.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; name = riffle_1002_h.mlmodel; path = ../../../Downloads/riffle_1002_h.mlmodel; sourceTree = "<group>"; };
 		A887167E2A0623E500B7F2CD /* AManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AManager.swift; sourceTree = "<group>"; };
 		A887B64F2A7FE1AF009F488F /* ShowResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowResultView.swift; sourceTree = "<group>"; };
 		A887B6512A8104BC009F488F /* TimeAuthUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeAuthUtils.swift; sourceTree = "<group>"; };
@@ -339,6 +341,7 @@
 				A87DE1D02CA7349900B73DB6 /* 0926_cls_h.mlpackage */,
 				A87DE1CA2CA47A0900B73DB6 /* cls_0715_h_trans_copy.mlmodel */,
 				A87DE1CC2CA47A0900B73DB6 /* cls_0727_v_trans_copy.mlmodel */,
+				A87DE1D22CAF05EC00B73DB6 /* riffle_1002_h.mlmodel */,
 				A87DE1CB2CA47A0900B73DB6 /* detect_0903_copy.mlmodel */,
 				D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */,
 				D03811A42C7542C200726B99 /* cls_0727_v_trans.mlmodel */,
@@ -499,6 +502,7 @@
 				A86459282C90B59E00AF0BA9 /* Ain.swift in Sources */,
 				A8FBC7C22A3F0A5C00EDDFD7 /* VisionUtils.swift in Sources */,
 				A88EFE0D2A7FDC9500897243 /* HistoryView.swift in Sources */,
+				A87DE1D32CAF05EC00B73DB6 /* riffle_1002_h.mlmodel in Sources */,
 				A87DE1CD2CA47A0900B73DB6 /* cls_0715_h_trans_copy.mlmodel in Sources */,
 				18C98D102C158F7B00A8CD49 /* NPoi.swift in Sources */,
 				18CA14D6284AC42C00F90372 /* CameraImageView.swift in Sources */,
