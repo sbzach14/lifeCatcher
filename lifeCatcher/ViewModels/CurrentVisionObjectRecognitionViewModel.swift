@@ -1087,7 +1087,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         && self.state == "riffle"
                         && leftDetectSingleFeature == self.stateSingleFeature[0]
                         && rightDetectSingleFeature == self.stateSingleFeature[1]{
-                        self.state == "shuffle"
+                        self.state = "shuffle"
                     }
                     
                     if self.state == "shuffle" && leftDetectSingleFeature != -1 && rightDetectSingleFeature != -1{
@@ -1143,11 +1143,13 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         
                         if self.shuffleMode[1] == 1{
                             //拨到顶
-                            if self.singlefeatureArray.count >= self.minSingleFeatureNum{
-                                //self.speakText(input: 1)
-                            }
-                            else{
-                                //self.speakText(input: 2)
+                            if self.cutMode[1] != 0 || self.specialCard[1] != 0{
+                                if self.singlefeatureArray.count >= self.minSingleFeatureNum{
+                                    self.speakText(input: 1)
+                                }
+                                else{
+                                    self.speakText(input: 2)
+                                }
                             }
                         }
                         
@@ -1158,11 +1160,13 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                 self.singlefeatureArray.remove(at: 0)
                             }
                             
-                            if self.singlefeatureArray.count >= self.minSingleFeatureNum + 1{
-                                //self.speakText(input: 1)
-                            }
-                            else{
-                                //self.speakText(input: 2)
+                            if self.cutMode[1] != 0 || self.specialCard[1] != 0{
+                                if self.singlefeatureArray.count >= self.minSingleFeatureNum + 1{
+                                    self.speakText(input: 1)
+                                }
+                                else{
+                                    self.speakText(input: 2)
+                                }
                             }
                         }
                         
