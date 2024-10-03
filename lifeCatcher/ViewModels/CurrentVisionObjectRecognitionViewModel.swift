@@ -31,15 +31,14 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var cutStructArray: [cutStruct] = []
     @Published var cutShowArray : [Int] = []
     
-    let detectModel = try! detect_0903_copy()
+//    let detectModel = try! detect_0903_copy()
 //    let clsModel_h = try! cls_0715_h_trans_copy()
-// 加载 clsModel_h 模型 (.mlpackage)
-
-    let clsModel_h = try! cls_0715_h_trans_copy()
-    let clsModel_v = try! cls_0727_v_trans_copy()
-//    let detectModel = try! detect_0903()
-//    let clsModel_h = try! cls_0715_h_trans()
-//    let clsModel_v = try! cls_0727_v_trans()
+//    let clsModel_v = try! cls_0727_v_trans_copy()
+    
+    let detectModel = try! detect_0903()
+    let clsModel_h = try! cls_0715_h_trans()
+    let clsModel_v = try! cls_0727_v_trans()
+    
     var originSize : [Float] = [1920, 1080] //相机图像大小
     var imageSize : [Float] = [569, 320] //target area 截图大小
     var originImageSize : [Float] = [569, 320] //target area 原始截图大小
@@ -1082,6 +1081,14 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     self.detectResultList[taskIndex] = singlefeatureResult
                     
                     var stateResult : [[Float]] = []
+                    
+                    if minDetectConfidence >= detectConfidenceThreshold 
+                        && isShuffle
+                        && self.state == "riffle"
+                        && leftDetectSingleFeature == self.stateSingleFeature[0]
+                        && rightDetectSingleFeature == self.stateSingleFeature[1]{
+                        self.state == "shuffle"
+                    }
                     
                     if self.state == "shuffle" && leftDetectSingleFeature != -1 && rightDetectSingleFeature != -1{
                         stateResult.append(singlefeatureResult[0].coordinate)
@@ -2273,7 +2280,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     boxfactor = 5
                 }
                 
-                minW = max(minW,minH/h*w) * boxfactor
+                minW = max(minW,minH) * boxfactor
                 minW = min(minW, self.originSize[0] - 10)
                 
                 targetArea[2] = minW
@@ -2322,10 +2329,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     boxfactor = 5
                 }
                 
-                minH = max(minW/w*h,minH) * boxfactor
+                minH = max(minW,minH) * boxfactor
                 minH = min(minH, self.originSize[1] - 10)
                 
-                targetArea[2] = minH
+                targetArea[2] = minH / w * h
                 targetArea[3] = minH
                 
                 let centerX = (minX + maxX)/2
