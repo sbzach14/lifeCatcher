@@ -987,10 +987,11 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                     self.isProcessNeedToCut = false
                                 }
                             }
+                            //连续看手
                             else if self.specialCard[self.shuffleOrRiffle] == 3{
                                 self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 3))
                                 self.cutShowArray.append(detectSingleFeature)
-                                self.isProcessNeedToCut = false
+                                isCutDone = true
                             }
                         }
                         
