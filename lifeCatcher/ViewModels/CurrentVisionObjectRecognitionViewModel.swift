@@ -875,7 +875,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 //                    UIImageWriteToSavedPhotosAlbum(savedUIImage, self, #selector(self.imageSaved(_:didFinishSavingWithError:contextInfo:)), nil)
                     
                 }
-                else if self.state != "shuffle"
+                else if self.state != "detecting"
                     && (detectNum == 0 || detectConfidence < confidenceThreshold){
                     self.stateCounter += 1
                 }
