@@ -2779,6 +2779,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         testArray.shuffle()
         self.singlefeatureArray = testArray
+//        self.singlefeatureArray = [2,2,4,2,3,3,3,3,4,5,6,7,8]
         
         self.cutStructArray = []
         self.cutShowArray = []

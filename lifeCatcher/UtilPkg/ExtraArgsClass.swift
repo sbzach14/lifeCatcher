@@ -3092,7 +3092,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 }
                             //最大次大
                             case 1:
-                                for i in 0..<min(rankedWinnersInfo.count - 1, 2){
+                                for i in 0..<min(rankedWinnersInfo.count, 2){
                                     for winner in rankedWinnersInfo[i]{
                                         resultTargetPos.append(winner.rcID)
                                         resultTargetRank.append(i)
@@ -3350,6 +3350,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 }
                             }
                             
+                            print("winpretime \(winPreTime) winnexttime \(winNextTime) drawtime \(drawTime)")
+                            
                             //赢下家概率大于 70 上活门
                             if (Double(winNextTime) / Double(rcNum)) > 0.7 {
                                 upAlive = true
@@ -3358,9 +3360,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             else if (Double(winPreTime) / Double(rcNum)) > 0.7 {
                                 downAlive = true
                             }
-                            else if (Double(winNextTime + drawTime) / Double(rcNum) > 0.7){
+                            else if (Double(winNextTime + drawTime) / Double(rcNum)) > 0.7 && winNextTime > 1{
                                 halfUpAlive = true
-                            } else if (Double(winPreTime + drawTime) / Double(rcNum)) > 0.7 {
+                            } else if (Double(winPreTime + drawTime) / Double(rcNum)) > 0.7 && winPreTime > 1{
                                 halfDownAlive = true
                             }
                             break
