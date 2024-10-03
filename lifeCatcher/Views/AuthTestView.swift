@@ -12,7 +12,6 @@ struct AuthTestView: View {
     @State private var timeLimit = "One" // Add the state variable for timeLimit
     @State private var isTimeLimited = false // Add this state variable to track Toggle state
 
-
     var body: some View {
         VStack {
             TextField("Enter your Key here", text: $userInput)
@@ -55,6 +54,16 @@ struct AuthTestView: View {
                 .padding()
             }
             
+            HStack{
+                
+                Button(action: {
+                    sendDeleteRequest()
+                }, label: {
+                    Text("Delete")
+                })
+                .padding()
+            }
+            
             ScrollView{
                 Text(activeKey)
                     .textSelection(.enabled)
@@ -85,6 +94,52 @@ struct AuthTestView: View {
         )
         .navigationTitle("Auth".localized())
     }
+    
+    private func sendDeleteRequest() {
+        guard let url = URL(string: "http://1.94.17.30:8080/delete_user") else { return }
+                
+        let json: [String: Any] = [
+            "deviceID": userInput,
+        ]
+
+        let jsonData = try! JSONSerialization.data(withJSONObject: json)
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = jsonData
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            guard let data = data, error == nil else {
+                DispatchQueue.main.async {
+                    self.showAlert = true
+                }
+                return
+            }
+            do {
+                if let jsonResponse = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                    if let success = jsonResponse["success"] as? Bool, success {
+                        DispatchQueue.main.async {
+                            let deleteStatus = jsonResponse["deleteStatus"] as? Int ?? -1
+                            
+                            self.activateStatus = deleteStatus
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            let deleteStatus = jsonResponse["deleteStatus"] as? Int ?? -1
+                            self.activateStatus = deleteStatus
+                            self.showAlert = true
+                        }
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.showAlert = true
+                }
+            }
+        }
+        task.resume()
+    }
 
     private func sendActivateRequest() {
         guard let url = URL(string: "http://1.94.17.30:8080/activate") else { return }
@@ -95,7 +150,7 @@ struct AuthTestView: View {
         
         let json: [String: Any] = [
             "activate_code": activeKey,
-            "passCode": passcode,
+            "passCode": self.passcode,
             "deviceID": userInput,
             "timeLimit": timeLimit
         ]
@@ -120,8 +175,6 @@ struct AuthTestView: View {
                 if let jsonResponse = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
                     if let success = jsonResponse["success"] as? Bool, success {
                         DispatchQueue.main.async {
-                            let returnActivateStatus = jsonResponse["activateStatus"] as? Int ?? -1
-                            let returnExpiredTime = jsonResponse["expiredTime"] as? Int ?? 0
                             self.activateStatus = jsonResponse["activateStatus"] as? Int ?? -1
                             self.expiredTime = jsonResponse["expiredTime"] as? Int ?? 0
                           

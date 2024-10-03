@@ -31,16 +31,15 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var cutStructArray: [cutStruct] = []
     @Published var cutShowArray : [Int] = []
     
-//    let detectModel = try! detect_0903_copy()
+    let detectModel = try! detect_0903_copy()
 //    let clsModel_h = try! cls_0715_h_trans_copy()
-//    let clsModel_v = try! cls_0727_v_trans_copy()
-    let detectModel = try! detect_0903()
-    let clsModel_h = try! cls_0715_h_trans()
-    let clsModel_v = try! cls_0727_v_trans()
-    
-//    let riffleModel_h = try! riffle_1002_h()
-//    let riffleModel_v = try! riffle_1002_v()
-    
+// 加载 clsModel_h 模型 (.mlpackage)
+
+    let clsModel_h = try! cls_0715_h_trans_copy()
+    let clsModel_v = try! cls_0727_v_trans_copy()
+//    let detectModel = try! detect_0903()
+//    let clsModel_h = try! cls_0715_h_trans()
+//    let clsModel_v = try! cls_0727_v_trans()
     var originSize : [Float] = [1920, 1080] //相机图像大小
     var imageSize : [Float] = [569, 320] //target area 截图大小
     var originImageSize : [Float] = [569, 320] //target area 原始截图大小
@@ -89,6 +88,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     //测试用的定时器
     public var ding: Int = 0
     public var ciimageQueue: [CIImage] = []
+    
+    //存图用的记录顺序
+    var saveOrderIndex: Int = 0
     
     let idleRate = 30
     var taskImageArray : [String] = []
@@ -1219,6 +1221,15 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 }
             }
         }
+        
+//        if self.state == "riffle" {
+//            let modelCIImage = CIImage(cvPixelBuffer: pixelBuffer)
+//            let cgImage = CIContext().createCGImage(modelCIImage, from: modelCIImage.extent)
+//            let savedUIImage = UIImage(cgImage: cgImage!)
+//            UIImageWriteToSavedPhotosAlbum(savedUIImage, self, #selector(self.imageSaved(_:didFinishSavingWithError:contextInfo:)), nil)
+//            print("image task \(taskIndex) saved \(self.saveOrderIndex)")
+//            self.saveOrderIndex += 1
+//        }
     }
     
     private func quitDetect(reloadingTime: Double){
@@ -2880,6 +2891,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             else{
                 self.usedSingleFeatures = Array(self.singlefeatureArray[0...(usedNum - 1)])
             }
+            //看手牌
+//            if self.specialCard[self.shuffleOrRiffle] == 1 {
+//                self.usedSingleFeatures = multipleDatasetRCInfos.maxLookHandLeftCards + multipleDatasetRCInfos.minLookHandLeftCards
+//                print("看手牌")
+//            }
+            
             print("上一轮使用的牌 \(self.usedSingleFeatures)")
         }
     }
