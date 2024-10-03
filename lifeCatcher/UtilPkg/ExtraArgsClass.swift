@@ -3194,15 +3194,18 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                         }
                                         currentResultInfo.drawID = rankSet[0].rcID
                                     } else if rankSet.count == 3{
-                                        if rankSet[0].rcDatasetRank == 2{
+                                        print("三平点的排名 \(rankSet[0].rcDatasetRank)")
+                                        if setPos == 1{
                                             drawType = 5
-                                        } else if rankSet[0].rcDatasetRank == 1 {
+                                        } else if setPos == 0 {
                                             drawType = 4
                                         }
+                                    } else if rankSet.count == 4 {
+                                        drawType = 7
                                     }
                                     setPos += 1
                                 }
-                                //1,平点，2杂平点，3单双平点，4三大一小，5三小一大, 6连续双平点
+                                //1,平点，2杂平点，3单双平点，4三大一小，5三小一大, 6连续双平点, 7 四平点
                                 currentResultInfo.drawSize = drawSize
                                 
                                 //单双平点
@@ -3223,6 +3226,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 //杂平点
                                 } else if drawType == 2{
                                     currentResultInfo.drawType = 2
+                                } else if drawType == 7 {
+                                    currentResultInfo.drawType = 7
                                 }
                                 break
                                 
@@ -4259,7 +4264,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 }
 
                 // 不打几
-                if resultInfo.drawType != 3 && resultInfo.drawType != 5 && resultInfo.drawType != 6 {
+                if resultInfo.drawType != 3 && resultInfo.drawType != 5 && resultInfo.drawType != 6 && resultInfo.drawType != 7{
                     reportString = "不打"
                     reportString += String(resultInfo.NoColorNum)
                     currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
@@ -4306,6 +4311,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     break
                 case 6:
                     reportString = "连续双平点"
+                    break
+                case 7:
+                    reportString = "四平点"
                     break
                 default:
                     break
