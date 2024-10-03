@@ -4080,6 +4080,11 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 var voiceType = 1
                 var currentResult : [SpeakResultStruct] = []
                 var reportNum: Int = 0
+                //有平点就男声
+                if resultInfo.hasDrawPoint > 0 {
+                    voiceType = 0
+                }
+                
                 for rcID in resultInfo.targetRCList[0] {
                     if reportNum > 1 {
                         break
@@ -4089,22 +4094,27 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     reportNum += 1
                     
                 }
+
                 
                 switch resultInfo.aliveNumber {
                 case 4, 2:
                     reportString = "活门" + String(resultInfo.aliveNumber)
+                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+
                     break
                 case 3, 1:
                     reportString = "半活门" + String(resultInfo.aliveNumber + 1)
                     voiceType = 0
+                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                    break
                 default:
-                    reportString = "0"
+                    break
                 }
-                currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                
                 
                 if resultInfo.pairIDList.count > 0{
                     reportString = "对子"
-                    voiceType = 0
+//                    voiceType = 0
                     currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
                 }
                 
@@ -4117,9 +4127,14 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         case 7:
             for resultInfo in multipleReportResultInfo.singleResultList{
                 var reportString = ""
-                let voiceType = 1
+                var voiceType = 1
                 var currentResult : [SpeakResultStruct] = []
                 var reportNum: Int = 0
+                
+                //有平点就男声
+                if resultInfo.hasDrawPoint > 0 {
+                    voiceType = 0
+                }
 
                 for rcID in resultInfo.targetRCList[0] {
                     if reportNum > 1 {
@@ -4137,7 +4152,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
                 }
                 
-
                 reportResult.append(currentResult)
             }
             break
