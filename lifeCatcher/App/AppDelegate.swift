@@ -32,7 +32,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //            AuthManager.detectModel = try MLModel.init(contentsOf: URL.init(fileURLWithPath: detectModelPath!))
 //            AuthManager.clsModel_h = try MLModel.init(contentsOf: URL.init(fileURLWithPath: ClsHModelPath!))
 //            AuthManager.clsModel_v = try MLModel.init(contentsOf: URL.init(fileURLWithPath: ClsVModelPath!))
-            
+
         } catch {
             // print("解密操作失败：\(error)")
         }

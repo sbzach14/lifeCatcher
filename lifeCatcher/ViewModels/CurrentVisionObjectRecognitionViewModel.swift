@@ -37,6 +37,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     let detectModel = try! detect_0903()
     let clsModel_h = try! cls_0715_h_trans()
     let clsModel_v = try! cls_0727_v_trans()
+    
+//    let riffleModel_h = try! riffle_1002_h()
+//    let riffleModel_v = try! riffle_1002_v()
+    
     var originSize : [Float] = [1920, 1080] //相机图像大小
     var imageSize : [Float] = [569, 320] //target area 截图大小
     var originImageSize : [Float] = [569, 320] //target area 原始截图大小
@@ -699,7 +703,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             confidenceThreshold = 0.7
         }
         else{
-            confidenceThreshold = 0.5
+            confidenceThreshold = 0.3
         }
         
         var iou: Double = 0.01
@@ -710,29 +714,34 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer)
         }
         else if self.isCameraHorizon{
-            let result = try! self.clsModel_h.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
-            singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer)
+            if self.shuffleMode[0] != 0{
+                let result = try! self.clsModel_h.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
+                singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer)
+            }
+            else{
+                let result = try! self.clsModel_h.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
+                singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer)
+            }
         }
         else{
-            let result = try! self.clsModel_v.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
-            singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer)
+            if self.shuffleMode[0] != 0{
+                let result = try! self.clsModel_v.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
+                singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer)
+            }
+            else{
+                let result = try! self.clsModel_v.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
+                singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer)
+            }
         }
         
-        
-        
-        //            // 创建输入
-        //            let input = try! DetectionInput(image: pixelBuffer,
-        //                                           iouThreshold: 0.45,
-        //                                           confidenceThreshold: confidenceThreshold)
-        //
-        //            // 进行预测
-        //            let prediction = try! mlmodel.prediction(from: input)
-        //
-        //            // 处理预测结果
-        //            let confidence = prediction.featureValue(for: "confidence")!.multiArrayValue!
-        //            let coordinates = prediction.featureValue(for: "coordinates")!.multiArrayValue!
-        //            singlefeatureResult = getSingleFeature(from: confidence, from: coordinates, from: pixelBuffer)
-        
+//        // 创建输入
+//        let input = try! DetectionInput(image: pixelBuffer,iouThreshold: iou,confidenceThreshold: 0.05)
+//        // 进行预测
+//        let prediction = try! riffleModel_h.prediction(from: input)
+//        // 处理预测结果
+//        let confidence = prediction.featureValue(for: "confidence")!.multiArrayValue!
+//        let coordinates = prediction.featureValue(for: "coordinates")!.multiArrayValue!
+//        singlefeatureResult = getSingleFeature(from: confidence, from: coordinates, from: pixelBuffer)
         
         
         DispatchQueue.main.async{ [self] in
@@ -855,13 +864,23 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     && self.state == "detecting"{
                     self.stateCounter += 1
                 }
-                else if self.state != "detecting"{
-                    if detectNum == 0 || detectConfidence < confidenceThreshold{
-                        self.stateCounter += 1
-                    }
-                    else{
-                        self.stateCounter = 0
-                    }
+                else if self.shuffleMode[1] != 0
+                    && (detectNum < 1 || detectConfidence < confidenceThreshold)
+                    && self.state == "detecting"{
+                    self.stateCounter += 1
+                    
+//                    let modelCIImage = CIImage(cvPixelBuffer: pixelBuffer)
+//                    let cgImage = CIContext().createCGImage(modelCIImage, from: modelCIImage.extent)
+//                    let savedUIImage = UIImage(cgImage: cgImage!)
+//                    UIImageWriteToSavedPhotosAlbum(savedUIImage, self, #selector(self.imageSaved(_:didFinishSavingWithError:contextInfo:)), nil)
+                    
+                }
+                else if self.state != "shuffle"
+                    && (detectNum == 0 || detectConfidence < confidenceThreshold){
+                    self.stateCounter += 1
+                }
+                else{
+                    self.stateCounter = 0
                 }
                 
                 var stateResult : [[Float]] = []
@@ -966,6 +985,11 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                     self.isProcessNeedToCut = false
                                 }
                             }
+                            else if self.specialCard[self.shuffleOrRiffle] == 3{
+                                self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 3))
+                                self.cutShowArray.append(detectSingleFeature)
+                                self.isProcessNeedToCut = false
+                            }
                         }
                         
                         if isCutDone{
@@ -1039,16 +1063,17 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 //识别过程
                 else if taskIndex >= 0 && self.isDetect{
                     
-                    if leftConfidence > detectConfidenceMinThreshold{
+                    if leftConfidence > 0.7{
                         self.detectSet.insert(leftDetectSingleFeature)
                     }
-                    if rightConfidence > detectConfidenceMinThreshold{
+                    if rightConfidence > 0.7{
                         self.detectSet.insert(rightDetectSingleFeature)
                     }
                     
                     if self.detectSet.count >= 5
                     {
                         self.initTargetArea = self.targetArea
+                        self.speechPerformer.stopSpeechSynthesis()
                     }
                     
                     self.detectResultList[taskIndex] = singlefeatureResult
@@ -1096,6 +1121,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 //                            }
                             self.computeWinnerRC(isReset: true)
                         }
+                        else{
+                            showShuffleTimeText()
+                        }
                     }
                     else if detectState.isSingle && !detectState.isShort && self.shuffleMode[1] != 0{
                         //拨牌
@@ -1134,6 +1162,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 //                                self.reloadingTime = 1
 //                            }
                             self.computeWinnerRC(isReset: true)
+                        }
+                        else{
+                            showShuffleTimeText()
                         }
                     }
                     
@@ -1187,11 +1218,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 }
             }
         }
-        
-        //        let modelCIImage = CIImage(cvPixelBuffer: pixelBuffer)
-        //        let cgImage = CIContext().createCGImage(modelCIImage, from: modelCIImage.extent)
-        //        let savedUIImage = UIImage(cgImage: cgImage!)
-        //        UIImageWriteToSavedPhotosAlbum(savedUIImage, self, #selector(self.imageSaved(_:didFinishSavingWithError:contextInfo:)), nil)
     }
     
     private func quitDetect(reloadingTime: Double){
@@ -1415,7 +1441,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         
         var isShort = true
-        if leftSideCnt + rightSideCnt >= self.minSingleFeatureNum{
+        if leftSideCnt + rightSideCnt >= 15{
             isShort = false
         }
         
@@ -2154,7 +2180,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
         }
         
-        isShort = uniqueArray.count < self.minSingleFeatureNum
+        isShort = uniqueArray.count < 15
         
         print("handle result \(uniqueArray.count) \(minSingleFeatureNum) isShort\(isShort)")
         
@@ -2230,12 +2256,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         boxfactor = 7.5
                     }
                 }
-                //要要洗或拨
+                //要洗或拨
                 else{
                     boxfactor = 5
                 }
                 
-                minW = max(minW,minH) * boxfactor
+                minW = max(minW,minH/h*w) * boxfactor
                 minW = min(minW, self.originSize[0] - 10)
                 
                 targetArea[2] = minW
@@ -2284,10 +2310,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     boxfactor = 5
                 }
                 
-                minH = max(minW,minH) * boxfactor
+                minH = max(minW/w*h,minH) * boxfactor
                 minH = min(minH, self.originSize[1] - 10)
                 
-                targetArea[2] = minH / w * h
+                targetArea[2] = minH
                 targetArea[3] = minH
                 
                 let centerX = (minX + maxX)/2
@@ -2377,7 +2403,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 var minW = (maxX - minX)*boxfactor
                 var minH = (maxY - minY)*boxfactor
                 
-                minH = max(minH, minW / h * w)
+                minH = max(minH, minW)
                 minH = min(minH, self.originSize[1] - 10)
                 
                 minW = max((maxX - minX), minH / w * h)
@@ -2954,17 +2980,15 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             
             var reportLength = 0
             if timeMode == 1{
-                reportLength = 2
+                reportLength = 1
             }
             else if timeMode == 2{
-                reportLength = 3
+                reportLength = 2
             }
             
             if reportTextList.count > reportLength {
-                // 如果长度大于2，则保留最后两个元素
                 reportTextList = Array(reportTextList.suffix(reportLength))
             } else {
-                // 如果长度小于2，则用 "00" 补齐到2
                 let count = reportTextList.count
                 while reportTextList.count < reportLength {
                     reportTextList.insert("00", at: 0)
@@ -2972,10 +2996,64 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
             
             self.timeModeText = reportTextList.joined(separator: ":")
+            
+            if self.shuffleOrRiffle == 0{
+                if self.singlefeatureArray.count == self.allSingleFeatureIndex.count{
+                    self.timeModeText = "88:" + self.timeModeText
+                }
+                else{
+                    self.timeModeText = "00:" + self.timeModeText
+                }
+            }
+            else{
+                self.timeModeText = "88:" + self.timeModeText
+            }
+            
             self.showTimeModeText = true
             scheduleHideTimeModeText()
             print(self.timeModeText)
             
+        }
+    }
+    
+    func showShuffleTimeText(){
+        if self.timeMode != 0{
+            if self.shuffleOrRiffle == 0{
+                if self.singlefeatureArray.count == self.allSingleFeatureIndex.count{
+                    self.timeModeText = "88:00:00"
+                }
+                else{
+                    self.timeModeText = "00:00:00"
+                }
+            }
+            else{
+                self.timeModeText = "88:00:00"
+            }
+            
+            self.showTimeModeText = true
+            scheduleHideTimeModeText()
+            print(self.timeModeText)
+        }
+    }
+    
+    func showSingleTimeText(showText: String){
+        if timeMode != 0{
+            var timeText = showText
+            if showText.count == 1{
+                timeText = "0" + timeText
+            }
+            
+            if timeMode == 1{
+                timeText = "00:" + timeText
+            }
+            else if timeMode == 2{
+                timeText = "00:00:" + timeText
+            }
+            
+            self.timeModeText = timeText
+            self.showTimeModeText = true
+            scheduleHideTimeModeText()
+            print(self.timeModeText)
         }
     }
     
@@ -2995,13 +3073,29 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         return connectedBluetoothHeadphones
     }
     
+    public func handleTap(isUp: Bool, isSingle: Bool) {
+        if isSingle{
+            handleSingleTap(isUp: isUp)
+        }
+        else{
+            handleDoubleTap(isUp: isUp)
+        }
+    }
     
-    public func handleVolumeIncrease() {
+    public func handleSingleTap(isUp: Bool) {
         
         let selectedRule = ClassifierSettingArgs.targetSetting[ruleIndex]!
         
-        // 处理音量增加事件的逻辑
-        if self.volumeUp == 1{
+        var eventType = 0
+        if isUp{
+            eventType = self.volumeUp
+        }
+        else{
+            eventType = self.volumeDown
+        }
+        
+        // 处理单击逻辑
+        if eventType == 1{
             let playNumList = selectedRule.rcNum
             self.rcNum += 1
             if self.rcNum >= playNumList.count{
@@ -3009,9 +3103,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
             self.minSingleFeatureNum = DatasetGetMinSingleFeatureNum()
             speakText(input: "人数" + String(selectedRule.rcNum[self.rcNum]))
+            showSingleTimeText(showText: String(selectedRule.rcNum[self.rcNum]))
             saveData()
         }
-        else if self.volumeUp == 2{
+        else if eventType == 2{
             let currentNum = selectedRule.rcNum[self.rcNum]
             var positionSetting = self.calModeArgs[0][1] + 1
             if positionSetting >= currentNum{
@@ -3020,31 +3115,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             self.calModeArgs[0][1] = positionSetting
             self.calModeArgs[1][1] = positionSetting
             speakText(input: "位置" + String(positionSetting+1))
+            showSingleTimeText(showText:String(positionSetting+1))
             saveData()
         }
-        else if self.volumeUp == 3{
-            self.shuffleMode[0] += 1
-            if self.shuffleMode[0] >= generalRuleSetting.allShuffleMode.count{
-                self.shuffleMode[0] = 0
-            }
-            speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode[0]]!)
-            saveData()
-        }
-        else if self.volumeUp == 4{
-            self.selectedSaveIndex += 1
-            if self.selectedSaveIndex >= DetectSettingArgs.allUsersDatasetRule.count{
-                self.selectedSaveIndex = 0
-            }
-            loadSaveRule(saveRuleIndex: self.selectedSaveIndex)
-            speakText(input: "方案" + String(self.selectedSaveIndex+1))
-        }
-        else if self.volumeUp == 5{
-            toggleWorking()
-        }
-        else if self.volumeUp == 6{
-            computeNextRound()
-        }
-        else if self.volumeUp == 7{
+        else if eventType == 3{
             let playNumList = selectedRule.rcNum
             self.rcNum += 1
             if self.rcNum >= playNumList.count{
@@ -3059,15 +3133,62 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             
             saveData()
             speakText(input: "人数" + String(selectedRule.rcNum[self.rcNum]) + "位置" + String(positionSetting+1))
+            showSingleTimeText(showText: String(selectedRule.rcNum[self.rcNum]))
+        }
+        else if eventType == 4{
+            self.shuffleMode[0] += 1
+            if self.shuffleMode[0] >= generalRuleSetting.allShuffleMode.count{
+                self.shuffleMode[0] = 0
+            }
+            speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode[0]]!)
+            saveData()
+        }
+        else if eventType == 5{
+            self.shuffleMode[1] += 1
+            if self.shuffleMode[1] >= generalRuleSetting.allRiffleMode.count{
+                self.shuffleMode[1] = 0
+            }
+            speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
+            saveData()
+        }
+        else if eventType == 6{
+            self.selectedSaveIndex += 1
+            if self.selectedSaveIndex >= DetectSettingArgs.allUsersDatasetRule.count{
+                self.selectedSaveIndex = 0
+            }
+            loadSaveRule(saveRuleIndex: self.selectedSaveIndex)
+            speakText(input: "方案" + String(self.selectedSaveIndex+1))
+        }
+        else if eventType == 7{
+            toggleWorking()
+        }
+        else if eventType == 8{
+            computeNextRound()
+        }
+        else if eventType == 9{
+            self.volumeUp += 1
+            if self.volumeUp >= FunctionSetting.volumeUpDict.count{
+                self.volumeUp = 0
+            }
+            speakText(input: FunctionSetting.volumeUpDict[self.volumeUp]!)
+            updateConfigJSON()
         }
     }
     
-    public func handleVolumeDecrease() {
-        // 处理音量减少事件的逻辑
+    public func handleDoubleTap(isUp: Bool) {
+        // 处理双击逻辑
+        
+        var eventType = 0
+        if isUp{
+            eventType = self.volumeUp
+        }
+        else{
+            eventType = self.volumeDown
+        }
         
         let selectedRule = ClassifierSettingArgs.targetSetting[ruleIndex]!
         
-        if self.volumeDown == 1{
+        if eventType == 1{
             let playNumList = selectedRule.rcNum
             self.rcNum -= 1
             if self.rcNum < 0{
@@ -3087,10 +3208,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
             
             speakText(input: speakString)
-            
+            showSingleTimeText(showText: String(selectedRule.rcNum[self.rcNum]))
             saveData()
         }
-        else if self.volumeDown == 2{
+        else if eventType == 2{
             let currentNum = selectedRule.rcNum[self.rcNum]
             var positionSetting = self.calModeArgs[0][1] - 1
             if positionSetting < 0{
@@ -3099,9 +3220,35 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             self.calModeArgs[0][1] = positionSetting
             self.calModeArgs[1][1] = positionSetting
             speakText(input: "位置" + String(positionSetting+1))
+            showSingleTimeText(showText:String(positionSetting+1))
             saveData()
         }
-        else if self.volumeDown == 3{
+        else if eventType == 3{
+            let playNumList = selectedRule.rcNum
+            self.rcNum -= 1
+            if self.rcNum < 0{
+                self.rcNum = playNumList.count - 1
+            }
+            self.minSingleFeatureNum = DatasetGetMinSingleFeatureNum()
+            
+            let currentNum = selectedRule.rcNum[self.rcNum]
+            var positionSetting = currentNum - 1
+            self.calModeArgs[0][1] = positionSetting
+            self.calModeArgs[1][1] = positionSetting
+            
+            saveData()
+            speakText(input: "人数" + String(selectedRule.rcNum[self.rcNum]) + "位置" + String(positionSetting+1))
+            showSingleTimeText(showText: String(selectedRule.rcNum[self.rcNum]))
+        }
+        else if eventType == 4{
+            self.shuffleMode[0] -= 1
+            if self.shuffleMode[0] < 0{
+                self.shuffleMode[0] = generalRuleSetting.allShuffleMode.count - 1
+            }
+            speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode[0]]!)
+            saveData()
+        }
+        else if eventType == 5{
             self.shuffleMode[1] -= 1
             if self.shuffleMode[1] < 0{
                 self.shuffleMode[1] = generalRuleSetting.allRiffleMode.count - 1
@@ -3109,7 +3256,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
             saveData()
         }
-        else if self.volumeDown == 4{
+        else if eventType == 6{
             self.selectedSaveIndex -= 1
             if self.selectedSaveIndex < 0{
                 self.selectedSaveIndex = DetectSettingArgs.allUsersDatasetRule.count - 1
@@ -3117,18 +3264,19 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             loadSaveRule(saveRuleIndex: self.selectedSaveIndex)
             speakText(input: "方案" + String(self.selectedSaveIndex+1))
         }
-        else if self.volumeDown == 5{
+        else if eventType == 7{
             toggleWorking()
         }
-        else if self.volumeDown == 6{
+        else if eventType == 8{
             computeNextRound()
         }
-        else if self.volumeDown == 7{
-            self.volumeUp += 1
-            if self.volumeUp >= FunctionSetting.volumeUpDict.count{
-                self.volumeUp = 0
+        else if eventType == 9{
+            self.volumeUp -= 1
+            if self.volumeUp < 0{
+                self.volumeUp = FunctionSetting.volumeUpDict.count - 1
             }
             speakText(input: FunctionSetting.volumeUpDict[self.volumeUp]!)
+            updateConfigJSON()
         }
     }
     
@@ -3185,7 +3333,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             self.laplacianDic[1][key] = 0
         }
         
-        // print(self.allSingleFeatureIndex.count)
     }
     
     private func DatasetGetMinSingleFeatureNum()-> Int{

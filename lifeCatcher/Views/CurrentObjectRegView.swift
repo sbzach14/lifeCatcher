@@ -324,10 +324,25 @@ class ButtonViewController: UIViewController {
     var currentVolume: Float = -1
     let volumeView = MPVolumeView(frame: CGRect(x: -1000, y: -1000, width: 1, height: 1))
     var lastVolumeChangeTime: Date = Date()
-    let minVolumeChangeInterval: TimeInterval = 0.5
     var isFirst: Bool = true
     var volumeValue: Float = 0.5
     var voiceDevice: Int = 1
+    
+    private var tapTimer: Timer?
+    private var lastTapTime: Date?
+    private let doubleTapDelay: TimeInterval = 0.5
+    private let ignoreInterval: TimeInterval = 0.1 // 忽略快速连续按键的时间间隔
+
+
+    private func handleSingleTap(isUp: Bool) {
+        print("Single Tap    isUp:\(isUp)")
+        self.viewModel?.handleTap(isUp: isUp, isSingle: true)
+    }
+
+    private func handleDoubleTap(isUp: Bool) {
+        print("Double Tap    isUp:\(isUp)")
+        self.viewModel?.handleTap(isUp: isUp, isSingle: false)
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -426,7 +441,7 @@ class ButtonViewController: UIViewController {
                 
                 let currentTime = Date()
                 let timeSinceLastChange = currentTime.timeIntervalSince(self.lastVolumeChangeTime)
-                if timeSinceLastChange < self.minVolumeChangeInterval {
+                if timeSinceLastChange < self.ignoreInterval {
                     return
                 }
                 self.lastVolumeChangeTime = currentTime
@@ -444,13 +459,20 @@ class ButtonViewController: UIViewController {
                 }
                 self.currentVolume = self.volumeValue
                 
-                self.setSystemVolume(volume: self.volumeValue)
-                
-                if isUp {
-                    self.viewModel?.handleVolumeIncrease()
+                if let timer = self.tapTimer {
+                    // 如果计时器已存在，取消它并认为是双击
+                    timer.invalidate()
+                    self.tapTimer = nil
+                    self.handleDoubleTap(isUp: isUp)
                 } else {
-                    self.viewModel?.handleVolumeDecrease()
+                    // 启动计时器，等待可能的双击
+                    self.tapTimer = Timer.scheduledTimer(withTimeInterval: self.doubleTapDelay, repeats: false) { [weak self] _ in
+                        self?.tapTimer = nil
+                        self?.handleSingleTap(isUp: isUp)
+                    }
                 }
+                
+                self.setSystemVolume(volume: self.volumeValue)
             }
         }
     }
