@@ -2892,10 +2892,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 self.usedSingleFeatures = Array(self.singlefeatureArray[0...(usedNum - 1)])
             }
             //看手牌
-            if self.specialCard[self.shuffleOrRiffle] == 1 {
-                self.usedSingleFeatures = multipleDatasetRCInfos.maxLookHandLeftCards + multipleDatasetRCInfos.minLookHandLeftCards
-                print("看手牌")
-            }
+//            if self.specialCard[self.shuffleOrRiffle] == 1 {
+//                self.usedSingleFeatures = multipleDatasetRCInfos.maxLookHandLeftCards + multipleDatasetRCInfos.minLookHandLeftCards
+//                print("看手牌")
+//            }
             
             print("上一轮使用的牌 \(self.usedSingleFeatures)")
         }

@@ -85,7 +85,7 @@ struct RegisterView: View {
 
 
     func registerUser(username: String, password: String) {
-        guard let url = URL(string: "http://192.168.1.224:8080/register") else { return }
+        guard let url = URL(string: "http://1.94.17.30:8080/register") else { return }
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"

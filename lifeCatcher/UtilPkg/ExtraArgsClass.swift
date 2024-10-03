@@ -4119,17 +4119,24 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 var reportString = ""
                 let voiceType = 1
                 var currentResult : [SpeakResultStruct] = []
+                var reportNum: Int = 0
+
                 for rcID in resultInfo.targetRCList[0] {
+                    if reportNum > 1 {
+                        break
+                    }
+
                     reportString = String(rcID + 1)
                     currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                    reportNum += 1
+
                 }
                 
                 if resultInfo.aliveNumber != 0 {
-                    reportString += "活门" + String(resultInfo.aliveNumber)
-                    
+                    reportString = "活门" + String(resultInfo.aliveNumber)
+                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
                 }
                 
-                currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
 
                 reportResult.append(currentResult)
             }
