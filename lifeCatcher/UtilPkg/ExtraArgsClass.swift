@@ -235,8 +235,8 @@ class ReportManager{
         42:"[75]上10张去牌保有活门报活门",
         43:"[76]:上10张去牌保有活门报最大",
         44:"[77]:上10张去牌保多轮同点报最大次大生死门*",
-        45:"[78_1]:上10张去牌保多轮同点且无9点*",
-        46:"[78]:上10张去牌保多轮同点且无对子*",
+        45:"[78_1]:上10张去牌保多轮同点且无9点",
+        46:"[78]:上10张去牌保多轮同点且无对子",
         47:"[79]:上10张去牌面为色去色保位置最大次大次数最多",
         48:"[80]:上10张去牌底为色保位置最大次大",
         49:"[81]:上10张去牌保位置最小无对子*",
@@ -289,7 +289,7 @@ class ReportManager{
             96: "[207]:飞2张看色去色1张保位置最小",
             97: "[208]:飞2张看色色先发保位置最大",
             98: "[209]:飞2张看色色先发保位置最小",
-            99: "[211]:飞2张骰子打色保位置最大*",
+            99: "[211]:飞2张骰子打色保位置最大",
             100: "[212]:飞2张面为色留色保位置最大",
             101: "[213]:飞2张面为色留色保位置最小",
             102: "[214]:飞2张面为色去色保位置最大",
@@ -1697,10 +1697,11 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             singlefeatureRank = cutRankConvert(cutNumSetting: cutNumSetting, singlefeatureIndex: inputSingleFeatures[9])
             colorSingleFeatureIndexList.append(inputSingleFeatures[9])
             break
+        //骰子为色
         case 21:
+            singlefeatureRank = upDownID + 1
+            colorSingleFeatureIndexList.append(upDownID)
             break
-
-            
         default:
             break
         }
@@ -1772,6 +1773,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         var NoBullOrMaxOneBull: Int = 0
         //返回飞二张的结果
         var flyTCSolution: [FlyTCsNode] = []
+        //返回飞二张骰子打色的结果
+        var flyTCSolutionForColor: [[FlyTCsNode]] = []
         //随意混合打色变化
         var randomColorFlag: [Int] = []
         //随意打色打色范围集合
@@ -1780,6 +1783,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         var fourCardReport: String = ""
         //报发牌方式
         var dealTypeReport: String = ""
+        //报无9点
+        var hasNp: Int = 0
 
     }
     
@@ -2284,7 +2289,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 inputSingleFeatures = leftSingleFeatures
                 
                 
-                
                 if inputSingleFeatures.count == 0 && reportRule.consecutiveReport == -1{
                     break
                 }
@@ -2400,11 +2404,40 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     let maxX: Int = min(XValue, cutPos)
                     let maxY: Int = min(YValue, inputSingleFeatures.count - 1 - cutPos)
                     cutList.append([-maxX, maxY])
+                    break
                 //不同发牌方式
                 case 18:
                     let YValue = cutNumRangeSetting[1]
                     let currentDealTypeSet = allDealNumDic[YValue]
                     cutList.append([0, currentDealTypeSet!.count - 1])
+                    break
+                //飞2张骰子打色
+                case 19:
+                    for colorIndex in 0..<rcNum {
+                        //每轮默认发一张牌
+                        var everyDealNum: [Int] = []
+                        if newArgs[0] == 0 {
+                            for _ in 0..<handNum {
+                                everyDealNum.append(1)
+                            }
+                            flyTCSolution = FlyTCsSolution(rcNum: rcNum, round: handNum, everyDealNum: everyDealNum)
+                        } else {
+                            var dealRoundNum = 0
+                            for i in 0..<diyDealStatus.count {
+                                if diyDealStatus[i][0] == true {
+                                    dealRoundNum += 1
+                                    everyDealNum.append(diyDealNum[i])
+                                }
+                            }
+                            flyTCSolution = FlyTCsSolution(rcNum: rcNum, round: dealRoundNum, everyDealNum: everyDealNum)
+                        }
+                        
+                        flyTCSolution.insert([FlyTCsNode(X: -1, Y: -1)], at: 0)
+                        if flyTCSolution.count > 0 {
+                            cutList.append([0, flyTCSolution.count - 1])
+                        }
+                    }
+                    break
                 default:
                     cutList.append([0,0])
                     break
@@ -2515,6 +2548,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     currentResultInfo.singlefeatureIndexToConfirmMaxMin.append([])
                     currentResultInfo.singlefeatureIndexToConfirmAliveDeath.append([])
                     currentResultInfo.XorYMax.append([])
+                    currentResultInfo.flyTCSolutionForColor.append([])
                     print("cuRange \(cutRange1)  \(cutRange2)")
                     
                     for singlefeatureIndex in cutRange1...cutRange2{
@@ -3237,6 +3271,13 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             switch reportRule.NPReport {
                             //0, 报无9点
                             case 0:
+                                for rankSet in rankedWinnersInfo {
+                                    for winner in rankSet {
+                                        if winner.rcSingleFeaturesType.hasPrefix("9点") {
+                                            currentResultInfo.hasNp = 1
+                                        }
+                                    }
+                                }
                                 break
                             //1, 不打几
                             case 1:
@@ -3863,7 +3904,40 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             }
                             
                             break
-                            
+                        //保多轮同点且无9点
+                        case 26:
+                            print("当前去牌\(singlefeatureIndex) 当前轮数 \(roundID)")
+                            if currentResultInfo.hasDrawPoint > 0 && currentResultInfo.hasNp == 0 {
+                                
+                                multipleResultInfo.multiRoundInfo[singlefeatureIndex].targetRoundID.append(roundID)
+                                multipleResultInfo.multiRoundInfo[singlefeatureIndex].targetTimes += 1
+                                currentResultInfo.ColorSingleFeatures = colorSingleFeatureIndexList
+                                print("去牌 \(singlefeatureIndex) 轮数 \(roundID) 结果 \(multipleResultInfo.multiRoundInfo[singlefeatureIndex].targetTimes) \(multipleResultInfo.multiRoundInfo[singlefeatureIndex].targetRoundID)")
+                            }
+                            multipleResultInfo.multiRoundInfo[singlefeatureIndex].leftFeatures = leftSingleFeatures
+                            break
+                        //保多轮同点无对子
+                        case 27:
+                            print("当前去牌\(singlefeatureIndex) 当前轮数 \(roundID)")
+                            if currentResultInfo.hasDrawPoint > 0 && currentResultInfo.pairNum == 0 {
+                                
+                                multipleResultInfo.multiRoundInfo[singlefeatureIndex].targetRoundID.append(roundID)
+                                multipleResultInfo.multiRoundInfo[singlefeatureIndex].targetTimes += 1
+                                currentResultInfo.ColorSingleFeatures = colorSingleFeatureIndexList
+                                print("去牌 \(singlefeatureIndex) 轮数 \(roundID) 结果 \(multipleResultInfo.multiRoundInfo[singlefeatureIndex].targetTimes) \(multipleResultInfo.multiRoundInfo[singlefeatureIndex].targetRoundID)")
+                            }
+                            multipleResultInfo.multiRoundInfo[singlefeatureIndex].leftFeatures = leftSingleFeatures
+                            break
+                        //飞2张骰子打色保最大
+                        case 28:
+                            if resultPos.contains(where: {$0 == targets[0]}) {
+                                currentResultInfo.singlefeatureIndexToConfirmMaxMin[upDownID].append(singlefeatureIndex + 1)
+                                currentResultInfo.flyTCSolutionForColor[upDownID] = currentFlyTCSolution
+                                currentResultInfo.ColorSingleFeatures = colorSingleFeatureIndexList
+                                print("色牌 \(colorSingleFeatureIndexList)")
+                                reportTargetFlag = 1
+                            }
+                            break
                             
                         default:
                             break
@@ -4509,14 +4583,12 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
 //            44:"[77]:上10张去牌保多轮同点报最大次大生死门*",
         case 44:
             break
-//            45:"[78_1]:上10张去牌保多轮同点且无9点*",
-//            46:"[78]:上10张去牌保多轮同点且无对子*",
-        case 45...46:
-            break
+//            "[78]上10张去牌多轮同点且无对子"
+//            "[78_1]上10张去牌多轮同点且无9点"
 //            47:"[79]:上10张去牌面为色去色保位置最大次大次数最多",
 //            54:"[85]:上10张去牌保多轮位置最大次数最多*",
-        case 47,54:
-            let voiceType: Int = 1
+        case 45,46,47,54:
+            var voiceType: Int = 1
             var reportString: String = ""
             var maxInfo: multiRoundInfoStruct = multiRoundInfoStruct(leftFeatures: [], targetTimes: 0, targetRoundID: [])
             var index: Int = 0
@@ -4532,6 +4604,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             reportString += String(maxIndex) + " "
             for roundID in maxInfo.targetRoundID{
                 reportString += String(roundID) + " "
+            }
+            if maxInfo.targetRoundID.count == 0 {
+                voiceType = 0
             }
             
             reportResult.append([SpeakResultStruct(voiceType: voiceType, content: reportString)])
@@ -4776,7 +4851,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
 //                96: "[207]:飞2张打色去色1张保位置最小*",
 //                97: "[208]:飞2张打色色先发保位置最大*",
 //                98: "[209]:飞2张打色色先发保位置最小*",
-//                99: "[211]:飞2张骰子打色保位置最大*",
 //                100: "[212]:飞2张面为色留色保位置最大*",
 //                101: "[213]:飞张面为色留色保位置最小*",
 //                102: "[214]:飞2张面为色去色保位置最大*",
@@ -4789,7 +4863,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
 //            258: "[227]:飞2张底为色 色先发保位置最小",
 //            259: "[228]:飞2张底2张相加为色保位置最小",
 //            260: "[229]:飞2张看色留色再看底保位置最小",
-        case 91...107, 257...260:
+        case 91...98, 100...107, 257...260:
             for resultInfo in multipleReportResultInfo.singleResultList{
                 let voiceType: Int = 1
                 var reportString: String = ""
@@ -4806,6 +4880,33 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 if resultInfo.flyTCSolution.count == 0{
                     reportString += "没有"
                     currentSpeakStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                }
+                reportResult.append(currentSpeakStruct)
+            }
+            break
+//                99: "[211]:飞2张骰子打色保位置最大*",
+        case 99:
+            for resultInfo in multipleReportResultInfo.singleResultList{
+                let voiceType: Int = 1
+                var reportString: String = ""
+                var currentSpeakStruct: [SpeakResultStruct] = []
+                for colorIndex in 0..<resultInfo.flyTCSolutionForColor.count{
+                    reportString = "色 \(colorIndex + 1)"
+                    currentSpeakStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                    
+                    for flyTCNode in resultInfo.flyTCSolutionForColor[colorIndex]{
+                        if flyTCNode.X == -1 && flyTCNode.Y == -1 {
+                            reportString = "0 0"
+                        } else {
+                            reportString = String(flyTCNode.X + 1) + " "
+                            reportString += String((flyTCNode.Y + 1) / flyTCsEveryDealNumList[flyTCNode.X])
+                        }
+                        currentSpeakStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                    }
+                    if resultInfo.flyTCSolutionForColor[colorIndex].count == 0{
+                        reportString = "没有"
+                        currentSpeakStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                    }
                 }
                 reportResult.append(currentSpeakStruct)
             }
