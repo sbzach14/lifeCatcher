@@ -2518,7 +2518,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     print("cuRange \(cutRange1)  \(cutRange2)")
                     
                     for singlefeatureIndex in cutRange1...cutRange2{
-                        // print("发牌位置 \(singlefeatureIndex)")
+                         print("轮次 \(roundID) 上下切牌 \(upDownID) 切牌位置 \(singlefeatureIndex)")
                         //保多轮
                         switch reportRule.consecutiveReport{
                         case 0:
@@ -3061,11 +3061,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             break
                         }
                         
-                        
-                        print("进入计算的牌堆 \(newInputSingleFeatures)")
-                        
+                        print("进入Datafunction的牌堆 \(newInputSingleFeatures)")
                         let (winnersInfo, currentLeftSingleFeatures) = DatasetFunction!(diyDealStatus, diyDealNum, newInputSingleFeatures, newArgs, rankRules, suitRules)
-                        print("剩余的牌 \(currentLeftSingleFeatures)")
+                        print("Datafunction剩余的牌 \(currentLeftSingleFeatures)")
                         leftSingleFeatures = currentLeftSingleFeatures
                         if winnersInfo.count != 0 {
                             
@@ -3194,7 +3192,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                         }
                                         currentResultInfo.drawID = rankSet[0].rcID
                                     } else if rankSet.count == 3{
-                                        print("三平点的排名 \(rankSet[0].rcDatasetRank)")
                                         if setPos == 1{
                                             drawType = 5
                                         } else if setPos == 0 {
@@ -3440,9 +3437,11 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         //保单个位置大小, 只报第一个
                         case 1:
                             if resultPos.contains(where: {$0 == targets[0]}) {
+                                
                                 currentResultInfo.singlefeatureIndexToConfirmMaxMin[upDownID].append(singlefeatureIndex + 1)
                                 currentResultInfo.flyTCSolution = (currentFlyTCSolution)
                                 currentResultInfo.ColorSingleFeatures = colorSingleFeatureIndexList
+                                print("最大位置 \(singlefeatureIndex) 色牌 \(colorSingleFeatureIndexList)")
                                 reportTargetFlag = 1
                             }
                             break
@@ -3875,9 +3874,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         }
                         
                         //剩余的牌不够用
-                        if leftSingleFeatures.count == 0 && reportRule.differentDeal == -1 {
-                            break
-                        }
+//                        if leftSingleFeatures.count == 0 && reportRule.differentDeal == -1 {
+//                            break
+//                        }
                     }
                     upDownID += 1
                 }
@@ -4634,9 +4633,16 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         case 64...73:
             for resultInfo in multipleReportResultInfo.singleResultList {
                 var currentSpeakStruct :[SpeakResultStruct] = []
+                var subArrayIndex: Int = 0
                 for subArray in resultInfo.singlefeatureIndexToConfirmMaxMin {
                     var voiceType: Int = 1
                     var reportString: String = ""
+
+                    if subArrayIndex == 0 {
+                        reportString += "上"
+                    } else {
+                        reportString += "下"
+                    }
                     if subArray.count == 0{
                         voiceType = 1
                         reportString += "0"
@@ -4645,6 +4651,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         reportString += String(i)
                     }
                     currentSpeakStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                    subArrayIndex += 1
                 }
                 reportResult.append(currentSpeakStruct)
             }

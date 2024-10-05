@@ -1096,16 +1096,14 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         self.targetArea = self.updateTargetArea(coordinates: stateResult, targetArea: targetArea)
                     }
                     else if self.state == "riffle" && detectConfidence >= detectConfidenceMinThreshold{
-                        if leftConfidence == detectConfidence{
+                        if leftDetectSingleFeature != -1{
                             stateResult.append(singlefeatureResult[0].coordinate)
                         }
-                        else if rightConfidence == detectConfidence{
+                        if rightDetectSingleFeature != -1{
                             stateResult.append(singlefeatureResult[1].coordinate)
                         }
                         
-                        if stateResult.count == 1{
-                            self.targetArea = self.updateTargetArea(coordinates: stateResult, targetArea: targetArea)
-                        }
+                        self.targetArea = self.updateTargetArea(coordinates: stateResult, targetArea: targetArea)
                     }
                 }
             }
@@ -2549,7 +2547,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     
                     let trueIndex = j == 52 ? 54 : j
                     
-                    if value > 0 && self.allSingleFeatureIndex.contains(trueIndex){
+                    if value > 0{
                         
                         if (value/confidenceSum>=0) {
                             singlefeatureIndex.append(j)
