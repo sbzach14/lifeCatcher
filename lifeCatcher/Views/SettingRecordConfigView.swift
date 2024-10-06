@@ -844,11 +844,11 @@ struct SettingRecordConfigView: View{
     
     private func alertMessageCheck()-> String{
         var alertMessage:String = ""
-        if cutNumRangeSetting[0] > self.singlefeatureToUse.count || cutNumRangeSetting[1] > self.singlefeatureToUse.count || cutNumRangeSetting[0] > cutNumRangeSetting[1]{
-            alertMessage = "打色范围设置超出可用牌范围，或X值>Y值，请重新设置"
-            
-        }
-        else if dealNum == 1 && diyDealNum.count == 0{
+//        if cutNumRangeSetting[0] > self.singlefeatureToUse.count || cutNumRangeSetting[1] > self.singlefeatureToUse.count || cutNumRangeSetting[0] > cutNumRangeSetting[1]{
+//            alertMessage = "打色范围设置超出可用牌范围，或X值>Y值，请重新设置"
+//            
+//        }
+        if dealNum == 1 && diyDealNum.count == 0{
             alertMessage = "自定义发牌为空"
         }
         return alertMessage

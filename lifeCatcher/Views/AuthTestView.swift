@@ -6,6 +6,7 @@ struct AuthTestView: View {
     @State private var activeKey = ""
     @State private var isAuthorized = false
     @State private var activateStatus = -1
+    @State private var shiftStatus = -1
     @State private var expiredTime = 0
     @State private var showAlert = false
     @State private var alertMessage = ""
@@ -14,11 +15,11 @@ struct AuthTestView: View {
 
     var body: some View {
         VStack {
-            TextField("Enter your Key here", text: $userInput)
+            TextField("输入你要激活的序列号", text: $userInput)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
 
-            TextField("Enter your Passcode here", text: $passcode)
+            TextField("输入你的授权码/旧的序列号", text: $passcode)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
             
@@ -59,7 +60,7 @@ struct AuthTestView: View {
                 Button(action: {
                     sendDeleteRequest()
                 }, label: {
-                    Text("Delete")
+                    Text("删除")
                 })
                 .padding()
             }
@@ -121,7 +122,6 @@ struct AuthTestView: View {
                     if let success = jsonResponse["success"] as? Bool, success {
                         DispatchQueue.main.async {
                             let deleteStatus = jsonResponse["deleteStatus"] as? Int ?? -1
-                            
                             self.activateStatus = deleteStatus
                         }
                     } else {
@@ -129,6 +129,9 @@ struct AuthTestView: View {
                             let deleteStatus = jsonResponse["deleteStatus"] as? Int ?? -1
                             self.activateStatus = deleteStatus
                             self.showAlert = true
+                            if deleteStatus == 0{
+                                self.alertMessage = "不存在要删除的deviceID"
+                            }
                         }
                     }
                 }
@@ -194,6 +197,62 @@ struct AuthTestView: View {
             }
         }
 
+        task.resume()
+    }
+    
+    
+    private func sendShiftRequest() {
+        guard let url = URL(string: "http://1.94.17.30:8080/shift_user") else { return }
+        
+        self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
+        
+        let json: [String: Any] = [
+            "activate_code": activeKey,
+            "old_deviceID": self.passcode,
+            "new_deviceID": userInput,
+        ]
+
+        let jsonData = try! JSONSerialization.data(withJSONObject: json)
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = jsonData
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            guard let data = data, error == nil else {
+                DispatchQueue.main.async {
+                    self.showAlert = true
+                    self.alertMessage = "移机失败"
+                }
+                return
+            }
+
+            do {
+                if let jsonResponse = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                    if let success = jsonResponse["success"] as? Bool, success {
+                        DispatchQueue.main.async {
+                            self.shiftStatus = jsonResponse["shiftStatus"] as? Int ?? -1
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            self.showAlert = true
+                            self.shiftStatus = jsonResponse["shiftStatus"] as? Int ?? -1
+
+                            if self.shiftStatus == 0 {
+                                self.alertMessage = "移机对象不存在"
+                            }
+                        }
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.showAlert = true
+                    self.alertMessage = "激活失败"
+                }
+            }
+        }
+        
         task.resume()
     }
     

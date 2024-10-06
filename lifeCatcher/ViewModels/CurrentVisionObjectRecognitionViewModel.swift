@@ -709,10 +709,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         
         var iou: Double = 0.01
-        
         var singlefeatureResult : [DetectionResult]
         if !isTargetArea{
             let result = try! self.detectModel.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: Double(confidenceThreshold))
+            print("状态6 \(result)")
             singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer)
         }
         else if self.isCameraHorizon{
@@ -776,9 +776,11 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
             
             if self.state == "reloading"{
+                print("状态2")
                 
             }
             else if self.state == "idle" && !self.isTargetArea && !isTargetArea{
+                print("状态1")
                 
                 if (self.isProcessNeedToCut || self.recgReport) && self.singlefeatureArray.count > 0{
                     self.detectNeedToCut = true
@@ -786,7 +788,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 else{
                     self.detectNeedToCut = false
                 }
-                
+                print("状态进入识别前 \(detectNum) \(stateCounter) \(self.shuffleMode) \(self.detectNeedToCut)")
                 if ((detectNum == 1 && (self.shuffleMode[1] != 0 || self.detectNeedToCut))
                     || (detectNum == 2 && self.shuffleMode[0] != 0)) && stateCounter >= 1{
                     
@@ -2535,9 +2537,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     let value = singlefeatureArray[index].floatValue
                     
                     let trueIndex = j == 52 ? 54 : j
-                    
+                    print("用牌 \(self.allSingleFeatureIndex)  trueIndex \(trueIndex) value \(value) n \(n)")
                     if value > 0 && self.allSingleFeatureIndex.contains(trueIndex){
-                        
                         if (value/confidenceSum>=0) {
                             singlefeatureIndex.append(j)
                             confidence.append(value)
@@ -2605,7 +2606,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             for resultIndex in 0..<result.count{
                 result[resultIndex].singlefeatureIndex = result[resultIndex].singlefeatureIndex.map { $0 == 52 ? 54 : $0 }
             }
-            
+            print("result1 \(result) \(result[0].singlefeatureIndex) \(result[1].singlefeatureIndex)")
             return result
         }
         
@@ -2763,8 +2764,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             for resultIndex in 0..<result.count{
                 result[resultIndex].laplacianVariance = ComputeROILaplacianVariance(box: result[resultIndex].coordinate, destinationBuffer8: destinationBuffer8)
             }
-            
-            
             return result
         }
     }
@@ -3333,6 +3332,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         self.rcNum = rules.rcNum
         self.shuffleMode = rules.shuffleMode
         self.allSingleFeatureIndex = rules.singlefeatureToUse
+        print("所有的用牌 \(self.allSingleFeatureIndex)")
         self.cutNumSetting = rules.cutNumSetting
         self.cutNumRangeSetting = rules.cutNumRangeSetting
         self.calModeArgs = [[rules.reportSetting[0], rules.positionSetting], [rules.reportSetting[1], rules.positionSetting]]
