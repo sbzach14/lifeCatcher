@@ -44,11 +44,6 @@
 		A83853532ADA918000346038 /* CustomUIComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83853522ADA918000346038 /* CustomUIComponent.swift */; };
 		A86459282C90B59E00AF0BA9 /* Ain.swift in Sources */ = {isa = PBXBuildFile; fileRef = A86459272C90B59E00AF0BA9 /* Ain.swift */; };
 		A87097112C8A5D1E003A4729 /* UserHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87097102C8A5D1E003A4729 /* UserHelper.swift */; };
-		A87DE1CD2CA47A0900B73DB6 /* cls_0715_h_trans_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A87DE1CA2CA47A0900B73DB6 /* cls_0715_h_trans_copy.mlmodel */; };
-		A87DE1CE2CA47A0900B73DB6 /* detect_0903_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A87DE1CB2CA47A0900B73DB6 /* detect_0903_copy.mlmodel */; };
-		A87DE1CF2CA47A0900B73DB6 /* cls_0727_v_trans_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A87DE1CC2CA47A0900B73DB6 /* cls_0727_v_trans_copy.mlmodel */; };
-		A87DE1D12CA7349900B73DB6 /* 0926_cls_h.mlpackage in Sources */ = {isa = PBXBuildFile; fileRef = A87DE1D02CA7349900B73DB6 /* 0926_cls_h.mlpackage */; };
-		A87DE1D32CAF05EC00B73DB6 /* riffle_1002_h.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A87DE1D22CAF05EC00B73DB6 /* riffle_1002_h.mlmodel */; };
 		A887167F2A0623E500B7F2CD /* AManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887167E2A0623E500B7F2CD /* AManager.swift */; };
 		A887B6502A7FE1AF009F488F /* ShowResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B64F2A7FE1AF009F488F /* ShowResultView.swift */; };
 		A887B6522A8104BC009F488F /* TimeAuthUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B6512A8104BC009F488F /* TimeAuthUtils.swift */; };
@@ -59,6 +54,9 @@
 		A88EFE0B2A7FC05900897243 /* JsonIOUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFE0A2A7FC05900897243 /* JsonIOUtils.swift */; };
 		A88EFE0D2A7FDC9500897243 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFE0C2A7FDC9500897243 /* HistoryView.swift */; };
 		A892C6002A765A0A003FA2B3 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A892C5FF2A765A0A003FA2B3 /* MainView.swift */; };
+		A89680E92CB2EB4100CA910B /* detect_0903_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A89680E62CB2EB4100CA910B /* detect_0903_copy.mlmodel */; };
+		A89680EA2CB2EB4100CA910B /* cls_0715_h_trans_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A89680E72CB2EB4100CA910B /* cls_0715_h_trans_copy.mlmodel */; };
+		A89680EB2CB2EB4100CA910B /* cls_0727_v_trans_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A89680E82CB2EB4100CA910B /* cls_0727_v_trans_copy.mlmodel */; };
 		A89CDD882C70569400588273 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89CDD872C70569400588273 /* LoginView.swift */; };
 		A89CDD8A2C71B79500588273 /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89CDD892C71B79500588273 /* RegisterView.swift */; };
 		A89CDD8C2C76767300588273 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89CDD8B2C76767300588273 /* KeychainHelper.swift */; };
@@ -125,11 +123,6 @@
 		A83853522ADA918000346038 /* CustomUIComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomUIComponent.swift; sourceTree = "<group>"; };
 		A86459272C90B59E00AF0BA9 /* Ain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ain.swift; sourceTree = "<group>"; };
 		A87097102C8A5D1E003A4729 /* UserHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserHelper.swift; sourceTree = "<group>"; };
-		A87DE1CA2CA47A0900B73DB6 /* cls_0715_h_trans_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0715_h_trans_copy.mlmodel; sourceTree = "<group>"; };
-		A87DE1CB2CA47A0900B73DB6 /* detect_0903_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = detect_0903_copy.mlmodel; sourceTree = "<group>"; };
-		A87DE1CC2CA47A0900B73DB6 /* cls_0727_v_trans_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0727_v_trans_copy.mlmodel; sourceTree = "<group>"; };
-		A87DE1D02CA7349900B73DB6 /* 0926_cls_h.mlpackage */ = {isa = PBXFileReference; lastKnownFileType = folder.mlpackage; path = 0926_cls_h.mlpackage; sourceTree = "<group>"; };
-		A87DE1D22CAF05EC00B73DB6 /* riffle_1002_h.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; name = riffle_1002_h.mlmodel; path = ../../../Downloads/riffle_1002_h.mlmodel; sourceTree = "<group>"; };
 		A887167E2A0623E500B7F2CD /* AManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AManager.swift; sourceTree = "<group>"; };
 		A887B64F2A7FE1AF009F488F /* ShowResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowResultView.swift; sourceTree = "<group>"; };
 		A887B6512A8104BC009F488F /* TimeAuthUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeAuthUtils.swift; sourceTree = "<group>"; };
@@ -140,6 +133,9 @@
 		A88EFE0A2A7FC05900897243 /* JsonIOUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonIOUtils.swift; sourceTree = "<group>"; };
 		A88EFE0C2A7FDC9500897243 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		A892C5FF2A765A0A003FA2B3 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		A89680E62CB2EB4100CA910B /* detect_0903_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = detect_0903_copy.mlmodel; sourceTree = "<group>"; };
+		A89680E72CB2EB4100CA910B /* cls_0715_h_trans_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0715_h_trans_copy.mlmodel; sourceTree = "<group>"; };
+		A89680E82CB2EB4100CA910B /* cls_0727_v_trans_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0727_v_trans_copy.mlmodel; sourceTree = "<group>"; };
 		A89CDD872C70569400588273 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		A89CDD892C71B79500588273 /* RegisterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
 		A89CDD8B2C76767300588273 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
@@ -338,11 +334,9 @@
 			isa = PBXGroup;
 			children = (
 				D03811A12C75401200726B99 /* cls_main.mlmodel */,
-				A87DE1D02CA7349900B73DB6 /* 0926_cls_h.mlpackage */,
-				A87DE1CA2CA47A0900B73DB6 /* cls_0715_h_trans_copy.mlmodel */,
-				A87DE1CC2CA47A0900B73DB6 /* cls_0727_v_trans_copy.mlmodel */,
-				A87DE1D22CAF05EC00B73DB6 /* riffle_1002_h.mlmodel */,
-				A87DE1CB2CA47A0900B73DB6 /* detect_0903_copy.mlmodel */,
+				A89680E72CB2EB4100CA910B /* cls_0715_h_trans_copy.mlmodel */,
+				A89680E82CB2EB4100CA910B /* cls_0727_v_trans_copy.mlmodel */,
+				A89680E62CB2EB4100CA910B /* detect_0903_copy.mlmodel */,
 				D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */,
 				D03811A42C7542C200726B99 /* cls_0727_v_trans.mlmodel */,
 				D02717D72C8704AB00A29D43 /* detect_0903.mlmodel */,
@@ -457,7 +451,6 @@
 				A89CDD8C2C76767300588273 /* KeychainHelper.swift in Sources */,
 				18C98D0B2C158F7B00A8CD49 /* BZi.swift in Sources */,
 				A887B6582A8511A4009F488F /* InformationView.swift in Sources */,
-				A87DE1D12CA7349900B73DB6 /* 0926_cls_h.mlpackage in Sources */,
 				18C98D122C158F7B00A8CD49 /* PBul.swift in Sources */,
 				18C98D192C158F7B00A8CD49 /* ZJHua.swift in Sources */,
 				A887167F2A0623E500B7F2CD /* AManager.swift in Sources */,
@@ -467,7 +460,7 @@
 				A88EFE0B2A7FC05900897243 /* JsonIOUtils.swift in Sources */,
 				18C98D0C2C158F7B00A8CD49 /* CNin.swift in Sources */,
 				D02717D82C8704AB00A29D43 /* detect_0903.mlmodel in Sources */,
-				A87DE1CF2CA47A0900B73DB6 /* cls_0727_v_trans_copy.mlmodel in Sources */,
+				A89680EB2CB2EB4100CA910B /* cls_0727_v_trans_copy.mlmodel in Sources */,
 				18C98CE52C15893200A8CD49 /* DeprecatedComponentView.swift in Sources */,
 				18C98D172C158F7B00A8CD49 /* TWat.swift in Sources */,
 				D0DAEF932C77664100D5938A /* HistoryItemView.swift in Sources */,
@@ -476,7 +469,7 @@
 				A88EFDC82A7D249C00897243 /* CurrentObjectRegView.swift in Sources */,
 				187A45512C31BBB400BB055C /* AllBaseSettingArgs.swift in Sources */,
 				18C98D0E2C158F7B00A8CD49 /* FCar.swift in Sources */,
-				A87DE1CE2CA47A0900B73DB6 /* detect_0903_copy.mlmodel in Sources */,
+				A89680E92CB2EB4100CA910B /* detect_0903_copy.mlmodel in Sources */,
 				A887B6522A8104BC009F488F /* TimeAuthUtils.swift in Sources */,
 				18C98D0F2C158F7B00A8CD49 /* JJBao.swift in Sources */,
 				18C98D1B2C158F7B00A8CD49 /* TNin.swift in Sources */,
@@ -493,6 +486,7 @@
 				A89CDD882C70569400588273 /* LoginView.swift in Sources */,
 				B058BE5F2B09FFC20078E792 /* CurrentBlurDetector.swift in Sources */,
 				18FFC40A2BB9587A00029B0D /* OriginBlurDetector.swift in Sources */,
+				A89680EA2CB2EB4100CA910B /* cls_0715_h_trans_copy.mlmodel in Sources */,
 				18CA14DB284AC42C00F90372 /* MyApp.swift in Sources */,
 				18C98D1C2C158F7B00A8CD49 /* TCar.swift in Sources */,
 				18C98D142C158F7B00A8CD49 /* TPFive.swift in Sources */,
@@ -502,8 +496,6 @@
 				A86459282C90B59E00AF0BA9 /* Ain.swift in Sources */,
 				A8FBC7C22A3F0A5C00EDDFD7 /* VisionUtils.swift in Sources */,
 				A88EFE0D2A7FDC9500897243 /* HistoryView.swift in Sources */,
-				A87DE1D32CAF05EC00B73DB6 /* riffle_1002_h.mlmodel in Sources */,
-				A87DE1CD2CA47A0900B73DB6 /* cls_0715_h_trans_copy.mlmodel in Sources */,
 				18C98D102C158F7B00A8CD49 /* NPoi.swift in Sources */,
 				18CA14D6284AC42C00F90372 /* CameraImageView.swift in Sources */,
 				A87097112C8A5D1E003A4729 /* UserHelper.swift in Sources */,
@@ -660,7 +652,7 @@
 				CODE_SIGN_ENTITLEMENTS = lifeCatcher/lifeCatcher.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
 				DEVELOPMENT_TEAM = 6TV8BJJFTF;
 				ENABLE_PREVIEWS = YES;
@@ -686,7 +678,7 @@
 				);
 				MARKETING_VERSION = 2.0.1;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.catcher.lifeCatcher;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lifeCatcher.catcher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -708,7 +700,7 @@
 				CODE_SIGN_ENTITLEMENTS = lifeCatcher/lifeCatcher.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
 				DEVELOPMENT_TEAM = 6TV8BJJFTF;
 				ENABLE_PREVIEWS = YES;
@@ -734,7 +726,7 @@
 				);
 				MARKETING_VERSION = 2.0.1;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.catcher.lifeCatcher;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lifeCatcher.catcher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";

@@ -63,6 +63,20 @@ struct AuthTestView: View {
                     Text("删除")
                 })
                 .padding()
+                
+                Button(action: {
+                    if containsOnlyHalfWidthUppercaseAndDigits(self.userInput){
+                        self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
+                        sendShiftRequest()
+                    }
+                    else{
+                        showAlert = true
+                        alertMessage = "非法序列号，请手动输入。"
+                    }
+                }, label: {
+                    Text("移机")
+                })
+                .padding()
             }
             
             ScrollView{
@@ -233,6 +247,9 @@ struct AuthTestView: View {
                     if let success = jsonResponse["success"] as? Bool, success {
                         DispatchQueue.main.async {
                             self.shiftStatus = jsonResponse["shiftStatus"] as? Int ?? -1
+                            self.showAlert = true
+                            self.alertMessage = "移机成功"
+
                         }
                     } else {
                         DispatchQueue.main.async {
