@@ -57,7 +57,15 @@ struct AuthTestView: View {
             HStack{
                 
                 Button(action: {
-                    sendDeleteRequest()
+                    if containsOnlyHalfWidthUppercaseAndDigits(self.userInput){
+                        self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
+                        sendDeleteRequest()
+                    }
+                    else{
+                        showAlert = true
+                        alertMessage = "非法序列号，请手动输入。"
+                    }
+                    
                 }, label: {
                     Text("Delete")
                 })
