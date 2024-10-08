@@ -711,7 +711,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         var singlefeatureResult : [DetectionResult]
         if !isTargetArea{
             let result = try! self.detectModel.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: Double(confidenceThreshold))
-            print("状态6 \(result)")
             singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer)
         }
         else if self.isCameraHorizon{
@@ -775,11 +774,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
             
             if self.state == "reloading"{
-                print("状态2")
                 
             }
             else if self.state == "idle" && !self.isTargetArea && !isTargetArea{
-                print("状态1")
                 
                 if (self.isProcessNeedToCut || self.recgReport) && self.singlefeatureArray.count > 0{
                     self.detectNeedToCut = true
@@ -787,7 +784,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 else{
                     self.detectNeedToCut = false
                 }
-                print("状态进入识别前 \(detectNum) \(stateCounter) \(self.shuffleMode) \(self.detectNeedToCut)")
+//                print("状态进入识别前 \(detectNum) \(stateCounter) \(self.shuffleMode) \(self.detectNeedToCut)")
                 if ((detectNum == 1 && (self.shuffleMode[1] != 0 || self.detectNeedToCut))
                     || (detectNum == 2 && self.shuffleMode[0] != 0)) && stateCounter >= 1{
                     
@@ -2618,7 +2615,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             for resultIndex in 0..<result.count{
                 result[resultIndex].singlefeatureIndex = result[resultIndex].singlefeatureIndex.map { $0 == 52 ? 54 : $0 }
             }
-            print("result1 \(result) \(result[0].singlefeatureIndex) \(result[1].singlefeatureIndex)")
+//            print("result1 \(result) \(result[0].singlefeatureIndex) \(result[1].singlefeatureIndex)")
             return result
         }
         
@@ -2861,7 +2858,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
     
     func computeWinnerRC(isReset: Bool) {
-        if singlefeatureArray.count >= minSingleFeatureNum && singlefeatureArray.count > cutNumRangeSetting[0] && singlefeatureArray.count > cutNumRangeSetting[1] - minSingleFeatureNum{
+        if singlefeatureArray.count >= minSingleFeatureNum {
             multipleDatasetRCInfos = ClassifierSettingArgs.selectDataset(DatasetIndex: ruleIndex, inputSingleFeatures: singlefeatureArray, rcNum: (ClassifierSettingArgs.targetSetting[ruleIndex]?.rcNum[rcNum])!, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs[self.shuffleOrRiffle], cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, minSingleFeatureNum: minSingleFeatureNum, cutStructList: cutStructArray, currentRoundID: self.currentRoundID)
             
             self.singlefeatureArray = multipleDatasetRCInfos.returnSingleFeatureArray
@@ -2891,7 +2888,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
     
     func computeSingleFeatures(isReset: Bool){
-        if self.singlefeatureArray.count >= self.minSingleFeatureNum && self.singlefeatureArray.count > self.cutNumRangeSetting[0] && self.singlefeatureArray.count > self.cutNumRangeSetting[1] - self.minSingleFeatureNum{
+        if self.singlefeatureArray.count >= self.minSingleFeatureNum {
             self.leftSingleFeatures = multipleDatasetRCInfos.leftSingleFeatures
             let usedNum = self.singlefeatureArray.count - self.leftSingleFeatures.count
             if usedNum == 0 || self.leftSingleFeatures.count == 0{
@@ -2903,11 +2900,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             else{
                 self.usedSingleFeatures = Array(self.singlefeatureArray[0...(usedNum - 1)])
             }
-            //看手牌
-//            if self.specialCard[self.shuffleOrRiffle] == 1 {
-//                self.usedSingleFeatures = multipleDatasetRCInfos.maxLookHandLeftCards + multipleDatasetRCInfos.minLookHandLeftCards
-//                print("看手牌")
-//            }
             
             print("上一轮使用的牌 \(self.usedSingleFeatures)")
         }
@@ -2915,6 +2907,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     
     func computeNextRound(){
         if (self.leftSingleFeatures.count > 0){
+            print("开始计算下一轮")
             self.singlefeatureArray = self.leftSingleFeatures
             self.currentRoundID += 1
             computeWinnerRC(isReset: false)
