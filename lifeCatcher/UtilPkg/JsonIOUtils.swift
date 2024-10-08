@@ -117,7 +117,6 @@ func createConfigJSON() {
                     try jsonData.write(to: fileURL)
                 }
             }
-            // print("config.json file already exists, skipping write operation.")
         }
 
 

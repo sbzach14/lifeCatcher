@@ -3023,9 +3023,14 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                     
                                     if newArgs[0] == 0{
                                         singlefeatureIndex = round * rcNum + dealOrder
-                                        let temp = newInputSingleFeatures[singlefeatureIndex]
-                                        newInputSingleFeatures[singlefeatureIndex] = newInputSingleFeatures[singlefeatureIndex + 1]
-                                        newInputSingleFeatures[singlefeatureIndex + 1] = temp
+                                        if singlefeatureIndex >= newInputSingleFeatures.count - 1 {
+                                            
+                                        } else {
+                                            let temp = newInputSingleFeatures[singlefeatureIndex]
+                                            newInputSingleFeatures[singlefeatureIndex] = newInputSingleFeatures[singlefeatureIndex + 1]
+                                            newInputSingleFeatures[singlefeatureIndex + 1] = temp
+                                        }
+                                        
                                     } else {
                                         var currentDealRound = -1
                                         var otherNum = 0
@@ -3037,10 +3042,15 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                                 for j in 0..<currentRoundDealNum{
                                                     if currentDealRound == round && j == dealOrder {
                                                         singlefeatureIndex = otherNum
-                                                        let temp = newInputSingleFeatures[singlefeatureIndex]
-                                                        newInputSingleFeatures[singlefeatureIndex] = newInputSingleFeatures[singlefeatureIndex + 1]
-                                                        newInputSingleFeatures[singlefeatureIndex + 1] = temp
-                                                        print("飞2张之后的牌堆 \(newInputSingleFeatures)")
+                                                        if singlefeatureIndex >= newInputSingleFeatures.count - 1 {
+                                                            
+                                                        } else {
+                                                            let temp = newInputSingleFeatures[singlefeatureIndex]
+                                                            newInputSingleFeatures[singlefeatureIndex] = newInputSingleFeatures[singlefeatureIndex + 1]
+                                                            newInputSingleFeatures[singlefeatureIndex + 1] = temp
+                                                            print("飞2张之后的牌堆 \(newInputSingleFeatures)")
+                                                        }
+                                                        
                                                     }
                                                     otherNum += 1
                                                 }

@@ -707,33 +707,34 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             confidenceThreshold = 0.3
         }
         
-        var iou: Double = 0.01
-        
+        var iou: Double = 0.2
         var singlefeatureResult : [DetectionResult]
+        var uniqueNum : Int
         if !isTargetArea{
             let result = try! self.detectModel.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: Double(confidenceThreshold))
-            singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer)
+            (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: false)
         }
         else if self.isCameraHorizon{
             if self.shuffleMode[0] != 0{
                 let result = try! self.clsModel_h.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
-                singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer)
+                (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: true)
             }
             else{
                 let result = try! self.clsModel_h.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
-                singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer)
+                (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: true)
             }
         }
         else{
             if self.shuffleMode[0] != 0{
                 let result = try! self.clsModel_v.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
-                singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer)
+                (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: true)
             }
             else{
                 let result = try! self.clsModel_v.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
-                singlefeatureResult = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer)
+                (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: true)
             }
         }
+        
         
 //        // 创建输入
 //        let input = try! DetectionInput(image: pixelBuffer,iouThreshold: iou,confidenceThreshold: 0.05)
@@ -785,9 +786,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 else{
                     self.detectNeedToCut = false
                 }
-                
                 if ((detectNum == 1 && (self.shuffleMode[1] != 0 || self.detectNeedToCut))
-                    || (detectNum == 2 && self.shuffleMode[0] != 0)) && stateCounter >= 1{
+                    || (detectNum == 2 && (self.shuffleMode[0] != 0 || self.detectNeedToCut))) && stateCounter >= 1{
                     
                     self.reloadingTime = 0.2
                     
@@ -904,9 +904,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     self.detectNeedToCut = false
                     
                     if self.usedSingleFeatures.contains(detectSingleFeature) && self.recgReport {
-                        self.stateCounter = 100
+//                        self.stateCounter = 100
+//                        self.state = "waitingEnd"
+//                        print("状态：等待结束")
                         self.reloadingTime = 0.2
-                        self.state = "waitingEnd"
                         self.computeNextRound()
                     }
                     else if self.singlefeatureArray.contains(detectSingleFeature){
@@ -1014,7 +1015,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     }
                     else if minDetectConfidence >= detectConfidenceThreshold && isShuffle {
                         if leftDetectSingleFeature == self.stateSingleFeature[0]
-                            && rightDetectSingleFeature == self.stateSingleFeature[1]{
+                            && rightDetectSingleFeature == self.stateSingleFeature[1]
+                            && uniqueNum == 2
+                            && shufflePostureJudge(coordinates: [singlefeatureResult[0].coordinate, singlefeatureResult[1].coordinate]){
                             self.shuffleStartCounter += 1
                         }
                         else{
@@ -1025,8 +1028,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             self.isDetect = true
                             self.detectNeedToCut = false
                             self.state = "shuffle"
-                            
-                            print("shuffle \(leftDetectSingleFeature) \(rightDetectSingleFeature)")
+                            print("状态：进入洗牌")
                             
                             if self.targetAreaMove(initTargetArea: self.initTargetArea, targetArea: targetArea){
                                 self.speakText(input: 0)
@@ -1064,7 +1066,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 
                 //识别过程
                 else if taskIndex >= 0 && self.isDetect{
-                    
                     if minDetectConfidence >= detectConfidenceThreshold
                         && isShuffle
                         && self.state == "riffle"
@@ -2523,14 +2524,51 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
         }
     }
+    
+    func shufflePostureJudge(coordinates:[[Float]]) -> Bool{
+        var isShuffle = false
+        
+        var w = self.imageSize[0]
+        var h = self.imageSize[1]
+        
+        if self.isCameraHorizon{
+            
+            //x间距不能太小 大于最大宽度
+            let xGap = abs(coordinates[0][0] - coordinates[1][0]) * w
+            let maxW = max((coordinates[0][2] + coordinates[1][2]) * w * 1.1 / 2, coordinates[0][3] * h, coordinates[1][3] * h)
+            
+            //y间距不能太大 小于平均高度 / 2
+            let yGap = abs(coordinates[0][1] - coordinates[1][1]) * h
+            let minH = (coordinates[0][3] + coordinates[1][3]) / 4 * h
+            
+            if xGap > maxW && yGap < minH{
+                isShuffle = true
+            }
+        }
+        else{
+            //x间距不能太小 大于最大宽度
+            let xGap = abs(coordinates[0][1] - coordinates[1][1]) * w
+            let maxW = max((coordinates[0][3] + coordinates[1][3]) * w * 1.1 / 2, coordinates[0][2] * h, coordinates[1][2] * h)
+            
+            //y间距不能太大 小于最小高度
+            let yGap = abs(coordinates[0][0] - coordinates[1][0]) * h
+            let minH = (coordinates[0][2] + coordinates[1][2]) / 4 * h
+            
+            if xGap > maxW && yGap < minH{
+                isShuffle = true
+            }
+        }
+        
+        return isShuffle
+    }
 
-    func getSingleFeature(from singlefeatureArray: MLMultiArray, from boxArray : MLMultiArray, from pixelBuffer : CVPixelBuffer) -> [DetectionResult] {
+    func getSingleFeature(from singlefeatureArray: MLMultiArray, from boxArray : MLMultiArray, from pixelBuffer : CVPixelBuffer, from iscls : Bool) -> ([DetectionResult], Int) {
         let cnt : Int = Int(singlefeatureArray.shape[0])
         let n : Int = Int(singlefeatureArray.shape[1])
         var result : [DetectionResult] = []
         
         
-        if self.state != "shuffle" && self.state != "riffle"{
+        if !iscls{
             for i in 0..<cnt {
                 var maxVal: Float32 = singlefeatureArray[i * n].floatValue
                 var confidenceSum : Float = 0
@@ -2591,6 +2629,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 }
             }
             
+            var uniqueNum = result.count
+            
             if result.count > 2{
                 result.sort{$0.confidence[0] > $1.confidence[0]}
                 result.removeLast(result.count - 2)
@@ -2616,8 +2656,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             for resultIndex in 0..<result.count{
                 result[resultIndex].singlefeatureIndex = result[resultIndex].singlefeatureIndex.map { $0 == 52 ? 54 : $0 }
             }
-            
-            return result
+            return (result, uniqueNum)
         }
         
         else{
@@ -2687,18 +2726,23 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 let coordinate = [centerX, centerY, widthX, heightY]
                 
                 if singlefeatureIndex.count > 0{
-                    if let index = result.firstIndex(where: {
-                        abs($0.coordinate[0] - coordinate[0]) < ($0.coordinate[2] + coordinate[2]) / 2
-                         && abs($0.coordinate[1] - coordinate[1]) < ($0.coordinate[3] + coordinate[3]) / 2
-                    }) {
-                        
-                        if maxVal > result[index].confidence[0] {
-                            result[index].singlefeatureIndex = singlefeatureIndex + result[index].singlefeatureIndex
-                            result[index].confidence = confidence + result[index].confidence
+                    if self.state == "shuffle" || self.state == "riffle"{
+                        if let index = result.firstIndex(where: {
+                            abs($0.coordinate[0] - coordinate[0]) < ($0.coordinate[2] + coordinate[2]) / 2
+                            && abs($0.coordinate[1] - coordinate[1]) < ($0.coordinate[3] + coordinate[3]) / 2
+                        }) {
+                            
+                            if maxVal > result[index].confidence[0] {
+                                result[index].singlefeatureIndex = singlefeatureIndex + result[index].singlefeatureIndex
+                                result[index].confidence = confidence + result[index].confidence
+                            }
+                            else{
+                                result[index].singlefeatureIndex = result[index].singlefeatureIndex + singlefeatureIndex
+                                result[index].confidence = result[index].confidence + confidence
+                            }
                         }
                         else{
-                            result[index].singlefeatureIndex = result[index].singlefeatureIndex + singlefeatureIndex
-                            result[index].confidence = result[index].confidence + confidence
+                            result.append(DetectionResult(singlefeatureIndex: singlefeatureIndex, confidence: confidence, confidencePercent: maxVal/confidenceSum, coordinate: coordinate, laplacianVariance: 0))
                         }
                     }
                     else{
@@ -2720,6 +2764,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     }
                 }
             }
+            
+            let uniqueNum = result.count
             
             if result.count > 2{
                 result.sort{$0.confidence[0] > $1.confidence[0]}
@@ -2774,9 +2820,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             for resultIndex in 0..<result.count{
                 result[resultIndex].laplacianVariance = ComputeROILaplacianVariance(box: result[resultIndex].coordinate, destinationBuffer8: destinationBuffer8)
             }
-            
-            
-            return result
+            return (result, uniqueNum)
         }
     }
     
@@ -3344,6 +3388,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         self.rcNum = rules.rcNum
         self.shuffleMode = rules.shuffleMode
         self.allSingleFeatureIndex = rules.singlefeatureToUse
+        print("所有的用牌 \(self.allSingleFeatureIndex)")
         self.cutNumSetting = rules.cutNumSetting
         self.cutNumRangeSetting = rules.cutNumRangeSetting
         self.calModeArgs = [[rules.reportSetting[0], rules.positionSetting], [rules.reportSetting[1], rules.positionSetting]]
