@@ -75,6 +75,7 @@ class ClassifierSettingArgs {
     ]
     
     static var SuitReportDix: [Int: String] = [
+        4: "",
         3: "黑桃",
         2: "红桃",
         1: "梅花",
@@ -431,7 +432,7 @@ public class DetectSettingArgs{
         
         allPreSetReportRules[260] =  ReportClass.init(reportName: "[229]:飞2张看色留色再看底保位置最小", reportID: 260, rankReport: 3, aliveDeathReport: 0, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 14, reportTarget: 1, singlefeaturesTransformation: -1, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: 17, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: 4, dealFormation: -1, cutSingleFeatureProcession: 6)
         
-        allPreSetReportRules[108] = ReportClass.init(reportName: "[284]:固定范围切牌报对子和同点数目", reportID: 108, rankReport: 0, aliveDeathReport: -1, pairReport: 2, drawPointReport: 2, ninePointReport: -1,  reportCutRange: 0, reportTarget: 0, singlefeaturesTransformation: 4, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, dealFormation: -1, cutSingleFeatureProcession: -1)
+        allPreSetReportRules[108] = ReportClass.init(reportName: "[284]:固定范围切牌报对子和同点数目", reportID: 108, rankReport: 0, aliveDeathReport: -1, pairReport: 2, drawPointReport: 1, ninePointReport: -1,  reportCutRange: 0, reportTarget: 0, singlefeaturesTransformation: 4, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, dealFormation: -1, cutSingleFeatureProcession: -1)
         
         allPreSetReportRules[109] = ReportClass.init(reportName: "[285]:固定范围切牌报那个位置拿最大最多", reportID: 109, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 0, reportTarget: 2, singlefeaturesTransformation: 4, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, dealFormation: -1, cutSingleFeatureProcession: -1)
         allPreSetReportRules[110] = ReportClass.init(reportName: "[286]:固定范围切牌报那个位置拿最大次大最多", reportID: 110, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 0, reportTarget: 2, singlefeaturesTransformation: 4, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, dealFormation: -1, cutSingleFeatureProcession: -1)

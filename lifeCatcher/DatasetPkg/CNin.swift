@@ -488,14 +488,80 @@ class CNDataset{
             }
         }
         
+        let currentHandNum = allPlaySingleFeatures[0].rcSingleFeature.count
         
-        
-        for i in 0..<rcNum {
-            (allPlaySingleFeatures[i].evaluateFlag, allPlaySingleFeatures[i].singlefeatureType, allPlaySingleFeatures[i].isPair) = CNDatasetHandAnalyst(
-                rankRules: rankRules,
-                suitRules: suitRules
-            ).evalHand(singlefeatures: allPlaySingleFeatures[i].rcSingleFeature, redspecialfeatureValueRange: redspecialfeatureValueRange,blackspecialfeatureValueRange: blackspecialfeatureValueRange,KValueRange: KValueRange,QValueRange: QValueRange,JValueRange: JValueRange, AValueRange: AValueRange,pointComparision: pointComparision,samePointComparision: samePointComparision, singlefeatureRankRule: singlefeatureRankRule, pairRank: pairRank)
+        if currentHandNum == 2 {
+            
+            for i in 0..<rcNum {
+                (allPlaySingleFeatures[i].evaluateFlag, allPlaySingleFeatures[i].singlefeatureType, allPlaySingleFeatures[i].isPair) = CNDatasetHandAnalyst(
+                    rankRules: rankRules,
+                    suitRules: suitRules
+                ).evalHand(singlefeatures: allPlaySingleFeatures[i].rcSingleFeature, redspecialfeatureValueRange: redspecialfeatureValueRange,blackspecialfeatureValueRange: blackspecialfeatureValueRange,KValueRange: KValueRange,QValueRange: QValueRange,JValueRange: JValueRange, AValueRange: AValueRange,pointComparision: pointComparision,samePointComparision: samePointComparision, singlefeatureRankRule: singlefeatureRankRule, pairRank: pairRank)
+            }
+            
+        } else if currentHandNum == 4 {
+            
+            var allHeadRank: [Int] = []
+            var allTailRank: [Int] = []
+            var allType: [String] = []
+            var allPair: [Int] = []
+            
+            for i in 0..<rcNum {
+                let currentHand = allPlaySingleFeatures[i].rcSingleFeature
+                
+                var combinations : [[SingleFeature]] = []
+                for i in 0..<currentHand.count {
+                    for j in (i + 1)..<currentHand.count {
+                        combinations.append([currentHand[i], currentHand[j]])
+                    }
+                }
+                
+                //算最大的两张
+                var currentMaxRank: Int = 0
+                var currentMaxType: String = ""
+                var currentHeadFeature: [SingleFeature] = []
+                var currentMaxPair: Int = 0
+                for combination in combinations {
+                    let (currentRank, currentFeatureType, currentIsPair) = CNDatasetHandAnalyst(
+                        rankRules: rankRules,
+                        suitRules: suitRules
+                    ).evalHand(singlefeatures: combination, redspecialfeatureValueRange: redspecialfeatureValueRange,blackspecialfeatureValueRange: blackspecialfeatureValueRange,KValueRange: KValueRange,QValueRange: QValueRange,JValueRange: JValueRange, AValueRange: AValueRange,pointComparision: pointComparision,samePointComparision: samePointComparision, singlefeatureRankRule: singlefeatureRankRule, pairRank: pairRank)
+                    
+                    if currentMaxRank < currentRank {
+                        currentMaxRank = currentRank
+                        currentMaxType = currentFeatureType
+                        currentHeadFeature = combination
+                        currentMaxPair = currentIsPair
+                    }
+                }
+                
+                let currentTailFeature = currentHand.filter { $0 != currentHeadFeature[0] && $0 != currentHeadFeature[1] }
+                
+                print("currentHeadFeature \(currentHeadFeature[0].singlefeatureIndex) \(currentHeadFeature[1].singlefeatureIndex) currentTailFeature \(currentTailFeature[0].singlefeatureIndex) \(currentTailFeature[1].singlefeatureIndex)")
+                
+                //尾部的牌型
+                let (tailRank, tailFeatureType, tailIsPair) = CNDatasetHandAnalyst(
+                    rankRules: rankRules,
+                    suitRules: suitRules
+                ).evalHand(singlefeatures: currentTailFeature, redspecialfeatureValueRange: redspecialfeatureValueRange,blackspecialfeatureValueRange: blackspecialfeatureValueRange,KValueRange: KValueRange,QValueRange: QValueRange,JValueRange: JValueRange, AValueRange: AValueRange,pointComparision: pointComparision,samePointComparision: samePointComparision, singlefeatureRankRule: singlefeatureRankRule, pairRank: pairRank)
+                
+                allHeadRank.append(currentMaxRank)
+                allTailRank.append(tailRank)
+                allType.append(currentMaxType)
+                allPair.append(currentMaxPair)
+            }
+            
+            //重新组合出新的rank
+            let newHeadRank = GetNewRankArray(allRankSet: allHeadRank)
+            let newTailRank = GetNewRankArray(allRankSet: allTailRank)
+            
+            for i in 0..<rcNum{
+                allPlaySingleFeatures[i].evaluateFlag = newHeadRank[i]<<6 | newTailRank[i]
+                allPlaySingleFeatures[i].singlefeatureType = allType[i]
+                allPlaySingleFeatures[i].isPair = allPair[i]
+            }
         }
+        
         
                 
         for rcID in 0..<allPlaySingleFeatures.count {
@@ -676,7 +742,7 @@ class CNDatasetHandAnalyst{
     }
     
     func eval_isRedAPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 1{
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 1{
             return (1, "对红尖", 1)
         }
         return (0, "", 0)
@@ -692,7 +758,7 @@ class CNDatasetHandAnalyst{
     
     
     func eval_isSameColorPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == singlefeatures[1].color {
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == singlefeatures[1].color {
             
 //            var singlefeatureType: String = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
             var singlefeatureType: String = "同色对子"
@@ -748,7 +814,7 @@ class CNDatasetHandAnalyst{
     }
     
     func eval_isRedNineFiveBlackEightSevenPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && (singlefeatures[0].originalRank == 9 || singlefeatures[0].originalRank == 5){
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && (singlefeatures[0].originalRank == 9 || singlefeatures[0].originalRank == 5){
             
             var singlefeatureType: String = ""
             
@@ -761,7 +827,7 @@ class CNDatasetHandAnalyst{
             return (1, singlefeatureType, 1)
         }
         
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && (singlefeatures[0].originalRank == 8 || singlefeatures[0].originalRank == 7){
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && (singlefeatures[0].originalRank == 8 || singlefeatures[0].originalRank == 7){
             var singlefeatureType: String = ""
             
             if singlefeatures[0].originalRank == 7{
@@ -805,7 +871,7 @@ class CNDatasetHandAnalyst{
     }
     
     func eval_isBlackNineEightSevenFivePair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && (singlefeatures[0].originalRank == 9 || singlefeatures[0].originalRank == 8 || singlefeatures[0].originalRank == 7 || singlefeatures[0].originalRank == 5){
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && (singlefeatures[0].originalRank == 9 || singlefeatures[0].originalRank == 8 || singlefeatures[0].originalRank == 7 || singlefeatures[0].originalRank == 5){
             
             if singlefeatures[0].originalRank == 9{
                 return (1, "对黑9", 1)
@@ -821,7 +887,7 @@ class CNDatasetHandAnalyst{
     }
     
     func eval_isRedJTenSevenSixPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && (singlefeatures[0].originalRank == 11 || singlefeatures[0].originalRank == 10 || singlefeatures[0].originalRank == 7 || singlefeatures[0].originalRank == 6){
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && (singlefeatures[0].originalRank == 11 || singlefeatures[0].originalRank == 10 || singlefeatures[0].originalRank == 7 || singlefeatures[0].originalRank == 6){
             
             if singlefeatures[0].originalRank == 11{
                 return (1, "对红J", 1)
@@ -838,7 +904,7 @@ class CNDatasetHandAnalyst{
     }
     
     func eval_isBlackTenSixFourPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && (singlefeatures[0].originalRank == 10 || singlefeatures[0].originalRank == 6 || singlefeatures[0].originalRank == 5){
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && (singlefeatures[0].originalRank == 10 || singlefeatures[0].originalRank == 6 || singlefeatures[0].originalRank == 5){
             
             if singlefeatures[0].originalRank == 10{
                 return (1, "对黑10", 1)
@@ -852,84 +918,84 @@ class CNDatasetHandAnalyst{
     }
     
     func eval_isBlackSevenPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 7{
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 7{
             return (1, "对黑7", 1)
         }
         return (0, "", 0)
     }
     
     func eval_isBlackEightPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 8{
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 8{
             return (1, "对黑8", 1)
         }
         return (0, "", 0)
     }
     
     func eval_isBlackNinePair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 9{
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 9{
             return (1, "对黑9", 1)
         }
         return (0, "", 0)
     }
     
     func eval_isBlackSixPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 6{
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 6{
             return (1, "对黑6", 1)
         }
         return (0, "", 0)
     }
     
     func eval_isRedSevenPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 7{
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 7{
             return (1, "对红7", 1)
         }
         return (0, "", 0)
     }
     
     func eval_isBlackTenPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 10{
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 10{
             return (1, "对黑10", 1)
         }
         return (0, "", 0)
     }
     
     func eval_isBlackJPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 11{
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 11{
             return (1, "对黑J", 1)
         }
         return (0, "", 0)
     }
     
     func eval_isBlackFourPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 4{
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 4{
             return (1, "对黑4", 1)
         }
         return (0, "", 0)
     }
     
     func eval_isRedSixPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 6{
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 6{
             return (1, "对红6", 1)
         }
         return (0, "", 0)
     }
     
     func eval_isRedTenPair(singlefeatures:[CNSingleFeature]) -> (Int, String,Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 10{
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 10{
             return (1, "对红10", 1)
         }
         return (0, "", 0)
     }
     
     func eval_isRedFourPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 4{
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 4{
             return (1, "对红4", 1)
         }
         return (0, "", 0)
     }
     
     func eval_isRedEightPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 8{
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 8{
             return (1, "对红8", 1)
         }
         return (0, "", 0)
@@ -943,21 +1009,21 @@ class CNDatasetHandAnalyst{
     }
     
     func eval_isTwoPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].originalRank == 2{
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].originalRank == 2{
             return (1, "对2", 1)
         }
         return (0, "", 0)
     }
     
     func eval_isQPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].originalRank == 12{
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].originalRank == 12{
             return (1, "对Q", 1)
         }
         return (0, "", 0)
     }
     
     func eval_isBlackFivePair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 5{
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 && singlefeatures[0].originalRank == 5{
             return (1, "对黑5", 1)
         }
         return (0, "", 0)
@@ -975,7 +1041,7 @@ class CNDatasetHandAnalyst{
     }
     
     func eval_isRedFivePair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 5{
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 5{
             return (1, "对红5", 1)
         }
         return (0, "", 0)
@@ -992,21 +1058,21 @@ class CNDatasetHandAnalyst{
         
     }
     func eval_isRedTwoPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 2{
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 2{
             return (1, "对红2", 1)
         }
         return (0, "", 0)
     }
     
     func eval_isRedQPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 12{
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 && singlefeatures[0].originalRank == 12{
             return (1, "对红Q", 1)
         }
         return (0, "", 0)
     }
     
     func eval_isRedColorPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 {
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 {
             
 //            var singlefeatureType: String = "红对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
             var singlefeatureType: String = "红对子"
@@ -1021,7 +1087,7 @@ class CNDatasetHandAnalyst{
     }
     
     func eval_isBlackColorPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 {
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 {
             
 //            var singlefeatureType: String = "黑对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
             
@@ -1037,7 +1103,7 @@ class CNDatasetHandAnalyst{
     }
     
     func eval_isMixColorPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank && singlefeatures[0].color != singlefeatures[1].color {
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color != singlefeatures[1].color {
             
 //            var singlefeatureType: String = "混对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
             var singlefeatureType: String = "混对子"
@@ -1052,7 +1118,7 @@ class CNDatasetHandAnalyst{
     }
     
     func eval_isPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].rank == singlefeatures[1].rank{
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank{
             
 //            var singlefeatureType: String = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
             var singlefeatureType: String = "对子"

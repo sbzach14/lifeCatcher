@@ -1,6 +1,6 @@
 import Foundation
 
-class SingleFeature {
+class SingleFeature: Equatable {
     var suit: [Int]
     var rank: Int
     var singlefeatureIndex: Int
@@ -15,6 +15,11 @@ class SingleFeature {
     
     static func calScore(singlefeature: SingleFeature) -> Int {
         return singlefeature.rank * 10 + singlefeature.suit.max()!
+    }
+    
+    // 实现 Equatable 协议来比较两个对象是否相等
+    static func == (lhs: SingleFeature, rhs: SingleFeature) -> Bool {
+        return lhs.singlefeatureIndex == rhs.singlefeatureIndex
     }
 }
 
@@ -71,6 +76,28 @@ func randomSingleFeatureArray(singlefeatureNum: Int) -> [Int] {
     return singlefeatureArray
 }
 
+func GetNewRankArray(allRankSet: [Int]) -> [Int]{
+    var returnRankSet: [Int] = []
+    
+    for i in 0..<allRankSet.count {
+        returnRankSet.append(0)
+    }
+    
+    let sortedRankSet = allRankSet.sorted()
+    
+    for i in 0..<sortedRankSet.count{
+        for j in 0..<allRankSet.count{
+            if sortedRankSet[i] == allRankSet[j]{
+                returnRankSet[j] = i + 1
+            }
+        }
+    }
+        
+    return returnRankSet
+    
+    
+}
+
 // Helper extension for combinations
 extension Array {
     func combinations(ofCount count: Int) -> [[Element]] {
@@ -107,3 +134,5 @@ struct cutStruct{
     //0，看底，1，看顶，2，看色，3，看手
     var cutMode: Int = 0
 }
+
+

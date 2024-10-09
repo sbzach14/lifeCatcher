@@ -298,9 +298,9 @@ class ReportManager{
             105: "[217]:飞2张底为色保位置最小",
             106: "[218]:飞2张底2张相加为色保位置最大",
             107: "[221]:飞2张看色留色再看底保位置最大",
-            108: "[284]:固定范围切牌报对子和同点数目*",
-            109: "[285]:固定范围切牌报哪个位置拿最大最多*",
-            110: "[286]:固定范围切牌报哪个位置拿最大次大最多*",
+            108: "[284]:固定范围切牌报对子和同点数目",
+            109: "[285]:固定范围切牌报哪个位置拿最大最多",
+            110: "[286]:固定范围切牌报哪个位置拿最大次大最多",
             111: "[289]:范围切牌保指定2家有最大",
             112: "[290]:范围切牌保有最好活门*",
             113: "[291]:范围切牌保有最好死门*",
@@ -1810,7 +1810,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         //多轮平点点数
         var totalDrawNum: Int = -1
         //最大/最小最多的位置
-        var maxWinPosition: Int = -1
+        var rcWinTimes: [Int:Int] = [:]
         //多轮的播报结果, 每一轮是一个[SpeakResultStruct]
         var reportResult: [[SpeakResultStruct]] = []
         //返回的切牌后的数组
@@ -2044,11 +2044,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         //玩家数量
         let rcNum = newArgs[2]
 
-        //每个位置拿最大次数
-        var rcWinTimesDic : [Int:Int] = [:]
-        for id in 0..<rcNum {
-            rcWinTimesDic[id] = 0
-        }
+
         //指定牌位置
         var specialSingleFeaturePos: Int = -1
         //切每一张牌的目标玩家
@@ -2056,6 +2052,11 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         
         //装下总结果
         var multipleResultInfo = MultipleReportResultInfo()
+        
+        //每个位置拿最大次数
+        for id in -1..<rcNum {
+            multipleResultInfo.rcWinTimes[id] = 0
+        }
         
         //获得一轮最少的牌数(TODO handNum, communityNum)
         let handNum = newArgs[3]
@@ -2105,6 +2106,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         multipleResultInfo.leftSingleFeatures = leftSingleFeatures
                         return multipleResultInfo
                     }
+                    
 
                     let handSingleFeatureIndex = cutStructList[cutStructList.count - 1].cutcardIndex
                     let pos = searchSingleFeaturePos(inputSingleFeatures: inputSingleFeatures, singlefeatureIndex: handSingleFeatureIndex)
@@ -3462,7 +3464,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 let num2 = leftSingleFeatures.count
                                 multipleResultInfo.maxLookHandLeftCards = Array(newInputSingleFeatures[0...(num1 - num2 - 1)])
                                 print("第一张时候的用牌 \(multipleResultInfo.maxLookHandLeftCards)")
-                            
                             }
                             
                             if singlefeatureIndex == cutRange2 {
@@ -3509,8 +3510,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         //2,哪个位置拿最大最多
                         case 2:
                             for id in resultPos {
-                                rcWinTimesDic[id]! += 1
+                                multipleResultInfo.rcWinTimes[id]! += 1
                             }
+                            multipleResultInfo.rcWinTimes[-1]! += 1
                             break
                         //3, 保2个位置必有一家大小
                         case 3:
@@ -3821,13 +3823,24 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
 //                                        continue
 //                                    }
                                     let currentFeatureIndex = tempInputFeatures[currentFeaturePos]
-                                    let currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[currentFeatureIndex % 13 + 1]
-                                    
-                                    let currentColor = 3 - (currentFeatureIndex / 13)
-                                    if YValue == 10 {
-                                        currentResultInfo.fourCardReport += currentPoint! + " "
+                                    var currentPoint: String = ""
+                                    if currentFeatureIndex == 53 {
+                                        currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[14]!
+                                    } else if currentFeatureIndex == 54 {
+                                        currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[15]!
                                     } else {
-                                        currentResultInfo.fourCardReport +=  ClassifierSettingArgs.SuitReportDix[currentColor]! + currentPoint! + " "
+                                        currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[currentFeatureIndex % 13 + 1]!
+                                    }
+                                    var currentColor: Int = 4
+                                    
+                                    if currentFeatureIndex != 53 && currentFeatureIndex != 54 {
+                                        currentColor = 3 - (currentFeatureIndex / 13)
+                                    }
+                                    
+                                    if YValue == 10 {
+                                        currentResultInfo.fourCardReport += currentPoint + " "
+                                    } else {
+                                        currentResultInfo.fourCardReport +=  ClassifierSettingArgs.SuitReportDix[currentColor]! + currentPoint + " "
                                     }
                                 }
                                 break
@@ -3904,14 +3917,26 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             for i in currentFeatures{
                                 
                                 let currentFeatureIndex = i.singlefeatureIndex
-                                let currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[currentFeatureIndex % 13 + 1]
                                 
-                                let currentColor = 3 - (currentFeatureIndex / 13)
+                                var currentPoint: String = ""
+                                if currentFeatureIndex == 53 {
+                                    currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[14]!
+                                } else if currentFeatureIndex == 54 {
+                                    currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[15]!
+                                } else {
+                                    currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[currentFeatureIndex % 13 + 1]!
+                                }
+                                
+                                var currentColor: Int = 4
+                                
+                                if currentFeatureIndex != 53 && currentFeatureIndex != 54 {
+                                    currentColor = 3 - (currentFeatureIndex / 13)
+                                }
                                 
                                 if XValue == 1 {
-                                    currentResultInfo.fourCardReport += currentPoint! + " "
+                                    currentResultInfo.fourCardReport += currentPoint + " "
                                 } else {
-                                    currentResultInfo.fourCardReport +=  ClassifierSettingArgs.SuitReportDix[currentColor]! + currentPoint! + " "
+                                    currentResultInfo.fourCardReport +=  ClassifierSettingArgs.SuitReportDix[currentColor]! + currentPoint + " "
                                 }
                             }
                             break
@@ -4936,7 +4961,12 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     for rcID in subTargetRCList {
                         reportString += String(rcID + 1) + " "
                     }
-                    reportString = initialString + reportString + "\(aliveNumber)"
+                    var aliveString : String = ""
+                    if aliveNumber != 0 {
+                        aliveString = "\(aliveNumber)"
+                    }
+                    
+                    reportString = initialString + reportString + aliveString
                     currentReportStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
                     dealPos += 1
                 }
@@ -5048,16 +5078,33 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
 //            108: "[284]:固定范围切牌报对子和同点数目",
         //报法格式: 对子总数, 同点数目
         case 108:
-            
             var reportString: String  = ""
-            reportString += String(multipleReportResultInfo.totalPairNum) + "，"
-            reportString += String(multipleReportResultInfo.totalDrawNum)
+            reportString = String(multipleReportResultInfo.totalPairNum)
+            reportResult.append([SpeakResultStruct(voiceType: 1, content: reportString)])
+
+            reportString = String(multipleReportResultInfo.totalDrawNum)
             reportResult.append([SpeakResultStruct(voiceType: 1, content: reportString)])
             break
 //            109: "[285]:固定范围切牌报哪个位置拿最大最多",
 //            110: "[286]:固定范围切牌报哪个位置拿最大次大最多",
         case 109...110:
-            reportResult.append([SpeakResultStruct(voiceType: 1, content: String(multipleReportResultInfo.maxWinPosition))])
+            
+            let totalTimes : Int = multipleReportResultInfo.rcWinTimes[-1]!
+            var maxWinPosition: Int = 0
+            var maxWinTimes: Int = 0
+            for i in 0..<rcNum{
+                let currentPosWinTimes = multipleReportResultInfo.rcWinTimes[i]
+                if currentPosWinTimes! > maxWinTimes{
+                    maxWinPosition = i + 1
+                    maxWinTimes = currentPosWinTimes!
+                }
+            }
+            
+            var maxWinProb: Int = Int(Double(maxWinTimes) / Double(totalTimes) * 100.0)
+            
+            let reportString: String = "\(maxWinPosition) \(maxWinProb)%"
+
+            reportResult.append([SpeakResultStruct(voiceType: 1, content: reportString)])
             
             break
 //            111: "[289]:范围切牌保指定2家有最大",
@@ -5089,8 +5136,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         //报法格式：切牌范围1，切牌范围2
         case 111...136:
             for resultInfo in multipleReportResultInfo.singleResultList{
-                
-                
                 
                 var _: String = ""
                 
