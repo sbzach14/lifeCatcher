@@ -39,6 +39,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     let clsModel_h = try! cls_0715_h_trans()
     let clsModel_v = try! cls_0727_v_trans()
     
+    let riffleModel_h = try! riffle_1002_h()
+    let riffleModel_v = try! riffle_1002_v()
+    
     var originSize : [Float] = [1920, 1080] //相机图像大小
     var imageSize : [Float] = [569, 320] //target area 截图大小
     var originImageSize : [Float] = [569, 320] //target area 原始截图大小
@@ -720,7 +723,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: true)
             }
             else{
-                let result = try! self.clsModel_h.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
+                let result = try! self.riffleModel_h.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
                 (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: true)
             }
         }
@@ -730,7 +733,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: true)
             }
             else{
-                let result = try! self.clsModel_v.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
+                let result = try! self.riffleModel_v.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
                 (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: true)
             }
         }
@@ -993,6 +996,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                 self.cutShowArray.append(detectSingleFeature)
                                 isCutDone = true
                             }
+                            //连续看色
+                            else if self.specialCard[self.shuffleOrRiffle] == 4{
+                                self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 2))
+                                self.cutShowArray.append(detectSingleFeature)
+                                isCutDone = true
+                            }
                         }
                         
                         if isCutDone{
@@ -1008,7 +1017,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 }
                 
                 else if !self.isDetect && detectConfidence >= riffleDetectConfidenceThreshold{
-                    if isRiffle{
+                    if isRiffle
+                        && uniqueNum == 1{
                         self.isDetect = true
                         self.state = "riffle"
                         self.speakText(input: 0)
@@ -1466,7 +1476,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         
         var isShort = true
-        if leftSideCnt + rightSideCnt >= 15{
+        if leftSideCnt + rightSideCnt >= min(minSingleFeatureNum, 15){
             isShort = false
         }
         
@@ -2011,6 +2021,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     {
                         var confidenceFlag = 0
                         var blurFlag = 0
+                        
+                        if detectResultNode0.laplacianVariance < lastDetectResultNode0.laplacianVariance * 0.5
+                            && detectResultNode0.laplacianVariance < nextDetectResultNode0.laplacianVariance * 0.5{
+                            blurFlag += 1
+                        }
+                        
                         if detectResultNode0.confidence[0] > lastDetectResultNode0.confidence[0] && detectResultNode0.laplacianVariance > lastDetectResultNode0.laplacianVariance{
                             confidenceFlag += 1
                         }
@@ -2029,11 +2045,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             confidenceFlag += 1
                         }
                         if detectResultNode0.confidence[0] > lastDetectResultNode0.confidence[0]
-                            && detectResultNode0.confidence[0] > nextDetectResultNode0.confidence[0]{
+                            && detectResultNode0.confidence[0] > nextDetectResultNode0.confidence[0]
+                            && blurFlag == 0{
                             confidenceFlag += 1
                         }
                         
-                        if confidenceFlag + blurFlag >= 1{
+                        if confidenceFlag >= 1{
                             detectSingleFeatureArray.insert(insertCard0, at: 0)
                         }
                     }
@@ -2047,6 +2064,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     {
                         var confidenceFlag = 0
                         var blurFlag = 0
+                        
+                        if detectResultNode1.laplacianVariance < lastDetectResultNode1.laplacianVariance * 0.5
+                            && detectResultNode1.laplacianVariance < nextDetectResultNode1.laplacianVariance * 0.5{
+                            blurFlag += 1
+                        }
+                        
                         if detectResultNode1.confidence[0] > lastDetectResultNode1.confidence[0] && detectResultNode1.laplacianVariance > lastDetectResultNode1.laplacianVariance{
                             confidenceFlag += 1
                         }
@@ -2065,11 +2088,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             confidenceFlag += 1
                         }
                         if detectResultNode1.confidence[0] > lastDetectResultNode1.confidence[0]
-                            && detectResultNode1.confidence[0] > nextDetectResultNode1.confidence[0]{
+                            && detectResultNode1.confidence[0] > nextDetectResultNode1.confidence[0]
+                            && blurFlag == 0{
                             confidenceFlag += 1
                         }
                         
-                        if confidenceFlag + blurFlag >= 1{
+                        if confidenceFlag >= 1{
                             detectSingleFeatureArray.insert(insertCard1, at: 0)
                         }
                     }
@@ -2528,8 +2552,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     func shufflePostureJudge(coordinates:[[Float]]) -> Bool{
         var isShuffle = false
         
-        var w = self.imageSize[0]
-        var h = self.imageSize[1]
+        let w = self.imageSize[0]
+        let h = self.imageSize[1]
         
         if self.isCameraHorizon{
             
@@ -2550,7 +2574,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             let xGap = abs(coordinates[0][1] - coordinates[1][1]) * w
             let maxW = max((coordinates[0][3] + coordinates[1][3]) * w * 1.1 / 2, coordinates[0][2] * h, coordinates[1][2] * h)
             
-            //y间距不能太大 小于最小高度
+            //y间距不能太大 小于平均高度 / 2
             let yGap = abs(coordinates[0][0] - coordinates[1][0]) * h
             let minH = (coordinates[0][2] + coordinates[1][2]) / 4 * h
             
@@ -2863,12 +2887,11 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         
         if self.cutMode[self.shuffleOrRiffle] != 3{
-            if self.specialCard[self.shuffleOrRiffle] == 1{
+            if self.specialCard[self.shuffleOrRiffle] == 1 || self.specialCard[self.shuffleOrRiffle] == 3{
                 self.cutStructArray.append(cutStruct(cutcardIndex: cutSingleFeature, cutMode: 3))
                 self.cutShowArray.append(cutSingleFeature)
             }
-            else if self.specialCard[self.shuffleOrRiffle] == 2{
-                
+            else if self.specialCard[self.shuffleOrRiffle] == 2 || self.specialCard[self.shuffleOrRiffle] == 4{
                 for _ in 0..<maxCutTimes {
                     cutSingleFeature = self.singlefeatureArray.randomElement()!
                     cutSingleFeature = self.singlefeatureArray[1]
@@ -2905,7 +2928,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
     
     func computeWinnerRC(isReset: Bool) {
-        if singlefeatureArray.count >= minSingleFeatureNum && singlefeatureArray.count > cutNumRangeSetting[0] && singlefeatureArray.count > cutNumRangeSetting[1] - minSingleFeatureNum{
+        if singlefeatureArray.count >= minSingleFeatureNum {
             multipleDatasetRCInfos = ClassifierSettingArgs.selectDataset(DatasetIndex: ruleIndex, inputSingleFeatures: singlefeatureArray, rcNum: (ClassifierSettingArgs.targetSetting[ruleIndex]?.rcNum[rcNum])!, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs[self.shuffleOrRiffle], cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, minSingleFeatureNum: minSingleFeatureNum, cutStructList: cutStructArray, currentRoundID: self.currentRoundID)
             
             self.singlefeatureArray = multipleDatasetRCInfos.returnSingleFeatureArray
@@ -2935,7 +2958,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
     
     func computeSingleFeatures(isReset: Bool){
-        if self.singlefeatureArray.count >= self.minSingleFeatureNum && self.singlefeatureArray.count > self.cutNumRangeSetting[0] && self.singlefeatureArray.count > self.cutNumRangeSetting[1] - self.minSingleFeatureNum{
+        if self.singlefeatureArray.count >= self.minSingleFeatureNum {
             self.leftSingleFeatures = multipleDatasetRCInfos.leftSingleFeatures
             let usedNum = self.singlefeatureArray.count - self.leftSingleFeatures.count
             if usedNum == 0 || self.leftSingleFeatures.count == 0{
@@ -2947,11 +2970,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             else{
                 self.usedSingleFeatures = Array(self.singlefeatureArray[0...(usedNum - 1)])
             }
-            //看手牌
-//            if self.specialCard[self.shuffleOrRiffle] == 1 {
-//                self.usedSingleFeatures = multipleDatasetRCInfos.maxLookHandLeftCards + multipleDatasetRCInfos.minLookHandLeftCards
-//                print("看手牌")
-//            }
             
             print("上一轮使用的牌 \(self.usedSingleFeatures)")
         }
@@ -2959,6 +2977,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     
     func computeNextRound(){
         if (self.leftSingleFeatures.count > 0){
+            print("开始计算下一轮")
             self.singlefeatureArray = self.leftSingleFeatures
             self.currentRoundID += 1
             computeWinnerRC(isReset: false)

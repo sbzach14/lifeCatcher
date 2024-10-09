@@ -43,7 +43,8 @@ class generalRuleSetting{
         0:"无",
         1:"看手牌",
         2:"看色牌",
-        3:"连续看手"
+        3:"连续看手",
+        4:"连续看色"
     ]
     
     static let allDealType: [Int: String] = [

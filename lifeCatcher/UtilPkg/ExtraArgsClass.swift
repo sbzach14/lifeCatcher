@@ -452,6 +452,7 @@ class ReportManager{
         263: "[1003]: 底为色色牌点数去牌报最大次大",
         264: "[1004]: 底为色色牌点数去牌报最小次小",
         265:"[11]:报最大和最大家牌（点数)",
+        266:"[15]:报最大次大不打几平点对子活门半活门"
 
     ]
     static let allReportInfo: [Int: String] = [
@@ -1479,6 +1480,15 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
 
 """,
     265:"报哪家最大和最大家是什么牌。Y=10报点数。 Y不等于10:报点数和花色",
+        266:"""
+只能设置人数为4
+报:12不打2大对子1平点活门2，
+表示第1家最大，第2家次大，
+不打色2可确保庄家位置不拿最小，如果是三家小一家大不报，庄家任意位置都赢
+有1个对子
+有平点且平点相邻第2大（平点分为杂平点，双平点，平点，杂平点有大小则表示大->平点为最大两家，小->为最小两家
+如果有活门则会报活门几或者半活门几
+""",
     ]
     
     static func cutRankConvert(cutNumSetting: Int, singlefeatureIndex: Int)->Int{
@@ -4417,6 +4427,120 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 }
 
                 reportResult.append(currentResult)
+            }
+            break
+        case 266:
+            
+            for resultInfo in multipleReportResultInfo.singleResultList{
+                var reportString = ""
+                var voiceType = 1
+                if resultInfo.drawType > 0 {
+                    print("有平点")
+                    voiceType = 0
+                }
+                
+                var currentResult : [SpeakResultStruct] = []
+                var tempNum: Int = 0
+                var bullString: String = ""
+                var allTargetList: [Int] = []
+                for rcID in resultInfo.targetRCList[0] {
+                    if tempNum > 1 && resultInfo.drawType != 3{
+                        break
+                    }
+                    reportString = String(rcID + 1)
+                    allTargetList.append(rcID + 1)
+                    if resultInfo.RCReturnInfoList[rcID].rcSingleFeaturesType.hasPrefix("牛"){
+                        bullString += resultInfo.RCReturnInfoList[rcID].rcSingleFeaturesType + " "
+                    }
+                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                    tempNum += 1
+                }
+
+                // 不打几
+                if resultInfo.drawType != 3 && resultInfo.drawType != 5 && resultInfo.drawType != 6 && resultInfo.drawType != 7{
+                    reportString = "不打"
+                    reportString += String(resultInfo.NoColorNum)
+                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                }
+                //如果是牛牛就报牛几
+                
+                if bullString != ""{
+                    reportString = bullString
+                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                }
+                
+                //pingdian
+                //1,平点，2杂平点，3单双平点，4三大一小，5三小一大, 6连续双平点
+                switch resultInfo.drawType{
+                case 1:
+                    reportString = resultInfo.drawSize
+                    reportString += "平点"
+                    print("平点 \(reportString)")
+                    break
+                case 2:
+                    if resultInfo.drawSize == "大"{
+                        reportString = ""
+                    } else if resultInfo.drawSize == "中"{
+                        reportString = "杂平点"
+                    } else if resultInfo.drawSize == "小"{
+                        if allTargetList.contains(1){
+                            reportString = "双平点"
+                        } else if allTargetList.contains(2) {
+                            reportString = "单平点"
+                        }
+                    }
+                    break
+                case 3:
+                    if allTargetList[0] == 1 {
+                        reportString = "单双平点"
+                    } else {
+                        reportString = "双单平点"
+                    }
+                    break
+                case 4:
+                    reportString = "三平点"
+                case 5:
+                    reportString = "三平点" + String(allTargetList[0]) + "门"
+                    break
+                case 6:
+                    reportString = "连续双平点"
+                    break
+                case 7:
+                    reportString = "四平点"
+                    break
+                default:
+                    break
+                }
+                
+                if resultInfo.drawType != 0 && reportString != ""{
+                    
+                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                }
+                
+                //对子
+                reportString = "对子"
+                reportString += String(resultInfo.pairNum)
+                if resultInfo.pairNum != 0 {
+                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                }
+                //活门半活门
+                switch resultInfo.aliveNumber {
+                case 4, 2:
+                    reportString = "活门" + String(resultInfo.aliveNumber)
+                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+
+                    break
+                case 3, 1:
+                    reportString = "半活门" + String(resultInfo.aliveNumber + 1)
+                    voiceType = 0
+                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                    break
+                default:
+                    break
+                }
+
+                reportResult.append(currentResult)
+                
             }
             break
 //            13:"[45]:上10张打色留色再根据色牌点数去牌保位置最大",

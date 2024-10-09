@@ -73,7 +73,7 @@ struct AuthTestView: View {
                 .padding()
                 
                 Button(action: {
-                    if containsOnlyHalfWidthUppercaseAndDigits(self.userInput){
+                    if containsOnlyHalfWidthUppercaseAndDigits(self.userInput) && containsOnlyHalfWidthUppercaseAndDigits(self.passcode){
                         self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
                         sendShiftRequest()
                     }
@@ -251,6 +251,7 @@ struct AuthTestView: View {
             }
 
             do {
+                print(data)
                 if let jsonResponse = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
                     if let success = jsonResponse["success"] as? Bool, success {
                         DispatchQueue.main.async {
