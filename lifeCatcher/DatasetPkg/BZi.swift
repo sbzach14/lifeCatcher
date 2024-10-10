@@ -31,7 +31,8 @@ class BZDatasetRule : Rule{
         0:"同点同对庄家大",
         1:"同点比最大牌",
         2:"同点比最大牌，同牌同点庄家大",
-        3:"同点比最大牌，最大牌相同时红红>黑红>黑黑"
+        3:"同点比最大牌，最大牌相同时红红>黑红>黑黑",
+        4:"同点比最大牌带花色"
     ]
     let pointComparision :[Int:String] = [
         0:"9点最大，0点最小",
@@ -50,6 +51,10 @@ class BZDatasetRule : Rule{
     let AValueRange :[Int:String] = [
         0: "1",
         1: "4"
+    ]
+    let isCompareSuit :[Int: String] = [
+        0: "否",
+        1: "是"
     ]
     
     
@@ -74,9 +79,12 @@ class BZDatasetRule : Rule{
             14: "江苏52张二八",
             15: "52张宝子对子算点数[216]",
             16: "54张宝子15[213]",
-            17: "宝子2张9点大[212]"
+            17: "宝子2张9点大[212]",
+            18: "宝子(100017.北海宝子)"
         ]
-        self.rankRules = [6:"同色对子",
+        self.rankRules = [
+                          7:"双公",
+                          6:"同色对子",
                           5:"对子",
                           4:"对10",
                           3:"对5",
@@ -132,7 +140,7 @@ class BZDatasetRule : Rule{
     >A>K>Q>J>10>9>8>7>6>5>4>3>2
     """,
             7:"""
-    扑克张数:40张分 色
+    扑克张数:40张分色
     1) 用1到10的牌
     2>对红 10>对混 10>对黑 10>对红9>...对黑A，两个红的大于1黑1红大于两黑
     3)红10+红9>红10+黑 9=黑10+红9..>黑两张为0点最小
@@ -192,7 +200,14 @@ class BZDatasetRule : Rule{
             1）对王>对k>对Q>...对A，2张牌全黑或者全红才算对子，对黑>对红
             2）9点最大，0点最小，王=6点，K=3点，Q=2点，J=1点。
             3）同点比最大牌点数，点数一样比最大牌花色黑桃>红桃>梅花>方片，K最大A最小
-            """
+            """,
+            18:"""
+            玩家牌数: 2
+            1. 对子: 对A最大 > 对K >..对2
+            2. 双公: K,Q,J是公牌, 公派为0点 （K + Q > Q + J)
+            3. 9点最大，0点最小 （双公牌除外），同点比牌大（A + 8 > K + 9>..)
+            4. 同牌比最大牌花色(黑>红>梅>方)
+            """,
         ]
         self.rcNum = [2,3,4,5,6,7,8,9,10]
 
@@ -274,7 +289,8 @@ class BZDataset{
         case 17:
             result = Array(0...51) + [53,54]
             break
-        
+        case 18:
+            result = Array(0...51)
         default:
             result = Array(0...51) + [53,54]
             break
@@ -332,6 +348,7 @@ class BZDataset{
         let singlefeatureRank = args[11]
         let pairRank = args[12]
         let AValueRange = args[13]
+        let isCompareSuit = args[14]
         
         var maxRank = 0
         var returnRCInfos: [DatasetReturnRCInfo] = []
@@ -421,7 +438,7 @@ class BZDataset{
             (allPlaySingleFeatures[i].evaluateFlag, allPlaySingleFeatures[i].singlefeatureType, allPlaySingleFeatures[i].isPair) = BZDatasetHandAnalyst(
                 rankRules: rankRules,
                 suitRules: suitRules
-            ).evalHand(singlefeatures: allPlaySingleFeatures[i].rcSingleFeature, KValueRange: KValueRange,QValueRange: QValueRange,JValueRange: JValueRange,specialfeatureValueRange: specialfeatureValueRange,samePointComparision: samePointComparision,pointComparision: pointComparision,singlefeatureRank: singlefeatureRank,pairRank: pairRank, AValueRange: AValueRange)
+            ).evalHand(singlefeatures: allPlaySingleFeatures[i].rcSingleFeature, KValueRange: KValueRange,QValueRange: QValueRange,JValueRange: JValueRange,specialfeatureValueRange: specialfeatureValueRange,samePointComparision: samePointComparision,pointComparision: pointComparision,singlefeatureRank: singlefeatureRank,pairRank: pairRank, AValueRange: AValueRange, isCompareSuit: isCompareSuit)
         }
         
         for rcID in 0..<allPlaySingleFeatures.count {
@@ -475,19 +492,22 @@ class BZDatasetHandAnalyst{
         
     }
     
-    func evalHand(singlefeatures: [SingleFeature], KValueRange: Int, QValueRange: Int, JValueRange: Int, specialfeatureValueRange: Int, samePointComparision: Int, pointComparision: Int, singlefeatureRank: Int, pairRank: Int, AValueRange: Int)->(Int, String, Int){
+    func evalHand(singlefeatures: [SingleFeature], KValueRange: Int, QValueRange: Int, JValueRange: Int, specialfeatureValueRange: Int, samePointComparision: Int, pointComparision: Int, singlefeatureRank: Int, pairRank: Int, AValueRange: Int, isCompareSuit: Int)->(Int, String, Int){
         
         self.samePointComparision = samePointComparision
         self.pointComparision = pointComparision
         self.QValueRange = QValueRange
         self.PairRank = pairRank
         var score = 0
-        let num1 = BZSingleFeature(singlefeature: singlefeatures[0], KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, specialfeatureValueRange: specialfeatureValueRange, singlefeatureRank: singlefeatureRank, AValueRange: AValueRange)
-        let num2 = BZSingleFeature(singlefeature: singlefeatures[1], KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, specialfeatureValueRange: specialfeatureValueRange, singlefeatureRank: singlefeatureRank, AValueRange: AValueRange)
+        let num1 = BZSingleFeature(singlefeature: singlefeatures[0], KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, specialfeatureValueRange: specialfeatureValueRange, singlefeatureRank: singlefeatureRank, AValueRange: AValueRange, isCompareSuit: isCompareSuit)
+        let num2 = BZSingleFeature(singlefeature: singlefeatures[1], KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, specialfeatureValueRange: specialfeatureValueRange, singlefeatureRank: singlefeatureRank, AValueRange: AValueRange, isCompareSuit: isCompareSuit)
+        
+        var numList = [num1, num2]
+//        numList = numList.sorted(by: {$0.originalRank > $1.originalRank})
         
         var i = self.rankRules.count + 1
         for ruleIndex in self.rankRules{
-            let (rank, singlefeatureType, isPair) = self.rankRulesDic[ruleIndex]!([num1, num2])
+            let (rank, singlefeatureType, isPair) = self.rankRulesDic[ruleIndex]!(numList)
             i -= 1
             if rank == 0 {
                 continue
@@ -497,6 +517,15 @@ class BZDatasetHandAnalyst{
             }
         }
         return (score, "", 0)
+    }
+    
+    func eval_twoHeads(singlefeatures:[BZSingleFeature]) -> (Int, String, Int){
+        if (singlefeatures[0].originalRank > 10 && singlefeatures[0].originalRank < 14) && (singlefeatures[1].originalRank > 10 && singlefeatures[1].originalRank < 14) {
+            let maxRank = max(singlefeatures[0].rank, singlefeatures[1].rank)
+            return (maxRank, "两公牌", 0)
+        }
+        
+        return (0, "", 0)
     }
     
     func eval_isSameColorPair(singlefeatures:[BZSingleFeature]) -> (Int, String, Int){
@@ -590,6 +619,14 @@ class BZDatasetHandAnalyst{
         } else if self.samePointComparision == 3 {
             
             return (point << 6 | max(singlefeatures[0].rank, singlefeatures[1].rank) << 2 | (self.blackRedJudger(singlefeature: singlefeatures[0]) + self.blackRedJudger(singlefeature: singlefeatures[1])), singlefeatureType, 0)
+        } else if self.samePointComparision == 4 {
+            var maxFeature: BZSingleFeature
+            if singlefeatures[0].rank > singlefeatures[1].rank {
+                maxFeature = singlefeatures[0]
+            } else {
+                maxFeature = singlefeatures[1]
+            }
+            return (point << 6 | maxFeature.rank << 2 | maxFeature.suit, singlefeatureType, 0)
         }
         return (0, "", 0)
     }
@@ -613,7 +650,7 @@ class BZSingleFeature{
     var point:Int
     var suit:Int
     
-    init(singlefeature: SingleFeature, KValueRange:Int, QValueRange: Int, JValueRange: Int, specialfeatureValueRange: Int, singlefeatureRank:Int, AValueRange: Int){
+    init(singlefeature: SingleFeature, KValueRange:Int, QValueRange: Int, JValueRange: Int, specialfeatureValueRange: Int, singlefeatureRank:Int, AValueRange: Int, isCompareSuit: Int){
         //rank initialization
         let rule = ClassifierSettingArgs.targetSetting[7] as! BZDatasetRule
         if singlefeature.rank > 13{
@@ -655,7 +692,11 @@ class BZSingleFeature{
             self.point = self.point * 2
         }
         // suit initialization
-        self.suit = singlefeature.suit[0]
+        if isCompareSuit == 0 {
+            self.suit = 1
+        } else {
+            self.suit = singlefeature.suit[0]
+        }
         self.originalRank = singlefeature.rank
     }
 }

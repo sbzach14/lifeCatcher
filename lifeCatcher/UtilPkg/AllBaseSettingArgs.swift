@@ -594,6 +594,7 @@ public class DetectSettingArgs{
         allPreSetReportRules[237] = ReportClass.init(reportName: "[805]:固定第10张牌作色去色全部4种发牌方式报最大", reportID: 237, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 18, reportTarget: 0, singlefeaturesTransformation: 36, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: 20, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, dealFormation: 0, cutSingleFeatureProcession: -1)
         allPreSetReportRules[238] = ReportClass.init(reportName: "[806]:固定第10张牌作色去色全部4种发牌方式报最小", reportID: 238, rankReport: 3, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 18, reportTarget: 0, singlefeaturesTransformation: 36, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: 20, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, dealFormation: 0, cutSingleFeatureProcession: -1)
         allPreSetReportRules[239] = ReportClass.init(reportName: "[810]:固定去面上Y张牌,从X-Y张选择色牌，保1大2大", reportID: 239, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 0, reportTarget: 0, singlefeaturesTransformation: 13, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: 8, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: 0, dealFormation: -1, cutSingleFeatureProcession: -1)
+        allPreSetReportRules[240] = ReportClass.init(reportName: "[815]:报从第几门开始发保最大", reportID: 240, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: -1, reportTarget: 0, singlefeaturesTransformation: -1, consecutiveReport: -1, positionToReport: -1, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, dealFormation: -1, cutSingleFeatureProcession: -1)
         allPreSetReportRules[242] = ReportClass.init(reportName: "[817]:报发牌方式保位置最大次大", reportID: 242, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 18, reportTarget: 21, singlefeaturesTransformation: -1, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: 99, dealFormation: 0, cutSingleFeatureProcession: -1)
         allPreSetReportRules[243] = ReportClass.init(reportName: "[818]:报发牌方式保位置最大", reportID: 243, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 18, reportTarget: 21, singlefeaturesTransformation: -1, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: 99, dealFormation: 0, cutSingleFeatureProcession: -1)
         //TODO240-250
@@ -2042,7 +2043,8 @@ public class DetectSettingArgs{
                 var singlefeatureRank = 0
                 var pairRank = 0
                 var AvalueRange = 0
-                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange]
+                var isCompareSuit = 0
+                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange, isCompareSuit]
                 suitRules = [3,2,1,0]
                 rankRules = [5,0]
                 rankRuleChecked = [1,1]
@@ -2062,7 +2064,8 @@ public class DetectSettingArgs{
                 singlefeatureRank = 0
                 pairRank = 0
                 AvalueRange = 0
-                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange]
+                isCompareSuit = 0
+                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange, isCompareSuit]
                 suitRules = [3,2,1,0]
                 rankRules = [5,0]
                 rankRuleChecked = [1,1]
@@ -2082,7 +2085,9 @@ public class DetectSettingArgs{
                 singlefeatureRank = 0
                 pairRank = 0
                 AvalueRange = 0
-                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange]
+                isCompareSuit = 0
+
+                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange, isCompareSuit]
                 suitRules = [3,2,1,0]
                 rankRules = [5,0]
                 rankRuleChecked = [1,1]
@@ -2102,7 +2107,9 @@ public class DetectSettingArgs{
                 singlefeatureRank = 2
                 pairRank = 0
                 AvalueRange = 0
-                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange]
+                isCompareSuit = 0
+
+                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange, isCompareSuit]
                 
                 suitRules = [3,2,1,0]
                 rankRules = [5,0]
@@ -2123,7 +2130,9 @@ public class DetectSettingArgs{
                 singlefeatureRank = 1
                 pairRank = 0
                 AvalueRange = 0
-                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange]
+                isCompareSuit = 0
+
+                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange, isCompareSuit]
                 suitRules = [3,2,1,0]
                 rankRules = [5,0]
                 rankRuleChecked = [1,1]
@@ -2143,7 +2152,9 @@ public class DetectSettingArgs{
                 singlefeatureRank = 0
                 pairRank = 0
                 AvalueRange = 0
-                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange]
+                isCompareSuit = 0
+
+                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange, isCompareSuit]
                 suitRules = [3,2,1,0]
                 rankRules = [4,3,0]
                 rankRuleChecked = [1,1,1]
@@ -2163,7 +2174,9 @@ public class DetectSettingArgs{
                 singlefeatureRank = 1
                 pairRank = 0
                 AvalueRange = 0
-                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange]
+                isCompareSuit = 0
+
+                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange,isCompareSuit]
                 suitRules = [3,2,1,0]
                 rankRules = [2,5,0]
                 rankRuleChecked = [1,1,1]
@@ -2183,7 +2196,9 @@ public class DetectSettingArgs{
                 singlefeatureRank = 0
                 pairRank = 0
                 AvalueRange = 0
-                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange]
+                isCompareSuit = 0
+
+                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange, isCompareSuit]
                 suitRules = [3,2,1,0]
                 rankRules = [5,0]
                 rankRuleChecked = [1,1]
@@ -2203,7 +2218,9 @@ public class DetectSettingArgs{
                 singlefeatureRank = 1
                 pairRank = 0
                 AvalueRange = 0
-                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange]
+                isCompareSuit = 0
+
+                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange, isCompareSuit]
                 suitRules = [3,2,1,0]
                 rankRules = [2,1,5,0]
                 rankRuleChecked = [1,1,1,1]
@@ -2223,7 +2240,9 @@ public class DetectSettingArgs{
                 singlefeatureRank = 0
                 pairRank = 1
                 AvalueRange = 0
-                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange]
+                isCompareSuit = 0
+
+                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange,isCompareSuit]
                 suitRules = [3,2,1,0]
                 rankRules = [5,0]
                 rankRuleChecked = [1,1]
@@ -2243,7 +2262,9 @@ public class DetectSettingArgs{
                 singlefeatureRank = 0
                 pairRank = 0
                 AvalueRange = 0
-                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange]
+                isCompareSuit = 0
+
+                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange, isCompareSuit]
                 suitRules = [3,2,1,0]
                 rankRules = [5,0]
                 rankRuleChecked = [1,1]
@@ -2264,7 +2285,9 @@ public class DetectSettingArgs{
                 singlefeatureRank = 0
                 pairRank = 0
                 AvalueRange = 0
-                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange]
+                isCompareSuit = 0
+
+                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange,isCompareSuit]
                 suitRules = [3,2,1,0]
                 rankRules = [5,0]
                 rankRuleChecked = [1,1]
@@ -2284,7 +2307,9 @@ public class DetectSettingArgs{
                 singlefeatureRank = 0
                 pairRank = 0
                 AvalueRange = 0
-                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange]
+                isCompareSuit = 0
+
+                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange, isCompareSuit]
                 suitRules = [3,2,1,0]
                 rankRules = [5,0]
                 rankRuleChecked = [1,1]
@@ -2304,7 +2329,9 @@ public class DetectSettingArgs{
                 singlefeatureRank = 0
                 pairRank = 0
                 AvalueRange = 0
-                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange]
+                isCompareSuit = 0
+
+                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange, isCompareSuit]
                 suitRules = [3,2,1,0]
                 rankRules = [5,0]
                 rankRuleChecked = [1,1]
@@ -2324,7 +2351,9 @@ public class DetectSettingArgs{
                 singlefeatureRank = 0
                 pairRank = 0
                 AvalueRange = 0
-                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange]
+                isCompareSuit = 0
+
+                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange,isCompareSuit]
                 suitRules = [3,2,1,0]
                 rankRules = [5,0]
                 rankRuleChecked = [1,1]
@@ -2344,7 +2373,9 @@ public class DetectSettingArgs{
                 singlefeatureRank = 0
                 pairRank = 0
                 AvalueRange = 0
-                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange]
+                isCompareSuit = 0
+
+                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange, isCompareSuit]
                 suitRules = [0,0,0,0]
                 rankRules = [0]
                 rankRuleChecked = [1]
@@ -2364,7 +2395,9 @@ public class DetectSettingArgs{
                 singlefeatureRank = 1
                 pairRank = 0
                 AvalueRange = 1
-                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange]
+                isCompareSuit = 0
+
+                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange,isCompareSuit]
                 suitRules = [0,0,0,0]
                 rankRules = [2,5,0]
                 rankRuleChecked = [1,1,1]
@@ -2384,7 +2417,9 @@ public class DetectSettingArgs{
                 singlefeatureRank = 0
                 pairRank = 0
                 AvalueRange = 0
-                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange]
+                isCompareSuit = 0
+
+                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange,isCompareSuit]
                 suitRules = [3,2,1,0]
                 rankRules = [2,6,0]
                 rankRuleChecked = [1,1,1]
@@ -2392,6 +2427,28 @@ public class DetectSettingArgs{
                 allPreSetRules[i]![17]!.append(suitRules)
                 allPreSetRules[i]![17]!.append(rankRules)
                 allPreSetRules[i]![17]!.append(rankRuleChecked)
+                // "宝子(100017.北海宝子)",
+                handNum = 2
+                communityNum = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                specialfeatureValueRange = 0
+                samePointComparision = 4
+                pointComparision = 0
+                singlefeatureRank = 1
+                pairRank = 0
+                AvalueRange = 0
+                isCompareSuit = 1
+
+                args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange,isCompareSuit]
+                suitRules = [3,2,1,0]
+                rankRules = [2,6,0]
+                rankRuleChecked = [1,1,1]
+                allPreSetRules[i]![18]!.append(args)
+                allPreSetRules[i]![18]!.append(suitRules)
+                allPreSetRules[i]![18]!.append(rankRules)
+                allPreSetRules[i]![18]!.append(rankRuleChecked)
                 break
             case 8:
                 //通用54张佳佳宝

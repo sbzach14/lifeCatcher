@@ -2193,7 +2193,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         }
                     }
                     
-                    if currentHandFeature == cutStructList[cutStructList.count - 1].cutcardIndex && count < 3{
+                    if currentHandFeature == cutStructList[cutStructList.count - 1].cutcardIndex && count < 2 && currentHandFeature != handCardList[handCardList.count - 1]{
                         let currentHandPos = searchSingleFeaturePos(inputSingleFeatures: inputSingleFeatures, singlefeatureIndex: currentHandFeature)
                         if currentHandPos == inputSingleFeatures.count - 1 {
                             inputSingleFeatures = [inputSingleFeatures[currentHandPos]] + Array(inputSingleFeatures[0..<currentHandPos])
@@ -2581,8 +2581,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     }
                     
                     print("看手牌的牌组 \(lookHandSingleFeatures.count)")
-
-                    
                     
                     break
                 //看手牌比第一张牌从最大牌继续发, 从第一轮开始报
@@ -5454,6 +5452,21 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 reportString = resultInfo.dealTypeReport
                 reportResult.append([SpeakResultStruct(voiceType: 1, content: reportString)])
                 print("发牌方式报法\(reportString)")
+            }
+            break
+//            [815]:报从第几门开始发保最大
+        case 240:
+            for resultInfo in multipleReportResultInfo.singleResultList{
+                var reportString = ""
+                let voiceType = 1
+                var currentReportStruct: [SpeakResultStruct] = []
+                let rcID : Int = resultInfo.targetRCList[0][0] + 1
+                
+                reportString = String("\((rcNum - rcID + 2) % rcNum)")
+                
+                currentReportStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                
+                reportResult.append(currentReportStruct)
             }
             break
 //            265:"报哪家最大和最大家是什么牌。Y=10报点数。 Y不等于10:报点数和花色",
