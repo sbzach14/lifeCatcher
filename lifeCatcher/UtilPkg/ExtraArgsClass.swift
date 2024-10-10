@@ -1924,6 +1924,35 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         return leftNum
     }
     
+    static func AfterCutGenerator(inputSingleFeatures: [Int], cutStructList: [cutStruct], colorTransform: Int, miniCardNum: Int) -> ([Int], Bool){
+        print("需要操作的cutStructList \(cutStructList), 使用的牌数量 \(miniCardNum) 传入的牌库 \(inputSingleFeatures)")
+        var returnSingleFeatures: [Int] = inputSingleFeatures
+        var inputFeatures: [Int] = inputSingleFeatures
+        var i: Int = 0
+        for cutStruct in cutStructList {
+            print("第\(i + 1)个cut inputfeatures \(inputFeatures) leftfeatures \(returnSingleFeatures)")
+            if !returnSingleFeatures.contains(cutStruct.cutcardIndex) && i == cutStructList.count - 1 {
+                return (inputFeatures, false)
+            }
+            if returnSingleFeatures.contains(cutStruct.cutcardIndex) {
+                
+                if cutStruct.cutMode == 2 {
+                    returnSingleFeatures = cutSingleFeatures(inputSingleFeatures: returnSingleFeatures, inputCutStruct: cutStruct, colorTransform: colorTransform)
+                    inputFeatures = returnSingleFeatures
+                    if returnSingleFeatures.count >= miniCardNum {
+                        returnSingleFeatures = Array(returnSingleFeatures.dropFirst(miniCardNum))
+                    }
+                    
+                } else {
+                    returnSingleFeatures = cutSingleFeatures(inputSingleFeatures: returnSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1)
+                }
+            }
+            i += 1
+        }
+        
+        return (inputFeatures, true)
+    }
+    
     static func cutSingleFeatures(inputSingleFeatures: [Int], inputCutStruct: cutStruct, colorTransform: Int) -> [Int]{
         
         let pos = searchSingleFeaturePos(inputSingleFeatures: inputSingleFeatures, singlefeatureIndex: inputCutStruct.cutcardIndex)
@@ -2107,13 +2136,74 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         return multipleResultInfo
                     }
                     
-
-                    let handSingleFeatureIndex = cutStructList[cutStructList.count - 1].cutcardIndex
+                    //连续看手
+                    //找到第一张手牌
+                    var firstCutStruct: cutStruct = cutStruct()
+                    var handCardList: [Int] = []
+                    for cutstruct in cutStructList {
+                        if cutstruct.cutMode == 3 {
+                            firstCutStruct = cutstruct
+                            break
+                        }
+                    }
+                    //第一张看手的牌
+                    let handSingleFeatureIndex = firstCutStruct.cutcardIndex
+                    print("第一张手牌\(handSingleFeatureIndex)")
                     let pos = searchSingleFeaturePos(inputSingleFeatures: inputSingleFeatures, singlefeatureIndex: handSingleFeatureIndex)
                     if pos == inputSingleFeatures.count - 1 {
                         inputSingleFeatures = [inputSingleFeatures[pos]] + Array(inputSingleFeatures[0..<pos])
                     } else if pos != 0 {
                         inputSingleFeatures = Array(inputSingleFeatures[pos...]) + Array(inputSingleFeatures[0...(pos - 1)])
+                    }
+                    //发牌顺序不变
+                    var firstPos: Int = 0
+                    let leftCardsNum: Int = LeftDealCardCal(startIndex: 0, diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, dealType: newArgs[0], handNum: handNum, minimumCardsNum: minSingleFeatureNum)
+                    if reportRule.differentDeal == 1 {
+                        while firstPos < inputSingleFeatures.count {
+                            handCardList.append(inputSingleFeatures[firstPos])
+                            firstPos += leftCardsNum
+                        }
+                    //TODO 发牌顺序改变，和看手牌最大家开始发一起写
+                    } else if reportRule.differentDeal == 2 {
+                        
+                    }
+                    print("所有会发到的牌 \(handCardList)")
+                    //削链
+                    var currentHandFeature: Int = -1
+                    for lookFeature in cutStructList {
+                        if lookFeature.cutMode == 3 {
+                            for i in 0..<handCardList.count {
+                                if handCardList[i] == lookFeature.cutcardIndex{
+                                    currentHandFeature = handCardList[i]
+                                    if i == handCardList.count - 1 {
+                                        handCardList = []
+                                    } else {
+                                        handCardList = Array(handCardList[(i + 1)...])
+                                    }
+                                    break
+                                }
+                            }
+                        }
+                    }
+                    
+                    var count: Int = 0
+                    for lookFeature in cutStructList {
+                        if lookFeature.cutcardIndex == currentHandFeature {
+                            count += 1
+                        }
+                    }
+                    
+                    if currentHandFeature == cutStructList[cutStructList.count - 1].cutcardIndex && count < 3{
+                        let currentHandPos = searchSingleFeaturePos(inputSingleFeatures: inputSingleFeatures, singlefeatureIndex: currentHandFeature)
+                        if currentHandPos == inputSingleFeatures.count - 1 {
+                            inputSingleFeatures = [inputSingleFeatures[currentHandPos]] + Array(inputSingleFeatures[0..<currentHandPos])
+                        } else if currentHandPos != 0 {
+                            inputSingleFeatures = Array(inputSingleFeatures[currentHandPos...]) + Array(inputSingleFeatures[0...(currentHandPos - 1)])
+                        }
+                        
+                    } else {
+                        multipleResultInfo.leftSingleFeatures = leftSingleFeatures
+                        return multipleResultInfo
                     }
                 }
             //看色两次, 留色
@@ -2150,14 +2240,22 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     multipleResultInfo.leftSingleFeatures = leftSingleFeatures
                     return multipleResultInfo
                 }
+                var isEffective: Bool = false
                 
-                for cutStruct in cutStructList{
-                    if cutStruct.cutMode == 2 {
-                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 0)
-                    } else {
-                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1)
-                    }
+                (inputSingleFeatures, isEffective) = AfterCutGenerator(inputSingleFeatures: inputSingleFeatures, cutStructList: cutStructList, colorTransform: 0, miniCardNum: LeftDealCardCal(startIndex: 0, diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, dealType: newArgs[0], handNum: handNum, minimumCardsNum: minSingleFeatureNum))
+                
+                if isEffective == false {
+                    multipleResultInfo.leftSingleFeatures = leftSingleFeatures
+                    return multipleResultInfo
                 }
+                
+//                for cutStruct in cutStructList{
+//                    if cutStruct.cutMode == 2 {
+//                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 0)
+//                    } else {
+//                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1)
+//                    }
+//                }
                 
 
             //看色去色

@@ -54,6 +54,9 @@
 		A88EFE0B2A7FC05900897243 /* JsonIOUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFE0A2A7FC05900897243 /* JsonIOUtils.swift */; };
 		A88EFE0D2A7FDC9500897243 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A88EFE0C2A7FDC9500897243 /* HistoryView.swift */; };
 		A892C6002A765A0A003FA2B3 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A892C5FF2A765A0A003FA2B3 /* MainView.swift */; };
+		A89680EF2CB7498300CA910B /* cls_0715_h_trans_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A89680EC2CB7498300CA910B /* cls_0715_h_trans_copy.mlmodel */; };
+		A89680F02CB7498300CA910B /* detect_0903_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A89680ED2CB7498300CA910B /* detect_0903_copy.mlmodel */; };
+		A89680F12CB7498300CA910B /* cls_0727_v_trans_copy.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = A89680EE2CB7498300CA910B /* cls_0727_v_trans_copy.mlmodel */; };
 		A89CDD882C70569400588273 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89CDD872C70569400588273 /* LoginView.swift */; };
 		A89CDD8A2C71B79500588273 /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89CDD892C71B79500588273 /* RegisterView.swift */; };
 		A89CDD8C2C76767300588273 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89CDD8B2C76767300588273 /* KeychainHelper.swift */; };
@@ -132,6 +135,9 @@
 		A88EFE0A2A7FC05900897243 /* JsonIOUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonIOUtils.swift; sourceTree = "<group>"; };
 		A88EFE0C2A7FDC9500897243 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		A892C5FF2A765A0A003FA2B3 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		A89680EC2CB7498300CA910B /* cls_0715_h_trans_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0715_h_trans_copy.mlmodel; sourceTree = "<group>"; };
+		A89680ED2CB7498300CA910B /* detect_0903_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = detect_0903_copy.mlmodel; sourceTree = "<group>"; };
+		A89680EE2CB7498300CA910B /* cls_0727_v_trans_copy.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0727_v_trans_copy.mlmodel; sourceTree = "<group>"; };
 		A89CDD872C70569400588273 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		A89CDD892C71B79500588273 /* RegisterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterView.swift; sourceTree = "<group>"; };
 		A89CDD8B2C76767300588273 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
@@ -334,6 +340,9 @@
 				D03811A12C75401200726B99 /* cls_main.mlmodel */,
 				D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */,
 				D03811A42C7542C200726B99 /* cls_0727_v_trans.mlmodel */,
+				A89680EC2CB7498300CA910B /* cls_0715_h_trans_copy.mlmodel */,
+				A89680EE2CB7498300CA910B /* cls_0727_v_trans_copy.mlmodel */,
+				A89680ED2CB7498300CA910B /* detect_0903_copy.mlmodel */,
 				D02717D72C8704AB00A29D43 /* detect_0903.mlmodel */,
 				D0971D7C2CB572C100E6AE5E /* riffle_1002_h.mlmodel */,
 				D0971D7D2CB572C200E6AE5E /* riffle_1002_v.mlmodel */,
@@ -453,6 +462,7 @@
 				A887167F2A0623E500B7F2CD /* AManager.swift in Sources */,
 				18C98D1A2C158F7B00A8CD49 /* TMen.swift in Sources */,
 				A89CDD8A2C71B79500588273 /* RegisterView.swift in Sources */,
+				A89680F12CB7498300CA910B /* cls_0727_v_trans_copy.mlmodel in Sources */,
 				D0DAEF992C7768DD00D5938A /* SettingRecordConfigView.swift in Sources */,
 				A88EFE0B2A7FC05900897243 /* JsonIOUtils.swift in Sources */,
 				D0971D7F2CB572C200E6AE5E /* riffle_1002_v.mlmodel in Sources */,
@@ -470,6 +480,7 @@
 				18C98D0F2C158F7B00A8CD49 /* JJBao.swift in Sources */,
 				18C98D1B2C158F7B00A8CD49 /* TNin.swift in Sources */,
 				1824EF672C3EB4990029836C /* AuthTestView.swift in Sources */,
+				A89680F02CB7498300CA910B /* detect_0903_copy.mlmodel in Sources */,
 				18C98D0D2C158F7B00A8CD49 /* CBat.swift in Sources */,
 				D03811A72C7542C300726B99 /* cls_0727_v_trans.mlmodel in Sources */,
 				D03811A82C7542C300726B99 /* cls_0715_h_trans.mlmodel in Sources */,
@@ -500,6 +511,7 @@
 				A88EFDC42A7D217200897243 /* OriginVisionObjectRecognitionViewModel.swift in Sources */,
 				D03811AA2C76904D00726B99 /* OriginObjectRegView.swift in Sources */,
 				18C98D182C158F7B00A8CD49 /* TCPoi.swift in Sources */,
+				A89680EF2CB7498300CA910B /* cls_0715_h_trans_copy.mlmodel in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -650,7 +662,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
-				DEVELOPMENT_TEAM = 6WK4Q32GMN;
+				DEVELOPMENT_TEAM = 6TV8BJJFTF;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = lifeCatcher/App/Info.plist;
@@ -674,7 +686,7 @@
 				);
 				MARKETING_VERSION = 99;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lifeCatcher.develop;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -698,7 +710,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
-				DEVELOPMENT_TEAM = 6WK4Q32GMN;
+				DEVELOPMENT_TEAM = 6TV8BJJFTF;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = lifeCatcher/App/Info.plist;
@@ -722,7 +734,7 @@
 				);
 				MARKETING_VERSION = 99;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
+				PRODUCT_BUNDLE_IDENTIFIER = com.carter.L;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
