@@ -31,13 +31,13 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var cutStructArray: [cutStruct] = []
     @Published var cutShowArray : [Int] = []
     
-    let detectModel = try! detect_0903_copy()
-    let clsModel_h = try! cls_0715_h_trans_copy()
-    let clsModel_v = try! cls_0727_v_trans_copy()
+//    let detectModel = try! detect_0903_copy()
+//    let clsModel_h = try! cls_0715_h_trans_copy()
+//    let clsModel_v = try! cls_0727_v_trans_copy()
     
-//    let detectModel = try! detect_0903()
-//    let clsModel_h = try! cls_0715_h_trans()
-//    let clsModel_v = try! cls_0727_v_trans()
+    let detectModel = try! detect_0903()
+    let clsModel_h = try! cls_0715_h_trans()
+    let clsModel_v = try! cls_0727_v_trans()
     
     let riffleModel_h = try! riffle_1002_h()
     let riffleModel_v = try! riffle_1002_v()
@@ -1084,16 +1084,19 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         self.state = "shuffle"
                     }
                     
-                    if leftConfidence > 0.7 || (self.state == "shuffle" && leftConfidence > 0.5){
+                    if (self.state == "riffle" && leftConfidence > 0.7 && detectNum == 1) || (self.state == "shuffle" && leftConfidence > 0.5){
                         self.detectSet.insert(leftDetectSingleFeature)
                     }
-                    if rightConfidence > 0.7 || (self.state == "shuffle" && rightConfidence > 0.5){
+                    if (self.state == "riffle" && rightConfidence > 0.7 && detectNum == 1) || (self.state == "shuffle" && rightConfidence > 0.5){
                         self.detectSet.insert(rightDetectSingleFeature)
                     }
                     
                     if self.detectSet.count >= 5
                     {
                         self.initTargetArea = self.targetArea
+                    }
+                    if self.detectSet.count >= 8
+                    {
                         self.speechPerformer.stopSpeechSynthesis()
                     }
                     
@@ -2894,7 +2897,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             else if self.specialCard[self.shuffleOrRiffle] == 2 || self.specialCard[self.shuffleOrRiffle] == 4{
                 for _ in 0..<maxCutTimes {
                     cutSingleFeature = self.singlefeatureArray.randomElement()!
-                    cutSingleFeature = self.singlefeatureArray[1]
                     self.cutStructArray.append(cutStruct(cutcardIndex: cutSingleFeature, cutMode: 2))
                 }
             }
