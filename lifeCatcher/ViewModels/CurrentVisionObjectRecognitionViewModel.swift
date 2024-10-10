@@ -958,48 +958,47 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                         
                         if !isCutDone{
-                            if self.specialCard[self.shuffleOrRiffle] == 1{
-                                var cnt = 0
-                                for lastCutStrucht in self.cutStructArray{
-                                    if lastCutStrucht.cutMode == 3{
-                                        cnt += 1
-                                    }
-                                }
-                                //看手
-                                if cnt == 0{
-                                    self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 3))
-                                    isCutDone = true
-                                    self.cutShowArray.append(detectSingleFeature)
-                                    self.isProcessNeedToCut = false
-                                }
-                            }
-                            else if self.specialCard[self.shuffleOrRiffle] == 2{
-                                //看色
-                                var cnt = 0
-                                for lastCutStrucht in self.cutStructArray{
-                                    if lastCutStrucht.cutMode == 2{
-                                        cnt += 1
-                                    }
-                                }
-                                if cnt < self.getWatchColorNumber(){
-                                    self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 2))
-                                    isCutDone = true
-                                    cnt += 1
-                                }
-                                if cnt == self.getWatchColorNumber(){
-                                    self.isProcessNeedToCut = false
-                                }
-                            }
+//                            if self.specialCard[self.shuffleOrRiffle] == 1{
+//                                var cnt = 0
+//                                for lastCutStrucht in self.cutStructArray{
+//                                    if lastCutStrucht.cutMode == 3{
+//                                        cnt += 1
+//                                    }
+//                                }
+//                                //看手
+//                                if cnt == 0{
+//                                    self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 3))
+//                                    isCutDone = true
+//                                    self.cutShowArray.append(detectSingleFeature)
+//                                    self.isProcessNeedToCut = false
+//                                }
+//                            }
+//                            else if self.specialCard[self.shuffleOrRiffle] == 2{
+//                                //看色
+//                                var cnt = 0
+//                                for lastCutStrucht in self.cutStructArray{
+//                                    if lastCutStrucht.cutMode == 2{
+//                                        cnt += 1
+//                                    }
+//                                }
+//                                if cnt < self.getWatchColorNumber(){
+//                                    self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 2))
+//                                    isCutDone = true
+//                                    cnt += 1
+//                                }
+//                                if cnt == self.getWatchColorNumber(){
+//                                    self.isProcessNeedToCut = false
+//                                }
+//                            }
                             //连续看手
-                            else if self.specialCard[self.shuffleOrRiffle] == 3{
+                            if self.specialCard[self.shuffleOrRiffle] == 1{
                                 self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 3))
                                 self.cutShowArray.append(detectSingleFeature)
                                 isCutDone = true
                             }
                             //连续看色
-                            else if self.specialCard[self.shuffleOrRiffle] == 4{
+                            else if self.specialCard[self.shuffleOrRiffle] == 2{
                                 self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 2))
-                                self.cutShowArray.append(detectSingleFeature)
                                 isCutDone = true
                             }
                         }
@@ -2955,7 +2954,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 }
             }
             
-            speakText(input: multipleDatasetRCInfos.reportResult)
+            speakText(input: multipleDatasetRCInfos.reportResult, isCut: cutStructArray.count == 0)
         }
     }
     
@@ -3005,6 +3004,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 }
                 
                 currentAudioPlayer = try AVAudioPlayer(contentsOf: url)
+                currentAudioPlayer?.volume = 0.75
                 currentAudioPlayer?.delegate = self
                 currentAudioPlayer?.prepareToPlay()
                 currentAudioPlayer?.play()
@@ -3030,7 +3030,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
 
 
-    func speakText(input: [[SpeakResultStruct]]) {
+    func speakText(input: [[SpeakResultStruct]], isCut: Bool) {
         let isSpeak = (!self.isHeadphonesConnected() && self.voiceDevice == 0)
                     || (self.isHeadphonesConnected() && self.voiceDevice == 1)
         
@@ -3038,70 +3038,119 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             self.speechPerformer.performSpeechSynthesis(speakResultStruct: input)
         }
         if self.timeMode != 0{
-            var reportTextList : [String] = []
+//            var reportTextList : [String] = []
+//            for (turnIndex, turnResult) in input.enumerated() {
+//                for (reportIndex, reportResult) in turnResult.enumerated() {
+//                    var originSpeakString = reportResult.content
+//                    
+//                    let checkSpeakString = originSpeakString.replacingOccurrences(of: " ", with: "")
+//                    var speakString = ""
+//                    
+//                    if checkSpeakString == "没有"{
+//                        speakString = "99"
+//                        reportTextList.insert(speakString, at: 0)
+//                    }
+//                    else if checkSpeakString.count > 0 && isOnlyDigits(checkSpeakString){
+//                        
+//                        let wordsArray = originSpeakString.components(separatedBy: " ").filter { !$0.isEmpty }
+//                        
+//                        for word in wordsArray {
+//                            if word.count == 1 && word != " " {
+//                                speakString = word + speakString
+//                            }
+//                            if speakString.count == 2{
+//                                reportTextList.insert(speakString, at: 0)
+//                                speakString = ""
+//                            }
+//                        }
+//                        
+//                        if speakString != ""{
+//                            // 补充到两位
+//                            let paddedString = String(repeating: "0", count: max(0, 2 - speakString.count)) + speakString
+//                            reportTextList.insert(paddedString, at: 0)
+//                        }
+//                    }
+//                }
+//            }
+//            
+//            var reportLength = 0
+//            if timeMode == 1{
+//                reportLength = 1
+//            }
+//            else if timeMode == 2{
+//                reportLength = 2
+//            }
+//            
+//            if reportTextList.count > reportLength {
+//                reportTextList = Array(reportTextList.suffix(reportLength))
+//            } else {
+//                let count = reportTextList.count
+//                while reportTextList.count < reportLength {
+//                    reportTextList.insert("00", at: 0)
+//                }
+//            }
+//            
+//            self.timeModeText = reportTextList.joined(separator: ":")
+            
+            var speakString = ""
             for (turnIndex, turnResult) in input.enumerated() {
                 for (reportIndex, reportResult) in turnResult.enumerated() {
                     var originSpeakString = reportResult.content
                     
                     let checkSpeakString = originSpeakString.replacingOccurrences(of: " ", with: "")
-                    var speakString = ""
                     
                     if checkSpeakString == "没有"{
-                        speakString = "99"
-                        reportTextList.insert(speakString, at: 0)
+                        speakString = "99" + speakString
                     }
                     else if checkSpeakString.count > 0 && isOnlyDigits(checkSpeakString){
-                        
                         let wordsArray = originSpeakString.components(separatedBy: " ").filter { !$0.isEmpty }
-                        
                         for word in wordsArray {
-                            if word.count == 1 && word != " " {
+                            if word != " " {
                                 speakString = word + speakString
                             }
-                            if speakString.count == 2{
-                                reportTextList.insert(speakString, at: 0)
-                                speakString = ""
-                            }
-                        }
-                        
-                        if speakString != ""{
-                            // 补充到两位
-                            let paddedString = String(repeating: "0", count: max(0, 2 - speakString.count)) + speakString
-                            reportTextList.insert(paddedString, at: 0)
+                            
                         }
                     }
                 }
             }
             
-            var reportLength = 0
+            var reportLength = 2
             if timeMode == 1{
-                reportLength = 1
-            }
-            else if timeMode == 2{
                 reportLength = 2
             }
-            
-            if reportTextList.count > reportLength {
-                reportTextList = Array(reportTextList.suffix(reportLength))
-            } else {
-                let count = reportTextList.count
-                while reportTextList.count < reportLength {
-                    reportTextList.insert("00", at: 0)
-                }
+            else if timeMode == 2{
+                reportLength = 4
             }
             
-            self.timeModeText = reportTextList.joined(separator: ":")
+            speakString = String(repeating: "0", count: max(0, reportLength - speakString.count)) + speakString
+            if speakString.count % 2 == 1{
+                speakString = "0" + speakString
+            }
+            
+            var speakStringList: [String] = []
+            for i in stride(from: 0, to: speakString.count, by: 2) {
+                let startIndex = speakString.index(speakString.startIndex, offsetBy: i)
+                let endIndex = speakString.index(startIndex, offsetBy: 2, limitedBy: speakString.endIndex) ?? speakString.endIndex
+                let substring = String(speakString[startIndex..<endIndex])
+                speakStringList.append(substring)
+            }
+            speakStringList = speakStringList.reversed()
+            self.timeModeText = ""
+            for i in 0..<reportLength/2{
+                self.timeModeText = ":" + speakStringList[i] + self.timeModeText
+            }
+            
             
             if self.shuffleOrRiffle == 0{
                 if self.singlefeatureArray.count == self.allSingleFeatureIndex.count{
-                    self.timeModeText = "88:" + self.timeModeText
+                    self.timeModeText = "88" + self.timeModeText
                 }
                 else{
-                    self.timeModeText = "00:" + self.timeModeText
+                    self.timeModeText = "00" + self.timeModeText
                 }
             }
             else{
-                self.timeModeText = "88:" + self.timeModeText
+                self.timeModeText = "88" + self.timeModeText
             }
             
             self.showTimeModeText = true
@@ -3682,6 +3731,18 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
     }
     
     func performSpeechSynthesis(speakResultStruct: [[SpeakResultStruct]]) {
+        
+        var emptyFlag = true
+        for (turnIndex, turnResult) in speakResultStruct.enumerated() {
+            if turnResult.count > 0{
+                emptyFlag = false
+                break
+            }
+        }
+        if emptyFlag{
+            return
+        }
+        
         lock.lock()
         guard !isPlaying else {
             lock.unlock()
