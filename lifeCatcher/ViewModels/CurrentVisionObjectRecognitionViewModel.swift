@@ -31,13 +31,13 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var cutStructArray: [cutStruct] = []
     @Published var cutShowArray : [Int] = []
     
-//    let detectModel = try! detect_0903_copy()
-//    let clsModel_h = try! cls_0715_h_trans_copy()
-//    let clsModel_v = try! cls_0727_v_trans_copy()
+    let detectModel = try! detect_0903_copy()
+    let clsModel_h = try! cls_0715_h_trans_copy()
+    let clsModel_v = try! cls_0727_v_trans_copy()
     
-    let detectModel = try! detect_0903()
-    let clsModel_h = try! cls_0715_h_trans()
-    let clsModel_v = try! cls_0727_v_trans()
+//    let detectModel = try! detect_0903()
+//    let clsModel_h = try! cls_0715_h_trans()
+//    let clsModel_v = try! cls_0727_v_trans()
     
     let riffleModel_h = try! riffle_1002_h()
     let riffleModel_v = try! riffle_1002_v()
@@ -2930,6 +2930,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     
     func computeWinnerRC(isReset: Bool) {
         if singlefeatureArray.count >= minSingleFeatureNum {
+            
+            print("计算后的singlefeaturearray \(self.singlefeatureArray)")
             multipleDatasetRCInfos = ClassifierSettingArgs.selectDataset(DatasetIndex: ruleIndex, inputSingleFeatures: singlefeatureArray, rcNum: (ClassifierSettingArgs.targetSetting[ruleIndex]?.rcNum[rcNum])!, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs[self.shuffleOrRiffle], cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, minSingleFeatureNum: minSingleFeatureNum, cutStructList: cutStructArray, currentRoundID: self.currentRoundID)
             
             self.singlefeatureArray = multipleDatasetRCInfos.returnSingleFeatureArray

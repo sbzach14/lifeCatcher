@@ -2443,7 +2443,7 @@ public class DetectSettingArgs{
 
                 args = [handNum, communityNum,KValueRange,QValueRange,JValueRange,specialfeatureValueRange, samePointComparision, pointComparision, singlefeatureRank, pairRank, AvalueRange,isCompareSuit]
                 suitRules = [3,2,1,0]
-                rankRules = [2,6,0]
+                rankRules = [5,7,0]
                 rankRuleChecked = [1,1,1]
                 allPreSetRules[i]![18]!.append(args)
                 allPreSetRules[i]![18]!.append(suitRules)

@@ -1924,33 +1924,37 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         return leftNum
     }
     
-    static func AfterCutGenerator(inputSingleFeatures: [Int], cutStructList: [cutStruct], colorTransform: Int, miniCardNum: Int) -> ([Int], Bool){
-        print("需要操作的cutStructList \(cutStructList), 使用的牌数量 \(miniCardNum) 传入的牌库 \(inputSingleFeatures)")
-        var returnSingleFeatures: [Int] = inputSingleFeatures
-        var inputFeatures: [Int] = inputSingleFeatures
-        var i: Int = 0
-        for cutStruct in cutStructList {
-            print("第\(i + 1)个cut inputfeatures \(inputFeatures) leftfeatures \(returnSingleFeatures)")
-            if !returnSingleFeatures.contains(cutStruct.cutcardIndex) && i == cutStructList.count - 1 {
-                return (inputFeatures, false)
+    static func StructCleaner(inputSingleFeatures: [Int], cutStructList: [cutStruct], miniCardNum: Int, lookTimes: Int) -> (Bool,[cutStruct], [Int]){
+        var count: Int = 0
+        for cutStruct in cutStructList{
+            if cutStruct.cutMode == 2 {
+                count += 1
             }
-            if returnSingleFeatures.contains(cutStruct.cutcardIndex) {
-                
-                if cutStruct.cutMode == 2 {
-                    returnSingleFeatures = cutSingleFeatures(inputSingleFeatures: returnSingleFeatures, inputCutStruct: cutStruct, colorTransform: colorTransform)
-                    inputFeatures = returnSingleFeatures
-                    if returnSingleFeatures.count >= miniCardNum {
-                        returnSingleFeatures = Array(returnSingleFeatures.dropFirst(miniCardNum))
-                    }
-                    
+        }
+        switch lookTimes{
+        //看一次
+        case 1:
+            if count <= 1 {
+                return (true, cutStructList, inputSingleFeatures)
+            } else {
+                if inputSingleFeatures.dropFirst(miniCardNum).contains(cutStructList[cutStructList.count - 1].cutcardIndex) {
+                    return (true, [cutStructList[cutStructList.count - 1]], Array(inputSingleFeatures.dropFirst(miniCardNum)))
                 } else {
-                    returnSingleFeatures = cutSingleFeatures(inputSingleFeatures: returnSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1)
+                    return (false, cutStructList, inputSingleFeatures)
                 }
             }
-            i += 1
+        case 2:
+            if count <= 2{
+                return (true, cutStructList, inputSingleFeatures)
+            } else {
+                
+            }
+            break
+        default:
+            return (false, cutStructList, inputSingleFeatures)
         }
         
-        return (inputFeatures, true)
+        return (false, cutStructList, inputSingleFeatures)
     }
     
     static func cutSingleFeatures(inputSingleFeatures: [Int], inputCutStruct: cutStruct, colorTransform: Int) -> [Int]{
@@ -2119,8 +2123,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             }
             print(structString)
             
-            
-
 
             //看手牌
             if reportRule.cutSingleFeatureProcession == 0{
@@ -2157,7 +2159,13 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     }
                     //发牌顺序不变
                     var firstPos: Int = 0
-                    let leftCardsNum: Int = LeftDealCardCal(startIndex: 0, diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, dealType: newArgs[0], handNum: handNum, minimumCardsNum: minSingleFeatureNum)
+                    var leftCardsNum: Int = minSingleFeatureNum
+                    //面为色去色
+                    if reportRule.cutSingleFeatureProcession == 0 && reportRule.singlefeaturesTransformation == 20{
+                        print("面为色去色")
+                        leftCardsNum += 1
+                    }
+                    
                     if reportRule.differentDeal == 1 {
                         while firstPos < inputSingleFeatures.count {
                             handCardList.append(inputSingleFeatures[firstPos])
@@ -2193,7 +2201,12 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         }
                     }
                     
-                    if currentHandFeature == cutStructList[cutStructList.count - 1].cutcardIndex && count < 2 && currentHandFeature != handCardList[handCardList.count - 1]{
+                    let leftNum = abs(inputSingleFeatures.count - inputSingleFeatures.firstIndex(of: currentHandFeature)!)
+                    
+                    print("剩余的牌数量\(leftNum)")
+                
+                    
+                    if currentHandFeature == cutStructList[cutStructList.count - 1].cutcardIndex && count < 2 && (leftNum >= 2 * minSingleFeatureNum) {
                         let currentHandPos = searchSingleFeaturePos(inputSingleFeatures: inputSingleFeatures, singlefeatureIndex: currentHandFeature)
                         if currentHandPos == inputSingleFeatures.count - 1 {
                             inputSingleFeatures = [inputSingleFeatures[currentHandPos]] + Array(inputSingleFeatures[0..<currentHandPos])
@@ -2203,13 +2216,19 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         
                     } else {
                         multipleResultInfo.leftSingleFeatures = leftSingleFeatures
+                        print("返回的returnsingle feature array \(multipleResultInfo.returnSingleFeatureArray)")
                         return multipleResultInfo
                     }
                 }
             //看色两次, 留色
             } else if reportRule.cutSingleFeatureProcession == 1{
-                
-                if cutStructList.count < 2 || (cutStructList[cutStructList.count - 1].cutMode != 2 && cutStructList[cutStructList.count - 2].cutMode != 2) {
+                var count = 0
+                for cutStruct in cutStructList {
+                    if cutStruct.cutMode == 2 {
+                        count += 1
+                    }
+                }
+                if cutStructList.count < 2 || (cutStructList[cutStructList.count - 1].cutMode != 2 && cutStructList[cutStructList.count - 2].cutMode != 2) || count > 2 {
                     if cutStructList.count > 0 && (cutStructList.count == 1 || (cutStructList.count > 1 && cutStructList[cutStructList.count - 2].cutMode != 2)) {
                         
                         multipleResultInfo.reportResult = [[SpeakResultStruct(voiceType: 1, content: "已完成")]]
@@ -2240,22 +2259,23 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     multipleResultInfo.leftSingleFeatures = leftSingleFeatures
                     return multipleResultInfo
                 }
+                
                 var isEffective: Bool = false
                 
-                (inputSingleFeatures, isEffective) = AfterCutGenerator(inputSingleFeatures: inputSingleFeatures, cutStructList: cutStructList, colorTransform: 0, miniCardNum: LeftDealCardCal(startIndex: 0, diyDealStatus: diyDealStatus, diyDealNum: diyDealNum, dealType: newArgs[0], handNum: handNum, minimumCardsNum: minSingleFeatureNum))
+                (isEffective, cutStructList, inputSingleFeatures) = StructCleaner(inputSingleFeatures: inputSingleFeatures, cutStructList: cutStructList, miniCardNum: minSingleFeatureNum, lookTimes: 1)
                 
                 if isEffective == false {
                     multipleResultInfo.leftSingleFeatures = leftSingleFeatures
                     return multipleResultInfo
                 }
-                
-//                for cutStruct in cutStructList{
-//                    if cutStruct.cutMode == 2 {
-//                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 0)
-//                    } else {
-//                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1)
-//                    }
-//                }
+                print("cutStructList \(cutStructList[0].cutcardIndex)  inputsinglefeatures \(inputSingleFeatures)")
+                for cutStruct in cutStructList{
+                    if cutStruct.cutMode == 2 {
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 0)
+                    } else {
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1)
+                    }
+                }
                 
 
             //看色去色
@@ -2270,6 +2290,16 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     multipleResultInfo.leftSingleFeatures = leftSingleFeatures
                     return multipleResultInfo
                 }
+                
+                var isEffective: Bool = false
+                
+                (isEffective, cutStructList, inputSingleFeatures) = StructCleaner(inputSingleFeatures: inputSingleFeatures, cutStructList: cutStructList, miniCardNum: minSingleFeatureNum, lookTimes: 1)
+                
+                if isEffective == false {
+                    multipleResultInfo.leftSingleFeatures = leftSingleFeatures
+                    return multipleResultInfo
+                }
+                print("cutStructList \(cutStructList[0].cutcardIndex)  inputsinglefeatures \(inputSingleFeatures)")
                 
                 for cutStruct in cutStructList{
                     if cutStruct.cutMode == 2 {
@@ -2295,6 +2325,16 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     return multipleResultInfo
                 }
                 
+                var isEffective: Bool = false
+                
+                (isEffective, cutStructList, inputSingleFeatures) = StructCleaner(inputSingleFeatures: inputSingleFeatures, cutStructList: cutStructList, miniCardNum: minSingleFeatureNum, lookTimes: 1)
+                
+                if isEffective == false {
+                    multipleResultInfo.leftSingleFeatures = leftSingleFeatures
+                    return multipleResultInfo
+                }
+                print("cutStructList \(cutStructList[0].cutcardIndex)  inputsinglefeatures \(inputSingleFeatures)")
+                
                 for cutStruct in cutStructList{
                     if cutStruct.cutMode == 2 {
                         inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 2)
@@ -2313,6 +2353,16 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     return multipleResultInfo
                 }
                 
+                var isEffective: Bool = false
+                
+                (isEffective, cutStructList, inputSingleFeatures) = StructCleaner(inputSingleFeatures: inputSingleFeatures, cutStructList: cutStructList, miniCardNum: minSingleFeatureNum, lookTimes: 1)
+                
+                if isEffective == false {
+                    multipleResultInfo.leftSingleFeatures = leftSingleFeatures
+                    return multipleResultInfo
+                }
+                print("cutStructList \(cutStructList[0].cutcardIndex)  inputsinglefeatures \(inputSingleFeatures)")
+                
                 for cutStruct in cutStructList{
                     if cutStruct.cutMode == 2 {
                         inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 3)
@@ -2323,7 +2373,14 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 }
             //飞2张看色留色再看底
             } else if reportRule.cutSingleFeatureProcession == 6{
-                if cutStructList.count < 2 || cutStructList[cutStructList.count - 2].cutMode != 2 {
+                var colorNum: Int = 0
+                for cutStruct in cutStructList {
+                    if cutStruct.cutMode == 2 {
+                        colorNum += 1
+                    }
+                }
+                
+                if cutStructList.count < 2 || cutStructList[cutStructList.count - 2].cutMode != 2 || colorNum > 2{
                     if cutStructList.count > 0 && (cutStructList.count == 1 || (cutStructList.count == 2 && cutStructList[cutStructList.count - 2].cutMode != 2)) {
                         
                         multipleResultInfo.reportResult = [[SpeakResultStruct(voiceType: 1, content: "已完成")]]
@@ -2332,7 +2389,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     return multipleResultInfo
                 }
                 print("看色留色再看底 \(inputSingleFeatures)")
-//                cutStructList = Array(cutStructList.reversed())
                 
                 cutStructList[cutStructList.count - 1].cutMode = 0
                 var temp = cutStructList[cutStructList.count - 2]
@@ -2349,7 +2405,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 }
                 
                 print("看色留色再看底后 \(inputSingleFeatures)")
-            //
+            //去色加提前去掉的一张牌为色
             } else if reportRule.cutSingleFeatureProcession == 8 {
                 
                 print("去色1张 \(inputSingleFeatures) --\(inputSingleFeatures.count)")
@@ -2368,7 +2424,6 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1)
                     }
                 }
-                
                 
             }
             //普通切牌
@@ -2399,7 +2454,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 inputSingleFeatures = leftSingleFeatures
                 
                 
-                if inputSingleFeatures.count == 0 && reportRule.consecutiveReport == -1{
+                if inputSingleFeatures.count < minSingleFeatureNum && reportRule.consecutiveReport == -1{
                     break
                 }
             
@@ -3592,12 +3647,17 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             }
                             
                             break
+                            
                         //保单个位置大小, 只报第一个
                         case 1:
                             if resultPos.contains(where: {$0 == targets[0]}) {
                                 
                                 currentResultInfo.singlefeatureIndexToConfirmMaxMin[upDownID].append(singlefeatureIndex + 1)
                                 currentResultInfo.flyTCSolution = (currentFlyTCSolution)
+                                if reportRule.differentDeal == 4 && reportRule.cutSingleFeatureProcession > 1 && reportRule.cutSingleFeatureProcession < 6 {
+                                    print("飞2张多轮")
+                                    multipleResultInfo.returnSingleFeatureArray = newInputSingleFeatures
+                                }
                                 currentResultInfo.ColorSingleFeatures = colorSingleFeatureIndexList
                                 print("最大位置 \(singlefeatureIndex) 色牌 \(colorSingleFeatureIndexList)")
                                 reportTargetFlag = 1
@@ -5462,7 +5522,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 var currentReportStruct: [SpeakResultStruct] = []
                 let rcID : Int = resultInfo.targetRCList[0][0] + 1
                 
-                reportString = String("\((rcNum - rcID + 2) % rcNum)")
+                
+                reportString = String("\((rcNum - rcID + 1) % rcNum + 1)")
                 
                 currentReportStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
                 

@@ -487,7 +487,8 @@ class BZDatasetHandAnalyst{
             3:eval_isPairFive(singlefeatures:),
             4:eval_isPairTen(singlefeatures:),
             5:eval_isPair(singlefeatures:),
-            6:eval_isSameColorPair(singlefeatures:)
+            6:eval_isSameColorPair(singlefeatures:),
+            7:eval_twoHeads(singlefeatures:)
         ]
         
     }
@@ -502,7 +503,7 @@ class BZDatasetHandAnalyst{
         let num1 = BZSingleFeature(singlefeature: singlefeatures[0], KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, specialfeatureValueRange: specialfeatureValueRange, singlefeatureRank: singlefeatureRank, AValueRange: AValueRange, isCompareSuit: isCompareSuit)
         let num2 = BZSingleFeature(singlefeature: singlefeatures[1], KValueRange: KValueRange, QValueRange: QValueRange, JValueRange: JValueRange, specialfeatureValueRange: specialfeatureValueRange, singlefeatureRank: singlefeatureRank, AValueRange: AValueRange, isCompareSuit: isCompareSuit)
         
-        var numList = [num1, num2]
+        let numList = [num1, num2]
 //        numList = numList.sorted(by: {$0.originalRank > $1.originalRank})
         
         var i = self.rankRules.count + 1
@@ -520,6 +521,8 @@ class BZDatasetHandAnalyst{
     }
     
     func eval_twoHeads(singlefeatures:[BZSingleFeature]) -> (Int, String, Int){
+        print("计算两公牌")
+
         if (singlefeatures[0].originalRank > 10 && singlefeatures[0].originalRank < 14) && (singlefeatures[1].originalRank > 10 && singlefeatures[1].originalRank < 14) {
             let maxRank = max(singlefeatures[0].rank, singlefeatures[1].rank)
             return (maxRank, "两公牌", 0)
@@ -545,9 +548,9 @@ class BZDatasetHandAnalyst{
     }
     
     func eval_isPair(singlefeatures:[BZSingleFeature]) -> (Int, String, Int){
+        print("计算对子")
         if singlefeatures[0].originalRank == singlefeatures[1].originalRank {
             
-//            let singlefeatureType: String = "对" + String(singlefeatures[0].originalRank)
             let singlefeatureType: String = "对子"
             
             if self.PairRank == 0 {
