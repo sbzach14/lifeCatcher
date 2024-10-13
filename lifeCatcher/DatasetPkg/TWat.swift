@@ -736,7 +736,7 @@ class TWDatasetHandAnalyst{
                 }
                 
                 rank = rank << 4 | fourSingleFeatureRank
-                rank = rank << 2 | foursinglefeatureSuit
+                //rank = rank << 2 | foursinglefeatureSuit
                 
 //                let singlefeatureType = "炸弹" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[2]].originRank]!
                 let singlefeatureType = "炸弹"
@@ -802,8 +802,8 @@ class TWDatasetHandAnalyst{
                 
                 rank = rank << 4 | threesinglefeatureRank
                 rank = rank << 4 | pairRank
-                rank = rank << 2 | threesinglefeatureSuit
-                rank = rank << 2 | pairSuit
+                //rank = rank << 2 | threesinglefeatureSuit
+                //rank = rank << 2 | pairSuit
                 
 //                let singlefeatureType = "三带二" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[2]].originRank]!
                 let singlefeatureType = "葫芦"
@@ -1050,7 +1050,7 @@ class TWDatasetHandAnalyst{
                 }
                 
                 rank = rank << 4 | threeSingleFeatureRank
-                rank = rank << 2 | threeSingleFeatureSuit
+                //rank = rank << 2 | threeSingleFeatureSuit
                 
 //                let singlefeatureType = "三条" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[2]].originRank]!
                 let singlefeatureType = "三条"
@@ -1119,7 +1119,7 @@ class TWDatasetHandAnalyst{
                 
                 rank = rank << 4 | firstPairRank
                 rank = rank << 4 | secondPairRank
-                rank = rank << 2 | firstPairSuit
+                //rank = rank << 2 | firstPairSuit
                 
                 
 //                let singlefeatureType = "两对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[1]].originRank]! + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[3]].originRank]!
@@ -1168,7 +1168,7 @@ class TWDatasetHandAnalyst{
                 }
                                 
                 rank = rank << 4 | pairRank
-                rank = rank << 2 | pairsuit
+                //rank = rank << 2 | pairsuit
                 
                 
                 let singlefeatureType = "对子"
