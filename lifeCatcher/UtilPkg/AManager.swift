@@ -64,18 +64,6 @@ class AuthManager {
         return hash
     }
     
-    static func hashWithTimeSalt(input: String) ->String?{
-        let salt1: String = returnDeformString(input: "HYSECRET_HEAD")
-        let salt2: String = returnDeformString(input: "MESSI_RONALDO")
-        
-        // 使用SHA-512哈希算法对新字符串进行哈希加密
-        let hashedData = SHA512.hash(data: Data((salt1 + input + salt2).utf8))
-        // 将哈希值转换成字符串
-        let hash = hashedData.map { String(format: "%02hhx", $0) }.joined()
-        
-        return hash
-    }
-    
     static func activeAccount(input: String) -> Bool{
         var isSuccess = false
         let transInput = input

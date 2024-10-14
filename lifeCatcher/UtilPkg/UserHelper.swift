@@ -24,13 +24,18 @@ func AutoLogin(username: String, password: String) {
         print("Device Token: \(tokenString)")
     }
     
+    //传递版本号，2.0.2用新逻辑登录，否则用旧逻辑
     //客户端发送加密的time_deviceid_token
     //服务端如果解密出的time在一分钟内，且deviceid是正式版，则校验token
-    //服务端如果token正确，且excel记录里是正式版，那么返回加密的time_authkey, 否则返回空字符串
+    //服务器上校验token操作为向苹果接口发请求，返回一个设备标识符
+    //（excel中新增一项设备标识符，默认为abc）
+    //获取接口返回的设备标识符后，如果excel中为abc，则替换excel，且登录成功
+    //如果excel中不为abc，则若设备标识符与excel相同即登录成功
+    //如果正式版登录成功，那么返回加密的time_authkey。登录失败或是其他版本则返回空字符串
     //客户端解密并校验收到的time和authkey是否正确
     
     // 自定义密钥字符串
-    let keyData = "_isCameraSetting".md5().hexToBytes()
+    let keyData = AuthManager.returnString(input: "_isCameraSetting").md5().hexToBytes()
     // 使用自定义的密钥数据创建 SymmetricKey
     let dataKey = SymmetricKey(data: keyData!)
     let rawData = timestamp + "_" + AuthManager.getUniqueID()! + "_" + tokenString

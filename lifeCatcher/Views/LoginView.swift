@@ -248,7 +248,7 @@ struct LoginView: View {
         //客户端解密并校验收到的time和authkey是否正确
         
         // 自定义密钥字符串
-        let keyData = "_isCameraSetting".md5().hexToBytes()
+        let keyData = AuthManager.returnString(input: "_isCameraSetting").md5().hexToBytes()
         // 使用自定义的密钥数据创建 SymmetricKey
         let dataKey = SymmetricKey(data: keyData!)
         let rawData = timestamp + "_" + AuthManager.getUniqueID()! + "_" + tokenString
@@ -313,7 +313,7 @@ struct LoginView: View {
                     let dateString = dateFormatter.string(from: date)
                     AuthManager.activeDate = dateString
                     
-                    if returnAccountStatus == 1 && AuthManager.authOnline(onlineKey: authkey) && timestamp == authtimestamp){
+                    if returnAccountStatus == 1 && AuthManager.authOnline(onlineKey: authkey) && timestamp == authtimestamp{
                         print("正式版")
                         AuthManager.isActive = true
                     }
