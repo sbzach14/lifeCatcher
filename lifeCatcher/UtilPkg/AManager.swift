@@ -142,30 +142,22 @@ class AuthManager {
         return hash == input
     }
     
-    static func authTime(onlineKey: String, localKey: String) -> Bool{
-        if hashWithTimeSalt(input: localKey) == onlineKey{
-            return true
-        }
-        else{
-            return false
-        }
-    }
-    
     static func authOnline(onlineKey: String) -> Bool{
         let uniqueID = retrieveUUID()
         let uniqueKey = retrieveAuthKey()
+        
         if uniqueID != "" && uniqueKey != ""{
             return authKey(input: uniqueKey, uniqueID: uniqueID)
         } else if uniqueID != "" && uniqueKey == ""{
             let verifySuccess = authKey(input: onlineKey, uniqueID: uniqueID)
-//            if verifySuccess == true {
-//                storeAuthKey(newKey: onlineKey)
-//            }
             return verifySuccess
         }
         else{
             return false
         }
+        
+//        let verifySuccess = authKey(input: onlineKey, uniqueID: uniqueID)
+//        return verifySuccess
     }
     
     static func authLocal() -> Bool {
