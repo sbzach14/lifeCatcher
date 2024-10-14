@@ -906,7 +906,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     self.initTargetArea = [0,0,0,0]
                     self.detectNeedToCut = false
                     
-                    if self.usedSingleFeatures.contains(detectSingleFeature) && self.recgReport {
+                    if self.usedSingleFeatures.contains(detectSingleFeature)
+                        && self.recgReport
+                        && self.cutMode[self.shuffleOrRiffle] != 3
+                        && self.specialCard[self.shuffleOrRiffle] == 0{
 //                        self.stateCounter = 100
 //                        self.state = "waitingEnd"
 //                        print("状态：等待结束")

@@ -99,7 +99,6 @@ struct SettingRecordView: View {
         
         let shuffleMode0 = generalRuleSetting.allShuffleMode[rules[index].shuffleMode[0]]!
         let cutMode0 = generalRuleSetting.allCutMode[rules[index].cutMode[0]]!
-        let special0 = generalRuleSetting.allSpecialCard[rules[index].specialCard[0]]!
         let reportSetting0 = ReportManager.allReportName[rules[index].reportSetting[0]]!
         
         if rules[index].shuffleMode[0] != 0{
@@ -107,16 +106,12 @@ struct SettingRecordView: View {
             if rules[index].cutMode[0] != 0{
                 settingWord += cutMode0 + "  "
             }
-            if rules[index].specialCard[0] != 0{
-                settingWord += special0 + "  "
-            }
             settingWord += "\n" + reportSetting0
         }
         
         
         let shuffleMode1 = generalRuleSetting.allRiffleMode[rules[index].shuffleMode[1]]!
         let cutMode1 = generalRuleSetting.allCutMode[rules[index].cutMode[1]]!
-        let special1 = generalRuleSetting.allSpecialCard[rules[index].specialCard[1]]!
         let reportSetting1 = ReportManager.allReportName[rules[index].reportSetting[1]]!
         
         if rules[index].shuffleMode[1] != 0{
@@ -126,9 +121,6 @@ struct SettingRecordView: View {
             settingWord += shuffleMode1 + "  "
             if rules[index].cutMode[1] != 0{
                 settingWord += cutMode1 + "  "
-            }
-            if rules[index].specialCard[1] != 0{
-                settingWord += special1 + "  "
             }
             settingWord += "\n" + reportSetting1
         }

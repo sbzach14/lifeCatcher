@@ -1,5 +1,7 @@
 import SwiftUI
 import Localize_Swift
+import CryptoKit
+import DeviceCheck
 
 enum AppState {
     case loggedOut
@@ -222,14 +224,41 @@ struct LoginView: View {
         let url = URL(string: "http://1.94.17.30:8080/login")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        
         let timestamp = String(Date().timeIntervalSince1970)
+        var tokenString = ""
+        
+        DCDevice.current.generateToken { (token, error) in
+            if let error = error {
+                print("Error generating device token: \(error.localizedDescription)")
+                return
+            }
+            guard let token = token else {
+                print("Token generation failed")
+                return
+            }
+            
+            // 将 token 发送到服务器进行验证
+            tokenString = token.base64EncodedString()
+            print("Device Token: \(tokenString)")
+        }
+        
+        //客户端发送加密的time_deviceid_token
+        //服务端如果解密出的time在一分钟内，且deviceid是正式版，则校验token
+        //服务端如果token正确，且excel记录里是正式版，那么返回加密的time_authkey, 否则返回空字符串
+        //客户端解密并校验收到的time和authkey是否正确
+        
+        // 自定义密钥字符串
+        let keyData = AuthManager.returnString(input: "_isCameraSetting").md5().hexToBytes()
+        // 使用自定义的密钥数据创建 SymmetricKey
+        let dataKey = SymmetricKey(data: keyData!)
+        let rawData = timestamp + "_" + AuthManager.getUniqueID()! + "_" + tokenString
+        let encryptString = try! AuthManager.encrypt(rawData, key: dataKey)
         
         let parameters: [String: Any] = [
-            "deviceID": AuthManager.retrieveUUID(),
             "username": username,
             "password": password,
-            "timestamp": timestamp
+            "encryptString": encryptString,
+            "version": AuthManager.version
         ]
         
         UserDefaults.standard.set(username, forKey: "savedUsername")
@@ -263,7 +292,13 @@ struct LoginView: View {
             let returnAccountStatus = jsonResponse?["accountStatus"] as? Int ?? -1
             let returnExpiredTime = jsonResponse?["expiredTime"] as? Int ?? 0
             let returnActiveCode = jsonResponse?["activated_code"] as? String ?? ""
-            let returnAuthKey = jsonResponse?["hash"] as? String ?? ""
+            
+            let decryptString = try! AuthManager.decrypt(returnActiveCode, key: dataKey)
+            let separatedStrings = decryptString.split(separator: "_")
+            // 将结果转换为字符串数组
+            let stringArray = separatedStrings.map { String($0) }
+            let authtimestamp = stringArray[0]
+            let authkey = stringArray[1]
 
             DispatchQueue.main.async {
                 if success {
@@ -278,13 +313,11 @@ struct LoginView: View {
                     let dateString = dateFormatter.string(from: date)
                     AuthManager.activeDate = dateString
                     
-                    print("过期时间 \(returnExpiredTime)  验证码\(returnAuthKey)")
-
-                    if returnAccountStatus == 1 && AuthManager.authOnline(onlineKey: returnActiveCode) && AuthManager.authTime(onlineKey: returnAuthKey, localKey: timestamp + AuthManager.retrieveUUID()){
+                    if returnAccountStatus == 1 && AuthManager.authOnline(onlineKey: authkey) && timestamp == authtimestamp{
                         print("正式版")
                         AuthManager.isActive = true
                     }
-                    else if returnAccountStatus == 2 && AuthManager.authTime(onlineKey: returnAuthKey, localKey: timestamp + AuthManager.retrieveUUID()){
+                    else if returnAccountStatus == 2{
                         AuthManager.isActive = true
                         AuthManager.autoQuit()
                         print("测试版")

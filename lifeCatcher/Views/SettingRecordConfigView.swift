@@ -185,6 +185,38 @@ struct SettingRecordConfigView: View{
             self.specialCard = rules.specialCard
         }
         
+        //看手牌
+        if ReportManager.allHandSpecialCardReport.contains(self.reportSetting[0]){
+            self.specialCard[0] = 1
+            self.cutMode[0] = 0 //看手牌情况下不能切牌
+        }
+        //看色牌
+        else if ReportManager.allColorSpecialCardReport.contains(self.reportSetting[0]){
+            self.specialCard[0] = 2
+            if self.cutMode[0] == 3{
+                self.cutMode[0] = 1 //看色牌情况下把连续看底变成看底
+            }
+        }
+        else{
+            self.specialCard[0] = 0
+        }
+        
+        //看手牌
+        if ReportManager.allHandSpecialCardReport.contains(self.reportSetting[1]){
+            self.specialCard[1] = 1
+            self.cutMode[1] = 0
+        }
+        //看色牌
+        else if ReportManager.allColorSpecialCardReport.contains(self.reportSetting[1]){
+            self.specialCard[1] = 2
+            if self.cutMode[1] == 3{
+                self.cutMode[1] = 1
+            }
+        }
+        else{
+            self.specialCard[1] = 0
+        }
+        
         self.editType = 1
         self.initdone = true
     }
@@ -295,35 +327,29 @@ struct SettingRecordConfigView: View{
                                     Text("切牌")
                                         .frame(width: 40, alignment: .leading)
                                         .foregroundColor(.white)
-                                    Picker("cutMode", selection: $cutMode[0]) {
-                                        ForEach(0...generalRuleSetting.allCutMode.count - 1, id: \.self){
-                                            index in Text(generalRuleSetting.allCutMode[index]!).tag(index)
-                                        }
-                                    }
-                                    .pickerStyle(MenuPickerStyle())
-                                    .frame(maxWidth: .infinity, alignment: .trailing)
-                                    .accentColor(.blue)
-                                    .onChange(of: cutMode) { _ in
-                                        handleCutModeChange()
-                                    }
-                                }.frame(height: 25)
-                                
-                                HStack{
-                                    Text("特殊牌")
-                                        .frame(width: 60, alignment: .leading)
-                                        .foregroundColor(.white)
                                     
-                                    if cutMode[0] == 3{
+                                    //看手牌不能选切牌
+                                    if self.specialCard[0] == 1{
                                         Spacer()
-                                        
                                         Text("无")
                                             .padding(.trailing, 10)
                                             .foregroundColor(.white)
                                     }
+                                    //看色牌不能选连续看底
+                                    else if self.specialCard[0] == 2{
+                                        Picker("cutMode", selection: $cutMode[0]) {
+                                            ForEach(0...generalRuleSetting.allCutMode.count - 2, id: \.self){
+                                                index in Text(generalRuleSetting.allCutMode[index]!).tag(index)
+                                            }
+                                        }
+                                        .pickerStyle(MenuPickerStyle())
+                                        .frame(maxWidth: .infinity, alignment: .trailing)
+                                        .accentColor(.blue)
+                                    }
                                     else{
-                                        Picker("specialCard", selection: $specialCard[0]) {
-                                            ForEach(0...generalRuleSetting.allSpecialCard.count - 1, id: \.self){
-                                                index in Text(generalRuleSetting.allSpecialCard[index]!).tag(index)
+                                        Picker("cutMode", selection: $cutMode[0]) {
+                                            ForEach(0...generalRuleSetting.allCutMode.count - 1, id: \.self){
+                                                index in Text(generalRuleSetting.allCutMode[index]!).tag(index)
                                             }
                                         }
                                         .pickerStyle(MenuPickerStyle())
@@ -361,40 +387,32 @@ struct SettingRecordConfigView: View{
                                     Text("切牌")
                                         .frame(width: 40, alignment: .leading)
                                         .foregroundColor(.white)
-                                    Picker("cutMode", selection: $cutMode[1]) {
-                                        ForEach(0...generalRuleSetting.allCutMode.count - 1, id: \.self){
-                                            index in Text(generalRuleSetting.allCutMode[index]!).tag(index)
-                                        }
-                                    }
-                                    .pickerStyle(MenuPickerStyle())
-                                    .accentColor(.blue)
-                                    .frame(maxWidth: .infinity, alignment: .trailing)
-                                    .onChange(of: cutMode) { _ in
-                                        handleCutModeChange()
-                                    }
-                                }.frame(height: 25)
-                                
-                                HStack{
-                                    Text("特殊牌")
-                                        .frame(width: 60, alignment: .leading)
-                                        .foregroundColor(.white)
                                     
-                                    if cutMode[1] == 3{
+                                    if self.specialCard[1] == 1{
                                         Spacer()
-                                        
                                         Text("无")
                                             .padding(.trailing, 10)
                                             .foregroundColor(.white)
                                     }
-                                    else{
-                                        Picker("specialCard", selection: $specialCard[1]) {
-                                            ForEach(0...generalRuleSetting.allSpecialCard.count - 1, id: \.self){
-                                                index in Text(generalRuleSetting.allSpecialCard[index]!).tag(index)
+                                    else if self.specialCard[1] == 2{
+                                        Picker("cutMode", selection: $cutMode[1]) {
+                                            ForEach(0...generalRuleSetting.allCutMode.count - 2, id: \.self){
+                                                index in Text(generalRuleSetting.allCutMode[index]!).tag(index)
                                             }
                                         }
                                         .pickerStyle(MenuPickerStyle())
-                                        .frame(maxWidth: .infinity, alignment: .trailing)
                                         .accentColor(.blue)
+                                        .frame(maxWidth: .infinity, alignment: .trailing)
+                                    }
+                                    else{
+                                        Picker("cutMode", selection: $cutMode[1]) {
+                                            ForEach(0...generalRuleSetting.allCutMode.count - 1, id: \.self){
+                                                index in Text(generalRuleSetting.allCutMode[index]!).tag(index)
+                                            }
+                                        }
+                                        .pickerStyle(MenuPickerStyle())
+                                        .accentColor(.blue)
+                                        .frame(maxWidth: .infinity, alignment: .trailing)
                                     }
                                 }.frame(height: 25)
                                 
@@ -654,15 +672,6 @@ struct SettingRecordConfigView: View{
         DetectSettingArgs.saveDatasetRule()
         if isShowAlert{
             self.saveSuccessAlert = true
-        }
-    }
-    
-    private func handleCutModeChange(){
-        if cutMode[0] == 3{
-            specialCard[0] = 0
-        }
-        if cutMode[1] == 3{
-            specialCard[1] = 0
         }
     }
     
