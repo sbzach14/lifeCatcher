@@ -1957,6 +1957,15 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         return (false, cutStructList, inputSingleFeatures)
     }
     
+    static func handCardRangeEstimator(rcNum: Int, lookFeature: Int, inputSingleFeatures: [Int]) -> [Int]{
+        
+        let pos = searchSingleFeaturePos(inputSingleFeatures: inputSingleFeatures, singlefeatureIndex: lookFeature)
+        let lowerBound = max(0, pos - rcNum + 1)
+        let higherBound = min(inputSingleFeatures.count - 1, pos + rcNum - 1)
+        let returnRange: [Int] = Array(inputSingleFeatures[lowerBound...higherBound])
+        return returnRange
+    }
+    
     static func cutSingleFeatures(inputSingleFeatures: [Int], inputCutStruct: cutStruct, colorTransform: Int) -> [Int]{
         
         let pos = searchSingleFeaturePos(inputSingleFeatures: inputSingleFeatures, singlefeatureIndex: inputCutStruct.cutcardIndex)
@@ -2181,7 +2190,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     for lookFeature in cutStructList {
                         if lookFeature.cutMode == 3 {
                             for i in 0..<handCardList.count {
-                                if handCardList[i] == lookFeature.cutcardIndex{
+                                let handCardRange: [Int] =handCardRangeEstimator(rcNum: rcNum, lookFeature: handCardList[i], inputSingleFeatures: inputSingleFeatures)
+                                if handCardRange.contains(lookFeature.cutcardIndex){
                                     currentHandFeature = handCardList[i]
                                     if i == handCardList.count - 1 {
                                         handCardList = []
