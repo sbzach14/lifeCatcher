@@ -466,7 +466,7 @@ class ReportManager{
     ]
     static let allReportInfo: [Int: String] = [
         0:"""
-报哪家最大。最大家如果是多个，把所有最大家报出来
+报哪家最大
 """,
         1:"""
 报哪家最小
@@ -2216,7 +2216,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     print("剩余的牌数量\(leftNum)")
                 
                     
-                    if currentHandFeature == cutStructList[cutStructList.count - 1].cutcardIndex && count < 2 && (leftNum >= 2 * minSingleFeatureNum) {
+                    if currentHandFeature == cutStructList[cutStructList.count - 1].cutcardIndex && count < 2 && (leftNum >= (2 * minSingleFeatureNum - rcNum)) {
                         let currentHandPos = searchSingleFeaturePos(inputSingleFeatures: inputSingleFeatures, singlefeatureIndex: currentHandFeature)
                         if currentHandPos == inputSingleFeatures.count - 1 {
                             inputSingleFeatures = [inputSingleFeatures[currentHandPos]] + Array(inputSingleFeatures[0..<currentHandPos])
@@ -4232,6 +4232,26 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
     
     static func reportStringGenerator(reportID:Int, multipleReportResultInfo: MultipleReportResultInfo, cutNumRangeSetting: [Int], rcNum: Int) -> [[SpeakResultStruct]]{
         var reportResult:[[SpeakResultStruct]] = []
+        var validNum: Int = 6
+        if let reportRule = DetectSettingArgs.allPreSetReportRules[reportID] {
+            switch reportRule.rankReport {
+            case 0, 3:
+                validNum = 1
+                break
+            case 1, 4:
+                validNum = 2
+                break
+            case 2:
+                validNum = 3
+                break
+            case 5:
+                validNum = 6
+                break
+            default:
+                validNum = 6
+            }
+        }
+
         switch reportID{
 //            0:"[1]:报最大",
 //            1:"[2]:报最小",
@@ -4295,10 +4315,14 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 var reportString = ""
                 let voiceType = 1
                 var currentReportStruct: [SpeakResultStruct] = []
-                
+                var currentValidNum = 0
                 for rcID in resultInfo.targetRCList[0] {
                     reportString = String(rcID + 1)
                     currentReportStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                    currentValidNum += 1
+                    if currentValidNum >= validNum {
+                        break
+                    }
                 }
                 
                 reportResult.append(currentReportStruct)
@@ -4453,11 +4477,16 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 var reportString = ""
                 let voiceType = 1
                 var currentSpeakStruct: [SpeakResultStruct] = []
+                var currentValidNum: Int = 0
                 for rcID in resultInfo.targetRCList[0] {
                     reportString = String(rcID + 1) + " "
                     currentSpeakStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
                     reportString = resultInfo.RCReturnInfoList[rcID].rcSingleFeaturesType
                     currentSpeakStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                    currentValidNum += 1
+                    if currentValidNum >= validNum {
+                        break
+                    }
                 }
                 
                 reportResult.append(currentSpeakStruct)
@@ -5124,8 +5153,13 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     let aliveNumber = resultInfo.handCardAliveNumberList[handindex]
                     let initialString : String = String(dealPos) + "张"
                     reportString = ""
+                    var currentValidNum: Int = 0
                     for rcID in subTargetRCList {
                         reportString += String(rcID + 1) + " "
+                        currentValidNum += 1
+                        if currentValidNum >= validNum{
+                            break
+                        }
                     }
                     var aliveString : String = ""
                     if aliveNumber != 0 {
@@ -5159,8 +5193,13 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 for subTargetRCList in resultInfo.targetRCList{
                     let initialString : String = String(dealPos) + "张"
                     reportString = ""
+                    var currentValidNum: Int = 0
                     for rcID in subTargetRCList {
                         reportString += String(rcID + 1) + " "
+                        currentValidNum += 1
+                        if currentValidNum >= validNum{
+                            break
+                        }
                     }
                     reportString = initialString + reportString
                     currentReportStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
@@ -5485,8 +5524,13 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 var reportString: String = ""
                 reportString += String(resultInfo.specialSingleFeaturePos) + " "
                 if resultInfo.targetRCList.count > 0 {
+                    var currentValidNum: Int = 0
                     for rcID in resultInfo.targetRCList[0]{
                         reportString += String(rcID + 1)
+                        currentValidNum += 1
+                        if currentValidNum >= validNum {
+                            break
+                        }
                     }
                 }
                 reportResult.append([SpeakResultStruct(voiceType: 1, content: reportString)])
