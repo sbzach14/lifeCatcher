@@ -43,7 +43,6 @@
 		A838534C2ADA7C0200346038 /* BG.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A838534B2ADA7C0200346038 /* BG.xcassets */; };
 		A83853532ADA918000346038 /* CustomUIComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A83853522ADA918000346038 /* CustomUIComponent.swift */; };
 		A86459282C90B59E00AF0BA9 /* Ain.swift in Sources */ = {isa = PBXBuildFile; fileRef = A86459272C90B59E00AF0BA9 /* Ain.swift */; };
-		A87097112C8A5D1E003A4729 /* UserHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A87097102C8A5D1E003A4729 /* UserHelper.swift */; };
 		A887167F2A0623E500B7F2CD /* AManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887167E2A0623E500B7F2CD /* AManager.swift */; };
 		A887B6502A7FE1AF009F488F /* ShowResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B64F2A7FE1AF009F488F /* ShowResultView.swift */; };
 		A887B6522A8104BC009F488F /* TimeAuthUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A887B6512A8104BC009F488F /* TimeAuthUtils.swift */; };
@@ -72,8 +71,8 @@
 		D03811A72C7542C300726B99 /* cls_0727_v_trans.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D03811A42C7542C200726B99 /* cls_0727_v_trans.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/cls_0727_v_trans.mlmodelkey"; }; };
 		D03811A82C7542C300726B99 /* cls_0715_h_trans.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/cls_0715_h_trans.mlmodelkey"; }; };
 		D03811AA2C76904D00726B99 /* OriginObjectRegView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D03811A92C76904D00726B99 /* OriginObjectRegView.swift */; };
-		D0971D7E2CB572C200E6AE5E /* riffle_1002_h.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D0971D7C2CB572C100E6AE5E /* riffle_1002_h.mlmodel */; };
-		D0971D7F2CB572C200E6AE5E /* riffle_1002_v.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D0971D7D2CB572C200E6AE5E /* riffle_1002_v.mlmodel */; };
+		D0971D7E2CB572C200E6AE5E /* riffle_1002_h.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D0971D7C2CB572C100E6AE5E /* riffle_1002_h.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/detect_0903.mlmodelkey"; }; };
+		D0971D7F2CB572C200E6AE5E /* riffle_1002_v.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D0971D7D2CB572C200E6AE5E /* riffle_1002_v.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/detect_0903.mlmodelkey"; }; };
 		D0CD59FD2C86DEF50030A939 /* Localize_Swift in Frameworks */ = {isa = PBXBuildFile; productRef = D0CD59FC2C86DEF50030A939 /* Localize_Swift */; };
 		D0DAEF912C77657400D5938A /* ReportSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF902C77657400D5938A /* ReportSettingView.swift */; };
 		D0DAEF932C77664100D5938A /* HistoryItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF922C77664100D5938A /* HistoryItemView.swift */; };
@@ -121,7 +120,6 @@
 		A838534B2ADA7C0200346038 /* BG.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = BG.xcassets; sourceTree = "<group>"; };
 		A83853522ADA918000346038 /* CustomUIComponent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomUIComponent.swift; sourceTree = "<group>"; };
 		A86459272C90B59E00AF0BA9 /* Ain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ain.swift; sourceTree = "<group>"; };
-		A87097102C8A5D1E003A4729 /* UserHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserHelper.swift; sourceTree = "<group>"; };
 		A887167E2A0623E500B7F2CD /* AManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AManager.swift; sourceTree = "<group>"; };
 		A887B64F2A7FE1AF009F488F /* ShowResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowResultView.swift; sourceTree = "<group>"; };
 		A887B6512A8104BC009F488F /* TimeAuthUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeAuthUtils.swift; sourceTree = "<group>"; };
@@ -316,7 +314,6 @@
 				A887B6512A8104BC009F488F /* TimeAuthUtils.swift */,
 				18FFC4092BB9587900029B0D /* OriginBlurDetector.swift */,
 				B058BE5E2B09FFC20078E792 /* CurrentBlurDetector.swift */,
-				A87097102C8A5D1E003A4729 /* UserHelper.swift */,
 			);
 			path = UtilPkg;
 			sourceTree = "<group>";
@@ -494,7 +491,6 @@
 				A88EFE0D2A7FDC9500897243 /* HistoryView.swift in Sources */,
 				18C98D102C158F7B00A8CD49 /* NPoi.swift in Sources */,
 				18CA14D6284AC42C00F90372 /* CameraImageView.swift in Sources */,
-				A87097112C8A5D1E003A4729 /* UserHelper.swift in Sources */,
 				A83853532ADA918000346038 /* CustomUIComponent.swift in Sources */,
 				A887B6502A7FE1AF009F488F /* ShowResultView.swift in Sources */,
 				A88EFDC42A7D217200897243 /* OriginVisionObjectRecognitionViewModel.swift in Sources */,
@@ -648,7 +644,7 @@
 				CODE_SIGN_ENTITLEMENTS = lifeCatcher/lifeCatcher.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
 				DEVELOPMENT_TEAM = 6WK4Q32GMN;
 				ENABLE_PREVIEWS = YES;
@@ -696,7 +692,7 @@
 				CODE_SIGN_ENTITLEMENTS = lifeCatcher/lifeCatcher.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 6;
+				CURRENT_PROJECT_VERSION = 7;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
 				DEVELOPMENT_TEAM = 6WK4Q32GMN;
 				ENABLE_PREVIEWS = YES;

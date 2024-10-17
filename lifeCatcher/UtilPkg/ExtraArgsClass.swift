@@ -2192,7 +2192,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             for i in 0..<handCardList.count {
                                 let handCardRange: [Int] = handCardRangeEstimator(rcNum: rcNum, lookFeature: handCardList[i], inputSingleFeatures: inputSingleFeatures)
                                 if handCardRange.contains(lookFeature.cutcardIndex){
-                                    currentHandFeature = handCardList[i]
+                                    currentHandFeature = lookFeature.cutcardIndex
                                     if i == handCardList.count - 1 {
                                         handCardList = []
                                     } else {
