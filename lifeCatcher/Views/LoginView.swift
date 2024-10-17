@@ -292,6 +292,7 @@ struct LoginView: View {
                 let returnAccountStatus = jsonResponse?["accountStatus"] as? Int ?? -1
                 let returnExpiredTime = jsonResponse?["expiredTime"] as? Int ?? 0
                 let returnActiveCode = jsonResponse?["activated_code"] as? String ?? ""
+                let returnMessage = jsonResponse?["message"] as? String ?? ""
                 
                 let decryptString = try! AuthManager.decrypt(returnActiveCode, key: dataKey)
                 let separatedStrings = decryptString.split(separator: "_")
@@ -342,6 +343,11 @@ struct LoginView: View {
                         
                         showAlert = true
                         alertMessage = message
+                    }
+                    
+                    if returnMessage != ""{
+                        showAlert = true
+                        alertMessage = returnMessage
                     }
                 }
             }
