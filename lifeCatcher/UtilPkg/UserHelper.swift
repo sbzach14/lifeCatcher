@@ -3,7 +3,7 @@ import Foundation
 import DeviceCheck
 
 func AutoLogin(username: String, password: String) {
-    let url = URL(string: "http://10.0.0.26:8080/login")!
+    let url = URL(string: "http://1.94.17.30:5000/login")!
     var request = URLRequest(url: url)
     request.httpMethod = "POST"
     let timestamp = String(Date().timeIntervalSince1970)
@@ -37,9 +37,7 @@ func AutoLogin(username: String, password: String) {
         // 使用自定义的密钥数据创建 SymmetricKey
         let dataKey = SymmetricKey(data: keyData!)
         let rawData = timestamp + "_" + AuthManager.retrieveUUID() + "_" + tokenString
-        print("Device Token: \(tokenString)")
-
-        print("传输的rawData \(rawData)")
+        
         let encryptString = try! AuthManager.encrypt(rawData, key: dataKey)
         
         let parameters: [String: Any] = [
@@ -90,9 +88,12 @@ func AutoLogin(username: String, password: String) {
                     print("正式版")
                     AuthManager.isActive = true
                 }
+                else{
+                    print("验证失败")
+                }
             //登陆失败
             } else {
-                
+                print("登录失败")
             }
         }
         task.resume()
