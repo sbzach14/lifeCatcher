@@ -153,6 +153,12 @@ struct AuthTestView: View {
                             self.showAlert = true
                             if deleteStatus == 0{
                                 self.alertMessage = "不存在要删除的deviceID"
+                            } else if deleteStatus == 1 {
+                                self.alertMessage = "删除成功"
+                            } else if deleteStatus == 2 {
+                                self.alertMessage = "当前token无效"
+                            } else if deleteStatus == 3 {
+                                self.alertMessage = "重制bit失败"
                             }
                         }
                     }
@@ -207,7 +213,16 @@ struct AuthTestView: View {
                     } else {
                         DispatchQueue.main.async {
                             self.showAlert = true
-                            self.alertMessage = "激活失败"
+                            if self.activateStatus == 3{
+                                self.alertMessage = "口令错误"
+                            }
+                            else if self.activateStatus == 4{
+                                self.alertMessage = "重制失败"
+                            } else if self.activateStatus == 5 {
+                                self.alertMessage = "授权次数耗尽"
+                            } else {
+                                self.alertMessage = "激活失败"
+                            }
                         }
                     }
                 }
@@ -267,6 +282,12 @@ struct AuthTestView: View {
 
                             if self.shiftStatus == 0 {
                                 self.alertMessage = "移机对象不存在"
+                            } else if shiftStatus == 2 {
+                                self.alertMessage = "旧设备无效"
+                            } else if shiftStatus == 3 {
+                                self.alertMessage = "重制失败"
+                            } else if shiftStatus == 4 {
+                                self.alertMessage = "重制新设备失败"
                             }
                         }
                     }
