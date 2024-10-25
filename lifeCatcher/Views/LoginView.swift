@@ -22,88 +22,24 @@ struct LoginView: View {
     @State private var isAction: Bool = true
     @State private var showPassword = false
     @State private var vericode: String = ""
+    @State private var isLoading: Bool = false
 
     @EnvironmentObject var loginStatus: AppViewModel
     
     var body: some View {
-        VStack {
-            VStack(spacing: 20) {
-                if case .loggedOut = loginStatus.appState {
-                    // Username input
-                    ZStack(alignment: .leading){
-                        if username == ""{
-                            Text("Username".localized())
-                                .foregroundColor(.white) // 占位符文本颜色
-                                .opacity(0.5) // 仅在没有输入时显示占位符
-                                .padding(.leading, 40)
-                        }
-                        TextField("", text: $username)
-                            .padding()
-                            .background(Color.gray.opacity(0.2))
-                            .cornerRadius(10)
-                            .padding(.horizontal, 20)
-                            .foregroundColor(.white)
-                    }
-
-                    // Password input with visibility toggle
-                    HStack {
-                        if showPassword {
-                            ZStack(alignment: .leading){
-                                if password == ""{
-                                    Text("Password".localized())
-                                        .foregroundColor(.white) // 占位符文本颜色
-                                        .opacity(0.5) // 仅在没有输入时显示占位符
-                                        .padding(.leading, 40)
-                                }
-                                TextField("", text: $password)
-                                    .padding()
-                                    .background(Color.gray.opacity(0.2))
-                                    .cornerRadius(10)
-                                    .padding(.horizontal, 20)
-                                    .foregroundColor(.white)
-                            }
-                        } else {
-                            ZStack(alignment: .leading){
-                                if password == ""{
-                                    Text("Password".localized())
-                                        .foregroundColor(.white) // 占位符文本颜色
-                                        .opacity(0.5) // 仅在没有输入时显示占位符
-                                        .padding(.leading, 40)
-                                }
-                                
-                                SecureField("", text: $password)
-                                    .padding()
-                                    .background(Color.gray.opacity(0.2))
-                                    .cornerRadius(10)
-                                    .padding(.horizontal, 20)
-                                    .foregroundColor(.white)
-                            }
-                        }
-                        
-                        Button(action: {
-                            showPassword.toggle()
-                        }) {
-                            Image(systemName: showPassword ? "eye.fill" : "eye.slash.fill")
-                        }
-                        .padding(.trailing, 20)
-                    }
-
-                    // Remember Password checkbox
-                    Toggle(isOn: $rememberPassword) {
-                        Text("Remember Password".localized()).foregroundColor(.gray)
-                    }
-                    .padding(.horizontal, 30)
-
-                    HStack{
+        ZStack{
+            VStack {
+                VStack(spacing: 20) {
+                    if case .loggedOut = loginStatus.appState {
+                        // Username input
                         ZStack(alignment: .leading){
-                            if vericode == ""{
-                                Text("Verification Code".localized())
+                            if username == ""{
+                                Text("Username".localized())
                                     .foregroundColor(.white) // 占位符文本颜色
                                     .opacity(0.5) // 仅在没有输入时显示占位符
                                     .padding(.leading, 40)
                             }
-                            // 验证码输入框
-                            TextField("", text: $vericode)
+                            TextField("", text: $username)
                                 .padding()
                                 .background(Color.gray.opacity(0.2))
                                 .cornerRadius(10)
@@ -111,100 +47,172 @@ struct LoginView: View {
                                 .foregroundColor(.white)
                         }
                         
-                        Text(loginStatus.vericode)
-                            .font(.system(size: 20, weight: .bold))
-                            .foregroundColor(.black)
-                            .padding()
-                            .frame(width: 100)
-                            .background(Color.gray)
-                            .cornerRadius(10)
-                            .padding(.horizontal, 20)
-                            .contextMenu {
-                                Text("") // 空的contextMenu意味着禁用所有默认操作
+                        // Password input with visibility toggle
+                        HStack {
+                            if showPassword {
+                                ZStack(alignment: .leading){
+                                    if password == ""{
+                                        Text("Password".localized())
+                                            .foregroundColor(.white) // 占位符文本颜色
+                                            .opacity(0.5) // 仅在没有输入时显示占位符
+                                            .padding(.leading, 40)
+                                    }
+                                    TextField("", text: $password)
+                                        .padding()
+                                        .background(Color.gray.opacity(0.2))
+                                        .cornerRadius(10)
+                                        .padding(.horizontal, 20)
+                                        .foregroundColor(.white)
+                                }
+                            } else {
+                                ZStack(alignment: .leading){
+                                    if password == ""{
+                                        Text("Password".localized())
+                                            .foregroundColor(.white) // 占位符文本颜色
+                                            .opacity(0.5) // 仅在没有输入时显示占位符
+                                            .padding(.leading, 40)
+                                    }
+                                    
+                                    SecureField("", text: $password)
+                                        .padding()
+                                        .background(Color.gray.opacity(0.2))
+                                        .cornerRadius(10)
+                                        .padding(.horizontal, 20)
+                                        .foregroundColor(.white)
+                                }
                             }
-                    }
-                    
-                    // Sign In button
-                    Button(action: {
-                        if username == ""{
-                            showAlert = true
-                            alertMessage = "Username can not be empty.".localized()
+                            
+                            Button(action: {
+                                showPassword.toggle()
+                            }) {
+                                Image(systemName: showPassword ? "eye.fill" : "eye.slash.fill")
+                            }
+                            .padding(.trailing, 20)
                         }
-                        else if password == ""{
-                            showAlert = true
-                            alertMessage = "Password can not be empty.".localized()
+                        
+                        // Remember Password checkbox
+                        Toggle(isOn: $rememberPassword) {
+                            Text("Remember Password".localized()).foregroundColor(.gray)
                         }
-                        else if vericode != loginStatus.vericode{
-                            showAlert = true
-                            alertMessage = "Verification code error.".localized()
+                        .padding(.horizontal, 30)
+                        
+                        HStack{
+                            ZStack(alignment: .leading){
+                                if vericode == ""{
+                                    Text("Verification Code".localized())
+                                        .foregroundColor(.white) // 占位符文本颜色
+                                        .opacity(0.5) // 仅在没有输入时显示占位符
+                                        .padding(.leading, 40)
+                                }
+                                // 验证码输入框
+                                TextField("", text: $vericode)
+                                    .padding()
+                                    .background(Color.gray.opacity(0.2))
+                                    .cornerRadius(10)
+                                    .padding(.horizontal, 20)
+                                    .foregroundColor(.white)
+                            }
+                            
+                            Text(loginStatus.vericode)
+                                .font(.system(size: 20, weight: .bold))
+                                .foregroundColor(.black)
+                                .padding()
+                                .frame(width: 100)
+                                .background(Color.gray)
+                                .cornerRadius(10)
+                                .padding(.horizontal, 20)
+                                .contextMenu {
+                                    Text("") // 空的contextMenu意味着禁用所有默认操作
+                                }
                         }
-                        else{
-                            loginUser()
-                        }
-                        loginStatus.resetVericode()
-                    }) {
-                        Text("Sign In".localized())
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.blue)
-                            .cornerRadius(10)
-                            .padding(.horizontal, 20)
-                    }
-
-                    // Sign Up button
-                    Button(action: {
-                        if username == ""{
-                            showAlert = true
-                            alertMessage = "Username can not be empty.".localized()
-                        }
-                        else if password == ""{
-                            showAlert = true
-                            alertMessage = "Password can not be empty.".localized()
-                        }
-                        else if vericode != loginStatus.vericode{
-                            showAlert = true
-                            alertMessage = "Verification code error.".localized()
-                        }
-                        else{
-                            registerUser()
-                        }
-                        loginStatus.resetVericode()
-                    }) {
-                        Text("Sign Up".localized())
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.blue)
-                            .cornerRadius(10)
-                            .padding(.horizontal, 20)
-                    }
-                } else if case .loggedIn(username: loginStatus.userInfo?.username) = loginStatus.appState {
-                    
-                    VStack {
-                        // 显示当前登录账号，居中加粗
-                        if let username = loginStatus.userInfo?.username {
-                            Text(username)
-                                .font(.system(size: 24, weight: .bold))
+                        
+                        // Sign In button
+                        Button(action: {
+                            if username == ""{
+                                showAlert = true
+                                alertMessage = "Username can not be empty.".localized()
+                            }
+                            else if password == ""{
+                                showAlert = true
+                                alertMessage = "Password can not be empty.".localized()
+                            }
+                            else if vericode != loginStatus.vericode{
+                                showAlert = true
+                                alertMessage = "Verification code error.".localized()
+                            }
+                            else{
+                                loginUser()
+                            }
+                            loginStatus.resetVericode()
+                        }) {
+                            Text("Sign In".localized())
                                 .foregroundColor(.white)
                                 .padding()
                                 .frame(maxWidth: .infinity)
-                                .multilineTextAlignment(.center)
+                                .background(Color.blue)
+                                .cornerRadius(10)
+                                .padding(.horizontal, 20)
                         }
-
-                        // 登陆成功提示
-                        Text("You have logged in".localized())
-                            .foregroundColor(.blue)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.white)
-                            .cornerRadius(10)
-                            .padding(.horizontal, 20)
+                        
+                        // Sign Up button
+                        Button(action: {
+                            if username == ""{
+                                showAlert = true
+                                alertMessage = "Username can not be empty.".localized()
+                            }
+                            else if password == ""{
+                                showAlert = true
+                                alertMessage = "Password can not be empty.".localized()
+                            }
+                            else if vericode != loginStatus.vericode{
+                                showAlert = true
+                                alertMessage = "Verification code error.".localized()
+                            }
+                            else{
+                                registerUser()
+                            }
+                            loginStatus.resetVericode()
+                        }) {
+                            Text("Sign Up".localized())
+                                .foregroundColor(.white)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color.blue)
+                                .cornerRadius(10)
+                                .padding(.horizontal, 20)
+                        }
+                    } else if case .loggedIn(username: loginStatus.userInfo?.username) = loginStatus.appState {
+                        
+                        VStack {
+                            // 显示当前登录账号，居中加粗
+                            if let username = loginStatus.userInfo?.username {
+                                Text(username)
+                                    .font(.system(size: 24, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .padding()
+                                    .frame(maxWidth: .infinity)
+                                    .multilineTextAlignment(.center)
+                            }
+                            
+                            // 登陆成功提示
+                            Text("You have logged in".localized())
+                                .foregroundColor(.blue)
+                                .padding()
+                                .frame(maxWidth: .infinity)
+                                .background(Color.white)
+                                .cornerRadius(10)
+                                .padding(.horizontal, 20)
+                        }
                     }
-                }
-            }.padding(.top, 20)
+                }.padding(.top, 20)
                 
-            Spacer()
+                Spacer()
+            }
+            
+            // 当 isLoading 为 true 时显示加载遮罩
+            if isLoading {
+                LoadingOverlay()
+            }
         }
         .background(
             Image("Newbg2")
@@ -221,6 +229,8 @@ struct LoginView: View {
     
     // 登录逻辑
     func loginUser() {
+        isLoading = true
+        
         let url = URL(string: "http://1.94.17.30:8080/login")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -350,6 +360,8 @@ struct LoginView: View {
                         alertMessage = returnMessage
                     }
                 }
+                
+                isLoading = false
             }
             task.resume()
         }
@@ -358,6 +370,8 @@ struct LoginView: View {
     }
     
     func registerUser() {
+        isLoading = true
+        
         guard let url = URL(string: "http://1.94.17.30:8080/register") else { return }
 
         var request = URLRequest(url: url)
@@ -421,6 +435,8 @@ struct LoginView: View {
                     self.showAlert = true
                 }
             }
+            
+            isLoading = false
         }
 
         task.resume()
