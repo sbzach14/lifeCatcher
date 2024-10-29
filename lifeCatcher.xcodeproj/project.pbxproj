@@ -668,7 +668,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 99;
+				MARKETING_VERSION = 2.0.3;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -716,7 +716,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 99;
+				MARKETING_VERSION = 2.0.3;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
 				PRODUCT_NAME = "$(TARGET_NAME)";

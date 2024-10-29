@@ -197,6 +197,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     var isProcessNeedToCut: Bool = false
     var reloadingTime: Double = 0
     
+    var continueCutTimeCounter: Float = 10
+    var continueMaxCutTime: Float = 10
+    
 
     override init(){
         
@@ -283,6 +286,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
     
     private func initShuffle(){
+        self.continueCutTimeCounter = self.continueMaxCutTime
         self.currentRoundID = 1
         singlefeatureArray = []
         cutStructArray = []
@@ -653,6 +657,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             timestamp = currentTimestamp
             // 重置计数器
             frameCount = 0
+            
+            if self.continueCutTimeCounter < self.continueMaxCutTime{
+                self.continueCutTimeCounter += 1
+            }
         }
         
         if self.state != "idle"{
@@ -912,7 +920,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     
                     if self.usedSingleFeatures.contains(detectSingleFeature)
                         && self.recgReport
-                        && self.cutMode[self.shuffleOrRiffle] != 3
+                        && (self.cutMode[self.shuffleOrRiffle] != 3 || self.continueCutTimeCounter >= self.continueMaxCutTime)
                         && self.specialCard[self.shuffleOrRiffle] == 0{
 //                        self.stateCounter = 100
 //                        self.state = "waitingEnd"
@@ -962,6 +970,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 0))
                             isCutDone = true
                             self.cutShowArray.append(detectSingleFeature)
+                            
+                            self.continueCutTimeCounter = 0
                         }
                         
                         if !isCutDone{
@@ -2986,7 +2996,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
     
     func computeNextRound(){
-        if (self.leftSingleFeatures.count > 0){
+        if ReportManager.baodanzhang.contains(self.calModeArgs[self.shuffleOrRiffle][0]) && self.singlefeatureArray.count > 0{
+            print("计算报单张的下一轮")
+            
+            //TODO
+        }
+        else if (self.leftSingleFeatures.count > 0){
             print("开始计算下一轮")
             self.singlefeatureArray = self.leftSingleFeatures
             self.currentRoundID += 1
@@ -3013,7 +3028,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 }
                 
                 currentAudioPlayer = try AVAudioPlayer(contentsOf: url)
-                currentAudioPlayer?.volume = 0.75
+                currentAudioPlayer?.volume = 0.5
                 currentAudioPlayer?.delegate = self
                 currentAudioPlayer?.prepareToPlay()
                 currentAudioPlayer?.play()
@@ -3487,6 +3502,16 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             self.laplacianDic[1][key] = 0
         }
         
+        if self.shuffleMode[0] != 0 && ReportManager.baodanzhang.contains(self.calModeArgs[0][0]) && self.recgReport{
+            self.recgReport = false
+            self.cutMode[0] = 3
+        }
+        if self.shuffleMode[1] != 0 && ReportManager.baodanzhang.contains(self.calModeArgs[1][0]) && self.recgReport{
+            self.recgReport = false
+            self.cutMode[1] = 3
+        }
+        
+        saveData()
     }
     
     private func DatasetGetMinSingleFeatureNum()-> Int{

@@ -189,6 +189,8 @@ class ReportManager{
         3: 2
     ]
     
+    static let baodanzhang : [Int] = [187,188,189,211]
+    
     static let allHandSpecialCardReport : [Int] = [
         79,80,81,82,83,84,85,86,87,88,89,90
     ]

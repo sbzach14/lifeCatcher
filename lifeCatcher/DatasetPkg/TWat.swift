@@ -801,7 +801,7 @@ class TWDatasetHandAnalyst{
                 }
                 
                 rank = rank << 4 | threesinglefeatureRank
-                rank = rank << 4 | pairRank
+                rank = rank << 4 | (15 - pairRank) //用小的对子
                 //rank = rank << 2 | threesinglefeatureSuit
                 //rank = rank << 2 | pairSuit
                 
@@ -1141,8 +1141,27 @@ class TWDatasetHandAnalyst{
         var usedSingleFeatureIndexList : [[Int]] = []
         
         for i in 0..<singlefeatures.count-1{
-            if singlefeatures[i].rank != 15 && singlefeatures[i].rank == singlefeatures[i+1].rank{
-                usedSingleFeatureIndexList.append([i, i+1])
+            if i == 0{
+                if singlefeatures[i].rank != 15
+                    && singlefeatures[i].rank == singlefeatures[i+1].rank
+                    && singlefeatures[i+1].rank != singlefeatures[i+2].rank{
+                    usedSingleFeatureIndexList.append([i, i+1])
+                }
+            }
+            else if i == singlefeatures.count-2{
+                if singlefeatures[i].rank != 15
+                    && singlefeatures[i].rank == singlefeatures[i+1].rank
+                    && singlefeatures[i].rank != singlefeatures[i-1].rank{
+                    usedSingleFeatureIndexList.append([i, i+1])
+                }
+            }
+            else{
+                if singlefeatures[i].rank != 15
+                    && singlefeatures[i].rank == singlefeatures[i+1].rank
+                    && singlefeatures[i].rank != singlefeatures[i-1].rank
+                    && singlefeatures[i+1].rank != singlefeatures[i+2].rank{
+                    usedSingleFeatureIndexList.append([i, i+1])
+                }
             }
         }
         
