@@ -158,7 +158,7 @@ struct MainMenuView: View {
     
     func AutoLogin(username: String, password: String) {
         
-        let url = URL(string: "http://1.94.17.30:8080/login")!
+        let url = URL(string: "http://10.19.124.168:8080/login")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         let timestamp = String(Date().timeIntervalSince1970)
@@ -193,8 +193,10 @@ struct MainMenuView: View {
             let dataKey = SymmetricKey(data: keyData!)
             let rawData = timestamp + "_" + AuthManager.retrieveUUID() + "_" + tokenString
             
-            let encryptString = try! AuthManager.encrypt(rawData, key: dataKey)
             
+            let encryptString = try! AuthManager.encrypt(rawData, key: dataKey)
+//            测试密文
+//            print("测试密文 \(encryptString)")
             let parameters: [String: Any] = [
                 "username": username,
                 "password": password,

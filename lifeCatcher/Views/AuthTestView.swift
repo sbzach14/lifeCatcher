@@ -3,6 +3,7 @@ import SwiftUI
 struct AuthTestView: View {
     @State private var userInput = ""
     @State private var passcode = ""
+    @State private var oldDeviceID = ""
     @State private var activeKey = ""
     @State private var isAuthorized = false
     @State private var activateStatus = -1
@@ -18,8 +19,11 @@ struct AuthTestView: View {
             TextField("输入你要激活的序列号", text: $userInput)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
+            TextField("enter old series number", text: $oldDeviceID)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding()
 
-            TextField("输入你的授权码/旧的序列号", text: $passcode)
+            TextField("输入你的授权码", text: $passcode)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
             
@@ -119,10 +123,11 @@ struct AuthTestView: View {
     }
     
     private func sendDeleteRequest() {
-        guard let url = URL(string: "http://1.94.17.30:8080/delete_user") else { return }
+        guard let url = URL(string: "http://10.19.124.168:8080/delete_user") else { return }
                 
         let json: [String: Any] = [
             "deviceID": userInput,
+            "passCode": passcode,
         ]
 
         let jsonData = try! JSONSerialization.data(withJSONObject: json)
@@ -173,7 +178,7 @@ struct AuthTestView: View {
     }
 
     private func sendActivateRequest() {
-        guard let url = URL(string: "http://1.94.17.30:8080/activate") else { return }
+        guard let url = URL(string: "http://10.19.124.168:8080/activate") else { return }
         
         self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
         
@@ -239,14 +244,15 @@ struct AuthTestView: View {
     
     
     private func sendShiftRequest() {
-        guard let url = URL(string: "http://1.94.17.30:8080/shift_user") else { return }
+        guard let url = URL(string: "http://10.19.124.168:8080/shift_user") else { return }
         
         self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
         
         let json: [String: Any] = [
             "activate_code": activeKey,
-            "old_deviceID": self.passcode,
+            "old_deviceID": self.oldDeviceID,
             "new_deviceID": userInput,
+            "passCode": self.passcode,
         ]
 
         let jsonData = try! JSONSerialization.data(withJSONObject: json)
