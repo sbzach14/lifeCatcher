@@ -142,5 +142,21 @@ extension View {
 }
 
 
+struct LoadingOverlay: View {
+    var body: some View {
+        ZStack {
+            // 半透明遮罩覆盖整个屏幕
+            Color.black.opacity(0.6)
+                .edgesIgnoringSafeArea(.all)
+            
+            // 使用 ProgressView 作为加载动画
+            ProgressView()
+                .progressViewStyle(CircularProgressViewStyle())
+                .scaleEffect(3) // 放大
+                .foregroundColor(.blue) // 设置加载圈颜色为白色
+                .padding(.bottom, 200) // 将加载圈向上移动
+        }
+    }
+}
 
 

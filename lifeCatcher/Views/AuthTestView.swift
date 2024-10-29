@@ -77,7 +77,7 @@ struct AuthTestView: View {
                 .padding()
                 
                 Button(action: {
-                    if containsOnlyHalfWidthUppercaseAndDigits(self.userInput) && containsOnlyHalfWidthUppercaseAndDigits(self.passcode){
+                    if containsOnlyHalfWidthUppercaseAndDigits(self.userInput) && containsOnlyHalfWidthUppercaseAndDigits(self.oldDeviceID){
                         self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
                         sendShiftRequest()
                     }
@@ -123,7 +123,7 @@ struct AuthTestView: View {
     }
     
     private func sendDeleteRequest() {
-        guard let url = URL(string: "http://10.19.124.168:8080/delete_user") else { return }
+        guard let url = URL(string: "http://1.94.17.30:8080/delete_user") else { return }
                 
         let json: [String: Any] = [
             "deviceID": userInput,
@@ -164,6 +164,8 @@ struct AuthTestView: View {
                                 self.alertMessage = "当前token无效"
                             } else if deleteStatus == 3 {
                                 self.alertMessage = "重制bit失败"
+                            } else if deleteStatus == 4 {
+                                self.alertMessage = "授权码错误"
                             }
                         }
                     }
@@ -178,7 +180,7 @@ struct AuthTestView: View {
     }
 
     private func sendActivateRequest() {
-        guard let url = URL(string: "http://10.19.124.168:8080/activate") else { return }
+        guard let url = URL(string: "http://1.94.17.30:8080/activate") else { return }
         
         self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
         
@@ -244,7 +246,7 @@ struct AuthTestView: View {
     
     
     private func sendShiftRequest() {
-        guard let url = URL(string: "http://10.19.124.168:8080/shift_user") else { return }
+        guard let url = URL(string: "http://1.94.17.30:8080/shift_user") else { return }
         
         self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
         
@@ -294,6 +296,8 @@ struct AuthTestView: View {
                                 self.alertMessage = "重制失败"
                             } else if shiftStatus == 4 {
                                 self.alertMessage = "重制新设备失败"
+                            } else if shiftStatus == 5 {
+                                self.alertMessage = "授权码错误"
                             }
                         }
                     }

@@ -9,6 +9,7 @@ struct MainMenuView: View {
     @State private var historyNavigate: Int? = -1
     @State private var showAlert: Bool = false
     @State private var alertMessage: String = ""
+    @State private var isLoading: Bool = false
     
     @AppStorage("appLanguage") private var appLanguage: String = "en"
 
@@ -120,6 +121,11 @@ struct MainMenuView: View {
                         .cornerRadius(10)
                     
                 }
+                
+                // 当 isLoading 为 true 时显示加载遮罩
+                if isLoading {
+                    LoadingOverlay()
+                }
             }
             .background(
                 Image("Newbg2")
@@ -158,7 +164,14 @@ struct MainMenuView: View {
     
     func AutoLogin(username: String, password: String) {
         
-        let url = URL(string: "http://10.19.124.168:8080/login")!
+        if AuthManager.isLoginServer
+        {
+            isLoading = false
+            return
+        }
+        
+        isLoading = true
+        let url = URL(string: "http://1.94.17.30:8080/login")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         let timestamp = String(Date().timeIntervalSince1970)
@@ -258,6 +271,8 @@ struct MainMenuView: View {
                     showAlert = true
                     alertMessage = returnMessage
                 }
+                
+                isLoading = false
             }
             task.resume()
         }

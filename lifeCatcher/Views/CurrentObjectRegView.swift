@@ -361,6 +361,16 @@ class ButtonViewController: UIViewController {
             self.voiceDevice = intDict["voiceDevice"]!
         }
         self.currentVolume = self.volumeValue
+        
+        if self.isHeadphonesConnected(){
+            self.voiceDevice = 1
+        }
+    }
+    
+    func isHeadphonesConnected() -> Bool {
+        let currentRoute = AVAudioSession.sharedInstance().currentRoute
+        let connectedBluetoothHeadphones = currentRoute.outputs.contains { $0.portType == .bluetoothA2DP }
+        return connectedBluetoothHeadphones
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -411,6 +421,13 @@ class ButtonViewController: UIViewController {
             viewModel?.speechPerformer.stopSpeechSynthesis()
             viewModel?.speakText(input: -1)
             setSystemVolume(volume: 0)
+        }
+        
+        if reason == .newDeviceAvailable && self.voiceDevice == 0 && self.isHeadphonesConnected(){
+            print("Earphones or other audio device connect")
+            self.voiceDevice = 1
+            viewModel?.voiceDevice = 1
+            viewModel?.updateConfigJSON()
         }
     }
 

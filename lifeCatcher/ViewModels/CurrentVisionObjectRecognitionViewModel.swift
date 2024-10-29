@@ -233,6 +233,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         self.speechPerformer.voiceRate = self.voiceRate
         
+        if self.isHeadphonesConnected(){
+            self.voiceDevice = 1
+            self.updateConfigJSON()
+        }
     }
     
     func initialize(saveRuleIndex: Int) {
@@ -723,7 +727,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: true)
             }
             else{
-                let result = try! self.riffleModel_h.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
+                let result = try! self.clsModel_h.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
                 (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: true)
             }
         }
@@ -733,7 +737,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: true)
             }
             else{
-                let result = try! self.riffleModel_v.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
+                let result = try! self.clsModel_v.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
                 (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: true)
             }
         }
@@ -2314,7 +2318,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     boxfactor = 5
                 }
                 
-                minW = max(minW,minH) * boxfactor
+                minW = max(minW,minH/h*w) * boxfactor
                 minW = min(minW, self.originSize[0] - 10)
                 
                 targetArea[2] = minW
@@ -2363,7 +2367,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     boxfactor = 5
                 }
                 
-                minH = max(minW,minH) * boxfactor
+                minH = max(minW/h*w,minH) * boxfactor
                 minH = min(minH, self.originSize[1] - 10)
                 
                 targetArea[2] = minH / w * h

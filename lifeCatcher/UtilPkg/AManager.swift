@@ -16,40 +16,40 @@ class AuthManager {
     static let passCodeKey = SymmetricKey(data: Data("CARNEGIEMELLONUNIVERSITY".utf8))
 
  
-    //deprecated
-    static func getUniqueID() -> String? {
-        // 获取设备ID
-        let keychainIdentifier = UIDevice.current.identifierForVendor!.uuidString
-        var query = [String: Any]()
-        query[kSecClass as String] = kSecClassGenericPassword
-        query[kSecAttrAccount as String] = keychainIdentifier
-        query[kSecMatchLimit as String] = kSecMatchLimitOne
-        query[kSecReturnAttributes as String] = kCFBooleanTrue
-        var item: CFTypeRef?
-        let status = SecItemCopyMatching(query as CFDictionary, &item)
-        
-        if status == errSecSuccess {
-            // 如果标识符在钥匙串中存在，则返回它
-            if let existingItem = item as? [String: Any],
-               let data = existingItem[kSecAttrGeneric as String] as? Data,
-               let identifier = String(data: data, encoding: .utf8) {
-                return identifier
-            }
-        } else if status == errSecItemNotFound {
-            // 如果标识符在钥匙串中不存在，则创建一个新的并存储它
-            let newID = UUID().uuidString
-            let data = newID.data(using: .utf8)!
-            query[kSecValueData as String] = data
-            let status = SecItemAdd(query as CFDictionary, nil)
-            
-            if status == errSecSuccess {
-                return newID
-            }
-        }
-        
-        // 如果出现错误，则返回nil
-        return nil
-    }
+//    //deprecated
+//    static func getUniqueID() -> String? {
+//        // 获取设备ID
+//        let keychainIdentifier = UIDevice.current.identifierForVendor!.uuidString
+//        var query = [String: Any]()
+//        query[kSecClass as String] = kSecClassGenericPassword
+//        query[kSecAttrAccount as String] = keychainIdentifier
+//        query[kSecMatchLimit as String] = kSecMatchLimitOne
+//        query[kSecReturnAttributes as String] = kCFBooleanTrue
+//        var item: CFTypeRef?
+//        let status = SecItemCopyMatching(query as CFDictionary, &item)
+//        
+//        if status == errSecSuccess {
+//            // 如果标识符在钥匙串中存在，则返回它
+//            if let existingItem = item as? [String: Any],
+//               let data = existingItem[kSecAttrGeneric as String] as? Data,
+//               let identifier = String(data: data, encoding: .utf8) {
+//                return identifier
+//            }
+//        } else if status == errSecItemNotFound {
+//            // 如果标识符在钥匙串中不存在，则创建一个新的并存储它
+//            let newID = UUID().uuidString
+//            let data = newID.data(using: .utf8)!
+//            query[kSecValueData as String] = data
+//            let status = SecItemAdd(query as CFDictionary, nil)
+//            
+//            if status == errSecSuccess {
+//                return newID
+//            }
+//        }
+//        
+//        // 如果出现错误，则返回nil
+//        return nil
+//    }
     
     static func hashWithSalt(input: String) -> String? {
         
@@ -72,7 +72,7 @@ class AuthManager {
             
             //TODO: post active request
                         
-            let url = URL(string: "http://10.19.124.168:8080/activate")!
+            let url = URL(string: "http://1.94.17.30:8080/activate")!
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
             
