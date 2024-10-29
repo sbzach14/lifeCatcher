@@ -3,6 +3,7 @@ import SwiftUI
 struct AuthTestView: View {
     @State private var userInput = ""
     @State private var passcode = ""
+    @State private var oldDeviceID = ""
     @State private var activeKey = ""
     @State private var isAuthorized = false
     @State private var activateStatus = -1
@@ -18,8 +19,11 @@ struct AuthTestView: View {
             TextField("输入你要激活的序列号", text: $userInput)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
+            TextField("enter old series number", text: $oldDeviceID)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding()
 
-            TextField("输入你的授权码/旧的序列号", text: $passcode)
+            TextField("输入你的授权码", text: $passcode)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
             
@@ -73,7 +77,7 @@ struct AuthTestView: View {
                 .padding()
                 
                 Button(action: {
-                    if containsOnlyHalfWidthUppercaseAndDigits(self.userInput) && containsOnlyHalfWidthUppercaseAndDigits(self.passcode){
+                    if containsOnlyHalfWidthUppercaseAndDigits(self.userInput) && containsOnlyHalfWidthUppercaseAndDigits(self.oldDeviceID){
                         self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
                         sendShiftRequest()
                     }
@@ -123,6 +127,7 @@ struct AuthTestView: View {
                 
         let json: [String: Any] = [
             "deviceID": userInput,
+            "passCode": passcode,
         ]
 
         let jsonData = try! JSONSerialization.data(withJSONObject: json)
@@ -159,6 +164,8 @@ struct AuthTestView: View {
                                 self.alertMessage = "当前token无效"
                             } else if deleteStatus == 3 {
                                 self.alertMessage = "重制bit失败"
+                            } else if deleteStatus == 4 {
+                                self.alertMessage = "授权码错误"
                             }
                         }
                     }
@@ -245,8 +252,9 @@ struct AuthTestView: View {
         
         let json: [String: Any] = [
             "activate_code": activeKey,
-            "old_deviceID": self.passcode,
+            "old_deviceID": self.oldDeviceID,
             "new_deviceID": userInput,
+            "passCode": self.passcode,
         ]
 
         let jsonData = try! JSONSerialization.data(withJSONObject: json)
@@ -288,6 +296,8 @@ struct AuthTestView: View {
                                 self.alertMessage = "重制失败"
                             } else if shiftStatus == 4 {
                                 self.alertMessage = "重制新设备失败"
+                            } else if shiftStatus == 5 {
+                                self.alertMessage = "授权码错误"
                             }
                         }
                     }

@@ -206,8 +206,10 @@ struct MainMenuView: View {
             let dataKey = SymmetricKey(data: keyData!)
             let rawData = timestamp + "_" + AuthManager.retrieveUUID() + "_" + tokenString
             
-            let encryptString = try! AuthManager.encrypt(rawData, key: dataKey)
             
+            let encryptString = try! AuthManager.encrypt(rawData, key: dataKey)
+//            测试密文
+//            print("测试密文 \(encryptString)")
             let parameters: [String: Any] = [
                 "username": username,
                 "password": password,
