@@ -287,10 +287,20 @@ struct DeprecatedMainView: View {
             //Image("Logo")
             VStack {
                 NavigationLink(
-                    destination: SettingRecordView()
+                    destination: SettingRecordView(configType: 0)
                 ) {
                     VStack(alignment: .leading) {
-                        Text("历史记录")
+                        Text("历史记录  (界面样式1)")
+                            .foregroundColor(.white)
+                        Divider().colorInvert()
+                    }
+                    .padding()
+                }
+                NavigationLink(
+                    destination: SettingRecordView(configType: 1)
+                ) {
+                    VStack(alignment: .leading) {
+                        Text("历史记录  (界面样式2)")
                             .foregroundColor(.white)
                         Divider().colorInvert()
                     }

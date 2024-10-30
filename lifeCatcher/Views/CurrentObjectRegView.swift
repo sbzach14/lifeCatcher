@@ -5,6 +5,7 @@ import AVFoundation
 
 struct CurrentVisionObjectRecognitionView: View {
     var saveRuleIndex : Int
+    var configType : Int
     @StateObject var viewModel : CurrentVisionObjectRecognitionViewModel = CurrentVisionObjectRecognitionViewModel()
     @State var isAVCaptureActive = false
     
@@ -281,7 +282,7 @@ struct CurrentVisionObjectRecognitionView: View {
         }
         .onAppear {
             if !self.isAVCaptureActive && self.saveRuleIndex != -1{
-                viewModel.initialize(saveRuleIndex: saveRuleIndex)
+                viewModel.initialize(saveRuleIndex: saveRuleIndex, configType: configType)
             }
             self.isAVCaptureActive = true
             viewModel.isWorking = true

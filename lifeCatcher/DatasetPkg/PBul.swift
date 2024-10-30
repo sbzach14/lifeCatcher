@@ -157,7 +157,7 @@ class PBRule : Rule{
     override init(ruleIndex: Int, ruleName: String) {
         super.init(ruleIndex: ruleIndex, ruleName: ruleName)
         self.rankRules = PBRule.fiveSingleFeaturesRankRules
-        self.rcNum = [2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+        self.rcNum = [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]
         self.setting = [
             0: "斗牛-分花色[501]",
             1: "斗牛-不分花色[502]",

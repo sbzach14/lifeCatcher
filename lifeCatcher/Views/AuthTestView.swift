@@ -16,10 +16,10 @@ struct AuthTestView: View {
 
     var body: some View {
         VStack {
-            TextField("输入你要激活的序列号", text: $userInput)
+            TextField("输入你要激活或激活的序列号", text: $userInput)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
-            TextField("enter old series number", text: $oldDeviceID)
+            TextField("输入移机旧的序列号", text: $oldDeviceID)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
 
@@ -38,7 +38,7 @@ struct AuthTestView: View {
                         alertMessage = "非法序列号，请手动输入。"
                     }
                 }, label: {
-                    Text("Generate")
+                    Text("生成")
                 })
                 .padding()
                 
@@ -54,12 +54,11 @@ struct AuthTestView: View {
                         alertMessage = "非法序列号，请手动输入。"
                     }
                 }, label: {
-                    Text("Authorize")
+                    Text("激活")
                 })
                 .padding()
-            }
-            
-            HStack{
+                
+                Spacer()
                 
                 Button(action: {
                     if containsOnlyHalfWidthUppercaseAndDigits(self.userInput){
@@ -75,6 +74,8 @@ struct AuthTestView: View {
                     Text("删除")
                 })
                 .padding()
+                
+                Spacer()
                 
                 Button(action: {
                     if containsOnlyHalfWidthUppercaseAndDigits(self.userInput) && containsOnlyHalfWidthUppercaseAndDigits(self.oldDeviceID){
@@ -183,8 +184,6 @@ struct AuthTestView: View {
         guard let url = URL(string: "http://1.94.17.30:8080/activate") else { return }
         
         self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
-        
-        
         
         let json: [String: Any] = [
             "activate_code": activeKey,

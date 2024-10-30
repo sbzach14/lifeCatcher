@@ -73,6 +73,7 @@
 		D03811AA2C76904D00726B99 /* OriginObjectRegView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D03811A92C76904D00726B99 /* OriginObjectRegView.swift */; };
 		D0971D7E2CB572C200E6AE5E /* riffle_1002_h.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D0971D7C2CB572C100E6AE5E /* riffle_1002_h.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/detect_0903.mlmodelkey"; }; };
 		D0971D7F2CB572C200E6AE5E /* riffle_1002_v.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D0971D7D2CB572C200E6AE5E /* riffle_1002_v.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/detect_0903.mlmodelkey"; }; };
+		D0C507E02CD13AF4007FF4D0 /* SettingRecordConfigView_leishen.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C507DF2CD13AF4007FF4D0 /* SettingRecordConfigView_leishen.swift */; };
 		D0CD59FD2C86DEF50030A939 /* Localize_Swift in Frameworks */ = {isa = PBXBuildFile; productRef = D0CD59FC2C86DEF50030A939 /* Localize_Swift */; };
 		D0DAEF912C77657400D5938A /* ReportSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF902C77657400D5938A /* ReportSettingView.swift */; };
 		D0DAEF932C77664100D5938A /* HistoryItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF922C77664100D5938A /* HistoryItemView.swift */; };
@@ -146,6 +147,7 @@
 		D03811A92C76904D00726B99 /* OriginObjectRegView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OriginObjectRegView.swift; sourceTree = "<group>"; };
 		D0971D7C2CB572C100E6AE5E /* riffle_1002_h.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = riffle_1002_h.mlmodel; sourceTree = "<group>"; };
 		D0971D7D2CB572C200E6AE5E /* riffle_1002_v.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = riffle_1002_v.mlmodel; sourceTree = "<group>"; };
+		D0C507DF2CD13AF4007FF4D0 /* SettingRecordConfigView_leishen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingRecordConfigView_leishen.swift; sourceTree = "<group>"; };
 		D0DAEF902C77657400D5938A /* ReportSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportSettingView.swift; sourceTree = "<group>"; };
 		D0DAEF922C77664100D5938A /* HistoryItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryItemView.swift; sourceTree = "<group>"; };
 		D0DAEF942C7766D900D5938A /* UsedFeatureSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsedFeatureSelectView.swift; sourceTree = "<group>"; };
@@ -270,6 +272,7 @@
 				18C98D212C15906100A8CD49 /* SettingRecordView.swift */,
 				D0DAEF942C7766D900D5938A /* UsedFeatureSelectView.swift */,
 				18C98CE42C15893200A8CD49 /* DeprecatedComponentView.swift */,
+				D0C507DF2CD13AF4007FF4D0 /* SettingRecordConfigView_leishen.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -459,6 +462,7 @@
 				18C98D172C158F7B00A8CD49 /* TWat.swift in Sources */,
 				D0DAEF932C77664100D5938A /* HistoryItemView.swift in Sources */,
 				D0DAEF912C77657400D5938A /* ReportSettingView.swift in Sources */,
+				D0C507E02CD13AF4007FF4D0 /* SettingRecordConfigView_leishen.swift in Sources */,
 				18C98D1D2C158F7B00A8CD49 /* TEGan.swift in Sources */,
 				A88EFDC82A7D249C00897243 /* CurrentObjectRegView.swift in Sources */,
 				187A45512C31BBB400BB055C /* AllBaseSettingArgs.swift in Sources */,
@@ -646,7 +650,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
-				DEVELOPMENT_TEAM = 6TV8BJJFTF;
+				DEVELOPMENT_TEAM = 6WK4Q32GMN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = lifeCatcher/App/Info.plist;
@@ -668,9 +672,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.3;
+				MARKETING_VERSION = 99;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.life.lifeUnique;
+				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -694,7 +698,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
-				DEVELOPMENT_TEAM = 6TV8BJJFTF;
+				DEVELOPMENT_TEAM = 6WK4Q32GMN;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = lifeCatcher/App/Info.plist;
@@ -716,9 +720,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.3;
+				MARKETING_VERSION = 99;
 				NEW_SETTING = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.life.lifeUnique;
+				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
