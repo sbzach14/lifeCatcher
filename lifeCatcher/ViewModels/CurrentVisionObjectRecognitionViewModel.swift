@@ -923,6 +923,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     if self.usedSingleFeatures.contains(detectSingleFeature)
                         && self.recgReport
                         && (self.cutMode[self.shuffleOrRiffle] != 3 || self.continueCutTimeCounter >= self.continueMaxCutTime)
+                        && self.cutMode[self.shuffleOrRiffle] != 4
                         && self.specialCard[self.shuffleOrRiffle] == 0{
 //                        self.stateCounter = 100
 //                        self.state = "waitingEnd"
@@ -974,6 +975,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             self.cutShowArray.append(detectSingleFeature)
                             
                             self.continueCutTimeCounter = 0
+                        }
+                        else if self.cutMode[self.shuffleOrRiffle] == 4{
+                            //连续看手牌（切牌）
+                            self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 4))
+                            isCutDone = true
+                            self.cutShowArray.append(detectSingleFeature)
                         }
                         
                         if !isCutDone{
@@ -2906,17 +2913,19 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             self.cutStructArray.append(cutStruct(cutcardIndex: cutSingleFeature, cutMode: 0))
             self.cutShowArray.append(cutSingleFeature)
         }
+        else if self.cutMode[self.shuffleOrRiffle] == 4{
+            self.cutStructArray.append(cutStruct(cutcardIndex: cutSingleFeature, cutMode: 4))
+            self.cutShowArray.append(cutSingleFeature)
+        }
         
-        if self.cutMode[self.shuffleOrRiffle] != 3{
-            if self.specialCard[self.shuffleOrRiffle] == 1 || self.specialCard[self.shuffleOrRiffle] == 3{
-                self.cutStructArray.append(cutStruct(cutcardIndex: cutSingleFeature, cutMode: 3))
-                self.cutShowArray.append(cutSingleFeature)
-            }
-            else if self.specialCard[self.shuffleOrRiffle] == 2 || self.specialCard[self.shuffleOrRiffle] == 4{
-                for _ in 0..<maxCutTimes {
-                    cutSingleFeature = self.singlefeatureArray.randomElement()!
-                    self.cutStructArray.append(cutStruct(cutcardIndex: cutSingleFeature, cutMode: 2))
-                }
+        if self.specialCard[self.shuffleOrRiffle] == 1{
+            self.cutStructArray.append(cutStruct(cutcardIndex: cutSingleFeature, cutMode: 3))
+            self.cutShowArray.append(cutSingleFeature)
+        }
+        else if self.specialCard[self.shuffleOrRiffle] == 2{
+            for _ in 0..<maxCutTimes {
+                cutSingleFeature = self.singlefeatureArray.randomElement()!
+                self.cutStructArray.append(cutStruct(cutcardIndex: cutSingleFeature, cutMode: 2))
             }
         }
         
