@@ -2936,6 +2936,28 @@ public class DetectSettingArgs{
                 allPreSetRules[i]![17]!.append(suitRules)
                 allPreSetRules[i]![17]!.append(rankRules)
                 allPreSetRules[i]![17]!.append(rankRuleChecked)
+//              18: "温州牌九"
+                handNum = 2
+                communityNum = 0
+                redspecialfeatureValueRange = 0
+                blackspecialfeatureValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                pointComparision = 0
+                samePointComparision = 2
+                AValueRange = 1
+                pairRank = 0
+                singlefeatureRankRule = 7
+                
+                args = [handNum, communityNum,redspecialfeatureValueRange, blackspecialfeatureValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, singlefeatureRankRule]
+                suitRules = [3,2,1,0]
+                rankRules = [8,9,43,17,18,29,47,48,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![18]!.append(args)
+                allPreSetRules[i]![18]!.append(suitRules)
+                allPreSetRules[i]![18]!.append(rankRules)
+                allPreSetRules[i]![18]!.append(rankRuleChecked)
                 break
             case 10:
 //                0:"福建54张9点[221]",

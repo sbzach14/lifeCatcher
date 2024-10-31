@@ -30,6 +30,7 @@ class CNDatasetRule : Rule{
     let samePointComparision:[Int: String] = [
         0:"同点比最大牌，最大牌相同时庄家赢",
         1:"同对庄大，同点有Q最大，有2次大，其他同点同大",
+        2:"同点比最大牌，0点全部一样大"
     ]
     let AValueRange:[Int:String] = [
         0:"1",
@@ -46,7 +47,8 @@ class CNDatasetRule : Rule{
         3:"红Q>红2>红8>红4>红10>红6>黑4>黑J>黑10>红7>黑6>黑9>黑8>黑7>黑5>大王>小王",
         4:"红Q>红2>红8>红4>红6(=红10=黑4)>红J(=黑10=红7=黑6)>红9(=黑8=黑7=红5=大王=黑桃A=黑桃3=红桃3)",
         5:"黑2>红2>红8>红4>红10>红6>黑4>红1>黑10>红7>黑6>黑9>黑8>黑7>黑5>大王>小王",
-        6:"红Q>红2>红8>红4>红6(=红10=黑4)>红J(=黑10=红7=黑6)>红9(=黑8=黑7=红5=大王=黑桃A=黑桃3=红桃3)"
+        6:"红Q>红2>红8>红4>红6(=红10=黑4)>红J(=黑10=红7=黑6)>红9(=黑8=黑7=红5=大王=黑桃A=黑桃3=红桃3)",
+        7:"红Q>红2>红8>红4>黑10=黑4=黑6>红10=红6=红7=红J=黑J>王=A=黑5=红5=黑7=黑9=红9=黑8=黑3=红3"
     ]
     let handNum:[Int] = [2,4]
     
@@ -54,7 +56,9 @@ class CNDatasetRule : Rule{
     override init(ruleIndex: Int, ruleName: String) {
         super.init(ruleIndex: ruleIndex, ruleName: ruleName)
         self.rankRules = [
-            46: "红3+大王",
+            48:"对9=对黑8=对黑7=对5",
+            47:"对红10=对J=对红6=对红7",
+            46:"红3+大王",
             45:"对红J=黑10=红7=黑6",
             44:"红6=红10=黑4",
             43:"大王+黑3=大王+红三=黑A+黑3=黑A+红3",
@@ -121,6 +125,7 @@ class CNDatasetRule : Rule{
             15: "32张牌九[266]",
             16: "山西牌九[269]",
             17: "通用四张-杭州牌九[420]*",
+            18: "温州牌九"
         ]
         self.ruleInfo = [
             0:"""
@@ -258,7 +263,19 @@ Q+红9>红2+红9>红Q+8>红2+8>红 Q+7>红2+7>红8+红J
 2)天地人和三长四短五杂
 3)三长都是平点，四短都是平点，所有零点都是平点
 """,
-        ]
+        18:"""
+游戏说明
+用牌：
+大王
+黑桃: A, 3,4,5,6,7,8,9,10,J
+红桃: 2,3,4,5,6,7,8,9,10,J,Q,
+梅花: 4,5,6,7,8,9,10,J,
+方片: 2,4,5,6,7,8,9,10,J,Q
+大小: 对红Q > 对红2 > 王+3=A+3 > 对红8 > 对红4 > 对黑10=对黑6=对黑4 > 对红10=对J=对红6=对红7 >
+对9=对黑8=对黑7=对5 > 红Q+9 > 红Q+8 > 红2+8 > 点数
+9点最大，0点最小，大王6点，A 6点，0点全部一样大，同点比最大牌
+红Q>红2>红8>红4>黑10=黑4=黑6>红10=红6=红7=红J=黑J>王=A=黑5=红5=黑7=黑9=红9>黑8=黑3=红3
+""",]
         self.rcNum = [2,3,4,5,6,7,8,9,10]
 
     }
@@ -339,6 +356,9 @@ class CNDataset{
             break
         case 17:
             result = Array(0...51) + [53,54]
+            break
+        case 18:
+            result = [54,0,2,3,4,5,6,7,8,9,10,14,15,16,17,18,19,20,21,22,23,24,29,30,31,32,33,34,35,36,40,42,43,44,45,46,47,48,49,50]
             break
         default:
             result = Array(0...51) + [53,54]
@@ -1073,7 +1093,7 @@ class CNDatasetHandAnalyst{
     func eval_isRedColorPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
         if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 {
             
-//            var singlefeatureType: String = "红对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+
             var singlefeatureType: String = "红对子"
             
             if self.pairRank == 0{
@@ -1088,7 +1108,7 @@ class CNDatasetHandAnalyst{
     func eval_isBlackColorPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
         if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 {
             
-//            var singlefeatureType: String = "黑对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
+
             
             var singlefeatureType: String = "黑对子"
             
@@ -1104,7 +1124,6 @@ class CNDatasetHandAnalyst{
     func eval_isMixColorPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
         if singlefeatures[0].originalRank == singlefeatures[1].originalRank && singlefeatures[0].color != singlefeatures[1].color {
             
-//            var singlefeatureType: String = "混对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
             var singlefeatureType: String = "混对子"
             
             if self.pairRank == 0{
@@ -1118,10 +1137,7 @@ class CNDatasetHandAnalyst{
     
     func eval_isPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
         if singlefeatures[0].originalRank == singlefeatures[1].originalRank{
-            
-//            var singlefeatureType: String = "对" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[0].originalRank]!
             var singlefeatureType: String = "对子"
-            
             if self.pairRank == 0{
                 return (singlefeatures[0].rank, singlefeatureType, 1)
             } else if self.pairRank == 1{
@@ -1151,10 +1167,22 @@ class CNDatasetHandAnalyst{
     }
     func eval_isPoint(singlefeatures:[CNSingleFeature]) -> (Int, String, Int) {
         let point = (singlefeatures[0].point + singlefeatures[1].point) % 10
+        let maxRank = max(singlefeatures[0].rank, singlefeatures[1].rank)
         
         var singlefeatureType: String = String(point) + "点"
         
-        return ((point + 1) << 4 | singlefeatures[0].rank, singlefeatureType, 0)
+        if self.samePointComparision == 0 {
+            return ((point + 1) << 5 | maxRank, singlefeatureType, 0)
+        } else if self.samePointComparision == 1 {
+            return ((point + 1) << 5 | maxRank, singlefeatureType, 0)
+        } else if self.samePointComparision == 2 {
+            if point == 0 {
+                return (1, singlefeatureType, 0)
+            } else {
+                return ((point + 1) << 5 | maxRank, singlefeatureType, 0)
+            }
+        }
+        return (1, singlefeatureType, 0)
     }
     
     class CNSingleFeature{
@@ -1448,6 +1476,46 @@ class CNDatasetHandAnalyst{
                 }
                 //小王
                 if singlefeature.rank == 14{
+                    self.rank = 1
+                }
+            } else if singlefeatureRankRule == 6 {
+                if singlefeature.rank == 12  && self.color == 1{
+                    self.rank = 7
+                }
+                else if singlefeature.rank == 2 && self.color == 1{
+                    self.rank = 6
+                }
+                else if singlefeature.rank == 8 && self.color == 1 {
+                    self.rank = 5
+                }
+                else if singlefeature.rank == 4 && self.color == 1 {
+                    self.rank = 4
+                }
+                else if ((singlefeature.rank == 6 || singlefeature.rank == 10) && self.color == 1) || (singlefeature.rank == 4 && self.color == 0) {
+                    self.rank = 3
+                } else if ((singlefeature.rank == 11 || singlefeature.rank == 7) && self.color == 1) || ((singlefeature.rank == 10 || singlefeature.rank == 6) && self.color == 0) {
+                    self.rank = 2
+                } else {
+                    self.rank = 1
+                }
+            } else if singlefeatureRankRule == 7 {
+                if singlefeature.rank == 12  && self.color == 1{
+                    self.rank = 7
+                }
+                else if singlefeature.rank == 2 && self.color == 1{
+                    self.rank = 6
+                }
+                else if singlefeature.rank == 8 && self.color == 1 {
+                    self.rank = 5
+                }
+                else if singlefeature.rank == 4 && self.color == 1 {
+                    self.rank = 4
+                }
+                else if (singlefeature.rank == 6 || singlefeature.rank == 10 || singlefeature.rank == 4) && self.color == 0 {
+                    self.rank = 3
+                } else if ((singlefeature.rank == 11 || singlefeature.rank == 7 || singlefeature.rank == 10 || singlefeature.rank == 6) && self.color == 1) || (singlefeature.rank == 11 && self.color == 0) {
+                    self.rank = 2
+                } else {
                     self.rank = 1
                 }
             }
