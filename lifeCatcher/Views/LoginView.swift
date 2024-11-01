@@ -231,7 +231,7 @@ struct LoginView: View {
     func loginUser() {
         isLoading = true
         
-        let url = URL(string: "http://1.94.17.30:8080/login")!
+        let url = URL(string: "http://10.0.0.26:8080/login")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         let timestamp = String(Date().timeIntervalSince1970)
@@ -372,7 +372,7 @@ struct LoginView: View {
     func registerUser() {
         isLoading = true
         
-        guard let url = URL(string: "http://1.94.17.30:8080/register") else { return }
+        guard let url = URL(string: "http://10.0.0.26:8080/register") else { return }
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"

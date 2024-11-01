@@ -1968,7 +1968,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         return returnRange
     }
     
-    static func cutSingleFeatures(inputSingleFeatures: [Int], inputCutStruct: cutStruct, colorTransform: Int) -> [Int]{
+    static func cutSingleFeatures(inputSingleFeatures: [Int], inputCutStruct: cutStruct, colorTransform: Int, rcNum: Int) -> [Int]{
         
         let pos = searchSingleFeaturePos(inputSingleFeatures: inputSingleFeatures, singlefeatureIndex: inputCutStruct.cutcardIndex)
         var returnSingleFeatures : [Int] = inputSingleFeatures
@@ -2013,11 +2013,22 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     print("look color error")
                 }
                 break
+            //看手牌
+            case 4:
+                let priorNum = rcNum - colorTransform
+                if pos > priorNum {
+                    returnSingleFeatures = Array(inputSingleFeatures[(pos - priorNum)...]) + Array(inputSingleFeatures[0...(pos - priorNum)])
+                } else if pos == priorNum {
+                    returnSingleFeatures = inputSingleFeatures
+                } else if pos < priorNum {
+                    let length: Int = inputSingleFeatures.count
+                    returnSingleFeatures = Array(inputSingleFeatures[(length - pos + priorNum)...]) + Array(inputSingleFeatures[0...(length - pos + priorNum - 1)])
+                }
+                break
             default:
                 break
             }
         }
-        
         return returnSingleFeatures
     }
     
@@ -2121,7 +2132,13 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             if cutStructList.count > 0  && reportRule.cutSingleFeatureProcession != 6{
                 //如果看底看顶先操作
                 if cutStructList[cutStructList.count - 1].cutMode == 0 || cutStructList[cutStructList.count - 1].cutMode == 1 {
-                    inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStructList[cutStructList.count - 1], colorTransform: -1)
+                    inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStructList[cutStructList.count - 1], colorTransform: -1, rcNum: rcNum)
+                //看手牌提前操作
+                } else if cutStructList[cutStructList.count - 1].cutMode == 4 {
+                    //获取位置
+                    let pos = targetPos
+                    print("设置的位置 \(pos)")
+                    inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStructList[cutStructList.count - 1], colorTransform: pos, rcNum: rcNum)
                 }
             }
             print("提前操作之后的牌组 \(inputSingleFeatures) --\(inputSingleFeatures.count)")
@@ -2252,9 +2269,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 
                 for cutStruct in cutStructList{
                     if cutStruct.cutMode == 2 {
-                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 0)
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 0, rcNum: rcNum)
                     } else {
-                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1)
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1, rcNum: rcNum)
                     }
                 }
             //看色留色
@@ -2283,9 +2300,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 print("cutStructList \(cutStructList[0].cutcardIndex)  inputsinglefeatures \(inputSingleFeatures)")
                 for cutStruct in cutStructList{
                     if cutStruct.cutMode == 2 {
-                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 0)
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 0, rcNum: rcNum)
                     } else {
-                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1)
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1, rcNum: rcNum)
                     }
                 }
                 
@@ -2316,13 +2333,13 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 for cutStruct in cutStructList{
                     if cutStruct.cutMode == 2 {
                         if cutNumRangeSetting[1] > 1{
-                            inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 1)
+                            inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 1, rcNum: rcNum)
                             
                         } else {
-                            inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 1)
+                            inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 1, rcNum: rcNum)
                         }
                     } else {
-                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1)
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1, rcNum: rcNum)
                     }
                 }
                 
@@ -2349,9 +2366,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 
                 for cutStruct in cutStructList{
                     if cutStruct.cutMode == 2 {
-                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 2)
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 2, rcNum: rcNum)
                     } else {
-                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1)
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1, rcNum: rcNum)
                     }
                 }
                 
@@ -2377,10 +2394,10 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 
                 for cutStruct in cutStructList{
                     if cutStruct.cutMode == 2 {
-                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 3)
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 3, rcNum: rcNum)
                     } else {
                         inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: 
-                                                                    cutStruct, colorTransform: -1)
+                                                                    cutStruct, colorTransform: -1, rcNum: rcNum)
                     }
                 }
             //飞2张看色留色再看底
@@ -2410,9 +2427,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 print("操作 \(cutStructList[0].cutcardIndex) \(cutStructList[1].cutcardIndex)")
                 for cutStruct in cutStructList{
                     if cutStruct.cutMode == 2 {
-                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 0)
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 0, rcNum: rcNum)
                     } else {
-                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1)
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1, rcNum: rcNum)
                     }
                 }
                 
@@ -2431,9 +2448,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 
                 for cutStruct in cutStructList{
                     if cutStruct.cutMode == 2 {
-                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 2)
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: 2, rcNum: rcNum)
                     } else {
-                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1)
+                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1, rcNum: rcNum)
                     }
                 }
                 
@@ -2441,7 +2458,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             //普通切牌
             else if cutStructList.count > 0 {
                 for cutStruct in cutStructList{
-                        inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1)
+                    inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1, rcNum: rcNum)
                     
                 }
             }
