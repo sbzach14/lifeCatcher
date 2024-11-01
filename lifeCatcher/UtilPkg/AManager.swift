@@ -11,7 +11,7 @@ class AuthManager {
     static var isActive: Bool = false
     static var activeDate: String = ""
     
-    static var version: String = "2.0.2"
+    static var version: String = "2.0.3"
     
     static let passCodeKey = SymmetricKey(data: Data("CARNEGIEMELLONUNIVERSITY".utf8))
 

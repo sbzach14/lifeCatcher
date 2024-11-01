@@ -197,6 +197,11 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     var isProcessNeedToCut: Bool = false
     var reloadingTime: Double = 0
     
+    var continueCutTimeCounter: Float = 10
+    var continueMaxCutTime: Float = 10
+    
+    var configType: Int = 0
+    
 
     override init(){
         
@@ -239,8 +244,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
     }
     
-    func initialize(saveRuleIndex: Int) {
-        
+    func initialize(saveRuleIndex: Int, configType: Int) {
+        self.configType = configType
         setupAVCapture()
         configureAudioSession()
         initializeTransform()
@@ -283,6 +288,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
     
     private func initShuffle(){
+        self.continueCutTimeCounter = self.continueMaxCutTime
         self.currentRoundID = 1
         singlefeatureArray = []
         cutStructArray = []
@@ -653,6 +659,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             timestamp = currentTimestamp
             // 重置计数器
             frameCount = 0
+            
+            if self.continueCutTimeCounter < self.continueMaxCutTime{
+                self.continueCutTimeCounter += 1
+            }
         }
         
         if self.state != "idle"{
@@ -912,7 +922,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     
                     if self.usedSingleFeatures.contains(detectSingleFeature)
                         && self.recgReport
-                        && self.cutMode[self.shuffleOrRiffle] != 3
+                        && (self.cutMode[self.shuffleOrRiffle] != 3 || self.continueCutTimeCounter >= self.continueMaxCutTime)
                         && self.specialCard[self.shuffleOrRiffle] == 0{
 //                        self.stateCounter = 100
 //                        self.state = "waitingEnd"
@@ -962,6 +972,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 0))
                             isCutDone = true
                             self.cutShowArray.append(detectSingleFeature)
+                            
+                            self.continueCutTimeCounter = 0
                         }
                         
                         if !isCutDone{
@@ -2908,7 +2920,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
         }
         
-        computeWinnerRC(isReset: true)
+        computeWinnerRC(isReset: true, isTest: true)
     }
     
     func getWatchColorNumber() -> Int{
@@ -2935,11 +2947,16 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
     }
     
-    func computeWinnerRC(isReset: Bool) {
+    func computeWinnerRC(isReset: Bool, isTest: Bool = false) {
         if singlefeatureArray.count >= minSingleFeatureNum {
             
+            var m_consecutiveReport = consecutiveReport;
+            if !isTest && self.recgReport{
+                m_consecutiveReport = 1
+            }
+            
             print("计算后的singlefeaturearray \(self.singlefeatureArray)")
-            multipleDatasetRCInfos = ClassifierSettingArgs.selectDataset(DatasetIndex: ruleIndex, inputSingleFeatures: singlefeatureArray, rcNum: (ClassifierSettingArgs.targetSetting[ruleIndex]?.rcNum[rcNum])!, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs[self.shuffleOrRiffle], cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: consecutiveReport, minSingleFeatureNum: minSingleFeatureNum, cutStructList: cutStructArray, currentRoundID: self.currentRoundID)
+            multipleDatasetRCInfos = ClassifierSettingArgs.selectDataset(DatasetIndex: ruleIndex, inputSingleFeatures: singlefeatureArray, rcNum: (ClassifierSettingArgs.targetSetting[ruleIndex]?.rcNum[rcNum])!, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs[self.shuffleOrRiffle], cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: m_consecutiveReport, minSingleFeatureNum: minSingleFeatureNum, cutStructList: cutStructArray, currentRoundID: self.currentRoundID)
             
             self.singlefeatureArray = multipleDatasetRCInfos.returnSingleFeatureArray
             computeSingleFeatures(isReset: isReset)
@@ -2986,7 +3003,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
     
     func computeNextRound(){
-        if (self.leftSingleFeatures.count > 0){
+        if ReportManager.baodanzhang.contains(self.calModeArgs[self.shuffleOrRiffle][0]) && self.singlefeatureArray.count > 0{
+            print("计算报单张的下一轮")
+            
+            //TODO
+        }
+        else if (self.leftSingleFeatures.count > 0){
             print("开始计算下一轮")
             self.singlefeatureArray = self.leftSingleFeatures
             self.currentRoundID += 1
@@ -3013,7 +3035,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 }
                 
                 currentAudioPlayer = try AVAudioPlayer(contentsOf: url)
-                currentAudioPlayer?.volume = 0.75
+                currentAudioPlayer?.volume = 0.5
                 currentAudioPlayer?.delegate = self
                 currentAudioPlayer?.prepareToPlay()
                 currentAudioPlayer?.play()
@@ -3289,19 +3311,57 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             showSingleTimeText(showText: String(selectedRule.rcNum[self.rcNum]))
         }
         else if eventType == 4{
-            self.shuffleMode[0] += 1
-            if self.shuffleMode[0] >= generalRuleSetting.allShuffleMode.count{
-                self.shuffleMode[0] = 0
+            if configType == 0{
+                self.shuffleMode[0] += 1
+                if self.shuffleMode[0] >= generalRuleSetting.allShuffleMode.count{
+                    self.shuffleMode[0] = 0
+                }
+                speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode[0]]!)
             }
-            speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode[0]]!)
+            else{
+                if self.shuffleMode[0] == 1{
+                    self.shuffleMode[0] = 0
+                    self.shuffleMode[1] = 1
+                    speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
+                }
+                else if self.shuffleMode[1] == 1{
+                    self.shuffleMode[0] = 0
+                    self.shuffleMode[1] = 2
+                    speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
+                }
+                else if self.shuffleMode[1] == 2{
+                    self.shuffleMode[0] = 1
+                    self.shuffleMode[1] = 0
+                    speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode[0]]!)
+                }
+            }
             saveData()
         }
         else if eventType == 5{
-            self.shuffleMode[1] += 1
-            if self.shuffleMode[1] >= generalRuleSetting.allRiffleMode.count{
-                self.shuffleMode[1] = 0
+            if configType == 0{
+                self.shuffleMode[1] += 1
+                if self.shuffleMode[1] >= generalRuleSetting.allRiffleMode.count{
+                    self.shuffleMode[1] = 0
+                }
+                speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
             }
-            speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
+            else{
+                if self.shuffleMode[0] == 1{
+                    self.shuffleMode[0] = 0
+                    self.shuffleMode[1] = 1
+                    speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
+                }
+                else if self.shuffleMode[1] == 1{
+                    self.shuffleMode[0] = 0
+                    self.shuffleMode[1] = 2
+                    speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
+                }
+                else if self.shuffleMode[1] == 2{
+                    self.shuffleMode[0] = 1
+                    self.shuffleMode[1] = 0
+                    speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode[0]]!)
+                }
+            }
             saveData()
         }
         else if eventType == 6{
@@ -3394,19 +3454,57 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             showSingleTimeText(showText: String(selectedRule.rcNum[self.rcNum]))
         }
         else if eventType == 4{
-            self.shuffleMode[0] -= 1
-            if self.shuffleMode[0] < 0{
-                self.shuffleMode[0] = generalRuleSetting.allShuffleMode.count - 1
+            if configType == 0{
+                self.shuffleMode[0] -= 1
+                if self.shuffleMode[0] < 0{
+                    self.shuffleMode[0] = generalRuleSetting.allShuffleMode.count - 1
+                }
+                speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode[0]]!)
             }
-            speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode[0]]!)
+            else{
+                if self.shuffleMode[0] == 1{
+                    self.shuffleMode[0] = 0
+                    self.shuffleMode[1] = 2
+                    speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
+                }
+                else if self.shuffleMode[1] == 1{
+                    self.shuffleMode[0] = 1
+                    self.shuffleMode[1] = 0
+                    speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
+                }
+                else if self.shuffleMode[1] == 2{
+                    self.shuffleMode[0] = 0
+                    self.shuffleMode[1] = 1
+                    speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode[0]]!)
+                }
+            }
             saveData()
         }
         else if eventType == 5{
-            self.shuffleMode[1] -= 1
-            if self.shuffleMode[1] < 0{
-                self.shuffleMode[1] = generalRuleSetting.allRiffleMode.count - 1
+            if configType == 0{
+                self.shuffleMode[1] -= 1
+                if self.shuffleMode[1] < 0{
+                    self.shuffleMode[1] = generalRuleSetting.allRiffleMode.count - 1
+                }
+                speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
             }
-            speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
+            else{
+                if self.shuffleMode[0] == 1{
+                    self.shuffleMode[0] = 0
+                    self.shuffleMode[1] = 2
+                    speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
+                }
+                else if self.shuffleMode[1] == 1{
+                    self.shuffleMode[0] = 1
+                    self.shuffleMode[1] = 0
+                    speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
+                }
+                else if self.shuffleMode[1] == 2{
+                    self.shuffleMode[0] = 0
+                    self.shuffleMode[1] = 1
+                    speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode[0]]!)
+                }
+            }
             saveData()
         }
         else if eventType == 6{
@@ -3487,6 +3585,16 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             self.laplacianDic[1][key] = 0
         }
         
+        if self.shuffleMode[0] != 0 && ReportManager.baodanzhang.contains(self.calModeArgs[0][0]) && self.recgReport{
+            self.recgReport = false
+            self.cutMode[0] = 3
+        }
+        if self.shuffleMode[1] != 0 && ReportManager.baodanzhang.contains(self.calModeArgs[1][0]) && self.recgReport{
+            self.recgReport = false
+            self.cutMode[1] = 3
+        }
+        
+        saveData()
     }
     
     private func DatasetGetMinSingleFeatureNum()-> Int{

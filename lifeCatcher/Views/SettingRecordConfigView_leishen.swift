@@ -1,96 +1,6 @@
 import SwiftUI
 
-class generalRuleSetting{
-    static let allDatasetType: [Int: String] = [
-        0:"德州",
-        1:"牛牛",
-        2:"炸金花",
-        3:"小九",
-        4:"三公",
-        5:"二八杠",
-        6:"九点半",
-        7:"宝子",
-        8:"佳佳宝",
-        9:"牌九",
-        10:"九点",
-        11:"4张",
-        12:"2张",
-        13:"3张",
-        14:"10点半",
-        15:"比鸡",
-        16:"十三水",
-        17:"梭哈",
-    ]
-    static let allShuffleMode: [Int:String] = [
-        0:"不洗牌",
-        1:"洗牌"
-    ]
-    
-    static let allRiffleMode: [Int: String] = [
-        0:"不拨牌",
-        1:"拨到顶",
-        2:"拨中间",
-    ]
-    
-    static let allShuffleRiffleMode: [Int: String] = [
-        0:"洗牌",
-        1:"拨到顶",
-        2:"拨中间",
-//        3:"洗牌+拨到顶",
-//        4:"洗牌+拨中间",
-    ]
-    
-    static let allCutMode: [Int:String] = [
-        0:"无",
-        1:"看底",
-        2:"看顶",
-        3:"连续看底"
-    ]
-    
-    static let allSpecialCard: [Int:String] = [
-        0:"无",
-        1:"看手牌",
-        2:"看色牌",
-    ]
-    
-    static let allDealType: [Int: String] = [
-        0:"默认每轮发一张",
-        1:"自定义"
-    ]
-    
-    static let allCutNumSetting:[Int:String] = [
-        0:"J=11,Q=12,K=13,王=6",
-        1:"J=1,Q=2,K=3,王=6",
-        2:"J=1,Q=2,K=1,王=1",
-        3:"J=4,Q=3,K=2,王=1",
-        4:"黑=1,红=2,梅=,方=4",
-        5:"黑=4,红=3,梅=2,方=1"
-    ]
-    
-    static let allReportSetting:[Int:String] = [
-        0:"报最大",
-        1:"报最小",
-        2:"报切几张目标位置最大",
-        3:"报切几张目标位置最小",
-        4:"报目标生死门",
-        5:"啊啊啊阿啊阿啊阿啊阿啊阿啊阿啊阿啊阿啊阿啊阿啊阿啊阿啊阿啊阿啊阿啊阿啊阿啊"
-    ]
-    
-    static let maxConsecutiveReport: Int = 5
-    static let maxReportNumber: Int = 10
-    
-    static let allVoiceReport:[Int:String] = [
-        0:"无",
-        1:"有"
-    ]
-    
-    static let allResultReportType:[Int:String] = [
-        0:"无",
-        1:"识别任意牌报下一轮"
-    ]
-}
-
-struct SettingRecordConfigView: View{
+struct SettingRecordConfigView_leishen: View{
     
     var selectedSaveIndex: Int
     @State private var initdone : Bool = false
@@ -132,6 +42,8 @@ struct SettingRecordConfigView: View{
     @State private var currentNum: Int = 2
     @State private var minSingleFeatureNum:Int = 0
     @State private var recgReport: Bool = false
+    
+    @State private var shuffleRiffleMode: Int = 0
     
     private func SetUpAll(){
         if (self.selectedSaveIndex == -1 && _selectedSaveIndex == -1) && self.editType == 0{
@@ -191,6 +103,31 @@ struct SettingRecordConfigView: View{
             self.currentNum = rcNumList[self.rcNum]
             self.singlefeatureToUse = rules.singlefeatureToUse
             self.specialCard = rules.specialCard
+        }
+        
+        //leishen
+        if self.shuffleMode[0] == 1{
+            self.shuffleRiffleMode = 0
+        }
+        else if self.shuffleMode[1] == 1{
+            self.shuffleRiffleMode = 1
+        }
+        else if self.shuffleMode[1] == 2{
+            self.shuffleRiffleMode = 2
+        }
+        else{
+            self.shuffleRiffleMode = 0
+        }
+        
+        if self.shuffleMode[0] != 0{
+            self.cutMode[1] = self.cutMode[0]
+            self.specialCard[1] = self.specialCard[0]
+            self.reportSetting[1] = self.reportSetting[0]
+        }
+        else{
+            self.cutMode[0] = self.cutMode[1]
+            self.specialCard[0] = self.specialCard[1]
+            self.reportSetting[0] = self.reportSetting[1]
         }
         
         self.editType = 1
@@ -272,304 +209,236 @@ struct SettingRecordConfigView: View{
                             .frame(height: 100)
                         }.bluebubbleBackground().padding(3)
                         
-                        
-                        
-                        LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 5) {
+                        HStack{
+                            Text("人数设置")
+                                .frame(width: 100, alignment: .leading)
+                                .foregroundColor(.white)
+                                .font(.system(size: 20))
+                                .bold()
+                                .padding(.leading, 10)
                             
-                            VStack(spacing: 5){
-                                Text("洗牌设置")
-                                    .frame(height: 30, alignment: .leading)
-                                    .foregroundColor(.white)
-                                    .bold()
-                                
-                                Divider().colorInvert()
-                                
-                                HStack{
-                                    Text("手法")
-                                        .frame(width: 40, alignment: .leading)
-                                        .foregroundColor(.white)
-                                    
-                                    Picker("shuffleMode", selection: $shuffleMode[0]) {
-                                        ForEach(0...generalRuleSetting.allShuffleMode.count - 1, id: \.self){
-                                            index in Text(generalRuleSetting.allShuffleMode[index]!).tag(index)
-                                        }
-                                    }
-                                    .pickerStyle(MenuPickerStyle())
-                                    .frame(maxWidth: .infinity, alignment: .trailing)
-                                    .accentColor(.blue)
-                                }.frame(height: 25)
-                                
-                                HStack{
-                                    Text("切牌")
-                                        .frame(width: 40, alignment: .leading)
-                                        .foregroundColor(.white)
-                                    
-                                    //看手牌不能选切牌
-                                    if self.specialCard[0] == 1{
-                                        Spacer()
-                                        Text("无")
-                                            .padding(.trailing, 10)
-                                            .foregroundColor(.white)
-                                    }
-                                    //看色牌不能选连续看底
-                                    else if self.specialCard[0] == 2{
-                                        Picker("cutMode", selection: $cutMode[0]) {
-                                            ForEach(0...generalRuleSetting.allCutMode.count - 2, id: \.self){
-                                                index in Text(generalRuleSetting.allCutMode[index]!).tag(index)
-                                            }
-                                        }
-                                        .pickerStyle(MenuPickerStyle())
-                                        .frame(maxWidth: .infinity, alignment: .trailing)
-                                        .accentColor(.blue)
-                                    }
-                                    else{
-                                        Picker("cutMode", selection: $cutMode[0]) {
-                                            ForEach(0...generalRuleSetting.allCutMode.count - 1, id: \.self){
-                                                index in Text(generalRuleSetting.allCutMode[index]!).tag(index)
-                                            }
-                                        }
-                                        .pickerStyle(MenuPickerStyle())
-                                        .frame(maxWidth: .infinity, alignment: .trailing)
-                                        .accentColor(.blue)
-                                    }
-                                }.frame(height: 25)
-                                
-                            }.bluebubbleBackground().frame(width: 180)
-                            
-                            VStack(spacing: 5){
-                                Text("拨牌设置")
-                                    .frame(height: 30, alignment: .leading)
-                                    .foregroundColor(.white)
-                                    .bold()
-                                
-                                
-                                Divider().colorInvert()
-                                
-                                HStack{
-                                    Text("手法")
-                                        .frame(width: 40, alignment: .leading)
-                                        .foregroundColor(.white)
-                                    Picker("riffleMode", selection: $shuffleMode[1]) {
-                                        ForEach(0...generalRuleSetting.allRiffleMode.count - 1, id: \.self){
-                                            index in Text(generalRuleSetting.allRiffleMode[index]!).tag(index)
-                                        }
-                                    }
-                                    .pickerStyle(MenuPickerStyle())
-                                    .frame(maxWidth: .infinity, alignment: .trailing)
-                                    .accentColor(.blue)
-                                }.frame(height: 25)
-                                
-                                HStack{
-                                    Text("切牌")
-                                        .frame(width: 40, alignment: .leading)
-                                        .foregroundColor(.white)
-                                    
-                                    if self.specialCard[1] == 1{
-                                        Spacer()
-                                        Text("无")
-                                            .padding(.trailing, 10)
-                                            .foregroundColor(.white)
-                                    }
-                                    else if self.specialCard[1] == 2{
-                                        Picker("cutMode", selection: $cutMode[1]) {
-                                            ForEach(0...generalRuleSetting.allCutMode.count - 2, id: \.self){
-                                                index in Text(generalRuleSetting.allCutMode[index]!).tag(index)
-                                            }
-                                        }
-                                        .pickerStyle(MenuPickerStyle())
-                                        .accentColor(.blue)
-                                        .frame(maxWidth: .infinity, alignment: .trailing)
-                                    }
-                                    else{
-                                        Picker("cutMode", selection: $cutMode[1]) {
-                                            ForEach(0...generalRuleSetting.allCutMode.count - 1, id: \.self){
-                                                index in Text(generalRuleSetting.allCutMode[index]!).tag(index)
-                                            }
-                                        }
-                                        .pickerStyle(MenuPickerStyle())
-                                        .accentColor(.blue)
-                                        .frame(maxWidth: .infinity, alignment: .trailing)
-                                    }
-                                }.frame(height: 25)
-                                
-                            }.bluebubbleBackground().frame(width: 180)
-                            
-                            
-                            VStack(spacing:5){
-                                Text("洗牌报法")
-                                    .frame(height: 25)
-                                    .foregroundColor(.white)
-                                    .bold()
-                                
-                                Divider().colorInvert()
-                                
-                                NavigationLink(destination:  ReportSettingView(reportSetting: $reportSetting, target : 0)){
-                                    let text = ReportManager.allReportName[reportSetting[0]]!
-                                    Text(text).multilineTextAlignment(.leading)
+                            Picker("rcNum", selection: $rcNum) {
+                                ForEach(0...(self.rcNumList.count) - 1, id: \.self){
+                                    index in Text(String(self.rcNumList[index])).tag(index)
                                 }
-                                .frame(height: 75)
-                                
-                            }.bluebubbleBackground().frame(width: 180)
-                            
-                            VStack(spacing:5){
-                                Text("拨牌报法")
-                                    .frame(height: 25)
-                                    .foregroundColor(.white)
-                                    .bold()
-                                
-                                Divider().colorInvert()
-                                
-                                NavigationLink(destination:  ReportSettingView(reportSetting: $reportSetting, target : 1)){
-                                        let text = ReportManager.allReportName[reportSetting[1]]!
-                                        Text(text).multilineTextAlignment(.leading)
-                                }.frame(height: 75)
-                                
-                            }.bluebubbleBackground().frame(width: 180)
-                            
-                            VStack(spacing: 0){
-                                Text("牌堆设置")
-                                    .frame(height: 25)
-                                    .foregroundColor(.white)
-                                    .bold()
-                                
-                                Divider().colorInvert()
-                                
-                                NavigationLink(destination: UsedFeatureSelectView(singlefeatureToUse: $singlefeatureToUse)){
-                                    Text("使用\(singlefeatureToUse.count)张牌")
-                                        .frame(height: 25)
-                                }
-                                
-                                NavigationLink(destination: TurnSettingView(dealNum: $dealNum, coloringType: $coloringType, dealType: $dealType, diyDealNum: $diyDealNum, diyDealStatus: $diyDealStatus)){
-                                    Text("\(generalRuleSetting.allDealType[dealNum]!)\n\(DealClass.dealDic[dealType]!)  \(DealClass.coloringDic[coloringType]!)")
-                                }.frame(height:60)
-                                
-                            }.bluebubbleBackground().frame(width: 180)
-                            
-                            VStack(spacing: 5){
-                                Text("玩家设置")
-                                    .frame(height: 25)
-                                    .foregroundColor(.white)
-                                    .bold()
-                                
-                                Divider().colorInvert()
-                                
-                                HStack{
-                                    Text("人数")
-                                        .frame(width: 40, height: 25, alignment: .leading)
-                                        .foregroundColor(.white)
-                                    Picker("rcNum", selection: $rcNum) {
-                                        ForEach(0...(self.rcNumList.count) - 1, id: \.self){
-                                            index in Text(String(self.rcNumList[index])).tag(index)
-                                        }
-                                    }
-                                    .pickerStyle(MenuPickerStyle())
-                                    .frame(maxWidth: .infinity, alignment: .trailing)
-                                    .accentColor(.blue).onChange(of: rcNum) { _ in
-                                        handleRCNumChange(rcNumIndex: rcNum)
-                                    }
-                                }
-                                
-                                HStack{
-                                    Text("位置")
-                                        .frame(width: 40, height: 25, alignment: .leading)
-                                        .foregroundColor(.white)
-                                    
-                                    Picker("positionSetting", selection: $positionSetting) {
-                                        ForEach(0...self.currentNum - 1, id: \.self){
-                                            index in Text(String(index + 1)).tag(index)
-                                        }
-                                    }
-                                    .pickerStyle(MenuPickerStyle())
-                                    .frame(maxWidth: .infinity, alignment: .trailing)
-                                    .accentColor(.blue)
-                                }
-                                
-                            }.bluebubbleBackground().frame(width: 180)
-                             
-                            
-                            VStack(spacing: 5){
-                                
-                                Text("打色设置")
-                                    .frame(height: 25)
-                                    .foregroundColor(.white)
-                                    .bold()
-                                
-                                Divider().colorInvert()
-                                
-                                if coloringType == 2{
-                                    HStack{
-                                        Text("无")
-                                            .frame(width: 80, height: 80)
-                                            .foregroundColor(.white)
-                                    }
-                                }
-                                
-                                else{
-                                    HStack{
-                                        Text("范围")
-                                            .frame(width: 35, alignment: .leading)
-                                            .foregroundColor(.white)
-                                        //打色范围
-                                        NavigationLink(destination:  NumRangeSettingView(cutNumRangeSetting: $cutNumRangeSetting)){
-                                            Text("X = \(cutNumRangeSetting[0])   Y = \(cutNumRangeSetting[1])")
-                                        }.frame(maxWidth: .infinity)
-                                    }.frame(height: 25)
-                                    
-                                    HStack{
-                                        Text("色点")
-                                            .frame(width: 35, alignment: .leading)
-                                            .foregroundColor(.white)
-                                        //色点设置
-                                        Picker("cutNumSetting", selection: $cutNumSetting) {
-                                            ForEach(0...generalRuleSetting.allCutNumSetting.count - 1, id: \.self){
-                                                index in Text(generalRuleSetting.allCutNumSetting[index]!).tag(index)
-                                            }
-                                        }
-                                        .pickerStyle(MenuPickerStyle())
-                                        .multilineTextAlignment(.leading)
-                                        .frame(maxWidth: .infinity, alignment: .trailing)
-                                    }
-                                    .frame(height: 50)
-                                }
-                                
-                                
-                            }.bluebubbleBackground().frame(width: 180)
-                            
-                            VStack(spacing: 5){
-                                Text("播报设置")
-                                    .frame(height: 25)
-                                    .foregroundColor(.white)
-                                    .bold()
-                                
-                                Divider().colorInvert()
-                                
-                                HStack{
-                                    Text("连报轮数")
-                                        .frame(width: 80, alignment: .leading)
-                                        .foregroundColor(.white)
-                                    Picker("consecutiveReport", selection: $consecutiveReport) {
-                                        ForEach(1...generalRuleSetting.maxConsecutiveReport, id: \.self){
-                                            index in Text(String(index)).tag(index)
-                                        }
-                                    }
-                                    .pickerStyle(MenuPickerStyle())
-                                    .frame(maxWidth: .infinity, alignment: .trailing)
-                                }.frame(height: 25)
-                                
-                                HStack{
-                                    Text("识别任意牌报下轮")
-                                        .frame(width: 80, alignment: .leading)
-                                        .foregroundColor(.white)
-                                    Toggle("", isOn: $recgReport).toggleStyle(CustomToggleStyle())
-                                        .frame(maxWidth: .infinity, alignment: .trailing)
-                                        .accentColor(.white)
-                                }
-                                .frame(height: 50)
                             }
-                            .bluebubbleBackground().frame(width: 180)
+                            .pickerStyle(MenuPickerStyle())
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .accentColor(.blue).onChange(of: rcNum) { _ in
+                                handleRCNumChange(rcNumIndex: rcNum)
+                            }
                         }
+                        .frame(height: 40)
+                        .bluebubbleBackground()
+                        
+                        HStack{
+                            Text("手法设置")
+                                .frame(width: 100, alignment: .leading)
+                                .foregroundColor(.white)
+                                .font(.system(size: 20))
+                                .bold()
+                                .padding(.leading, 10)
+                            
+                            Picker("shuffleMode", selection: $shuffleRiffleMode) {
+                                ForEach(0...generalRuleSetting.allShuffleRiffleMode.count - 1, id: \.self){
+                                    index in Text(generalRuleSetting.allShuffleRiffleMode[index]!).tag(index)
+                                }
+                            }
+                            .pickerStyle(MenuPickerStyle())
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .accentColor(.blue)
+                        }.frame(height: 40)
+                        .bluebubbleBackground()
+                        
+                        HStack{
+                            Text("发牌定制")
+                                .frame(width: 100, alignment: .leading)
+                                .foregroundColor(.white)
+                                .font(.system(size: 20))
+                                .bold()
+                                .padding(.leading, 10)
+                            
+                            NavigationLink(destination: TurnSettingView(dealNum: $dealNum, coloringType: $coloringType, dealType: $dealType, diyDealNum: $diyDealNum, diyDealStatus: $diyDealStatus)){
+                                Text("\(DealClass.dealDic[dealType]!) \(generalRuleSetting.allDealType[dealNum]!)  \(DealClass.coloringDic[coloringType]!)")
+                            }.frame(maxWidth: .infinity, alignment: .trailing)
+                                .padding(.trailing, 10)
+                            
+                        }.frame(height: 40)
+                        .bluebubbleBackground()
+                        
+                        HStack{
+                            Text("用牌设置")
+                                .frame(width: 100, alignment: .leading)
+                                .foregroundColor(.white)
+                                .font(.system(size: 20))
+                                .bold()
+                                .padding(.leading, 10)
+                            
+                            NavigationLink(destination: UsedFeatureSelectView(singlefeatureToUse: $singlefeatureToUse)){
+                                Text("使用\(singlefeatureToUse.count)张牌")
+                            }
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .padding(.trailing, 10)
+                            
+                            
+                        }.frame(height: 40)
+                        .bluebubbleBackground()
+                            
+                        if coloringType != 2{
+                            HStack{
+                                Text("色点设置")
+                                    .frame(width: 100, alignment: .leading)
+                                    .foregroundColor(.white)
+                                    .font(.system(size: 20))
+                                    .bold()
+                                    .padding(.leading, 10)
+                                
+                                //色点设置
+                                Picker("cutNumSetting", selection: $cutNumSetting) {
+                                    ForEach(0...generalRuleSetting.allCutNumSetting.count - 1, id: \.self){
+                                        index in Text(generalRuleSetting.allCutNumSetting[index]!).tag(index)
+                                    }
+                                }
+                                .pickerStyle(MenuPickerStyle())
+                                .multilineTextAlignment(.leading)
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                            }
+                            .frame(height: 40)
+                            .bluebubbleBackground()
+                        }
+                        
+                        HStack{
+                            Text("报法设置")
+                                .frame(width: 100, alignment: .leading)
+                                .foregroundColor(.white)
+                                .font(.system(size: 20))
+                                .bold()
+                                .padding(.leading, 10)
+                            
+                            NavigationLink(destination:  ReportSettingView(reportSetting: $reportSetting, target: 0)){
+                                let text = ReportManager.allReportName[reportSetting[0]]!
+                                Text(text).multilineTextAlignment(.leading)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .padding(.trailing, 10)
+                            
+                        }.frame(height: 40)
+                        .bluebubbleBackground()
+                        
+                        
+                        if coloringType != 2{
+                            HStack{
+                                Text("打色范围")
+                                    .frame(width: 100, alignment: .leading)
+                                    .foregroundColor(.white)
+                                    .font(.system(size: 20))
+                                    .bold()
+                                    .padding(.leading, 10)
+                                
+                                //打色范围
+                                NavigationLink(destination:  NumRangeSettingView(cutNumRangeSetting: $cutNumRangeSetting)){
+                                    Text("X = \(cutNumRangeSetting[0])   Y = \(cutNumRangeSetting[1])")
+                                }.frame(maxWidth: .infinity, alignment: .trailing)
+                                    .padding(.trailing, 10)
+                                
+                            }.frame(height: 40)
+                                .bluebubbleBackground()
+                        }
+                        
+                        HStack{
+                            Text("位置设置")
+                                .frame(width: 100, alignment: .leading)
+                                .foregroundColor(.white)
+                                .font(.system(size: 20))
+                                .bold()
+                                .padding(.leading, 10)
+                            
+                            Picker("positionSetting", selection: $positionSetting) {
+                                ForEach(0...self.currentNum - 1, id: \.self){
+                                    index in Text(String(index + 1)).tag(index)
+                                }
+                            }
+                            .pickerStyle(MenuPickerStyle())
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .accentColor(.blue)
+                        }
+                        .frame(height: 40)
+                        .bluebubbleBackground()
+                        
+                        HStack{
+                            Text("连报轮数")
+                                .frame(width: 100, alignment: .leading)
+                                .foregroundColor(.white)
+                                .font(.system(size: 20))
+                                .bold()
+                                .padding(.leading, 10)
+                            
+                            Picker("consecutiveReport", selection: $consecutiveReport) {
+                                ForEach(1...generalRuleSetting.maxConsecutiveReport, id: \.self){
+                                    index in Text(String(index)).tag(index)
+                                }
+                            }
+                            .pickerStyle(MenuPickerStyle())
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                        }.frame(height: 40)
+                        .bluebubbleBackground()
+                        
+                        HStack{
+                            Text("切牌设置")
+                                .frame(width: 100, alignment: .leading)
+                                .foregroundColor(.white)
+                                .font(.system(size: 20))
+                                .bold()
+                                .padding(.leading, 10)
+                            
+                            //看手牌不能选切牌
+                            if self.specialCard[0] == 1{
+                                Spacer()
+                                Text("无")
+                                    .padding(.trailing, 10)
+                                    .foregroundColor(.white)
+                                    .font(.system(size: 20))
+                            }
+                            //看色牌不能选连续看底
+                            else if self.specialCard[0] == 2{
+                                Picker("cutMode", selection: $cutMode[0]) {
+                                    ForEach(0...generalRuleSetting.allCutMode.count - 2, id: \.self){
+                                        index in Text(generalRuleSetting.allCutMode[index]!).tag(index)
+                                    }
+                                }
+                                .pickerStyle(MenuPickerStyle())
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                                .accentColor(.blue)
+                            }
+                            else{
+                                Picker("cutMode", selection: $cutMode[0]) {
+                                    ForEach(0...generalRuleSetting.allCutMode.count - 1, id: \.self){
+                                        index in Text(generalRuleSetting.allCutMode[index]!).tag(index)
+                                    }
+                                }
+                                .pickerStyle(MenuPickerStyle())
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                                .accentColor(.blue)
+                            }
+                        }.frame(height: 40)
+                        .bluebubbleBackground()
+                        
+                            
+                        HStack{
+                            Text("识别任意牌报下轮")
+                                .frame(width: 200, alignment: .leading)
+                                .foregroundColor(.white)
+                                .font(.system(size: 20))
+                                .bold()
+                                .padding(.leading, 10)
+                            
+                            Toggle("", isOn: $recgReport).toggleStyle(CustomToggleStyle())
+                                .frame(maxWidth: .infinity, alignment: .trailing)
+                                .accentColor(.white)
+                                .padding(.trailing, 10)
+                        }.frame(height: 40)
+                        .bluebubbleBackground()
                     }
-
                 }
             }
                 
@@ -601,7 +470,7 @@ struct SettingRecordConfigView: View{
                         dismissButton: .default(Text("OK"))
                     )
                 }.background(NavigationLink(destination:
-                                                CurrentVisionObjectRecognitionView(saveRuleIndex: self._selectedSaveIndex, configType: 0)
+                                                CurrentVisionObjectRecognitionView(saveRuleIndex: self._selectedSaveIndex, configType: 1)
                                                 ,
                                             isActive: $isNavigateToMainContentView,
                                             label: EmptyView.init).hidden()
@@ -631,9 +500,27 @@ struct SettingRecordConfigView: View{
         .onAppear(){
             self.SetUpAll()
         }
+        
     }
     
     private func saveData(isShowAlert: Bool){
+        if self.shuffleRiffleMode == 0{
+            self.shuffleMode[0] = 1
+            self.shuffleMode[1] = 0
+        }
+        else if self.shuffleRiffleMode == 1{
+            self.shuffleMode[0] = 0
+            self.shuffleMode[1] = 1
+        }
+        else if self.shuffleRiffleMode == 2{
+            self.shuffleMode[0] = 0
+            self.shuffleMode[1] = 2
+        }
+        
+        self.cutMode[1] = self.cutMode[0]
+        self.specialCard[1] = self.specialCard[0]
+        self.reportSetting[1] = self.reportSetting[0]
+        
         //看手牌
         if ReportManager.allHandSpecialCardReport.contains(self.reportSetting[0]){
             self.specialCard[0] = 1
@@ -665,6 +552,8 @@ struct SettingRecordConfigView: View{
         else{
             self.specialCard[1] = 0
         }
+        
+        
         
         let selectedRule = ClassifierSettingArgs.targetSetting[DatasetType]
         self.minSingleFeatureNum = self.DatasetGetMinSingleFeatureNum()
@@ -862,7 +751,7 @@ struct SettingRecordConfigView: View{
         var alertMessage:String = ""
 //        if cutNumRangeSetting[0] > self.singlefeatureToUse.count || cutNumRangeSetting[1] > self.singlefeatureToUse.count || cutNumRangeSetting[0] > cutNumRangeSetting[1]{
 //            alertMessage = "打色范围设置超出可用牌范围，或X值>Y值，请重新设置"
-//            
+//
 //        }
         if dealNum == 1 && diyDealNum.count == 0{
             alertMessage = "自定义发牌为空"
@@ -877,4 +766,3 @@ struct SettingRecordConfigView: View{
         }
     }
 }
-

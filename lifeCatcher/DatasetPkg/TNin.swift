@@ -35,8 +35,6 @@ class TNDatasetRule : Rule{
                           1:"对子",
                           0:"点数"]
         
-        self.rcNum = [2,3,4,5,6,7,8]
-
         self.ruleInfo = [
             0:"""
     一人发两张牌，一共四十张牌1-10
@@ -52,7 +50,7 @@ class TNDatasetRule : Rule{
 """,
         ]
         
-        self.rcNum = [2,3,4,5,6,7,8,9,10]
+        self.rcNum = [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]
         
     }
 }
