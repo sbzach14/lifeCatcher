@@ -72,8 +72,6 @@
 		D03811A82C7542C300726B99 /* cls_0715_h_trans.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/cls_0715_h_trans.mlmodelkey"; }; };
 		D03811AA2C76904D00726B99 /* OriginObjectRegView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D03811A92C76904D00726B99 /* OriginObjectRegView.swift */; };
 		D0C507E02CD13AF4007FF4D0 /* SettingRecordConfigView_leishen.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C507DF2CD13AF4007FF4D0 /* SettingRecordConfigView_leishen.swift */; };
-		D0C507E42CD3EC3F007FF4D0 /* cls_riffle_h_1030.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D0C507E12CD3EC3B007FF4D0 /* cls_riffle_h_1030.mlmodel */; };
-		D0C507E52CD3EC3F007FF4D0 /* detect_riffle_1031.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D0C507E22CD3EC3D007FF4D0 /* detect_riffle_1031.mlmodel */; };
 		D0CD59FD2C86DEF50030A939 /* Localize_Swift in Frameworks */ = {isa = PBXBuildFile; productRef = D0CD59FC2C86DEF50030A939 /* Localize_Swift */; };
 		D0DAEF912C77657400D5938A /* ReportSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF902C77657400D5938A /* ReportSettingView.swift */; };
 		D0DAEF932C77664100D5938A /* HistoryItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF922C77664100D5938A /* HistoryItemView.swift */; };
@@ -146,8 +144,6 @@
 		D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0715_h_trans.mlmodel; sourceTree = "<group>"; };
 		D03811A92C76904D00726B99 /* OriginObjectRegView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OriginObjectRegView.swift; sourceTree = "<group>"; };
 		D0C507DF2CD13AF4007FF4D0 /* SettingRecordConfigView_leishen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingRecordConfigView_leishen.swift; sourceTree = "<group>"; };
-		D0C507E12CD3EC3B007FF4D0 /* cls_riffle_h_1030.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_riffle_h_1030.mlmodel; sourceTree = "<group>"; };
-		D0C507E22CD3EC3D007FF4D0 /* detect_riffle_1031.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = detect_riffle_1031.mlmodel; sourceTree = "<group>"; };
 		D0DAEF902C77657400D5938A /* ReportSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportSettingView.swift; sourceTree = "<group>"; };
 		D0DAEF922C77664100D5938A /* HistoryItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryItemView.swift; sourceTree = "<group>"; };
 		D0DAEF942C7766D900D5938A /* UsedFeatureSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsedFeatureSelectView.swift; sourceTree = "<group>"; };
@@ -335,8 +331,6 @@
 				D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */,
 				D03811A42C7542C200726B99 /* cls_0727_v_trans.mlmodel */,
 				D02717D72C8704AB00A29D43 /* detect_0903.mlmodel */,
-				D0C507E12CD3EC3B007FF4D0 /* cls_riffle_h_1030.mlmodel */,
-				D0C507E22CD3EC3D007FF4D0 /* detect_riffle_1031.mlmodel */,
 				187A45422C2DA25E00BB055C /* success_voice.mp3 */,
 				187A45442C2DA26100BB055C /* fail_voice.mp3 */,
 				187A45432C2DA25F00BB055C /* start_voice.mp3 */,
@@ -465,7 +459,6 @@
 				18C98D1D2C158F7B00A8CD49 /* TEGan.swift in Sources */,
 				A88EFDC82A7D249C00897243 /* CurrentObjectRegView.swift in Sources */,
 				187A45512C31BBB400BB055C /* AllBaseSettingArgs.swift in Sources */,
-				D0C507E42CD3EC3F007FF4D0 /* cls_riffle_h_1030.mlmodel in Sources */,
 				18C98D0E2C158F7B00A8CD49 /* FCar.swift in Sources */,
 				A887B6522A8104BC009F488F /* TimeAuthUtils.swift in Sources */,
 				18C98D0F2C158F7B00A8CD49 /* JJBao.swift in Sources */,
@@ -484,7 +477,6 @@
 				B058BE5F2B09FFC20078E792 /* CurrentBlurDetector.swift in Sources */,
 				18FFC40A2BB9587A00029B0D /* OriginBlurDetector.swift in Sources */,
 				18CA14DB284AC42C00F90372 /* MyApp.swift in Sources */,
-				D0C507E52CD3EC3F007FF4D0 /* detect_riffle_1031.mlmodel in Sources */,
 				18C98D1C2C158F7B00A8CD49 /* TCar.swift in Sources */,
 				18C98D142C158F7B00A8CD49 /* TPFive.swift in Sources */,
 				A88EFE092A7FAD1100897243 /* AllSettingViewModel.swift in Sources */,
