@@ -44,7 +44,8 @@ class generalRuleSetting{
         0:"无",
         1:"看底",
         2:"看顶",
-        3:"连续看底"
+        3:"连续看底",
+        4:"看手牌"
     ]
     
     static let allSpecialCard: [Int:String] = [
@@ -305,16 +306,16 @@ struct SettingRecordConfigView: View{
                                         .foregroundColor(.white)
                                     
                                     //看手牌不能选切牌
-                                    if self.specialCard[0] == 1{
+                                    if ReportManager.allHandSpecialCardReport.contains(self.reportSetting[0]){
                                         Spacer()
                                         Text("无")
                                             .padding(.trailing, 10)
                                             .foregroundColor(.white)
                                     }
                                     //看色牌不能选连续看底
-                                    else if self.specialCard[0] == 2{
+                                    else if ReportManager.allColorSpecialCardReport.contains(self.reportSetting[0]){
                                         Picker("cutMode", selection: $cutMode[0]) {
-                                            ForEach(0...generalRuleSetting.allCutMode.count - 2, id: \.self){
+                                            ForEach(0...generalRuleSetting.allCutMode.count - 3, id: \.self){
                                                 index in Text(generalRuleSetting.allCutMode[index]!).tag(index)
                                             }
                                         }
@@ -364,15 +365,15 @@ struct SettingRecordConfigView: View{
                                         .frame(width: 40, alignment: .leading)
                                         .foregroundColor(.white)
                                     
-                                    if self.specialCard[1] == 1{
+                                    if ReportManager.allHandSpecialCardReport.contains(self.reportSetting[1]){
                                         Spacer()
                                         Text("无")
                                             .padding(.trailing, 10)
                                             .foregroundColor(.white)
                                     }
-                                    else if self.specialCard[1] == 2{
+                                    else if ReportManager.allColorSpecialCardReport.contains(self.reportSetting[1]){
                                         Picker("cutMode", selection: $cutMode[1]) {
-                                            ForEach(0...generalRuleSetting.allCutMode.count - 2, id: \.self){
+                                            ForEach(0...generalRuleSetting.allCutMode.count - 3, id: \.self){
                                                 index in Text(generalRuleSetting.allCutMode[index]!).tag(index)
                                             }
                                         }
@@ -645,6 +646,9 @@ struct SettingRecordConfigView: View{
             if self.cutMode[0] == 3{
                 self.cutMode[0] = 1 //看色牌情况下把连续看底变成看底
             }
+            if self.cutMode[0] == 4{
+                self.cutMode[0] = 0 //看色牌情况下把看手变成不切牌
+            }
         }
         else{
             self.specialCard[0] = 0
@@ -660,6 +664,9 @@ struct SettingRecordConfigView: View{
             self.specialCard[1] = 2
             if self.cutMode[1] == 3{
                 self.cutMode[1] = 1
+            }
+            if self.cutMode[1] == 4{
+                self.cutMode[1] = 0 //看色牌情况下把看手变成不切牌
             }
         }
         else{

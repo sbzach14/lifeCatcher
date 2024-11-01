@@ -71,8 +71,6 @@
 		D03811A72C7542C300726B99 /* cls_0727_v_trans.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D03811A42C7542C200726B99 /* cls_0727_v_trans.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/cls_0727_v_trans.mlmodelkey"; }; };
 		D03811A82C7542C300726B99 /* cls_0715_h_trans.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/cls_0715_h_trans.mlmodelkey"; }; };
 		D03811AA2C76904D00726B99 /* OriginObjectRegView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D03811A92C76904D00726B99 /* OriginObjectRegView.swift */; };
-		D0971D7E2CB572C200E6AE5E /* riffle_1002_h.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D0971D7C2CB572C100E6AE5E /* riffle_1002_h.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/detect_0903.mlmodelkey"; }; };
-		D0971D7F2CB572C200E6AE5E /* riffle_1002_v.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D0971D7D2CB572C200E6AE5E /* riffle_1002_v.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/detect_0903.mlmodelkey"; }; };
 		D0C507E02CD13AF4007FF4D0 /* SettingRecordConfigView_leishen.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C507DF2CD13AF4007FF4D0 /* SettingRecordConfigView_leishen.swift */; };
 		D0CD59FD2C86DEF50030A939 /* Localize_Swift in Frameworks */ = {isa = PBXBuildFile; productRef = D0CD59FC2C86DEF50030A939 /* Localize_Swift */; };
 		D0DAEF912C77657400D5938A /* ReportSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF902C77657400D5938A /* ReportSettingView.swift */; };
@@ -145,8 +143,6 @@
 		D03811A42C7542C200726B99 /* cls_0727_v_trans.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0727_v_trans.mlmodel; sourceTree = "<group>"; };
 		D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0715_h_trans.mlmodel; sourceTree = "<group>"; };
 		D03811A92C76904D00726B99 /* OriginObjectRegView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OriginObjectRegView.swift; sourceTree = "<group>"; };
-		D0971D7C2CB572C100E6AE5E /* riffle_1002_h.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = riffle_1002_h.mlmodel; sourceTree = "<group>"; };
-		D0971D7D2CB572C200E6AE5E /* riffle_1002_v.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = riffle_1002_v.mlmodel; sourceTree = "<group>"; };
 		D0C507DF2CD13AF4007FF4D0 /* SettingRecordConfigView_leishen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingRecordConfigView_leishen.swift; sourceTree = "<group>"; };
 		D0DAEF902C77657400D5938A /* ReportSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportSettingView.swift; sourceTree = "<group>"; };
 		D0DAEF922C77664100D5938A /* HistoryItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryItemView.swift; sourceTree = "<group>"; };
@@ -335,8 +331,6 @@
 				D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */,
 				D03811A42C7542C200726B99 /* cls_0727_v_trans.mlmodel */,
 				D02717D72C8704AB00A29D43 /* detect_0903.mlmodel */,
-				D0971D7C2CB572C100E6AE5E /* riffle_1002_h.mlmodel */,
-				D0971D7D2CB572C200E6AE5E /* riffle_1002_v.mlmodel */,
 				187A45422C2DA25E00BB055C /* success_voice.mp3 */,
 				187A45442C2DA26100BB055C /* fail_voice.mp3 */,
 				187A45432C2DA25F00BB055C /* start_voice.mp3 */,
@@ -455,7 +449,6 @@
 				A89CDD8A2C71B79500588273 /* RegisterView.swift in Sources */,
 				D0DAEF992C7768DD00D5938A /* SettingRecordConfigView.swift in Sources */,
 				A88EFE0B2A7FC05900897243 /* JsonIOUtils.swift in Sources */,
-				D0971D7F2CB572C200E6AE5E /* riffle_1002_v.mlmodel in Sources */,
 				18C98D0C2C158F7B00A8CD49 /* CNin.swift in Sources */,
 				D02717D82C8704AB00A29D43 /* detect_0903.mlmodel in Sources */,
 				18C98CE52C15893200A8CD49 /* DeprecatedComponentView.swift in Sources */,
@@ -483,7 +476,6 @@
 				A89CDD882C70569400588273 /* LoginView.swift in Sources */,
 				B058BE5F2B09FFC20078E792 /* CurrentBlurDetector.swift in Sources */,
 				18FFC40A2BB9587A00029B0D /* OriginBlurDetector.swift in Sources */,
-				D0971D7E2CB572C200E6AE5E /* riffle_1002_h.mlmodel in Sources */,
 				18CA14DB284AC42C00F90372 /* MyApp.swift in Sources */,
 				18C98D1C2C158F7B00A8CD49 /* TCar.swift in Sources */,
 				18C98D142C158F7B00A8CD49 /* TPFive.swift in Sources */,
@@ -648,7 +640,7 @@
 				CODE_SIGN_ENTITLEMENTS = lifeCatcher/lifeCatcher.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
 				DEVELOPMENT_TEAM = 6WK4Q32GMN;
 				ENABLE_PREVIEWS = YES;
@@ -672,7 +664,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 99;
+				MARKETING_VERSION = 2.0.3;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -696,7 +688,7 @@
 				CODE_SIGN_ENTITLEMENTS = lifeCatcher/lifeCatcher.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
 				DEVELOPMENT_TEAM = 6WK4Q32GMN;
 				ENABLE_PREVIEWS = YES;
@@ -720,7 +712,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 99;
+				MARKETING_VERSION = 2.0.3;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
 				PRODUCT_NAME = "$(TARGET_NAME)";
