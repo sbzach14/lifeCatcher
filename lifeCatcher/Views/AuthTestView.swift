@@ -124,7 +124,7 @@ struct AuthTestView: View {
     }
     
     private func sendDeleteRequest() {
-        guard let url = URL(string: "http://10.0.0.26:8080/delete_user") else { return }
+        guard let url = URL(string: "http://1.94.17.30:8080/delete_user") else { return }
                 
         let json: [String: Any] = [
             "deviceID": userInput,
@@ -181,7 +181,7 @@ struct AuthTestView: View {
     }
 
     private func sendActivateRequest() {
-        guard let url = URL(string: "http://10.0.0.26:8080/activate") else { return }
+        guard let url = URL(string: "http://1.94.17.30:8080/activate") else { return }
         
         self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
         
@@ -245,7 +245,7 @@ struct AuthTestView: View {
     
     
     private func sendShiftRequest() {
-        guard let url = URL(string: "http://10.0.0.26:8080/shift_user") else { return }
+        guard let url = URL(string: "http://1.94.17.30:8080/shift_user") else { return }
         
         self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
         

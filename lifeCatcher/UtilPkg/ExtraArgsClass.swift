@@ -2015,14 +2015,15 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 break
             //看手牌
             case 4:
-                let priorNum = rcNum - colorTransform
+                let priorNum = colorTransform
+                print("priorNum \(priorNum) pos \(pos)")
                 if pos > priorNum {
-                    returnSingleFeatures = Array(inputSingleFeatures[(pos - priorNum)...]) + Array(inputSingleFeatures[0...(pos - priorNum)])
+                    returnSingleFeatures = Array(inputSingleFeatures[(pos - priorNum)...]) + Array(inputSingleFeatures[0..<(pos - priorNum)])
                 } else if pos == priorNum {
                     returnSingleFeatures = inputSingleFeatures
                 } else if pos < priorNum {
                     let length: Int = inputSingleFeatures.count
-                    returnSingleFeatures = Array(inputSingleFeatures[(length - pos + priorNum)...]) + Array(inputSingleFeatures[0...(length - pos + priorNum - 1)])
+                    returnSingleFeatures = Array(inputSingleFeatures[(length - (priorNum - pos))...]) + Array(inputSingleFeatures[0...(length + pos - priorNum - 1)])
                 }
                 break
             default:
@@ -2456,7 +2457,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 
             }
             //普通切牌
-            else if cutStructList.count > 0 {
+            else if cutStructList.count > 0 && cutStructList[cutStructList.count - 1].cutMode != 4{
                 for cutStruct in cutStructList{
                     inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1, rcNum: rcNum)
                     

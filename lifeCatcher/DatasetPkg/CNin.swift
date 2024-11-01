@@ -668,6 +668,9 @@ class CNDatasetHandAnalyst{
             44: self.eval_isRedSixTenBlackFourPair,
             45: self.eval_isRedJSevenBlackTenSixPair,
             46: self.eval_RedThreeRedJoJo(singlefeatures:),
+            47: self.eval_RedTenJRedSixRedSevenPair(singlefeatures:),
+            48: self.eval_NineBlackEightBlackSevenFivePair(singlefeatures:),
+            
         ]
     }
     
@@ -699,6 +702,48 @@ class CNDatasetHandAnalyst{
         }
         
         return (score, "", 0)
+    }
+    
+    func eval_NineBlackEightBlackSevenFivePair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int) {
+        
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank {
+            if singlefeatures[0].originalRank == 8 && (singlefeatures[0].color == 0 && singlefeatures[1].color == 0) {
+                return (1, "对黑8", 1)
+            }
+            if singlefeatures[0].originalRank == 9 {
+                return (1, "对9", 1)
+            }
+            if singlefeatures[0].originalRank == 7 && singlefeatures[0].color == 0 && singlefeatures[1].color == 0 {
+                return (1, "对黑7", 1)
+            }
+            
+            if singlefeatures[0].originalRank == 5 {
+                return (1, "对5", 1)
+            }
+            
+        }
+        return (0, "", 0)
+    }
+    
+    func eval_RedTenJRedSixRedSevenPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int) {
+        
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank {
+            if singlefeatures[0].originalRank == 10 && (singlefeatures[0].color == 1 && singlefeatures[1].color == 1) {
+                return (1, "对红10", 1)
+            }
+            if singlefeatures[0].originalRank == 11 {
+                return (1, "对J", 1)
+            }
+            if singlefeatures[0].originalRank == 6 && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 {
+                return (1, "对红6", 1)
+            }
+            
+            if singlefeatures[0].originalRank == 7 && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 {
+                return (1, "对红7", 1)
+            }
+            
+        }
+        return (0, "", 0)
     }
     
     func eval_RedThreeRedJoJo(singlefeatures:[CNSingleFeature]) -> (Int, String, Int) {
