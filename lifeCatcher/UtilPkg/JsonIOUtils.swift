@@ -93,7 +93,6 @@ func createConfigJSON() {
         "Bool": boolDict,
         "Version": AuthManager.version
     ]
-    
 
     do {
         // Convert the dictionary to JSON Data
@@ -113,7 +112,7 @@ func createConfigJSON() {
         } else {
             if let configData = readConfigJSON() {
                 let version = configData["Version"] as? String
-                if version != AuthManager.version{
+                if version != AuthManager.version && version != "2.0.2"{
                     try jsonData.write(to: fileURL)
                 }
             }
@@ -170,7 +169,6 @@ func createRecordHistoryJSON() {
                 }
                 recordDict[resultString] = []
             }
-            
         }
         
         // Get the Documents directory path in the app's sandbox

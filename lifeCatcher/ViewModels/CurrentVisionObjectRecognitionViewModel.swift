@@ -39,9 +39,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     let clsModel_h = try! cls_0715_h_trans()
     let clsModel_v = try! cls_0727_v_trans()
     
-    let riffleModel_h = try! riffle_1002_h()
-    let riffleModel_v = try! riffle_1002_v()
-    
     var originSize : [Float] = [1920, 1080] //相机图像大小
     var imageSize : [Float] = [569, 320] //target area 截图大小
     var originImageSize : [Float] = [569, 320] //target area 原始截图大小
@@ -614,14 +611,14 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         if !self.isBlack && !self.isShowSingleFeature && self.isWorking {
             backgroundQueue.async {
                 do {
-                    //                    var rectList : [[Float]] = []
-                    //                    rectList.append(self.lastBoxes[0])
-                    //                    rectList.append(self.lastBoxes[1])
-                    //                    rectList.append(self.targetArea)
-                    //                    let drawcvpixelbuffer = drawRectanglesOnPixelBuffer(pixelBuffer: pixelBuffer, rectList: rectList)!
-                    //                    ciImage = CIImage(cvPixelBuffer: drawcvpixelbuffer)
+                    var rectList : [[Float]] = []
+                    rectList.append(self.lastBoxes[0])
+                    rectList.append(self.lastBoxes[1])
+                    rectList.append(self.targetArea)
+                    let drawcvpixelbuffer = drawRectanglesOnPixelBuffer(pixelBuffer: frame, rectList: rectList)!
+                    let ciImage = CIImage(cvPixelBuffer: drawcvpixelbuffer)
                     
-                    let ciImage = CIImage(cvPixelBuffer: frame)
+                    //let ciImage = CIImage(cvPixelBuffer: frame)
 
                     // 使用预先计算的变换矩阵
                     let translatedImage = ciImage.transformed(by: self.combinedTransform)
@@ -728,8 +725,14 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         var singlefeatureResult : [DetectionResult]
         var uniqueNum : Int
         if !isTargetArea{
-            let result = try! self.detectModel.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: Double(confidenceThreshold))
-            (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: false)
+            if self.shuffleMode[0] != 0{
+                let result = try! self.detectModel.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: Double(confidenceThreshold))
+                (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: false)
+            }
+            else{
+                let result = try! self.detectModel.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: Double(confidenceThreshold))
+                (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: false)
+            }
         }
         else if self.isCameraHorizon{
             if self.shuffleMode[0] != 0{
@@ -752,7 +755,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
         }
         
-        
 //        // 创建输入
 //        let input = try! DetectionInput(image: pixelBuffer,iouThreshold: iou,confidenceThreshold: 0.05)
 //        // 进行预测
@@ -761,7 +763,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 //        let confidence = prediction.featureValue(for: "confidence")!.multiArrayValue!
 //        let coordinates = prediction.featureValue(for: "coordinates")!.multiArrayValue!
 //        singlefeatureResult = getSingleFeature(from: confidence, from: coordinates, from: pixelBuffer)
-        
         
         DispatchQueue.main.async{ [self] in
             
@@ -782,7 +783,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 self.centerPos = [(singlefeatureResult[0].coordinate[0] + singlefeatureResult[1].coordinate[0])/2, (singlefeatureResult[0].coordinate[1] + singlefeatureResult[1].coordinate[1])/2]
             }
             self.lastBoxes = [singlefeatureResult[0].coordinate,singlefeatureResult[1].coordinate]
-            
             
             var detectNum = 0
             if singlefeatureResult[0].singlefeatureIndex[0] != -1{
@@ -886,16 +886,16 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     && (detectNum < 1 || detectConfidence < confidenceThreshold)
                     && self.state == "detecting"{
                     self.stateCounter += 1
-                    
+                }
+                else if self.state != "detecting"
+                    //&& (detectNum == 0 || detectConfidence < confidenceThreshold){
+                            && (detectNum == 0){
+                    self.stateCounter += 1
+//                    
 //                    let modelCIImage = CIImage(cvPixelBuffer: pixelBuffer)
 //                    let cgImage = CIContext().createCGImage(modelCIImage, from: modelCIImage.extent)
 //                    let savedUIImage = UIImage(cgImage: cgImage!)
 //                    UIImageWriteToSavedPhotosAlbum(savedUIImage, self, #selector(self.imageSaved(_:didFinishSavingWithError:contextInfo:)), nil)
-                    
-                }
-                else if self.state != "detecting"
-                    && (detectNum == 0 || detectConfidence < confidenceThreshold){
-                    self.stateCounter += 1
                 }
                 else{
                     self.stateCounter = 0
@@ -2370,7 +2370,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             else{
                 //如果不洗牌 只拨牌
                 if self.shuffleMode[0] == 0 && self.shuffleMode[1] != 0{
-                    boxfactor = 2.5
+                    boxfactor = 1.5
                 }
                 //如果不拨牌 只洗牌
                 else if self.shuffleMode[0] != 0 && self.shuffleMode[1] == 0{
@@ -2430,7 +2430,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 let maxX = self.originSize[0] * (originBoxes[1][0] + originBoxes[1][2] / 2)
                 let minY = self.originSize[1] * min(originBoxes[0][1] - originBoxes[0][3] / 2, originBoxes[1][1] - originBoxes[1][3] / 2)
                 let maxY = self.originSize[1] * max(originBoxes[0][1] + originBoxes[0][3] / 2, originBoxes[1][1] + originBoxes[1][3] / 2)
-                
                 
                 var minW = (maxX - minX)*boxfactor
                 minW = min(minW, self.originSize[0] - 10)

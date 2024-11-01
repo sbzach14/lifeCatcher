@@ -96,17 +96,17 @@ struct MainMenuView: View {
                             .background(RoundedRectangle(cornerRadius: 10).fill(Color.red.opacity(0.8)).frame(width: 150, height: 100, alignment: .center))
                         }
                         
-//                        NavigationLink(destination: AuthTestView()) {
-//                            VStack {
-//                                Image(systemName: "person.crop.circle.fill")
-//                                    .font(.largeTitle)
-//                                    .foregroundColor(.white)
-//                                Text("Auth".localized())
-//                                    .foregroundColor(.white)
-//                            }
-//                            .padding()
-//                            .background(RoundedRectangle(cornerRadius: 10).fill(Color.red.opacity(0.8)).frame(width: 150, height: 100, alignment: .center))
-//                        }
+                        NavigationLink(destination: AuthTestView()) {
+                            VStack {
+                                Image(systemName: "person.crop.circle.fill")
+                                    .font(.largeTitle)
+                                    .foregroundColor(.white)
+                                Text("Auth".localized())
+                                    .foregroundColor(.white)
+                            }
+                            .padding()
+                            .background(RoundedRectangle(cornerRadius: 10).fill(Color.red.opacity(0.8)).frame(width: 150, height: 100, alignment: .center))
+                        }
                         
                     }
                     
@@ -290,7 +290,7 @@ struct DeprecatedMainView: View {
                     destination: SettingRecordView(configType: 0)
                 ) {
                     VStack(alignment: .leading) {
-                        Text("历史记录  (界面样式1)")
+                        Text("历史记录")
                             .foregroundColor(.white)
                         Divider().colorInvert()
                     }
@@ -300,7 +300,7 @@ struct DeprecatedMainView: View {
                     destination: SettingRecordView(configType: 1)
                 ) {
                     VStack(alignment: .leading) {
-                        Text("历史记录  (界面样式2)")
+                        Text("历史记录(雷神界面)")
                             .foregroundColor(.white)
                         Divider().colorInvert()
                     }
