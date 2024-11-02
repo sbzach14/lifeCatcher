@@ -611,14 +611,14 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         if !self.isBlack && !self.isShowSingleFeature && self.isWorking {
             backgroundQueue.async {
                 do {
-                    var rectList : [[Float]] = []
-                    rectList.append(self.lastBoxes[0])
-                    rectList.append(self.lastBoxes[1])
-                    rectList.append(self.targetArea)
-                    let drawcvpixelbuffer = drawRectanglesOnPixelBuffer(pixelBuffer: frame, rectList: rectList)!
-                    let ciImage = CIImage(cvPixelBuffer: drawcvpixelbuffer)
+//                    var rectList : [[Float]] = []
+//                    rectList.append(self.lastBoxes[0])
+//                    rectList.append(self.lastBoxes[1])
+//                    rectList.append(self.targetArea)
+//                    let drawcvpixelbuffer = drawRectanglesOnPixelBuffer(pixelBuffer: frame, rectList: rectList)!
+//                    let ciImage = CIImage(cvPixelBuffer: drawcvpixelbuffer)
                     
-                    //let ciImage = CIImage(cvPixelBuffer: frame)
+                    let ciImage = CIImage(cvPixelBuffer: frame)
 
                     // 使用预先计算的变换矩阵
                     let translatedImage = ciImage.transformed(by: self.combinedTransform)
@@ -923,7 +923,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     if self.usedSingleFeatures.contains(detectSingleFeature)
                         && self.recgReport
                         && (self.cutMode[self.shuffleOrRiffle] != 3 || self.continueCutTimeCounter >= self.continueMaxCutTime)
-                        && self.cutMode[self.shuffleOrRiffle] != 4
                         && self.specialCard[self.shuffleOrRiffle] == 0{
 //                        self.stateCounter = 100
 //                        self.state = "waitingEnd"
@@ -977,10 +976,16 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             self.continueCutTimeCounter = 0
                         }
                         else if self.cutMode[self.shuffleOrRiffle] == 4{
-                            //连续看手牌（切牌）
-                            self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 4))
-                            isCutDone = true
-                            self.cutShowArray.append(detectSingleFeature)
+                            //看手牌（切牌）
+                            if self.cutStructArray.count == 0{
+                                self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 4))
+                                isCutDone = true
+                                self.cutShowArray.append(detectSingleFeature)
+                                
+                                if self.specialCard[self.shuffleOrRiffle] == 0{
+                                    self.isProcessNeedToCut = false
+                                }
+                            }
                         }
                         
                         if !isCutDone{
