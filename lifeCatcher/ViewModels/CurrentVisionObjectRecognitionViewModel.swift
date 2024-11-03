@@ -888,10 +888,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     self.stateCounter += 1
                 }
                 else if self.state != "detecting"
-                    //&& (detectNum == 0 || detectConfidence < confidenceThreshold){
-                            && (detectNum == 0){
+                    && (detectNum == 0 || detectConfidence < confidenceThreshold){
                     self.stateCounter += 1
-//                    
+                   
 //                    let modelCIImage = CIImage(cvPixelBuffer: pixelBuffer)
 //                    let cgImage = CIContext().createCGImage(modelCIImage, from: modelCIImage.extent)
 //                    let savedUIImage = UIImage(cgImage: cgImage!)
@@ -2375,7 +2374,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             else{
                 //如果不洗牌 只拨牌
                 if self.shuffleMode[0] == 0 && self.shuffleMode[1] != 0{
-                    boxfactor = 1.5
+                    boxfactor = 2.5
                 }
                 //如果不拨牌 只洗牌
                 else if self.shuffleMode[0] != 0 && self.shuffleMode[1] == 0{
