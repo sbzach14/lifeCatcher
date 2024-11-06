@@ -90,6 +90,29 @@ struct AuthTestView: View {
                     Text("移机")
                 })
                 .padding()
+                
+                Button(action: {
+                    if containsOnlyHalfWidthUppercaseAndDigits(self.userInput) && containsOnlyHalfWidthUppercaseAndDigits(self.oldDeviceID){
+                        self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
+                        sendRebootRequest()
+                    }
+                    else{
+                        showAlert = true
+                        alertMessage = "非法序列号，请手动输入。"
+                    }
+                }, label: {
+                    Text("刷机重置")
+                })
+                .padding()
+                
+                Toggle(isOn: $isTimeLimited) {
+                        Text("是否半年")
+                            .foregroundColor(.white)
+                    }
+                    .padding()
+                    .onChange(of: isTimeLimited) { newValue in
+                        timeLimit = newValue ? "half" : "One"
+                    }
             }
             
             ScrollView{
@@ -301,6 +324,75 @@ struct AuthTestView: View {
 
                             if self.shiftStatus == 0 {
                                 self.alertMessage = "移机对象不存在"
+                            } else if shiftStatus == 2 {
+                                self.alertMessage = "旧设备无效"
+                            } else if shiftStatus == 3 {
+                                self.alertMessage = "重制失败"
+                            } else if shiftStatus == 4 {
+                                self.alertMessage = "重制新设备失败"
+                            } else if shiftStatus == 5 {
+                                self.alertMessage = "授权码错误"
+                            }
+                        }
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    self.showAlert = true
+                    self.alertMessage = "激活失败"
+                }
+            }
+        }
+        
+        task.resume()
+    }
+    
+    
+    private func sendRebootRequest() {
+        guard let url = URL(string: "http://1.94.17.30:8080/default_reboot") else { return }
+        
+        self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
+        
+        let json: [String: Any] = [
+            "activate_code": activeKey,
+            "old_deviceID": self.oldDeviceID,
+            "new_deviceID": userInput,
+            "passCode": self.passcode,
+        ]
+
+        let jsonData = try! JSONSerialization.data(withJSONObject: json)
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = jsonData
+
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+            guard let data = data, error == nil else {
+                DispatchQueue.main.async {
+                    self.showAlert = true
+                    self.alertMessage = "重置失败"
+                }
+                return
+            }
+
+            do {
+                print(data)
+                if let jsonResponse = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                    if let success = jsonResponse["success"] as? Bool, success {
+                        DispatchQueue.main.async {
+                            self.shiftStatus = jsonResponse["rebootStatus"] as? Int ?? -1
+                            self.showAlert = true
+                            self.alertMessage = "刷机重置成功"
+
+                        }
+                    } else {
+                        DispatchQueue.main.async {
+                            self.showAlert = true
+                            self.shiftStatus = jsonResponse["rebootStatus"] as? Int ?? -1
+
+                            if self.shiftStatus == 0 {
+                                self.alertMessage = "刷机对象不存在"
                             } else if shiftStatus == 2 {
                                 self.alertMessage = "旧设备无效"
                             } else if shiftStatus == 3 {
