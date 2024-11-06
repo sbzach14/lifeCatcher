@@ -290,7 +290,7 @@ struct DeprecatedMainView: View {
                     destination: SettingRecordView(configType: 0)
                 ) {
                     VStack(alignment: .leading) {
-                        Text("历史记录")
+                        Text("历史记录(幻影界面)")
                             .foregroundColor(.white)
                         Divider().colorInvert()
                     }
@@ -300,7 +300,7 @@ struct DeprecatedMainView: View {
                     destination: SettingRecordView(configType: 1)
                 ) {
                     VStack(alignment: .leading) {
-                        Text("历史记录(雷神界面)")
+                        Text("历史记录(经典界面)")
                             .foregroundColor(.white)
                         Divider().colorInvert()
                     }

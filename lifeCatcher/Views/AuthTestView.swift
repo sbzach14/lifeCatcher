@@ -165,6 +165,11 @@ struct AuthTestView: View {
                         DispatchQueue.main.async {
                             let deleteStatus = jsonResponse["deleteStatus"] as? Int ?? -1
                             self.activateStatus = deleteStatus
+                            
+                            self.showAlert = true
+                            if deleteStatus == 1 {
+                                self.alertMessage = "删除成功"
+                            }
                         }
                     } else {
                         DispatchQueue.main.async {
@@ -228,12 +233,19 @@ struct AuthTestView: View {
                         DispatchQueue.main.async {
                             self.activateStatus = jsonResponse["activateStatus"] as? Int ?? -1
                             self.expiredTime = jsonResponse["expiredTime"] as? Int ?? 0
-                          
+                            
+                            self.showAlert = true
+                            if self.activateStatus == 2{
+                                self.alertMessage = "激活成功"
+                            }
                         }
                     } else {
                         DispatchQueue.main.async {
                             self.showAlert = true
-                            if self.activateStatus == 3{
+                            if self.activateStatus == 2{
+                                self.alertMessage = "激活成功"
+                            }
+                            else if self.activateStatus == 3{
                                 self.alertMessage = "口令错误"
                             }
                             else if self.activateStatus == 4{
