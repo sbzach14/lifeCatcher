@@ -104,6 +104,15 @@ struct AuthTestView: View {
                     Text("刷机重置")
                 })
                 .padding()
+                
+                Toggle(isOn: $isTimeLimited) {
+                        Text("是否半年")
+                            .foregroundColor(.white)
+                    }
+                    .padding()
+                    .onChange(of: isTimeLimited) { newValue in
+                        timeLimit = newValue ? "half" : "One"
+                    }
             }
             
             ScrollView{
