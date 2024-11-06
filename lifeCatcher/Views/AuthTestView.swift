@@ -16,7 +16,7 @@ struct AuthTestView: View {
 
     var body: some View {
         VStack {
-            TextField("输入你要激活或激活的序列号", text: $userInput)
+            TextField("输入你要激活或删除的序列号", text: $userInput)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
             TextField("输入移机旧的序列号", text: $oldDeviceID)
