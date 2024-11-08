@@ -1188,7 +1188,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         if self.shuffleMode[1] == 1{
                             //拨到顶
                             if self.cutMode[1] != 0 || self.specialCard[1] != 0{
-                                if self.singlefeatureArray.count >= self.minSingleFeatureNum{
+                                if self.singlefeatureArray.count == self.allSingleFeatureIndex.count{
                                     self.speakText(input: 1)
                                 }
                                 else{
@@ -1205,7 +1205,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             }
                             
                             if self.cutMode[1] != 0 || self.specialCard[1] != 0{
-                                if self.singlefeatureArray.count >= self.minSingleFeatureNum + 1{
+                                if self.singlefeatureArray.count == self.allSingleFeatureIndex.count{
                                     self.speakText(input: 1)
                                 }
                                 else{

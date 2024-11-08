@@ -16,10 +16,10 @@ struct AuthTestView: View {
 
     var body: some View {
         VStack {
-            TextField("输入你要激活或删除的序列号", text: $userInput)
+            TextField("输入激活/删除/移机新/刷机新的序列号", text: $userInput)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
-            TextField("输入移机旧的序列号", text: $oldDeviceID)
+            TextField("输入移机旧/刷机旧的序列号", text: $oldDeviceID)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
 
@@ -30,7 +30,7 @@ struct AuthTestView: View {
             HStack{
                 
                 Button(action: {
-                    if containsOnlyHalfWidthUppercaseAndDigits(self.userInput){
+                    if containsOnlyHalfWidthUppercaseAndDigits(self.userInput) && isValidUUIDFormat(self.userInput){
                         self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
                     }
                     else{
@@ -45,7 +45,7 @@ struct AuthTestView: View {
                 Spacer()
                 
                 Button(action: {
-                    if containsOnlyHalfWidthUppercaseAndDigits(self.userInput){
+                    if containsOnlyHalfWidthUppercaseAndDigits(self.userInput) && isValidUUIDFormat(self.userInput){
                         self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
                         sendActivateRequest()
                     }
@@ -61,7 +61,7 @@ struct AuthTestView: View {
                 Spacer()
                 
                 Button(action: {
-                    if containsOnlyHalfWidthUppercaseAndDigits(self.userInput){
+                    if containsOnlyHalfWidthUppercaseAndDigits(self.userInput) && isValidUUIDFormat(self.userInput){
                         self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
                         sendDeleteRequest()
                     }
@@ -78,7 +78,7 @@ struct AuthTestView: View {
                 Spacer()
                 
                 Button(action: {
-                    if containsOnlyHalfWidthUppercaseAndDigits(self.userInput) && containsOnlyHalfWidthUppercaseAndDigits(self.oldDeviceID){
+                    if containsOnlyHalfWidthUppercaseAndDigits(self.userInput) && containsOnlyHalfWidthUppercaseAndDigits(self.oldDeviceID) && isValidUUIDFormat(self.userInput) && isValidUUIDFormat(self.oldDeviceID){
                         self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
                         sendShiftRequest()
                     }
@@ -92,7 +92,7 @@ struct AuthTestView: View {
                 .padding()
                 
                 Button(action: {
-                    if containsOnlyHalfWidthUppercaseAndDigits(self.userInput) && containsOnlyHalfWidthUppercaseAndDigits(self.oldDeviceID){
+                    if containsOnlyHalfWidthUppercaseAndDigits(self.userInput) && containsOnlyHalfWidthUppercaseAndDigits(self.oldDeviceID) && isValidUUIDFormat(self.userInput) && isValidUUIDFormat(self.oldDeviceID){
                         self.activeKey = AuthManager.hashWithSalt(input: self.userInput)!
                         sendRebootRequest()
                     }
@@ -101,19 +101,19 @@ struct AuthTestView: View {
                         alertMessage = "非法序列号，请手动输入。"
                     }
                 }, label: {
-                    Text("刷机重置")
+                    Text("刷机")
                 })
                 .padding()
-                
-                Toggle(isOn: $isTimeLimited) {
-                        Text("是否半年")
-                            .foregroundColor(.white)
-                    }
-                    .padding()
-                    .onChange(of: isTimeLimited) { newValue in
-                        timeLimit = newValue ? "half" : "One"
-                    }
             }
+            
+            Toggle(isOn: $isTimeLimited) {
+                    Text("是否半年")
+                        .foregroundColor(.white)
+                }
+                .padding()
+                .onChange(of: isTimeLimited) { newValue in
+                    timeLimit = newValue ? "half" : "One"
+                }
             
             ScrollView{
                 Text(activeKey)
@@ -426,6 +426,13 @@ struct AuthTestView: View {
             }
             return false
         }
+    }
+    
+    func isValidUUIDFormat(_ string: String) -> Bool {
+        let pattern = "^[A-Z0-9]{8}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{12}$"
+        let regex = try? NSRegularExpression(pattern: pattern)
+        let range = NSRange(location: 0, length: string.utf16.count)
+        return regex?.firstMatch(in: string, options: [], range: range) != nil
     }
 }
 

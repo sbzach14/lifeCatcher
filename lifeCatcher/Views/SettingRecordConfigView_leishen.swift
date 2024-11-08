@@ -315,7 +315,7 @@ struct SettingRecordConfigView_leishen: View{
                                 .bold()
                                 .padding(.leading, 10)
                             
-                            NavigationLink(destination:  ReportSettingView(reportSetting: $reportSetting, target: 0)){
+                            NavigationLink(destination: ReportSettingView(reportSetting: $reportSetting, target: 0)){
                                 let text = ReportManager.allReportName[reportSetting[0]]!
                                 Text(text).multilineTextAlignment(.leading)
                             }
@@ -499,6 +499,9 @@ struct SettingRecordConfigView_leishen: View{
         .navigationTitle("参数设置")
         .onAppear(){
             self.SetUpAll()
+        }
+        .onDisappear(){
+            self.saveData(isShowAlert: false)
         }
         
     }
