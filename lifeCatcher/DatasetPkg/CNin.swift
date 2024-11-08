@@ -6,12 +6,14 @@ class CNDatasetRule : Rule{
     
     let redspecialfeatureValueRange:[Int:String] = [
         0:"6",
-        1:"1"
+        1:"1",
+        2:"2",
     ]
     let blackspecialfeatureValueRange: [Int: String] = [
         0:"6",
         1:"3",
-        2:"1"
+        2:"1",
+        3:"2",
     ]
     let KValueRange:[Int:String] = [
         0:"3",
@@ -48,7 +50,9 @@ class CNDatasetRule : Rule{
         4:"红Q>红2>红8>红4>红6(=红10=黑4)>红J(=黑10=红7=黑6)>红9(=黑8=黑7=红5=大王=黑桃A=黑桃3=红桃3)",
         5:"黑2>红2>红8>红4>红10>红6>黑4>红1>黑10>红7>黑6>黑9>黑8>黑7>黑5>大王>小王",
         6:"红Q>红2>红8>红4>红6(=红10=黑4)>红J(=黑10=红7=黑6)>红9(=黑8=黑7=红5=大王=黑桃A=黑桃3=红桃3)",
-        7:"红Q>红2>红8>红4>黑10=黑4=黑6>红10=红6=红7=红J=黑J>王=A=黑5=红5=黑7=黑9=红9=黑8=黑3=红3"
+        7:"红Q>红2>红8>红4>黑10=黑4=黑6>红10=红6=红7=红J=黑J>王=A=黑5=红5=黑7=黑9=红9=黑8=黑3=红3",
+        8:"红Q>红2>红8>红4>红10=黑4=红6>黑10=黑6=红7=红J=黑J>王=A=黑5=红5=黑7=黑9=红9=黑8=黑3=红3",
+        9:"大王=小王>红2>红8>红4>黑10=黑6=黑4>红K=红10=红7=红6>红9=黑8=黑7=红5=黑桃A=黑桃3"
     ]
     let handNum:[Int] = [2,4]
     
@@ -56,6 +60,8 @@ class CNDatasetRule : Rule{
     override init(ruleIndex: Int, ruleName: String) {
         super.init(ruleIndex: ruleIndex, ruleName: ruleName)
         self.rankRules = [
+            50:"王+8",
+            49:"对红K=对红10=对红7=对红6",
             48:"对9=对黑8=对黑7=对5",
             47:"对红10=对J=对红6=对红7",
             46:"红3+大王",
@@ -125,7 +131,9 @@ class CNDatasetRule : Rule{
             15: "32张牌九[266]",
             16: "山西牌九[269]",
             17: "通用四张-杭州牌九[420]*",
-            18: "温州牌九"
+            18: "温州牌九黑大",
+            19: "温州牌九红大",
+            20: "温州小牌九",
         ]
         self.ruleInfo = [
             0:"""
@@ -275,7 +283,41 @@ Q+红9>红2+红9>红Q+8>红2+8>红 Q+7>红2+7>红8+红J
 对9=对黑8=对黑7=对5 > 红Q+9 > 红Q+8 > 红2+8 > 点数
 9点最大，0点最小，大王6点，A 6点，0点全部一样大，同点比最大牌
 红Q>红2>红8>红4>黑10=黑4=黑6>红10=红6=红7=红J=黑J>王=A=黑5=红5=黑7=黑9=红9>黑8=黑3=红3
-""",]
+""",
+            19:"""
+    游戏说明
+    用牌：
+    大王
+    黑桃: A, 3,4,5,6,7,8,9,10,J
+    红桃: 2,3,4,5,6,7,8,9,10,J,Q,
+    梅花: 4,5,6,7,8,9,10,J,
+    方片: 2,4,5,6,7,8,9,10,J,Q
+    大小: 对红Q > 对红2 > 王+3=A+3 > 对红8 > 对红4 > 对黑10=对黑6=对黑4 > 对红10=对J=对红6=对红7 >
+    对9=对黑8=对黑7=对5 > 红Q+9 > 红Q+8 > 红2+8 > 点数
+    9点最大，0点最小，大王6点，A 6点，0点全部一样大，同点比最大牌
+    红Q>红2>红8>红4>红10=黑4=红6>黑10=黑6=红7=红J=黑J>王=A=黑5=红5=黑7=黑9=红9>黑8=黑3=红3
+    """,
+            20:"""
+    游戏说明
+    用牌：
+    大王小王
+    黑桃：10，6，4，8，7，A，3
+    红桃：2，8，4，K，10，7，6，9，5
+    梅花：10，6，4，8，7
+    方片：2，8，4，K，10，7，6，9，5
+    共32张
+    大小：
+    (1) 至尊 （黑桃A + 黑桃3）
+    (2) 对王 > 对红2 > 对红8 > 对红4 > 对黑10=对黑6=对黑4 > 对红K=对红10=对红7=对红6 >
+        对红9=对黑8=对黑7=对红5
+    (3) 天九：大小王 + 9
+    (4) 大小王 + 8 > 2 + 8
+    (5) 大小王 + 7 > 2 + 7 >...同点比较天地人和三长四短
+    A=6点 大小王=2点 K=1点，同点同牌庄家大，零点不分大小
+    天: 大王小王 地：红2 人：红8 和：红4 三长：黑10，黑6，黑4 四短：红K，红10，红7，红6 其余为杂牌
+""",
+        
+        ]
         self.rcNum = [2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17]
 
     }
@@ -360,6 +402,12 @@ class CNDataset{
         case 18:
             result = [54,0,2,3,4,5,6,7,8,9,10,14,15,16,17,18,19,20,21,22,23,24,29,30,31,32,33,34,35,36,40,42,43,44,45,46,47,48,49,50]
             break
+        case 19:
+            result = [54,0,2,3,4,5,6,7,8,9,10,14,15,16,17,18,19,20,21,22,23,24,29,30,31,32,33,34,35,36,40,42,43,44,45,46,47,48,49,50]
+            break
+        case 20:
+            result = [53, 54, 14, 40, 20, 46, 16, 42, 9, 35, 5, 31, 3, 29, 25, 51, 22, 48, 19, 45,
+            18, 44, 21, 47, 7, 33, 6, 32, 17, 43, 0, 2]
         default:
             result = Array(0...51) + [53,54]
             break
@@ -670,6 +718,8 @@ class CNDatasetHandAnalyst{
             46: self.eval_RedThreeRedJoJo(singlefeatures:),
             47: self.eval_RedTenJRedSixRedSevenPair(singlefeatures:),
             48: self.eval_NineBlackEightBlackSevenFivePair(singlefeatures:),
+            49: self.eval_RedTenKRedSixRedSevenPair(singlefeatures:),
+            50: self.eval_isspecialfeaturePlusEight(singlefeatures:),
             
         ]
     }
@@ -702,6 +752,34 @@ class CNDatasetHandAnalyst{
         }
         
         return (score, "", 0)
+    }
+    
+    func eval_isspecialfeaturePlusEight(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
+        if (singlefeatures[0].originalRank == 15 || singlefeatures[0].originalRank == 14) && singlefeatures[1].originalRank == 8{
+            return (1, "王8", 0)
+        }
+        return (0, "", 0)
+    }
+    
+    func eval_RedTenKRedSixRedSevenPair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int) {
+        
+        if singlefeatures[0].originalRank == singlefeatures[1].originalRank {
+            if singlefeatures[0].originalRank == 10 && (singlefeatures[0].color == 1 && singlefeatures[1].color == 1) {
+                return (1, "对红10", 1)
+            }
+            if singlefeatures[0].originalRank == 13 {
+                return (1, "对K", 1)
+            }
+            if singlefeatures[0].originalRank == 6 && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 {
+                return (1, "对红6", 1)
+            }
+            
+            if singlefeatures[0].originalRank == 7 && singlefeatures[0].color == 1 && singlefeatures[1].color == 1 {
+                return (1, "对红7", 1)
+            }
+            
+        }
+        return (0, "", 0)
     }
     
     func eval_NineBlackEightBlackSevenFivePair(singlefeatures:[CNSingleFeature]) -> (Int, String, Int) {
@@ -814,8 +892,8 @@ class CNDatasetHandAnalyst{
     
     
     func eval_isspecialfeaturePlusNine(singlefeatures:[CNSingleFeature]) -> (Int, String, Int){
-        if singlefeatures[0].originalRank == 15 && singlefeatures[0].originalRank == 9{
-            return (1, "王9", 1)
+        if (singlefeatures[0].originalRank == 15 || singlefeatures[0].originalRank == 14) && singlefeatures[1].originalRank == 9{
+            return (1, "王9", 0)
         }
         return (0, "", 0)
     }
@@ -1559,6 +1637,45 @@ class CNDatasetHandAnalyst{
                 else if (singlefeature.rank == 6 || singlefeature.rank == 10 || singlefeature.rank == 4) && self.color == 0 {
                     self.rank = 3
                 } else if ((singlefeature.rank == 11 || singlefeature.rank == 7 || singlefeature.rank == 10 || singlefeature.rank == 6) && self.color == 1) || (singlefeature.rank == 11 && self.color == 0) {
+                    self.rank = 2
+                } else {
+                    self.rank = 1
+                }
+            } else if singlefeatureRankRule == 8 {
+                if singlefeature.rank == 12  && self.color == 1{
+                    self.rank = 7
+                }
+                else if singlefeature.rank == 2 && self.color == 1{
+                    self.rank = 6
+                }
+                else if singlefeature.rank == 8 && self.color == 1 {
+                    self.rank = 5
+                }
+                else if singlefeature.rank == 4 && self.color == 1 {
+                    self.rank = 4
+                }
+                else if (singlefeature.rank == 4 && self.color == 0) || ((singlefeature.rank == 6 || singlefeature.rank == 10) && self.color == 1) {
+                    self.rank = 3
+                } else if ((singlefeature.rank == 11 || singlefeature.rank == 7) && self.color == 1) || ((singlefeature.rank == 11 || singlefeature.rank == 10 || singlefeature.rank == 6) && self.color == 0) {
+                    self.rank = 2
+                } else {
+                    self.rank = 1
+                }
+            } else if singlefeatureRankRule == 9 {
+                if singlefeature.rank == 14 || singlefeature.rank == 15 {
+                    self.rank = 7
+                } else if singlefeature.rank == 2 && self.color == 1{
+                    self.rank = 6
+                }
+                else if singlefeature.rank == 8 && self.color == 1 {
+                    self.rank = 5
+                }
+                else if singlefeature.rank == 4 && self.color == 1 {
+                    self.rank = 4
+                }
+                else if (singlefeature.rank == 4 || singlefeature.rank == 6 || singlefeature.rank == 10) && self.color == 1 {
+                    self.rank = 3
+                } else if (singlefeature.rank == 13 || singlefeature.rank == 10 || singlefeature.rank == 6 || singlefeature.rank == 7) && self.color == 0 {
                     self.rank = 2
                 } else {
                     self.rank = 1

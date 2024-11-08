@@ -2936,7 +2936,7 @@ public class DetectSettingArgs{
                 allPreSetRules[i]![17]!.append(suitRules)
                 allPreSetRules[i]![17]!.append(rankRules)
                 allPreSetRules[i]![17]!.append(rankRuleChecked)
-//              18: "温州牌九"
+//              18: "温州牌九黑大"
                 handNum = 2
                 communityNum = 0
                 redspecialfeatureValueRange = 0
@@ -2958,6 +2958,51 @@ public class DetectSettingArgs{
                 allPreSetRules[i]![18]!.append(suitRules)
                 allPreSetRules[i]![18]!.append(rankRules)
                 allPreSetRules[i]![18]!.append(rankRuleChecked)
+                //19: 温州牌九红大
+                handNum = 2
+                communityNum = 0
+                redspecialfeatureValueRange = 0
+                blackspecialfeatureValueRange = 0
+                KValueRange = 0
+                QValueRange = 0
+                JValueRange = 0
+                pointComparision = 0
+                samePointComparision = 2
+                AValueRange = 1
+                pairRank = 0
+                singlefeatureRankRule = 8
+                
+                args = [handNum, communityNum,redspecialfeatureValueRange, blackspecialfeatureValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, singlefeatureRankRule]
+                suitRules = [3,2,1,0]
+                rankRules = [8,9,43,17,18,29,47,48,3,2,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![19]!.append(args)
+                allPreSetRules[i]![19]!.append(suitRules)
+                allPreSetRules[i]![19]!.append(rankRules)
+                allPreSetRules[i]![19]!.append(rankRuleChecked)
+                
+                //20: 温州小牌九
+                handNum = 2
+                communityNum = 0
+                redspecialfeatureValueRange = 2
+                blackspecialfeatureValueRange = 3
+                KValueRange = 1
+                QValueRange = 0
+                JValueRange = 0
+                pointComparision = 0
+                samePointComparision = 2
+                AValueRange = 1
+                pairRank = 0
+                singlefeatureRankRule = 9
+                
+                args = [handNum, communityNum,redspecialfeatureValueRange, blackspecialfeatureValueRange, KValueRange, QValueRange, JValueRange, pointComparision, samePointComparision, AValueRange, pairRank, singlefeatureRankRule]
+                suitRules = [3,2,1,0]
+                rankRules = [10,16,15,17,18,29,49,48,41,50,1,0]
+                rankRuleChecked = [1,1,1,1,1,1,1,1,1,1,1,1]
+                allPreSetRules[i]![20]!.append(args)
+                allPreSetRules[i]![20]!.append(suitRules)
+                allPreSetRules[i]![20]!.append(rankRules)
+                allPreSetRules[i]![20]!.append(rankRuleChecked)
                 break
             case 10:
 //                0:"福建54张9点[221]",
