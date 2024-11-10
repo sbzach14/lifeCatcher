@@ -71,6 +71,9 @@
 		D03811A72C7542C300726B99 /* cls_0727_v_trans.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D03811A42C7542C200726B99 /* cls_0727_v_trans.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/cls_0727_v_trans.mlmodelkey"; }; };
 		D03811A82C7542C300726B99 /* cls_0715_h_trans.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/cls_0715_h_trans.mlmodelkey"; }; };
 		D03811AA2C76904D00726B99 /* OriginObjectRegView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D03811A92C76904D00726B99 /* OriginObjectRegView.swift */; };
+		D0697CDF2CDE67FC006DD383 /* SpeechUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0697CDE2CDE67FB006DD383 /* SpeechUtils.swift */; };
+		D0697CE22CDF5F7A006DD383 /* riffle_cls_h_1107.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D0697CE02CDF5F78006DD383 /* riffle_cls_h_1107.mlmodel */; };
+		D0697CE32CDF5F7A006DD383 /* riffle_cls_v_1107.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D0697CE12CDF5F79006DD383 /* riffle_cls_v_1107.mlmodel */; };
 		D0C507E02CD13AF4007FF4D0 /* SettingRecordConfigView_leishen.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C507DF2CD13AF4007FF4D0 /* SettingRecordConfigView_leishen.swift */; };
 		D0CD59FD2C86DEF50030A939 /* Localize_Swift in Frameworks */ = {isa = PBXBuildFile; productRef = D0CD59FC2C86DEF50030A939 /* Localize_Swift */; };
 		D0DAEF912C77657400D5938A /* ReportSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF902C77657400D5938A /* ReportSettingView.swift */; };
@@ -143,6 +146,9 @@
 		D03811A42C7542C200726B99 /* cls_0727_v_trans.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0727_v_trans.mlmodel; sourceTree = "<group>"; };
 		D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0715_h_trans.mlmodel; sourceTree = "<group>"; };
 		D03811A92C76904D00726B99 /* OriginObjectRegView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OriginObjectRegView.swift; sourceTree = "<group>"; };
+		D0697CDE2CDE67FB006DD383 /* SpeechUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechUtils.swift; sourceTree = "<group>"; };
+		D0697CE02CDF5F78006DD383 /* riffle_cls_h_1107.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = riffle_cls_h_1107.mlmodel; sourceTree = "<group>"; };
+		D0697CE12CDF5F79006DD383 /* riffle_cls_v_1107.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = riffle_cls_v_1107.mlmodel; sourceTree = "<group>"; };
 		D0C507DF2CD13AF4007FF4D0 /* SettingRecordConfigView_leishen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingRecordConfigView_leishen.swift; sourceTree = "<group>"; };
 		D0DAEF902C77657400D5938A /* ReportSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportSettingView.swift; sourceTree = "<group>"; };
 		D0DAEF922C77664100D5938A /* HistoryItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryItemView.swift; sourceTree = "<group>"; };
@@ -313,6 +319,7 @@
 				A887B6512A8104BC009F488F /* TimeAuthUtils.swift */,
 				18FFC4092BB9587900029B0D /* OriginBlurDetector.swift */,
 				B058BE5E2B09FFC20078E792 /* CurrentBlurDetector.swift */,
+				D0697CDE2CDE67FB006DD383 /* SpeechUtils.swift */,
 			);
 			path = UtilPkg;
 			sourceTree = "<group>";
@@ -331,6 +338,8 @@
 				D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */,
 				D03811A42C7542C200726B99 /* cls_0727_v_trans.mlmodel */,
 				D02717D72C8704AB00A29D43 /* detect_0903.mlmodel */,
+				D0697CE02CDF5F78006DD383 /* riffle_cls_h_1107.mlmodel */,
+				D0697CE12CDF5F79006DD383 /* riffle_cls_v_1107.mlmodel */,
 				187A45422C2DA25E00BB055C /* success_voice.mp3 */,
 				187A45442C2DA26100BB055C /* fail_voice.mp3 */,
 				187A45432C2DA25F00BB055C /* start_voice.mp3 */,
@@ -458,6 +467,7 @@
 				D0C507E02CD13AF4007FF4D0 /* SettingRecordConfigView_leishen.swift in Sources */,
 				18C98D1D2C158F7B00A8CD49 /* TEGan.swift in Sources */,
 				A88EFDC82A7D249C00897243 /* CurrentObjectRegView.swift in Sources */,
+				D0697CE22CDF5F7A006DD383 /* riffle_cls_h_1107.mlmodel in Sources */,
 				187A45512C31BBB400BB055C /* AllBaseSettingArgs.swift in Sources */,
 				18C98D0E2C158F7B00A8CD49 /* FCar.swift in Sources */,
 				A887B6522A8104BC009F488F /* TimeAuthUtils.swift in Sources */,
@@ -465,11 +475,13 @@
 				18C98D1B2C158F7B00A8CD49 /* TNin.swift in Sources */,
 				1824EF672C3EB4990029836C /* AuthTestView.swift in Sources */,
 				18C98D0D2C158F7B00A8CD49 /* CBat.swift in Sources */,
+				D0697CE32CDF5F7A006DD383 /* riffle_cls_v_1107.mlmodel in Sources */,
 				D03811A72C7542C300726B99 /* cls_0727_v_trans.mlmodel in Sources */,
 				D03811A82C7542C300726B99 /* cls_0715_h_trans.mlmodel in Sources */,
 				D03811A22C75401200726B99 /* cls_main.mlmodel in Sources */,
 				18C98D112C158F7B00A8CD49 /* NPFive.swift in Sources */,
 				A892C6002A765A0A003FA2B3 /* MainView.swift in Sources */,
+				D0697CDF2CDE67FC006DD383 /* SpeechUtils.swift in Sources */,
 				D0DAEF952C7766D900D5938A /* UsedFeatureSelectView.swift in Sources */,
 				18C98D072C158F7B00A8CD49 /* CUtils.swift in Sources */,
 				18C98D152C158F7B00A8CD49 /* TPok.swift in Sources */,
@@ -640,7 +652,7 @@
 				CODE_SIGN_ENTITLEMENTS = lifeCatcher/lifeCatcher.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
 				DEVELOPMENT_TEAM = 6WK4Q32GMN;
 				ENABLE_PREVIEWS = YES;
@@ -664,7 +676,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 99;
+				MARKETING_VERSION = 49;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -688,7 +700,7 @@
 				CODE_SIGN_ENTITLEMENTS = lifeCatcher/lifeCatcher.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
 				DEVELOPMENT_TEAM = 6WK4Q32GMN;
 				ENABLE_PREVIEWS = YES;
@@ -712,7 +724,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 99;
+				MARKETING_VERSION = 49;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
 				PRODUCT_NAME = "$(TARGET_NAME)";

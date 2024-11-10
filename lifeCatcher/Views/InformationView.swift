@@ -242,8 +242,8 @@ class FunctionSetting{
     
     static let blackModeDict: [Int: String] = [
         0: "相机图像",
-        1: "正常黑屏",
-        2: "黑屏点击"
+        1: "正常黑屏(双击进入)",
+        2: "黑屏点击(双击进入，单击暂停）"
     ]
     
     static let voiceDeviceDict: [Int: String] = [
