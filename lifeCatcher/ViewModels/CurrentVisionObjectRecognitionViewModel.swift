@@ -31,14 +31,11 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var cutStructArray: [cutStruct] = []
     @Published var cutShowArray : [Int] = []
     
-//    let detectModel = try! detect_0903_copy()
-//    let clsModel_h = try! cls_0715_h_trans_copy()
-//    let clsModel_v = try! cls_0727_v_trans_copy()
-    
     let detectModel = try! detect_0903()
     let clsModel_h = try! cls_0715_h_trans()
     let clsModel_v = try! cls_0727_v_trans()
     
+    let riffleDetectModel = try! detect_0903()
     let riffleModel_h = try! riffle_cls_h_1107()
     let riffleModel_v = try! riffle_cls_v_1107()
     
@@ -729,7 +726,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: false)
             }
             else{
-                let result = try! self.detectModel.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: Double(confidenceThreshold))
+                let result = try! self.riffleDetectModel.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: Double(confidenceThreshold))
                 (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: false)
             }
         }
@@ -749,7 +746,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: true)
             }
             else{
-                let result = try! self.riffleModel_h.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
+                let result = try! self.riffleModel_v.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
                 (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: true)
             }
         }
