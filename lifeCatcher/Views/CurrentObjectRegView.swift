@@ -196,38 +196,38 @@ struct CurrentVisionObjectRecognitionView: View {
                                     }
                                 }
                             }
-                            else{
-                                Divider().colorInvert()
-                                
-                                HStack {
-                                    Text("刷新频率")
-                                        .foregroundColor(.white)
-                                        .frame(maxWidth: 80, alignment: .leading)
-                 
-                                    Spacer()
-                                    
-                                    Text("正常")
-                                        .foregroundColor(.white)
-                                        .frame(maxWidth: 40, alignment: .trailing)
-                                    
-                                    Toggle("", isOn: $viewModel.isHighHz)
-                                        .toggleStyle(CustomToggleStyle_NoText())
-                                        .frame(width: 70, height: 30, alignment: .trailing)
-                                        .accentColor(.white)
-                                        .onChange(of: viewModel.isHighHz) {
-                                            newValue in
-                                            
-                                            viewModel.stopCamera()
-                                            viewModel.setupAVCapture()
-                                            viewModel.prestartCamera()
-                                            viewModel.updateConfigJSON()
-                                        }
-                                    
-                                    Text("增强")
-                                        .foregroundColor(.white)
-                                        .frame(maxWidth: 40, alignment: .trailing)
-                                }
-                            }
+//                            else{
+//                                Divider().colorInvert()
+//                                
+//                                HStack {
+//                                    Text("刷新频率")
+//                                        .foregroundColor(.white)
+//                                        .frame(maxWidth: 80, alignment: .leading)
+//                 
+//                                    Spacer()
+//                                    
+//                                    Text("正常")
+//                                        .foregroundColor(.white)
+//                                        .frame(maxWidth: 40, alignment: .trailing)
+//                                    
+//                                    Toggle("", isOn: $viewModel.isHighHz)
+//                                        .toggleStyle(CustomToggleStyle_NoText())
+//                                        .frame(width: 70, height: 30, alignment: .trailing)
+//                                        .accentColor(.white)
+//                                        .onChange(of: viewModel.isHighHz) {
+//                                            newValue in
+//                                            
+//                                            viewModel.stopCamera()
+//                                            viewModel.setupAVCapture()
+//                                            viewModel.prestartCamera()
+//                                            viewModel.updateConfigJSON()
+//                                        }
+//                                    
+//                                    Text("增强")
+//                                        .foregroundColor(.white)
+//                                        .frame(maxWidth: 40, alignment: .trailing)
+//                                }
+//                            }
                             
                             Divider().colorInvert()
                             

@@ -35,7 +35,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     let clsModel_h = try! cls_0715_h_trans()
     let clsModel_v = try! cls_0727_v_trans()
     
-    let riffleDetectModel = try! detect_0903()
+    let riffleDetectModel = try! riffle_detect_1111()
     let riffleModel_h = try! riffle_cls_h_1107()
     let riffleModel_v = try! riffle_cls_v_1107()
     
@@ -230,6 +230,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         self.isWorking = true
         
         self.speechPerformer.voiceRate = self.voiceRate
+        
+        self.isHighHz = true
         
         if self.isHeadphonesConnected(){
             self.voiceDevice = 1
@@ -1191,7 +1193,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             }
                         }
                         
-                        else if self.shuffleMode[1] == 2{
+                        else if self.shuffleMode[1] == 2 && self.singlefeatureArray.count - 1 >= self.minSingleFeatureNum{
                             //拨中间
                             if self.singlefeatureArray.count > 0{
                                 self.singlefeatureArray.append(self.singlefeatureArray[0])
@@ -1776,8 +1778,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                     }
                 }
-                //Mod 0.7->0.25
-                if nodeIndex.count > 0 && (isAddCard || confidenceDic[key]! > 0.25){
+                if nodeIndex.count > 0 && (isAddCard || confidenceDic[key]! > 0.7){
                     targetDetecResultList[nodeIndex[0]]![nodeIndex[1]].nodeType = 4
                 }
             }
@@ -2024,8 +2025,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 let nodeType1 = targetDetecResultList[detectResultListIndex]![1].nodeType
                 
                 print("index ", detectResultListIndex,
-                      singlefeatureLabelDic[nowNum0] ?? "none", "type\(detectResultNode0.nodeType)", detectResultNode0.laplacianVariance, detectResultNode0.confidence[0], detectResultNode0.confidencePercent, detectResultListIndex,
-                      singlefeatureLabelDic[nowNum1] ?? "none", "type\(detectResultNode1.nodeType)", detectResultNode1.laplacianVariance, detectResultNode1.confidence[0], detectResultNode1.confidencePercent)
+                      singlefeatureLabelDic[nowNum0] ?? "none", "type\(detectResultNode0.nodeType)", detectResultNode0.laplacianVariance, detectResultNode0.confidence[0], detectResultNode0.singlefeatureIndex.count, "     ",
+                      singlefeatureLabelDic[nowNum1] ?? "none", "type\(detectResultNode1.nodeType)", detectResultNode1.laplacianVariance, detectResultNode1.confidence[0], detectResultNode1.singlefeatureIndex.count)
                 
                 chainConfidence0 = max(chainConfidence0, detectResultNode0.confidence[0])
                 chainConfidence1 = max(chainConfidence1, detectResultNode1.confidence[0])
@@ -2045,88 +2046,102 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     if nodeType0 == 2{
                         detectSingleFeatureArray.insert(insertCard0, at: 0)
                     }
-                    else if (nodeType0 == 0 || nodeType0 == 4) 
-                                && nowNum0 != -1
-                                && detectResultNode0.confidence[0] > 0.7
+                    else if nodeType0 == 4
+                            && nowNum0 != -1
+                            && detectResultNode0.confidence[0] > 0.7
+                            //&& detectResultNode0.confidence.count <= 10
                     {
-                        var confidenceFlag = 0
-                        var blurFlag = 0
-                        
-                        if detectResultNode0.laplacianVariance < lastDetectResultNode0.laplacianVariance * 0.5
-                            && detectResultNode0.laplacianVariance < nextDetectResultNode0.laplacianVariance * 0.5{
-                            blurFlag += 1
-                        }
-                        
-                        if detectResultNode0.confidence[0] > lastDetectResultNode0.confidence[0] && detectResultNode0.laplacianVariance > lastDetectResultNode0.laplacianVariance{
-                            confidenceFlag += 1
-                        }
-                        if detectResultNode0.confidence[0] > nextDetectResultNode0.confidence[0]
-                            && detectResultNode0.laplacianVariance > nextDetectResultNode0.laplacianVariance{
-                            confidenceFlag += 1
-                        }
-                        if lastDetectResultNode0.confidence[0] < 0.7 && lastDetectResultNode0.nodeType != 2{
-                            confidenceFlag += 1
-                        }
-                        if nextDetectResultNode0.confidence[0] < 0.7 && nextDetectResultNode0.nodeType != 1{
-                            confidenceFlag += 1
-                        }
-                        if detectResultNode0.laplacianVariance > lastDetectResultNode0.laplacianVariance
-                            && detectResultNode0.laplacianVariance > nextDetectResultNode0.laplacianVariance{
-                            confidenceFlag += 1
-                        }
-                        if detectResultNode0.confidence[0] > lastDetectResultNode0.confidence[0]
-                            && detectResultNode0.confidence[0] > nextDetectResultNode0.confidence[0]
-                            && blurFlag == 0{
-                            confidenceFlag += 1
-                        }
-                        
-                        if confidenceFlag >= 1{
-                            detectSingleFeatureArray.insert(insertCard0, at: 0)
-                        }
+                        detectSingleFeatureArray.insert(insertCard0, at: 0)
                     }
+//                    else if (nodeType0 == 0 || nodeType0 == 4)
+//                                && nowNum0 != -1
+//                                && detectResultNode0.confidence[0] > 0.7
+//                    {
+//                        var confidenceFlag = 0
+//                        var blurFlag = 0
+//                        
+//                        if detectResultNode0.laplacianVariance < lastDetectResultNode0.laplacianVariance * 0.5
+//                            && detectResultNode0.laplacianVariance < nextDetectResultNode0.laplacianVariance * 0.5{
+//                            blurFlag += 1
+//                        }
+//                        
+//                        if detectResultNode0.confidence[0] > lastDetectResultNode0.confidence[0] && detectResultNode0.laplacianVariance > lastDetectResultNode0.laplacianVariance{
+//                            confidenceFlag += 1
+//                        }
+//                        if detectResultNode0.confidence[0] > nextDetectResultNode0.confidence[0]
+//                            && detectResultNode0.laplacianVariance > nextDetectResultNode0.laplacianVariance{
+//                            confidenceFlag += 1
+//                        }
+//                        if lastDetectResultNode0.confidence[0] < 0.7 && lastDetectResultNode0.nodeType != 2{
+//                            confidenceFlag += 1
+//                        }
+//                        if nextDetectResultNode0.confidence[0] < 0.7 && nextDetectResultNode0.nodeType != 1{
+//                            confidenceFlag += 1
+//                        }
+//                        if detectResultNode0.laplacianVariance > lastDetectResultNode0.laplacianVariance
+//                            && detectResultNode0.laplacianVariance > nextDetectResultNode0.laplacianVariance{
+//                            confidenceFlag += 1
+//                        }
+//                        if detectResultNode0.confidence[0] > lastDetectResultNode0.confidence[0]
+//                            && detectResultNode0.confidence[0] > nextDetectResultNode0.confidence[0]
+//                            && blurFlag == 0{
+//                            confidenceFlag += 1
+//                        }
+//                        
+//                        if confidenceFlag >= 1{
+//                            detectSingleFeatureArray.insert(insertCard0, at: 0)
+//                        }
+//                    }
                     
-                    if nodeType1 == 2{
+                    if nodeType1 == 2 || nodeType1 == 4{
                         detectSingleFeatureArray.insert(insertCard1, at: 0)
                     }
-                    else if (nodeType1 == 0 || nodeType1 == 4) 
-                                && nowNum1 != -1
-                                && detectResultNode1.confidence[0] > 0.7
+                    else if nodeType1 == 4
+                            && nowNum1 != -1
+                            && detectResultNode1.confidence[0] > 0.7
+                            //&& detectResultNode1.confidence.count <= 10
                     {
-                        var confidenceFlag = 0
-                        var blurFlag = 0
-                        
-                        if detectResultNode1.laplacianVariance < lastDetectResultNode1.laplacianVariance * 0.5
-                            && detectResultNode1.laplacianVariance < nextDetectResultNode1.laplacianVariance * 0.5{
-                            blurFlag += 1
-                        }
-                        
-                        if detectResultNode1.confidence[0] > lastDetectResultNode1.confidence[0] && detectResultNode1.laplacianVariance > lastDetectResultNode1.laplacianVariance{
-                            confidenceFlag += 1
-                        }
-                        if detectResultNode1.confidence[0] > nextDetectResultNode1.confidence[0]
-                            && detectResultNode1.laplacianVariance > nextDetectResultNode1.laplacianVariance{
-                            confidenceFlag += 1
-                        }
-                        if lastDetectResultNode1.confidence[0] < 0.7 && lastDetectResultNode1.nodeType != 2{
-                            confidenceFlag += 1
-                        }
-                        if nextDetectResultNode1.confidence[0] < 0.7 && nextDetectResultNode1.nodeType != 1{
-                            confidenceFlag += 1
-                        }
-                        if detectResultNode1.laplacianVariance > lastDetectResultNode1.laplacianVariance
-                            && detectResultNode1.laplacianVariance > nextDetectResultNode1.laplacianVariance{
-                            confidenceFlag += 1
-                        }
-                        if detectResultNode1.confidence[0] > lastDetectResultNode1.confidence[0]
-                            && detectResultNode1.confidence[0] > nextDetectResultNode1.confidence[0]
-                            && blurFlag == 0{
-                            confidenceFlag += 1
-                        }
-                        
-                        if confidenceFlag >= 1{
-                            detectSingleFeatureArray.insert(insertCard1, at: 0)
-                        }
+                        detectSingleFeatureArray.insert(insertCard1, at: 0)
                     }
+//                    else if (nodeType1 == 0 || nodeType1 == 4)
+//                                && nowNum1 != -1
+//                                && detectResultNode1.confidence[0] > 0.7
+//                    {
+//                        var confidenceFlag = 0
+//                        var blurFlag = 0
+//                        
+//                        if detectResultNode1.laplacianVariance < lastDetectResultNode1.laplacianVariance * 0.5
+//                            && detectResultNode1.laplacianVariance < nextDetectResultNode1.laplacianVariance * 0.5{
+//                            blurFlag += 1
+//                        }
+//                        
+//                        if detectResultNode1.confidence[0] > lastDetectResultNode1.confidence[0] && detectResultNode1.laplacianVariance > lastDetectResultNode1.laplacianVariance{
+//                            confidenceFlag += 1
+//                        }
+//                        if detectResultNode1.confidence[0] > nextDetectResultNode1.confidence[0]
+//                            && detectResultNode1.laplacianVariance > nextDetectResultNode1.laplacianVariance{
+//                            confidenceFlag += 1
+//                        }
+//                        if lastDetectResultNode1.confidence[0] < 0.7 && lastDetectResultNode1.nodeType != 2{
+//                            confidenceFlag += 1
+//                        }
+//                        if nextDetectResultNode1.confidence[0] < 0.7 && nextDetectResultNode1.nodeType != 1{
+//                            confidenceFlag += 1
+//                        }
+//                        if detectResultNode1.laplacianVariance > lastDetectResultNode1.laplacianVariance
+//                            && detectResultNode1.laplacianVariance > nextDetectResultNode1.laplacianVariance{
+//                            confidenceFlag += 1
+//                        }
+//                        if detectResultNode1.confidence[0] > lastDetectResultNode1.confidence[0]
+//                            && detectResultNode1.confidence[0] > nextDetectResultNode1.confidence[0]
+//                            && blurFlag == 0{
+//                            confidenceFlag += 1
+//                        }
+//                        
+//                        if confidenceFlag >= 1{
+//                            detectSingleFeatureArray.insert(insertCard1, at: 0)
+//                        }
+//                    }
                 }
                 else{
                     if (nodeType0 == 2 || nodeType0 == 4)
@@ -2258,7 +2273,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
         }
         
-        isShort = uniqueArray.count <= 10
+        isShort = uniqueArray.count < min(minSingleFeatureNum,10)
         
         print("handle result \(uniqueArray.count) \(minSingleFeatureNum) isShort\(isShort)")
         
