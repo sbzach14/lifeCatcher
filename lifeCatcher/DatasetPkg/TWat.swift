@@ -1187,11 +1187,9 @@ class TWDatasetHandAnalyst{
                 }
                                 
                 rank = rank << 4 | pairRank
-                //rank = rank << 2 | pairsuit
                 
                 
                 let singlefeatureType = "对子"
-//                let singlefeatureType = "对子" + ClassifierSettingArgs.SingleFeatureNumberReportDic[singlefeatures[currentUsedSingleFeatureIndex[1]].originRank]!
                 
                 rankList.append(rank)
                 singlefeatureTypeList.append(singlefeatureType)

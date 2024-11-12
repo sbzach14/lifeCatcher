@@ -31,13 +31,13 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var cutStructArray: [cutStruct] = []
     @Published var cutShowArray : [Int] = []
     
-//    let detectModel = try! detect_0903_copy()
-//    let clsModel_h = try! cls_0715_h_trans_copy()
-//    let clsModel_v = try! cls_0727_v_trans_copy()
-    
     let detectModel = try! detect_0903()
     let clsModel_h = try! cls_0715_h_trans()
     let clsModel_v = try! cls_0727_v_trans()
+    
+    let riffleDetectModel = try! detect_0903()
+    let riffleModel_h = try! riffle_cls_h_1107()
+    let riffleModel_v = try! riffle_cls_v_1107()
     
     var originSize : [Float] = [1920, 1080] //相机图像大小
     var imageSize : [Float] = [569, 320] //target area 截图大小
@@ -228,10 +228,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         
         self.isWorking = true
-        
-        if self.blackMode == 1{
-            self.isBlack = true
-        }
         
         self.speechPerformer.voiceRate = self.voiceRate
         
@@ -730,7 +726,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: false)
             }
             else{
-                let result = try! self.detectModel.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: Double(confidenceThreshold))
+                let result = try! self.riffleDetectModel.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: Double(confidenceThreshold))
                 (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: false)
             }
         }
@@ -740,7 +736,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: true)
             }
             else{
-                let result = try! self.clsModel_h.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
+                let result = try! self.riffleModel_h.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
                 (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: true)
             }
         }
@@ -750,7 +746,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: true)
             }
             else{
-                let result = try! self.clsModel_v.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
+                let result = try! self.riffleModel_v.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
                 (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: true)
             }
         }
@@ -1045,41 +1041,40 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     }
                 }
                 
-                else if !self.isDetect && detectConfidence >= riffleDetectConfidenceThreshold{
-                    if isRiffle
-                        && uniqueNum == 1{
-                        self.isDetect = true
-                        self.state = "riffle"
-                        self.speakText(input: 0)
-                    }
-                    else if minDetectConfidence >= detectConfidenceThreshold && isShuffle {
-                        if leftDetectSingleFeature == self.stateSingleFeature[0]
-                            && rightDetectSingleFeature == self.stateSingleFeature[1]
-                            && uniqueNum == 2
-                            && shufflePostureJudge(coordinates: [singlefeatureResult[0].coordinate, singlefeatureResult[1].coordinate]){
-                            self.shuffleStartCounter += 1
-                        }
-                        else{
-                            self.shuffleStartCounter = 0
-                        }
-                        
-                        if self.shuffleStartCounter >= 3{
-                            self.isDetect = true
-                            self.detectNeedToCut = false
-                            self.state = "shuffle"
-                            print("状态：进入洗牌")
-                            
-                            if self.targetAreaMove(initTargetArea: self.initTargetArea, targetArea: targetArea){
-                                self.speakText(input: 0)
-                                self.speechPerformer.stopSpeechSynthesis()
-                            }
-                            
-                            self.initTargetArea = targetArea
-                        }
-                    }
+                //Mod riffleDetectConfidenceThreshold -> detectConfidenceMinThreshold
+                else if !self.isDetect && detectConfidence >= detectConfidenceMinThreshold
+                            && isRiffle && uniqueNum == 1{
+                    self.isDetect = true
+                    self.state = "riffle"
+                    self.speakText(input: 0)
                 }
                 
-                
+                //Mod detectConfidenceThreshold -> detectConfidenceMinThreshold
+                else if !self.isDetect && minDetectConfidence >= detectConfidenceMinThreshold && isShuffle{
+                    if leftDetectSingleFeature == self.stateSingleFeature[0]
+                        && rightDetectSingleFeature == self.stateSingleFeature[1]
+                        && uniqueNum == 2
+                        && shufflePostureJudge(coordinates: [singlefeatureResult[0].coordinate, singlefeatureResult[1].coordinate]){
+                        self.shuffleStartCounter += 1
+                    }
+                    else{
+                        self.shuffleStartCounter = 0
+                    }
+                    
+                    if self.shuffleStartCounter >= 3{
+                        self.isDetect = true
+                        self.detectNeedToCut = false
+                        self.state = "shuffle"
+                        print("状态：进入洗牌")
+                        
+                        if self.targetAreaMove(initTargetArea: self.initTargetArea, targetArea: targetArea){
+                            self.speakText(input: 0)
+                            self.speechPerformer.stopSpeechSynthesis()
+                        }
+                        
+                        self.initTargetArea = targetArea
+                    }
+                }
                 
                 if self.isDetect && self.state == "shuffle" && self.targetAreaMove(initTargetArea: self.initTargetArea, targetArea: targetArea) && self.detectSet.count < 5{
                     self.shuffleResetCounter += 1
@@ -1097,7 +1092,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     self.targetArea = [0,0,0,0]
                     self.stateCounter = 0
                     print("状态：切换为检测")
-                    
                 }
                 else if self.shuffleResetCounter > 5{
                     self.initDetectResult()
@@ -1188,7 +1182,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         if self.shuffleMode[1] == 1{
                             //拨到顶
                             if self.cutMode[1] != 0 || self.specialCard[1] != 0{
-                                if self.singlefeatureArray.count >= self.minSingleFeatureNum{
+                                if self.singlefeatureArray.count == self.allSingleFeatureIndex.count{
                                     self.speakText(input: 1)
                                 }
                                 else{
@@ -1205,7 +1199,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             }
                             
                             if self.cutMode[1] != 0 || self.specialCard[1] != 0{
-                                if self.singlefeatureArray.count >= self.minSingleFeatureNum + 1{
+                                if self.singlefeatureArray.count == self.allSingleFeatureIndex.count{
                                     self.speakText(input: 1)
                                 }
                                 else{
@@ -1514,13 +1508,16 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         if !isShort{
             //如果两侧都有 则要找到两侧都是链的时候开始 即两侧都是3
+            //Mod add targetDetecResultList[detectResultListIndex]![0].confidence[0] >= 0.8
             if !isSingle
             {
                 beginIndex = longHeadIndex
                 for keyIndex in beginIndex..<endIndex{
                     let detectResultListIndex = sortedKeys[keyIndex]
                     if targetDetecResultList[detectResultListIndex]![0].nodeType == 3
-                        && targetDetecResultList[detectResultListIndex]![1].nodeType == 3{
+                        && targetDetecResultList[detectResultListIndex]![1].nodeType == 3
+                        && targetDetecResultList[detectResultListIndex]![0].confidence[0] >= 0.8
+                        && targetDetecResultList[detectResultListIndex]![1].confidence[0] >= 0.8{
                         beginIndex = keyIndex
                         break
                     }
@@ -1779,7 +1776,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                     }
                 }
-                if nodeIndex.count > 0 && (isAddCard || confidenceDic[key]! > 0.7){
+                //Mod 0.7->0.25
+                if nodeIndex.count > 0 && (isAddCard || confidenceDic[key]! > 0.25){
                     targetDetecResultList[nodeIndex[0]]![nodeIndex[1]].nodeType = 4
                 }
             }
@@ -2260,7 +2258,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             }
         }
         
-        isShort = uniqueArray.count < 15
+        isShort = uniqueArray.count <= 10
         
         print("handle result \(uniqueArray.count) \(minSingleFeatureNum) isShort\(isShort)")
         
@@ -3884,6 +3882,9 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
         self.synthesizer = AVSpeechSynthesizer()
         self.synthesizer.delegate = self
         
+        var allSpeakString : String = " "
+        var allVoiceType : Int = 0
+        
         for repeatIndex in 0..<2{
             for (turnIndex, turnResult) in speakResultStruct.enumerated() {
                 
@@ -3892,31 +3893,30 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
                     if speakString.isEmpty{
                         speakString = "0"
                     }
-                        
-                    let speechUtterance = AVSpeechUtterance(string: speakString)
-                    if reportResult.voiceType == 0{
-                        speechUtterance.voice = chineseMaleVoice
-                    }
-                    if reportResult.voiceType == 1{
-                        speechUtterance.voice = chineseFemaleVoice
+                    else{
+                        speakString = convertArabicNumbersToChinese(speakString)
                     }
                     
-                    if repeatIndex != 0 && turnIndex == 0 && reportIndex == 0{
-                        speechUtterance.preUtteranceDelay = 0.05
-                    }
-                    speechUtterance.postUtteranceDelay = 0
-                    
-                    // print("播报的input \(reportResult.content)")
-                    
-                    speechUtterance.pitchMultiplier = 1
-                    speechUtterance.rate = self.voiceRate
-                    
-                    synthesizer.speak(speechUtterance)
+                    allVoiceType = reportResult.voiceType
+                    allSpeakString += speakString
                 }
             }
+            allSpeakString += "        "
         }
-        let emptySpeechUtterance = AVSpeechUtterance(string: " ")
-        synthesizer.speak(emptySpeechUtterance)
+        
+        let speechUtterance = AVSpeechUtterance(string: allSpeakString)
+        
+        speechUtterance.pitchMultiplier = 1
+        speechUtterance.rate = 0.25 + self.voiceRate * 0.5
+        
+        if allVoiceType == 0{
+            speechUtterance.voice = chineseMaleVoice
+        }
+        else{
+            speechUtterance.voice = chineseFemaleVoice
+        }
+        
+        synthesizer.speak(speechUtterance)
     }
 
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {

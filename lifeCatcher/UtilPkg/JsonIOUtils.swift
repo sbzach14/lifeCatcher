@@ -112,7 +112,7 @@ func createConfigJSON() {
         } else {
             if let configData = readConfigJSON() {
                 let version = configData["Version"] as? String
-                if version != AuthManager.version && version != "2.0.2"{
+                if version != AuthManager.version{
                     try jsonData.write(to: fileURL)
                 }
             }

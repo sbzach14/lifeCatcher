@@ -61,7 +61,7 @@ struct CurrentVisionObjectRecognitionView: View {
                         .aspectRatio(contentMode: .fill)
                         .ignoresSafeArea()
                         .onTapGesture(count: 2){
-                            if viewModel.blackMode == 2{
+                            if viewModel.blackMode != 0{
                                 viewModel.isBlack = true
                             }
                         }
