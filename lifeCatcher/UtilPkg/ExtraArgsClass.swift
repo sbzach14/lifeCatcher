@@ -1873,6 +1873,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             let nodesSet = allCombinations(combination)
             returnSolutionSet += nodesSet
         }
+        //第三次...
+        
         return returnSolutionSet
     }
     

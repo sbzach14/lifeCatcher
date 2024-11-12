@@ -171,7 +171,7 @@ struct MainMenuView: View {
         }
         
         isLoading = true
-        let url = URL(string: "http://1.94.17.30:8080/login")!
+        let url = URL(string: "http://10.0.0.26:8080/login")!
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         let timestamp = String(Date().timeIntervalSince1970)
