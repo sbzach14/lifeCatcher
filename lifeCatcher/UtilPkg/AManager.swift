@@ -72,7 +72,7 @@ class AuthManager {
             
             //TODO: post active request
                         
-            let url = URL(string: "http://10.0.0.26:8080/activate")!
+            let url = URL(string: "http://1.94.17.30:8080/activate")!
             var request = URLRequest(url: url)
             request.httpMethod = "POST"
             
