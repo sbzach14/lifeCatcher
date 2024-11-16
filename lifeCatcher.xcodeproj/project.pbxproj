@@ -73,8 +73,9 @@
 		D03811A82C7542C300726B99 /* cls_0715_h_trans.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/cls_0715_h_trans.mlmodelkey"; }; };
 		D03811AA2C76904D00726B99 /* OriginObjectRegView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D03811A92C76904D00726B99 /* OriginObjectRegView.swift */; };
 		D0697CDF2CDE67FC006DD383 /* SpeechUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0697CDE2CDE67FB006DD383 /* SpeechUtils.swift */; };
-		D0697CE22CDF5F7A006DD383 /* riffle_cls_h_1107.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D0697CE02CDF5F78006DD383 /* riffle_cls_h_1107.mlmodel */; };
-		D0697CE32CDF5F7A006DD383 /* riffle_cls_v_1107.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D0697CE12CDF5F79006DD383 /* riffle_cls_v_1107.mlmodel */; };
+		D0697CE22CDF5F7A006DD383 /* riffle_cls_h_1107.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D0697CE02CDF5F78006DD383 /* riffle_cls_h_1107.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/detect_0903.mlmodelkey"; }; };
+		D0697CE32CDF5F7A006DD383 /* riffle_cls_v_1107.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D0697CE12CDF5F79006DD383 /* riffle_cls_v_1107.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/detect_0903.mlmodelkey"; }; };
+		D0697CE52CE1E7E1006DD383 /* riffle_detect_1111.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D0697CE42CE1E7E0006DD383 /* riffle_detect_1111.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/detect_0903.mlmodelkey"; }; };
 		D0C507E02CD13AF4007FF4D0 /* SettingRecordConfigView_leishen.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0C507DF2CD13AF4007FF4D0 /* SettingRecordConfigView_leishen.swift */; };
 		D0CD59FD2C86DEF50030A939 /* Localize_Swift in Frameworks */ = {isa = PBXBuildFile; productRef = D0CD59FC2C86DEF50030A939 /* Localize_Swift */; };
 		D0DAEF912C77657400D5938A /* ReportSettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF902C77657400D5938A /* ReportSettingView.swift */; };
@@ -151,6 +152,7 @@
 		D0697CDE2CDE67FB006DD383 /* SpeechUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechUtils.swift; sourceTree = "<group>"; };
 		D0697CE02CDF5F78006DD383 /* riffle_cls_h_1107.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = riffle_cls_h_1107.mlmodel; sourceTree = "<group>"; };
 		D0697CE12CDF5F79006DD383 /* riffle_cls_v_1107.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = riffle_cls_v_1107.mlmodel; sourceTree = "<group>"; };
+		D0697CE42CE1E7E0006DD383 /* riffle_detect_1111.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = riffle_detect_1111.mlmodel; sourceTree = "<group>"; };
 		D0C507DF2CD13AF4007FF4D0 /* SettingRecordConfigView_leishen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingRecordConfigView_leishen.swift; sourceTree = "<group>"; };
 		D0DAEF902C77657400D5938A /* ReportSettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportSettingView.swift; sourceTree = "<group>"; };
 		D0DAEF922C77664100D5938A /* HistoryItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryItemView.swift; sourceTree = "<group>"; };
@@ -341,6 +343,7 @@
 				D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */,
 				D03811A42C7542C200726B99 /* cls_0727_v_trans.mlmodel */,
 				D02717D72C8704AB00A29D43 /* detect_0903.mlmodel */,
+				D0697CE42CE1E7E0006DD383 /* riffle_detect_1111.mlmodel */,
 				D0697CE02CDF5F78006DD383 /* riffle_cls_h_1107.mlmodel */,
 				D0697CE12CDF5F79006DD383 /* riffle_cls_v_1107.mlmodel */,
 				187A45422C2DA25E00BB055C /* success_voice.mp3 */,
@@ -498,6 +501,7 @@
 				A88EFE092A7FAD1100897243 /* AllSettingViewModel.swift in Sources */,
 				18C98D202C15902700A8CD49 /* CurrentVisionObjectRecognitionViewModel.swift in Sources */,
 				18C98D222C15906100A8CD49 /* SettingRecordView.swift in Sources */,
+				D0697CE52CE1E7E1006DD383 /* riffle_detect_1111.mlmodel in Sources */,
 				A86459282C90B59E00AF0BA9 /* Ain.swift in Sources */,
 				A8FBC7C22A3F0A5C00EDDFD7 /* VisionUtils.swift in Sources */,
 				A88EFE0D2A7FDC9500897243 /* HistoryView.swift in Sources */,
@@ -656,7 +660,7 @@
 				CODE_SIGN_ENTITLEMENTS = lifeCatcher/lifeCatcher.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
 				DEVELOPMENT_TEAM = 6WK4Q32GMN;
 				ENABLE_PREVIEWS = YES;
@@ -675,12 +679,12 @@
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 49;
+				MARKETING_VERSION = 2.0.4;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -704,7 +708,7 @@
 				CODE_SIGN_ENTITLEMENTS = lifeCatcher/lifeCatcher.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
 				DEVELOPMENT_TEAM = 6WK4Q32GMN;
 				ENABLE_PREVIEWS = YES;
@@ -723,12 +727,12 @@
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 49;
+				MARKETING_VERSION = 2.0.4;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
 				PRODUCT_NAME = "$(TARGET_NAME)";
