@@ -57,6 +57,7 @@
 		A89CDD8A2C71B79500588273 /* RegisterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89CDD892C71B79500588273 /* RegisterView.swift */; };
 		A89CDD8C2C76767300588273 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = A89CDD8B2C76767300588273 /* KeychainHelper.swift */; };
 		A89D912B2C854CD2009B7003 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A89D91292C854CD2009B7003 /* Localizable.strings */; };
+		A8A9F1632CE4218500084DBE /* RFast.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8A9F1622CE4218500084DBE /* RFast.swift */; };
 		A8FBC7C22A3F0A5C00EDDFD7 /* VisionUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8FBC7C12A3F0A5C00EDDFD7 /* VisionUtils.swift */; };
 		B058BE5F2B09FFC20078E792 /* CurrentBlurDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058BE5E2B09FFC20078E792 /* CurrentBlurDetector.swift */; };
 		D013E36D2C712F8D000F2B57 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D013E36C2C712F8D000F2B57 /* Assets.xcassets */; };
@@ -138,6 +139,7 @@
 		A89CDD8B2C76767300588273 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 		A89D912A2C854CD2009B7003 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A89D912C2C854FF4009B7003 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		A8A9F1622CE4218500084DBE /* RFast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RFast.swift; sourceTree = "<group>"; };
 		A8FBC7C12A3F0A5C00EDDFD7 /* VisionUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionUtils.swift; sourceTree = "<group>"; };
 		B058BE5E2B09FFC20078E792 /* CurrentBlurDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentBlurDetector.swift; sourceTree = "<group>"; };
 		D013E3612C7129EE000F2B57 /* lifeCatcher.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = lifeCatcher.entitlements; sourceTree = "<group>"; };
@@ -206,6 +208,7 @@
 				18C98D022C158F7B00A8CD49 /* TCar.swift */,
 				18C98D032C158F7B00A8CD49 /* TEGan.swift */,
 				A86459272C90B59E00AF0BA9 /* Ain.swift */,
+				A8A9F1622CE4218500084DBE /* RFast.swift */,
 			);
 			path = DatasetPkg;
 			sourceTree = "<group>";
@@ -482,6 +485,7 @@
 				D03811A72C7542C300726B99 /* cls_0727_v_trans.mlmodel in Sources */,
 				D03811A82C7542C300726B99 /* cls_0715_h_trans.mlmodel in Sources */,
 				D03811A22C75401200726B99 /* cls_main.mlmodel in Sources */,
+				A8A9F1632CE4218500084DBE /* RFast.swift in Sources */,
 				18C98D112C158F7B00A8CD49 /* NPFive.swift in Sources */,
 				A892C6002A765A0A003FA2B3 /* MainView.swift in Sources */,
 				D0697CDF2CDE67FC006DD383 /* SpeechUtils.swift in Sources */,

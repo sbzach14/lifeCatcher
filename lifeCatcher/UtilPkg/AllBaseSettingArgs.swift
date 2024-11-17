@@ -102,7 +102,9 @@ class ClassifierSettingArgs {
         let rule15 = CBDatasetRule(ruleIndex: 15, ruleName: "比鸡")
         let rule16 = TWDatasetRule(ruleIndex: 16, ruleName: "十三水")
         let rule17 = AinRule(ruleIndex: 17, ruleName: "梭哈")
-        return [rule0.ruleIndex: rule0, rule1.ruleIndex: rule1, rule2.ruleIndex: rule2, rule3.ruleIndex: rule3, rule4.ruleIndex: rule4, rule5.ruleIndex: rule5, rule6.ruleIndex: rule6, rule7.ruleIndex: rule7, rule8.ruleIndex: rule8, rule9.ruleIndex: rule9,rule10.ruleIndex:rule10, rule11.ruleIndex: rule11,rule12.ruleIndex:rule12, rule13.ruleIndex:rule13, rule14.ruleIndex: rule14, rule15.ruleIndex: rule15, rule16.ruleIndex: rule16, rule17.ruleIndex: rule17]
+        let rule18 = RFastDatasetRule(ruleIndex: 18, ruleName: "跑的快")
+        
+        return [rule0.ruleIndex: rule0, rule1.ruleIndex: rule1, rule2.ruleIndex: rule2, rule3.ruleIndex: rule3, rule4.ruleIndex: rule4, rule5.ruleIndex: rule5, rule6.ruleIndex: rule6, rule7.ruleIndex: rule7, rule8.ruleIndex: rule8, rule9.ruleIndex: rule9,rule10.ruleIndex:rule10, rule11.ruleIndex: rule11,rule12.ruleIndex:rule12, rule13.ruleIndex:rule13, rule14.ruleIndex: rule14, rule15.ruleIndex: rule15, rule16.ruleIndex: rule16, rule17.ruleIndex: rule17, rule18.ruleIndex: rule18]
     }()
     
     static func cutRankConvert(cutNumSetting: Int, singlefeatureIndex: Int)->Int{
@@ -546,7 +548,9 @@ public class DetectSettingArgs{
         allPreSetReportRules[199] = ReportClass.init(reportName: "[706]:去掉14张面牌再根据第14张牌点书再去牌报哪家最小", reportID: 199, rankReport: 3, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: -1, reportTarget: 0, singlefeaturesTransformation: 14, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, dealFormation: -1, cutSingleFeatureProcession: -1)
         allPreSetReportRules[200] = ReportClass.init(reportName: "[707]:去掉面牌底牌再根据面牌底牌点数和再去牌报最大次大", reportID: 200, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: -1, reportTarget: 0, singlefeaturesTransformation: 15, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, dealFormation: -1, cutSingleFeatureProcession: -1)
         allPreSetReportRules[201] = ReportClass.init(reportName: "[708]:固定去掉6、7、8、9张牌，以去牌数为色报位置最大", reportID: 200, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 8, reportTarget: 0, singlefeaturesTransformation: 3, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: 11, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, dealFormation: -1, cutSingleFeatureProcession: -1)
-        //TODO 202
+
+        allPreSetReportRules[202] = ReportClass.init(reportName: "[710]: 跑的快报下家大牌", reportID: 202, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: -1, reportTarget: 29, singlefeaturesTransformation: -1, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, dealFormation: -1, cutSingleFeatureProcession: -1)
+        
         allPreSetReportRules[203] = ReportClass.init(reportName: "[719]:比第一张牌从最大牌继续发报最大次大", reportID: 203, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: -1, reportTarget: 0, singlefeaturesTransformation: 16, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, dealFormation: -1, cutSingleFeatureProcession: -1)
         allPreSetReportRules[204] = ReportClass.init(reportName: "[720]:比第一张牌从最大牌继续发报最大", reportID: 204, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: -1, reportTarget: 0, singlefeaturesTransformation: 16, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, dealFormation: -1, cutSingleFeatureProcession: -1)
         allPreSetReportRules[205] = ReportClass.init(reportName: "[721]:比第一张牌从最小牌继续发报最大", reportID: 205, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: -1, reportTarget: 0, singlefeaturesTransformation: 17, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, dealFormation: -1, cutSingleFeatureProcession: -1)
@@ -555,6 +559,11 @@ public class DetectSettingArgs{
         allPreSetReportRules[209] = ReportClass.init(reportName: "[725]:比第一张牌从最大牌继续发报各家点数", reportID: 209, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: -1, reportTarget: 0, singlefeaturesTransformation: 15, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, dealFormation: -1, cutSingleFeatureProcession: -1)
         
         allPreSetReportRules[210] = ReportClass.init(reportName: "[740]:报指定玩家手里牌", reportID: 210, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: -1, reportTarget: 24, singlefeaturesTransformation: -1, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, dealFormation: -1, cutSingleFeatureProcession: -1)
+        
+        allPreSetReportRules[211] = ReportClass.init(reportName: "[741]:报玩家手里牌+照牌报后面4张单张", reportID: 211, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: -1, reportTarget: 30, singlefeaturesTransformation: -1, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, dealFormation: -1, cutSingleFeatureProcession: -1)
+        
+        allPreSetReportRules[267] = ReportClass.init(reportName: "[741_1]:报最大+照牌报后面4张单张", reportID: 267, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: -1, reportTarget: 31, singlefeaturesTransformation: -1, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, dealFormation: -1, cutSingleFeatureProcession: -1)
+        
         
         //todo 210-212
         allPreSetReportRules[213] = ReportClass.init(reportName: "[755]:看色留色上10 张去牌保位置最大", reportID: 212, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: 12, reportTarget: 1, singlefeaturesTransformation: 23, consecutiveReport: -1, positionToReport: 0, colorSingleFeaturePos: 17, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, dealFormation: -1, cutSingleFeatureProcession: 2)
@@ -3859,6 +3868,55 @@ public class DetectSettingArgs{
                     allPreSetRules[i]![0]!.append(suitRules)
                     allPreSetRules[i]![0]!.append(rankRules)
                     allPreSetRules[i]![0]!.append(rankRuleChecked)
+                    
+                    break
+                
+                //跑的快规则
+                case 18:
+                    let rule = ClassifierSettingArgs.targetSetting[i] as! RFastDatasetRule
+                    for j in 0...rule.setting.count - 1{
+                        allPreSetRules[i]![j] = []
+                    }
+
+                    var handNum = 12
+                    var communityNum = 0
+                    var redspecialfeatureValueRange = 0
+                    var blackspecialfeatureValueRange = 0
+                    var KValueRange = 0
+                    var QValueRange = 0
+                    var JValueRange = 0
+                    var samePointComparision = 0
+                    var isCompareSuit = 0
+                    var singlefeatureRankRule = 0
+                
+                    args = [handNum, communityNum,redspecialfeatureValueRange, blackspecialfeatureValueRange, KValueRange, QValueRange, JValueRange, samePointComparision,isCompareSuit,singlefeatureRankRule]
+                    suitRules = [3,2,1,0]
+                    rankRules = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]
+                    rankRuleChecked = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+                    allPreSetRules[i]![0]!.append(args)
+                    allPreSetRules[i]![0]!.append(suitRules)
+                    allPreSetRules[i]![0]!.append(rankRules)
+                    allPreSetRules[i]![0]!.append(rankRuleChecked)
+                
+                    handNum = 13
+                    communityNum = 0
+                    redspecialfeatureValueRange = 0
+                    blackspecialfeatureValueRange = 0
+                    KValueRange = 0
+                    QValueRange = 0
+                    JValueRange = 0
+                    samePointComparision = 0
+                    isCompareSuit = 0
+                    singlefeatureRankRule = 0
+                
+                    args = [handNum, communityNum,redspecialfeatureValueRange, blackspecialfeatureValueRange, KValueRange, QValueRange, JValueRange, samePointComparision,isCompareSuit,singlefeatureRankRule]
+                    suitRules = [3,2,1,0]
+                    rankRules = [16,17,18,19,20,21]
+                    rankRuleChecked = [1,1,1,1,1,1]
+                    allPreSetRules[i]![1]!.append(args)
+                    allPreSetRules[i]![1]!.append(suitRules)
+                    allPreSetRules[i]![1]!.append(rankRules)
+                    allPreSetRules[i]![1]!.append(rankRuleChecked)
                     
                     break
                 

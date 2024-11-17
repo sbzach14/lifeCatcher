@@ -670,6 +670,9 @@ struct SettingRecordConfigView_leishen: View{
         case 17:
             allSingleFeatureIndex = Ain.getAllSingleFeatureIndex(minRank: args[2])
             break
+        case 18:
+            allSingleFeatureIndex = RFastDataset.getAllSingleFeatureIndex(setting: self.setting)
+            break
         default:
             print("error")
         }
@@ -750,6 +753,9 @@ struct SettingRecordConfigView_leishen: View{
         case 17:
             let selectedRule = ClassifierSettingArgs.targetSetting[DatasetType] as! AinRule
             minSingleFeatureNum = Ain.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+        case 18:
+            let selectedRule = ClassifierSettingArgs.targetSetting[DatasetType] as! RFastDatasetRule
+            minSingleFeatureNum = RFastDataset.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
         default:
             print("error")
         }

@@ -189,6 +189,8 @@ class ReportManager{
         3: 2
     ]
     
+    static var isFirstReport: Bool = true
+    
     static let baodanzhang : [Int] = [187,188,189,211]
     
     static let allHandSpecialCardReport : [Int] = [
@@ -403,7 +405,7 @@ class ReportManager{
             199: "[706]:去掉14张面牌根据第14张牌点数再去牌报最小",
             200: "[707]:去面牌底牌根据面牌底牌点数和去牌报最大次大",
             201: "[708]:固定去掉6、7、8、9张牌，以去牌数为色报位置最大*",
-            202: "[710]:跑的快报下家大牌*",
+            202: "[710]:跑的快报下家大牌",
             203: "[719]:比第一张牌从最大牌继续发报最大次大",
             204: "[720]:比第一张牌从最大牌继续发报最大",
             205: "[721]:比第一张牌从最小牌继续发报最大",
@@ -412,7 +414,7 @@ class ReportManager{
             208: "[724]:比第一张牌从最小牌继续发飞2张保庄家最大次大*",
             209: "[725]:比第一张牌从最大牌继续发报各家点数*",
             210: "[740]:报指定玩家手里牌",
-            211: "[741]:报玩家手里牌+照牌报后面4张单张*",
+            211: "[741]:报玩家手里牌+照牌报后面4张单张",
             212: "[745]:看切牌报上下部分牌张数*",
             213: "[755]看色留色上10张去牌保位置最大",
             214: "[758]:看色留色+色牌上X张为色报最大次大",
@@ -463,7 +465,8 @@ class ReportManager{
         263: "[1003]: 底为色色牌点数去牌报最大次大",
         264: "[1004]: 底为色色牌点数去牌报最小次小",
         265:"[11]:报最大和最大家牌（点数)",
-        266:"[15]:报最大次大不打几平点对子活门半活门"
+        266:"[15]:报最大次大不打几平点对子活门半活门",
+        267:"[741_1]:报最大+照牌报后面4张单张"
 
     ]
     static let allReportInfo: [Int: String] = [
@@ -1205,7 +1208,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         比如报4231，表示去掉6张时以6为色，位置比如报较4最大、去掉7张时以7为色，位置2最大，去掉8张时以8为色位置3最大，去掉9张时以9为色，位置1最大
         """,
             202: """
-        报下家大于9的牌，上家炸弹。910 JQKA王，Y=9,报大于9的牌。Y=10,报大于10的牌
+        报下家大于9的牌, 910JQKA2王，Y=9,报大于9的牌。Y=10,报大于10的牌
         """,
             203: """
         每人先发一张牌，哪家牌点数最大，后续牌从最大家继续发。报哪家最大次大。拿第一张牌的定义为第1家
@@ -1239,7 +1242,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         洗看底后报位置参数指定的玩家手里的牌。位置参数变化后，再报当前位置指定的玩家的牌。比如洗看底时，位置=4，报第4家的手里的牌调位置=1，报玩家1手里的牌。X=1报单张的点数。X>1报单张的点数和花色
         """,
             211: """
-        如果不能看底，设定切牌设置=看手牌，选择好看的是第几张。先报各玩家手里的牌，照任意牌，报该牌的后续4张。
+        设置选连续看底，如果不能看底，设定切牌设置=看手牌。先报各玩家手里的牌，照任意牌，报该牌的后续4张。
         X=1报单张的点数。
         X>1 报单张的点数和花色
         """,
@@ -1491,6 +1494,11 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
 有平点且平点相邻第2大（平点分为杂平点，双平点，平点，杂平点有大小则表示大->平点为最大两家，小->为最小两家
 如果有活门则会报活门几或者半活门几
 """,
+        267:"""
+        设置选连续看底，如果不能看底，设定切牌设置=看手牌。先报最大家，照任意牌，报该牌的后续4张。
+        X=1报单张的点数。
+        X>1 报单张的点数和花色
+"""
     ]
     
     static func cutRankConvert(cutNumSetting: Int, singlefeatureIndex: Int)->Int{
@@ -1873,6 +1881,16 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             let nodesSet = allCombinations(combination)
             returnSolutionSet += nodesSet
         }
+        //第三次可以的话...
+        if FlyTCResultMatrix.count > 2 {
+            let threeCombination = FlyTCResultMatrix.combinations(ofCount: 3)
+            for combination in threeCombination {
+                let nodesSet = allCombinations(combination)
+                returnSolutionSet += nodesSet
+            }
+        }
+        
+        
         return returnSolutionSet
     }
     
@@ -2063,6 +2081,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             15: CBDataset.FindWinner(diyDealStatus:diyDealNum:inputSingleFeatures:args:rankRules:suitRules:),
             16: TWDataset.FindWinner,
             17: Ain.FindWinner(diyDealStatus:diyDealNum:inputSingleFeatures:args:rankRules:suitRules:),
+            18: RFastDataset.FindWinner(diyDealStatus:diyDealNum:inputSingleFeatures:args:rankRules:suitRules:),
         ]
         
         let minSingleFeatureFunctions: [Int: (Int, Int, Int, Int,[Int], [[Bool]]) -> Int] = [
@@ -2084,6 +2103,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             15: CBDataset.getMinSingleFeatureNum,
             16: TWDataset.getMinSingleFeatureNum,
             17: Ain.getMinSingleFeatureNum,
+            18: RFastDataset.getMinSingleFeatureNum,
         ]
         
         
@@ -4169,7 +4189,192 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 reportTargetFlag = 1
                             }
                             break
+                        //跑的快报下家大牌
+                        case 29:
                             
+                            let YValue = cutNumRangeSetting[1]
+                            
+                            let currentFeatures = currentResultInfo.RCReturnInfoList[targets[0]].RCSingleFeatures
+                            var bar = 9
+                            
+                            if YValue == 10 {
+                                bar = 10
+                            }
+                            
+                            var currentPoint: String = ""
+
+                            for i in currentFeatures{
+                                
+                                if i.originalRank == 1 || i.originalRank > bar || i.originalRank == 2 {
+                                    
+                                    let currentFeatureIndex = i.singlefeatureIndex
+                                    
+                                    if currentFeatureIndex == 53 {
+                                        currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[14]!
+                                    } else if currentFeatureIndex == 54 {
+                                        currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[15]!
+                                    } else {
+                                        currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[currentFeatureIndex % 13 + 1]!
+                                    }
+                                    
+                                    var currentColor: Int = 4
+                                    
+                                    if currentFeatureIndex != 53 && currentFeatureIndex != 54 {
+                                        currentColor = 3 - (currentFeatureIndex / 13)
+                                    }
+//                                    if XValue == 1 {
+                                    currentResultInfo.fourCardReport += currentPoint + " "
+//                                    } else {
+//                                        currentResultInfo.fourCardReport +=  ClassifierSettingArgs.SuitReportDix[currentColor]! + currentPoint + " "
+//                                    }
+                                }
+                            }
+                            
+                            break
+//                      报玩家手里牌+照牌报后面4张单张"
+                        case 30:
+//                          报所有人手里牌
+                            var currentPoint: String = ""
+                            if ReportManager.isFirstReport {
+                                let XValue = cutNumRangeSetting[0]
+                                
+                                for info in currentResultInfo.RCReturnInfoList{
+                                    
+                                    let currentFeatures = info.RCSingleFeatures
+
+                                    for i in currentFeatures{
+                                        
+                                        let currentFeatureIndex = i.singlefeatureIndex
+                                        
+                                        if currentFeatureIndex == 53 {
+                                            currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[14]!
+                                        } else if currentFeatureIndex == 54 {
+                                            currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[15]!
+                                        } else {
+                                            currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[currentFeatureIndex % 13 + 1]!
+                                        }
+                                        
+                                        var currentColor: Int = 4
+                                        
+                                        if currentFeatureIndex != 53 && currentFeatureIndex != 54 {
+                                            currentColor = 3 - (currentFeatureIndex / 13)
+                                        }
+                                        
+                                        if XValue == 1 {
+                                            currentResultInfo.fourCardReport += currentPoint + " "
+                                        } else {
+                                            currentResultInfo.fourCardReport +=  ClassifierSettingArgs.SuitReportDix[currentColor]! + currentPoint + " "
+                                        }
+                                    }
+                                    
+                                }
+                                
+                                ReportManager.isFirstReport = false
+//                          报后面四张单张
+                            } else {
+                                
+                                let XValue = cutNumRangeSetting[0]
+                                let featureNum = rcNum
+                                let gapNum = 1
+                                //如果反发
+                                var tempInputFeatures: [Int] = []
+                                var dealCoeff : Int = 0
+                                if newArgs[1] != 0{
+                                    tempInputFeatures = newInputSingleFeatures.reversed()
+                                    dealCoeff = 1
+                                } else {
+                                    tempInputFeatures = newInputSingleFeatures
+                                }
+                                for i in 0..<featureNum{
+                                    
+                                    let currentFeaturePos = (i * gapNum + XValue - 1 + dealCoeff) % tempInputFeatures.count
+//                                    if currentFeaturePos > tempInputFeatures.count - 1 || currentFeaturePos < 0{
+//                                        continue
+//                                    }
+                                    let currentFeatureIndex = tempInputFeatures[currentFeaturePos]
+                                    var currentPoint: String = ""
+                                    if currentFeatureIndex == 53 {
+                                        currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[14]!
+                                    } else if currentFeatureIndex == 54 {
+                                        currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[15]!
+                                    } else {
+                                        currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[currentFeatureIndex % 13 + 1]!
+                                    }
+                                    var currentColor: Int = 4
+                                    
+                                    if currentFeatureIndex != 53 && currentFeatureIndex != 54 {
+                                        currentColor = 3 - (currentFeatureIndex / 13)
+                                    }
+                                    
+                                    if XValue == 1 {
+                                        currentResultInfo.fourCardReport += currentPoint + " "
+                                    } else {
+                                        currentResultInfo.fourCardReport +=  ClassifierSettingArgs.SuitReportDix[currentColor]! + currentPoint + " "
+                                    }
+                                }
+                            }
+                            break
+                        //报最大+照牌报后面4张单张
+                        case 31:
+//                          报最大
+                            var currentPoint: String = ""
+                            if ReportManager.isFirstReport {
+                                
+                                print("RC加入了 \(resultPos)")
+                                currentResultInfo.targetRCList.append(resultPos)
+                                
+                                if colorSingleFeatureIndexList.count > 0 {
+                                    currentResultInfo.ColorSingleFeatures = colorSingleFeatureIndexList
+                                }
+                                
+                                currentPoint = String(resultPos[0] + 1)
+                                currentResultInfo.fourCardReport += currentPoint + " "
+                                
+                                ReportManager.isFirstReport = false
+                                
+//                          报后面四张单张
+                            } else {
+                                
+                                let XValue = cutNumRangeSetting[0]
+                                let featureNum = rcNum
+                                let gapNum = 1
+                                //如果反发
+                                var tempInputFeatures: [Int] = []
+                                var dealCoeff : Int = 0
+                                if newArgs[1] != 0{
+                                    tempInputFeatures = newInputSingleFeatures.reversed()
+                                    dealCoeff = 1
+                                } else {
+                                    tempInputFeatures = newInputSingleFeatures
+                                }
+                                for i in 0..<featureNum{
+                                    
+                                    let currentFeaturePos = (i * gapNum + XValue - 1 + dealCoeff) % tempInputFeatures.count
+//                                    if currentFeaturePos > tempInputFeatures.count - 1 || currentFeaturePos < 0{
+//                                        continue
+//                                    }
+                                    let currentFeatureIndex = tempInputFeatures[currentFeaturePos]
+                                    if currentFeatureIndex == 53 {
+                                        currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[14]!
+                                    } else if currentFeatureIndex == 54 {
+                                        currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[15]!
+                                    } else {
+                                        currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[currentFeatureIndex % 13 + 1]!
+                                    }
+                                    var currentColor: Int = 4
+                                    
+                                    if currentFeatureIndex != 53 && currentFeatureIndex != 54 {
+                                        currentColor = 3 - (currentFeatureIndex / 13)
+                                    }
+                                    
+                                    if XValue == 1 {
+                                        currentResultInfo.fourCardReport += currentPoint + " "
+                                    } else {
+                                        currentResultInfo.fourCardReport +=  ClassifierSettingArgs.SuitReportDix[currentColor]! + currentPoint + " "
+                                    }
+                                }
+                            }
+                            break
                         default:
                             break
                         }
@@ -5566,12 +5771,15 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             }
             break
 //      210: "[740]:报指定玩家手里牌",
-        case 210:
+//      211: "[741]:报玩家手里牌+照牌报后面4张单张"
+//      267: "[741_1]:报最大+照牌报后面4张单张"
+//      202: "[710]: 跑的快报下家大牌"
+        case 202, 210,211,267:
             for resultInfo in multipleReportResultInfo.singleResultList{
                 var reportString: String = ""
                 reportString = resultInfo.fourCardReport
                 reportResult.append([SpeakResultStruct(voiceType: 1, content: reportString)])
-                print("740 报法\(reportString)")
+                print("报法string\(reportString)")
             }
             break
 //            173: "[525]:底为色报发牌方式保位置最大次大",

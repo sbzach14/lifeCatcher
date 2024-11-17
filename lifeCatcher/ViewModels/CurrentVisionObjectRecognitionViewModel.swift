@@ -283,6 +283,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
     
     private func initShuffle(){
+        //初始化reportmanager flag
+        ReportManager.isFirstReport = true
+        
         self.continueCutTimeCounter = self.continueMaxCutTime
         self.currentRoundID = 1
         singlefeatureArray = []
@@ -3698,6 +3701,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         case 17:
             let selectedRule = ClassifierSettingArgs.targetSetting[DatasetType] as! AinRule
             minSingleFeatureNum = Ain.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
+        case 18:
+            let selectedRule = ClassifierSettingArgs.targetSetting[DatasetType] as! RFastDatasetRule
+            minSingleFeatureNum = RFastDataset.getMinSingleFeatureNum(rcNum: selectedRule.rcNum[rcNum], handNum: args[0], communityNum: args[1], dealType: self.dealType, diyDealNum: self.diyDealNum, diyDealStatus: self.diyDealStatus)
         default:
             print("DatasetType error")
         }
