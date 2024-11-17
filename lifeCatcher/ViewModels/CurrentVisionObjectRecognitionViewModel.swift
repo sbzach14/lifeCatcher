@@ -3008,7 +3008,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 }
             }
             
-            speakText(input: multipleDatasetRCInfos.reportResult, isCut: cutStructArray.count == 0)
+            speakText(input: multipleDatasetRCInfos.reportResult, isCut: cutStructArray.count == 0, repeatCnt: multipleDatasetRCInfos.repeatCnt)
         }
     }
     
@@ -3089,12 +3089,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
 
 
-    func speakText(input: [[SpeakResultStruct]], isCut: Bool) {
+    func speakText(input: [[SpeakResultStruct]], isCut: Bool, repeatCnt: Int) {
         let isSpeak = (!self.isHeadphonesConnected() && self.voiceDevice == 0)
                     || (self.isHeadphonesConnected() && self.voiceDevice == 1)
         
         if isSpeak{
-            self.speechPerformer.performSpeechSynthesis(speakResultStruct: input)
+            self.speechPerformer.performSpeechSynthesis(speakResultStruct: input, repeatCnt: repeatCnt)
         }
         if self.timeMode != 0{
 //            var reportTextList : [String] = []
@@ -3878,7 +3878,7 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
         lock.unlock()
     }
     
-    func performSpeechSynthesis(speakResultStruct: [[SpeakResultStruct]]) {
+    func performSpeechSynthesis(speakResultStruct: [[SpeakResultStruct]], repeatCnt: Int) {
         
         var emptyFlag = true
         for (turnIndex, turnResult) in speakResultStruct.enumerated() {
@@ -3906,7 +3906,7 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
         var allSpeakString : String = " "
         var allVoiceType : Int = 0
         
-        for repeatIndex in 0..<2{
+        for repeatIndex in 0..<repeatCnt{
             for (turnIndex, turnResult) in speakResultStruct.enumerated() {
                 
                 for (reportIndex, reportResult) in turnResult.enumerated() {

@@ -1833,7 +1833,10 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         var maxLookHandLeftCards: [Int] = []
         //看手牌的最小剩牌
         var minLookHandLeftCards: [Int] = []
+        //播报次数
+        var repeatCnt: Int = 2
     }
+    
     //多轮不同情况的结果
     struct multiRoundInfoStruct{
         var leftFeatures: [Int]
