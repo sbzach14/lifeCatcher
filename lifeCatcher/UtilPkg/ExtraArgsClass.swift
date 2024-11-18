@@ -191,7 +191,7 @@ class ReportManager{
     
     static var isFirstReport: Bool = true
     
-    static let baodanzhang : [Int] = [187,188,189,211]
+    static let baodanzhang : [Int] = [187,188,189,211,267]
     
     static let allHandSpecialCardReport : [Int] = [
         79,80,81,82,83,84,85,86,87,88,89,90
@@ -2131,8 +2131,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         
         //装下总结果
         var multipleResultInfo = MultipleReportResultInfo()
-        let oneTimeReport: [Int] = [202, 210,211,267]
-        if oneTimeReport.contains(reportID) {
+        if baodanzhang.contains(reportID) {
             multipleResultInfo.repeatCnt = 1
         } else {
             multipleResultInfo.repeatCnt = 2
@@ -5783,7 +5782,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
 //      211: "[741]:报玩家手里牌+照牌报后面4张单张"
 //      267: "[741_1]:报最大+照牌报后面4张单张"
 //      202: "[710]: 跑的快报下家大牌"
-        case 202, 210,211,267:
+        case 202,210,211,267:
             for resultInfo in multipleReportResultInfo.singleResultList{
                 var reportString: String = ""
                 reportString = resultInfo.fourCardReport

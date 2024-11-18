@@ -3922,7 +3922,7 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
                     allSpeakString += speakString
                 }
             }
-            allSpeakString += "        "
+            allSpeakString += " "
         }
         
         let speechUtterance = AVSpeechUtterance(string: allSpeakString)
