@@ -2131,6 +2131,12 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         
         //装下总结果
         var multipleResultInfo = MultipleReportResultInfo()
+        let oneTimeReport: [Int] = [202, 210,211,267]
+        if oneTimeReport.contains(reportID) {
+            multipleResultInfo.repeatCnt = 1
+        } else {
+            multipleResultInfo.repeatCnt = 2
+        }
         
         //每个位置拿最大次数
         for id in -1..<rcNum {
@@ -5861,6 +5867,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 contentStruct.content = contentStruct.content.replacingOccurrences(of: "J", with: "勾")
                 contentStruct.content = contentStruct.content.replacingOccurrences(of: "Q", with: "圈")
                 contentStruct.content = contentStruct.content.replacingOccurrences(of: "A", with: "尖")
+                contentStruct.content = contentStruct.content.replacingOccurrences(of: "K", with: "凯")
             }
         }
         
