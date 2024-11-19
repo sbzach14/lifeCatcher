@@ -1208,7 +1208,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         比如报4231，表示去掉6张时以6为色，位置比如报较4最大、去掉7张时以7为色，位置2最大，去掉8张时以8为色位置3最大，去掉9张时以9为色，位置1最大
         """,
             202: """
-        报下家大于9的牌, 910JQKA2王，Y=9,报大于9的牌。Y=10,报大于10的牌
+        报下家大于9的牌, 910JQKA2，Y=9, 报大于9的牌。Y=10,报大于10的牌, Y=3, 报全部牌
         """,
             203: """
         每人先发一张牌，哪家牌点数最大，后续牌从最大家继续发。报哪家最大次大。拿第一张牌的定义为第1家
@@ -4205,37 +4205,30 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             
                             let currentFeatures = currentResultInfo.RCReturnInfoList[targets[0]].RCSingleFeatures
                             var bar = 9
-                            
+                            let reportOrder: [Int] = [2,1,13,12,11,10,9,8,7,6,5,4,3]
+                            var cardDic: [Int:Int] = [:]
                             if YValue == 10 {
                                 bar = 10
+                            } else if YValue == 3{
+                                bar = 3
+                            }
+                            
+                            for i in currentFeatures {
+                                if let currentCnt = cardDic[i.originalRank] {
+                                    cardDic[i.originalRank] = currentCnt + 1
+                                } else {
+                                    cardDic[i.originalRank] = 1
+                                }
                             }
                             
                             var currentPoint: String = ""
+                            for cardOrginalRank in reportOrder {
+                                if let currentCnt = cardDic[cardOrginalRank] {
+                                    if cardOrginalRank == 1 || cardOrginalRank == 2 || cardOrginalRank > bar {
+                                        currentPoint = "\(currentCnt)张\(ClassifierSettingArgs.SingleFeatureNumberReportDic[cardOrginalRank]!)  "
+                                        currentResultInfo.fourCardReport += currentPoint + " "
 
-                            for i in currentFeatures{
-                                
-                                if i.originalRank == 1 || i.originalRank > bar || i.originalRank == 2 {
-                                    
-                                    let currentFeatureIndex = i.singlefeatureIndex
-                                    
-                                    if currentFeatureIndex == 53 {
-                                        currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[14]!
-                                    } else if currentFeatureIndex == 54 {
-                                        currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[15]!
-                                    } else {
-                                        currentPoint = ClassifierSettingArgs.SingleFeatureNumberReportDic[currentFeatureIndex % 13 + 1]!
                                     }
-                                    
-                                    var currentColor: Int = 4
-                                    
-                                    if currentFeatureIndex != 53 && currentFeatureIndex != 54 {
-                                        currentColor = 3 - (currentFeatureIndex / 13)
-                                    }
-//                                    if XValue == 1 {
-                                    currentResultInfo.fourCardReport += currentPoint + " "
-//                                    } else {
-//                                        currentResultInfo.fourCardReport +=  ClassifierSettingArgs.SuitReportDix[currentColor]! + currentPoint + " "
-//                                    }
                                 }
                             }
                             
@@ -5779,11 +5772,21 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 print("670 报法\(reportString)")
             }
             break
+            
+//      202: "[710]: 跑的快报下家大牌"
+        case 202:
+            for resultInfo in multipleReportResultInfo.singleResultList{
+                var reportString: String = ""
+                reportString = resultInfo.fourCardReport
+                reportResult.append([SpeakResultStruct(voiceType: 1, content: reportString)])
+                print("报法string\(reportString)")
+            }
+            break
+            
 //      210: "[740]:报指定玩家手里牌",
 //      211: "[741]:报玩家手里牌+照牌报后面4张单张"
 //      267: "[741_1]:报最大+照牌报后面4张单张"
-//      202: "[710]: 跑的快报下家大牌"
-        case 202, 210,211,267:
+        case 210,211,267:
             for resultInfo in multipleReportResultInfo.singleResultList{
                 var reportString: String = ""
                 reportString = resultInfo.fourCardReport
