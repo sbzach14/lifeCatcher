@@ -195,6 +195,8 @@ struct AuthTestView: View {
                                 self.alertMessage = "重制bit失败"
                             } else if deleteStatus == 4 {
                                 self.alertMessage = "授权码错误"
+                            } else if deleteStatus == 5 {
+                                self.alertMessage = "强制删除成功"
                             }
                         }
                     }
@@ -332,6 +334,8 @@ struct AuthTestView: View {
                                 self.alertMessage = "重制新设备失败"
                             } else if shiftStatus == 5 {
                                 self.alertMessage = "授权码错误"
+                            } else if shiftStatus == 6 {
+                                self.alertMessage = "强制移机成功"
                             }
                         }
                     }
