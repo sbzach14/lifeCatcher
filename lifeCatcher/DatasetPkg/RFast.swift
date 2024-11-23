@@ -33,6 +33,7 @@ class RFastDatasetRule : Rule{
     let handNum: [Int] = [12, 16]
     let singlefeatureRankRule:[Int: String] = [
         0:"2>A>K>Q>J..>4>3",
+        1:"A>k>Q>10....>2",
     ]
     
     
@@ -60,11 +61,19 @@ class RFastDatasetRule : Rule{
             18:"一条龙",
             19:"全小牌",
             20:"4张顺子",
-            21:"对子"
+            21:"对子",
+            22:"1703算分",
+            23:"1350算分",
+            24:"1501算分",
+            25:"1604算分",
         ]
         self.setting = [
             0:"48张跑的快[1601]",
-            1:"广西跑得快"
+            1:"广西跑得快",
+            2:"51张跑得快[1703]",
+            3:"52张跑的快[1350]",
+            4:"45张跑的快[1501]",
+            5:"48张跑的快[1604]",
         ]
         self.ruleInfo = [
             0:"""
@@ -104,7 +113,30 @@ class RFastDatasetRule : Rule{
 6.对子 对2 最大 对3最小
 
 
-"""
+""",
+            2:"""
+用牌张数： 51张 2-K 都是4张 3张A
+游戏规则:
+1.A最大, 2最小
+2.每人17张, 大牌得分最多者为最大
+3.A=2分 K=1.5分 Q=0.6分 其余都是0分
+4.如果要飞张直接选择飞张相关报法就可以
+
+""",
+            3:"""
+52张跑得快用牌:
+52张没有大小王2最大3最小
+4个人每人13张
+如果要飞张直接选择飞张相关报法就可以。 2和A和炸弹最多算最大
+""",
+            4:"""
+张数:45张。去掉3个2，3个A，2个王，1个K
+只用于报下家手里的牌 报法710手法，没有大小排序
+""",
+            5:"""
+1.用牌:去掉大小王，去掉4张2, 3算3分、炸弹算2.5分、A算2分、K算1分.
+2。总分最高为最大家如果要飞张直接选择飞张相关报法就可以
+""",
         ]
         self.rcNum = [2,3,4,5,6,7,8,9,10]
 
@@ -140,6 +172,19 @@ class RFastDataset{
             break
         case 1:
             result = Array(0...51)
+            break
+        case 2:
+            result = Array(1...51)
+            break
+        case 3:
+            result = Array(0...51)
+            break
+        case 4:
+            result = Array(2...11) + Array(15...25) + Array(28...51)
+            break
+        case 5:
+            result = [0] + Array(2...13) + Array(15...26) + Array(28...39) + Array(41...51)
+            break
         default:
             result = Array(0...51) + [53,54]
             break
@@ -218,7 +263,7 @@ class RFastDataset{
         var FeatureList = FeatureList
         // 发牌
         if dealNum == 0{
-            while !FeatureList.isEmpty && FeatureList.count > rcNum{
+            while !FeatureList.isEmpty && FeatureList.count >= rcNum{
                 //正发
                 if dealType == 0 {
                     for i in 0..<rcNum {
@@ -347,9 +392,14 @@ class RFastDatasetHandAnalyst{
             15:self.eval_isForthLevelPair(singlefeatures:),
             16:self.eval_isFourTwo(singlefeatures:),
             17:self.eval_isThreeBoom(singlefeatures:),
-            18:self.eval_isAllSmallCard(singlefeatures:),
-            19:self.eval_isFourCardStraight(singlefeatures:),
-            20:self.eval_isPair(singlefeatures:),
+            18:self.eval_isDragon(singlefeatures:),
+            19:self.eval_isAllSmallCard(singlefeatures:),
+            20:self.eval_isFourCardStraight(singlefeatures:),
+            21:self.eval_isPair(singlefeatures:),
+            22:self.eval_is1703Points(singlefeatures:),
+            23:self.eval_is1350Points(singlefeatures:),
+            24:self.eval_is1501Points(singlefeatures:),
+            25:self.eval_is1604Points(singlefeatures:),
         ]
     }
     
@@ -1136,6 +1186,90 @@ class RFastDatasetHandAnalyst{
         return (0, "", 0)
     }
     
+    func eval_is1703Points(singlefeatures: [RFastSingelFeature]) -> (Int, String, Int){
+        
+        var sum: Int = 0
+        
+        for singlefeature in singlefeatures {
+            if singlefeature.originalRank == 1 {
+                sum += 20
+            } else if singlefeature.originalRank == 13 {
+                sum += 15
+            } else if singlefeature.originalRank == 12 {
+                sum += 6
+            }
+        }
+        
+        return (sum, "分数\(sum)", 0)
+    }
+    
+    func eval_is1350Points(singlefeatures: [RFastSingelFeature]) -> (Int, String, Int){
+        
+        var sum: Int = 0
+        var cardDic: [Int:Int] = [:]
+        
+        for singlefeature in singlefeatures {
+            if let currentCnt = cardDic[singlefeature.originalRank] {
+                
+                cardDic[singlefeature.originalRank] = currentCnt + 1
+            } else {
+                cardDic[singlefeature.originalRank] = 1
+            }
+            
+            if singlefeature.originalRank == 1 {
+                sum += 1
+            } else if singlefeature.originalRank == 2 {
+                sum += 1
+            }
+        }
+        
+        for (key, value) in cardDic {
+            if value == 4 {
+                sum += 1
+            }
+        }
+        
+        return (sum, "分数\(sum)", 0)
+    }
+    
+    func eval_is1501Points(singlefeatures: [RFastSingelFeature]) -> (Int, String, Int){
+        
+        return (1, "分数\(1)", 0)
+    }
+    
+    func eval_is1604Points(singlefeatures: [RFastSingelFeature]) -> (Int, String, Int){
+        
+        var sum: Int = 0
+        var cardDic: [Int:Int] = [:]
+        
+        for singlefeature in singlefeatures {
+            if let currentCnt = cardDic[singlefeature.originalRank] {
+                
+                cardDic[singlefeature.originalRank] = currentCnt + 1
+            } else {
+                cardDic[singlefeature.originalRank] = 1
+            }
+            
+            if singlefeature.originalRank == 1 {
+                sum += 4
+            } else if singlefeature.originalRank == 13 {
+                sum += 2
+            } else if singlefeature.originalRank == 3 && singlefeature.suit == 2 {
+                sum += 6
+            }
+        }
+        
+        for (key, value) in cardDic {
+            if value == 4 {
+                sum += 5
+            }
+        }
+        
+        return (sum, "分数\(sum)", 0)
+    }
+    
+    
+    
     
     
     
@@ -1166,6 +1300,12 @@ class RFastDatasetHandAnalyst{
                     self.rank = 14
                 } else if singlefeature.originalRank == 2 {
                     self.rank = 15
+                } else {
+                    self.rank = singlefeature.originalRank
+                }
+            } else if singlefeatureRankRule == 1 {
+                if singlefeature.originalRank == 1 {
+                    self.rank = 14
                 } else {
                     self.rank = singlefeature.originalRank
                 }
