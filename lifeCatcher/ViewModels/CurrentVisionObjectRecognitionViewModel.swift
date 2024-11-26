@@ -3879,7 +3879,6 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
     }
     
     func performSpeechSynthesis(speakResultStruct: [[SpeakResultStruct]], repeatCnt: Int) {
-        
         var emptyFlag = true
         for (turnIndex, turnResult) in speakResultStruct.enumerated() {
             if turnResult.count > 0{
@@ -3907,6 +3906,7 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
         var allVoiceType : Int = 0
         
         for repeatIndex in 0..<repeatCnt{
+            allSpeakString = " "
             for (turnIndex, turnResult) in speakResultStruct.enumerated() {
                 
                 for (reportIndex, reportResult) in turnResult.enumerated() {
@@ -3922,22 +3922,21 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
                     allSpeakString += speakString
                 }
             }
-            allSpeakString += " "
+            
+            let speechUtterance = AVSpeechUtterance(string: allSpeakString)
+            
+            speechUtterance.pitchMultiplier = 1
+            speechUtterance.rate = 0.25 + self.voiceRate * 0.5
+            
+            if allVoiceType == 0{
+                speechUtterance.voice = chineseMaleVoice
+            }
+            else{
+                speechUtterance.voice = chineseFemaleVoice
+            }
+            synthesizer.speak(speechUtterance)
         }
         
-        let speechUtterance = AVSpeechUtterance(string: allSpeakString)
-        
-        speechUtterance.pitchMultiplier = 1
-        speechUtterance.rate = 0.25 + self.voiceRate * 0.5
-        
-        if allVoiceType == 0{
-            speechUtterance.voice = chineseMaleVoice
-        }
-        else{
-            speechUtterance.voice = chineseFemaleVoice
-        }
-        
-        synthesizer.speak(speechUtterance)
     }
 
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {

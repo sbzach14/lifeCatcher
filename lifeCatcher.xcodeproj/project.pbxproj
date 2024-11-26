@@ -660,7 +660,7 @@
 				CODE_SIGN_ENTITLEMENTS = lifeCatcher/lifeCatcher.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
 				DEVELOPMENT_TEAM = 6WK4Q32GMN;
 				ENABLE_PREVIEWS = YES;
@@ -684,7 +684,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.4;
+				MARKETING_VERSION = 2.0.5;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -708,7 +708,7 @@
 				CODE_SIGN_ENTITLEMENTS = lifeCatcher/lifeCatcher.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
 				DEVELOPMENT_TEAM = 6WK4Q32GMN;
 				ENABLE_PREVIEWS = YES;
@@ -732,7 +732,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.4;
+				MARKETING_VERSION = 2.0.5;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
 				PRODUCT_NAME = "$(TARGET_NAME)";
