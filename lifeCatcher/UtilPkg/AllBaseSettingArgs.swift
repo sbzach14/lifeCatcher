@@ -3917,7 +3917,86 @@ public class DetectSettingArgs{
                     allPreSetRules[i]![1]!.append(suitRules)
                     allPreSetRules[i]![1]!.append(rankRules)
                     allPreSetRules[i]![1]!.append(rankRuleChecked)
+                
+                    handNum = 13
+                    communityNum = 0
+                    redspecialfeatureValueRange = 0
+                    blackspecialfeatureValueRange = 0
+                    KValueRange = 0
+                    QValueRange = 0
+                    JValueRange = 0
+                    samePointComparision = 0
+                    isCompareSuit = 0
+                    singlefeatureRankRule = 1
+                
+                    args = [handNum, communityNum,redspecialfeatureValueRange, blackspecialfeatureValueRange, KValueRange, QValueRange, JValueRange, samePointComparision,isCompareSuit,singlefeatureRankRule]
+                    suitRules = [3,2,1,0]
+                    rankRules = [22]
+                    rankRuleChecked = [1]
+                    allPreSetRules[i]![2]!.append(args)
+                    allPreSetRules[i]![2]!.append(suitRules)
+                    allPreSetRules[i]![2]!.append(rankRules)
+                    allPreSetRules[i]![2]!.append(rankRuleChecked)
+                
+                    handNum = 13
+                    communityNum = 0
+                    redspecialfeatureValueRange = 0
+                    blackspecialfeatureValueRange = 0
+                    KValueRange = 0
+                    QValueRange = 0
+                    JValueRange = 0
+                    samePointComparision = 0
+                    isCompareSuit = 0
+                    singlefeatureRankRule = 0
+                
+                    args = [handNum, communityNum,redspecialfeatureValueRange, blackspecialfeatureValueRange, KValueRange, QValueRange, JValueRange, samePointComparision,isCompareSuit,singlefeatureRankRule]
+                    suitRules = [3,2,1,0]
+                    rankRules = [23]
+                    rankRuleChecked = [1]
+                    allPreSetRules[i]![3]!.append(args)
+                    allPreSetRules[i]![3]!.append(suitRules)
+                    allPreSetRules[i]![3]!.append(rankRules)
+                    allPreSetRules[i]![3]!.append(rankRuleChecked)
                     
+                    handNum = 13
+                    communityNum = 0
+                    redspecialfeatureValueRange = 0
+                    blackspecialfeatureValueRange = 0
+                    KValueRange = 0
+                    QValueRange = 0
+                    JValueRange = 0
+                    samePointComparision = 0
+                    isCompareSuit = 0
+                    singlefeatureRankRule = 0
+                
+                    args = [handNum, communityNum,redspecialfeatureValueRange, blackspecialfeatureValueRange, KValueRange, QValueRange, JValueRange, samePointComparision,isCompareSuit,singlefeatureRankRule]
+                    suitRules = [3,2,1,0]
+                    rankRules = [24]
+                    rankRuleChecked = [1]
+                    allPreSetRules[i]![4]!.append(args)
+                    allPreSetRules[i]![4]!.append(suitRules)
+                    allPreSetRules[i]![4]!.append(rankRules)
+                    allPreSetRules[i]![4]!.append(rankRuleChecked)
+                
+                    handNum = 13
+                    communityNum = 0
+                    redspecialfeatureValueRange = 0
+                    blackspecialfeatureValueRange = 0
+                    KValueRange = 0
+                    QValueRange = 0
+                    JValueRange = 0
+                    samePointComparision = 0
+                    isCompareSuit = 0
+                    singlefeatureRankRule = 0
+                
+                    args = [handNum, communityNum,redspecialfeatureValueRange, blackspecialfeatureValueRange, KValueRange, QValueRange, JValueRange, samePointComparision,isCompareSuit,singlefeatureRankRule]
+                    suitRules = [3,2,1,0]
+                    rankRules = [25]
+                    rankRuleChecked = [1]
+                    allPreSetRules[i]![5]!.append(args)
+                    allPreSetRules[i]![5]!.append(suitRules)
+                    allPreSetRules[i]![5]!.append(rankRules)
+                    allPreSetRules[i]![5]!.append(rankRuleChecked)
                     break
                 
             default:
