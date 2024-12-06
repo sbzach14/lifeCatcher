@@ -81,10 +81,11 @@ func createConfigJSON() {
     ]
     
     let boolDict: [String: Bool] = [
-        "isBackCamera": false,
+        "isBackCamera": true,
         "isCameraHorizon": true,
         "isHighHz": true,
         "isMaxLightness": false,
+        "isAddCard": true
     ]
     
     let configDict: [String: Any] = [

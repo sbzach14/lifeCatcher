@@ -119,16 +119,9 @@ struct SettingRecordConfigView_leishen: View{
             self.shuffleRiffleMode = 0
         }
         
-        if self.shuffleMode[0] != 0{
-            self.cutMode[1] = self.cutMode[0]
-            self.specialCard[1] = self.specialCard[0]
-            self.reportSetting[1] = self.reportSetting[0]
-        }
-        else{
-            self.cutMode[0] = self.cutMode[1]
-            self.specialCard[0] = self.specialCard[1]
-            self.reportSetting[0] = self.reportSetting[1]
-        }
+        self.cutMode[1] = self.cutMode[0]
+        self.specialCard[1] = self.specialCard[0]
+        self.reportSetting[1] = self.reportSetting[0]
         
         self.editType = 1
         self.initdone = true

@@ -11,6 +11,7 @@ class SettingViewModel: ObservableObject {
     @Published var isCameraHorizon: Bool = true
     @Published var isHighHz: Bool = true
     @Published var isMaxLightness: Bool = false
+    @Published var isAddCard: Bool = true
 
     @Published var activeDate: String = ""
     @Published var uniqueID: String = ""
@@ -41,6 +42,7 @@ class SettingViewModel: ObservableObject {
             self.isCameraHorizon = boolDict["isCameraHorizon"]!
             self.isHighHz = boolDict["isHighHz"]!
             self.isMaxLightness = boolDict["isMaxLightness"]!
+            self.isAddCard = boolDict["isAddCard"]!
             
             let intDict = configData["Int"] as! [String : Int]
             self.volumeUp = intDict["volumeUp"]!
@@ -107,7 +109,8 @@ class SettingViewModel: ObservableObject {
                 "isBackCamera" : self.isBackCamera,
                 "isCameraHorizon": self.isCameraHorizon,
                 "isHighHz": self.isHighHz,
-                "isMaxLightness": self.isMaxLightness
+                "isMaxLightness": self.isMaxLightness,
+                "isAddCard": self.isAddCard
             ]
             
             let intDict : [String: Int] = [

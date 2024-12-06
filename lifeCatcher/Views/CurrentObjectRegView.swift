@@ -245,6 +245,33 @@ struct CurrentVisionObjectRecognitionView: View {
                                         viewModel.updateConfigJSON()
                                     }
                             }
+                            
+                            Divider().colorInvert()
+                            
+                            HStack {
+                                Text("洗牌模式")
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: 80, alignment: .leading)
+             
+                                Spacer()
+                                
+                                Text("熟练")
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: 40, alignment: .trailing)
+                                
+                                Toggle("", isOn: $viewModel.isAddCard)
+                                    .toggleStyle(CustomToggleStyle_NoText())
+                                    .frame(width: 70, height: 30, alignment: .trailing)
+                                    .accentColor(.white)
+                                    .onChange(of: viewModel.isAddCard) {
+                                        newValue in
+                                        viewModel.updateConfigJSON()
+                                    }
+                                
+                                Text("新手")
+                                    .foregroundColor(.white)
+                                    .frame(maxWidth: 40, alignment: .trailing)
+                            }
                         }
                         .bubbleBackground()
                     }

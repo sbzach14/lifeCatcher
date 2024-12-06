@@ -81,7 +81,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     public var minSingleFeatureNum : Int = 0
     public var recgReport : Bool = false
     public var specialCard:[Int] = [0,0]
-    public var isAddCard: Bool = false
+    @Published var isAddCard: Bool = true
     public var currentRoundID: Int = 0
     
     //测试用的定时器
@@ -211,6 +211,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             self.isCameraHorizon = boolDict["isCameraHorizon"]!
             self.isHighHz = boolDict["isHighHz"]!
             self.isMaxLightness = boolDict["isMaxLightness"]!
+            self.isAddCard = boolDict["isAddCard"]!
             
             let intDict = configData["Int"] as! [String : Int]
             self.volumeUp = intDict["volumeUp"]!
@@ -3720,7 +3721,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 "isBackCamera" : self.isBackCamera,
                 "isCameraHorizon" : self.isCameraHorizon,
                 "isHighHz": self.isHighHz,
-                "isMaxLightness": self.isMaxLightness
+                "isMaxLightness": self.isMaxLightness,
+                "isAddCard": self.isAddCard
             ]
             
             let intDict : [String: Int] = [
