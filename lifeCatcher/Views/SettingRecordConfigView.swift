@@ -33,6 +33,11 @@ class generalRuleSetting{
         2:"拨中间",
     ]
     
+    static let allAddCardMode: [Int:String] = [
+        0:"熟手（高准确率）",
+        1:"新手（易洗全）",
+    ]
+    
     static let allShuffleRiffleMode: [Int: String] = [
         0:"洗牌",
         1:"拨到顶",
@@ -134,6 +139,8 @@ struct SettingRecordConfigView: View{
     @State private var currentNum: Int = 2
     @State private var minSingleFeatureNum:Int = 0
     @State private var recgReport: Bool = false
+    
+    @StateObject var viewModel = SettingViewModel()
     
     private func SetUpAll(){
         if (self.selectedSaveIndex == -1 && _selectedSaveIndex == -1) && self.editType == 0{
@@ -334,6 +341,21 @@ struct SettingRecordConfigView: View{
                                         .frame(maxWidth: .infinity, alignment: .trailing)
                                         .accentColor(.blue)
                                     }
+                                }.frame(height: 25)
+                                
+                                HStack{
+                                    Text("模式")
+                                        .frame(width: 40, alignment: .leading)
+                                        .foregroundColor(.white)
+                                    
+                                    Picker("addCardMode", selection: $viewModel.addCardMode) {
+                                        ForEach(0...generalRuleSetting.allAddCardMode.count - 1, id: \.self){
+                                            index in Text(generalRuleSetting.allAddCardMode[index]!).tag(index)
+                                        }
+                                    }
+                                    .pickerStyle(MenuPickerStyle())
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                                    .accentColor(.blue)
                                 }.frame(height: 25)
                                 
                             }.bluebubbleBackground().frame(width: 180)
@@ -636,6 +658,8 @@ struct SettingRecordConfigView: View{
     }
     
     private func saveData(isShowAlert: Bool){
+        viewModel.updateConfigJSON()
+        
         //看手牌
         if ReportManager.allHandSpecialCardReport.contains(self.reportSetting[0]){
             self.specialCard[0] = 1

@@ -70,6 +70,7 @@ func createConfigJSON() {
         "blackMode": 0,
         "voiceDevice": 0,
         "timeMode": 0,
+        "addCardMode": 1
     ]
     
     let floatDict : [String: Float] = [
@@ -82,10 +83,9 @@ func createConfigJSON() {
     
     let boolDict: [String: Bool] = [
         "isBackCamera": true,
-        "isCameraHorizon": true,
+        "isCameraHorizon": false,
         "isHighHz": true,
         "isMaxLightness": false,
-        "isAddCard": true
     ]
     
     let configDict: [String: Any] = [

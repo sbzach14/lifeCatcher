@@ -44,6 +44,7 @@ struct SettingRecordConfigView_leishen: View{
     @State private var recgReport: Bool = false
     
     @State private var shuffleRiffleMode: Int = 0
+    @StateObject var viewModel = SettingViewModel()
     
     private func SetUpAll(){
         if (self.selectedSaveIndex == -1 && _selectedSaveIndex == -1) && self.editType == 0{
@@ -242,6 +243,25 @@ struct SettingRecordConfigView_leishen: View{
                             .accentColor(.blue)
                         }.frame(height: 40)
                         .bluebubbleBackground()
+                        
+                        HStack{
+                            Text("洗牌模式")
+                                .frame(width: 100, alignment: .leading)
+                                .foregroundColor(.white)
+                                .font(.system(size: 20))
+                                .bold()
+                                .padding(.leading, 10)
+                            
+                            Picker("addCardMode", selection: $viewModel.addCardMode) {
+                                ForEach(0...generalRuleSetting.allAddCardMode.count - 1, id: \.self){
+                                    index in Text(generalRuleSetting.allAddCardMode[index]!).tag(index)
+                                }
+                            }
+                            .pickerStyle(MenuPickerStyle())
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .accentColor(.blue)
+                        }.frame(height: 40)
+                            .bluebubbleBackground()
                         
                         HStack{
                             Text("发牌定制")
@@ -493,13 +513,11 @@ struct SettingRecordConfigView_leishen: View{
         .onAppear(){
             self.SetUpAll()
         }
-        .onDisappear(){
-            self.saveData(isShowAlert: false)
-        }
-        
     }
     
     private func saveData(isShowAlert: Bool){
+        viewModel.updateConfigJSON()
+        
         if self.shuffleRiffleMode == 0{
             self.shuffleMode[0] = 1
             self.shuffleMode[1] = 0

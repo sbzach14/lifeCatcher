@@ -11,8 +11,7 @@ class SettingViewModel: ObservableObject {
     @Published var isCameraHorizon: Bool = true
     @Published var isHighHz: Bool = true
     @Published var isMaxLightness: Bool = false
-    @Published var isAddCard: Bool = true
-
+    
     @Published var activeDate: String = ""
     @Published var uniqueID: String = ""
     @Published var authKey: String = ""
@@ -22,6 +21,8 @@ class SettingViewModel: ObservableObject {
     @Published var blackMode: Int = 0
     @Published var voiceDevice: Int = 0
     @Published var timeMode: Int = 0
+    @Published var addCardMode: Int = 1
+
     
     @Published var volumeValue: Float = 0.5
     @Published var voiceRate: Float = 0.5
@@ -42,7 +43,6 @@ class SettingViewModel: ObservableObject {
             self.isCameraHorizon = boolDict["isCameraHorizon"]!
             self.isHighHz = boolDict["isHighHz"]!
             self.isMaxLightness = boolDict["isMaxLightness"]!
-            self.isAddCard = boolDict["isAddCard"]!
             
             let intDict = configData["Int"] as! [String : Int]
             self.volumeUp = intDict["volumeUp"]!
@@ -50,6 +50,7 @@ class SettingViewModel: ObservableObject {
             self.blackMode = intDict["blackMode"]!
             self.voiceDevice = intDict["voiceDevice"]!
             self.timeMode = intDict["timeMode"]!
+            self.addCardMode = intDict["addCardMode"]!
             
             let floatDict = configData["Float"] as! [String : Float]
             self.volumeValue = floatDict["volumeValue"]!
@@ -110,7 +111,7 @@ class SettingViewModel: ObservableObject {
                 "isCameraHorizon": self.isCameraHorizon,
                 "isHighHz": self.isHighHz,
                 "isMaxLightness": self.isMaxLightness,
-                "isAddCard": self.isAddCard
+                
             ]
             
             let intDict : [String: Int] = [
@@ -118,7 +119,8 @@ class SettingViewModel: ObservableObject {
                 "volumeDown": self.volumeDown,
                 "blackMode": self.blackMode,
                 "voiceDevice": self.voiceDevice,
-                "timeMode": self.timeMode
+                "timeMode": self.timeMode,
+                "addCardMode": self.addCardMode
             ]
             
             let floatDict : [String: Float] = [
