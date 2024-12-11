@@ -2905,7 +2905,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         testArray.shuffle()
         self.singlefeatureArray = testArray
-//        self.singlefeatureArray = [2,2,4,2,3,3,3,3,4,5,6,7,8]
+//        self.singlefeatureArray = [2,2,2,2,2,2,2,2,2,2,2,2]
         
         self.cutStructArray = []
         self.cutShowArray = []
@@ -3033,8 +3033,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     func computeNextRound(){
         if ReportManager.baodanzhang.contains(self.calModeArgs[self.shuffleOrRiffle][0]) && self.singlefeatureArray.count > 0{
             print("计算报单张的下一轮")
-            
-            //TODO
+            self.singlefeatureArray = self.leftSingleFeatures
+            self.currentRoundID += 1
+            self.cutStructArray.append(cutStruct(cutcardIndex: self.singlefeatureArray[self.singlefeatureArray.count - 1], cutMode: 0))
+            computeWinnerRC(isReset: false)
         }
         else if (self.leftSingleFeatures.count > 0){
             print("开始计算下一轮")

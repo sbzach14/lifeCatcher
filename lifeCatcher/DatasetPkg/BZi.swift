@@ -613,6 +613,7 @@ class BZDatasetHandAnalyst{
         if self.pointComparision == 1 {
             point = (point + mod - 1) % mod
         }
+        
         if self.samePointComparision == 0 {
             return (point + 1, singlefeatureType, 0)
         } else if self.samePointComparision == 1 {
