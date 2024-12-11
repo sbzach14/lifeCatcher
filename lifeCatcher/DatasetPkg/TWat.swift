@@ -184,7 +184,10 @@ class TWDataset{
         var allPlaySingleFeatures: [RC] = []
         var community = [SingleFeature]()
         
+        print("牌堆数量 \(FeatureList.count) 人数 \(rcNum) 手牌数 \(handNum)")
+        
         if FeatureList.count < self.getMinSingleFeatureNum(rcNum: rcNum,handNum: handNum, communityNum: communityNum,dealType: dealType,diyDealNum: diyDealNum,diyDealStatus: diyDealStatus){
+            
             return ([], [])
         }
         

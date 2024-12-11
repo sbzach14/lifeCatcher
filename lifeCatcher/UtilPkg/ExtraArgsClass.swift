@@ -3905,6 +3905,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             break
                         //保单个位置大小, 报多个, 多轮报单个(牌堆变化)
                         case 13:
+                            print("resultPos \(resultPos) targets \(targets)")
                             if resultPos.contains(where: {$0 == targets[0]}) {
                                 currentResultInfo.singlefeatureIndexToConfirmMaxMin[upDownID].append(singlefeatureIndex + 1)
                                 currentResultInfo.ColorSingleFeatures = colorSingleFeatureIndexList
