@@ -194,7 +194,7 @@ class ReportManager{
     static let baodanzhang : [Int] = [187,188,189,211,267]
     
     static let allHandSpecialCardReport : [Int] = [
-        79,80,81,82,83,84,85,86,87,88,89,90
+        79,80,81,82,83,84,85,86,87,88,89,90,268
     ]
     
     static let allColorSpecialCardReport : [Int] = [
@@ -466,7 +466,10 @@ class ReportManager{
         264: "[1004]: 底为色色牌点数去牌报最小次小",
         265:"[11]:报最大和最大家牌（点数)",
         266:"[15]:报最大次大不打几平点对子活门半活门",
-        267:"[741_1]:报最大+照牌报后面4张单张"
+        267:"[741_1]:报最大+照牌报后面4张单张",
+        268:"[8_2]:看手牌报最大次大活门半活门平点对子",
+        269:"[82-1]上10张去牌保34门有最大报最大",
+        270:"[83-1]上10张去牌保34门有最大次大报最大"
 
     ]
     static let allReportInfo: [Int: String] = [
@@ -636,7 +639,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         比如报24，表示去掉2张面牌补到底部可保第3门或第4门是最大，最大家是4。保34门由XY修改设定。
         """,
             51: """
-        比如报2，表示去掉2张面牌补到底部可保第3门第4门是最大次大，最大家是4。保34门由XY修改设定。
+        比如报24，表示去掉2张面牌补到底部可保第3门第4门是最大次大，最大家是4。保34门由XY修改设定。
         """,
             52: """
         报3，表示把前3张面牌一张一张地抽到底部，不是一次去3张。女声0=不用去牌也能保位置最大。男声0=找不到满足条件的牌
@@ -1498,7 +1501,16 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         设置选连续看底，如果不能看底，设定切牌设置=看手牌。先报最大家，照任意牌，报该牌的后续4张。
         X=1报单张的点数。
         X>1 报单张的点数和花色
-"""
+""",
+        268:"""
+        8-1报法加入看手牌，报 1张 23 活门4 对子 表示照牌是发牌的第一张 最大次大家为第二家和第三家，有活门4 有对子。以此类推
+""",
+        269:"""
+        比如报24，表示去掉2张面牌补到底部可保第3门第4门是最大，最大家是4。保34门, 去面牌由XY设定。
+""",
+        270:"""
+        比如报24，表示去掉2张面牌补到底部可保第3门第4门是最大次大，最大家是4。保34门, 去面牌由XY设定。
+""",
     ]
     
     static func cutRankConvert(cutNumSetting: Int, singlefeatureIndex: Int)->Int{
@@ -1760,6 +1772,10 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         var aliveNumber: Int = 0
         //看手牌的 aliveNumber List
         var handCardAliveNumberList: [Int] = []
+        //看手牌的 pairNumList
+        var handCardPairNumList: [[Int]] = []
+        //看手牌的 平点List
+        var handCardHasDrawList: [Int] = []
         //保XY门最大/最小，X 还是 Y最大/小
         var XorYMax: [[Int]] = []
         //有牛牛的rcID
@@ -3541,9 +3557,11 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             break
                         //save pair_player_ID, not cal color, no color, won't be wrong
                         case 3:
+                            currentResultInfo.handCardPairNumList.append([])
                             for winner in winnersInfo{
                                 if winner.isPair == 1{
                                     currentResultInfo.pairIDList.append(winner.rcID)
+                                    currentResultInfo.handCardPairNumList[singlefeatureIndex].append(winner.rcID)
                                 }
                             }
                             break
@@ -3690,6 +3708,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         case 0:
                             print("RC加入了 \(resultPos)")
                             currentResultInfo.targetRCList.append(resultPos)
+                            currentResultInfo.handCardHasDrawList.append(currentResultInfo.hasDrawPoint)
                             
                             if colorSingleFeatureIndexList.count > 0 {
                                 currentResultInfo.ColorSingleFeatures = colorSingleFeatureIndexList
@@ -3861,6 +3880,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         //report half alive gate
                         case 12:
                             currentResultInfo.targetRCList.append(resultPos)
+                            currentResultInfo.handCardHasDrawList.append(currentResultInfo.hasDrawPoint)
+
                             
                             if colorSingleFeatureIndexList.count > 0 {
                                 currentResultInfo.ColorSingleFeatures = colorSingleFeatureIndexList
@@ -3884,6 +3905,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             break
                         //保单个位置大小, 报多个, 多轮报单个(牌堆变化)
                         case 13:
+                            print("resultPos \(resultPos) targets \(targets)")
                             if resultPos.contains(where: {$0 == targets[0]}) {
                                 currentResultInfo.singlefeatureIndexToConfirmMaxMin[upDownID].append(singlefeatureIndex + 1)
                                 currentResultInfo.ColorSingleFeatures = colorSingleFeatureIndexList
@@ -3943,16 +3965,16 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 }
                             }
                             break
-                        //报xy大，多轮报一个
+                        //保xy有最大，报去牌 + 最大，多轮报一个
                         case 16:
                             var X: Int = 0
                             var Y: Int = 0
+                            print("resultPos \(resultPos) targets \(targets)")
                             if resultPos.contains(where: {$0 == targets[0]}){
                                 X = 1
                                 if currentResultInfo.RCReturnInfoList[targets[0]].rcDatasetRank == 1 {
                                     currentResultInfo.XorYMax[upDownID].append(targets[0] + 1)
                                 }
-                                
                             }
                             if resultPos.contains(where: {$0 == targets[1]}) {
                                 Y = 1
@@ -3961,7 +3983,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 }                            }
                             
                             if X == 1 || Y == 1{
-                                currentResultInfo.singlefeatureIndexToConfirmMaxMin[upDownID].append(singlefeatureIndex + 1)
+                                currentResultInfo.singlefeatureIndexToConfirmMaxMin[upDownID].append(singlefeatureIndex)
                                 currentResultInfo.flyTCSolution = (currentFlyTCSolution)
                                 currentResultInfo.ColorSingleFeatures = colorSingleFeatureIndexList
                                 
@@ -3971,6 +3993,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                     firstMultiCutColorFeatures = currentResultInfo.ColorSingleFeatures
                                     firstCutSaved = true
                                 }
+                                reportTargetFlag = 1
                             }
                             break
                         
@@ -4033,9 +4056,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 for i in 0..<featureNum{
                                     
                                     let currentFeaturePos = (i * gapNum + XValue - 1 + dealCoeff) % tempInputFeatures.count
-//                                    if currentFeaturePos > tempInputFeatures.count - 1 || currentFeaturePos < 0{
-//                                        continue
-//                                    }
+                                    
+                                    
+
                                     let currentFeatureIndex = tempInputFeatures[currentFeaturePos]
                                     var currentPoint: String = ""
                                     if currentFeatureIndex == 53 {
@@ -4055,6 +4078,15 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                         currentResultInfo.fourCardReport += currentPoint + " "
                                     } else {
                                         currentResultInfo.fourCardReport +=  ClassifierSettingArgs.SuitReportDix[currentColor]! + currentPoint + " "
+                                    }
+                                    
+                                    //按键下一轮的leftcards
+                                    if i == featureNum - 1{
+                                        leftSingleFeatures =
+                                        Array(tempInputFeatures[(currentFeaturePos + 1)...]) + Array(tempInputFeatures[0...currentFeaturePos])
+                                        if newArgs[1] != 0{
+                                            leftSingleFeatures = leftSingleFeatures.reversed()
+                                        }
                                     }
                                 }
                                 break
@@ -4312,6 +4344,15 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                     } else {
                                         currentResultInfo.fourCardReport +=  ClassifierSettingArgs.SuitReportDix[currentColor]! + currentPoint + " "
                                     }
+                                    
+                                    //按键下一轮的leftcards
+                                    if i == featureNum - 1{
+                                        leftSingleFeatures =
+                                        Array(tempInputFeatures[(currentFeaturePos + 1)...]) + Array(tempInputFeatures[0...currentFeaturePos])
+                                        if newArgs[1] != 0{
+                                            leftSingleFeatures = leftSingleFeatures.reversed()
+                                        }
+                                    }
                                 }
                             }
                             break
@@ -4373,7 +4414,112 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                     } else {
                                         currentResultInfo.fourCardReport +=  ClassifierSettingArgs.SuitReportDix[currentColor]! + currentPoint + " "
                                     }
+                                    
+                                    //按键下一轮的leftcards
+                                    if i == featureNum - 1{
+                                        leftSingleFeatures =
+                                        Array(tempInputFeatures[(currentFeaturePos + 1)...]) + Array(tempInputFeatures[0...currentFeaturePos])
+                                        if newArgs[1] != 0{
+                                            leftSingleFeatures = leftSingleFeatures.reversed()
+                                        }
+                                    }
                                 }
+                            }
+                            break
+                        //保xy有最大次大，报去牌 + 最大，多轮报一个
+                        case 32:
+                            var temp = 0
+                            print("resultPos \(resultPos) targets \(targets)")
+                            if resultPos.contains(where: {$0 == targets[0]}) && resultPos.contains(where: {$0 == targets[1]}){
+                                temp = 1
+                                
+                                if currentResultInfo.RCReturnInfoList[targets[0]].rcDatasetRank == 1 {
+                                    currentResultInfo.XorYMax[upDownID].append(targets[0] + 1)
+                                }
+                                
+                                if currentResultInfo.RCReturnInfoList[targets[1]].rcDatasetRank == 1 {
+                                    currentResultInfo.XorYMax[upDownID].append(targets[1] + 1)
+                                }
+                                
+                            }
+                            
+                            if temp == 1{
+                                
+                                currentResultInfo.singlefeatureIndexToConfirmMaxMin[upDownID].append(singlefeatureIndex)
+                                currentResultInfo.flyTCSolution = (currentFlyTCSolution)
+                                currentResultInfo.ColorSingleFeatures = colorSingleFeatureIndexList
+                                
+                                
+                                if firstCutSaved == false {
+                                    firstMultiCutFeatures = currentLeftSingleFeatures
+                                    firstMultiCutRCreturnInfo = currentResultInfo.RCReturnInfoList
+                                    firstMultiCutColorFeatures = currentResultInfo.ColorSingleFeatures
+                                    firstCutSaved = true
+                                }
+                                reportTargetFlag = 1
+                            }
+                            break
+                        case 33:
+                            var X: Int = 0
+                            var Y: Int = 0
+                            print("resultPos \(resultPos)")
+                            if resultPos.contains(where: {$0 == 2}){
+                                X = 1
+                                if currentResultInfo.RCReturnInfoList[targets[0]].rcDatasetRank == 1 {
+                                    currentResultInfo.XorYMax[upDownID].append(3)
+                                }
+                                
+                            }
+                            if resultPos.contains(where: {$0 == 3}) {
+                                Y = 1
+                                if currentResultInfo.RCReturnInfoList[targets[1]].rcDatasetRank == 1 {
+                                    currentResultInfo.XorYMax[upDownID].append(4)
+                                }                            }
+                            
+                            if X == 1 || Y == 1{
+                                currentResultInfo.singlefeatureIndexToConfirmMaxMin[upDownID].append(singlefeatureIndex)
+                                currentResultInfo.flyTCSolution = (currentFlyTCSolution)
+                                currentResultInfo.ColorSingleFeatures = colorSingleFeatureIndexList
+                                
+                                if firstCutSaved == false {
+                                    firstMultiCutFeatures = currentLeftSingleFeatures
+                                    firstMultiCutRCreturnInfo = currentResultInfo.RCReturnInfoList
+                                    firstMultiCutColorFeatures = currentResultInfo.ColorSingleFeatures
+                                    firstCutSaved = true
+                                }
+                                reportTargetFlag = 1
+                            }
+                            break
+                        case 34:
+                            var temp = 0
+                            print("resultPos \(resultPos) targets \(targets)")
+                            if resultPos.contains(where: {$0 == 2}) && resultPos.contains(where: {$0 == 3}){
+                                temp = 1
+                                
+                                if currentResultInfo.RCReturnInfoList[targets[0]].rcDatasetRank == 1 {
+                                    currentResultInfo.XorYMax[upDownID].append(targets[0] + 1)
+                                }
+                                
+                                if currentResultInfo.RCReturnInfoList[targets[1]].rcDatasetRank == 1 {
+                                    currentResultInfo.XorYMax[upDownID].append(targets[1] + 1)
+                                }
+                                
+                            }
+                            
+                            if temp == 1{
+                                
+                                currentResultInfo.singlefeatureIndexToConfirmMaxMin[upDownID].append(singlefeatureIndex)
+                                currentResultInfo.flyTCSolution = (currentFlyTCSolution)
+                                currentResultInfo.ColorSingleFeatures = colorSingleFeatureIndexList
+                                
+                                
+                                if firstCutSaved == false {
+                                    firstMultiCutFeatures = currentLeftSingleFeatures
+                                    firstMultiCutRCreturnInfo = currentResultInfo.RCReturnInfoList
+                                    firstMultiCutColorFeatures = currentResultInfo.ColorSingleFeatures
+                                    firstCutSaved = true
+                                }
+                                reportTargetFlag = 1
                             }
                             break
                         default:
@@ -4431,6 +4577,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         }else {
             multipleResultInfo.leftSingleFeatures = leftSingleFeatures
         }
+        
+        print("剩余的牌 \(multipleResultInfo.leftSingleFeatures)")
         
         print("播报内容")
         PrintSpeakResult(speakStructArray: reportResult)
@@ -4846,15 +4994,15 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     }
                     break
                 case 4:
-                    reportString = "三平点"
+                    reportString = "3平点"
                 case 5:
-                    reportString = "三平点" + String(allTargetList[0]) + "门"
+                    reportString = "3平点" + String(allTargetList[0]) + "门"
                     break
                 case 6:
                     reportString = "连续双平点"
                     break
                 case 7:
-                    reportString = "四平点"
+                    reportString = "4平点"
                     break
                 default:
                     break
@@ -5142,8 +5290,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             voiceType = 1
                             reportString += String(singlefeatureIndex - 1) + " "
                         }
-                        reportString += "活门" + String(resultInfo.aliveNumber) + " "
+                        
                     }
+                    
                     currentSpeakStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
                     //报最大家
                     voiceType = 1
@@ -5156,6 +5305,13 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         }
                         currentSpeakStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
                     }
+                    reportString = ""
+                    //活门
+                    if subArray.count != 0{
+                        reportString += "活门" + String(resultInfo.aliveNumber) + " "
+                        currentSpeakStruct.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                    }
+                    
                 }
                 reportResult.append(currentSpeakStruct)
             }
@@ -5197,14 +5353,15 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
 //            50:"[82]:上10张去牌保34门有最大报最大",
 //            51:"[83]:上10张去牌保34门最大次大",
         //报法格式：去牌+最大位置
-        case 50...51:
+        case 50...51, 269...270:
             for resultInfo in multipleReportResultInfo.singleResultList{
                 var currentSpeakStruct :[SpeakResultStruct] = []
-                for i in 0..<resultInfo.singlefeatureIndexToConfirmMaxMin.count - 1 {
+                print("切牌数组 \(resultInfo.singlefeatureIndexToConfirmMaxMin) 最大次大 \(resultInfo.XorYMax)")
+                for i in 0..<resultInfo.singlefeatureIndexToConfirmMaxMin.count {
                     let voiceType: Int = 1
                     var reportString: String = ""
                     for j in 0..<resultInfo.singlefeatureIndexToConfirmMaxMin[i].count {
-                        reportString += String(resultInfo.singlefeatureIndexToConfirmMaxMin[i][j])
+                        reportString += String(resultInfo.singlefeatureIndexToConfirmMaxMin[i][j]) + " "
                         if resultInfo.XorYMax[i].count > 0{
                             reportString += String(resultInfo.XorYMax[i][j]) + " "
                         }
@@ -5400,6 +5557,66 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 
                 reportResult.append(currentReportStruct)
             }
+            break
+        case 268:
+            for resultInfo in multipleReportResultInfo.singleResultList{
+                
+                var dealPos: Int = 1
+                for handindex in 0..<resultInfo.targetRCList.count {
+                    
+                    var reportString = ""
+                    var voiceType = 1
+                    var currentResult : [SpeakResultStruct] = []
+                    var reportNum: Int = 0
+                    
+                    
+                    //有平点就男声
+                    if resultInfo.handCardHasDrawList[handindex] > 0 {
+                        voiceType = 0
+                    }
+                    
+                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: "\(dealPos) 张"))
+                    dealPos += 1
+
+                    for rcID in resultInfo.targetRCList[handindex] {
+                        if reportNum > 1 {
+                            break
+                        }
+                        reportString = String(rcID + 1)
+                        currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                        reportNum += 1
+                        
+                    }
+
+                    switch resultInfo.handCardAliveNumberList[handindex] {
+                    case 4, 2:
+                        reportString = "活门" + String(resultInfo.aliveNumber)
+                        currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+
+                        break
+                    case 3, 1:
+                        reportString = "半活门" + String(resultInfo.aliveNumber + 1)
+                        voiceType = 0
+                        currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                        break
+                    default:
+                        break
+                    }
+                    
+                    
+                    if resultInfo.handCardPairNumList[handindex].count > 0{
+                        reportString = "对子"
+    //                    voiceType = 0
+                        currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                    }
+                    
+                    reportResult.append(currentResult)
+                    
+                }
+                
+
+            }
+            break
             
 //            80:"[131]:看手牌报最大*",
 //            81:"[132]:看手牌报最大次大*",
