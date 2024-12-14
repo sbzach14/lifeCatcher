@@ -35,7 +35,7 @@ class SettingViewModel: ObservableObject {
     @Published var trueDate : String = ""
     
 
-    init() {
+    public init() {
         // Load data from config.json
         if let configData = readConfigJSON() {
             let boolDict = configData["Bool"] as! [String : Bool]

@@ -32,8 +32,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var cutShowArray : [Int] = []
     
     let detectModel = try! detect_0903()
-    let clsModel_h = try! cls_0715_h_trans()
-    let clsModel_v = try! cls_0727_v_trans()
+    let clsModel_h = try! cls_1215_h()
+    let clsModel_v = try! cls_1215_v()
+//    let clsModel_h = try! cls_0715_h_trans()
+//    let clsModel_v = try! cls_0727_v_trans()
     
     let riffleDetectModel = try! riffle_detect_1111()
     let riffleModel_h = try! riffle_cls_h_1107()

@@ -34,8 +34,8 @@ class generalRuleSetting{
     ]
     
     static let allAddCardMode: [Int:String] = [
-        0:"熟手（高准确率）",
-        1:"新手（易洗全）",
+        0:"熟手",
+        1:"新手",
     ]
     
     static let allShuffleRiffleMode: [Int: String] = [
@@ -140,9 +140,12 @@ struct SettingRecordConfigView: View{
     @State private var minSingleFeatureNum:Int = 0
     @State private var recgReport: Bool = false
     
-    @StateObject var viewModel = SettingViewModel()
+    @State var viewModel = SettingViewModel()
+    @State private var addCardMode: Int = 0
     
     private func SetUpAll(){
+        viewModel = SettingViewModel()
+        addCardMode = viewModel.addCardMode
         if (self.selectedSaveIndex == -1 && _selectedSaveIndex == -1) && self.editType == 0{
             
             let selectedRule = ClassifierSettingArgs.targetSetting[DatasetType]!
@@ -348,7 +351,7 @@ struct SettingRecordConfigView: View{
                                         .frame(width: 40, alignment: .leading)
                                         .foregroundColor(.white)
                                     
-                                    Picker("addCardMode", selection: $viewModel.addCardMode) {
+                                    Picker("addCardMode", selection: $addCardMode) {
                                         ForEach(0...generalRuleSetting.allAddCardMode.count - 1, id: \.self){
                                             index in Text(generalRuleSetting.allAddCardMode[index]!).tag(index)
                                         }
@@ -655,9 +658,11 @@ struct SettingRecordConfigView: View{
         .onAppear(){
             self.SetUpAll()
         }
+        
     }
     
     private func saveData(isShowAlert: Bool){
+        viewModel.addCardMode = addCardMode
         viewModel.updateConfigJSON()
         
         //看手牌

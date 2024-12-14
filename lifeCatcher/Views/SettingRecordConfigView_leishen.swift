@@ -44,9 +44,12 @@ struct SettingRecordConfigView_leishen: View{
     @State private var recgReport: Bool = false
     
     @State private var shuffleRiffleMode: Int = 0
-    @StateObject var viewModel = SettingViewModel()
+    @State var viewModel = SettingViewModel()
+    @State private var addCardMode: Int = 0
     
     private func SetUpAll(){
+        viewModel = SettingViewModel()
+        addCardMode = viewModel.addCardMode
         if (self.selectedSaveIndex == -1 && _selectedSaveIndex == -1) && self.editType == 0{
             
             let selectedRule = ClassifierSettingArgs.targetSetting[DatasetType]!
@@ -252,7 +255,7 @@ struct SettingRecordConfigView_leishen: View{
                                 .bold()
                                 .padding(.leading, 10)
                             
-                            Picker("addCardMode", selection: $viewModel.addCardMode) {
+                            Picker("addCardMode", selection: $addCardMode) {
                                 ForEach(0...generalRuleSetting.allAddCardMode.count - 1, id: \.self){
                                     index in Text(generalRuleSetting.allAddCardMode[index]!).tag(index)
                                 }
@@ -513,9 +516,11 @@ struct SettingRecordConfigView_leishen: View{
         .onAppear(){
             self.SetUpAll()
         }
+        
     }
     
     private func saveData(isShowAlert: Bool){
+        viewModel.addCardMode = addCardMode
         viewModel.updateConfigJSON()
         
         if self.shuffleRiffleMode == 0{
