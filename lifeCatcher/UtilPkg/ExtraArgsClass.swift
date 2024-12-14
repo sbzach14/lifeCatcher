@@ -636,10 +636,10 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             报234:表示去掉2张面牌,可保第1家最小。第3家最大，第4家次大。如果有活门，最后再报活门。女声0=不用去牌也能保位置最小。男声0=找不到满足条件的牌。
         """,
             50: """
-        比如报24，表示去掉2张面牌补到底部可保第3门或第4门是最大，最大家是4。保34门由XY修改设定。
+        比如报24，表示去掉2张面牌补到底部可保第3门或第4门是最大，最大家是4。保第几门门由XY修改设定比如保34门，设置X = 3, Y = 4。
         """,
             51: """
-        比如报24，表示去掉2张面牌补到底部可保第3门第4门是最大次大，最大家是4。保34门由XY修改设定。
+        比如报24，表示去掉2张面牌补到底部可保第3门第4门是最大次大，最大家是4。保第几门门由XY修改设定比如保34门，设置X = 3, Y = 4。
         """,
             52: """
         报3，表示把前3张面牌一张一张地抽到底部，不是一次去3张。女声0=不用去牌也能保位置最大。男声0=找不到满足条件的牌
@@ -1506,10 +1506,10 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         8-1报法加入看手牌，报 1张 23 活门4 对子 表示照牌是发牌的第一张 最大次大家为第二家和第三家，有活门4 有对子。以此类推
 """,
         269:"""
-        比如报24，表示去掉2张面牌补到底部可保第3门第4门是最大，最大家是4。保34门, 去面牌由XY设定。
+        比如报24，表示去掉2张面牌补到底部可保第3门第4门是最大，最大家是4。保34门, 去面牌的数量由XY设定。
 """,
         270:"""
-        比如报24，表示去掉2张面牌补到底部可保第3门第4门是最大次大，最大家是4。保34门, 去面牌由XY设定。
+        比如报24，表示去掉2张面牌补到底部可保第3门第4门是最大次大，最大家是4。保34门, 去面牌的数量由XY设定。
 """,
     ]
     
@@ -4465,14 +4465,14 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             print("resultPos \(resultPos)")
                             if resultPos.contains(where: {$0 == 2}){
                                 X = 1
-                                if currentResultInfo.RCReturnInfoList[targets[0]].rcDatasetRank == 1 {
+                                if currentResultInfo.RCReturnInfoList[2].rcDatasetRank == 1 {
                                     currentResultInfo.XorYMax[upDownID].append(3)
                                 }
                                 
                             }
                             if resultPos.contains(where: {$0 == 3}) {
                                 Y = 1
-                                if currentResultInfo.RCReturnInfoList[targets[1]].rcDatasetRank == 1 {
+                                if currentResultInfo.RCReturnInfoList[3].rcDatasetRank == 1 {
                                     currentResultInfo.XorYMax[upDownID].append(4)
                                 }                            }
                             
@@ -4496,12 +4496,12 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             if resultPos.contains(where: {$0 == 2}) && resultPos.contains(where: {$0 == 3}){
                                 temp = 1
                                 
-                                if currentResultInfo.RCReturnInfoList[targets[0]].rcDatasetRank == 1 {
-                                    currentResultInfo.XorYMax[upDownID].append(targets[0] + 1)
+                                if currentResultInfo.RCReturnInfoList[2].rcDatasetRank == 1 {
+                                    currentResultInfo.XorYMax[upDownID].append(3)
                                 }
                                 
-                                if currentResultInfo.RCReturnInfoList[targets[1]].rcDatasetRank == 1 {
-                                    currentResultInfo.XorYMax[upDownID].append(targets[1] + 1)
+                                if currentResultInfo.RCReturnInfoList[3].rcDatasetRank == 1 {
+                                    currentResultInfo.XorYMax[upDownID].append(3)
                                 }
                                 
                             }
