@@ -3100,7 +3100,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     || (self.isHeadphonesConnected() && self.voiceDevice == 1)
         
         if isSpeak{
-            self.speechPerformer.performSpeechSynthesis(speakResultStruct: input, repeatCnt: repeatCnt)
+            self.speechPerformer.performSpeechSynthesis(speakResultStruct: input, repeatCnt: repeatCnt, isSeparate: ReportManager.kanshoupai.contains(self.calModeArgs[self.shuffleOrRiffle][0])
+            )
         }
         if self.timeMode != 0{
 //            var reportTextList : [String] = []
@@ -3885,7 +3886,7 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
         lock.unlock()
     }
     
-    func performSpeechSynthesis(speakResultStruct: [[SpeakResultStruct]], repeatCnt: Int) {
+    func performSpeechSynthesis(speakResultStruct: [[SpeakResultStruct]], repeatCnt: Int, isSeparate: Bool) {
         var emptyFlag = true
         for (turnIndex, turnResult) in speakResultStruct.enumerated() {
             if turnResult.count > 0{
@@ -3912,36 +3913,71 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
         var allSpeakString : String = " "
         var allVoiceType : Int = 0
         
-        for repeatIndex in 0..<repeatCnt{
-            allSpeakString = " "
-            for (turnIndex, turnResult) in speakResultStruct.enumerated() {
-                
-                for (reportIndex, reportResult) in turnResult.enumerated() {
-                    var speakString = reportResult.content
-                    if speakString.isEmpty{
-                        speakString = "0"
+        if isSeparate{
+            for repeatIndex in 0..<repeatCnt{
+                for (turnIndex, turnResult) in speakResultStruct.enumerated() {
+                    for (reportIndex, reportResult) in turnResult.enumerated() {
+                        var speakString = reportResult.content
+                        if speakString.isEmpty{
+                            speakString = "0"
+                        }
+                        else{
+                            speakString = convertArabicNumbersToChinese(speakString)
+                        }
+                        
+                        allVoiceType = reportResult.voiceType
+                        
+                        let speechUtterance = AVSpeechUtterance(string: speakString)
+                        
+                        speechUtterance.pitchMultiplier = 1
+                        speechUtterance.rate = 0.25 + self.voiceRate * 0.5
+                        
+                        if allVoiceType == 0{
+                            speechUtterance.voice = chineseMaleVoice
+                        }
+                        else{
+                            speechUtterance.voice = chineseFemaleVoice
+                        }
+                        synthesizer.speak(speechUtterance)
                     }
-                    else{
-                        speakString = convertArabicNumbersToChinese(speakString)
-                    }
-                    
-                    allVoiceType = reportResult.voiceType
-                    allSpeakString += speakString
                 }
+                
+                
             }
-            
-            let speechUtterance = AVSpeechUtterance(string: allSpeakString)
-            
-            speechUtterance.pitchMultiplier = 1
-            speechUtterance.rate = 0.25 + self.voiceRate * 0.5
-            
-            if allVoiceType == 0{
-                speechUtterance.voice = chineseMaleVoice
+        }
+        
+        else{
+            for repeatIndex in 0..<repeatCnt{
+                allSpeakString = " "
+                for (turnIndex, turnResult) in speakResultStruct.enumerated() {
+                    
+                    for (reportIndex, reportResult) in turnResult.enumerated() {
+                        var speakString = reportResult.content
+                        if speakString.isEmpty{
+                            speakString = "0"
+                        }
+                        else{
+                            speakString = convertArabicNumbersToChinese(speakString)
+                        }
+                        
+                        allVoiceType = reportResult.voiceType
+                        allSpeakString += speakString
+                    }
+                }
+                
+                let speechUtterance = AVSpeechUtterance(string: allSpeakString)
+                
+                speechUtterance.pitchMultiplier = 1
+                speechUtterance.rate = 0.25 + self.voiceRate * 0.5
+                
+                if allVoiceType == 0{
+                    speechUtterance.voice = chineseMaleVoice
+                }
+                else{
+                    speechUtterance.voice = chineseFemaleVoice
+                }
+                synthesizer.speak(speechUtterance)
             }
-            else{
-                speechUtterance.voice = chineseFemaleVoice
-            }
-            synthesizer.speak(speechUtterance)
         }
         
     }
