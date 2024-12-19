@@ -2983,7 +2983,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 m_consecutiveReport = 1
             }
             
-            print("计算后的singlefeaturearray \(self.singlefeatureArray)")
+            print("计算前的singlefeaturearray \(self.singlefeatureArray)")
             multipleDatasetRCInfos = ClassifierSettingArgs.selectDataset(DatasetIndex: ruleIndex, inputSingleFeatures: singlefeatureArray, rcNum: (ClassifierSettingArgs.targetSetting[ruleIndex]?.rcNum[rcNum])!, args: args, rankRules: rankRules, suitRules: suitRules,dealNum: dealNum, coloringType: coloringType, dealType: dealType, diyDealNum: diyDealNum,diyDealStatus: diyDealStatus, calModeArgs: calModeArgs[self.shuffleOrRiffle], cutNumSetting: cutNumSetting, cutNumRangeSetting: cutNumRangeSetting, consecutiveReport: m_consecutiveReport, minSingleFeatureNum: minSingleFeatureNum, cutStructList: cutStructArray, currentRoundID: self.currentRoundID)
             
             self.singlefeatureArray = multipleDatasetRCInfos.returnSingleFeatureArray
