@@ -245,6 +245,7 @@ struct CurrentVisionObjectRecognitionView: View {
                                         viewModel.updateConfigJSON()
                                     }
                             }
+                            
                         }
                         .bubbleBackground()
                     }

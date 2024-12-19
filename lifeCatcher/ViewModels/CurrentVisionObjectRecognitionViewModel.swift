@@ -32,8 +32,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var cutShowArray : [Int] = []
     
     let detectModel = try! detect_0903()
-    let clsModel_h = try! cls_0715_h_trans()
-    let clsModel_v = try! cls_0727_v_trans()
+    let clsModel_h = try! cls_1215_h()
+    let clsModel_v = try! cls_1215_v()
+//    let clsModel_h = try! cls_0715_h_trans()
+//    let clsModel_v = try! cls_0727_v_trans()
     
     let riffleDetectModel = try! riffle_detect_1111()
     let riffleModel_h = try! riffle_cls_h_1107()
@@ -81,7 +83,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     public var minSingleFeatureNum : Int = 0
     public var recgReport : Bool = false
     public var specialCard:[Int] = [0,0]
-    public var isAddCard: Bool = false
     public var currentRoundID: Int = 0
     
     //测试用的定时器
@@ -148,6 +149,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var blackMode: Int = 0
     @Published var voiceDevice: Int = 0
     @Published var timeMode: Int = 0
+    @Published var addCardMode: Int = 1
     @Published var volumeValue: Float = 0.5
     @Published var voiceRate: Float = 0.5
     @Published var zoomFactor: Float = 0
@@ -218,6 +220,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             self.blackMode = intDict["blackMode"]!
             self.voiceDevice = intDict["voiceDevice"]!
             self.timeMode = intDict["timeMode"]!
+            self.addCardMode = intDict["addCardMode"]!
+            
             
             let floatDict = configData["Float"] as! [String : Float]
             self.volumeValue = floatDict["volumeValue"]!
@@ -877,7 +881,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     minDetectConfidence = leftConfidence
                 }
                 
-                if self.shuffleMode[0] != 0 
+                if self.shuffleMode[0] != 0
                     && self.shuffleMode[1] == 0
                     && (detectNum < 2 || minDetectConfidence < confidenceThreshold)
                     && self.state == "detecting"{
@@ -1731,7 +1735,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                     }
                 }
-                if nodeIndex.count > 0 && (isAddCard || confidenceDic[key]! > 0.7){
+                if nodeIndex.count > 0 && (addCardMode==1 || confidenceDic[key]! > 0.7){
                     targetDetecResultList[nodeIndex[0]]![nodeIndex[1]].nodeType = 4
                 }
             }
@@ -1781,7 +1785,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                     }
                 }
-                if nodeIndex.count > 0 && (isAddCard || confidenceDic[key]! > 0.7){
+                if nodeIndex.count > 0 && (addCardMode==1 || confidenceDic[key]! > 0.7){
                     targetDetecResultList[nodeIndex[0]]![nodeIndex[1]].nodeType = 4
                 }
             }
@@ -1820,7 +1824,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         
         //补牌
-        if isAddCard && isShuffle && beginIndex < addEndIndex && lostNum <= 2{
+        if addCardMode==1 && isShuffle && beginIndex < addEndIndex && lostNum <= 2{
             
             let numIndexList : [Int] = [0, 1]
             
@@ -2062,12 +2066,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 //                    {
 //                        var confidenceFlag = 0
 //                        var blurFlag = 0
-//                        
+//
 //                        if detectResultNode0.laplacianVariance < lastDetectResultNode0.laplacianVariance * 0.5
 //                            && detectResultNode0.laplacianVariance < nextDetectResultNode0.laplacianVariance * 0.5{
 //                            blurFlag += 1
 //                        }
-//                        
+//
 //                        if detectResultNode0.confidence[0] > lastDetectResultNode0.confidence[0] && detectResultNode0.laplacianVariance > lastDetectResultNode0.laplacianVariance{
 //                            confidenceFlag += 1
 //                        }
@@ -2090,7 +2094,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 //                            && blurFlag == 0{
 //                            confidenceFlag += 1
 //                        }
-//                        
+//
 //                        if confidenceFlag >= 1{
 //                            detectSingleFeatureArray.insert(insertCard0, at: 0)
 //                        }
@@ -2112,12 +2116,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 //                    {
 //                        var confidenceFlag = 0
 //                        var blurFlag = 0
-//                        
+//
 //                        if detectResultNode1.laplacianVariance < lastDetectResultNode1.laplacianVariance * 0.5
 //                            && detectResultNode1.laplacianVariance < nextDetectResultNode1.laplacianVariance * 0.5{
 //                            blurFlag += 1
 //                        }
-//                        
+//
 //                        if detectResultNode1.confidence[0] > lastDetectResultNode1.confidence[0] && detectResultNode1.laplacianVariance > lastDetectResultNode1.laplacianVariance{
 //                            confidenceFlag += 1
 //                        }
@@ -2140,7 +2144,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 //                            && blurFlag == 0{
 //                            confidenceFlag += 1
 //                        }
-//                        
+//
 //                        if confidenceFlag >= 1{
 //                            detectSingleFeatureArray.insert(insertCard1, at: 0)
 //                        }
@@ -3018,7 +3022,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             let usedNum = self.singlefeatureArray.count - self.leftSingleFeatures.count
             if usedNum == 0 || self.leftSingleFeatures.count == 0{
                 self.usedSingleFeatures = []
-            } 
+            }
             else if isReset{
                 self.usedSingleFeatures = Array(self.singlefeatureArray[0...(usedNum - 1)])
             }
@@ -3096,25 +3100,26 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     || (self.isHeadphonesConnected() && self.voiceDevice == 1)
         
         if isSpeak{
-            self.speechPerformer.performSpeechSynthesis(speakResultStruct: input, repeatCnt: repeatCnt)
+            self.speechPerformer.performSpeechSynthesis(speakResultStruct: input, repeatCnt: repeatCnt, isSeparate: ReportManager.kanshoupai.contains(self.calModeArgs[self.shuffleOrRiffle][0])
+            )
         }
         if self.timeMode != 0{
 //            var reportTextList : [String] = []
 //            for (turnIndex, turnResult) in input.enumerated() {
 //                for (reportIndex, reportResult) in turnResult.enumerated() {
 //                    var originSpeakString = reportResult.content
-//                    
+//
 //                    let checkSpeakString = originSpeakString.replacingOccurrences(of: " ", with: "")
 //                    var speakString = ""
-//                    
+//
 //                    if checkSpeakString == "没有"{
 //                        speakString = "99"
 //                        reportTextList.insert(speakString, at: 0)
 //                    }
 //                    else if checkSpeakString.count > 0 && isOnlyDigits(checkSpeakString){
-//                        
+//
 //                        let wordsArray = originSpeakString.components(separatedBy: " ").filter { !$0.isEmpty }
-//                        
+//
 //                        for word in wordsArray {
 //                            if word.count == 1 && word != " " {
 //                                speakString = word + speakString
@@ -3124,7 +3129,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 //                                speakString = ""
 //                            }
 //                        }
-//                        
+//
 //                        if speakString != ""{
 //                            // 补充到两位
 //                            let paddedString = String(repeating: "0", count: max(0, 2 - speakString.count)) + speakString
@@ -3133,7 +3138,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 //                    }
 //                }
 //            }
-//            
+//
 //            var reportLength = 0
 //            if timeMode == 1{
 //                reportLength = 1
@@ -3141,7 +3146,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 //            else if timeMode == 2{
 //                reportLength = 2
 //            }
-//            
+//
 //            if reportTextList.count > reportLength {
 //                reportTextList = Array(reportTextList.suffix(reportLength))
 //            } else {
@@ -3150,7 +3155,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 //                    reportTextList.insert("00", at: 0)
 //                }
 //            }
-//            
+//
 //            self.timeModeText = reportTextList.joined(separator: ":")
             
             var speakString = ""
@@ -3722,7 +3727,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 "isBackCamera" : self.isBackCamera,
                 "isCameraHorizon" : self.isCameraHorizon,
                 "isHighHz": self.isHighHz,
-                "isMaxLightness": self.isMaxLightness
+                "isMaxLightness": self.isMaxLightness,
             ]
             
             let intDict : [String: Int] = [
@@ -3730,7 +3735,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 "volumeDown": self.volumeDown,
                 "blackMode": self.blackMode,
                 "voiceDevice": self.voiceDevice,
-                "timeMode": self.timeMode
+                "timeMode": self.timeMode,
+                "addCardMode": self.addCardMode
             ]
             
             let floatDict : [String: Float] = [
@@ -3880,8 +3886,7 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
         lock.unlock()
     }
     
-    func performSpeechSynthesis(speakResultStruct: [[SpeakResultStruct]], repeatCnt: Int) {
-        
+    func performSpeechSynthesis(speakResultStruct: [[SpeakResultStruct]], repeatCnt: Int, isSeparate: Bool) {
         var emptyFlag = true
         for (turnIndex, turnResult) in speakResultStruct.enumerated() {
             if turnResult.count > 0{
@@ -3908,38 +3913,73 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
         var allSpeakString : String = " "
         var allVoiceType : Int = 0
         
-        for repeatIndex in 0..<repeatCnt{
-            for (turnIndex, turnResult) in speakResultStruct.enumerated() {
-                
-                for (reportIndex, reportResult) in turnResult.enumerated() {
-                    var speakString = reportResult.content
-                    if speakString.isEmpty{
-                        speakString = "0"
+        if isSeparate{
+            for repeatIndex in 0..<repeatCnt{
+                for (turnIndex, turnResult) in speakResultStruct.enumerated() {
+                    for (reportIndex, reportResult) in turnResult.enumerated() {
+                        var speakString = reportResult.content
+                        if speakString.isEmpty{
+                            speakString = "0"
+                        }
+                        else{
+                            speakString = convertArabicNumbersToChinese(speakString)
+                        }
+                        
+                        allVoiceType = reportResult.voiceType
+                        
+                        let speechUtterance = AVSpeechUtterance(string: speakString)
+                        
+                        speechUtterance.pitchMultiplier = 1
+                        speechUtterance.rate = 0.25 + self.voiceRate * 0.5
+                        
+                        if allVoiceType == 0{
+                            speechUtterance.voice = chineseMaleVoice
+                        }
+                        else{
+                            speechUtterance.voice = chineseFemaleVoice
+                        }
+                        synthesizer.speak(speechUtterance)
                     }
-                    else{
-                        speakString = convertArabicNumbersToChinese(speakString)
-                    }
-                    
-                    allVoiceType = reportResult.voiceType
-                    allSpeakString += speakString
                 }
+                
+                
             }
-            allSpeakString += " "
         }
         
-        let speechUtterance = AVSpeechUtterance(string: allSpeakString)
-        
-        speechUtterance.pitchMultiplier = 1
-        speechUtterance.rate = 0.25 + self.voiceRate * 0.5
-        
-        if allVoiceType == 0{
-            speechUtterance.voice = chineseMaleVoice
-        }
         else{
-            speechUtterance.voice = chineseFemaleVoice
+            for repeatIndex in 0..<repeatCnt{
+                allSpeakString = " "
+                for (turnIndex, turnResult) in speakResultStruct.enumerated() {
+                    
+                    for (reportIndex, reportResult) in turnResult.enumerated() {
+                        var speakString = reportResult.content
+                        if speakString.isEmpty{
+                            speakString = "0"
+                        }
+                        else{
+                            speakString = convertArabicNumbersToChinese(speakString)
+                        }
+                        
+                        allVoiceType = reportResult.voiceType
+                        allSpeakString += speakString
+                    }
+                }
+                
+                let speechUtterance = AVSpeechUtterance(string: allSpeakString)
+                
+                speechUtterance.pitchMultiplier = 1
+                speechUtterance.rate = 0.25 + self.voiceRate * 0.5
+                
+                if allVoiceType == 0{
+                    speechUtterance.voice = chineseMaleVoice
+                }
+                else{
+                    speechUtterance.voice = chineseFemaleVoice
+                }
+                synthesizer.speak(speechUtterance)
+            }
         }
         
-        synthesizer.speak(speechUtterance)
     }
 
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {

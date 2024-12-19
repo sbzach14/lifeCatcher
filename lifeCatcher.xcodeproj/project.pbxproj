@@ -60,6 +60,8 @@
 		A8A9F1632CE4218500084DBE /* RFast.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8A9F1622CE4218500084DBE /* RFast.swift */; };
 		A8FBC7C22A3F0A5C00EDDFD7 /* VisionUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8FBC7C12A3F0A5C00EDDFD7 /* VisionUtils.swift */; };
 		B058BE5F2B09FFC20078E792 /* CurrentBlurDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058BE5E2B09FFC20078E792 /* CurrentBlurDetector.swift */; };
+		D01021C12D0E35540063AE34 /* cls_1215_h.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D01021BF2D0E35540063AE34 /* cls_1215_h.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/detect_0903.mlmodelkey"; }; };
+		D01021C22D0E35540063AE34 /* cls_1215_v.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D01021C02D0E35540063AE34 /* cls_1215_v.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/detect_0903.mlmodelkey"; }; };
 		D013E36D2C712F8D000F2B57 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D013E36C2C712F8D000F2B57 /* Assets.xcassets */; };
 		D02717C82C86E39100A29D43 /* Collections in Frameworks */ = {isa = PBXBuildFile; productRef = D02717C72C86E39100A29D43 /* Collections */; };
 		D02717CB2C86E3C700A29D43 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = D02717CA2C86E3C700A29D43 /* Algorithms */; };
@@ -142,6 +144,8 @@
 		A8A9F1622CE4218500084DBE /* RFast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RFast.swift; sourceTree = "<group>"; };
 		A8FBC7C12A3F0A5C00EDDFD7 /* VisionUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionUtils.swift; sourceTree = "<group>"; };
 		B058BE5E2B09FFC20078E792 /* CurrentBlurDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentBlurDetector.swift; sourceTree = "<group>"; };
+		D01021BF2D0E35540063AE34 /* cls_1215_h.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_1215_h.mlmodel; sourceTree = "<group>"; };
+		D01021C02D0E35540063AE34 /* cls_1215_v.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_1215_v.mlmodel; sourceTree = "<group>"; };
 		D013E3612C7129EE000F2B57 /* lifeCatcher.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = lifeCatcher.entitlements; sourceTree = "<group>"; };
 		D013E36C2C712F8D000F2B57 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D02717D72C8704AB00A29D43 /* detect_0903.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = detect_0903.mlmodel; sourceTree = "<group>"; };
@@ -340,6 +344,8 @@
 			isa = PBXGroup;
 			children = (
 				D03811A12C75401200726B99 /* cls_main.mlmodel */,
+				D01021BF2D0E35540063AE34 /* cls_1215_h.mlmodel */,
+				D01021C02D0E35540063AE34 /* cls_1215_v.mlmodel */,
 				D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */,
 				D03811A42C7542C200726B99 /* cls_0727_v_trans.mlmodel */,
 				D02717D72C8704AB00A29D43 /* detect_0903.mlmodel */,
@@ -486,6 +492,8 @@
 				D03811A82C7542C300726B99 /* cls_0715_h_trans.mlmodel in Sources */,
 				D03811A22C75401200726B99 /* cls_main.mlmodel in Sources */,
 				A8A9F1632CE4218500084DBE /* RFast.swift in Sources */,
+				D01021C12D0E35540063AE34 /* cls_1215_h.mlmodel in Sources */,
+				D01021C22D0E35540063AE34 /* cls_1215_v.mlmodel in Sources */,
 				18C98D112C158F7B00A8CD49 /* NPFive.swift in Sources */,
 				A892C6002A765A0A003FA2B3 /* MainView.swift in Sources */,
 				D0697CDF2CDE67FC006DD383 /* SpeechUtils.swift in Sources */,
@@ -660,7 +668,7 @@
 				CODE_SIGN_ENTITLEMENTS = lifeCatcher/lifeCatcher.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
 				DEVELOPMENT_TEAM = 6WK4Q32GMN;
 				ENABLE_PREVIEWS = YES;
@@ -679,12 +687,12 @@
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.4;
+				MARKETING_VERSION = 2.0.5;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -708,7 +716,7 @@
 				CODE_SIGN_ENTITLEMENTS = lifeCatcher/lifeCatcher.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
 				DEVELOPMENT_TEAM = 6WK4Q32GMN;
 				ENABLE_PREVIEWS = YES;
@@ -727,12 +735,12 @@
 				INFOPLIST_KEY_UIStatusBarHidden = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationPortrait;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.4;
+				MARKETING_VERSION = 2.0.5;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
 				PRODUCT_NAME = "$(TARGET_NAME)";

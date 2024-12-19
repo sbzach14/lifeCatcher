@@ -44,8 +44,12 @@ struct SettingRecordConfigView_leishen: View{
     @State private var recgReport: Bool = false
     
     @State private var shuffleRiffleMode: Int = 0
+    @State var viewModel = SettingViewModel()
+    @State private var addCardMode: Int = 0
     
     private func SetUpAll(){
+        viewModel = SettingViewModel()
+        addCardMode = viewModel.addCardMode
         if (self.selectedSaveIndex == -1 && _selectedSaveIndex == -1) && self.editType == 0{
             
             let selectedRule = ClassifierSettingArgs.targetSetting[DatasetType]!
@@ -119,16 +123,9 @@ struct SettingRecordConfigView_leishen: View{
             self.shuffleRiffleMode = 0
         }
         
-        if self.shuffleMode[0] != 0{
-            self.cutMode[1] = self.cutMode[0]
-            self.specialCard[1] = self.specialCard[0]
-            self.reportSetting[1] = self.reportSetting[0]
-        }
-        else{
-            self.cutMode[0] = self.cutMode[1]
-            self.specialCard[0] = self.specialCard[1]
-            self.reportSetting[0] = self.reportSetting[1]
-        }
+        self.cutMode[1] = self.cutMode[0]
+        self.specialCard[1] = self.specialCard[0]
+        self.reportSetting[1] = self.reportSetting[0]
         
         self.editType = 1
         self.initdone = true
@@ -249,6 +246,25 @@ struct SettingRecordConfigView_leishen: View{
                             .accentColor(.blue)
                         }.frame(height: 40)
                         .bluebubbleBackground()
+                        
+                        HStack{
+                            Text("洗牌模式")
+                                .frame(width: 100, alignment: .leading)
+                                .foregroundColor(.white)
+                                .font(.system(size: 20))
+                                .bold()
+                                .padding(.leading, 10)
+                            
+                            Picker("addCardMode", selection: $addCardMode) {
+                                ForEach(0...generalRuleSetting.allAddCardMode.count - 1, id: \.self){
+                                    index in Text(generalRuleSetting.allAddCardMode[index]!).tag(index)
+                                }
+                            }
+                            .pickerStyle(MenuPickerStyle())
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .accentColor(.blue)
+                        }.frame(height: 40)
+                            .bluebubbleBackground()
                         
                         HStack{
                             Text("发牌定制")
@@ -500,13 +516,13 @@ struct SettingRecordConfigView_leishen: View{
         .onAppear(){
             self.SetUpAll()
         }
-        .onDisappear(){
-            self.saveData(isShowAlert: false)
-        }
         
     }
     
     private func saveData(isShowAlert: Bool){
+        viewModel.addCardMode = addCardMode
+        viewModel.updateConfigJSON()
+        
         if self.shuffleRiffleMode == 0{
             self.shuffleMode[0] = 1
             self.shuffleMode[1] = 0

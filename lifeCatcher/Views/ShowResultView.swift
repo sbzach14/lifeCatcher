@@ -10,11 +10,7 @@ struct ShowResultView: View {
         VStack(alignment: .leading) {
             
             ScrollView {
-                
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(minimum: 30)), count: 10)) {
-                    if viewModel.shuffleOrRiffle == 1 && viewModel.shuffleMode[1] == 2 && viewModel.singlefeatureArray.count > 0{
-                        SingleIconView(index: viewModel.singlefeatureArray[viewModel.singlefeatureArray.count-1])
-                    }
                     ForEach(viewModel.singlefeatureArray, id: \.self) { index in
                         if !(viewModel.shuffleOrRiffle == 1
                              && viewModel.shuffleMode[1] == 2
