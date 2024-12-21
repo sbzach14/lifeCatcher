@@ -4529,10 +4529,10 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 
                                 if temp == 1{
                                     
+                                    
                                     currentResultInfo.singlefeatureIndexToConfirmMaxMin[upDownID].append(singlefeatureIndex)
                                     currentResultInfo.flyTCSolution = (currentFlyTCSolution)
                                     currentResultInfo.ColorSingleFeatures = colorSingleFeatureIndexList
-                                    
                                     
                                     if firstCutSaved == false {
                                         firstMultiCutFeatures = currentLeftSingleFeatures
@@ -4772,6 +4772,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             multipleResultInfo.leftSingleFeatures = multipleResultInfo.minLookHandLeftCards + leftSingleFeatures
             print("看手牌的最后剩余的牌 \(multipleResultInfo.leftSingleFeatures)")
         }else if ReportManager.recordedMaxIndex != -1 {
+            print("多轮recorded \(ReportManager.recordedMaxIndex)")
             multipleResultInfo.leftSingleFeatures = multipleResultInfo.multiRoundInfo[ReportManager.recordedMaxIndex].firstRoundLeftFeatures
             multipleResultInfo.returnSingleFeatureArray = multipleResultInfo.multiRoundInfo[ReportManager.recordedMaxIndex].firstReturnFeatures
             multipleResultInfo.singleResultList[0] = multipleResultInfo.multiRoundInfo[ReportManager.recordedMaxIndex].firstSingleResultList
