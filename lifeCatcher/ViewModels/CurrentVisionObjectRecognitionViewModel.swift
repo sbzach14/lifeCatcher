@@ -2902,6 +2902,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     //MARK: generate test result
     func generateTestResult(){
         self.currentRoundID = 1
+        ReportManager.isFirstReport = true
         var testArray:[Int] = []
         for i in self.allSingleFeatureIndex{
             testArray.append(i)
