@@ -3041,8 +3041,15 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             self.currentRoundID += 1
             self.cutStructArray.append(cutStruct(cutcardIndex: self.singlefeatureArray[self.singlefeatureArray.count - 1], cutMode: 0))
             computeWinnerRC(isReset: false)
-        }
-        else if (self.leftSingleFeatures.count > 0){
+        } else if ReportManager.baozuidacida.contains(self.calModeArgs[self.shuffleOrRiffle][0]) && self.leftSingleFeatures.count > 0{
+            
+            print("计算最大次大的下一轮")
+            self.singlefeatureArray = self.leftSingleFeatures
+            self.currentRoundID += 1
+            self.cutStructArray.append(cutStruct(cutcardIndex: self.singlefeatureArray[self.singlefeatureArray.count - 1], cutMode: 0))
+            computeWinnerRC(isReset: false)
+            
+        } else if (self.leftSingleFeatures.count > 0){
             print("开始计算下一轮")
             self.singlefeatureArray = self.leftSingleFeatures
             self.currentRoundID += 1

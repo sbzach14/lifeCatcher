@@ -197,6 +197,8 @@ class ReportManager{
     
     static let kanshoupai : [Int] = [268,79,80,81,82,83,84,85,86,87,88,89,90]
     
+    static let baozuidacida : [Int] = [44, 50, 51, 269, 270]
+    
     static let allHandSpecialCardReport : [Int] = [
         79,80,81,82,83,84,85,86,87,88,89,90,268
     ]
@@ -251,7 +253,7 @@ class ReportManager{
         41:"[74]:上10张去牌保位置最小次小",
         42:"[75]上10张去牌保有活门报活门",
         43:"[76]:上10张去牌保有活门报最大",
-        44:"[77]:上10张去牌保多轮同点报最大次大生死门*",
+        44:"[77]:上10张去牌保多轮同点报最大次大生死门",
         45:"[78_1]:上10张去牌保多轮同点且无9点",
         46:"[78]:上10张去牌保多轮同点且无对子",
         47:"[79]:上10张去牌面为色去色保位置最大次大次数最多",
@@ -4517,13 +4519,15 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 if resultPos.contains(where: {$0 == targets[0]}) && resultPos.contains(where: {$0 == targets[1]}){
                                     temp = 1
                                     
-                                    if currentResultInfo.RCReturnInfoList[targets[0]].rcDatasetRank == 1 {
-                                        currentResultInfo.XorYMax[upDownID].append(targets[0] + 1)
-                                    }
+                                    currentResultInfo.XorYMax[upDownID].append(resultPos[0] + 1)
                                     
-                                    if currentResultInfo.RCReturnInfoList[targets[1]].rcDatasetRank == 1 {
-                                        currentResultInfo.XorYMax[upDownID].append(targets[1] + 1)
-                                    }
+//                                    if currentResultInfo.RCReturnInfoList[targets[0]].rcDatasetRank == 1 {
+//                                        currentResultInfo.XorYMax[upDownID].append(targets[0] + 1)
+//                                    }
+//                                    
+//                                    if currentResultInfo.RCReturnInfoList[targets[1]].rcDatasetRank == 1 {
+//                                        currentResultInfo.XorYMax[upDownID].append(targets[1] + 1)
+//                                    }
                                                     
                                 }
                                 
@@ -4561,18 +4565,21 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 print("resultPos \(resultPos)")
                                 if resultPos.contains(where: {$0 == 2}){
                                     X = 1
-                                    if currentResultInfo.RCReturnInfoList[2].rcDatasetRank == 1 {
-                                        currentResultInfo.XorYMax[upDownID].append(3)
-                                    }
+//                                    if currentResultInfo.RCReturnInfoList[2].rcDatasetRank == 1 {
+//                                        currentResultInfo.XorYMax[upDownID].append(3)
+//                                    }
                                     
                                 }
                                 if resultPos.contains(where: {$0 == 3}) {
                                     Y = 1
-                                    if currentResultInfo.RCReturnInfoList[3].rcDatasetRank == 1 {
-                                        currentResultInfo.XorYMax[upDownID].append(4)
-                                    }                            }
+//                                    if currentResultInfo.RCReturnInfoList[3].rcDatasetRank == 1 {
+//                                        currentResultInfo.XorYMax[upDownID].append(4)
+//                                    }
+                                }
+                                
                                 
                                 if X == 1 || Y == 1{
+                                    currentResultInfo.XorYMax[upDownID].append(resultPos[0] + 1)
                                     currentResultInfo.singlefeatureIndexToConfirmMaxMin[upDownID].append(singlefeatureIndex)
                                     currentResultInfo.flyTCSolution = (currentFlyTCSolution)
                                     currentResultInfo.ColorSingleFeatures = colorSingleFeatureIndexList
@@ -4606,15 +4613,14 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 print("resultPos \(resultPos) targets \(targets)")
                                 if resultPos.contains(where: {$0 == 2}) && resultPos.contains(where: {$0 == 3}){
                                     temp = 1
-                                    
-                                    if currentResultInfo.RCReturnInfoList[2].rcDatasetRank == 1 {
-                                        currentResultInfo.XorYMax[upDownID].append(3)
-                                    }
-                                    
-                                    if currentResultInfo.RCReturnInfoList[3].rcDatasetRank == 1 {
-                                        currentResultInfo.XorYMax[upDownID].append(4)
-                                    }
-                                    
+                                    currentResultInfo.XorYMax[upDownID].append(resultPos[0] + 1)
+//                                    if currentResultInfo.RCReturnInfoList[2].rcDatasetRank == 1 {
+//                                        currentResultInfo.XorYMax[upDownID].append(3)
+//                                    }
+//                                    
+//                                    if currentResultInfo.RCReturnInfoList[3].rcDatasetRank == 1 {
+//                                        currentResultInfo.XorYMax[upDownID].append(4)
+//                                    }
                                 }
                                 
                                 if temp == 1{
@@ -4682,6 +4688,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                     currentResultInfo.aliveNumber = 2
                                     currentResultInfo.handCardAliveNumberList.append(2)
                                 } else if !upAlive && !downAlive{
+                                    currentResultInfo.aliveNumber = 0
                                     currentResultInfo.handCardAliveNumberList.append(0)
                                 }
                                 
@@ -5561,8 +5568,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     voiceType = 0
                 }
                 var reportNum: Int = 0
+                print("firstResultInfo.targetRCList \(firstResultInfo.targetRCList)")
 
-                for rcID in firstResultInfo.targetRCList[0] {
+                for rcID in firstResultInfo.targetRCList[maxIndex] {
                     if reportNum > 1 {
                         break
                     }
