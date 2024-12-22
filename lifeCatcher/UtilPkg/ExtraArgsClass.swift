@@ -626,7 +626,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         """,
             44: """
         报去掉多少张面牌，可保保多轮同点。去面牌范围由参数XY设定:默认X=1,Y=10.表示在上10张内去掉面牌。修改为:X=1，Y=5表示在前5张内去掉面牌。有活门=女声。平点=男声，半活门=男声，无对子优先.
-        每轮报当轮的最大次大生死门
+        每轮报当轮的最大次大生死门，照牌报下一轮最大次大生死门。保多轮轮数需要用连报轮数设置，比如设置连报轮数为4，就是保4轮同点最多。
         """,
             45: """
         报去掉多少张面牌，可保多轮同点且无9点。去面牌范围由参数XY设定:默认X=1，Y=10。表示在上10张内三掉面牌。修改为:X=1，Y=5表示在前5张内，去掉面牌。女声0=不用去牌也能满足条件。男声0=找不到满足条件的牌,如果需要玩4轮，就把连报轮数设定为4，报134=去掉1张面牌。第3轮4轮同点且无9点
@@ -4516,18 +4516,10 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             if ReportManager.isFirstReport == true {
                                 var temp = 0
                                 print("resultPos \(resultPos) targets \(targets)")
-                                if resultPos.contains(where: {$0 == targets[0]}) && resultPos.contains(where: {$0 == targets[1]}){
+                                if resultPos.contains(where: {$0 == targets[0]}) && resultPos.contains(where: {$0 == targets[1]}) && (resultPos[0] == targets[0] || resultPos[0] == targets[1]){
                                     temp = 1
                                     
                                     currentResultInfo.XorYMax[upDownID].append(resultPos[0] + 1)
-                                    
-//                                    if currentResultInfo.RCReturnInfoList[targets[0]].rcDatasetRank == 1 {
-//                                        currentResultInfo.XorYMax[upDownID].append(targets[0] + 1)
-//                                    }
-//                                    
-//                                    if currentResultInfo.RCReturnInfoList[targets[1]].rcDatasetRank == 1 {
-//                                        currentResultInfo.XorYMax[upDownID].append(targets[1] + 1)
-//                                    }
                                                     
                                 }
                                 
@@ -4611,7 +4603,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 
                                 var temp = 0
                                 print("resultPos \(resultPos) targets \(targets)")
-                                if resultPos.contains(where: {$0 == 2}) && resultPos.contains(where: {$0 == 3}){
+                                if resultPos.contains(where: {$0 == 2}) && resultPos.contains(where: {$0 == 3}) && (resultPos[0] == 2 || resultPos[0] == 3){
                                     temp = 1
                                     currentResultInfo.XorYMax[upDownID].append(resultPos[0] + 1)
 //                                    if currentResultInfo.RCReturnInfoList[2].rcDatasetRank == 1 {
@@ -4704,6 +4696,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                     multipleResultInfo.multiRoundInfo[singlefeatureIndex].firstRoundLeftFeatures = leftSingleFeatures
                                     multipleResultInfo.multiRoundInfo[singlefeatureIndex].firstReturnFeatures = newInputSingleFeatures
                                     multipleResultInfo.multiRoundInfo[singlefeatureIndex].firstSingleResultList = currentResultInfo
+                                    
+                                    print("更新多轮信息结构 \(multipleResultInfo.multiRoundInfo[singlefeatureIndex].firstSingleResultList.targetRCList)")
+
                                 }
                                 
                             } else {
@@ -5536,10 +5531,11 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 
                 var voiceType: Int = 1
                 var reportString: String = ""
-                var maxInfo: multiRoundInfoStruct = multiRoundInfoStruct(leftFeatures: [], targetTimes: 0, targetRoundID: [], firstRoundLeftFeatures: [], firstReturnFeatures: [])
+                var maxInfo: multiRoundInfoStruct = multipleReportResultInfo.multiRoundInfo[0]
                 var index: Int = 0
                 var maxIndex: Int = 0
                 
+                //寻找多轮的结果
                 for multiRoundInfo in multipleReportResultInfo.multiRoundInfo {
                     if multiRoundInfo.targetTimes > maxInfo.targetTimes {
                         maxInfo = multiRoundInfo
