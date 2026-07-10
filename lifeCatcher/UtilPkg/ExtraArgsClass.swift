@@ -5918,15 +5918,19 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
 
                     switch resultInfo.handCardAliveNumberList[handindex] {
                     case 4, 2:
-                        reportString = "活门" + String(resultInfo.aliveNumber)
+                        if resultInfo.aliveNumber == 4 || resultInfo.aliveNumber == 2 {
+                            reportString = "活门" + String(resultInfo.aliveNumber)
+                        } else {
+                            reportString = "半活门" + String(resultInfo.aliveNumber + 1)
+                        }
                         currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
 
                         break
-                    case 3, 1:
-                        reportString = "半活门" + String(resultInfo.aliveNumber + 1)
-                        voiceType = 0
-                        currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
-                        break
+//                    case 3, 1:
+//                        reportString = "半活门" + String(resultInfo.aliveNumber + 1)
+//                        voiceType = 0
+//                        currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+//                        break
                     default:
                         break
                     }
