@@ -2055,8 +2055,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     }
                     else if nodeType0 == 4
                             && nowNum0 != -1
-                            && detectResultNode0.confidence[0] > 0.7
-                            && detectResultNode0.confidence.count <= 10
+                            && detectResultNode0.confidence[0] > 0.75
+                            && detectResultNode0.confidence.count <= 6
                     {
                         detectSingleFeatureArray.insert(insertCard0, at: 0)
                     }
