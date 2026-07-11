@@ -3503,6 +3503,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                         currentResultInfo.hasDrawPoint += rankSet.count
                                     }
                                 }
+                                print("drawopoint1 \(currentResultInfo.hasDrawPoint)")
                                 break
                             //2, 算多轮有多少家平点
                             case 1:
@@ -4975,12 +4976,13 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 var currentResult : [SpeakResultStruct] = []
                 var reportNum: Int = 0
                 //有平点就男声
+                print("pingdian \(resultInfo.hasDrawPoint)")
                 if resultInfo.hasDrawPoint > 0 {
                     voiceType = 0
                 }
                 
                 for rcID in resultInfo.targetRCList[0] {
-                    if reportNum > 1 {
+                    if reportNum > 3 {
                         break
                     }
                     reportString = String(rcID + 1)
@@ -5907,7 +5909,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     dealPos += 1
 
                     for rcID in resultInfo.targetRCList[handindex] {
-                        if reportNum > 1 {
+                        if reportNum > 3 {
                             break
                         }
                         reportString = String(rcID + 1)
