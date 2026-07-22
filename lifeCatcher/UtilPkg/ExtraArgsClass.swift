@@ -1811,6 +1811,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         var specialSingleFeaturePos: Int = -1
         //报最大最小次打次小等目标集合
         var targetRCList: [[Int]] = []
+        //带平点的排名
+        var targetRCDrawRankList: [[Int]] = []
         //每轮有无平点
         var hasDrawPoint: Int = -1
         //每轮的平点类型
@@ -3395,6 +3397,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         var resultTargetPos:[Int] = []
                         //装所有目标位置对应的排名
                         var resultTargetRank: [Int] = []
+                        //装有所有目标对应位置排名带平点
+                        var resultDrawRank: [Int] = []
 
                         //反面打色，打色完变回去
                         if coloringType == 1 {
@@ -3487,8 +3491,10 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                     for winner in rankedWinnersInfo[i]{
                                         resultTargetPos.append(winner.rcID)
                                         resultTargetRank.append(i)
+                                        resultDrawRank.append(i + 1)
                                     }
                                 }
+                                print("平点测试\(resultDrawRank)")
                                 break
                             //6，大1大2，小1小2
                             case 6:
@@ -3588,6 +3594,17 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 } else if drawType == 7 {
                                     currentResultInfo.drawType = 7
                                 }
+                                break
+                                
+                            case 3:
+                                
+                                currentResultInfo.hasDrawPoint = 0
+                                for rankSet in rankedWinnersInfo {
+                                    if rankSet.count > 1{
+                                        currentResultInfo.hasDrawPoint += rankSet.count
+                                    }
+                                }
+                                print("drawopoint1 \(currentResultInfo.hasDrawPoint)")
                                 break
                                 
                             default:
@@ -3789,6 +3806,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         case 0:
                             print("RC加入了 \(resultPos)")
                             currentResultInfo.targetRCList.append(resultPos)
+                            currentResultInfo.targetRCDrawRankList.append(resultDrawRank)
                             currentResultInfo.handCardHasDrawList.append(currentResultInfo.hasDrawPoint)
                             
                             if colorSingleFeatureIndexList.count > 0 {
@@ -3961,6 +3979,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         //report half alive gate
                         case 12:
                             currentResultInfo.targetRCList.append(resultPos)
+                            currentResultInfo.targetRCDrawRankList.append(resultDrawRank)
                             currentResultInfo.handCardHasDrawList.append(currentResultInfo.hasDrawPoint)
 
                             
@@ -3982,6 +4001,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             } else {
                                 currentResultInfo.handCardAliveNumberList.append(0)
                             }
+                            
+                            
                             
                             break
                         //保单个位置大小, 报多个, 多轮报单个(牌堆变化)
@@ -5048,7 +5069,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                     }
                     reportString = String(rcID + 1)
 //                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
-                    currentResult[rcID].content = String(reportNum + 1)
+                    currentResult[rcID].content = String(resultInfo.targetRCDrawRankList[0][reportNum])
+                    
                     reportNum += 1
                     
                 }
@@ -6044,7 +6066,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         }
                         reportString = String(rcID + 1)
 //                        currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
-                        currentResult[rcID + 1].content = String(reportNum + 1)
+                        currentResult[rcID + 1].content = String(resultInfo.targetRCDrawRankList[handindex][reportNum])
                         reportNum += 1
                         
                     }
