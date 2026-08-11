@@ -2293,7 +2293,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     confidenceDic[singlefeature.cardIndex] = singlefeature.confidence
                     uniqueArray.append(singlefeature.cardIndex)
                     uniqueArray.remove(at: existIndex)
-                    print("delete chain \(detectSingleFeatureArray._index(at: singlefeature.cardIndex)) \(existIndex)/\(uniqueArray.count) \(singlefeatureLabelDic[singlefeature.cardIndex]!)")
+                    print("delete chain \(singlefeature.cardIndex) \(existIndex)/\(uniqueArray.count) \(singlefeatureLabelDic[singlefeature.cardIndex]!)")
                 }
             }
             else if singlefeature.confidence >= 0.5{
