@@ -1,5 +1,60 @@
 import SwiftUI
 
+struct RemotePresenceItem: Identifiable {
+    let label: String
+    let state: RemotePresenceState
+
+    var id: String { label }
+}
+
+struct RemotePresenceStatusBar: View {
+    let items: [RemotePresenceItem]
+
+    var body: some View {
+        HStack(spacing: 12) {
+            ForEach(items) { item in
+                HStack(spacing: 4) {
+                    Image(systemName: item.state.statusIcon)
+                    Text("\(item.label) \(item.state.statusTitle)")
+                }
+                .foregroundColor(item.state.statusColor)
+            }
+        }
+        .font(.caption2.weight(.semibold))
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(.black.opacity(0.68))
+        .clipShape(Capsule())
+        .accessibilityElement(children: .combine)
+    }
+}
+
+private extension RemotePresenceState {
+    var statusTitle: String {
+        switch self {
+        case .online: return "在线"
+        case .reconnecting: return "重连中"
+        case .offline: return "离线"
+        }
+    }
+
+    var statusIcon: String {
+        switch self {
+        case .online: return "checkmark.circle.fill"
+        case .reconnecting: return "arrow.triangle.2.circlepath.circle.fill"
+        case .offline: return "circle.fill"
+        }
+    }
+
+    var statusColor: Color {
+        switch self {
+        case .online: return .green
+        case .reconnecting: return .orange
+        case .offline: return .secondary
+        }
+    }
+}
+
 struct RemoteReceiverConnectView: View {
     @StateObject private var viewModel = RemoteReceiverViewModel()
     @AppStorage(RemotePreferenceKeys.receiverRegion) private var regionValue = RemoteRegion.cn.rawValue
@@ -29,7 +84,7 @@ struct RemoteReceiverConnectView: View {
             Image(systemName: "antenna.radiowaves.left.and.right")
                 .font(.system(size: 58))
                 .foregroundColor(.white)
-            Text("连接手机1")
+            Text("加入远程会话")
                 .font(.title2).bold().foregroundColor(.white)
 
             VStack(spacing: 14) {
@@ -98,10 +153,14 @@ struct RemoteReceiverSessionView: View {
             .padding(.bottom, 14)
         }
         .overlay(alignment: .top) {
-            Text(statusText)
-                .font(.caption).foregroundColor(.white)
-                .padding(.horizontal, 10).padding(.vertical, 5)
-                .background(.black.opacity(0.55)).clipShape(Capsule()).padding(.top, 8)
+            if viewModel.displayMode != .black {
+                RemotePresenceStatusBar(items: [
+                    RemotePresenceItem(label: "服务器", state: viewModel.serverPresence),
+                    RemotePresenceItem(label: "手机1", state: viewModel.sourcePresence),
+                    RemotePresenceItem(label: "桌面端", state: viewModel.desktopPresence)
+                ])
+                .padding(.top, 8)
+            }
         }
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
@@ -170,10 +229,5 @@ struct RemoteReceiverSessionView: View {
                 .frame(width: 32, height: 28)
                 .foregroundColor(viewModel.displayMode == mode ? .blue : .white)
         }
-    }
-
-    private var statusText: String {
-        if viewModel.connectionState == .reconnecting { return "网络中断，正在自动重连" }
-        return viewModel.sourceOnline ? "手机1在线" : "等待手机1"
     }
 }

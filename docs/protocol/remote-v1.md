@@ -22,7 +22,17 @@
 | `sourceSessionId` | 一次 source 服务器会话 UUID |
 | `resumeToken` | 短期签名令牌，绑定 region/role/serial/client/connection |
 
-角色为 `source`、`receiver`、`desktop`。每个 `(region, serial)` 各角色最多一台。
+角色为 `source`、`receiver`、`desktop`。每个 `(region, serial)` 各角色最多一台，任意角色都可先创建等待房间，不要求 source 先上线。
+
+welcome 同时返回 `sourceOnline/receiverOnline/desktopOnline` 兼容布尔值和 `sourcePresence/receiverPresence/desktopPresence` 三态。增量消息为：
+
+```text
+source.presence   { online, state, sourceSessionId? }
+receiver.presence { online, state }
+desktop.presence  { online, state }
+```
+
+`state` 为 `online | reconnecting | offline`。reconnecting 表示角色槽处于断线租约宽限期，`online` 兼容字段此时为 false；客户端 UI 使用三态，但只有 online 可看实时画面或接收新命令。
 
 ## SourceEvent
 

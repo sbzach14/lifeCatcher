@@ -21,6 +21,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     public static let context = CIContext()
     @MainActor private var remoteSourceBridge: RemoteSourceBridge?
     private var lastRemoteFrameTimestamp = CMTime.invalid
+
+    @Published private(set) var remoteServerPresence: RemotePresenceState = .offline
+    @Published private(set) var remoteReceiverPresence: RemotePresenceState = .offline
+    @Published private(set) var remoteDesktopPresence: RemotePresenceState = .offline
     
     @Published var cameraImage : CGImage?
     @Published var isShowSingleFeature : Bool = false
@@ -270,7 +274,20 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         guard RemotePreferences.sourceEnabled else { return }
         Task { @MainActor [weak self] in
             guard let self else { return }
-            if self.remoteSourceBridge == nil { self.remoteSourceBridge = RemoteSourceBridge() }
+            if self.remoteSourceBridge == nil {
+                let bridge = RemoteSourceBridge()
+                bridge.onStatusChange = { [weak self] state, receiver, desktop in
+                    guard let self else { return }
+                    switch state {
+                    case .connected: self.remoteServerPresence = .online
+                    case .connecting, .reconnecting: self.remoteServerPresence = .reconnecting
+                    case .idle, .failed: self.remoteServerPresence = .offline
+                    }
+                    self.remoteReceiverPresence = receiver
+                    self.remoteDesktopPresence = desktop
+                }
+                self.remoteSourceBridge = bridge
+            }
             self.remoteSourceBridge?.startIfEnabled()
         }
     }
@@ -279,6 +296,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         Task { @MainActor [weak self] in
             self?.remoteSourceBridge?.stop()
             self?.remoteSourceBridge = nil
+            self?.remoteServerPresence = .offline
+            self?.remoteReceiverPresence = .offline
+            self?.remoteDesktopPresence = .offline
         }
     }
     
@@ -3930,6 +3950,8 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
     }
 
     func performSpeechSynthesis(utterance: AVSpeechUtterance) {
+        // 远程版手机1的最终防线：即使上层以后漏掉 guard，也不允许本机或耳机 TTS。
+        guard RemoteRecognitionPolicy.localAudioEnabled else { return }
         lock.lock()
         guard !isPlaying else {
             lock.unlock()
@@ -3951,6 +3973,8 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
     }
     
     func performSpeechSynthesis(speakResultStruct: [[SpeakResultStruct]], repeatCnt: Int, isSeparate: Bool) {
+        // 手机2使用独立 RemoteReceiverAudioCoordinator，不经过这里。
+        guard RemoteRecognitionPolicy.localAudioEnabled else { return }
         var emptyFlag = true
         for (turnIndex, turnResult) in speakResultStruct.enumerated() {
             if turnResult.count > 0{

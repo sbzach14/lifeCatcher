@@ -9,7 +9,7 @@
 
 必须保持以下不变量：
 
-1. 识别、牌序恢复、`ClassifierSettingArgs.selectDataset` 和 `ReportManager` 的既有调用顺序不因网络成功或失败改变；识别端的所有本地提示音与 TTS 则固定禁用。
+1. 识别、牌序恢复、`ClassifierSettingArgs.selectDataset` 和 `ReportManager` 的既有调用顺序不因网络成功或失败改变；识别端的所有本地提示音与 TTS 固定禁用，手机扬声器和本机连接耳机都不得发声。
 2. 网络只监听三个既有输出边界：`speakText(input: Int)` 的开始/成功/失败、最终 `speakText(input:[[SpeakResultStruct]],...)`、`captureOutput` 的原始帧旁路。
 3. 业务事件写入持久 outbox 后异步发送；网络异常不能阻塞识别线程。
 4. 大陆与新加坡是完全隔离的域和会话空间。outbox 项记录 region + serial，禁止切换区域后跨区补发。
@@ -26,7 +26,7 @@
 | `RemoteDiagnostics.swift` | 统一错误翻译、终端日志与全局 toast；不记录序列号或 token |
 | `RemoteBusinessClient.swift` | HTTP admission、WebSocket、10秒建连超时、恢复令牌、带抖动指数退避、媒体令牌 |
 | `RemoteOutboxStore.swift` | 识别端未确认事件的 Application Support 原子 JSON outbox |
-| `RemoteSourceBridge.swift` | 操作 ID、严格单飞序号、ACK 去重、视频需求控制 |
+| `RemoteSourceBridge.swift` | 操作 ID、严格单飞序号、ACK 去重、视频需求控制、手机2/桌面端 presence；只写日志/toast，不调用音频 API |
 | `RemoteVideoPublisher.swift` | 1080p 相机旁路缩放为 720p30，并以 LiveKit buffer track 发布 |
 | `RemoteVideoSubscriber.swift` | 手机2 LiveKit 订阅与 UIKit `VideoView` SwiftUI bridge |
 | `RemotePresentationBuilder.swift` | 把已计算、已排序的本地结果映射为纯展示快照 |
@@ -59,6 +59,7 @@
 - 永久协议错误只隔离并删除对应远程 outbox 项，避免坏快照阻塞后续远程事件；会话或序号错误不丢事件，而是重连后按新 welcome 重派。两种路径都不回调或中断本地识别链。
 - start/success/failure 有 5 秒有效期；过期提示从 outbox 清理。presentation 不过期。
 - `RemoteBusinessClient` 使用 0.5 秒起、最高 30 秒的指数退避；同 `clientInstanceId` 在服务器租约内恢复同一角色槽。
+- 手机1、手机2、桌面端可按任意顺序加入同一 `(region, serial)` 等待房间。welcome 给出三角色完整三态，后续 presence 用 online/reconnecting/offline 增量更新；reconnecting 不能当作在线投递或可用视频。
 - HTTP admission、媒体令牌和首条 WebSocket welcome 均有10秒超时；已连会话用15秒 ping、45秒无 pong 主动重连。
 - 服务器会在 pong 周期刷新短期 resume/media Bearer；过期恢复令牌会被丢弃并自动进行一次无 token admission，避免长时前台运行在 TTL 后失去视频。
 - `sourceSessionId` 变化表示 LiveKit 房间也变化；手机1、手机2和桌面端必须断开旧媒体 room，再用当前业务连接的新媒体令牌加入。相同 session 内的网络抖动不重建房间。
@@ -94,4 +95,4 @@ presentation 的 UI 在收到命令时立即刷新，不等待音频结束。自
 xcodebuild -project lifeCatcher.xcodeproj -scheme lifeCatcher -destination 'generic/platform=iOS' CODE_SIGNING_ALLOWED=NO build
 ```
 
-相机旁路、720p 帧率、前后台、扬声器/蓝牙和网络切换仍必须真机验证。固定 IP 在线不代表 UDP/TURN 媒体可用，必须分别验证业务与视频路径。
+相机旁路、720p 帧率、前后台、手机1扬声器/蓝牙绝对静音、手机2音频和网络切换仍必须真机验证。固定 IP 在线不代表 UDP/TURN 媒体可用，必须分别验证业务与视频路径。

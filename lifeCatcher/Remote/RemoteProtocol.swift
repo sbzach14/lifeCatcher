@@ -10,6 +10,18 @@ enum RemoteRole: String, Codable, Equatable {
     case desktop
 }
 
+enum RemotePresenceState: String, Codable, Equatable {
+    case offline
+    case online
+    case reconnecting
+
+    var isOnline: Bool { self == .online }
+
+    static func resolved(_ value: RemotePresenceState?, online: Bool) -> RemotePresenceState {
+        value ?? (online ? .online : .offline)
+    }
+}
+
 enum RemoteVoiceIntent: String, Codable {
     case male
     case female
@@ -181,10 +193,52 @@ struct RemoteWelcomeMessage: Decodable {
     let resumeToken: String
     let historyEpoch: UUID
     let sourceOnline: Bool
+    let receiverOnline: Bool
+    let desktopOnline: Bool
+    let sourcePresence: RemotePresenceState
+    let receiverPresence: RemotePresenceState
+    let desktopPresence: RemotePresenceState
     let sourceSessionId: UUID?
     let nextSourceEventSeq: Int?
     let forwardingEnabled: Bool
     let videoWanted: Bool
+
+    private enum CodingKeys: String, CodingKey {
+        case protocolVersion, region, role, serial, connectionId, resumeToken, historyEpoch
+        case sourceOnline, receiverOnline, desktopOnline
+        case sourcePresence, receiverPresence, desktopPresence
+        case sourceSessionId, nextSourceEventSeq, forwardingEnabled, videoWanted
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        protocolVersion = try container.decode(Int.self, forKey: .protocolVersion)
+        region = try container.decode(String.self, forKey: .region)
+        role = try container.decode(RemoteRole.self, forKey: .role)
+        serial = try container.decode(String.self, forKey: .serial)
+        connectionId = try container.decode(UUID.self, forKey: .connectionId)
+        resumeToken = try container.decode(String.self, forKey: .resumeToken)
+        historyEpoch = try container.decode(UUID.self, forKey: .historyEpoch)
+        sourceOnline = try container.decode(Bool.self, forKey: .sourceOnline)
+        receiverOnline = try container.decodeIfPresent(Bool.self, forKey: .receiverOnline) ?? false
+        desktopOnline = try container.decodeIfPresent(Bool.self, forKey: .desktopOnline) ?? false
+        sourcePresence = RemotePresenceState.resolved(
+            try container.decodeIfPresent(RemotePresenceState.self, forKey: .sourcePresence),
+            online: sourceOnline
+        )
+        receiverPresence = RemotePresenceState.resolved(
+            try container.decodeIfPresent(RemotePresenceState.self, forKey: .receiverPresence),
+            online: receiverOnline
+        )
+        desktopPresence = RemotePresenceState.resolved(
+            try container.decodeIfPresent(RemotePresenceState.self, forKey: .desktopPresence),
+            online: desktopOnline
+        )
+        sourceSessionId = try container.decodeIfPresent(UUID.self, forKey: .sourceSessionId)
+        nextSourceEventSeq = try container.decodeIfPresent(Int.self, forKey: .nextSourceEventSeq)
+        forwardingEnabled = try container.decode(Bool.self, forKey: .forwardingEnabled)
+        videoWanted = try container.decode(Bool.self, forKey: .videoWanted)
+    }
 }
 
 struct RemoteReceiverDelivery: Decodable {
@@ -200,7 +254,9 @@ enum RemoteServerMessage: Decodable {
     case welcome(RemoteWelcomeMessage)
     case acknowledgement(requestId: UUID, status: String, sourceEventSeq: Int?, deliverySeq: Int?)
     case error(requestId: UUID?, code: String, message: String)
-    case sourcePresence(online: Bool, sourceSessionId: UUID?)
+    case sourcePresence(state: RemotePresenceState, sourceSessionId: UUID?)
+    case receiverPresence(state: RemotePresenceState)
+    case desktopPresence(state: RemotePresenceState)
     case sourceEvent(event: RemoteSourceEvent, replayed: Bool, historySeq: Int?)
     case receiverDelivery(RemoteReceiverDelivery)
     case forwardingState(Bool)
@@ -209,7 +265,7 @@ enum RemoteServerMessage: Decodable {
 
     private enum CodingKeys: String, CodingKey {
         case type, requestId, status, sourceEventSeq, deliverySeq, code, message
-        case online, sourceSessionId, event, replayed, historySeq, enabled, videoWanted
+        case online, state, sourceSessionId, event, replayed, historySeq, enabled, videoWanted
         case clientTimeMs, serverTimeMs, resumeToken
     }
 
@@ -229,10 +285,27 @@ enum RemoteServerMessage: Decodable {
             code: try container.decode(String.self, forKey: .code),
             message: try container.decode(String.self, forKey: .message)
         )
-        case "source.presence": self = .sourcePresence(
-            online: try container.decode(Bool.self, forKey: .online),
-            sourceSessionId: try container.decodeIfPresent(UUID.self, forKey: .sourceSessionId)
-        )
+        case "source.presence":
+            let online = try container.decode(Bool.self, forKey: .online)
+            self = .sourcePresence(
+                state: RemotePresenceState.resolved(
+                    try container.decodeIfPresent(RemotePresenceState.self, forKey: .state),
+                    online: online
+                ),
+                sourceSessionId: try container.decodeIfPresent(UUID.self, forKey: .sourceSessionId)
+            )
+        case "receiver.presence":
+            let online = try container.decode(Bool.self, forKey: .online)
+            self = .receiverPresence(state: RemotePresenceState.resolved(
+                try container.decodeIfPresent(RemotePresenceState.self, forKey: .state),
+                online: online
+            ))
+        case "desktop.presence":
+            let online = try container.decode(Bool.self, forKey: .online)
+            self = .desktopPresence(state: RemotePresenceState.resolved(
+                try container.decodeIfPresent(RemotePresenceState.self, forKey: .state),
+                online: online
+            ))
         case "source.event": self = .sourceEvent(
             event: try container.decode(RemoteSourceEvent.self, forKey: .event),
             replayed: try container.decode(Bool.self, forKey: .replayed),

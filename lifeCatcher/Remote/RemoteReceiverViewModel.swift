@@ -10,7 +10,8 @@ final class RemoteReceiverViewModel: ObservableObject {
     }
 
     @Published private(set) var connectionState: RemoteBusinessClient.State = .idle
-    @Published private(set) var sourceOnline = false
+    @Published private(set) var sourcePresence: RemotePresenceState = .offline
+    @Published private(set) var desktopPresence: RemotePresenceState = .offline
     @Published private(set) var presentation = RemotePresentationSnapshot.empty
     @Published private(set) var timeText = ""
     @Published private(set) var currentDate = Date()
@@ -30,6 +31,15 @@ final class RemoteReceiverViewModel: ObservableObject {
     private var targetSerial = ""
     private var timeOverrideUntil: Date?
 
+    var sourceOnline: Bool { sourcePresence.isOnline }
+    var serverPresence: RemotePresenceState {
+        switch connectionState {
+        case .connected: return .online
+        case .connecting, .reconnecting: return .reconnecting
+        case .idle, .failed: return .offline
+        }
+    }
+
     init() {
         let config = readConfigJSON()
         let ints = config?["Int"] as? [String: Int]
@@ -38,8 +48,12 @@ final class RemoteReceiverViewModel: ObservableObject {
         timeMode = ints?["timeMode"] ?? 0
         blackFactor = floats?["blackFactor"] ?? 0.1
         client.onStateChange = { [weak self] state in
-            self?.connectionState = state
-            if case .failed(let message) = state { self?.errorMessage = message }
+            guard let self else { return }
+            self.connectionState = state
+            if state == .reconnecting {
+                self.videoSubscriber.disconnect()
+            }
+            if case .failed(let message) = state { self.errorMessage = message }
         }
         client.onMessage = { [weak self] message in self?.handle(message) }
         startTimer()
@@ -52,7 +66,8 @@ final class RemoteReceiverViewModel: ObservableObject {
         presentation = .empty
         sourceSessionId = nil
         lastDeliverySeq = 0
-        sourceOnline = false
+        sourcePresence = .offline
+        desktopPresence = .offline
         displayMode = .video
         targetSerial = serial.trimmingCharacters(in: .whitespacesAndNewlines)
         errorMessage = ""
@@ -70,7 +85,8 @@ final class RemoteReceiverViewModel: ObservableObject {
         audio.cancelAll()
         videoSubscriber.disconnect()
         client.disconnect()
-        sourceOnline = false
+        sourcePresence = .offline
+        desktopPresence = .offline
         sourceSessionId = nil
         lastDeliverySeq = 0
     }
@@ -97,9 +113,12 @@ final class RemoteReceiverViewModel: ObservableObject {
             let mediaSessionChanged = sourceSessionId != nil && sourceSessionId != welcome.sourceSessionId
             if sourceSessionId != welcome.sourceSessionId { lastDeliverySeq = 0 }
             sourceSessionId = welcome.sourceSessionId
-            sourceOnline = welcome.sourceOnline
-            if welcome.sourceOnline {
+            sourcePresence = welcome.sourcePresence
+            desktopPresence = welcome.desktopPresence
+            if welcome.sourcePresence == .online {
                 RemoteDiagnostics.record(.success, category: "presence", message: "手机1已在线", toast: true)
+            } else if welcome.sourcePresence == .reconnecting {
+                RemoteDiagnostics.record(.warning, category: "presence", message: "手机1正在重连，继续等待", toast: true)
             } else {
                 RemoteDiagnostics.record(.warning, category: "presence", message: "已连接服务器，正在等待手机1上线", toast: true)
             }
@@ -108,25 +127,22 @@ final class RemoteReceiverViewModel: ObservableObject {
                 else { Task { await videoSubscriber.connect(using: client) } }
             }
             Task { try? await client.send(RemotePresenceMessage(displayMode: displayMode.rawValue, videoWanted: displayMode == .video)) }
-        case .sourcePresence(let online, let sessionId):
-            let wasOnline = sourceOnline
+        case .sourcePresence(let presence, let sessionId):
+            let previous = sourcePresence
             let mediaSessionChanged = sourceSessionId != nil && sourceSessionId != sessionId
             if sourceSessionId != sessionId { lastDeliverySeq = 0 }
             sourceSessionId = sessionId
-            sourceOnline = online
-            if online != wasOnline {
-                RemoteDiagnostics.record(
-                    online ? .success : .warning,
-                    category: "presence",
-                    message: online ? "手机1已恢复在线" : "手机1已离线，等待自动恢复",
-                    toast: true
-                )
-            }
-            if online && displayMode == .video {
+            sourcePresence = presence
+            announcePresenceChange(label: "手机1", from: previous, to: presence)
+            if presence == .online && displayMode == .video {
                 if mediaSessionChanged { Task { await videoSubscriber.resetSession(using: client) } }
                 else { Task { await videoSubscriber.connect(using: client) } }
             }
-            if !online { videoSubscriber.disconnect() }
+            if presence != .online { videoSubscriber.disconnect() }
+        case .desktopPresence(let presence):
+            let previous = desktopPresence
+            desktopPresence = presence
+            announcePresenceChange(label: "桌面端", from: previous, to: presence)
         case .receiverDelivery(let delivery):
             consume(delivery)
         case .error(_, let code, let message):
@@ -135,6 +151,24 @@ final class RemoteReceiverViewModel: ObservableObject {
         default:
             break
         }
+    }
+
+    private func announcePresenceChange(label: String, from previous: RemotePresenceState, to current: RemotePresenceState) {
+        guard previous != current else { return }
+        let level: RemoteDiagnosticLevel
+        let message: String
+        switch current {
+        case .online:
+            level = .success
+            message = "\(label)已在线"
+        case .reconnecting:
+            level = .warning
+            message = "\(label)网络波动，等待自动重连"
+        case .offline:
+            level = .warning
+            message = "\(label)已离线"
+        }
+        RemoteDiagnostics.record(level, category: "presence", message: message, toast: true)
     }
 
     private func consume(_ delivery: RemoteReceiverDelivery) {

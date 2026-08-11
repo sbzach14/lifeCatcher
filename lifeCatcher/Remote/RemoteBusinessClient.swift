@@ -215,7 +215,7 @@ final class RemoteBusinessClient: ObservableObject {
         do {
             while !Task.isCancelled {
                 let decoded = try decode(try await task.receive())
-                if case .sourcePresence(let online, _) = decoded { sourceOnline = online }
+                if case .sourcePresence(let presence, _) = decoded { sourceOnline = presence.isOnline }
                 if case .pong(_, _, let refreshedToken) = decoded {
                     lastPongAt = Date()
                     if let refreshedToken {

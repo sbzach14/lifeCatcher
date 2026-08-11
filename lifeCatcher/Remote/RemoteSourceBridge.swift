@@ -6,6 +6,10 @@ import Foundation
 final class RemoteSourceBridge: ObservableObject {
     @Published private(set) var state: RemoteBusinessClient.State = .idle
     @Published private(set) var videoWanted = false
+    @Published private(set) var receiverPresence: RemotePresenceState = .offline
+    @Published private(set) var desktopPresence: RemotePresenceState = .offline
+
+    var onStatusChange: ((RemoteBusinessClient.State, RemotePresenceState, RemotePresenceState) -> Void)?
 
     private struct AssignedEvent {
         let requestId: UUID
@@ -28,8 +32,12 @@ final class RemoteSourceBridge: ObservableObject {
         videoPublisher = RemoteVideoPublisher(client: client)
         client.onMessage = { [weak self] message in self?.handle(message) }
         client.onStateChange = { [weak self] state in
-            self?.state = state
-            if state == .reconnecting { self?.assigned = nil }
+            guard let self else { return }
+            self.state = state
+            if state == .reconnecting {
+                self.assigned = nil
+            }
+            self.publishStatus()
         }
     }
 
@@ -63,9 +71,12 @@ final class RemoteSourceBridge: ObservableObject {
         client.disconnect()
         state = .idle
         videoWanted = false
+        receiverPresence = .offline
+        desktopPresence = .offline
         activeRegion = nil
         activeSerial = nil
         currentOperationId = nil
+        publishStatus()
         RemoteDiagnostics.record(.info, category: "source", message: "手机1远程发送已停止")
     }
 
@@ -150,13 +161,26 @@ final class RemoteSourceBridge: ObservableObject {
                 assigned = nil
             }
             nextSequence = welcome.nextSourceEventSeq ?? 1
+            receiverPresence = welcome.receiverPresence
+            desktopPresence = welcome.desktopPresence
             videoWanted = welcome.videoWanted
             if welcome.videoWanted {
                 RemoteDiagnostics.record(.info, category: "video", message: "接收端请求实时画面，开始建立 720p30 视频")
             }
             if mediaSessionChanged { videoPublisher.resetSession(wanted: welcome.videoWanted) }
             else { videoPublisher.setWanted(welcome.videoWanted) }
+            publishStatus()
             flush()
+        case .receiverPresence(let presence):
+            let previous = receiverPresence
+            receiverPresence = presence
+            announcePresenceChange(label: "手机2", from: previous, to: presence)
+            publishStatus()
+        case .desktopPresence(let presence):
+            let previous = desktopPresence
+            desktopPresence = presence
+            announcePresenceChange(label: "桌面端", from: previous, to: presence)
+            publishStatus()
         case .acknowledgement(let requestId, _, let sourceEventSeq, _):
             guard let match = assigned, match.requestId == requestId else { return }
             assigned = nil
@@ -186,5 +210,28 @@ final class RemoteSourceBridge: ObservableObject {
         default:
             break
         }
+    }
+
+    private func publishStatus() {
+        onStatusChange?(state, receiverPresence, desktopPresence)
+    }
+
+    /// 手机1只产生可视日志/toast；这里绝不触发音频 API。
+    private func announcePresenceChange(label: String, from previous: RemotePresenceState, to current: RemotePresenceState) {
+        guard previous != current else { return }
+        let level: RemoteDiagnosticLevel
+        let message: String
+        switch current {
+        case .online:
+            level = .success
+            message = "\(label)已在线"
+        case .reconnecting:
+            level = .warning
+            message = "\(label)网络波动，等待自动重连"
+        case .offline:
+            level = .warning
+            message = "\(label)已离线"
+        }
+        RemoteDiagnostics.record(level, category: "presence", message: message, toast: true)
     }
 }

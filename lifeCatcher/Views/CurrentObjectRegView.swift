@@ -261,6 +261,16 @@ struct CurrentVisionObjectRecognitionView: View {
             }
             Spacer()
         }
+        .overlay(alignment: .top) {
+            if !viewModel.isBlack {
+                RemotePresenceStatusBar(items: [
+                    RemotePresenceItem(label: "服务器", state: viewModel.remoteServerPresence),
+                    RemotePresenceItem(label: "手机2", state: viewModel.remoteReceiverPresence),
+                    RemotePresenceItem(label: "桌面端", state: viewModel.remoteDesktopPresence)
+                ])
+                .padding(.top, 8)
+            }
+        }
         .onAppear {
             Task { @MainActor in
                 let cameraGranted: Bool
