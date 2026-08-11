@@ -4,12 +4,12 @@
 
 远程功能只属于核心规则链路，不属于普通 `cls_main` 采集链路。手机角色在进入“幻影”后选择：
 
-- 识别端（手机1）：继续使用原核心识别链路；只有“远程连接”开启时才建立业务连接和按需媒体连接。
+- 识别端（手机1）：继续使用原核心识别链路，进入识别页即建立业务连接，不提供关闭开关。识别端固定本机静音、时间模式为“无”，且不提供本地结果页入口。
 - 接收端（手机2）：只建立网络、视频、结果展示和播放对象；严禁实例化 `CurrentVisionObjectRecognitionViewModel`，因此不会加载六个 Core ML 模型、创建 `AVCaptureSession` 或运行规则引擎。
 
 必须保持以下不变量：
 
-1. 识别、牌序恢复、`ClassifierSettingArgs.selectDataset`、`ReportManager`、本地语音的既有调用顺序不因网络成功或失败改变。
+1. 识别、牌序恢复、`ClassifierSettingArgs.selectDataset` 和 `ReportManager` 的既有调用顺序不因网络成功或失败改变；识别端的所有本地提示音与 TTS 则固定禁用。
 2. 网络只监听三个既有输出边界：`speakText(input: Int)` 的开始/成功/失败、最终 `speakText(input:[[SpeakResultStruct]],...)`、`captureOutput` 的原始帧旁路。
 3. 业务事件写入持久 outbox 后异步发送；网络异常不能阻塞识别线程。
 4. 大陆与新加坡是完全隔离的域和会话空间。outbox 项记录 region + serial，禁止切换区域后跨区补发。
@@ -39,11 +39,11 @@
 
 ### 提示音
 
-`CurrentVisionObjectRecognitionViewModel.speakText(input: Int)` 在原本地播放判断之前建立远程事件：0/1/2 映射 start/success/failure。它不改变原函数的耳机/扬声器判断和播放器状态。
+`CurrentVisionObjectRecognitionViewModel.speakText(input: Int)` 先建立远程事件：0/1/2 映射 start/success/failure，然后由远程分支固定策略拦截本地播放。因此连接本机耳机也不会听到识别端提示音。
 
 ### 最终结果
 
-`computeWinnerRC` 仍先完成数据集计算、牌数组回写、特殊玩法手牌排序，再调用原 `speakText(input:[[SpeakResultStruct]],...)`。该函数保持本地 TTS 与时间文本逻辑，然后用同一份牌序、切牌、`singleResultList`、`reportResult`、语速和重复次数构建 `RemotePresentationSnapshot`。不传 `shuffleOrRiffle`、当前轮索引、方案或其他规则设置。
+`computeWinnerRC` 仍先完成数据集计算、牌数组回写、特殊玩法手牌排序，再调用原 `speakText(input:[[SpeakResultStruct]],...)`。该函数不在识别端执行本地 TTS，时间模式固定为 0；它仍使用同一份牌序、切牌、`singleResultList`、`reportResult`、语速和重复次数构建 `RemotePresentationSnapshot`。不传 `shuffleOrRiffle`、当前轮索引、方案或其他规则设置。
 
 ### 视频
 

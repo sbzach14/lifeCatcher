@@ -221,7 +221,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             self.volumeDown = intDict["volumeDown"]!
             self.blackMode = intDict["blackMode"]!
             self.voiceDevice = intDict["voiceDevice"]!
-            self.timeMode = intDict["timeMode"]!
+            self.timeMode = RemoteRecognitionPolicy.timeMode
             self.addCardMode = intDict["addCardMode"]!
             
             
@@ -239,7 +239,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         self.isHighHz = true
         
-        if self.isHeadphonesConnected(){
+        if RemoteRecognitionPolicy.localAudioEnabled && self.isHeadphonesConnected(){
             self.voiceDevice = 1
             self.updateConfigJSON()
         }
@@ -248,7 +248,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     func initialize(saveRuleIndex: Int, configType: Int) {
         self.configType = configType
         setupAVCapture()
-        configureAudioSession()
+        if RemoteRecognitionPolicy.localAudioEnabled {
+            configureAudioSession()
+        }
         initializeTransform()
         
         self.loadSaveRule(saveRuleIndex: saveRuleIndex)
@@ -3084,6 +3086,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         if let prompt = input == 0 ? RemotePromptKind.start : input == 1 ? .success : input == 2 ? .failure : nil {
             Task { @MainActor [weak self] in self?.remoteSourceBridge?.emitPrompt(prompt) }
         }
+        guard RemoteRecognitionPolicy.localAudioEnabled else { return }
         let isSpeak = (!self.isHeadphonesConnected() && self.voiceDevice == 0)
                     || (self.isHeadphonesConnected() && self.voiceDevice == 1)
         
@@ -3129,8 +3132,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 
 
     func speakText(input: [[SpeakResultStruct]], isCut: Bool, repeatCnt: Int) {
-        let isSpeak = (!self.isHeadphonesConnected() && self.voiceDevice == 0)
+        let isSpeak = RemoteRecognitionPolicy.localAudioEnabled
+                    && ((!self.isHeadphonesConnected() && self.voiceDevice == 0)
                     || (self.isHeadphonesConnected() && self.voiceDevice == 1)
+                    )
         
         if isSpeak{
             self.speechPerformer.performSpeechSynthesis(speakResultStruct: input, repeatCnt: repeatCnt, isSeparate: ReportManager.kanshoupai.contains(self.calModeArgs[self.shuffleOrRiffle][0])
@@ -3326,6 +3331,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
     
     func speakText(input: String){
+        guard RemoteRecognitionPolicy.localAudioEnabled else { return }
         let isSpeak = (!self.isHeadphonesConnected() && self.voiceDevice == 0)
                     || (self.isHeadphonesConnected() && self.voiceDevice == 1)
         if isSpeak{

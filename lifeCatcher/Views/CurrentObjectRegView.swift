@@ -51,7 +51,7 @@ struct CurrentVisionObjectRecognitionView: View {
                 }
                 .navigationBarBackButtonHidden(true)
             } 
-            else if viewModel.isShowSingleFeature{
+            else if RemoteRecognitionPolicy.localResultDisplayEnabled && viewModel.isShowSingleFeature{
                 ShowResultView().environmentObject(viewModel)
             }
             else {
@@ -65,15 +65,6 @@ struct CurrentVisionObjectRecognitionView: View {
                                 viewModel.isBlack = true
                             }
                         }
-                        .gesture(
-                            DragGesture(minimumDistance: 50)
-                                .onChanged { value in
-                                    if value.translation.width < 0 {
-                                        // 右滑
-                                        viewModel.isShowSingleFeature = true
-                                    }
-                                }
-                        )
                 }
                 
                 VStack{
@@ -251,17 +242,6 @@ struct CurrentVisionObjectRecognitionView: View {
                     }
                     
                     HStack{
-                        Button {
-                            viewModel.isShowSingleFeature = true
-                        } label: {
-                            Label("ShowSingleFeature", systemImage: "magnifyingglass")
-                                .foregroundColor(.blue)
-                                .labelStyle(.iconOnly)
-                                .bubbleBackground()
-                                
-                        }
-                        .frame(width: 50, height: 50)
-                        
                         Spacer()
                         
                         Button {

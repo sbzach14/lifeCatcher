@@ -39,8 +39,15 @@ enum RemoteRegion: String, Codable, CaseIterable, Identifiable {
     }
 }
 
+/// Fixed behavior for the recognition role in the remote-only branch.
+enum RemoteRecognitionPolicy {
+    static let sourceConnectionEnabled = true
+    static let localAudioEnabled = false
+    static let localResultDisplayEnabled = false
+    static let timeMode = 0
+}
+
 enum RemotePreferenceKeys {
-    static let sourceEnabled = "remote.source.enabled"
     static let sourceRegion = "remote.source.region"
     static let receiverRegion = "remote.receiver.region"
     static let receiverLastSerial = "remote.receiver.lastSerial"
@@ -48,10 +55,7 @@ enum RemotePreferenceKeys {
 }
 
 enum RemotePreferences {
-    static var sourceEnabled: Bool {
-        get { UserDefaults.standard.bool(forKey: RemotePreferenceKeys.sourceEnabled) }
-        set { UserDefaults.standard.set(newValue, forKey: RemotePreferenceKeys.sourceEnabled) }
-    }
+    static var sourceEnabled: Bool { RemoteRecognitionPolicy.sourceConnectionEnabled }
 
     static var sourceRegion: RemoteRegion {
         get { RemoteRegion(rawValue: UserDefaults.standard.string(forKey: RemotePreferenceKeys.sourceRegion) ?? "cn") ?? .cn }

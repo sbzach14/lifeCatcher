@@ -81,7 +81,6 @@ struct InfoView: View {
 
 struct DeprecatedInfoView: View {
     @StateObject var viewModel = SettingViewModel()
-    @State private var remoteEnabled = RemotePreferences.sourceEnabled
     @State private var remoteRegion = RemotePreferences.sourceRegion
     
     var body: some View {
@@ -104,41 +103,21 @@ struct DeprecatedInfoView: View {
             Divider().colorInvert()
 
             HStack {
-                Text("远程连接").foregroundColor(.white).padding(.leading, 20)
+                Text("连接服务器").foregroundColor(.white).padding(.leading, 20)
                 Spacer()
-                Toggle("", isOn: $remoteEnabled)
-                    .labelsHidden()
-                    .padding(.trailing, 30)
-                    .onChange(of: remoteEnabled) { _, value in
-                        RemotePreferences.sourceEnabled = value
-                        RemoteDiagnostics.record(
-                            value ? .success : .info,
-                            category: "settings",
-                            message: value ? "远程连接已开启，将在进入识别页后连接" : "远程连接已关闭",
-                            toast: true
-                        )
-                    }
-            }
-
-            if remoteEnabled {
-                Divider().colorInvert()
-                HStack {
-                    Text("连接服务器").foregroundColor(.white).padding(.leading, 20)
-                    Spacer()
-                    Picker("连接服务器", selection: $remoteRegion) {
-                        ForEach(RemoteRegion.allCases) { region in Text(region.title).tag(region) }
-                    }
-                    .pickerStyle(.menu)
-                    .padding(.trailing, 30)
-                    .onChange(of: remoteRegion) { _, value in
-                        RemotePreferences.sourceRegion = value
-                        RemoteDiagnostics.record(
-                            value.isConfigured ? .info : .warning,
-                            category: "settings",
-                            message: value.isConfigured ? "已选择\(value.title)：\(value.endpointDescription)" : "\(value.title) IP 尚未配置",
-                            toast: true
-                        )
-                    }
+                Picker("连接服务器", selection: $remoteRegion) {
+                    ForEach(RemoteRegion.allCases) { region in Text(region.title).tag(region) }
+                }
+                .pickerStyle(.menu)
+                .padding(.trailing, 30)
+                .onChange(of: remoteRegion) { _, value in
+                    RemotePreferences.sourceRegion = value
+                    RemoteDiagnostics.record(
+                        value.isConfigured ? .info : .warning,
+                        category: "settings",
+                        message: value.isConfigured ? "已选择\(value.title)：\(value.endpointDescription)" : "\(value.title) IP 尚未配置",
+                        toast: true
+                    )
                 }
             }
 
@@ -159,48 +138,6 @@ struct DeprecatedInfoView: View {
             Divider().colorInvert()
             
             HStack {
-                Text("播放设备").foregroundColor(.white).padding(.leading, 20)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                
-                Picker("voiceDevice", selection: $viewModel.voiceDevice) {
-                    ForEach(0...FunctionSetting.voiceDeviceDict.count - 1, id: \.self){
-                        index in Text(FunctionSetting.voiceDeviceDict[index]!).tag(index)
-                    }
-                }
-                .pickerStyle(MenuPickerStyle())
-                .frame(width: 200, height: 30, alignment: .trailing)
-                .padding(.trailing,30) // 右侧间距
-            }
-            
-            Divider().colorInvert()
-        
-            HStack {
-                Text("音量\(String(format: "%.2f",viewModel.volumeValue))").foregroundColor(.white).padding(.leading, 20).frame(width: 100, alignment: .leading)
-                
-                Spacer()
-                
-                Slider(value: $viewModel.volumeValue, in: 0...1, step: 0.01)
-                    .frame(maxWidth: 200, alignment: .trailing)
-                    .padding(.trailing,30) // 右侧间距
-                    .accentColor(.white)
-            }.frame(height: 30)
-            
-            Divider().colorInvert()
-            
-            HStack {
-                Text("语速\(String(format: "%.2f",viewModel.voiceRate))").foregroundColor(.white).padding(.leading, 20).frame(width: 100, alignment: .leading)
-                
-                Spacer()
-                
-                Slider(value: $viewModel.voiceRate, in: 0...1, step: 0.01)
-                    .frame(maxWidth: 200, alignment: .trailing)
-                    .padding(.trailing,30) // 右侧间距
-                    .accentColor(.white)
-            }.frame(height: 30)
-            
-            Divider().colorInvert()
-            
-            HStack {
                 Text("屏幕显示").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
                 
                 Picker("blackMode", selection: $viewModel.blackMode) {
@@ -213,21 +150,6 @@ struct DeprecatedInfoView: View {
                 .padding(.trailing,30) // 右侧间距
             }
 
-            Divider().colorInvert()
-            
-            HStack {
-                Text("时间模式").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
-                
-                Picker("blackMode", selection: $viewModel.timeMode) {
-                    ForEach(0...FunctionSetting.timeModeDict.count - 1, id: \.self){
-                        index in Text(FunctionSetting.timeModeDict[index]!).tag(index)
-                    }
-                }
-                .pickerStyle(MenuPickerStyle())
-                .frame(width: 200, height: 30, alignment: .trailing)
-                .padding(.trailing,30) // 右侧间距
-            }
-            
             Divider().colorInvert()
             
             HStack {
@@ -244,7 +166,11 @@ struct DeprecatedInfoView: View {
             
             Spacer()
         }
+        .onAppear {
+            viewModel.timeMode = RemoteRecognitionPolicy.timeMode
+        }
         .onDisappear{
+            viewModel.timeMode = RemoteRecognitionPolicy.timeMode
             viewModel.updateConfigJSON()
         }
         .background(
