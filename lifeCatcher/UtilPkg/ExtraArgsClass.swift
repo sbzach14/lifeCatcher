@@ -195,12 +195,12 @@ class ReportManager{
     
     static let baodanzhang : [Int] = [187,188,189,211,267]
     
-    static let kanshoupai : [Int] = [268,79,80,81,82,83,84,85,86,87,88,89,90]
+    static let kanshoupai : [Int] = [268,79,80,81,82,83,84,85,86,87,88,89,90,274]
     
     static let baozuidacida : [Int] = [44, 50, 51, 269, 270]
     
     static let allHandSpecialCardReport : [Int] = [
-        79,80,81,82,83,84,85,86,87,88,89,90,268
+        79,80,81,82,83,84,85,86,87,88,89,90,268,274
     ]
     
     static let allColorSpecialCardReport : [Int] = [
@@ -478,6 +478,8 @@ class ReportManager{
         270:"[83-1]上10张去牌保34门有最大次大报最大",
         271:"[76-1]上10张去牌保有上活门报最大",
         272:"[76-2]上10张去牌保有下活门报最大",
+        273:"[8_3]:报排名活门对子",
+        274:"[8_4]:看手牌报排名活门对子",
     ]
     static let allReportInfo: [Int: String] = [
         0:"""
@@ -1527,6 +1529,14 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         272:"""
         报去掉多少张面牌，可保有下活门同时报哪家最大。去面牌范围由参数XY设定:默认X=1,Y=10.表示在上10张内去掉面牌，修改为:X=1，Y=5表示在前5张内去掉面牌。女声0=不用去牌也能保位置最大。男声0=找不到满足条件的牌
         """,
+        273:"""
+        说明：在8-1报法的基础上加入看手牌，报 1张 23 活门4 对子 表示照牌是发牌的第一张
+最大次大家为第二家和第三家，有活门4 有对子。以此类推
+""",
+        274:"""
+        说明：在8-1报法的基础上加入看手牌，报 1张 23 活门4 对子 表示照牌是发牌的第一张
+最大次大家为第二家和第三家，有活门4 有对子。以此类推
+""",
         
     ]
     
@@ -1801,6 +1811,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         var specialSingleFeaturePos: Int = -1
         //报最大最小次打次小等目标集合
         var targetRCList: [[Int]] = []
+        //带平点的排名
+        var targetRCDrawRankList: [[Int]] = []
         //每轮有无平点
         var hasDrawPoint: Int = -1
         //每轮的平点类型
@@ -3385,6 +3397,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         var resultTargetPos:[Int] = []
                         //装所有目标位置对应的排名
                         var resultTargetRank: [Int] = []
+                        //装有所有目标对应位置排名带平点
+                        var resultDrawRank: [Int] = []
 
                         //反面打色，打色完变回去
                         if coloringType == 1 {
@@ -3477,8 +3491,10 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                     for winner in rankedWinnersInfo[i]{
                                         resultTargetPos.append(winner.rcID)
                                         resultTargetRank.append(i)
+                                        resultDrawRank.append(i + 1)
                                     }
                                 }
+                                print("平点测试\(resultDrawRank)")
                                 break
                             //6，大1大2，小1小2
                             case 6:
@@ -3578,6 +3594,17 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 } else if drawType == 7 {
                                     currentResultInfo.drawType = 7
                                 }
+                                break
+                                
+                            case 3:
+                                
+                                currentResultInfo.hasDrawPoint = 0
+                                for rankSet in rankedWinnersInfo {
+                                    if rankSet.count > 1{
+                                        currentResultInfo.hasDrawPoint += rankSet.count
+                                    }
+                                }
+                                print("drawopoint1 \(currentResultInfo.hasDrawPoint)")
                                 break
                                 
                             default:
@@ -3779,6 +3806,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         case 0:
                             print("RC加入了 \(resultPos)")
                             currentResultInfo.targetRCList.append(resultPos)
+                            currentResultInfo.targetRCDrawRankList.append(resultDrawRank)
                             currentResultInfo.handCardHasDrawList.append(currentResultInfo.hasDrawPoint)
                             
                             if colorSingleFeatureIndexList.count > 0 {
@@ -3951,6 +3979,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                         //report half alive gate
                         case 12:
                             currentResultInfo.targetRCList.append(resultPos)
+                            currentResultInfo.targetRCDrawRankList.append(resultDrawRank)
                             currentResultInfo.handCardHasDrawList.append(currentResultInfo.hasDrawPoint)
 
                             
@@ -3972,6 +4001,8 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                             } else {
                                 currentResultInfo.handCardAliveNumberList.append(0)
                             }
+                            
+                            
                             
                             break
                         //保单个位置大小, 报多个, 多轮报单个(牌堆变化)
@@ -5017,6 +5048,59 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 reportResult.append(currentResult)
             }
             break
+        case 273:
+            for resultInfo in multipleReportResultInfo.singleResultList{
+                var reportString = ""
+                var voiceType = 1
+                var currentResult : [SpeakResultStruct] = []
+                var reportNum: Int = 0
+                //有平点就男声
+//                print("pingdian \(resultInfo.hasDrawPoint)")
+//                if resultInfo.hasDrawPoint > 0 {
+//                    voiceType = 0
+//                }
+                for i in 0..<4 {
+                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: ""))
+                }
+                
+                for rcID in resultInfo.targetRCList[0] {
+                    if reportNum > 3 {
+                        break
+                    }
+                    reportString = String(rcID + 1)
+//                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                    currentResult[rcID].content = String(resultInfo.targetRCDrawRankList[0][reportNum])
+                    
+                    reportNum += 1
+                    
+                }
+
+                
+                switch resultInfo.aliveNumber {
+                case 4, 2:
+                    reportString = "活门" + String(resultInfo.aliveNumber)
+                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+
+                    break
+//                case 3, 1:
+//                    reportString = "半活门" + String(resultInfo.aliveNumber + 1)
+//                    voiceType = 0
+//                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+//                    break
+                default:
+                    break
+                }
+                
+                
+                if resultInfo.pairIDList.count > 0{
+                    reportString = "对子"
+//                    voiceType = 0
+                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                }
+                
+                reportResult.append(currentResult)
+            }
+            break
 //            7:"[8]:报最大次大和生死门",
 //            报法格式：最大次大家+活门几
 
@@ -5933,6 +6017,73 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
 //                        voiceType = 0
 //                        currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
 //                        break
+
+                    default:
+                        break
+                    }
+                    
+                    
+                    if resultInfo.handCardPairNumList[handindex].count > 0{
+                        reportString = "对子"
+    //                    voiceType = 0
+                        currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                    }
+                    
+                    reportResult.append(currentResult)
+                    
+                }
+                
+
+            }
+            break
+        case 274:
+            for resultInfo in multipleReportResultInfo.singleResultList{
+                
+                var dealPos: Int = 1
+                for handindex in 0..<resultInfo.targetRCList.count {
+                    
+                    var reportString = ""
+                    var voiceType = 1
+                    var currentResult : [SpeakResultStruct] = []
+                    var reportNum: Int = 0
+                    
+                    
+                    //有平点就男声
+//                    if resultInfo.handCardHasDrawList[handindex] > 0 {
+//                        voiceType = 0
+//                    }
+                    
+                    currentResult.append(SpeakResultStruct(voiceType: voiceType, content: "\(dealPos) 张"))
+                    dealPos += 1
+                    
+                    for i in 0..<4 {
+                        currentResult.append(SpeakResultStruct(voiceType: voiceType, content: ""))
+                    }
+
+                    for rcID in resultInfo.targetRCList[handindex] {
+                        if reportNum > 3 {
+                            break
+                        }
+                        reportString = String(rcID + 1)
+//                        currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                        currentResult[rcID + 1].content = String(resultInfo.targetRCDrawRankList[handindex][reportNum])
+                        reportNum += 1
+                        
+                    }
+
+                    switch resultInfo.handCardAliveNumberList[handindex] {
+                    case 4, 2:
+                        if resultInfo.aliveNumber == 4 || resultInfo.aliveNumber == 2 {
+                            reportString = "活门" + String(resultInfo.aliveNumber)
+                            currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+                        }
+                        break
+//                    case 3, 1:
+//                        reportString = "半活门" + String(resultInfo.aliveNumber + 1)
+//                        voiceType = 0
+//                        currentResult.append(SpeakResultStruct(voiceType: voiceType, content: reportString))
+//                        break
+
                     default:
                         break
                     }
