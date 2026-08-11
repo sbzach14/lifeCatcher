@@ -85,6 +85,20 @@
 		D0DAEF952C7766D900D5938A /* UsedFeatureSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF942C7766D900D5938A /* UsedFeatureSelectView.swift */; };
 		D0DAEF992C7768DD00D5938A /* SettingRecordConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF982C7768DD00D5938A /* SettingRecordConfigView.swift */; };
 		D0DAEFA12C7EC46200D5938A /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEFA02C7EC46200D5938A /* AppViewModel.swift */; };
+		F0A100012F00000100000001 /* LiveKit in Frameworks */ = {isa = PBXBuildFile; productRef = F0A100032F00000100000003 /* LiveKit */; };
+		F0B200012F00000200000001 /* RemoteBusinessClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B100012F00000200000001 /* RemoteBusinessClient.swift */; };
+		F0B2000D2F0000020000000D /* RemoteDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B1000D2F0000020000000D /* RemoteDiagnostics.swift */; };
+		F0B200022F00000200000002 /* RemoteOutboxStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B100022F00000200000002 /* RemoteOutboxStore.swift */; };
+		F0B200032F00000200000003 /* RemotePresentationBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B100032F00000200000003 /* RemotePresentationBuilder.swift */; };
+		F0B200042F00000200000004 /* RemoteProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B100042F00000200000004 /* RemoteProtocol.swift */; };
+		F0B200052F00000200000005 /* RemoteReceiverAudioCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B100052F00000200000005 /* RemoteReceiverAudioCoordinator.swift */; };
+		F0B200062F00000200000006 /* RemoteReceiverViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B100062F00000200000006 /* RemoteReceiverViewModel.swift */; };
+		F0B200072F00000200000007 /* RemoteReceiverViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B100072F00000200000007 /* RemoteReceiverViews.swift */; };
+		F0B200082F00000200000008 /* RemoteResultContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B100082F00000200000008 /* RemoteResultContentView.swift */; };
+		F0B200092F00000200000009 /* RemoteServerProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B100092F00000200000009 /* RemoteServerProfile.swift */; };
+		F0B2000A2F0000020000000A /* RemoteSourceBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B1000A2F0000020000000A /* RemoteSourceBridge.swift */; };
+		F0B2000B2F0000020000000B /* RemoteVideoPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B1000B2F0000020000000B /* RemoteVideoPublisher.swift */; };
+		F0B2000C2F0000020000000C /* RemoteVideoSubscriber.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B1000C2F0000020000000C /* RemoteVideoSubscriber.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -164,6 +178,19 @@
 		D0DAEF982C7768DD00D5938A /* SettingRecordConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingRecordConfigView.swift; sourceTree = "<group>"; };
 		D0DAEFA02C7EC46200D5938A /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
 		F11ED84932036610B96BC234 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
+		F0B100012F00000200000001 /* RemoteBusinessClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteBusinessClient.swift; sourceTree = "<group>"; };
+		F0B1000D2F0000020000000D /* RemoteDiagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteDiagnostics.swift; sourceTree = "<group>"; };
+		F0B100022F00000200000002 /* RemoteOutboxStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteOutboxStore.swift; sourceTree = "<group>"; };
+		F0B100032F00000200000003 /* RemotePresentationBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemotePresentationBuilder.swift; sourceTree = "<group>"; };
+		F0B100042F00000200000004 /* RemoteProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteProtocol.swift; sourceTree = "<group>"; };
+		F0B100052F00000200000005 /* RemoteReceiverAudioCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteReceiverAudioCoordinator.swift; sourceTree = "<group>"; };
+		F0B100062F00000200000006 /* RemoteReceiverViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteReceiverViewModel.swift; sourceTree = "<group>"; };
+		F0B100072F00000200000007 /* RemoteReceiverViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteReceiverViews.swift; sourceTree = "<group>"; };
+		F0B100082F00000200000008 /* RemoteResultContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteResultContentView.swift; sourceTree = "<group>"; };
+		F0B100092F00000200000009 /* RemoteServerProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteServerProfile.swift; sourceTree = "<group>"; };
+		F0B1000A2F0000020000000A /* RemoteSourceBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteSourceBridge.swift; sourceTree = "<group>"; };
+		F0B1000B2F0000020000000B /* RemoteVideoPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteVideoPublisher.swift; sourceTree = "<group>"; };
+		F0B1000C2F0000020000000C /* RemoteVideoSubscriber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteVideoSubscriber.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -178,6 +205,7 @@
 				D0CD59FD2C86DEF50030A939 /* Localize_Swift in Frameworks */,
 				D02717CE2C86E3DF00A29D43 /* AsyncAlgorithms in Frameworks */,
 				D02717D62C86E59A00A29D43 /* CryptoSwift in Frameworks */,
+				F0A100012F00000100000001 /* LiveKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -241,6 +269,7 @@
 			isa = PBXGroup;
 			children = (
 				D013E3612C7129EE000F2B57 /* lifeCatcher.entitlements */,
+				F0B000012F00000200000000 /* Remote */,
 				A8FBC7BE2A3F057700EDDFD7 /* Resources */,
 				18C98D052C158F7B00A8CD49 /* DatasetPkg */,
 				A887167D2A0623A300B7F2CD /* UtilPkg */,
@@ -249,6 +278,26 @@
 				18CA14C4284AC42C00F90372 /* Views */,
 			);
 			path = lifeCatcher;
+			sourceTree = "<group>";
+		};
+		F0B000012F00000200000000 /* Remote */ = {
+			isa = PBXGroup;
+			children = (
+				F0B100012F00000200000001 /* RemoteBusinessClient.swift */,
+				F0B1000D2F0000020000000D /* RemoteDiagnostics.swift */,
+				F0B100022F00000200000002 /* RemoteOutboxStore.swift */,
+				F0B100032F00000200000003 /* RemotePresentationBuilder.swift */,
+				F0B100042F00000200000004 /* RemoteProtocol.swift */,
+				F0B100052F00000200000005 /* RemoteReceiverAudioCoordinator.swift */,
+				F0B100062F00000200000006 /* RemoteReceiverViewModel.swift */,
+				F0B100072F00000200000007 /* RemoteReceiverViews.swift */,
+				F0B100082F00000200000008 /* RemoteResultContentView.swift */,
+				F0B100092F00000200000009 /* RemoteServerProfile.swift */,
+				F0B1000A2F0000020000000A /* RemoteSourceBridge.swift */,
+				F0B1000B2F0000020000000B /* RemoteVideoPublisher.swift */,
+				F0B1000C2F0000020000000C /* RemoteVideoSubscriber.swift */,
+			);
+			path = Remote;
 			sourceTree = "<group>";
 		};
 		18CA14C2284AC42C00F90372 /* ViewModels */ = {
@@ -385,6 +434,7 @@
 				D02717D02C86E40800A29D43 /* Crypto */,
 				D02717D22C86E40800A29D43 /* _CryptoExtras */,
 				D02717D52C86E59A00A29D43 /* CryptoSwift */,
+				F0A100032F00000100000003 /* LiveKit */,
 			);
 			productName = CountMyActions;
 			productReference = 18CA1477284ABEC600F90372 /* lifeCatcher.app */;
@@ -424,6 +474,7 @@
 				D02717CC2C86E3DF00A29D43 /* XCRemoteSwiftPackageReference "swift-async-algorithms" */,
 				D02717CF2C86E40800A29D43 /* XCRemoteSwiftPackageReference "swift-crypto" */,
 				D02717D42C86E59A00A29D43 /* XCRemoteSwiftPackageReference "CryptoSwift" */,
+				F0A100022F00000100000002 /* XCRemoteSwiftPackageReference "client-sdk-swift" */,
 			);
 			productRefGroup = 18CA1478284ABEC600F90372 /* Products */;
 			projectDirPath = "";
@@ -456,6 +507,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F0B200012F00000200000001 /* RemoteBusinessClient.swift in Sources */,
+				F0B2000D2F0000020000000D /* RemoteDiagnostics.swift in Sources */,
+				F0B200022F00000200000002 /* RemoteOutboxStore.swift in Sources */,
+				F0B200032F00000200000003 /* RemotePresentationBuilder.swift in Sources */,
+				F0B200042F00000200000004 /* RemoteProtocol.swift in Sources */,
+				F0B200052F00000200000005 /* RemoteReceiverAudioCoordinator.swift in Sources */,
+				F0B200062F00000200000006 /* RemoteReceiverViewModel.swift in Sources */,
+				F0B200072F00000200000007 /* RemoteReceiverViews.swift in Sources */,
+				F0B200082F00000200000008 /* RemoteResultContentView.swift in Sources */,
+				F0B200092F00000200000009 /* RemoteServerProfile.swift in Sources */,
+				F0B2000A2F0000020000000A /* RemoteSourceBridge.swift in Sources */,
+				F0B2000B2F0000020000000B /* RemoteVideoPublisher.swift in Sources */,
+				F0B2000C2F0000020000000C /* RemoteVideoSubscriber.swift in Sources */,
 				187A45832C39440800BB055C /* AppDelegate.swift in Sources */,
 				D0DAEFA12C7EC46200D5938A /* AppViewModel.swift in Sources */,
 				18F6C0C32C10A685007BEAEC /* RecordViewModel.swift in Sources */,
@@ -827,6 +891,14 @@
 				minimumVersion = 3.2.0;
 			};
 		};
+		F0A100022F00000100000002 /* XCRemoteSwiftPackageReference "client-sdk-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/livekit/client-sdk-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.16.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -864,6 +936,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D0CD59FB2C86DEF50030A939 /* XCRemoteSwiftPackageReference "Localize-Swift" */;
 			productName = Localize_Swift;
+		};
+		F0A100032F00000100000003 /* LiveKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F0A100022F00000100000002 /* XCRemoteSwiftPackageReference "client-sdk-swift" */;
+			productName = LiveKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

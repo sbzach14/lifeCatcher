@@ -19,6 +19,8 @@ import MediaPlayer
 class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBufferDelegate, AVAudioPlayerDelegate{
     
     public static let context = CIContext()
+    @MainActor private var remoteSourceBridge: RemoteSourceBridge?
+    private var lastRemoteFrameTimestamp = CMTime.invalid
     
     @Published var cameraImage : CGImage?
     @Published var isShowSingleFeature : Bool = false
@@ -259,6 +261,22 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         else if self.shuffleMode[1] != 0 {
             shuffleOrRiffle = 1
+        }
+    }
+
+    func startRemoteSourceIfEnabled() {
+        guard RemotePreferences.sourceEnabled else { return }
+        Task { @MainActor [weak self] in
+            guard let self else { return }
+            if self.remoteSourceBridge == nil { self.remoteSourceBridge = RemoteSourceBridge() }
+            self.remoteSourceBridge?.startIfEnabled()
+        }
+    }
+
+    func stopRemoteSource() {
+        Task { @MainActor [weak self] in
+            self?.remoteSourceBridge?.stop()
+            self?.remoteSourceBridge = nil
         }
     }
     
@@ -678,8 +696,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
         // 处理视频帧数据
         let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!
-        // 释放视频帧资源
-        CMSampleBufferInvalidate(sampleBuffer)
+        let remoteTimestamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
+        let remoteDelta = lastRemoteFrameTimestamp.isValid ? CMTimeSubtract(remoteTimestamp, lastRemoteFrameTimestamp).seconds : .infinity
+        if RemotePreferences.sourceEnabled && (!lastRemoteFrameTimestamp.isValid || remoteDelta < 0 || remoteDelta >= (1.0 / 30.0)) {
+            lastRemoteFrameTimestamp = remoteTimestamp
+            Task { @MainActor [weak self] in self?.remoteSourceBridge?.offerVideoFrame(sampleBuffer) }
+        }
         
         // 保存最新的一帧
         latestFrame = pixelBuffer
@@ -3059,6 +3081,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
     
     func speakText(input: Int) {
+        if let prompt = input == 0 ? RemotePromptKind.start : input == 1 ? .success : input == 2 ? .failure : nil {
+            Task { @MainActor [weak self] in self?.remoteSourceBridge?.emitPrompt(prompt) }
+        }
         let isSpeak = (!self.isHeadphonesConnected() && self.voiceDevice == 0)
                     || (self.isHeadphonesConnected() && self.voiceDevice == 1)
         
@@ -3231,6 +3256,31 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             scheduleHideTimeModeText()
             print(self.timeModeText)
             
+        }
+
+        if RemotePreferences.sourceEnabled {
+            let displayText = self.timeMode == 0 ? nil : self.timeModeText
+            let digits = displayText?.filter(\.isNumber) ?? ""
+            let timeCue = displayText.map {
+                RemoteTimeDisplayCue(
+                    kind: .reportDigits,
+                    digits: digits,
+                    fullDeck: self.shuffleOrRiffle == 0 ? self.singlefeatureArray.count == self.allSingleFeatureIndex.count : true,
+                    displayText: $0
+                )
+            }
+            let presentation = RemotePresentationBuilder.make(
+                deck: self.singlefeatureArray,
+                hidesLastCard: self.shuffleOrRiffle == 1 && self.shuffleMode[1] == 2,
+                cutCards: self.cutShowArray,
+                result: self.multipleDatasetRCInfos,
+                speech: input,
+                voiceRate: self.voiceRate,
+                repeatCount: repeatCnt,
+                separateUtterances: ReportManager.kanshoupai.contains(self.calModeArgs[self.shuffleOrRiffle][0]),
+                timeDisplayCue: timeCue
+            )
+            Task { @MainActor [weak self] in self?.remoteSourceBridge?.emitPresentation(presentation) }
         }
     }
     

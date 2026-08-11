@@ -11,9 +11,9 @@ struct InfoView: View {
             Text("Version:".localized() + AuthManager.version)
                 .padding()
                 .foregroundColor(.white)
-            
+
             Divider().colorInvert()
-            
+
             // 序列号
             HStack {
                 Text("ID:".localized() + viewModel.uniqueID)
@@ -81,6 +81,8 @@ struct InfoView: View {
 
 struct DeprecatedInfoView: View {
     @StateObject var viewModel = SettingViewModel()
+    @State private var remoteEnabled = RemotePreferences.sourceEnabled
+    @State private var remoteRegion = RemotePreferences.sourceRegion
     
     var body: some View {
         VStack{
@@ -100,7 +102,48 @@ struct DeprecatedInfoView: View {
                 .padding(.trailing,30) // 右侧间距
             }
             Divider().colorInvert()
-        
+
+            HStack {
+                Text("远程连接").foregroundColor(.white).padding(.leading, 20)
+                Spacer()
+                Toggle("", isOn: $remoteEnabled)
+                    .labelsHidden()
+                    .padding(.trailing, 30)
+                    .onChange(of: remoteEnabled) { _, value in
+                        RemotePreferences.sourceEnabled = value
+                        RemoteDiagnostics.record(
+                            value ? .success : .info,
+                            category: "settings",
+                            message: value ? "远程连接已开启，将在进入识别页后连接" : "远程连接已关闭",
+                            toast: true
+                        )
+                    }
+            }
+
+            if remoteEnabled {
+                Divider().colorInvert()
+                HStack {
+                    Text("连接服务器").foregroundColor(.white).padding(.leading, 20)
+                    Spacer()
+                    Picker("连接服务器", selection: $remoteRegion) {
+                        ForEach(RemoteRegion.allCases) { region in Text(region.title).tag(region) }
+                    }
+                    .pickerStyle(.menu)
+                    .padding(.trailing, 30)
+                    .onChange(of: remoteRegion) { _, value in
+                        RemotePreferences.sourceRegion = value
+                        RemoteDiagnostics.record(
+                            value.isConfigured ? .info : .warning,
+                            category: "settings",
+                            message: value.isConfigured ? "已选择\(value.title)：\(value.endpointDescription)" : "\(value.title) IP 尚未配置",
+                            toast: true
+                        )
+                    }
+                }
+            }
+
+            Divider().colorInvert()
+
             HStack {
                 Text("音量下键功能").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
                 

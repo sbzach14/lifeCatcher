@@ -282,18 +282,29 @@ struct CurrentVisionObjectRecognitionView: View {
             Spacer()
         }
         .onAppear {
-            if !self.isAVCaptureActive && self.saveRuleIndex != -1{
-                viewModel.initialize(saveRuleIndex: saveRuleIndex, configType: configType)
+            Task { @MainActor in
+                let cameraGranted: Bool
+                switch AVCaptureDevice.authorizationStatus(for: .video) {
+                case .authorized: cameraGranted = true
+                case .notDetermined: cameraGranted = await AVCaptureDevice.requestAccess(for: .video)
+                default: cameraGranted = false
+                }
+                guard cameraGranted else { return }
+                if !self.isAVCaptureActive && self.saveRuleIndex != -1 {
+                    viewModel.initialize(saveRuleIndex: saveRuleIndex, configType: configType)
+                }
+                self.isAVCaptureActive = true
+                viewModel.isWorking = true
+                viewModel.isShowSingleFeature = false
+                viewModel.isCamereSetting = false
+                viewModel.prestartCamera()
+                viewModel.startRemoteSourceIfEnabled()
             }
-            self.isAVCaptureActive = true
-            viewModel.isWorking = true
-            viewModel.isShowSingleFeature = false
-            viewModel.isCamereSetting = false
-            viewModel.prestartCamera()
         }
         .onDisappear {
             viewModel.stopCamera()
             viewModel.speechPerformer.stopSpeechSynthesis()
+            viewModel.stopRemoteSource()
         }
         .onTapGesture{
             if viewModel.blackMode == 2 && viewModel.isBlack{

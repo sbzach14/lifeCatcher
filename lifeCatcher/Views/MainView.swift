@@ -282,6 +282,30 @@ struct MainMenuView: View {
 
 struct DeprecatedMainView: View {
     var body: some View {
+        VStack(spacing: 20) {
+            Spacer()
+            NavigationLink(destination: RecognitionEndpointHomeView()) {
+                Label("识别端", systemImage: "camera.viewfinder")
+                    .font(.title2).frame(maxWidth: .infinity).padding()
+                    .background(.blue.opacity(0.82)).foregroundColor(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+            }
+            NavigationLink(destination: RemoteReceiverConnectView()) {
+                Label("接收端", systemImage: "antenna.radiowaves.left.and.right")
+                    .font(.title2).frame(maxWidth: .infinity).padding()
+                    .background(.green.opacity(0.82)).foregroundColor(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+            }
+            Spacer()
+        }
+        .padding(.horizontal, 30)
+        .background(Image("Newbg2").resizable().scaledToFill().ignoresSafeArea())
+        .navigationBarTitle("幻影")
+    }
+}
+
+struct RecognitionEndpointHomeView: View {
+    var body: some View {
         ZStack{
             //Image("Logo")
             VStack {
@@ -326,6 +350,6 @@ struct DeprecatedMainView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
         )
-        .navigationBarTitle("幻影")
+        .navigationBarTitle("识别端")
     }
 }

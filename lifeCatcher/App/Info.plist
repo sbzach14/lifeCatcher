@@ -17,6 +17,10 @@
 	</array>
 	<key>Indi</key>
 	<string></string>
+	<key>LifeCatcherRemoteCNIP</key>
+	<string>101.37.166.131</string>
+	<key>LifeCatcherRemoteSGIP</key>
+	<string>0.0.0.0</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>

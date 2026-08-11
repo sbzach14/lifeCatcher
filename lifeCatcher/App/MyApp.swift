@@ -6,6 +6,7 @@ import Localize_Swift
 @main
 struct MyApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @StateObject private var remoteToastCenter = RemoteToastCenter.shared
     
     init(){
         // 创建导航栏外观样式
@@ -23,25 +24,18 @@ struct MyApp: App {
     
     var body: some Scene {
         WindowGroup {
-            MainMenuView().onAppear {
+            MainMenuView()
+                .overlay { RemoteToastHost(center: remoteToastCenter) }
+                .onAppear {
                     Localize.setCurrentLanguage("en")
-                    requestPermissions()
+                    refreshNetworkTime()
                     initFile()
                 }
         }
     }
     
     
-    private func requestPermissions() {
-        AVCaptureDevice.requestAccess(for: .video) { granted in
-            if !granted {
-                // print("camera access fail")
-            }
-            else{
-                // print("camera access success")
-            }
-        }
-        
+    private func refreshNetworkTime() {
         fetchInternetCurrentDate { internetDate in
             print("network success")
         }
