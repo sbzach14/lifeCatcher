@@ -8,6 +8,11 @@ struct MyApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
     init(){
+        // 语言必须在首帧渲染前设好，放到 onAppear 里会先按上一次的语言画一遍
+        Localize.setCurrentLanguage(
+            UserDefaults.standard.string(forKey: "appLanguage") ?? "en"
+        )
+
         // 创建导航栏外观样式
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -29,8 +34,6 @@ struct MyApp: App {
                 // 切换语言时重建整棵视图树，已打开的页面才会跟着变
                 .id(appLanguage)
                 .onAppear {
-                    // 用用户存下来的语言，别写死 "en" 覆盖掉他的选择
-                    Localize.setCurrentLanguage(appLanguage)
                     requestPermissions()
                     initFile()
                 }

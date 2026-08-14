@@ -1733,3 +1733,19 @@
 "用牌52张\n对k最大对a最小\n9点最大, 0点最小\nJQK算1点" = "Deck: 52 cards\nPair of K is highest, pair of A is lowest\n9 points is highest, 0 points is lowest\nJ, Q, K count as 1 point";
 "用牌54张\n9点最大，0点最小，对子算点数\nJ=1，Q=2，K=3 王=0\n同点比花色\n两红>一红一黑>两黑" = "Deck: 54 cards\n9 points is highest, 0 points is lowest; pairs count as points\nJ=1, Q=2, K=3, Joker=0\nOn the same points compare the suits\ntwo reds>one red and one black>two blacks";
 "用牌张数： 51张 2-K 都是4张 3张A\n游戏规则:\n1.A最大, 2最小\n2.每人17张, 大牌得分最多者为最大\n3.A=2分 K=1.5分 Q=0.6分 其余都是0分\n4.如果要飞张直接选择飞张相关报法就可以" = "Deck: 51 cards. 2 to K are four each, plus 3 As\nGame rules:\n1. A is highest, 2 is lowest\n2. 17 cards per player; whoever scores the most on the big cards is the highest\n3. A=2 points, K=1.5 points, Q=0.6 points, everything else is 0 points\n4. If you want to pass cards, just choose the related card-passing announcement";
+
+/* 切分翻译兜底：核心术语单词（代码里不单独出现，但会被拼进播报词） */
+"打色" = "mark";
+"去色" = "remove marked";
+"留色" = "keep marked";
+"拨牌" = "riffle";
+"发牌" = "deal";
+"生死门" = "live/dead gate";
+"死门" = "dead gate";
+"保位置" = "lock position";
+"次大" = "second highest";
+"次小" = "second lowest";
+"面为色" = "face is marked";
+"报" = "announce";
+"家" = "player";
+"轮" = "round";

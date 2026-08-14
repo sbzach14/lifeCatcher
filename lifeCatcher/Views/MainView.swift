@@ -141,7 +141,7 @@ struct MainMenuView: View {
                 }
             }
             .onAppear {
-                Localize.setCurrentLanguage(appLanguage)
+                // 语言已在 MyApp.init 里设好，这里再设一次会赶不上首帧
                 AutoLogin(username: "", password: "")
             }
             .alert(isPresented: $showAlert) {
