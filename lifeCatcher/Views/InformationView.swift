@@ -36,7 +36,7 @@ struct InfoView: View {
             
             // 激活日期（如果激活）
             if viewModel.trueVersion != ""{
-                Text("激活版本:".localized() + viewModel.trueVersion)
+                Text("激活版本:".localized() + viewModel.trueVersion.localizedPhrase())
                     .padding()
                     .foregroundColor(.white)
                 

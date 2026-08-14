@@ -175,7 +175,7 @@ struct SettingRecordConfigView_leishen: View{
                                 
                                 Picker("setting", selection: $setting) {
                                     ForEach(0...(selectedRule?.setting.count)! - 1, id: \.self){
-                                        index in Text(selectedRule!.setting[index]!.localized()).tag(index)
+                                        index in Text(selectedRule!.setting[index]!.localizedPhrase()).tag(index)
                                     }
                                 }
                                 .pickerStyle(MenuPickerStyle())
@@ -199,7 +199,7 @@ struct SettingRecordConfigView_leishen: View{
                             Divider().colorInvert()
                             
                             ScrollView{
-                                Text((selectedRule!.ruleInfo[self.setting] ?? "").localized())
+                                Text((selectedRule!.ruleInfo[self.setting] ?? "").localizedPhrase())
                                     .foregroundColor(.white)
                                     .frame(maxWidth: .infinity)
                             }
@@ -332,7 +332,7 @@ struct SettingRecordConfigView_leishen: View{
                                 .padding(.leading, 10)
                             
                             NavigationLink(destination: ReportSettingView(reportSetting: $reportSetting, target: 0)){
-                                let text = ReportManager.allReportName[reportSetting[0]]!.localized()
+                                let text = ReportManager.allReportName[reportSetting[0]]!.localizedPhrase()
                                 Text(text).multilineTextAlignment(.leading)
                             }
                             .frame(maxWidth: .infinity, alignment: .trailing)

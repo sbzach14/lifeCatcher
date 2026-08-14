@@ -22,7 +22,7 @@ struct SettingRecordView: View {
                                     destination: SettingRecordConfigView(selectedSaveIndex: index)
                                 ) {
                                     
-                                    let name: String = rules[index].RuleName
+                                    let name: String = rules[index].RuleName.localizedPhrase()
                                     
                                     VStack(spacing: 5) {
                                         HStack{
@@ -54,7 +54,7 @@ struct SettingRecordView: View {
                                     destination: SettingRecordConfigView_leishen(selectedSaveIndex: index)
                                 ) {
                                     
-                                    let name: String = rules[index].RuleName
+                                    let name: String = rules[index].RuleName.localizedPhrase()
                                     
                                     VStack(spacing: 5) {
                                         HStack{
@@ -133,9 +133,9 @@ struct SettingRecordView: View {
     private func generateSettingWord(index: Int) -> String{
         var settingWord = "\n"
         
-        let shuffleMode0 = generalRuleSetting.allShuffleMode[rules[index].shuffleMode[0]]!
-        let cutMode0 = generalRuleSetting.allCutMode[rules[index].cutMode[0]]!
-        let reportSetting0 = ReportManager.allReportName[rules[index].reportSetting[0]]!
+        let shuffleMode0 = generalRuleSetting.allShuffleMode[rules[index].shuffleMode[0]]!.localizedPhrase()
+        let cutMode0 = generalRuleSetting.allCutMode[rules[index].cutMode[0]]!.localizedPhrase()
+        let reportSetting0 = ReportManager.allReportName[rules[index].reportSetting[0]]!.localizedPhrase()
         
         if rules[index].shuffleMode[0] != 0{
             settingWord += shuffleMode0 + "  "
@@ -146,9 +146,9 @@ struct SettingRecordView: View {
         }
         
         
-        let shuffleMode1 = generalRuleSetting.allRiffleMode[rules[index].shuffleMode[1]]!
-        let cutMode1 = generalRuleSetting.allCutMode[rules[index].cutMode[1]]!
-        let reportSetting1 = ReportManager.allReportName[rules[index].reportSetting[1]]!
+        let shuffleMode1 = generalRuleSetting.allRiffleMode[rules[index].shuffleMode[1]]!.localizedPhrase()
+        let cutMode1 = generalRuleSetting.allCutMode[rules[index].cutMode[1]]!.localizedPhrase()
+        let reportSetting1 = ReportManager.allReportName[rules[index].reportSetting[1]]!.localizedPhrase()
         
         if rules[index].shuffleMode[1] != 0{
             if settingWord != "\n"{

@@ -74,8 +74,13 @@ class TimeModeFormatter{
     // 日期格式化器，用于显示公历的日期格式
     public static var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "zh_CN") // 使用中文区域设置
-        formatter.dateFormat = "M月dd日EEEE" // 9月17日 星期二
+        if LocalizeUtils.isChinese {
+            formatter.locale = Locale(identifier: "zh_CN")
+            formatter.dateFormat = "M月dd日EEEE" // 9月17日 星期二
+        } else {
+            formatter.locale = Locale(identifier: "en_US")
+            formatter.dateFormat = "MMM d EEEE" // Sep 17 Tuesday
+        }
         return formatter
     }
     
@@ -95,6 +100,16 @@ class TimeModeFormatter{
         return formatter
     }
     
+    /// 识别页顶部的日期显示：中文带农历，英文只显示公历。
+    public static func displayDateString(from date: Date) -> String {
+        let dateText = dateFormatter.string(from: date)
+        if LocalizeUtils.isChinese {
+            return dateText.replacingOccurrences(of: "星期", with: "周")
+                + " · " + lunarDateString(from: date)
+        }
+        return dateText
+    }
+
     // 获取农历日期
     public static func lunarDateString(from date: Date) -> String {
         let chineseCalendar = Calendar(identifier: .chinese)

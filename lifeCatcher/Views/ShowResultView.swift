@@ -99,7 +99,7 @@ struct ShowResultView: View {
                                         
                                         let singlefeatureRank = rankList[posIndex].rcSingleFeaturesType
 
-                                        Text(singlefeatureRank).frame(width: 45, alignment: .leading).font(.system(size: 15)).foregroundColor(.white)
+                                        Text(singlefeatureRank.localizedPhrase()).frame(width: 45, alignment: .leading).font(.system(size: 15)).foregroundColor(.white)
                                         
                                         let handSingleFeatureList = Array(0...rankList[posIndex].RCSingleFeatures.count - 1)
                                         

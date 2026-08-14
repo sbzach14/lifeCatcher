@@ -102,9 +102,9 @@ struct SingleIconView: View{
                 .shadow(radius: 2)
                 .frame(width: 30, height: 30)
             HStack(spacing: 0){
-                Text(ClassifierSettingArgs.singlefeatureLabelDic[index]!.prefix(1))
+                Text(ClassifierSettingArgs.singlefeatureLabelDic[index]!.localizedPhrase().prefix(1))
                     .font(.system(size: 10)).foregroundColor(Color.black)
-                Text(ClassifierSettingArgs.singlefeatureLabelDic[index]!.dropFirst())
+                Text(ClassifierSettingArgs.singlefeatureLabelDic[index]!.localizedPhrase().dropFirst())
                     .font(.system(size: 15)).foregroundColor(Color.black)
             }
         }

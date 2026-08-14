@@ -253,7 +253,7 @@ struct SettingRecordConfigView: View{
                                 
                                 Picker("setting", selection: $setting) {
                                     ForEach(0...(selectedRule?.setting.count)! - 1, id: \.self){
-                                        index in Text(selectedRule!.setting[index]!.localized()).tag(index)
+                                        index in Text(selectedRule!.setting[index]!.localizedPhrase()).tag(index)
                                     }
                                 }
                                 .pickerStyle(MenuPickerStyle())
@@ -277,7 +277,7 @@ struct SettingRecordConfigView: View{
                             Divider().colorInvert()
                             
                             ScrollView{
-                                Text((selectedRule!.ruleInfo[self.setting] ?? "").localized())
+                                Text((selectedRule!.ruleInfo[self.setting] ?? "").localizedPhrase())
                                     .foregroundColor(.white)
                                     .frame(maxWidth: .infinity)
                             }
@@ -431,7 +431,7 @@ struct SettingRecordConfigView: View{
                                 Divider().colorInvert()
                                 
                                 NavigationLink(destination:  ReportSettingView(reportSetting: $reportSetting, target : 0)){
-                                    let text = ReportManager.allReportName[reportSetting[0]]!.localized()
+                                    let text = ReportManager.allReportName[reportSetting[0]]!.localizedPhrase()
                                     Text(text).multilineTextAlignment(.leading)
                                 }
                                 .frame(height: 75)
@@ -447,7 +447,7 @@ struct SettingRecordConfigView: View{
                                 Divider().colorInvert()
                                 
                                 NavigationLink(destination:  ReportSettingView(reportSetting: $reportSetting, target : 1)){
-                                        let text = ReportManager.allReportName[reportSetting[1]]!.localized()
+                                        let text = ReportManager.allReportName[reportSetting[1]]!.localizedPhrase()
                                         Text(text).multilineTextAlignment(.leading)
                                 }.frame(height: 75)
                                 

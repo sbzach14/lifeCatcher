@@ -17,7 +17,7 @@ struct CurrentVisionObjectRecognitionView: View {
                 VStack (spacing: 0){
                     if viewModel.timeMode != 0{
                         // 公历日期和农历日期显示
-                        Text("\(TimeModeFormatter.dateFormatter.string(from: viewModel.currentDate).replacingOccurrences(of: "星期", with: "周")) · \(TimeModeFormatter.lunarDateString(from: viewModel.currentDate))")
+                        Text(TimeModeFormatter.displayDateString(from: viewModel.currentDate))
                             .font(.system(size: 22))
                             .bold()
                             .padding(.top, 40)

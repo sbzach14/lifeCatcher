@@ -3279,7 +3279,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         let isSpeak = (!self.isHeadphonesConnected() && self.voiceDevice == 0)
                     || (self.isHeadphonesConnected() && self.voiceDevice == 1)
         if isSpeak{
-            let speechUtterance = AVSpeechUtterance(string: input)
+            // 播报词是运行时拼的（"人数" + 数字），整句查不到词条时按术语切分翻译
+            let speechUtterance = AVSpeechUtterance(string: input.localizedPhrase())
             self.speechPerformer.performSpeechSynthesis(utterance: speechUtterance)
         }
     }
@@ -3864,6 +3865,26 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
     var synthesizer = AVSpeechSynthesizer() // Your AVSpeechSynthesizer instance
     let chineseFemaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.Ting-Ting-compact")
     let chineseMaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.siri_male_zh-CN_compact")
+    let englishFemaleVoice = AVSpeechSynthesisVoice(language: "en-US")
+    let englishMaleVoice = AVSpeechSynthesisVoice(identifier: "com.apple.ttsbundle.siri_male_en-US_compact")
+                            ?? AVSpeechSynthesisVoice(language: "en-US")
+
+    /// voiceType 0 为男声、1 为女声；语言跟随界面语言，英文界面不能再念中文音色。
+    private func voice(forType voiceType: Int) -> AVSpeechSynthesisVoice? {
+        if LocalizeUtils.isChinese {
+            return voiceType == 0 ? chineseMaleVoice : chineseFemaleVoice
+        }
+        return voiceType == 0 ? englishMaleVoice : englishFemaleVoice
+    }
+
+    /// 播报文案：英文界面下翻译，且不做「阿拉伯数字转中文数字」。
+    private func speakContent(_ raw: String) -> String {
+        if raw.isEmpty { return "0" }
+        if LocalizeUtils.isChinese {
+            return convertArabicNumbersToChinese(raw)
+        }
+        return raw.localizedPhrase()
+    }
     
     private let lock = NSLock()
     private var isPlaying = false
@@ -3883,7 +3904,7 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
         isPlaying = true
         lock.unlock()
         
-        utterance.voice = chineseFemaleVoice
+        utterance.voice = voice(forType: 1)
         synthesizer.speak(utterance)
     }
     
@@ -3925,14 +3946,7 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
             for repeatIndex in 0..<repeatCnt{
                 for (turnIndex, turnResult) in speakResultStruct.enumerated() {
                     for (reportIndex, reportResult) in turnResult.enumerated() {
-                        var speakString = reportResult.content
-                        if speakString.isEmpty{
-                            speakString = "0"
-                        }
-                        else{
-                            speakString = convertArabicNumbersToChinese(speakString)
-                        }
-                        
+                        let speakString = speakContent(reportResult.content)
                         allVoiceType = reportResult.voiceType
                         
                         let speechUtterance = AVSpeechUtterance(string: speakString)
@@ -3940,12 +3954,7 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
                         speechUtterance.pitchMultiplier = 1
                         speechUtterance.rate = 0.25 + self.voiceRate * 0.5
                         
-                        if allVoiceType == 0{
-                            speechUtterance.voice = chineseMaleVoice
-                        }
-                        else{
-                            speechUtterance.voice = chineseFemaleVoice
-                        }
+                        speechUtterance.voice = voice(forType: allVoiceType)
                         synthesizer.speak(speechUtterance)
                     }
                 }
@@ -3960,16 +3969,10 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
                 for (turnIndex, turnResult) in speakResultStruct.enumerated() {
                     
                     for (reportIndex, reportResult) in turnResult.enumerated() {
-                        var speakString = reportResult.content
-                        if speakString.isEmpty{
-                            speakString = "0"
-                        }
-                        else{
-                            speakString = convertArabicNumbersToChinese(speakString)
-                        }
-                        
+                        let speakString = speakContent(reportResult.content)
                         allVoiceType = reportResult.voiceType
-                        allSpeakString += speakString
+                        // 英文单词连写会念成一团，拼接时补空格
+                        allSpeakString += LocalizeUtils.isChinese ? speakString : speakString + " "
                     }
                 }
                 
@@ -3978,12 +3981,7 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
                 speechUtterance.pitchMultiplier = 1
                 speechUtterance.rate = 0.25 + self.voiceRate * 0.5
                 
-                if allVoiceType == 0{
-                    speechUtterance.voice = chineseMaleVoice
-                }
-                else{
-                    speechUtterance.voice = chineseFemaleVoice
-                }
+                speechUtterance.voice = voice(forType: allVoiceType)
                 synthesizer.speak(speechUtterance)
             }
         }
