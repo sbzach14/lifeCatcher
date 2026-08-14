@@ -26,7 +26,7 @@ struct SettingRecordView: View {
                                     
                                     VStack(spacing: 5) {
                                         HStack{
-                                            Text("方案\(index+1)")
+                                            Text(String(format: "方案%d".localized(), index+1))
                                                 .foregroundColor(.white)
                                                 .frame(width: 80, alignment: .leading)
                                                 .font(.system(size: 20, weight: .bold))
@@ -58,7 +58,7 @@ struct SettingRecordView: View {
                                     
                                     VStack(spacing: 5) {
                                         HStack{
-                                            Text("方案\(index+1)")
+                                            Text(String(format: "方案%d".localized(), index+1))
                                                 .foregroundColor(.white)
                                                 .frame(width: 80, alignment: .leading)
                                                 .font(.system(size: 20, weight: .bold))
@@ -125,7 +125,7 @@ struct SettingRecordView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
             
-        ).navigationTitle("历史记录").onAppear(){
+        ).navigationTitle("历史记录".localized()).onAppear(){
             self.rules = DetectSettingArgs.allUsersDatasetRule
         }
     }

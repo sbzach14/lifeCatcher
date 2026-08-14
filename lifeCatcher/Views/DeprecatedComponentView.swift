@@ -31,12 +31,12 @@ struct TurnSettingView: View {
             Divider().colorInvert()
             
             HStack{
-                Text("发牌模式").frame(maxWidth: .infinity, alignment: .leading)
+                Text("发牌模式".localized()).frame(maxWidth: .infinity, alignment: .leading)
                     .foregroundColor(.white)
                     .padding(.leading,20)
                 Picker("dealType", selection: $dealNum) {
                     ForEach(0...generalRuleSetting.allDealType.count - 1, id: \.self){
-                        index in Text(generalRuleSetting.allDealType[index]!).tag(index)
+                        index in Text(generalRuleSetting.allDealType[index]!.localized()).tag(index)
                     }
                 }
                 .pickerStyle(MenuPickerStyle())
@@ -49,12 +49,12 @@ struct TurnSettingView: View {
             Divider().colorInvert()
             
             HStack{
-                Text("发牌方向").frame(maxWidth: .infinity, alignment: .leading)
+                Text("发牌方向".localized()).frame(maxWidth: .infinity, alignment: .leading)
                     .foregroundColor(.white)
                     .padding(.leading,20)
                 Picker("dealType", selection: $dealType) {
                     ForEach(0...DealClass.dealDic.count - 1, id: \.self){
-                        index in Text(DealClass.dealDic[index]!).tag(index)
+                        index in Text(DealClass.dealDic[index]!.localized()).tag(index)
                     }
                 }
                 .pickerStyle(MenuPickerStyle())
@@ -66,13 +66,13 @@ struct TurnSettingView: View {
             Divider().colorInvert()
             
             HStack{
-                Text("打色方向").frame(maxWidth: .infinity, alignment: .leading)
+                Text("打色方向".localized()).frame(maxWidth: .infinity, alignment: .leading)
                     .foregroundColor(.white)
                     .padding(.leading,20)
                 
                 Picker("dealType", selection: $coloringType) {
                     ForEach(0...DealClass.coloringDic.count - 1, id: \.self){
-                        index in Text(DealClass.coloringDic[index]!).tag(index)
+                        index in Text(DealClass.coloringDic[index]!.localized()).tag(index)
                     }
                 }
                 .pickerStyle(MenuPickerStyle())
@@ -91,19 +91,19 @@ struct TurnSettingView: View {
 
                         HStack{
                             
-                            Text("牌数").frame(maxWidth: 40, alignment: .leading)
+                            Text("牌数".localized()).frame(maxWidth: 40, alignment: .leading)
                                 .foregroundColor(.white)
                                 .padding(.leading,30)
                             
                             Spacer()
                             
-                            Text("派牌").frame(maxWidth: 40, alignment: .trailing)
+                            Text("派牌".localized()).frame(maxWidth: 40, alignment: .trailing)
                                 .foregroundColor(.white)
                             
-                            Text("公牌").frame(maxWidth: 40, alignment: .trailing)
+                            Text("公牌".localized()).frame(maxWidth: 40, alignment: .trailing)
                                 .foregroundColor(.white)
 
-                            Text("去牌").frame(maxWidth: 40, alignment: .trailing)
+                            Text("去牌".localized()).frame(maxWidth: 40, alignment: .trailing)
                                 .foregroundColor(.white).padding(.trailing, 30)
 
                         }
@@ -171,7 +171,7 @@ struct TurnSettingView: View {
         }.background(Image("Newbg2").resizable()
             .scaledToFill()
             .ignoresSafeArea())
-        .navigationTitle("发牌设置")
+        .navigationTitle("发牌设置".localized())
         
         
     }
@@ -203,14 +203,14 @@ struct NumRangeSettingView: View {
     var body: some View {
         VStack{
             HStack{
-                Text("    最小位置   ").foregroundColor(.white)
+                Text("最小位置".localized()).foregroundColor(.white)
                 TextField("X = ", value: $cutNumRangeSetting[0], format: .number).textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding().onChange(of: cutNumRangeSetting[0]){
                         newValue in cutNumRangeSetting[0] = max(1, min(newValue, 54))
                     }
             }
             HStack{
-                Text("    最大位置   ").foregroundColor(.white)
+                Text("最大位置".localized()).foregroundColor(.white)
 
                 TextField("Y = ", value: $cutNumRangeSetting[1], format: .number).textFieldStyle(RoundedBorderTextFieldStyle())
                     .padding().onChange(of: cutNumRangeSetting[1]){
@@ -225,6 +225,6 @@ struct NumRangeSettingView: View {
         }.background(Image("Newbg2").resizable()
             .scaledToFill()
             .ignoresSafeArea())
-        .navigationTitle("范围设置")
+        .navigationTitle("范围设置".localized())
     }
 }

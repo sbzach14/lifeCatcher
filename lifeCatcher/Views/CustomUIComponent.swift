@@ -15,7 +15,7 @@ struct CustomToggleStyle: ToggleStyle{
                     onImage
                         .resizable()
                         .frame(width: 60, height: 25)
-                    Text("开")
+                    Text("开".localized())
                         .foregroundColor(.red)
                         .offset(x:-10)
                         .font(.system(size: 15, weight: .bold))
@@ -23,7 +23,7 @@ struct CustomToggleStyle: ToggleStyle{
                     offImage
                         .resizable()
                         .frame(width: 60, height: 25)
-                    Text("关")
+                    Text("关".localized())
                         .foregroundColor(.white)
                         .offset(x:10)
                         .font(.system(size: 15, weight: .bold))

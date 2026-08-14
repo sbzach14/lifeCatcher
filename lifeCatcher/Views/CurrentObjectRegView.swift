@@ -80,13 +80,13 @@ struct CurrentVisionObjectRecognitionView: View {
                     if viewModel.isCamereSetting{
                         VStack{
                             HStack {
-                                Text("相机选择")
+                                Text("相机选择".localized())
                                     .foregroundColor(.white)
                                     .frame(maxWidth: 80, alignment: .leading)
                                 
                                 Spacer()
                                 
-                                Text("前置")
+                                Text("前置".localized())
                                     .foregroundColor(.white)
                                     .frame(maxWidth: 40, alignment: .trailing)
                                 
@@ -111,7 +111,7 @@ struct CurrentVisionObjectRecognitionView: View {
                                         viewModel.updateConfigJSON()
                                     }
                                 
-                                Text("后置")
+                                Text("后置".localized())
                                     .foregroundColor(.white)
                                     .frame(maxWidth: 40, alignment: .trailing)
                             }
@@ -119,13 +119,13 @@ struct CurrentVisionObjectRecognitionView: View {
                             Divider().colorInvert()
                             
                             HStack {
-                                Text("相机亮度")
+                                Text("相机亮度".localized())
                                     .foregroundColor(.white)
                                     .frame(maxWidth: 80, alignment: .leading)
              
                                 Spacer()
                                 
-                                Text("自动")
+                                Text("自动".localized())
                                     .foregroundColor(.white)
                                     .frame(maxWidth: 40, alignment: .trailing)
                                 
@@ -142,7 +142,7 @@ struct CurrentVisionObjectRecognitionView: View {
                                         viewModel.updateConfigJSON()
                                     }
                                 
-                                Text("最大")
+                                Text("最大".localized())
                                     .foregroundColor(.white)
                                     .frame(maxWidth: 40, alignment: .trailing)
                             }
@@ -152,13 +152,13 @@ struct CurrentVisionObjectRecognitionView: View {
                                 Divider().colorInvert()
                                 
                                 HStack {
-                                    Text("屏幕方向")
+                                    Text("屏幕方向".localized())
                                         .foregroundColor(.white)
                                         .frame(maxWidth: 80, alignment: .leading)
                  
                                     Spacer()
                                     
-                                    Text("竖屏")
+                                    Text("竖屏".localized())
                                         .foregroundColor(.white)
                                         .frame(maxWidth: 40, alignment: .trailing)
                                     
@@ -171,7 +171,7 @@ struct CurrentVisionObjectRecognitionView: View {
                                             viewModel.updateConfigJSON()
                                         }
                                     
-                                    Text("横屏")
+                                    Text("横屏".localized())
                                         .foregroundColor(.white)
                                         .frame(maxWidth: 40, alignment: .trailing)
                                 }
@@ -182,7 +182,7 @@ struct CurrentVisionObjectRecognitionView: View {
                                 Divider().colorInvert()
                                 
                                 HStack {
-                                    Text("焦距:\(String(format: "%.2f", viewModel.focusFactor))").foregroundColor(.white).frame(maxWidth:80, alignment: .leading)
+                                    Text(String(format: "焦距:%.2f".localized(), viewModel.focusFactor)).foregroundColor(.white).frame(maxWidth:80, alignment: .leading)
                                     
                                     Spacer()
                                     
@@ -232,7 +232,7 @@ struct CurrentVisionObjectRecognitionView: View {
                             Divider().colorInvert()
                             
                             HStack {
-                                Text("缩放:\(String(format: "%.2f", viewModel.zoomFactor))").foregroundColor(.white).frame(maxWidth: 80, alignment: .leading)
+                                Text(String(format: "缩放:%.2f".localized(), viewModel.zoomFactor)).foregroundColor(.white).frame(maxWidth: 80, alignment: .leading)
                                 
                                 Spacer()
                                 

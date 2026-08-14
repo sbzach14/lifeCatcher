@@ -47,7 +47,7 @@ struct UsedFeatureSelectView: View {
             .resizable()
             .scaledToFill()
             .ignoresSafeArea())
-        .navigationTitle("用牌设置")
+        .navigationTitle("用牌设置".localized())
     }
     
     private func toggleSingleFeature(index: Int) {

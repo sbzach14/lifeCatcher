@@ -142,7 +142,7 @@ struct SettingRecordConfigView_leishen: View{
                         
                         VStack(spacing: 10){
                             HStack{
-                                Text("游戏选择")
+                                Text("游戏选择".localized())
                                     .frame(width: 100, alignment: .leading)
                                     .foregroundColor(.white)
                                     .font(.system(size: 20))
@@ -152,7 +152,7 @@ struct SettingRecordConfigView_leishen: View{
                                     ForEach(Array(ClassifierSettingArgs.targetSetting.keys).sorted(), id: \.self){
                                         key in
                                         if let value = ClassifierSettingArgs.targetSetting[key]{
-                                            Text(value.ruleName).tag(key)
+                                            Text(value.ruleName.localized()).tag(key)
                                         }
                                     }
                                 }
@@ -167,7 +167,7 @@ struct SettingRecordConfigView_leishen: View{
                             .frame(height: 40)
                             
                             HStack{
-                                Text("玩法选择")
+                                Text("玩法选择".localized())
                                     .frame(width: 100, alignment: .leading)
                                     .foregroundColor(.white)
                                     .font(.system(size: 20))
@@ -175,7 +175,7 @@ struct SettingRecordConfigView_leishen: View{
                                 
                                 Picker("setting", selection: $setting) {
                                     ForEach(0...(selectedRule?.setting.count)! - 1, id: \.self){
-                                        index in Text(selectedRule!.setting[index]!).tag(index)
+                                        index in Text(selectedRule!.setting[index]!.localized()).tag(index)
                                     }
                                 }
                                 .pickerStyle(MenuPickerStyle())
@@ -191,7 +191,7 @@ struct SettingRecordConfigView_leishen: View{
                         }.padding(10)
                         
                         VStack(spacing: 5){
-                            Text("规则说明")
+                            Text("规则说明".localized())
                                 .frame(height: 25)
                                 .foregroundColor(.white)
                                 .bold()
@@ -199,7 +199,7 @@ struct SettingRecordConfigView_leishen: View{
                             Divider().colorInvert()
                             
                             ScrollView{
-                                Text(selectedRule!.ruleInfo[self.setting] ?? "")
+                                Text((selectedRule!.ruleInfo[self.setting] ?? "").localized())
                                     .foregroundColor(.white)
                                     .frame(maxWidth: .infinity)
                             }
@@ -207,7 +207,7 @@ struct SettingRecordConfigView_leishen: View{
                         }.bluebubbleBackground().padding(3)
                         
                         HStack{
-                            Text("人数设置")
+                            Text("人数设置".localized())
                                 .frame(width: 100, alignment: .leading)
                                 .foregroundColor(.white)
                                 .font(.system(size: 20))
@@ -229,7 +229,7 @@ struct SettingRecordConfigView_leishen: View{
                         .bluebubbleBackground()
                         
                         HStack{
-                            Text("手法设置")
+                            Text("手法设置".localized())
                                 .frame(width: 100, alignment: .leading)
                                 .foregroundColor(.white)
                                 .font(.system(size: 20))
@@ -238,7 +238,7 @@ struct SettingRecordConfigView_leishen: View{
                             
                             Picker("shuffleMode", selection: $shuffleRiffleMode) {
                                 ForEach(0...generalRuleSetting.allShuffleRiffleMode.count - 1, id: \.self){
-                                    index in Text(generalRuleSetting.allShuffleRiffleMode[index]!).tag(index)
+                                    index in Text(generalRuleSetting.allShuffleRiffleMode[index]!.localized()).tag(index)
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
@@ -248,7 +248,7 @@ struct SettingRecordConfigView_leishen: View{
                         .bluebubbleBackground()
                         
                         HStack{
-                            Text("洗牌模式")
+                            Text("洗牌模式".localized())
                                 .frame(width: 100, alignment: .leading)
                                 .foregroundColor(.white)
                                 .font(.system(size: 20))
@@ -257,7 +257,7 @@ struct SettingRecordConfigView_leishen: View{
                             
                             Picker("addCardMode", selection: $addCardMode) {
                                 ForEach(0...generalRuleSetting.allAddCardMode.count - 1, id: \.self){
-                                    index in Text(generalRuleSetting.allAddCardMode[index]!).tag(index)
+                                    index in Text(generalRuleSetting.allAddCardMode[index]!.localized()).tag(index)
                                 }
                             }
                             .pickerStyle(MenuPickerStyle())
@@ -267,7 +267,7 @@ struct SettingRecordConfigView_leishen: View{
                             .bluebubbleBackground()
                         
                         HStack{
-                            Text("发牌定制")
+                            Text("发牌定制".localized())
                                 .frame(width: 100, alignment: .leading)
                                 .foregroundColor(.white)
                                 .font(.system(size: 20))
@@ -283,7 +283,7 @@ struct SettingRecordConfigView_leishen: View{
                         .bluebubbleBackground()
                         
                         HStack{
-                            Text("用牌设置")
+                            Text("用牌设置".localized())
                                 .frame(width: 100, alignment: .leading)
                                 .foregroundColor(.white)
                                 .font(.system(size: 20))
@@ -291,7 +291,7 @@ struct SettingRecordConfigView_leishen: View{
                                 .padding(.leading, 10)
                             
                             NavigationLink(destination: UsedFeatureSelectView(singlefeatureToUse: $singlefeatureToUse)){
-                                Text("使用\(singlefeatureToUse.count)张牌")
+                                Text(String(format: "使用%d张牌".localized(), singlefeatureToUse.count))
                             }
                             .frame(maxWidth: .infinity, alignment: .trailing)
                             .padding(.trailing, 10)
@@ -302,7 +302,7 @@ struct SettingRecordConfigView_leishen: View{
                             
                         if coloringType != 2{
                             HStack{
-                                Text("色点设置")
+                                Text("色点设置".localized())
                                     .frame(width: 100, alignment: .leading)
                                     .foregroundColor(.white)
                                     .font(.system(size: 20))
@@ -312,7 +312,7 @@ struct SettingRecordConfigView_leishen: View{
                                 //色点设置
                                 Picker("cutNumSetting", selection: $cutNumSetting) {
                                     ForEach(0...generalRuleSetting.allCutNumSetting.count - 1, id: \.self){
-                                        index in Text(generalRuleSetting.allCutNumSetting[index]!).tag(index)
+                                        index in Text(generalRuleSetting.allCutNumSetting[index]!.localized()).tag(index)
                                     }
                                 }
                                 .pickerStyle(MenuPickerStyle())
@@ -324,7 +324,7 @@ struct SettingRecordConfigView_leishen: View{
                         }
                         
                         HStack{
-                            Text("报法设置")
+                            Text("报法设置".localized())
                                 .frame(width: 100, alignment: .leading)
                                 .foregroundColor(.white)
                                 .font(.system(size: 20))
@@ -332,7 +332,7 @@ struct SettingRecordConfigView_leishen: View{
                                 .padding(.leading, 10)
                             
                             NavigationLink(destination: ReportSettingView(reportSetting: $reportSetting, target: 0)){
-                                let text = ReportManager.allReportName[reportSetting[0]]!
+                                let text = ReportManager.allReportName[reportSetting[0]]!.localized()
                                 Text(text).multilineTextAlignment(.leading)
                             }
                             .frame(maxWidth: .infinity, alignment: .trailing)
@@ -344,7 +344,7 @@ struct SettingRecordConfigView_leishen: View{
                         
                         if coloringType != 2{
                             HStack{
-                                Text("打色范围")
+                                Text("打色范围".localized())
                                     .frame(width: 100, alignment: .leading)
                                     .foregroundColor(.white)
                                     .font(.system(size: 20))
@@ -362,7 +362,7 @@ struct SettingRecordConfigView_leishen: View{
                         }
                         
                         HStack{
-                            Text("位置设置")
+                            Text("位置设置".localized())
                                 .frame(width: 100, alignment: .leading)
                                 .foregroundColor(.white)
                                 .font(.system(size: 20))
@@ -382,7 +382,7 @@ struct SettingRecordConfigView_leishen: View{
                         .bluebubbleBackground()
                         
                         HStack{
-                            Text("连报轮数")
+                            Text("连报轮数".localized())
                                 .frame(width: 100, alignment: .leading)
                                 .foregroundColor(.white)
                                 .font(.system(size: 20))
@@ -400,7 +400,7 @@ struct SettingRecordConfigView_leishen: View{
                         .bluebubbleBackground()
                         
                         HStack{
-                            Text("切牌设置")
+                            Text("切牌设置".localized())
                                 .frame(width: 100, alignment: .leading)
                                 .foregroundColor(.white)
                                 .font(.system(size: 20))
@@ -410,7 +410,7 @@ struct SettingRecordConfigView_leishen: View{
                             //看手牌不能选切牌
                             if ReportManager.allHandSpecialCardReport.contains(self.reportSetting[0]){
                                 Spacer()
-                                Text("无")
+                                Text("无".localized())
                                     .padding(.trailing, 10)
                                     .foregroundColor(.white)
                                     .font(.system(size: 20))
@@ -419,7 +419,7 @@ struct SettingRecordConfigView_leishen: View{
                             else if ReportManager.allColorSpecialCardReport.contains(self.reportSetting[0]){
                                 Picker("cutMode", selection: $cutMode[0]) {
                                     ForEach(0...generalRuleSetting.allCutMode.count - 3, id: \.self){
-                                        index in Text(generalRuleSetting.allCutMode[index]!).tag(index)
+                                        index in Text(generalRuleSetting.allCutMode[index]!.localized()).tag(index)
                                     }
                                 }
                                 .pickerStyle(MenuPickerStyle())
@@ -429,7 +429,7 @@ struct SettingRecordConfigView_leishen: View{
                             else{
                                 Picker("cutMode", selection: $cutMode[0]) {
                                     ForEach(0...generalRuleSetting.allCutMode.count - 1, id: \.self){
-                                        index in Text(generalRuleSetting.allCutMode[index]!).tag(index)
+                                        index in Text(generalRuleSetting.allCutMode[index]!.localized()).tag(index)
                                     }
                                 }
                                 .pickerStyle(MenuPickerStyle())
@@ -441,7 +441,7 @@ struct SettingRecordConfigView_leishen: View{
                         
                             
                         HStack{
-                            Text("识别任意牌报下轮")
+                            Text("识别任意牌报下轮".localized())
                                 .frame(width: 200, alignment: .leading)
                                 .foregroundColor(.white)
                                 .font(.system(size: 20))
@@ -481,7 +481,7 @@ struct SettingRecordConfigView_leishen: View{
                 }
                 .alert(isPresented: $showAlert) {
                     Alert(
-                        title: Text("参数错误"),
+                        title: Text("参数错误".localized()),
                         message: Text(alertMessage),
                         dismissButton: .default(Text("OK"))
                     )
@@ -498,7 +498,7 @@ struct SettingRecordConfigView_leishen: View{
                     Image("icon_save").resizable().frame(width: 150, height: 60)
                 }.alert(isPresented: $saveSuccessAlert) {
                     Alert(
-                        title: Text("保存成功"),
+                        title: Text("保存成功".localized()),
                         message: Text(alertMessage),
                         dismissButton: .default(Text("OK"))
                     )
@@ -512,7 +512,7 @@ struct SettingRecordConfigView_leishen: View{
         .background(Image("Newbg2").resizable()
             .scaledToFill()
             .ignoresSafeArea())
-        .navigationTitle("参数设置")
+        .navigationTitle("参数设置".localized())
         .onAppear(){
             self.SetUpAll()
         }
@@ -785,7 +785,7 @@ struct SettingRecordConfigView_leishen: View{
 //
 //        }
         if dealNum == 1 && diyDealNum.count == 0{
-            alertMessage = "自定义发牌为空"
+            alertMessage = "自定义发牌为空".localized()
         }
         return alertMessage
     }

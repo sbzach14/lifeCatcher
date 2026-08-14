@@ -320,7 +320,7 @@ struct LoginView: View {
                         AuthManager.loginStatus = returnAccountStatus
                         let date = Date(timeIntervalSince1970: TimeInterval(returnExpiredTime))
                         let dateFormatter = DateFormatter()
-                        dateFormatter.dateFormat = "yyyy年MM月dd日"
+                        dateFormatter.dateFormat = "yyyy年MM月dd日".localized()
                         let dateString = dateFormatter.string(from: date)
                         AuthManager.activeDate = dateString
                         
@@ -333,7 +333,7 @@ struct LoginView: View {
                             AuthManager.autoQuit()
                             print("测试版")
                             showAlert = true
-                            alertMessage = "五分钟后将自动退出"
+                            alertMessage = "五分钟后将自动退出".localized()
                         }
                     //登陆失败
                     } else {

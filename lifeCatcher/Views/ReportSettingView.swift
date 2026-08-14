@@ -62,7 +62,7 @@ struct ReportSettingView: View {
         }.background(Image("Newbg2").resizable()
             .scaledToFill()
             .ignoresSafeArea())
-        .navigationTitle("报法选择")
+        .navigationTitle("报法选择".localized())
     }
 }
 

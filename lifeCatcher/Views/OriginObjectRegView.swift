@@ -34,9 +34,9 @@ struct OriginVisionObjectRecognitionView: View {
         }
         .alert(isPresented: $viewModel.showAlert) {
             Alert(
-                title: Text("相机权限被拒绝"),
-                message: Text("请在设置中启用相机权限以使用此功能。"),
-                dismissButton: .default(Text("确定")) {
+                title: Text("相机权限被拒绝".localized()),
+                message: Text("请在设置中启用相机权限以使用此功能。".localized()),
+                dismissButton: .default(Text("确定".localized())) {
                     exit(0)
                 }
             )

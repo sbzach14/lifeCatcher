@@ -16,14 +16,14 @@ struct AuthTestView: View {
 
     var body: some View {
         VStack {
-            TextField("输入激活/删除/移机新/刷机新的序列号", text: $userInput)
+            TextField("输入激活/删除/移机新/刷机新的序列号".localized(), text: $userInput)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
-            TextField("输入移机旧/刷机旧的序列号", text: $oldDeviceID)
+            TextField("输入移机旧/刷机旧的序列号".localized(), text: $oldDeviceID)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
 
-            TextField("输入你的授权码", text: $passcode)
+            TextField("输入你的授权码".localized(), text: $passcode)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
             
@@ -35,10 +35,10 @@ struct AuthTestView: View {
                     }
                     else{
                         showAlert = true
-                        alertMessage = "非法序列号，请手动输入。"
+                        alertMessage = "非法序列号，请手动输入。".localized()
                     }
                 }, label: {
-                    Text("生成")
+                    Text("生成".localized())
                 })
                 .padding()
                 
@@ -51,10 +51,10 @@ struct AuthTestView: View {
                     }
                     else{
                         showAlert = true
-                        alertMessage = "非法序列号，请手动输入。"
+                        alertMessage = "非法序列号，请手动输入。".localized()
                     }
                 }, label: {
-                    Text("激活")
+                    Text("激活".localized())
                 })
                 .padding()
                 
@@ -67,11 +67,11 @@ struct AuthTestView: View {
                     }
                     else{
                         showAlert = true
-                        alertMessage = "非法序列号，请手动输入。"
+                        alertMessage = "非法序列号，请手动输入。".localized()
                     }
                     
                 }, label: {
-                    Text("删除")
+                    Text("删除".localized())
                 })
                 .padding()
                 
@@ -84,10 +84,10 @@ struct AuthTestView: View {
                     }
                     else{
                         showAlert = true
-                        alertMessage = "非法序列号，请手动输入。"
+                        alertMessage = "非法序列号，请手动输入。".localized()
                     }
                 }, label: {
-                    Text("移机")
+                    Text("移机".localized())
                 })
                 .padding()
                 
@@ -98,16 +98,16 @@ struct AuthTestView: View {
                     }
                     else{
                         showAlert = true
-                        alertMessage = "非法序列号，请手动输入。"
+                        alertMessage = "非法序列号，请手动输入。".localized()
                     }
                 }, label: {
-                    Text("刷机")
+                    Text("刷机".localized())
                 })
                 .padding()
             }
             
             Toggle(isOn: $isTimeLimited) {
-                    Text("是否半年")
+                    Text("是否半年".localized())
                         .foregroundColor(.white)
                 }
                 .padding()
@@ -177,7 +177,7 @@ struct AuthTestView: View {
                             
                             self.showAlert = true
                             if deleteStatus == 1 {
-                                self.alertMessage = "删除成功"
+                                self.alertMessage = "删除成功".localized()
                             }
                         }
                     } else {
@@ -186,17 +186,17 @@ struct AuthTestView: View {
                             self.activateStatus = deleteStatus
                             self.showAlert = true
                             if deleteStatus == 0{
-                                self.alertMessage = "不存在要删除的deviceID"
+                                self.alertMessage = "不存在要删除的deviceID".localized()
                             } else if deleteStatus == 1 {
-                                self.alertMessage = "删除成功"
+                                self.alertMessage = "删除成功".localized()
                             } else if deleteStatus == 2 {
-                                self.alertMessage = "当前token无效"
+                                self.alertMessage = "当前token无效".localized()
                             } else if deleteStatus == 3 {
-                                self.alertMessage = "重制bit失败"
+                                self.alertMessage = "重制bit失败".localized()
                             } else if deleteStatus == 4 {
-                                self.alertMessage = "授权码错误"
+                                self.alertMessage = "授权码错误".localized()
                             } else if deleteStatus == 5 {
-                                self.alertMessage = "强制删除成功"
+                                self.alertMessage = "强制删除成功".localized()
                             }
                         }
                     }
@@ -233,7 +233,7 @@ struct AuthTestView: View {
             guard let data = data, error == nil else {
                 DispatchQueue.main.async {
                     self.showAlert = true
-                    self.alertMessage = "激活失败"
+                    self.alertMessage = "激活失败".localized()
                 }
                 return
             }
@@ -247,24 +247,24 @@ struct AuthTestView: View {
                             
                             self.showAlert = true
                             if self.activateStatus == 2{
-                                self.alertMessage = "激活成功"
+                                self.alertMessage = "激活成功".localized()
                             }
                         }
                     } else {
                         DispatchQueue.main.async {
                             self.showAlert = true
                             if self.activateStatus == 2{
-                                self.alertMessage = "激活成功"
+                                self.alertMessage = "激活成功".localized()
                             }
                             else if self.activateStatus == 3{
-                                self.alertMessage = "口令错误"
+                                self.alertMessage = "口令错误".localized()
                             }
                             else if self.activateStatus == 4{
-                                self.alertMessage = "重制失败"
+                                self.alertMessage = "重制失败".localized()
                             } else if self.activateStatus == 5 {
-                                self.alertMessage = "授权次数耗尽"
+                                self.alertMessage = "授权次数耗尽".localized()
                             } else {
-                                self.alertMessage = "激活失败"
+                                self.alertMessage = "激活失败".localized()
                             }
                         }
                     }
@@ -272,7 +272,7 @@ struct AuthTestView: View {
             } catch {
                 DispatchQueue.main.async {
                     self.showAlert = true
-                    self.alertMessage = "激活失败"
+                    self.alertMessage = "激活失败".localized()
                 }
             }
         }
@@ -304,7 +304,7 @@ struct AuthTestView: View {
             guard let data = data, error == nil else {
                 DispatchQueue.main.async {
                     self.showAlert = true
-                    self.alertMessage = "移机失败"
+                    self.alertMessage = "移机失败".localized()
                 }
                 return
             }
@@ -316,7 +316,7 @@ struct AuthTestView: View {
                         DispatchQueue.main.async {
                             self.shiftStatus = jsonResponse["shiftStatus"] as? Int ?? -1
                             self.showAlert = true
-                            self.alertMessage = "移机成功"
+                            self.alertMessage = "移机成功".localized()
 
                         }
                     } else {
@@ -325,17 +325,17 @@ struct AuthTestView: View {
                             self.shiftStatus = jsonResponse["shiftStatus"] as? Int ?? -1
 
                             if self.shiftStatus == 0 {
-                                self.alertMessage = "移机对象不存在"
+                                self.alertMessage = "移机对象不存在".localized()
                             } else if shiftStatus == 2 {
-                                self.alertMessage = "旧设备无效"
+                                self.alertMessage = "旧设备无效".localized()
                             } else if shiftStatus == 3 {
-                                self.alertMessage = "重制失败"
+                                self.alertMessage = "重制失败".localized()
                             } else if shiftStatus == 4 {
-                                self.alertMessage = "重制新设备失败"
+                                self.alertMessage = "重制新设备失败".localized()
                             } else if shiftStatus == 5 {
-                                self.alertMessage = "授权码错误"
+                                self.alertMessage = "授权码错误".localized()
                             } else if shiftStatus == 6 {
-                                self.alertMessage = "强制移机成功"
+                                self.alertMessage = "强制移机成功".localized()
                             }
                         }
                     }
@@ -343,7 +343,7 @@ struct AuthTestView: View {
             } catch {
                 DispatchQueue.main.async {
                     self.showAlert = true
-                    self.alertMessage = "激活失败"
+                    self.alertMessage = "激活失败".localized()
                 }
             }
         }
@@ -375,7 +375,7 @@ struct AuthTestView: View {
             guard let data = data, error == nil else {
                 DispatchQueue.main.async {
                     self.showAlert = true
-                    self.alertMessage = "重置失败"
+                    self.alertMessage = "重置失败".localized()
                 }
                 return
             }
@@ -387,7 +387,7 @@ struct AuthTestView: View {
                         DispatchQueue.main.async {
                             self.shiftStatus = jsonResponse["rebootStatus"] as? Int ?? -1
                             self.showAlert = true
-                            self.alertMessage = "刷机重置成功"
+                            self.alertMessage = "刷机重置成功".localized()
 
                         }
                     } else {
@@ -396,15 +396,15 @@ struct AuthTestView: View {
                             self.shiftStatus = jsonResponse["rebootStatus"] as? Int ?? -1
 
                             if self.shiftStatus == 0 {
-                                self.alertMessage = "刷机对象不存在"
+                                self.alertMessage = "刷机对象不存在".localized()
                             } else if shiftStatus == 2 {
-                                self.alertMessage = "旧设备无效"
+                                self.alertMessage = "旧设备无效".localized()
                             } else if shiftStatus == 3 {
-                                self.alertMessage = "重制失败"
+                                self.alertMessage = "重制失败".localized()
                             } else if shiftStatus == 4 {
-                                self.alertMessage = "重制新设备失败"
+                                self.alertMessage = "重制新设备失败".localized()
                             } else if shiftStatus == 5 {
-                                self.alertMessage = "授权码错误"
+                                self.alertMessage = "授权码错误".localized()
                             }
                         }
                     }
@@ -412,7 +412,7 @@ struct AuthTestView: View {
             } catch {
                 DispatchQueue.main.async {
                     self.showAlert = true
-                    self.alertMessage = "激活失败"
+                    self.alertMessage = "激活失败".localized()
                 }
             }
         }

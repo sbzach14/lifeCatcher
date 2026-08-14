@@ -250,7 +250,7 @@ struct MainMenuView: View {
                     AuthManager.loginStatus = returnAccountStatus
                     let date = Date(timeIntervalSince1970: TimeInterval(returnExpiredTime))
                     let dateFormatter = DateFormatter()
-                    dateFormatter.dateFormat = "yyyy年MM月dd日"
+                    dateFormatter.dateFormat = "yyyy年MM月dd日".localized()
                     let dateString = dateFormatter.string(from: date)
                     AuthManager.activeDate = dateString
                     
@@ -289,7 +289,7 @@ struct DeprecatedMainView: View {
                     destination: SettingRecordView(configType: 0)
                 ) {
                     VStack(alignment: .leading) {
-                        Text("历史记录(幻影界面)")
+                        Text("历史记录(幻影界面)".localized())
                             .foregroundColor(.white)
                         Divider().colorInvert()
                     }
@@ -299,7 +299,7 @@ struct DeprecatedMainView: View {
                     destination: SettingRecordView(configType: 1)
                 ) {
                     VStack(alignment: .leading) {
-                        Text("历史记录(经典界面)")
+                        Text("历史记录(经典界面)".localized())
                             .foregroundColor(.white)
                         Divider().colorInvert()
                     }
@@ -309,7 +309,7 @@ struct DeprecatedMainView: View {
                     destination: DeprecatedInfoView()
                 ) {
                     VStack(alignment: .leading) {
-                        Text("功能设置")
+                        Text("功能设置".localized())
                             .foregroundColor(.white)
                         Divider().colorInvert()
                     }
@@ -326,6 +326,6 @@ struct DeprecatedMainView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
         )
-        .navigationBarTitle("幻影")
+        .navigationBarTitle("幻影".localized())
     }
 }
