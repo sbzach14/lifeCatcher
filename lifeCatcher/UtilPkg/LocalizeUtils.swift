@@ -23,7 +23,18 @@ enum LocalizeUtils {
         if whole != text { return whole }
         if !containsChinese(text) { return text }
 
+        // 切分只适用于运行时拼出来的短播报词。成句的文案逐词替换会变成词汇拼盘
+        // （"无牛比最大牌" → "none Niu compare max card"），那种情况宁可保持原文，
+        // 让缺失的词条暴露出来去补，也不要给用户看拼盘。
+        guard isComposable(text) else { return text }
+
         return segmented(text)
+    }
+
+    /// 是否属于「运行时拼接的短播报词」：单行、够短、没有句子标点。
+    private static func isComposable(_ text: String) -> Bool {
+        if text.count > 12 { return false }
+        return !text.contains(where: { "，。：；！？,.:;!?\n".contains($0) })
     }
 
     /// 按词条表里的中文 key 做最长匹配切分，逐段替换成英文。
