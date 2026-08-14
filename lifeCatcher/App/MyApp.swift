@@ -21,10 +21,16 @@ struct MyApp: App {
         UINavigationBar.appearance().scrollEdgeAppearance = appearance
     }
     
+    @AppStorage("appLanguage") private var appLanguage: String = "en"
+
     var body: some Scene {
         WindowGroup {
-            MainMenuView().onAppear {
-                    Localize.setCurrentLanguage("en")
+            MainMenuView()
+                // 切换语言时重建整棵视图树，已打开的页面才会跟着变
+                .id(appLanguage)
+                .onAppear {
+                    // 用用户存下来的语言，别写死 "en" 覆盖掉他的选择
+                    Localize.setCurrentLanguage(appLanguage)
                     requestPermissions()
                     initFile()
                 }
