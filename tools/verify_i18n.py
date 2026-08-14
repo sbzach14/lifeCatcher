@@ -4,7 +4,7 @@
 上一版失误就是没做这一步：key 带着 Swift 会剥掉的缩进，
 运行时全部匹配不上，界面看着像没翻译。
 """
-import json, re, sys
+import json, re, sys, glob
 
 def unesc(x):
     return x.replace('\\n', '\n').replace('\\"', '"').replace('\\\\', '\\')
@@ -21,8 +21,16 @@ def has_cn(t):
 
 def main():
     runtime = json.load(open('runtime_cn_strings.json'))
-    en = load_strings(sys.argv[1] if len(sys.argv) > 1
-                      else 'lifeCatcher/lifeCatcher/App/en.lproj/Localizable.strings')
+    default_en = glob.glob('**/en.lproj/Localizable.strings', recursive=True)
+    if len(sys.argv) > 1:
+        en_path = sys.argv[1]
+    elif default_en:
+        en_path = default_en[0]
+    else:
+        print("找不到 en.lproj/Localizable.strings，请把路径作为参数传进来")
+        return 1
+    print(f"词条文件: {en_path}")
+    en = load_strings(en_path)
 
     miss = [k for k in runtime if k not in en]
     cn_left = [k for k in runtime if k in en and has_cn(en[k])]
