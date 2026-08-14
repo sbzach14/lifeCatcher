@@ -14,7 +14,7 @@ struct ReportSettingView: View {
         if searchText.isEmpty {
             return Array(ReportManager.allReportName.keys).sorted()
         } else {
-            return ReportManager.allReportName.filter { $0.value.localizedCaseInsensitiveContains(searchText) }.map { $0.key }.sorted()
+            return ReportManager.allReportName.filter { $0.value.localizedCaseInsensitiveContains(searchText) || $0.value.localizedPhrase().localizedCaseInsensitiveContains(searchText) }.map { $0.key }.sorted()
         }
     }
 
@@ -26,7 +26,7 @@ struct ReportSettingView: View {
             ScrollView{
                 VStack { // 垂直间距
                     HStack {
-                        Text(ReportManager.allReportName[reportSetting[target]]! + "\n" + ReportManager.allReportInfo[reportSetting[target]]!)
+                        Text(ReportManager.allReportName[reportSetting[target]]!.localizedPhrase() + "\n" + ReportManager.allReportInfo[reportSetting[target]]!.localizedPhrase())
                             .foregroundColor(.blue)
                             .lineLimit(nil) // 可以显示多行文本
                             .fixedSize(horizontal: false, vertical: true) // 允许垂直方向上的大小自适应
@@ -41,7 +41,7 @@ struct ReportSettingView: View {
                     ForEach(0..<filteredReportSettings.count, id: \.self) { index in
                             let currentIndex = filteredReportSettings[index]
                            HStack {
-                               Text(ReportManager.allReportName[currentIndex]! + "\n" + ReportManager.allReportInfo[currentIndex]!)
+                               Text(ReportManager.allReportName[currentIndex]!.localizedPhrase() + "\n" + ReportManager.allReportInfo[currentIndex]!.localizedPhrase())
                                    .foregroundColor(.white)
                                    .lineLimit(nil) // 可以显示多行文本
                                    .fixedSize(horizontal: false, vertical: true) // 允许垂直方向上的大小自适应
@@ -62,7 +62,7 @@ struct ReportSettingView: View {
         }.background(Image("Newbg2").resizable()
             .scaledToFill()
             .ignoresSafeArea())
-        .navigationTitle("报法选择")
+        .navigationTitle("报法选择".localized())
     }
 }
 

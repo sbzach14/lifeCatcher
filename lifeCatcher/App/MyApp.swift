@@ -8,6 +8,11 @@ struct MyApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
     init(){
+        // 语言必须在首帧渲染前设好，放到 onAppear 里会先按上一次的语言画一遍
+        Localize.setCurrentLanguage(
+            UserDefaults.standard.string(forKey: "appLanguage") ?? "en"
+        )
+
         // 创建导航栏外观样式
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -21,10 +26,14 @@ struct MyApp: App {
         UINavigationBar.appearance().scrollEdgeAppearance = appearance
     }
     
+    @AppStorage("appLanguage") private var appLanguage: String = "en"
+
     var body: some Scene {
         WindowGroup {
-            MainMenuView().onAppear {
-                    Localize.setCurrentLanguage("en")
+            MainMenuView()
+                // 切换语言时重建整棵视图树，已打开的页面才会跟着变
+                .id(appLanguage)
+                .onAppear {
                     requestPermissions()
                     initFile()
                 }

@@ -36,7 +36,7 @@ struct InfoView: View {
             
             // 激活日期（如果激活）
             if viewModel.trueVersion != ""{
-                Text("激活版本:" + viewModel.trueVersion)
+                Text("激活版本:".localized() + viewModel.trueVersion.localizedPhrase())
                     .padding()
                     .foregroundColor(.white)
                 
@@ -44,7 +44,7 @@ struct InfoView: View {
             }
             
             if viewModel.trueDate != ""{
-                Text("有效日期:" + viewModel.trueDate)
+                Text("有效日期:".localized() + viewModel.trueDate)
                     .padding()
                     .foregroundColor(.white)
                 
@@ -88,11 +88,11 @@ struct DeprecatedInfoView: View {
             Divider().colorInvert()
             
             HStack {
-                Text("音量上键功能").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
+                Text("音量上键功能".localized()).foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
                 
                 Picker("volumeUp", selection: $viewModel.volumeUp) {
                     ForEach(0...FunctionSetting.volumeUpDict.count - 1, id: \.self){
-                        index in Text(FunctionSetting.volumeUpDict[index]!).tag(index)
+                        index in Text(FunctionSetting.volumeUpDict[index]!.localized()).tag(index)
                     }
                 }
                 .pickerStyle(MenuPickerStyle())
@@ -102,11 +102,11 @@ struct DeprecatedInfoView: View {
             Divider().colorInvert()
         
             HStack {
-                Text("音量下键功能").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
+                Text("音量下键功能".localized()).foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
                 
                 Picker("volumeDown", selection: $viewModel.volumeDown) {
                     ForEach(0...FunctionSetting.volumeDownDict.count - 1, id: \.self){
-                        index in Text(FunctionSetting.volumeDownDict[index]!).tag(index)
+                        index in Text(FunctionSetting.volumeDownDict[index]!.localized()).tag(index)
                     }
                 }
                 .pickerStyle(MenuPickerStyle())
@@ -116,12 +116,12 @@ struct DeprecatedInfoView: View {
             Divider().colorInvert()
             
             HStack {
-                Text("播放设备").foregroundColor(.white).padding(.leading, 20)
+                Text("播放设备".localized()).foregroundColor(.white).padding(.leading, 20)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 
                 Picker("voiceDevice", selection: $viewModel.voiceDevice) {
                     ForEach(0...FunctionSetting.voiceDeviceDict.count - 1, id: \.self){
-                        index in Text(FunctionSetting.voiceDeviceDict[index]!).tag(index)
+                        index in Text(FunctionSetting.voiceDeviceDict[index]!.localized()).tag(index)
                     }
                 }
                 .pickerStyle(MenuPickerStyle())
@@ -132,7 +132,7 @@ struct DeprecatedInfoView: View {
             Divider().colorInvert()
         
             HStack {
-                Text("音量\(String(format: "%.2f",viewModel.volumeValue))").foregroundColor(.white).padding(.leading, 20).frame(width: 100, alignment: .leading)
+                Text(String(format: "音量%.2f".localized(), viewModel.volumeValue)).foregroundColor(.white).padding(.leading, 20).frame(width: 100, alignment: .leading)
                 
                 Spacer()
                 
@@ -145,7 +145,7 @@ struct DeprecatedInfoView: View {
             Divider().colorInvert()
             
             HStack {
-                Text("语速\(String(format: "%.2f",viewModel.voiceRate))").foregroundColor(.white).padding(.leading, 20).frame(width: 100, alignment: .leading)
+                Text(String(format: "语速%.2f".localized(), viewModel.voiceRate)).foregroundColor(.white).padding(.leading, 20).frame(width: 100, alignment: .leading)
                 
                 Spacer()
                 
@@ -158,11 +158,11 @@ struct DeprecatedInfoView: View {
             Divider().colorInvert()
             
             HStack {
-                Text("屏幕显示").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
+                Text("屏幕显示".localized()).foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
                 
                 Picker("blackMode", selection: $viewModel.blackMode) {
                     ForEach(0...FunctionSetting.blackModeDict.count - 1, id: \.self){
-                        index in Text(FunctionSetting.blackModeDict[index]!).tag(index)
+                        index in Text(FunctionSetting.blackModeDict[index]!.localized()).tag(index)
                     }
                 }
                 .pickerStyle(MenuPickerStyle())
@@ -173,11 +173,11 @@ struct DeprecatedInfoView: View {
             Divider().colorInvert()
             
             HStack {
-                Text("时间模式").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
+                Text("时间模式".localized()).foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
                 
                 Picker("blackMode", selection: $viewModel.timeMode) {
                     ForEach(0...FunctionSetting.timeModeDict.count - 1, id: \.self){
-                        index in Text(FunctionSetting.timeModeDict[index]!).tag(index)
+                        index in Text(FunctionSetting.timeModeDict[index]!.localized()).tag(index)
                     }
                 }
                 .pickerStyle(MenuPickerStyle())
@@ -188,7 +188,7 @@ struct DeprecatedInfoView: View {
             Divider().colorInvert()
             
             HStack {
-                Text("亮度\(String(format: "%.2f",viewModel.blackFactor))").foregroundColor(.white).padding(.leading, 20).frame(width: 100, alignment: .leading)
+                Text(String(format: "亮度%.2f".localized(), viewModel.blackFactor)).foregroundColor(.white).padding(.leading, 20).frame(width: 100, alignment: .leading)
                 
                 Spacer()
                 
@@ -210,7 +210,7 @@ struct DeprecatedInfoView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
         )
-        .navigationBarTitle("功能设置")
+        .navigationBarTitle("功能设置".localized())
     }
 }
 

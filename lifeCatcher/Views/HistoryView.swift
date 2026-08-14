@@ -75,7 +75,7 @@ struct HistoryView: View {
         )
         .navigationBarTitle("History".localized())
         .alert(isPresented: $showAlert) {
-            Alert(title: Text("激活成功"), message: Text(""), dismissButton: .default(Text("OK".localized())))
+            Alert(title: Text("激活成功".localized()), message: Text(""), dismissButton: .default(Text("OK".localized())))
         }
     }
 }

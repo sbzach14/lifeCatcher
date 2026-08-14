@@ -31,7 +31,7 @@ struct ShowResultView: View {
                             
                             HStack{
                                 
-                                Text("轮次").font(.system(size: 20)).foregroundColor(.white).bold()
+                                Text("轮次".localized()).font(.system(size: 20)).foregroundColor(.white).bold()
                                 Text("\(resultIndex+1)").font(.system(size: 20)).foregroundColor(.white)
                                 Spacer()
                                 
@@ -40,7 +40,7 @@ struct ShowResultView: View {
                             HStack{
                                 if viewModel.cutShowArray.count > 0{
                                     
-                                    Text("切牌").font(.system(size: 15)).foregroundColor(.white).bold()
+                                    Text("切牌".localized()).font(.system(size: 15)).foregroundColor(.white).bold()
                                     
                                     SingleIconView(index: viewModel.cutShowArray[viewModel.cutShowArray.count - 1])
                                 }
@@ -48,7 +48,7 @@ struct ShowResultView: View {
                                 
                                 if viewModel.multipleDatasetRCInfos.singleResultList[resultIndex].ColorSingleFeatures.count > 0{
                                     
-                                    Text("色牌").font(.system(size: 15)).foregroundColor(.white).bold()
+                                    Text("色牌".localized()).font(.system(size: 15)).foregroundColor(.white).bold()
                                     
                                     ForEach(viewModel.multipleDatasetRCInfos.singleResultList[resultIndex].ColorSingleFeatures, id: \.self) { colorSingleFeatureIndex in
                                         SingleIconView(index: colorSingleFeatureIndex)
@@ -61,7 +61,7 @@ struct ShowResultView: View {
                             HStack{
                                 if viewModel.multipleDatasetRCInfos.singleResultList[resultIndex].community.count > 0{
                                     
-                                    Text("公牌").font(.system(size: 15)).foregroundColor(.white).bold()
+                                    Text("公牌".localized()).font(.system(size: 15)).foregroundColor(.white).bold()
                                     
                                     let pubSingleFeatureList = viewModel.multipleDatasetRCInfos.singleResultList[resultIndex].community
                                     
@@ -74,13 +74,13 @@ struct ShowResultView: View {
                             }
                             
                             HStack{
-                                Text("位置").frame(width: 45, alignment: .leading).font(.system(size: 15)).foregroundColor(.white).bold()
+                                Text("位置".localized()).frame(width: 45, alignment: .leading).font(.system(size: 15)).foregroundColor(.white).bold()
                                 
-                                Text("排名").frame(width: 45, alignment: .leading).font(.system(size: 15)).foregroundColor(.white).bold()
+                                Text("排名".localized()).frame(width: 45, alignment: .leading).font(.system(size: 15)).foregroundColor(.white).bold()
                                 
-                                Text("牌型").frame(width: 45, alignment: .leading).font(.system(size: 15)).foregroundColor(.white).bold()
+                                Text("牌型".localized()).frame(width: 45, alignment: .leading).font(.system(size: 15)).foregroundColor(.white).bold()
                                 
-                                Text("手牌").frame(width: 45, alignment: .leading).font(.system(size: 15)).foregroundColor(.white).bold()
+                                Text("手牌".localized()).frame(width: 45, alignment: .leading).font(.system(size: 15)).foregroundColor(.white).bold()
                                 
                                 Spacer()
                             }
@@ -99,7 +99,7 @@ struct ShowResultView: View {
                                         
                                         let singlefeatureRank = rankList[posIndex].rcSingleFeaturesType
 
-                                        Text(singlefeatureRank).frame(width: 45, alignment: .leading).font(.system(size: 15)).foregroundColor(.white)
+                                        Text(singlefeatureRank.localizedPhrase()).frame(width: 45, alignment: .leading).font(.system(size: 15)).foregroundColor(.white)
                                         
                                         let handSingleFeatureList = Array(0...rankList[posIndex].RCSingleFeatures.count - 1)
                                         

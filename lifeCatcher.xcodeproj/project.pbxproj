@@ -75,6 +75,7 @@
 		D03811A82C7542C300726B99 /* cls_0715_h_trans.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/cls_0715_h_trans.mlmodelkey"; }; };
 		D03811AA2C76904D00726B99 /* OriginObjectRegView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D03811A92C76904D00726B99 /* OriginObjectRegView.swift */; };
 		D0697CDF2CDE67FC006DD383 /* SpeechUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0697CDE2CDE67FB006DD383 /* SpeechUtils.swift */; };
+		D0AA11110001000000000002 /* LocalizeUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0AA11110001000000000001 /* LocalizeUtils.swift */; };
 		D0697CE22CDF5F7A006DD383 /* riffle_cls_h_1107.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D0697CE02CDF5F78006DD383 /* riffle_cls_h_1107.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/detect_0903.mlmodelkey"; }; };
 		D0697CE32CDF5F7A006DD383 /* riffle_cls_v_1107.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D0697CE12CDF5F79006DD383 /* riffle_cls_v_1107.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/detect_0903.mlmodelkey"; }; };
 		D0697CE52CE1E7E1006DD383 /* riffle_detect_1111.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D0697CE42CE1E7E0006DD383 /* riffle_detect_1111.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/detect_0903.mlmodelkey"; }; };
@@ -154,6 +155,7 @@
 		D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_0715_h_trans.mlmodel; sourceTree = "<group>"; };
 		D03811A92C76904D00726B99 /* OriginObjectRegView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OriginObjectRegView.swift; sourceTree = "<group>"; };
 		D0697CDE2CDE67FB006DD383 /* SpeechUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechUtils.swift; sourceTree = "<group>"; };
+		D0AA11110001000000000001 /* LocalizeUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizeUtils.swift; sourceTree = "<group>"; };
 		D0697CE02CDF5F78006DD383 /* riffle_cls_h_1107.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = riffle_cls_h_1107.mlmodel; sourceTree = "<group>"; };
 		D0697CE12CDF5F79006DD383 /* riffle_cls_v_1107.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = riffle_cls_v_1107.mlmodel; sourceTree = "<group>"; };
 		D0697CE42CE1E7E0006DD383 /* riffle_detect_1111.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = riffle_detect_1111.mlmodel; sourceTree = "<group>"; };
@@ -329,6 +331,7 @@
 				18FFC4092BB9587900029B0D /* OriginBlurDetector.swift */,
 				B058BE5E2B09FFC20078E792 /* CurrentBlurDetector.swift */,
 				D0697CDE2CDE67FB006DD383 /* SpeechUtils.swift */,
+				D0AA11110001000000000001 /* LocalizeUtils.swift */,
 			);
 			path = UtilPkg;
 			sourceTree = "<group>";
@@ -497,6 +500,7 @@
 				18C98D112C158F7B00A8CD49 /* NPFive.swift in Sources */,
 				A892C6002A765A0A003FA2B3 /* MainView.swift in Sources */,
 				D0697CDF2CDE67FC006DD383 /* SpeechUtils.swift in Sources */,
+				D0AA11110001000000000002 /* LocalizeUtils.swift in Sources */,
 				D0DAEF952C7766D900D5938A /* UsedFeatureSelectView.swift in Sources */,
 				18C98D072C158F7B00A8CD49 /* CUtils.swift in Sources */,
 				18C98D152C158F7B00A8CD49 /* TPok.swift in Sources */,

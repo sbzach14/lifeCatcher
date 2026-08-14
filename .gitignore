@@ -19,3 +19,6 @@ xcuserdata/
 
 **/*.playground/playground.xcworkspace/xcshareddata/*
 !**/*.playground/playground.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+
+# i18n 校验脚本的中间产物
+runtime_cn_strings.json

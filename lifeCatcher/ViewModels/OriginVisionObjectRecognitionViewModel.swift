@@ -310,7 +310,7 @@ class OriginVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCapt
     
     func speakText(input: String){
         successAudioRC!.play()
-        let speechUtterance = AVSpeechUtterance(string: input)
+        let speechUtterance = AVSpeechUtterance(string: input.localizedPhrase())
         speechSynthesizer.stopSpeaking(at: .immediate)
         speechSynthesizer.speak(speechUtterance)
     }

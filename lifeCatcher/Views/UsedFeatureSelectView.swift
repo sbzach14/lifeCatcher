@@ -15,7 +15,7 @@ struct UsedFeatureSelectView: View {
                                 let listindex = rowIndex * rowCount + colIndex
                                 if listindex < self.allSingleFeatureList.count {
                                     let index = self.allSingleFeatureList[listindex]
-                                    let imageName: String = ClassifierSettingArgs.singlefeatureLabelDic[index]!
+                                    let imageName: String = ClassifierSettingArgs.singlefeatureLabelDic[index]!.localizedPhrase()
                                     if !(singlefeatureToUse.contains(index)) {
                                         RoundedRectangle(cornerRadius: 5)
                                             .fill(Color.gray)
@@ -47,7 +47,7 @@ struct UsedFeatureSelectView: View {
             .resizable()
             .scaledToFill()
             .ignoresSafeArea())
-        .navigationTitle("用牌设置")
+        .navigationTitle("用牌设置".localized())
     }
     
     private func toggleSingleFeature(index: Int) {
