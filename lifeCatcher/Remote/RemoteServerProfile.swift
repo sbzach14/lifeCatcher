@@ -56,6 +56,7 @@ enum RemotePreferenceKeys {
     static let sourceRegion = "remote.source.region"
     static let videoFPS = "remote.video.fps"
     static let videoResolution = "remote.video.resolution"
+    static let videoLowPower = "remote.video.lowPower"
     static let receiverRegion = "remote.receiver.region"
     static let receiverLastSerial = "remote.receiver.lastSerial"
     static let clientInstanceId = "remote.client.instanceId"
@@ -81,6 +82,11 @@ enum RemotePreferences {
     static var videoResolution: Int {
         get { UserDefaults.standard.integer(forKey: RemotePreferenceKeys.videoResolution) == 1080 ? 1080 : 720 }
         set { UserDefaults.standard.set(newValue == 1080 ? 1080 : 720, forKey: RemotePreferenceKeys.videoResolution) }
+    }
+
+    static var videoLowPower: Bool {
+        get { UserDefaults.standard.bool(forKey: RemotePreferenceKeys.videoLowPower) }
+        set { UserDefaults.standard.set(newValue, forKey: RemotePreferenceKeys.videoLowPower) }
     }
 
     static var sourceRegion: RemoteRegion {

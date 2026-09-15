@@ -67,11 +67,12 @@ private final class RemoteFrameProcessor: @unchecked Sendable {
 }
 
 @MainActor
-final class RemoteVideoPublisher {
+final class RemoteVideoPublisher: RoomDelegate {
     private let client: RemoteBusinessClient
     private let reportStatistics: Bool
     let targetFPS: Int
     let targetResolution: Int
+    let lowPower: Bool
     private let room = Room()
     private let frameProcessor: RemoteFrameProcessor
     private var track: LocalVideoTrack?
@@ -89,6 +90,15 @@ final class RemoteVideoPublisher {
     private(set) var submittedFrameCount = 0
     var isPublishing: Bool { publication != nil && room.connectionState == .connected }
     var publishingError: String? { lastReportedError.isEmpty ? nil : lastReportedError }
+    private var maximumBitrate: Int {
+        let standard: Int = switch (targetResolution, targetFPS) {
+        case (1080, 60): 8_000_000
+        case (1080, _): 5_000_000
+        case (_, 60): 4_000_000
+        default: 2_500_000
+        }
+        return lowPower ? standard / 2 : standard
+    }
     var encodedFramesPerSecond: Double? {
         guard isPublishing else { return nil }
         return track?.statistics?.outboundRtpStream.compactMap(\.framesPerSecond).max()
@@ -97,14 +107,17 @@ final class RemoteVideoPublisher {
         client: RemoteBusinessClient,
         reportStatistics: Bool = false,
         targetFPS: Int = RemotePreferences.videoFPS,
-        targetResolution: Int = RemotePreferences.videoResolution
+        targetResolution: Int = RemotePreferences.videoResolution,
+        lowPower: Bool = RemotePreferences.videoLowPower
     ) {
         self.client = client
         self.reportStatistics = reportStatistics
         self.targetFPS = [30, 60].contains(targetFPS) ? targetFPS : 30
         self.targetResolution = targetResolution == 1080 ? 1080 : 720
+        self.lowPower = lowPower
         self.frameProcessor = RemoteFrameProcessor(resolution: self.targetResolution)
         AudioManager.shared.audioSession.isAutomaticConfigurationEnabled = false
+        room.add(delegate: self)
     }
 
     func setWanted(_ wanted: Bool) {
@@ -116,7 +129,9 @@ final class RemoteVideoPublisher {
     func offer(frame: RemoteVideoFrame) {
         guard wanted else { return }
         if room.connectionState == .disconnected, track != nil, !connecting, !resettingSession {
-            stopPublishing()
+            recoverPublishing(reason: "媒体连接已断开")
+        } else if room.connectionState == .connected, publication != nil, publication?.track == nil, !connecting, !resettingSession {
+            recoverPublishing(reason: "视频发布轨道已丢失")
         }
         guard let capturer else {
             if !connecting { Task { await connectIfNeeded() } }
@@ -183,7 +198,7 @@ final class RemoteVideoPublisher {
             self.track = track
             self.capturer = capturer
             let publication = try await room.localParticipant.publish(videoTrack: track, options: VideoPublishOptions(
-                encoding: VideoEncoding(maxBitrate: 1_800_000, maxFps: targetFPS)
+                encoding: VideoEncoding(maxBitrate: maximumBitrate, maxFps: targetFPS)
             ))
             guard wanted, generation == currentGeneration else {
                 try? await room.localParticipant.unpublish(publication: publication)
@@ -219,5 +234,31 @@ final class RemoteVideoPublisher {
             nextConnectAttemptAt = .distantPast
         }
         if let publication { Task { try? await room.localParticipant.unpublish(publication: publication) } }
+    }
+
+    private func recoverPublishing(reason: String) {
+        guard wanted, !resettingSession else { return }
+        RemoteDiagnostics.record(.warning, category: "video", message: "\(reason)，正在恢复视频发送")
+        stopPublishing()
+        nextConnectAttemptAt = .distantPast
+        Task { await connectIfNeeded() }
+    }
+
+    nonisolated func room(_ room: Room, didCompleteReconnectWithMode reconnectMode: ReconnectMode) {
+        Task { @MainActor [weak self] in
+            guard let self, self.wanted, !self.resettingSession else { return }
+            if self.publication?.track == nil {
+                self.recoverPublishing(reason: "媒体网络已恢复但发布轨道不可用")
+            } else {
+                RemoteDiagnostics.record(.success, category: "video", message: "手机1视频发送连接已自动恢复")
+            }
+        }
+    }
+
+    nonisolated func room(_ room: Room, participant: LocalParticipant, didUnpublishTrack publication: LocalTrackPublication) {
+        Task { @MainActor [weak self] in
+            guard let self, self.wanted, self.publication === publication else { return }
+            self.recoverPublishing(reason: "服务器取消了视频发布轨道")
+        }
     }
 }

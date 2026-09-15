@@ -84,6 +84,7 @@ struct DeprecatedInfoView: View {
     @State private var remoteRegion = RemotePreferences.sourceRegion
     @AppStorage(RemotePreferenceKeys.videoFPS) private var remoteVideoFPS = 30
     @AppStorage(RemotePreferenceKeys.videoResolution) private var remoteVideoResolution = 720
+    @AppStorage(RemotePreferenceKeys.videoLowPower) private var remoteVideoLowPower = false
     
     var body: some View {
         ScrollView {
@@ -111,6 +112,17 @@ struct DeprecatedInfoView: View {
                     .onChange(of: remoteVideoFPS) { _, value in
                         RemotePreferences.videoFPS = value
                     }
+                }
+                Divider().colorInvert()
+                Toggle(isOn: $remoteVideoLowPower) {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("低功耗传输").foregroundColor(.white)
+                        Text("LiveKit 最高码率减半").font(.caption).foregroundColor(.gray)
+                    }
+                }
+                .padding(.horizontal, 20)
+                .onChange(of: remoteVideoLowPower) { _, value in
+                    RemotePreferences.videoLowPower = value
                 }
                 Divider().colorInvert()
                 HStack {
