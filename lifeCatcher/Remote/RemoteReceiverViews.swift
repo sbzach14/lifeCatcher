@@ -151,24 +151,13 @@ struct RemoteReceiverSessionView: View {
     @State private var previousIdleTimerDisabled = UIApplication.shared.isIdleTimerDisabled
 
     var body: some View {
-        ZStack(alignment: .bottom) {
+        ZStack {
             content
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .ignoresSafeArea()
-
-            HStack(spacing: 8) {
-                modeButton("画面", .video, "video.fill")
-                modeButton("黑屏", .black, "moon.fill")
-                modeButton("时间", .time, "clock.fill")
-                modeButton("结果", .result, "rectangle.grid.1x2.fill")
-            }
-            .padding(8)
-            .background(.black.opacity(0.62))
-            .clipShape(Capsule())
-            .padding(.bottom, 14)
         }
         .overlay(alignment: .top) {
-            if viewModel.displayMode != .black {
+            if !isDisguiseVisible {
                 RemotePresenceStatusBar(items: [
                     RemotePresenceItem(label: "服务器", state: viewModel.serverPresence),
                     RemotePresenceItem(label: "手机1", state: viewModel.sourcePresence),
@@ -177,6 +166,7 @@ struct RemoteReceiverSessionView: View {
                 .padding(.top, 8)
             }
         }
+        .toolbar(isDisguiseVisible ? .hidden : .visible, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 NavigationLink { RemoteReceiverSettingsView() } label: {
@@ -213,27 +203,14 @@ struct RemoteReceiverSessionView: View {
                 }
             }
             .onTapGesture(count: 2) {
-                if viewModel.blackMode != 0 { viewModel.setDisplayMode(viewModel.timeMode == 0 ? .black : .time) }
+                if viewModel.blackMode != 0 { viewModel.setDisplayMode(.black) }
             }
             .gesture(DragGesture(minimumDistance: 50).onEnded { value in
                 if value.translation.width < 0 { viewModel.setDisplayMode(.result) }
             })
-        case .black:
-            Color.black.contentShape(Rectangle()).onTapGesture { viewModel.setDisplayMode(.result) }
-        case .time:
-            VStack(spacing: 12) {
-                Text("\(TimeModeFormatter.dateFormatter.string(from: viewModel.currentDate).replacingOccurrences(of: "星期", with: "周")) · \(TimeModeFormatter.lunarDateString(from: viewModel.currentDate))")
-                    .font(.system(size: 22)).bold()
-                Text(viewModel.timeText)
-                    .font(.system(size: viewModel.timeMode == 1 ? 100 : 70)).bold()
-                Spacer()
-            }
-            .padding(.top, 42)
-            .foregroundColor(.white)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.black)
-            .contentShape(Rectangle())
-            .onTapGesture { viewModel.setDisplayMode(.result) }
+        case .black, .time:
+            disguiseContent
+                .onTapGesture(count: 2) { viewModel.setDisplayMode(.video) }
         case .result:
             RemoteResultContentView(presentation: viewModel.presentation)
                 .gesture(DragGesture(minimumDistance: 50).onEnded { value in
@@ -242,12 +219,30 @@ struct RemoteReceiverSessionView: View {
         }
     }
 
-    private func modeButton(_ title: String, _ mode: RemoteReceiverViewModel.DisplayMode, _ icon: String) -> some View {
-        Button { viewModel.setDisplayMode(mode) } label: {
-            Label(title, systemImage: icon).labelStyle(.iconOnly)
-                .frame(width: 32, height: 28)
-                .foregroundColor(viewModel.displayMode == mode ? .blue : .white)
+    private var isDisguiseVisible: Bool {
+        viewModel.displayMode == .black || viewModel.displayMode == .time
+    }
+
+    @ViewBuilder private var disguiseContent: some View {
+        ZStack(alignment: .top) {
+            Color.black
+            if viewModel.timeMode != 0 {
+                VStack(spacing: 0) {
+                    Text("\(TimeModeFormatter.dateFormatter.string(from: viewModel.currentDate).replacingOccurrences(of: "星期", with: "周")) · \(TimeModeFormatter.lunarDateString(from: viewModel.currentDate))")
+                        .font(.system(size: 22))
+                        .bold()
+                        .padding(.top, 40)
+                    Text(viewModel.timeText)
+                        .font(.system(size: viewModel.timeMode == 1 ? 100 : 70))
+                        .bold()
+                    Spacer()
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
         }
+        .contentShape(Rectangle())
+        .ignoresSafeArea()
     }
 }
 
@@ -261,33 +256,47 @@ struct RemoteReceiverSettingsView: View {
     @AppStorage(RemotePreferenceKeys.receiverBrightness) private var brightness: Double = 0.1
 
     var body: some View {
-        Form {
-            Section("声音控制") {
+        ScrollView {
+            VStack(spacing: 0) {
                 Toggle("播放提示音和结果播报", isOn: $soundEnabled)
-                Picker("播放设备", selection: $voiceDevice) {
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 20)
+                    .frame(minHeight: 50)
+                Divider().colorInvert()
+
+                settingPickerRow("播放设备", selection: $voiceDevice) {
                     Text("扬声器").tag(0)
                     Text("耳机").tag(1)
                 }
-                SliderRow(title: "音量", value: $volume)
-                SliderRow(title: "语速", value: $voiceRate)
-            }
+                Divider().colorInvert()
 
-            Section("画面控制") {
-                Picker("屏幕显示", selection: $blackMode) {
+                settingSliderRow("音量", value: $volume)
+                Divider().colorInvert()
+
+                settingSliderRow("语速", value: $voiceRate)
+                Divider().colorInvert()
+
+                settingPickerRow("屏幕显示", selection: $blackMode) {
                     Text("相机图像").tag(0)
                     Text("正常黑屏（双击进入）").tag(1)
                     Text("黑屏点击（双击进入，单击暂停）").tag(2)
                 }
-                Picker("时间模式", selection: $timeMode) {
+                Divider().colorInvert()
+
+                settingPickerRow("时间模式", selection: $timeMode) {
                     Text("无").tag(0)
                     Text("HH:MM").tag(1)
                     Text("HH:MM:SS").tag(2)
                 }
-                SliderRow(title: "黑屏亮度", value: $brightness)
+                Divider().colorInvert()
+
+                settingSliderRow("黑屏亮度", value: $brightness)
+                Divider().colorInvert()
             }
         }
+        .background(Image("Newbg2").resizable().scaledToFill().ignoresSafeArea())
         .navigationTitle("接收端功能设置")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitleDisplayMode(.automatic)
         .onChange(of: soundEnabled) { _, value in RemotePreferences.receiverSoundEnabled = value }
         .onChange(of: volume) { _, value in RemotePreferences.receiverVolume = Float(value) }
         .onChange(of: voiceRate) { _, value in RemotePreferences.receiverVoiceRate = Float(value) }
@@ -296,16 +305,31 @@ struct RemoteReceiverSettingsView: View {
         .onChange(of: timeMode) { _, value in RemotePreferences.receiverTimeMode = value }
         .onChange(of: brightness) { _, value in RemotePreferences.receiverBrightness = Float(value) }
     }
-}
 
-private struct SliderRow: View {
-    let title: String
-    @Binding var value: Double
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text("\(title) \(String(format: "%.2f", value))")
-            Slider(value: $value, in: 0...1, step: 0.01)
+    private func settingPickerRow<Selection: Hashable, Content: View>(
+        _ title: String,
+        selection: Binding<Selection>,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        HStack {
+            Text(title).foregroundColor(.white)
+            Spacer()
+            Picker(title, selection: selection, content: content)
+                .pickerStyle(.menu)
         }
+        .padding(.horizontal, 20)
+        .frame(minHeight: 50)
+    }
+
+    private func settingSliderRow(_ title: String, value: Binding<Double>) -> some View {
+        HStack {
+            Text("\(title) \(String(format: "%.2f", value.wrappedValue))")
+                .foregroundColor(.white)
+                .frame(width: 115, alignment: .leading)
+            Slider(value: value, in: 0...1, step: 0.01)
+                .accentColor(.white)
+        }
+        .padding(.horizontal, 20)
+        .frame(minHeight: 50)
     }
 }
