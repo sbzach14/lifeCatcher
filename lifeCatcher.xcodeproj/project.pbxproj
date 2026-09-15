@@ -61,6 +61,7 @@
 		A8FBC7C22A3F0A5C00EDDFD7 /* VisionUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8FBC7C12A3F0A5C00EDDFD7 /* VisionUtils.swift */; };
 		B058BE5F2B09FFC20078E792 /* CurrentBlurDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058BE5E2B09FFC20078E792 /* CurrentBlurDetector.swift */; };
 		C09150022D0E35540063AE34 /* cls_20260915_texas.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = C09150012D0E35540063AE34 /* cls_20260915_texas.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/detect_0903.mlmodelkey"; }; };
+		C09150122D0E35540063AE34 /* detect_20260915_texas.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = C09150112D0E35540063AE34 /* detect_20260915_texas.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/detect_0903.mlmodelkey"; }; };
 		D01021C12D0E35540063AE34 /* cls_1215_h.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D01021BF2D0E35540063AE34 /* cls_1215_h.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/detect_0903.mlmodelkey"; }; };
 		D01021C22D0E35540063AE34 /* cls_1215_v.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D01021C02D0E35540063AE34 /* cls_1215_v.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/detect_0903.mlmodelkey"; }; };
 		D013E36D2C712F8D000F2B57 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D013E36C2C712F8D000F2B57 /* Assets.xcassets */; };
@@ -161,6 +162,7 @@
 		A8FBC7C12A3F0A5C00EDDFD7 /* VisionUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionUtils.swift; sourceTree = "<group>"; };
 		B058BE5E2B09FFC20078E792 /* CurrentBlurDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentBlurDetector.swift; sourceTree = "<group>"; };
 		C09150012D0E35540063AE34 /* cls_20260915_texas.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_20260915_texas.mlmodel; sourceTree = "<group>"; };
+		C09150112D0E35540063AE34 /* detect_20260915_texas.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = detect_20260915_texas.mlmodel; sourceTree = "<group>"; };
 		D01021BF2D0E35540063AE34 /* cls_1215_h.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_1215_h.mlmodel; sourceTree = "<group>"; };
 		D01021C02D0E35540063AE34 /* cls_1215_v.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_1215_v.mlmodel; sourceTree = "<group>"; };
 		D013E3612C7129EE000F2B57 /* lifeCatcher.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = lifeCatcher.entitlements; sourceTree = "<group>"; };
@@ -379,6 +381,7 @@
 				D03811A12C75401200726B99 /* cls_main.mlmodel */,
 				D01021BF2D0E35540063AE34 /* cls_1215_h.mlmodel */,
 				C09150012D0E35540063AE34 /* cls_20260915_texas.mlmodel */,
+				C09150112D0E35540063AE34 /* detect_20260915_texas.mlmodel */,
 				D01021C02D0E35540063AE34 /* cls_1215_v.mlmodel */,
 				D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */,
 				D03811A42C7542C200726B99 /* cls_0727_v_trans.mlmodel */,
@@ -565,6 +568,7 @@
 				A8A9F1632CE4218500084DBE /* RFast.swift in Sources */,
 				D01021C12D0E35540063AE34 /* cls_1215_h.mlmodel in Sources */,
 				C09150022D0E35540063AE34 /* cls_20260915_texas.mlmodel in Sources */,
+				C09150122D0E35540063AE34 /* detect_20260915_texas.mlmodel in Sources */,
 				D01021C22D0E35540063AE34 /* cls_1215_v.mlmodel in Sources */,
 				18C98D112C158F7B00A8CD49 /* NPFive.swift in Sources */,
 				A892C6002A765A0A003FA2B3 /* MainView.swift in Sources */,
@@ -764,7 +768,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0.1;
+				MARKETING_VERSION = 3.0.2;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -812,7 +816,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 3.0.1;
+				MARKETING_VERSION = 3.0.2;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
 				PRODUCT_NAME = "$(TARGET_NAME)";

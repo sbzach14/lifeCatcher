@@ -135,7 +135,7 @@ PB 的方法名是大写 `GetMinSingleFeatureNum`，其余多数为小写；映�
 
 1. 根据 reportID 取 `ReportClass`，根据 DatasetIndex 取函数。
 2. 解析 `newArgs = [dealNum, dealType, actualRcNum] + datasetArgs`。
-3. 根据 `cutStructList` 预处理看底、看顶、看手或看色。
+3. 根据 `cutStructList` 预处理看底、看顶、照顶去牌、看手或看色；照顶去牌会先从牌序删除所有已识别顶牌。
 4. 处理特殊看手/看色的连续输入完整性；未收集足够牌时可提前返回。
 5. 按 `reportCutRange` 生成候选切牌/去牌位置。
 6. 对每个候选应用 `singlefeaturesTransformation` 与打色规则。

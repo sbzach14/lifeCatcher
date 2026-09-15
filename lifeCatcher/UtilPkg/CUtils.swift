@@ -131,8 +131,7 @@ extension Array {
 
 struct cutStruct{
     var cutcardIndex: Int = 0
-    //0，看底，1，看顶，2，看色，3，看手
+    //0，看底，1，看顶，2，看色，3，连续看手，4，按位置看手，5，照顶去牌
     var cutMode: Int = 0
 }
-
 

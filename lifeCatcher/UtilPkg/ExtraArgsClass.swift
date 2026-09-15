@@ -2045,7 +2045,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         
         if pos != -1{
             
-            //0，看底，1，看顶，2，看色，3，看手
+            //0，看底，1，看顶，2，看色，3，连续看手，4，按位置看手，5，照顶去牌
             switch inputCutStruct.cutMode{
                 //看底
             case 0:
@@ -2060,6 +2060,14 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                 }
                 print("看顶的位置 \(watchSingleFeatureIndexPos) 底牌的位置 \(watchSingleFeatureIndexPos)")
                 returnSingleFeatures = Array(inputSingleFeatures[(pos + 1)...]) + Array(inputSingleFeatures[0...pos])
+                break
+                //照顶去牌：照到的顶牌从后续牌堆中删除，下一张成为新的顶牌。
+            case 5:
+                let after = pos + 1 < inputSingleFeatures.count
+                    ? Array(inputSingleFeatures[(pos + 1)...])
+                    : []
+                let before = pos > 0 ? Array(inputSingleFeatures[..<pos]) : []
+                returnSingleFeatures = after + before
                 break
                 //看色
             case 2:
@@ -2207,6 +2215,10 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             print("切的牌 \(cutStructList)")
             print("当前的牌组 \(inputSingleFeatures)--\(inputSingleFeatures.count)")
             var cutStructList = cutStructList
+            //照顶去牌必须在任何发牌/报法计算之前生效；连续模式按识别顺序逐张移除。
+            for cutStruct in cutStructList where cutStruct.cutMode == 5 {
+                inputSingleFeatures = cutSingleFeatures(inputSingleFeatures: inputSingleFeatures, inputCutStruct: cutStruct, colorTransform: -1, rcNum: rcNum)
+            }
         //是否切牌的位置，看手牌，切牌留色，切牌去色
             if cutStructList.count > 0  && reportRule.cutSingleFeatureProcession != 6{
                 //如果看底看顶先操作

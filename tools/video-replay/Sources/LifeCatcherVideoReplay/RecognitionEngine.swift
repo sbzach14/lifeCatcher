@@ -54,7 +54,7 @@ final class RecognitionEngine {
         minimumCards: Int,
         addCardMode: Int,
         trace: Bool,
-        singleROIAreaFactor: Float = 90,
+        singleROIAreaFactor: Float = 70,
         forcedSingleEntrySide: CLIOptions.ForcedSingleEntrySide? = nil
     ) {
         self.modelRunner = modelRunner

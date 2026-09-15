@@ -91,7 +91,11 @@ timeDisplayCue? { kind, digits, fullDeck?, displayText? }
 
 command 可为 `speakText`、`prompt` 或 `presentation`。桌面手动 prompt 只允许 success/failure。automatic 受 forwardingEnabled 控制；manual 不受控制。
 
+桌面 `forwarding.set` 可同时设置 `cutResultDelaySeconds`（0...60，默认 0）。仅带 `cutCard` 的 automatic presentation 延迟投递，使手机2播报与 UI 一起延后；prompt 和无切牌结果不延迟。
+
 服务器在手机2角色租约期内保留未 `delivery.ack` 的命令并在重连后重发；手机2按 `deliverySeq` 去重。新的 manual 或不同 operation 的 automatic 会替换旧待确认队列，同 operation 的提示与结果保持队列顺序。自动转发关闭时清除待确认 automatic；过期 prompt 不重播。
+
+手机2的新投递要求 desktop 当前在线。desktop 离线或处于重连宽限期时，手机1事件仍进入桌面历史，但服务器不创建 automatic receiver delivery；desktop 断线会立即清除待发与未确认 automatic，恢复后不补播离线期间结果。
 
 ## 桌面历史补传
 

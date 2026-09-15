@@ -94,6 +94,8 @@ specialCard[0...1]
 
 `shuffleMode[0]` 中 0 表示不洗、1 表示普通洗牌、2 表示横洗；横洗不新增槽位，仍使用洗牌的切牌/报法设置。完整设置页允许洗牌与拨牌同时开启；leishen 页提供普通洗牌、拨到顶、拨中间、横洗四选一。运行时通过 `shuffleOrRiffle` 选择对应槽位。
 
+`cutMode` 的 UI 稳定编码为：0 无、1 看底、2 看顶、3 连续看底、4 看手牌、5 连续看顶、6 照顶去牌、7 连续照顶去牌。模式 6/7 将照到的顶牌从当前牌堆移除后再进入发牌与报法计算，结果页和远程 presentation 的牌堆也使用移除后的数组。看色报法仍只允许 0/1/2。
+
 横洗不改变方向协议，也没有新增方向字段。全局 `isCameraHorizon` 同时决定分类模型、ROI 形变和两堆牌排列：普通流程横屏使用横向模型/ROI并按 X 轴处理，纵屏使用纵向模型/ROI并按 Y 轴处理；横洗横竖屏共用 `cls_20260915_texas`，ROI 比例分别为 16:9 与 9:16。`shuffleMode[0] == 2` 只区分横洗业务模式。
 
 ## 6. 牌资源编码
@@ -115,6 +117,8 @@ Core ML 输出在当前视觉代码中把类别 52 映射为 54。模型训练�
 核心运行使用：
 
 - `detect_0903.mlmodel`
+- `detect_20260915_texas.mlmodel`（横洗检测）
+- `cls_20260915_texas.mlmodel`（横洗分类）
 - `cls_1215_h.mlmodel`
 - `cls_1215_v.mlmodel`
 - `riffle_detect_1111.mlmodel`
@@ -124,6 +128,8 @@ Core ML 输出在当前视觉代码中把类别 52 映射为 54。模型训练�
 普通采集使用 `cls_main.mlmodel`。
 
 `cls_0715_h_trans`、`cls_0727_v_trans` 及 `.mlmodelkey` 是历史/备用资源，当前实例化代码已注释。`AppDelegate` 仍保留整段历史模型解密方案，但不执行。
+
+下载地址与访问方式见 [`model-server.md`](model-server.md)。
 
 ## 8. 音频与图片资源
 

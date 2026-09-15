@@ -54,7 +54,9 @@ class generalRuleSetting{
         2:"看顶",
         3:"连续看底",
         4:"看手牌",
-        5:"连续看顶"
+        5:"连续看顶",
+        6:"照顶去牌",
+        7:"连续照顶去牌"
     ]
     
     static let allSpecialCard: [Int:String] = [
@@ -682,6 +684,9 @@ struct SettingRecordConfigView: View{
             if self.cutMode[0] == 4{
                 self.cutMode[0] = 0 //看色牌情况下把看手变成不切牌
             }
+            if self.cutMode[0] == 6 || self.cutMode[0] == 7{
+                self.cutMode[0] = 0 //看色牌情况下不能使用照顶去牌
+            }
         }
         else{
             self.specialCard[0] = 0
@@ -700,6 +705,9 @@ struct SettingRecordConfigView: View{
             }
             if self.cutMode[1] == 4{
                 self.cutMode[1] = 0 //看色牌情况下把看手变成不切牌
+            }
+            if self.cutMode[1] == 6 || self.cutMode[1] == 7{
+                self.cutMode[1] = 0 //看色牌情况下不能使用照顶去牌
             }
         }
         else{

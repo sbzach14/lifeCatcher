@@ -96,10 +96,10 @@ final class CLIOptionsTests: XCTestCase {
         XCTAssertEqual(options.forcedSingleEntrySide, .left)
     }
 
-    func testHorizontalShuffleUsesTexasAndRiffleDetectorWithoutChangingNormalModes() {
+    func testHorizontalShuffleUsesTexasModelsWithoutChangingNormalModes() {
         XCTAssertEqual(ModelRunner.classifierName(mode: .horizontalShuffle, orientation: .horizontal), "cls_20260915_texas")
         XCTAssertEqual(ModelRunner.classifierName(mode: .horizontalShuffle, orientation: .vertical), "cls_20260915_texas")
-        XCTAssertEqual(ModelRunner.detectorName(mode: .horizontalShuffle), "riffle_detect_1111")
+        XCTAssertEqual(ModelRunner.detectorName(mode: .horizontalShuffle), "detect_20260915_texas")
         XCTAssertEqual(ModelRunner.detectorName(mode: .shuffle), "detect_0903")
         XCTAssertEqual(ModelRunner.detectorName(mode: .both), "detect_0903")
         XCTAssertEqual(ModelRunner.detectorName(mode: .riffle), "riffle_detect_1111")

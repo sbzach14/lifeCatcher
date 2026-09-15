@@ -73,8 +73,9 @@ final class RemoteVideoSubscriber: NSObject, ObservableObject, RoomDelegate {
             guard let self else { return }
             self.track = nil
             self.isConnected = false
+            guard self.wanted, !self.resettingSession else { return }
             RemoteDiagnostics.record(.warning, category: "video", message: "实时画面连接中断，正在重试", toast: true)
-            if !self.resettingSession, let client = self.client { self.scheduleRetry(using: client) }
+            if let client = self.client { self.scheduleRetry(using: client) }
         }
     }
 

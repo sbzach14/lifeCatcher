@@ -81,7 +81,7 @@ struct CLIOptions {
         if values["--max-frames"] != nil && (maximumFrames == nil || maximumFrames! <= 0) {
             throw ReplayError.invalidArguments("--max-frames 必须是正整数")
         }
-        let singleROIAreaFactor = Float(values["--single-roi-area-factor"] ?? "90") ?? -1
+        let singleROIAreaFactor = Float(values["--single-roi-area-factor"] ?? "70") ?? -1
         guard singleROIAreaFactor > 0 else {
             throw ReplayError.invalidArguments("--single-roi-area-factor 必须是正数")
         }
@@ -153,7 +153,7 @@ struct CLIOptions {
           --flush-frames <n>                 结尾追加的黑帧数，默认 16
           --skip-frames <n>                  诊断：解码但不处理前 n 帧
           --max-frames <n>                   诊断：最多处理 n 个视频帧
-          --single-roi-area-factor <n>       横洗单框 ROI 面积倍数，默认 90
+          --single-roi-area-factor <n>       横洗单框 ROI 面积倍数，默认 70
           --force-single-entry left|right    诊断：入口只保留指定侧单框，进入 ROI 后恢复正常
           --frames-output <directory>        保存逐帧标注；重跑前自动删除该目录的旧工具输出
           --trace                            输出逐帧状态摘要

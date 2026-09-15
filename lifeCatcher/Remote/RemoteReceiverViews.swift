@@ -59,6 +59,7 @@ struct RemoteReceiverConnectView: View {
     @StateObject private var viewModel = RemoteReceiverViewModel()
     @AppStorage(RemotePreferenceKeys.receiverRegion) private var regionValue = RemoteRegion.cn.rawValue
     @AppStorage(RemotePreferenceKeys.receiverLastSerial) private var serial = ""
+    @State private var connectionTask: Task<Void, Never>?
 
     private var region: RemoteRegion {
         get { RemoteRegion(rawValue: regionValue) ?? .cn }
@@ -76,6 +77,11 @@ struct RemoteReceiverConnectView: View {
         }
         .navigationTitle("接收端")
         .navigationBarTitleDisplayMode(.inline)
+        .onDisappear {
+            connectionTask?.cancel()
+            connectionTask = nil
+            viewModel.disconnect()
+        }
     }
 
     private var connectionForm: some View {
@@ -108,7 +114,8 @@ struct RemoteReceiverConnectView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 10))
 
                 Button {
-                    Task { await viewModel.connect(region: region, serial: serial) }
+                    connectionTask?.cancel()
+                    connectionTask = Task { await viewModel.connect(region: region, serial: serial) }
                 } label: {
                     Text(viewModel.connectionState == .connecting ? "正在连接…" : "开始连接")
                         .frame(maxWidth: .infinity).padding(12)
@@ -178,7 +185,6 @@ struct RemoteReceiverSessionView: View {
         .onDisappear {
             UIScreen.main.brightness = previousBrightness
             UIApplication.shared.isIdleTimerDisabled = previousIdleTimerDisabled
-            viewModel.disconnect()
         }
     }
 

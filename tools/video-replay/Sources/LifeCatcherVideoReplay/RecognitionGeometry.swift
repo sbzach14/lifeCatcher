@@ -37,7 +37,7 @@ struct HorizontalShuffleROIGeometry {
         stateResult: [[Float]],
         originSize: [Float] = [1920, 1080],
         isCameraHorizon: Bool,
-        areaFactor: Float = 90
+        areaFactor: Float = 70
     ) -> [Float] {
         let sourceBoxes = Array(stateResult.prefix(2))
         guard !sourceBoxes.isEmpty else {

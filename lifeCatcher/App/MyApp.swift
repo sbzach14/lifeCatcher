@@ -8,6 +8,7 @@ struct MyApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
     init(){
+        RemotePreferences.recognitionMode = .remote
         // 创建导航栏外观样式
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()

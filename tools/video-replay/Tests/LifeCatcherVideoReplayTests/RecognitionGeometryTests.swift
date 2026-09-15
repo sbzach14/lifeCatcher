@@ -8,12 +8,12 @@ final class RecognitionGeometryTests: XCTestCase {
                 stateResult: [[0.5, 0.5, 0.02, 0.05]], isCameraHorizon: horizontal)
             let width = roi[2] * 1920
             let height = roi[3] * 1080
-            XCTAssertEqual(width * height, 38.4 * 54 * 90, accuracy: 0.1)
+            XCTAssertEqual(width * height, 38.4 * 54 * 70, accuracy: 0.1)
             XCTAssertEqual(width / height, horizontal ? 16.0 / 9 : 9.0 / 16, accuracy: 0.00001)
         }
     }
 
-    func testSingleAreaCanBeOverriddenToNinetyForReplayComparison() {
+    func testSingleAreaCanBeOverriddenForReplayComparison() {
         let roi = HorizontalShuffleROIGeometry.compute(
             stateResult: [[0.5, 0.5, 0.02, 0.05]],
             isCameraHorizon: true,

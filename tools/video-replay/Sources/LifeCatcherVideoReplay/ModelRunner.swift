@@ -42,8 +42,10 @@ final class ModelRunner {
     }
 
     static func detectorName(mode: ReplayMode) -> String {
-        mode == .horizontalShuffle || !mode.usesShuffleModels
-            ? "riffle_detect_1111" : "detect_0903"
+        if mode == .horizontalShuffle {
+            return "detect_20260915_texas"
+        }
+        return mode.usesShuffleModels ? "detect_0903" : "riffle_detect_1111"
     }
 
     static func classifierName(mode: ReplayMode, orientation: CameraOrientation) -> String {

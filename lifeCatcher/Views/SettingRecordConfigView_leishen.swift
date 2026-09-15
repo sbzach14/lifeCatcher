@@ -561,6 +561,9 @@ struct SettingRecordConfigView_leishen: View{
             if self.cutMode[0] == 4{
                 self.cutMode[0] = 0 //看色牌情况下把看手变成不切牌
             }
+            if self.cutMode[0] == 6 || self.cutMode[0] == 7{
+                self.cutMode[0] = 0
+            }
         }
         else{
             self.specialCard[0] = 0
@@ -579,6 +582,9 @@ struct SettingRecordConfigView_leishen: View{
             }
             if self.cutMode[1] == 4{
                 self.cutMode[1] = 0 //看色牌情况下把看手变成不切牌
+            }
+            if self.cutMode[1] == 6 || self.cutMode[1] == 7{
+                self.cutMode[1] = 0
             }
         }
         else{

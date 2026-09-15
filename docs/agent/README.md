@@ -30,6 +30,7 @@
 ## 层级 4：查找与修改
 
 - [`file-index.md`](file-index.md)：按目录、职责和关键符号建立的源码索引。
+- [`model-server.md`](model-server.md)：Card 文件处理服务器、模型下载与完整性校验。
 - [`change-playbook.md`](change-playbook.md)：常见需求的影响面、修改顺序和验证清单。
 
 ## 快速任务路由

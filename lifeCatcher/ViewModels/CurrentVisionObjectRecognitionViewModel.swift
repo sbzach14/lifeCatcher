@@ -30,7 +30,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     /// Horizontal-shuffle classification uses one geometry contract in both
     /// orientations. Landscape treats X as along; portrait swaps the axes.
     private let horizontalShuffleROIAspect: Float = 16.0 / 9.0
-    private let horizontalShuffleROIAreaFactor: Float = 90.0
+    private let horizontalShuffleROIAreaFactor: Float = 70.0
     private let horizontalShuffleROIPairSpanFactor: Float = 1.5
     /// Calibrated on all 1,631 retained 0813/0814 M2 pairs after phone-axis
     /// canonicalization. The observed cross-offset/mean-cross-size maximum is
@@ -64,6 +64,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var cutShowArray : [Int] = []
     
     let detectModel = try! detect_0903()
+    let horizontalShuffleDetectModel = try! detect_20260915_texas()
     let horizontalShuffleModel = try! cls_20260915_texas()
     let clsModel_h = try! cls_1215_h()
     let clsModel_v = try! cls_1215_v()
@@ -373,6 +374,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             corrected = cutStruct(cutcardIndex: singlefeatureArray[topIndex], cutMode: 1)
         case 4:
             corrected = cutStruct(cutcardIndex: cutCard, cutMode: 4)
+        case 6, 7:
+            corrected = cutStruct(cutcardIndex: cutCard, cutMode: 5)
         default:
             let existingMode = cutStructArray.last?.cutMode ?? 0
             corrected = cutStruct(cutcardIndex: cutCard, cutMode: existingMode)
@@ -909,6 +912,16 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     isCameraHorizon: isCameraHorizon
                 )
             }
+            else if self.shuffleMode[0] == 2 {
+                let result = try! self.horizontalShuffleDetectModel.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: Double(confidenceThreshold))
+                (singlefeatureResult, uniqueNum) = getSingleFeature(
+                    from: result.confidence,
+                    from: result.coordinates,
+                    from: pixelBuffer,
+                    from: false,
+                    isCameraHorizon: isCameraHorizon
+                )
+            }
             else{
                 let result = try! self.riffleDetectModel.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: Double(confidenceThreshold))
                 (singlefeatureResult, uniqueNum) = getSingleFeature(
@@ -1200,7 +1213,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     
                     if self.usedSingleFeatures.contains(detectSingleFeature)
                         && self.recgReport
-                        && (![3, 5].contains(self.cutMode[self.shuffleOrRiffle]) || self.continueCutTimeCounter >= self.continueMaxCutTime)
+                        && (![3, 5, 7].contains(self.cutMode[self.shuffleOrRiffle]) || self.continueCutTimeCounter >= self.continueMaxCutTime)
                         && self.specialCard[self.shuffleOrRiffle] == 0{
 //                        self.stateCounter = 100
 //                        self.state = "waitingEnd"
@@ -1260,6 +1273,24 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                                 cutIndex = self.singlefeatureArray.count - 1
                             }
                             self.cutStructArray.append(cutStruct(cutcardIndex: self.singlefeatureArray[cutIndex], cutMode: 1))
+                            isCutDone = true
+                            self.cutShowArray.append(detectSingleFeature)
+                            self.continueCutTimeCounter = 0
+                        }
+                        else if self.cutMode[self.shuffleOrRiffle] == 6{
+                            //照顶去牌：照到的牌本身不参与后续发牌及牌堆显示。
+                            if self.cutStructArray.count == 0{
+                                self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 5))
+                                isCutDone = true
+                                self.cutShowArray.append(detectSingleFeature)
+                                if self.specialCard[self.shuffleOrRiffle] == 0{
+                                    self.isProcessNeedToCut = false
+                                }
+                            }
+                        }
+                        else if self.cutMode[self.shuffleOrRiffle] == 7{
+                            //连续照顶去牌：每次照到的顶牌都从原始牌序中移除。
+                            self.cutStructArray.append(cutStruct(cutcardIndex: detectSingleFeature, cutMode: 5))
                             isCutDone = true
                             self.cutShowArray.append(detectSingleFeature)
                             self.continueCutTimeCounter = 0
@@ -2670,7 +2701,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     
     // MARK: compute targetArea
     /// Horizontal shuffle and its follow-up cut actions share the same dynamic
-    /// Texas model: 16:9/9:16 ROI, single area 90× and pair span 1.5×. `detectNeedToCut`
+    /// Texas model: 16:9/9:16 ROI, single area 70× and pair span 1.5×. `detectNeedToCut`
     /// remains the immediate runtime signal; the saved configuration is also
     /// checked so a transient reset cannot make an ongoing cut use standard geometry.
     private func isHorizontalShuffleCutROIPhase() -> Bool {
@@ -3536,6 +3567,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 cutIndex = self.singlefeatureArray.count - 1
             }
             self.cutStructArray.append(cutStruct(cutcardIndex: self.singlefeatureArray[cutIndex], cutMode: 1))
+            self.cutShowArray.append(cutSingleFeature)
+        }
+        else if self.cutMode[self.shuffleOrRiffle] == 6 || self.cutMode[self.shuffleOrRiffle] == 7{
+            self.cutStructArray.append(cutStruct(cutcardIndex: cutSingleFeature, cutMode: 5))
             self.cutShowArray.append(cutSingleFeature)
         }
         

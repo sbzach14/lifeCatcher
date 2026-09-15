@@ -27,7 +27,7 @@ SettingRecordView
 ## 2. 页面职责
 
 - `MainMenuView`：根导航、语言、自动登录和基于授权状态的路由。
-- `InfoView`：设备/版本与入口信息；`DeprecatedInfoView` 包含全局功能设置、本地/远程识别模式和独立帧率测试入口。本地模式显示音频、时间及音量上下键功能，并隐藏服务器选择；远程模式显示服务器选择以及 LiveKit 720p/1080p、30/60 FPS 设置，并隐藏音量上下键功能。本地识别画面的“查看结果”按钮进入原结果页。本地帧率测试不连接 LiveKit，远程帧率测试使用所选分辨率和送帧率；详见 `remote-system.md` 第 8 节。
+- `InfoView`：设备/版本与入口信息；`DeprecatedInfoView` 隐藏本地/远程模式切换并在进入时固定为远程模式，显示服务器、LiveKit 720p/1080p、30/60 FPS 与远程帧率测试入口。详见 `remote-system.md` 第 8 节。
 - `LoginView`：账号登录、注册 UI、激活/状态展示；包含与 MainView 重复的登录实现。
 - `RegisterView`：独立注册页实现，当前主登录页也自带注册逻辑。
 - `SettingRecordView`：用户方案列表、删除、新增/编辑。

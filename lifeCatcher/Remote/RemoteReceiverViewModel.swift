@@ -74,6 +74,7 @@ final class RemoteReceiverViewModel: ObservableObject {
         do {
             try await client.connect(role: .receiver, region: region, serial: targetSerial)
         } catch {
+            guard !Task.isCancelled, !(error is CancellationError) else { return }
             errorMessage = RemoteDiagnostics.userMessage(for: error)
             client.markFailed(error)
         }

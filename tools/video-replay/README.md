@@ -52,8 +52,8 @@ swift run --package-path tools/video-replay lifecatcher-video-replay --help
 
 ### 横洗 ROI 校准状态
 
-iOS 与本工具均为横洗选择 `riffle_detect_1111` + `cls_20260915_texas`，后者横竖共用。
-单框入口按框面积×90 建 ROI；双框以两个框中心连线中点为中心，以最外侧沿轴边缘总跨度×1.5
+iOS 与本工具均为横洗选择 `detect_20260915_texas` + `cls_20260915_texas`，后者横竖共用。
+单框入口按框面积×70 建 ROI；双框以两个框中心连线中点为中心，以最外侧沿轴边缘总跨度×1.5
 确定长轴。横屏 X 为长轴、比例 16:9，竖屏 Y 为长轴、比例 9:16。边界只平移或填 RGB 114，
 不改变训练尺寸，不使用旧的 4.5:1、最大面积参考框或 90% 包含扩展。
 
@@ -77,7 +77,7 @@ Core ML 和状态机进行离线回放验证的 Swift Package。
 
 | 选项 | 含义 |
 |---|---|
-| `--mode horizontal-shuffle` | 横洗，默认值；使用 `riffle_detect_1111` + `cls_20260915_texas`；ROI 与排列取 `--orientation` |
+| `--mode horizontal-shuffle` | 横洗，默认值；使用 `detect_20260915_texas` + `cls_20260915_texas`；ROI 与排列取 `--orientation` |
 | `--mode shuffle` | 只允许洗牌结果，使用 `detect_0903` 与 `cls_1215_*` |
 | `--mode riffle` | 只允许拨牌结果，使用 `riffle_detect_1111` 与 `riffle_cls_*` |
 | `--mode both` | 对应正式代码 `[1,1]`，仍按正式选择顺序使用洗牌模型组 |
@@ -88,7 +88,7 @@ Core ML 和状态机进行离线回放验证的 Swift Package。
 | `--add-card-mode 0/1/2` | 对应正式跨帧孤立补牌设置 |
 | `--flush-frames 16` | 结尾送入模型的黑帧数量；设为 0 可关闭 |
 | `--skip-frames` / `--max-frames` | 仅用于快速复现某个视频区间；正式全量回放不要设置 |
-| `--single-roi-area-factor <n>` | 横洗单框 ROI 面积倍数，默认 90；可显式传其他值做离线对照，不会修改 iOS 配置 |
+| `--single-roi-area-factor <n>` | 横洗单框 ROI 面积倍数，默认 70；可显式传其他值做离线对照，不会修改 iOS 配置 |
 | `--force-single-entry left|right` | 诊断单框入口：全帧检测阶段只保留指定侧框；进入 ROI 后恢复真实检测结果 |
 | `--frames-output <directory>` | 保存旋转后、保持自然尺寸的标注 PNG 和 `frames.jsonl`；重跑前自动彻底删除该目录中的旧工具输出 |
 | `--trace` | 输出每个逻辑帧的状态、ROI、候选牌和置信度 |

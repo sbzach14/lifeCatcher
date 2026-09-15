@@ -82,86 +82,23 @@ struct InfoView: View {
 struct DeprecatedInfoView: View {
     @StateObject var viewModel = SettingViewModel()
     @State private var remoteRegion = RemotePreferences.sourceRegion
-    @AppStorage(RemotePreferenceKeys.recognitionMode) private var recognitionMode = RecognitionMode.remote.rawValue
     @AppStorage(RemotePreferenceKeys.videoFPS) private var remoteVideoFPS = 30
     @AppStorage(RemotePreferenceKeys.videoResolution) private var remoteVideoResolution = 720
     
     var body: some View {
         ScrollView {
         VStack{
-            Picker("识别模式", selection: $recognitionMode) {
-                ForEach(RecognitionMode.allCases) { mode in Text(mode.title).tag(mode.rawValue) }
-            }
-            .pickerStyle(.segmented)
-            .padding(.horizontal)
-
-            NavigationLink(recognitionMode == RecognitionMode.remote.rawValue
-                           ? "帧率测试（LiveKit \(remoteVideoResolution == 1080 ? 1080 : 720)p / \([30, 60].contains(remoteVideoFPS) ? remoteVideoFPS : 30) FPS ＋ CLS）"
-                           : "帧率测试（本地 CLS）") {
+            NavigationLink("帧率测试（LiveKit \(remoteVideoResolution == 1080 ? 1080 : 720)p / \([30, 60].contains(remoteVideoFPS) ? remoteVideoFPS : 30) FPS ＋ CLS）") {
                 FrameRateTestView(
                     isBackCamera: viewModel.isBackCamera,
-                    remoteEnabled: recognitionMode == RecognitionMode.remote.rawValue,
+                    remoteEnabled: true,
                     remoteVideoFPS: [30, 60].contains(remoteVideoFPS) ? remoteVideoFPS : 30,
                     remoteVideoResolution: remoteVideoResolution == 1080 ? 1080 : 720
                 )
             }
             .padding()
 
-            if recognitionMode == RecognitionMode.local.rawValue {
-                HStack {
-                    Text("播报设备").foregroundColor(.white)
-                    Spacer()
-                    Picker("播报设备", selection: $viewModel.voiceDevice) {
-                        Text("扬声器").tag(0)
-                        Text("耳机").tag(1)
-                    }.pickerStyle(.menu)
-                }.padding(.horizontal)
-                HStack {
-                    Text("播报音量").foregroundColor(.white)
-                    Slider(value: $viewModel.volumeValue, in: 0...1)
-                }.padding(.horizontal)
-                HStack {
-                    Text("播报语速").foregroundColor(.white)
-                    Slider(value: $viewModel.voiceRate, in: 0...1)
-                }.padding(.horizontal)
-                HStack {
-                    Text("时间显示").foregroundColor(.white)
-                    Spacer()
-                    Picker("时间显示", selection: $viewModel.timeMode) {
-                        Text("无").tag(0)
-                        Text("HH:MM").tag(1)
-                        Text("HH:MM:SS").tag(2)
-                    }.pickerStyle(.menu)
-                }.padding(.horizontal)
-                Divider().colorInvert()
-
-                HStack {
-                    Text("音量上键功能").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
-                    Picker("volumeUp", selection: $viewModel.volumeUp) {
-                        ForEach(0...FunctionSetting.volumeUpDict.count - 1, id: \.self){
-                            index in Text(FunctionSetting.volumeUpDict[index]!).tag(index)
-                        }
-                    }
-                    .pickerStyle(MenuPickerStyle())
-                    .frame(width: 200, height: 30, alignment: .trailing)
-                    .padding(.trailing,30)
-                }
-                Divider().colorInvert()
-
-                HStack {
-                    Text("音量下键功能").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
-                    Picker("volumeDown", selection: $viewModel.volumeDown) {
-                        ForEach(0...FunctionSetting.volumeDownDict.count - 1, id: \.self){
-                            index in Text(FunctionSetting.volumeDownDict[index]!).tag(index)
-                        }
-                    }
-                    .pickerStyle(MenuPickerStyle())
-                    .frame(width: 200, height: 30, alignment: .trailing)
-                    .padding(.trailing,30)
-                }
-                Divider().colorInvert()
-            } else {
-                Divider().colorInvert()
+            Divider().colorInvert()
                 HStack {
                     Text("显示帧率").foregroundColor(.white).padding(.leading, 20)
                     Spacer()
@@ -209,7 +146,6 @@ struct DeprecatedInfoView: View {
                     }
                 }
                 Divider().colorInvert()
-            }
             
             HStack {
                 Text("屏幕显示").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
@@ -240,6 +176,7 @@ struct DeprecatedInfoView: View {
             
             Spacer()
         }
+        .onAppear { RemotePreferences.recognitionMode = .remote }
         }
         .onDisappear{
             viewModel.updateConfigJSON()

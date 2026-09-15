@@ -43,7 +43,7 @@ final class HorizontalShuffleStateTests: XCTestCase {
         send([left], cards: [1], to: engine)
         XCTAssertEqual(engine.state, "detecting")
         let singleROI = engine.targetArea
-        XCTAssertEqual(singleROI[2] * singleROI[3], 0.02 * 0.05 * 90, accuracy: 0.000001)
+        XCTAssertEqual(singleROI[2] * singleROI[3], 0.02 * 0.05 * 70, accuracy: 0.000001)
         send([[0.41, 0.5, 0.01, 0.03]], cards: [1], to: engine)
         XCTAssertEqual(engine.targetArea, singleROI)
         for _ in 0..<3 { send([left, right], cards: [1, 2], to: engine) }
