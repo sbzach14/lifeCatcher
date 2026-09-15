@@ -5,8 +5,6 @@ final class RemoteReceiverViewModel: ObservableObject {
     enum DisplayMode: String {
         case video
         case black
-        case time
-        case result
     }
 
     @Published private(set) var connectionState: RemoteBusinessClient.State = .idle

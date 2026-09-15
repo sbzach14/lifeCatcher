@@ -182,7 +182,7 @@ struct RemoteReceiverSessionView: View {
             UIApplication.shared.isIdleTimerDisabled = true
         }
         .onChange(of: viewModel.displayMode) { _, mode in
-            if mode == .black || mode == .time { UIScreen.main.brightness = CGFloat(viewModel.blackFactor) }
+            if mode == .black { UIScreen.main.brightness = CGFloat(viewModel.blackFactor) }
             else { UIScreen.main.brightness = previousBrightness }
         }
         .onDisappear {
@@ -205,22 +205,14 @@ struct RemoteReceiverSessionView: View {
             .onTapGesture(count: 2) {
                 if viewModel.blackMode != 0 { viewModel.setDisplayMode(.black) }
             }
-            .gesture(DragGesture(minimumDistance: 50).onEnded { value in
-                if value.translation.width < 0 { viewModel.setDisplayMode(.result) }
-            })
-        case .black, .time:
+        case .black:
             disguiseContent
                 .onTapGesture(count: 2) { viewModel.setDisplayMode(.video) }
-        case .result:
-            RemoteResultContentView(presentation: viewModel.presentation)
-                .gesture(DragGesture(minimumDistance: 50).onEnded { value in
-                    if value.translation.width > 0 { viewModel.setDisplayMode(.video) }
-                })
         }
     }
 
     private var isDisguiseVisible: Bool {
-        viewModel.displayMode == .black || viewModel.displayMode == .time
+        viewModel.displayMode == .black
     }
 
     @ViewBuilder private var disguiseContent: some View {
@@ -277,7 +269,7 @@ struct RemoteReceiverSettingsView: View {
                 Divider().colorInvert()
 
                 settingPickerRow("屏幕显示", selection: $blackMode) {
-                    Text("相机图像").tag(0)
+                    Text("无").tag(0)
                     Text("正常黑屏（双击进入）").tag(1)
                     Text("黑屏点击（双击进入，单击暂停）").tag(2)
                 }
