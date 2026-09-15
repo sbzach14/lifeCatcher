@@ -82,6 +82,7 @@ struct InfoView: View {
 struct DeprecatedInfoView: View {
     @StateObject var viewModel = SettingViewModel()
     @State private var remoteRegion = RemotePreferences.sourceRegion
+    @AppStorage(RemotePreferenceKeys.recognitionMode) private var recognitionMode = RecognitionMode.remote.rawValue
     @AppStorage(RemotePreferenceKeys.videoFPS) private var remoteVideoFPS = 30
     @AppStorage(RemotePreferenceKeys.videoResolution) private var remoteVideoResolution = 720
     @AppStorage(RemotePreferenceKeys.videoLowPower) private var remoteVideoLowPower = false
@@ -89,10 +90,18 @@ struct DeprecatedInfoView: View {
     var body: some View {
         ScrollView {
         VStack{
-            NavigationLink("帧率测试（LiveKit \(remoteVideoResolution == 1080 ? 1080 : 720)p / \([30, 60].contains(remoteVideoFPS) ? remoteVideoFPS : 30) FPS ＋ CLS）") {
+            #if SHOW_RECOGNITION_MODE_SWITCH
+            Picker("识别模式", selection: $recognitionMode) {
+                ForEach(RecognitionMode.allCases) { mode in Text(mode.title).tag(mode.rawValue) }
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal)
+            #endif
+
+            NavigationLink(frameRateTestTitle) {
                 FrameRateTestView(
                     isBackCamera: viewModel.isBackCamera,
-                    remoteEnabled: true,
+                    remoteEnabled: !isLocalMode,
                     remoteVideoFPS: [30, 60].contains(remoteVideoFPS) ? remoteVideoFPS : 30,
                     remoteVideoResolution: remoteVideoResolution == 1080 ? 1080 : 720
                 )
@@ -100,6 +109,34 @@ struct DeprecatedInfoView: View {
             .padding()
 
             Divider().colorInvert()
+            if isLocalMode {
+                HStack {
+                    Text("播报设备").foregroundColor(.white)
+                    Spacer()
+                    Picker("播报设备", selection: $viewModel.voiceDevice) {
+                        Text("扬声器").tag(0)
+                        Text("耳机").tag(1)
+                    }.pickerStyle(.menu)
+                }.padding(.horizontal)
+                HStack {
+                    Text("播报音量").foregroundColor(.white)
+                    Slider(value: $viewModel.volumeValue, in: 0...1)
+                }.padding(.horizontal)
+                HStack {
+                    Text("播报语速").foregroundColor(.white)
+                    Slider(value: $viewModel.voiceRate, in: 0...1)
+                }.padding(.horizontal)
+                HStack {
+                    Text("时间显示").foregroundColor(.white)
+                    Spacer()
+                    Picker("时间显示", selection: $viewModel.timeMode) {
+                        Text("无").tag(0)
+                        Text("HH:MM").tag(1)
+                        Text("HH:MM:SS").tag(2)
+                    }.pickerStyle(.menu)
+                }.padding(.horizontal)
+                Divider().colorInvert()
+            } else {
                 HStack {
                     Text("显示帧率").foregroundColor(.white).padding(.leading, 20)
                     Spacer()
@@ -158,6 +195,7 @@ struct DeprecatedInfoView: View {
                     }
                 }
                 Divider().colorInvert()
+            }
             
             HStack {
                 Text("屏幕显示").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
@@ -188,7 +226,12 @@ struct DeprecatedInfoView: View {
             
             Spacer()
         }
-        .onAppear { RemotePreferences.recognitionMode = .remote }
+        .onAppear {
+            #if !SHOW_RECOGNITION_MODE_SWITCH
+            recognitionMode = RecognitionMode.remote.rawValue
+            RemotePreferences.recognitionMode = .remote
+            #endif
+        }
         }
         .onDisappear{
             viewModel.updateConfigJSON()
@@ -200,6 +243,19 @@ struct DeprecatedInfoView: View {
                 .ignoresSafeArea()
         )
         .navigationBarTitle("功能设置")
+    }
+
+    private var isLocalMode: Bool {
+        #if SHOW_RECOGNITION_MODE_SWITCH
+        recognitionMode == RecognitionMode.local.rawValue
+        #else
+        false
+        #endif
+    }
+
+    private var frameRateTestTitle: String {
+        if isLocalMode { return "帧率测试（本地 CLS）" }
+        return "帧率测试（LiveKit \(remoteVideoResolution == 1080 ? 1080 : 720)p / \([30, 60].contains(remoteVideoFPS) ? remoteVideoFPS : 30) FPS ＋ CLS）"
     }
 }
 
