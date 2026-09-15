@@ -71,7 +71,20 @@ func createCVPixelBuffer(ciImage: CIImage, targetSize: CGSize, targetArea: [Floa
     var croppedCIImage = ciImage
     
     if width != 0{
-        croppedCIImage = ciImage.cropped(to: CGRect(x: xCenter - width / 2, y: yCenter - height / 2, width: width, height: height))
+        let cropRect = CGRect(
+            x: xCenter - width / 2,
+            y: yCenter - height / 2,
+            width: width,
+            height: height
+        )
+        // A horizontal-shuffle ROI can intentionally exceed the camera frame
+        // so its statistical size/aspect is never shrunk by screen bounds.
+        // Composite over the same RGB 114 fill used by the training builder.
+        let gray = CGFloat(114.0 / 255.0)
+        let background = CIImage(
+            color: CIColor(red: gray, green: gray, blue: gray, alpha: 1)
+        ).cropped(to: cropRect)
+        croppedCIImage = ciImage.composited(over: background).cropped(to: cropRect)
     }
     
         

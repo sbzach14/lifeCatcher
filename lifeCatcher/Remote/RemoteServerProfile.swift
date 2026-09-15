@@ -39,23 +39,49 @@ enum RemoteRegion: String, Codable, CaseIterable, Identifiable {
     }
 }
 
-/// Fixed behavior for the recognition role in the remote-only branch.
+enum RecognitionMode: String, CaseIterable, Identifiable {
+    case remote, local
+    var id: String { rawValue }
+    var title: String { self == .remote ? "远程模式" : "本地模式" }
+}
+
 enum RemoteRecognitionPolicy {
-    static let sourceConnectionEnabled = true
-    static let localAudioEnabled = false
-    static let localResultDisplayEnabled = false
-    static let timeMode = 0
+    static var sourceConnectionEnabled: Bool { RemotePreferences.recognitionMode == .remote }
+    static var localAudioEnabled: Bool { RemotePreferences.recognitionMode == .local }
+    static var localResultDisplayEnabled: Bool { RemotePreferences.recognitionMode == .local }
 }
 
 enum RemotePreferenceKeys {
+    static let recognitionMode = "recognition.mode"
     static let sourceRegion = "remote.source.region"
+    static let videoFPS = "remote.video.fps"
+    static let videoResolution = "remote.video.resolution"
     static let receiverRegion = "remote.receiver.region"
     static let receiverLastSerial = "remote.receiver.lastSerial"
     static let clientInstanceId = "remote.client.instanceId"
 }
 
 enum RemotePreferences {
+    // Preserve remote behavior for existing installations and unknown stored values.
+    static var recognitionMode: RecognitionMode {
+        get { RecognitionMode(rawValue: UserDefaults.standard.string(forKey: RemotePreferenceKeys.recognitionMode) ?? "remote") ?? .remote }
+        set { UserDefaults.standard.set(newValue.rawValue, forKey: RemotePreferenceKeys.recognitionMode) }
+    }
+
     static var sourceEnabled: Bool { RemoteRecognitionPolicy.sourceConnectionEnabled }
+
+    static var videoFPS: Int {
+        get {
+            let value = UserDefaults.standard.integer(forKey: RemotePreferenceKeys.videoFPS)
+            return [30, 60].contains(value) ? value : 30
+        }
+        set { UserDefaults.standard.set([30, 60].contains(newValue) ? newValue : 30, forKey: RemotePreferenceKeys.videoFPS) }
+    }
+
+    static var videoResolution: Int {
+        get { UserDefaults.standard.integer(forKey: RemotePreferenceKeys.videoResolution) == 1080 ? 1080 : 720 }
+        set { UserDefaults.standard.set(newValue == 1080 ? 1080 : 720, forKey: RemotePreferenceKeys.videoResolution) }
+    }
 
     static var sourceRegion: RemoteRegion {
         get { RemoteRegion(rawValue: UserDefaults.standard.string(forKey: RemotePreferenceKeys.sourceRegion) ?? "cn") ?? .cn }

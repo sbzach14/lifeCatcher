@@ -82,60 +82,134 @@ struct InfoView: View {
 struct DeprecatedInfoView: View {
     @StateObject var viewModel = SettingViewModel()
     @State private var remoteRegion = RemotePreferences.sourceRegion
+    @AppStorage(RemotePreferenceKeys.recognitionMode) private var recognitionMode = RecognitionMode.remote.rawValue
+    @AppStorage(RemotePreferenceKeys.videoFPS) private var remoteVideoFPS = 30
+    @AppStorage(RemotePreferenceKeys.videoResolution) private var remoteVideoResolution = 720
     
     var body: some View {
+        ScrollView {
         VStack{
-            
-            Divider().colorInvert()
-            
-            HStack {
-                Text("音量上键功能").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
-                
-                Picker("volumeUp", selection: $viewModel.volumeUp) {
-                    ForEach(0...FunctionSetting.volumeUpDict.count - 1, id: \.self){
-                        index in Text(FunctionSetting.volumeUpDict[index]!).tag(index)
+            Picker("识别模式", selection: $recognitionMode) {
+                ForEach(RecognitionMode.allCases) { mode in Text(mode.title).tag(mode.rawValue) }
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal)
+
+            NavigationLink(recognitionMode == RecognitionMode.remote.rawValue
+                           ? "帧率测试（LiveKit \(remoteVideoResolution == 1080 ? 1080 : 720)p / \([30, 60].contains(remoteVideoFPS) ? remoteVideoFPS : 30) FPS ＋ CLS）"
+                           : "帧率测试（本地 CLS）") {
+                FrameRateTestView(
+                    isBackCamera: viewModel.isBackCamera,
+                    remoteEnabled: recognitionMode == RecognitionMode.remote.rawValue,
+                    remoteVideoFPS: [30, 60].contains(remoteVideoFPS) ? remoteVideoFPS : 30,
+                    remoteVideoResolution: remoteVideoResolution == 1080 ? 1080 : 720
+                )
+            }
+            .padding()
+
+            if recognitionMode == RecognitionMode.local.rawValue {
+                HStack {
+                    Text("播报设备").foregroundColor(.white)
+                    Spacer()
+                    Picker("播报设备", selection: $viewModel.voiceDevice) {
+                        Text("扬声器").tag(0)
+                        Text("耳机").tag(1)
+                    }.pickerStyle(.menu)
+                }.padding(.horizontal)
+                HStack {
+                    Text("播报音量").foregroundColor(.white)
+                    Slider(value: $viewModel.volumeValue, in: 0...1)
+                }.padding(.horizontal)
+                HStack {
+                    Text("播报语速").foregroundColor(.white)
+                    Slider(value: $viewModel.voiceRate, in: 0...1)
+                }.padding(.horizontal)
+                HStack {
+                    Text("时间显示").foregroundColor(.white)
+                    Spacer()
+                    Picker("时间显示", selection: $viewModel.timeMode) {
+                        Text("无").tag(0)
+                        Text("HH:MM").tag(1)
+                        Text("HH:MM:SS").tag(2)
+                    }.pickerStyle(.menu)
+                }.padding(.horizontal)
+                Divider().colorInvert()
+
+                HStack {
+                    Text("音量上键功能").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
+                    Picker("volumeUp", selection: $viewModel.volumeUp) {
+                        ForEach(0...FunctionSetting.volumeUpDict.count - 1, id: \.self){
+                            index in Text(FunctionSetting.volumeUpDict[index]!).tag(index)
+                        }
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                    .frame(width: 200, height: 30, alignment: .trailing)
+                    .padding(.trailing,30)
+                }
+                Divider().colorInvert()
+
+                HStack {
+                    Text("音量下键功能").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
+                    Picker("volumeDown", selection: $viewModel.volumeDown) {
+                        ForEach(0...FunctionSetting.volumeDownDict.count - 1, id: \.self){
+                            index in Text(FunctionSetting.volumeDownDict[index]!).tag(index)
+                        }
+                    }
+                    .pickerStyle(MenuPickerStyle())
+                    .frame(width: 200, height: 30, alignment: .trailing)
+                    .padding(.trailing,30)
+                }
+                Divider().colorInvert()
+            } else {
+                Divider().colorInvert()
+                HStack {
+                    Text("显示帧率").foregroundColor(.white).padding(.leading, 20)
+                    Spacer()
+                    Picker("显示帧率", selection: $remoteVideoFPS) {
+                        Text("30 FPS").tag(30)
+                        Text("60 FPS").tag(60)
+                    }
+                    .pickerStyle(.menu)
+                    .padding(.trailing, 30)
+                    .onChange(of: remoteVideoFPS) { _, value in
+                        RemotePreferences.videoFPS = value
                     }
                 }
-                .pickerStyle(MenuPickerStyle())
-                .frame(width: 200, height: 30, alignment: .trailing)
-                .padding(.trailing,30) // 右侧间距
-            }
-            Divider().colorInvert()
-
-            HStack {
-                Text("连接服务器").foregroundColor(.white).padding(.leading, 20)
-                Spacer()
-                Picker("连接服务器", selection: $remoteRegion) {
-                    ForEach(RemoteRegion.allCases) { region in Text(region.title).tag(region) }
-                }
-                .pickerStyle(.menu)
-                .padding(.trailing, 30)
-                .onChange(of: remoteRegion) { _, value in
-                    RemotePreferences.sourceRegion = value
-                    RemoteDiagnostics.record(
-                        value.isConfigured ? .info : .warning,
-                        category: "settings",
-                        message: value.isConfigured ? "已选择\(value.title)：\(value.endpointDescription)" : "\(value.title) IP 尚未配置",
-                        toast: true
-                    )
-                }
-            }
-
-            Divider().colorInvert()
-
-            HStack {
-                Text("音量下键功能").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
-                
-                Picker("volumeDown", selection: $viewModel.volumeDown) {
-                    ForEach(0...FunctionSetting.volumeDownDict.count - 1, id: \.self){
-                        index in Text(FunctionSetting.volumeDownDict[index]!).tag(index)
+                Divider().colorInvert()
+                HStack {
+                    Text("送帧分辨率").foregroundColor(.white).padding(.leading, 20)
+                    Spacer()
+                    Picker("送帧分辨率", selection: $remoteVideoResolution) {
+                        Text("720p").tag(720)
+                        Text("1080p").tag(1080)
+                    }
+                    .pickerStyle(.menu)
+                    .padding(.trailing, 30)
+                    .onChange(of: remoteVideoResolution) { _, value in
+                        RemotePreferences.videoResolution = value
                     }
                 }
-                .pickerStyle(MenuPickerStyle())
-                .frame(width: 200, height: 30, alignment: .trailing)
-                .padding(.trailing,30) // 右侧间距
+                Divider().colorInvert()
+                HStack {
+                    Text("连接服务器").foregroundColor(.white).padding(.leading, 20)
+                    Spacer()
+                    Picker("连接服务器", selection: $remoteRegion) {
+                        ForEach(RemoteRegion.allCases) { region in Text(region.title).tag(region) }
+                    }
+                    .pickerStyle(.menu)
+                    .padding(.trailing, 30)
+                    .onChange(of: remoteRegion) { _, value in
+                        RemotePreferences.sourceRegion = value
+                        RemoteDiagnostics.record(
+                            value.isConfigured ? .info : .warning,
+                            category: "settings",
+                            message: value.isConfigured ? "已选择\(value.title)：\(value.endpointDescription)" : "\(value.title) IP 尚未配置",
+                            toast: true
+                        )
+                    }
+                }
+                Divider().colorInvert()
             }
-            Divider().colorInvert()
             
             HStack {
                 Text("屏幕显示").foregroundColor(.white).padding(.leading, 20).frame(maxWidth: .infinity, alignment: .leading)
@@ -166,11 +240,8 @@ struct DeprecatedInfoView: View {
             
             Spacer()
         }
-        .onAppear {
-            viewModel.timeMode = RemoteRecognitionPolicy.timeMode
         }
         .onDisappear{
-            viewModel.timeMode = RemoteRecognitionPolicy.timeMode
             viewModel.updateConfigJSON()
         }
         .background(

@@ -17,7 +17,33 @@ import MediaPlayer
 
 /// - Tag: ViewModel
 class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCaptureVideoDataOutputSampleBufferDelegate, AVAudioPlayerDelegate{
-    
+
+    /// ROI routing follows the action currently being recognized rather than
+    /// only the modes enabled in the saved rule. Horizontal shuffle and its
+    /// cut phase remain distinct states but share one dynamic geometry.
+    private enum TargetAreaScenario: Equatable {
+        case standard
+        case horizontalShuffle
+        case horizontalShuffleCut
+    }
+
+    /// Horizontal-shuffle classification uses one geometry contract in both
+    /// orientations. Landscape treats X as along; portrait swaps the axes.
+    private let horizontalShuffleROIAspect: Float = 16.0 / 9.0
+    private let horizontalShuffleROIAreaFactor: Float = 90.0
+    private let horizontalShuffleROIPairSpanFactor: Float = 1.5
+    /// Calibrated on all 1,631 retained 0813/0814 M2 pairs after phone-axis
+    /// canonicalization. The observed cross-offset/mean-cross-size maximum is
+    /// 1.3247; 1.5 keeps 13% headroom without weakening the along-axis gate.
+    private let horizontalShufflePostureCrossOffsetLimit: Float = 1.5
+
+    private struct HorizontalShufflePixelBox {
+        let centerAlong: Float
+        let centerCross: Float
+        let sizeAlong: Float
+        let sizeCross: Float
+    }
+
     public static let context = CIContext()
     @MainActor private var remoteSourceBridge: RemoteSourceBridge?
     private var lastRemoteFrameTimestamp = CMTime.invalid
@@ -38,6 +64,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     @Published var cutShowArray : [Int] = []
     
     let detectModel = try! detect_0903()
+    let horizontalShuffleModel = try! cls_20260915_texas()
     let clsModel_h = try! cls_1215_h()
     let clsModel_v = try! cls_1215_v()
 //    let clsModel_h = try! cls_0715_h_trans()
@@ -62,6 +89,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     let backgroundQueue = DispatchQueue(label: "actionQueue", attributes: .concurrent)
     let saveImageQueue = DispatchQueue(label: "saveImageQueue", qos: .userInteractive, attributes: .concurrent)
     let detectionQueue = DispatchQueue(label: "detectionQueue", attributes: .concurrent)
+    private var recognitionGeneration = 0
+    private var requiresPairForNextRecognition = false
+    private var remoteRecomputableDeck: [Int] = []
     
     let lock = NSLock()
     
@@ -115,6 +145,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     var initTargetArea: [Float] = [0, 0, 0, 0]
     var isTargetArea : Bool = false
     var isDetect: Bool = false
+    private var activeTargetAreaScenario: TargetAreaScenario = .standard
     
     //显示帧率
     private var frameCount = 0
@@ -225,7 +256,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             self.volumeDown = intDict["volumeDown"]!
             self.blackMode = intDict["blackMode"]!
             self.voiceDevice = intDict["voiceDevice"]!
-            self.timeMode = RemoteRecognitionPolicy.timeMode
+            self.timeMode = RemoteRecognitionPolicy.localResultDisplayEnabled ? intDict["timeMode"]! : 0
             self.addCardMode = intDict["addCardMode"]!
             
             
@@ -286,10 +317,74 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     self.remoteReceiverPresence = receiver
                     self.remoteDesktopPresence = desktop
                 }
+                bridge.onAwaitShuffleCommand = { [weak self] in
+                    self?.resetToAwaitingShuffle()
+                }
+                bridge.onRecomputeCutCommand = { [weak self] cutCard in
+                    self?.recomputeRemoteResult(cutCard: cutCard)
+                }
                 self.remoteSourceBridge = bridge
             }
             self.remoteSourceBridge?.startIfEnabled()
         }
+    }
+
+    /// Resets only the current recognition session and keeps the selected rule/camera configuration.
+    @MainActor
+    func resetToAwaitingShuffle() {
+        stopCurrentAudio()
+        speechPerformer.stopSpeechSynthesis()
+        isWorking = true
+        isShowSingleFeature = false
+        isCamereSetting = false
+        reloadingTime = 0
+        detectNeedToCut = false
+        requiresPairForNextRecognition = true
+        remoteRecomputableDeck = []
+        initShuffle()
+        initDetectResult()
+        initBoxes()
+        recognitionGeneration += 1
+        state = "idle"
+        changeCameraFrameRate(to: idleRate)
+        RemoteDiagnostics.record(.success, category: "source", message: "识别端已切换为待洗牌", toast: true)
+    }
+
+    /// Replaces the most recent visually recognized cut card and reruns the
+    /// existing rule/report pipeline from the untouched recognized deck.
+    @MainActor
+    func recomputeRemoteResult(cutCard: Int) {
+        guard RemotePreferences.sourceEnabled else { return }
+        guard ((0...51).contains(cutCard) || cutCard == 53 || cutCard == 54),
+              let cutIndex = remoteRecomputableDeck.firstIndex(of: cutCard) else {
+            RemoteDiagnostics.record(.error, category: "source", message: "无法更正切牌：牌不在当前识别牌序中", toast: true)
+            return
+        }
+
+        stopCurrentAudio()
+        speechPerformer.stopSpeechSynthesis()
+        singlefeatureArray = remoteRecomputableDeck
+
+        let configuredCutMode = cutMode[shuffleOrRiffle]
+        let corrected: cutStruct
+        switch configuredCutMode {
+        case 2, 5:
+            let topIndex = cutIndex == 0 ? singlefeatureArray.count - 1 : cutIndex - 1
+            corrected = cutStruct(cutcardIndex: singlefeatureArray[topIndex], cutMode: 1)
+        case 4:
+            corrected = cutStruct(cutcardIndex: cutCard, cutMode: 4)
+        default:
+            let existingMode = cutStructArray.last?.cutMode ?? 0
+            corrected = cutStruct(cutcardIndex: cutCard, cutMode: existingMode)
+        }
+
+        if cutStructArray.isEmpty { cutStructArray = [corrected] }
+        else { cutStructArray[cutStructArray.count - 1] = corrected }
+        if cutShowArray.isEmpty { cutShowArray = [cutCard] }
+        else { cutShowArray[cutShowArray.count - 1] = cutCard }
+
+        computeWinnerRC(isReset: true)
+        RemoteDiagnostics.record(.success, category: "source", message: "已按更正切牌重新计算并发送结果", toast: true)
     }
 
     func stopRemoteSource() {
@@ -353,6 +448,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         lastBoxes = [[0.02, 0.02, 0.01, 0.01], [0.98, 0.98, 0.02, 0.02]]
         targetArea = [0,0,0,0]
         initTargetArea = [0, 0, 0, 0]
+        activeTargetAreaScenario = .standard
         imageSize[0] = min(originSize[0], originImageSize[0] * (1 + self.zoomFactor * self.maxZoomScale))
         imageSize[1] = min(originSize[1], originImageSize[1] * (1 + self.zoomFactor * self.maxZoomScale))
         isTargetArea = false
@@ -394,12 +490,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             for input in session.inputs {
                 session.removeInput(input)
             }
-            
+
             // 移除所有的输出
             for output in session.outputs {
                 session.removeOutput(output)
             }
-            
+
             session.addInput(captureDeviceInput!)
             
             
@@ -720,9 +816,11 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!
         let remoteTimestamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
         let remoteDelta = lastRemoteFrameTimestamp.isValid ? CMTimeSubtract(remoteTimestamp, lastRemoteFrameTimestamp).seconds : .infinity
-        if RemotePreferences.sourceEnabled && (!lastRemoteFrameTimestamp.isValid || remoteDelta < 0 || remoteDelta >= (1.0 / 30.0)) {
+        let remoteVideoInterval = 1.0 / Double(RemotePreferences.videoFPS)
+        if RemotePreferences.sourceEnabled && (!lastRemoteFrameTimestamp.isValid || remoteDelta < 0 || remoteDelta >= remoteVideoInterval) {
             lastRemoteFrameTimestamp = remoteTimestamp
-            Task { @MainActor [weak self] in self?.remoteSourceBridge?.offerVideoFrame(sampleBuffer) }
+            let remoteFrame = RemoteVideoFrame(pixelBuffer: pixelBuffer, timestamp: remoteTimestamp)
+            Task { @MainActor [weak self] in self?.remoteSourceBridge?.offerVideoFrame(remoteFrame) }
         }
         
         // 保存最新的一帧
@@ -731,7 +829,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         let ciImage = CIImage(cvPixelBuffer: pixelBuffer)
         
         let isTargetArea = self.isTargetArea
-        var targetArea = Array(self.targetArea)
+        let targetArea = Array(self.targetArea)
+        let targetAreaScenario = self.activeTargetAreaScenario
+        let isCameraHorizon = self.isCameraHorizon
+        let recognitionGeneration = self.recognitionGeneration
     
         
         if self.isWorking{
@@ -742,12 +843,28 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     if isTargetArea{
                         let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: self.inputSize[0], height: self.inputSize[1]), targetArea: targetArea)!
                         
-                        self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex, isTargetArea: isTargetArea, targetArea: targetArea)
+                        self.processImageOrigin(
+                            cvPixelBuffer,
+                            taskIndex: myIndex,
+                            isTargetArea: isTargetArea,
+                            targetArea: targetArea,
+                            targetAreaScenario: targetAreaScenario,
+                            isCameraHorizon: isCameraHorizon,
+                            recognitionGeneration: recognitionGeneration
+                        )
                     }
                     else{
                         let cvPixelBuffer = createCVPixelBuffer(ciImage: ciImage, targetSize: CGSize(width: self.detectSize[0], height: self.detectSize[1]), targetArea: targetArea)!
                         
-                        self.processImageOrigin(cvPixelBuffer, taskIndex: myIndex, isTargetArea: isTargetArea, targetArea: targetArea)
+                        self.processImageOrigin(
+                            cvPixelBuffer,
+                            taskIndex: myIndex,
+                            isTargetArea: isTargetArea,
+                            targetArea: targetArea,
+                            targetAreaScenario: targetAreaScenario,
+                            isCameraHorizon: isCameraHorizon,
+                            recognitionGeneration: recognitionGeneration
+                        )
                     }
                 }
             }
@@ -756,7 +873,15 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         
     }
     
-    func processImageOrigin(_ pixelBuffer: CVPixelBuffer, taskIndex: Int, isTargetArea: Bool, targetArea: [Float]){
+    private func processImageOrigin(
+        _ pixelBuffer: CVPixelBuffer,
+        taskIndex: Int,
+        isTargetArea: Bool,
+        targetArea: [Float],
+        targetAreaScenario: TargetAreaScenario,
+        isCameraHorizon: Bool,
+        recognitionGeneration: Int
+    ){
         
         let detectConfidenceThreshold:Float = 0.8
         let detectConfidenceMinThreshold:Float = 0.5
@@ -774,33 +899,79 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         var singlefeatureResult : [DetectionResult]
         var uniqueNum : Int
         if !isTargetArea{
-            if self.shuffleMode[0] != 0{
+            if self.shuffleMode[0] == 1{
                 let result = try! self.detectModel.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: Double(confidenceThreshold))
-                (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: false)
+                (singlefeatureResult, uniqueNum) = getSingleFeature(
+                    from: result.confidence,
+                    from: result.coordinates,
+                    from: pixelBuffer,
+                    from: false,
+                    isCameraHorizon: isCameraHorizon
+                )
             }
             else{
                 let result = try! self.riffleDetectModel.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: Double(confidenceThreshold))
-                (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: false)
+                (singlefeatureResult, uniqueNum) = getSingleFeature(
+                    from: result.confidence,
+                    from: result.coordinates,
+                    from: pixelBuffer,
+                    from: false,
+                    isCameraHorizon: isCameraHorizon
+                )
             }
         }
-        else if self.isCameraHorizon{
+        else if self.shuffleMode[0] == 2 {
+            let result = try! self.horizontalShuffleModel.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
+            (singlefeatureResult, uniqueNum) = getSingleFeature(
+                from: result.confidence,
+                from: result.coordinates,
+                from: pixelBuffer,
+                from: true,
+                isCameraHorizon: isCameraHorizon
+            )
+        }
+        else if isCameraHorizon{
             if self.shuffleMode[0] != 0{
                 let result = try! self.clsModel_h.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
-                (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: true)
+                (singlefeatureResult, uniqueNum) = getSingleFeature(
+                    from: result.confidence,
+                    from: result.coordinates,
+                    from: pixelBuffer,
+                    from: true,
+                    isCameraHorizon: isCameraHorizon
+                )
             }
             else{
                 let result = try! self.riffleModel_h.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
-                (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: true)
+                (singlefeatureResult, uniqueNum) = getSingleFeature(
+                    from: result.confidence,
+                    from: result.coordinates,
+                    from: pixelBuffer,
+                    from: true,
+                    isCameraHorizon: isCameraHorizon
+                )
             }
         }
         else{
             if self.shuffleMode[0] != 0{
                 let result = try! self.clsModel_v.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
-                (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: true)
+                (singlefeatureResult, uniqueNum) = getSingleFeature(
+                    from: result.confidence,
+                    from: result.coordinates,
+                    from: pixelBuffer,
+                    from: true,
+                    isCameraHorizon: isCameraHorizon
+                )
             }
             else{
                 let result = try! self.riffleModel_v.prediction(image: pixelBuffer, iouThreshold: iou, confidenceThreshold: 0.05)
-                (singlefeatureResult, uniqueNum) = getSingleFeature(from: result.confidence, from: result.coordinates, from: pixelBuffer, from: true)
+                (singlefeatureResult, uniqueNum) = getSingleFeature(
+                    from: result.confidence,
+                    from: result.coordinates,
+                    from: pixelBuffer,
+                    from: true,
+                    isCameraHorizon: isCameraHorizon
+                )
             }
         }
         
@@ -814,6 +985,18 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 //        singlefeatureResult = getSingleFeature(from: confidence, from: coordinates, from: pixelBuffer)
         
         DispatchQueue.main.async{ [self] in
+            guard recognitionGeneration == self.recognitionGeneration else { return }
+            // Concurrent inference may finish after the user/session has
+            // switched orientation or after ROI routing moved to another
+            // scenario. Such a frame was produced by a different geometry
+            // contract and must not mutate the current recognition state.
+            guard isCameraHorizon == self.isCameraHorizon else {
+                return
+            }
+            if isTargetArea
+                && targetAreaScenario != self.activeTargetAreaScenario {
+                return
+            }
             
             if self.state == "idle"{
                 if singlefeatureResult[0].singlefeatureIndex[0] == self.stateSingleFeature[0]
@@ -852,8 +1035,13 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 else{
                     self.detectNeedToCut = false
                 }
-                if ((detectNum == 1 && (self.shuffleMode[1] != 0 || self.detectNeedToCut))
-                    || (detectNum == 2 && (self.shuffleMode[0] != 0 || self.detectNeedToCut))) && stateCounter >= 1{
+                let entryMatchesRequestedTarget = self.requiresPairForNextRecognition
+                    ? (detectNum == 2 && self.shuffleMode[0] != 0)
+                    : ((detectNum == 1 && (self.shuffleMode[1] != 0
+                                        || self.detectNeedToCut
+                                        || self.shuffleMode[0] == 2))
+                       || (detectNum == 2 && (self.shuffleMode[0] != 0 || self.detectNeedToCut)))
+                if entryMatchesRequestedTarget && stateCounter >= 1{
                     
                     self.reloadingTime = 0.2
                     
@@ -869,7 +1057,19 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         stateResult.append(singlefeatureResult[1].coordinate)
                     }
                     
-                    self.targetArea = self.computeTargetArea(stateResult: stateResult)
+                    self.activeTargetAreaScenario = self.resolveTargetAreaScenario(boxCount: stateResult.count)
+                    self.targetArea = self.computeTargetArea(
+                        stateResult: stateResult,
+                        scenario: self.activeTargetAreaScenario,
+                        isCameraHorizon: isCameraHorizon
+                    )
+                    guard self.targetArea[2] > 0, self.targetArea[3] > 0 else {
+                        // Geometry could not produce a valid crop. Stay on
+                        // full-frame Detect rather than silently clipping a
+                        // target in the classifier input.
+                        self.activeTargetAreaScenario = .standard
+                        return
+                    }
                     self.isTargetArea = true
                     
                     if(detectNum == 2 && self.shuffleMode[0] != 0){
@@ -878,13 +1078,17 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         //这个范围需要够大，使切牌不响
                         //这个范围需要够小，能识别出正常洗牌
                         //即切牌两个框范围<判定范围<洗牌正常识别范围
-                        if !self.judgeCutRange(stateResult: stateResult){
+                        if !self.judgeCutRange(
+                            stateResult: stateResult,
+                            isCameraHorizon: isCameraHorizon
+                        ){
                             self.initTargetArea = self.targetArea
                             self.speakText(input: 0)
                             self.speechPerformer.stopSpeechSynthesis()
                         }
                     }
                     
+                    self.requiresPairForNextRecognition = false
                     self.state = "detecting"
                     
                     self.changeCameraFrameRate(to: Int(self.setFrameRate))
@@ -925,7 +1129,19 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     minDetectConfidence = leftConfidence
                 }
                 
-                if self.shuffleMode[0] != 0
+                if case .horizontalShuffle = targetAreaScenario,
+                    self.state == "detecting"{
+                    // A reliable first pile is the anchor used to search for
+                    // the other horizontal-shuffle pile. Do not discard this
+                    // ROI merely because the second pile has not appeared yet.
+                    if detectNum == 0 || detectConfidence < confidenceThreshold {
+                        self.stateCounter += 1
+                    }
+                    else {
+                        self.stateCounter = 0
+                    }
+                }
+                else if self.shuffleMode[0] != 0
                     && self.shuffleMode[1] == 0
                     && (detectNum < 2 || minDetectConfidence < confidenceThreshold)
                     && self.state == "detecting"{
@@ -956,13 +1172,27 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 if singlefeatureResult[1].singlefeatureIndex[0] != -1{
                     stateResult.append(singlefeatureResult[1].coordinate)
                 }
-                self.targetArea = self.updateTargetArea(coordinates: stateResult, targetArea: targetArea)
+                let nextTargetArea = self.updateTargetArea(
+                    coordinates: stateResult,
+                    targetArea: targetArea,
+                    scenario: targetAreaScenario,
+                    isCameraHorizon: isCameraHorizon
+                )
+                guard nextTargetArea[2] > 0, nextTargetArea[3] > 0 else {
+                    self.targetArea = [0, 0, 0, 0]
+                    self.isTargetArea = false
+                    self.activeTargetAreaScenario = .standard
+                    return
+                }
+                self.targetArea = nextTargetArea
                 
                 let isShuffle = detectNum == 2 && self.shuffleMode[0] != 0 && !isSame
                 let isRiffle = detectNum == 1 && self.shuffleMode[1] != 0
                 
-                let isCut = detectConfidence >= detectConfidenceThreshold
-                                && self.detectNeedToCut
+                let isCut = detectNum == 1
+                    && uniqueNum == 1
+                    && detectConfidence >= detectConfidenceThreshold
+                    && self.detectNeedToCut
                 
                 if isCut{
                     self.initTargetArea = [0,0,0,0]
@@ -970,7 +1200,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     
                     if self.usedSingleFeatures.contains(detectSingleFeature)
                         && self.recgReport
-                        && (self.cutMode[self.shuffleOrRiffle] != 3 || self.continueCutTimeCounter >= self.continueMaxCutTime)
+                        && (![3, 5].contains(self.cutMode[self.shuffleOrRiffle]) || self.continueCutTimeCounter >= self.continueMaxCutTime)
                         && self.specialCard[self.shuffleOrRiffle] == 0{
 //                        self.stateCounter = 100
 //                        self.state = "waitingEnd"
@@ -1021,6 +1251,17 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             isCutDone = true
                             self.cutShowArray.append(detectSingleFeature)
                             
+                            self.continueCutTimeCounter = 0
+                        }
+                        else if self.cutMode[self.shuffleOrRiffle] == 5{
+                            // 连续看顶：每次照到的牌都指向它在当前牌序中的前一张。
+                            cutIndex -= 1
+                            if cutIndex < 0 {
+                                cutIndex = self.singlefeatureArray.count - 1
+                            }
+                            self.cutStructArray.append(cutStruct(cutcardIndex: self.singlefeatureArray[cutIndex], cutMode: 1))
+                            isCutDone = true
+                            self.cutShowArray.append(detectSingleFeature)
                             self.continueCutTimeCounter = 0
                         }
                         else if self.cutMode[self.shuffleOrRiffle] == 4{
@@ -1107,7 +1348,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     if leftDetectSingleFeature == self.stateSingleFeature[0]
                         && rightDetectSingleFeature == self.stateSingleFeature[1]
                         && uniqueNum == 2
-                        && shufflePostureJudge(coordinates: [singlefeatureResult[0].coordinate, singlefeatureResult[1].coordinate]){
+                        && shufflePostureJudge(
+                            coordinates: [singlefeatureResult[0].coordinate, singlefeatureResult[1].coordinate],
+                            coordinateTargetArea: targetArea,
+                            scenario: targetAreaScenario,
+                            isCameraHorizon: isCameraHorizon
+                        ){
                         self.shuffleStartCounter += 1
                     }
                     else{
@@ -1117,10 +1363,17 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     if self.shuffleStartCounter >= 3{
                         self.isDetect = true
                         self.detectNeedToCut = false
+                        if self.shuffleMode[0] == 2 {
+                            self.activeTargetAreaScenario = .horizontalShuffle
+                        }
                         self.state = "shuffle"
                         print("状态：进入洗牌")
                         
-                        if self.targetAreaMove(initTargetArea: self.initTargetArea, targetArea: targetArea){
+                        if self.targetAreaMove(
+                            initTargetArea: self.initTargetArea,
+                            targetArea: targetArea,
+                            isCameraHorizon: isCameraHorizon
+                        ){
                             self.speakText(input: 0)
                             self.speechPerformer.stopSpeechSynthesis()
                         }
@@ -1129,7 +1382,11 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     }
                 }
                 
-                if self.isDetect && self.state == "shuffle" && self.targetAreaMove(initTargetArea: self.initTargetArea, targetArea: targetArea) && self.detectSet.count < 5{
+                if self.isDetect && self.state == "shuffle" && self.targetAreaMove(
+                    initTargetArea: self.initTargetArea,
+                    targetArea: targetArea,
+                    isCameraHorizon: isCameraHorizon
+                ) && self.detectSet.count < 5{
                     self.shuffleResetCounter += 1
                 }
                 else if self.isDetect && self.state == "shuffle" && (detectNum != 2 || minDetectConfidence < confidenceThreshold) && self.detectSet.count < 5{
@@ -1157,6 +1414,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         && self.state == "riffle"
                         && leftDetectSingleFeature == self.stateSingleFeature[0]
                         && rightDetectSingleFeature == self.stateSingleFeature[1]{
+                        if self.shuffleMode[0] == 2 {
+                            self.activeTargetAreaScenario = .horizontalShuffle
+                        }
                         self.state = "shuffle"
                     }
                     
@@ -1183,7 +1443,19 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     if self.state == "shuffle" && leftDetectSingleFeature != -1 && rightDetectSingleFeature != -1{
                         stateResult.append(singlefeatureResult[0].coordinate)
                         stateResult.append(singlefeatureResult[1].coordinate)
-                        self.targetArea = self.updateTargetArea(coordinates: stateResult, targetArea: targetArea)
+                        let nextTargetArea = self.updateTargetArea(
+                            coordinates: stateResult,
+                            targetArea: targetArea,
+                            scenario: targetAreaScenario,
+                            isCameraHorizon: isCameraHorizon
+                        )
+                        guard nextTargetArea[2] > 0, nextTargetArea[3] > 0 else {
+                            self.targetArea = [0, 0, 0, 0]
+                            self.isTargetArea = false
+                            self.activeTargetAreaScenario = .standard
+                            return
+                        }
+                        self.targetArea = nextTargetArea
                     }
                     else if self.state == "riffle" && detectConfidence >= detectConfidenceMinThreshold{
                         if leftDetectSingleFeature != -1{
@@ -1193,7 +1465,19 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             stateResult.append(singlefeatureResult[1].coordinate)
                         }
                         
-                        self.targetArea = self.updateTargetArea(coordinates: stateResult, targetArea: targetArea)
+                        let nextTargetArea = self.updateTargetArea(
+                            coordinates: stateResult,
+                            targetArea: targetArea,
+                            scenario: targetAreaScenario,
+                            isCameraHorizon: isCameraHorizon
+                        )
+                        guard nextTargetArea[2] > 0, nextTargetArea[3] > 0 else {
+                            self.targetArea = [0, 0, 0, 0]
+                            self.isTargetArea = false
+                            self.activeTargetAreaScenario = .standard
+                            return
+                        }
+                        self.targetArea = nextTargetArea
                     }
                 }
             }
@@ -1208,6 +1492,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         self.shuffleOrRiffle = 0
                         self.initShuffle()
                         self.singlefeatureArray = detectState.detectionResult
+                        self.remoteRecomputableDeck = detectState.detectionResult
                         
                         if self.singlefeatureArray.count == self.allSingleFeatureIndex.count{
                             self.speakText(input: 1)
@@ -1231,6 +1516,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         self.shuffleOrRiffle = 1
                         self.initShuffle()
                         self.singlefeatureArray = detectState.detectionResult
+                        self.remoteRecomputableDeck = detectState.detectionResult
                         
                         if self.shuffleMode[1] == 1{
                             //拨到顶
@@ -1279,7 +1565,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     
                     self.quitDetect(reloadingTime: self.reloadingTime)
                 }
-                else if ((detectNum == 1 && (self.shuffleMode[1] != 0 || self.detectNeedToCut))
+                else if ((detectNum == 1 && (self.shuffleMode[1] != 0
+                                             || self.detectNeedToCut
+                                             || self.shuffleMode[0] == 2))
                     || (detectNum == 2 && self.shuffleMode[0] != 0))
                     && self.state != "waitingEnd"{
                     
@@ -1291,17 +1579,33 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         stateResult.append(singlefeatureResult[1].coordinate)
                     }
                     
-                    self.targetArea = self.computeTargetArea(stateResult: stateResult)
+                    self.activeTargetAreaScenario = self.resolveTargetAreaScenario(boxCount: stateResult.count)
+                    self.targetArea = self.computeTargetArea(
+                        stateResult: stateResult,
+                        scenario: self.activeTargetAreaScenario,
+                        isCameraHorizon: isCameraHorizon
+                    )
+                    guard self.targetArea[2] > 0, self.targetArea[3] > 0 else {
+                        self.activeTargetAreaScenario = .standard
+                        return
+                    }
                     self.isTargetArea = true
 
                     if (detectNum == 2 && self.shuffleMode[0] != 0)
-                    && self.targetAreaMove(initTargetArea: self.initTargetArea, targetArea: self.targetArea){
+                    && self.targetAreaMove(
+                        initTargetArea: self.initTargetArea,
+                        targetArea: self.targetArea,
+                        isCameraHorizon: isCameraHorizon
+                    ){
                         //防止切牌语音被重进识别打断
                         //如果两个框距离小于一定范围，不直接响，等洗牌判定再响
                         //这个范围需要够大，使切牌不响
                         //这个范围需要够小，能识别出正常洗牌
                         //即切牌两个框范围<判定范围<洗牌正常识别范围
-                        if !self.judgeCutRange(stateResult: stateResult){
+                        if !self.judgeCutRange(
+                            stateResult: stateResult,
+                            isCameraHorizon: isCameraHorizon
+                        ){
                             self.speakText(input: 0)
                             self.speechPerformer.stopSpeechSynthesis()
                             self.initTargetArea = self.targetArea
@@ -2340,8 +2644,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
     }
     
-    func judgeCutRange(stateResult: [[Float]]) -> Bool{
-        if self.isCameraHorizon{
+    func judgeCutRange(stateResult: [[Float]], isCameraHorizon: Bool) -> Bool{
+        if isCameraHorizon{
             let xDistance = abs(stateResult[0][0] - stateResult[1][0]) - (stateResult[0][2] - stateResult[1][2])/2
             let maxX = max(stateResult[0][2], stateResult[1][2])
             if xDistance < 3 * maxX{
@@ -2365,13 +2669,231 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
     
     // MARK: compute targetArea
-    func computeTargetArea(stateResult: [[Float]])-> [Float]{
+    /// Horizontal shuffle and its follow-up cut actions share the same dynamic
+    /// Texas model: 16:9/9:16 ROI, single area 90× and pair span 1.5×. `detectNeedToCut`
+    /// remains the immediate runtime signal; the saved configuration is also
+    /// checked so a transient reset cannot make an ongoing cut use standard geometry.
+    private func isHorizontalShuffleCutROIPhase() -> Bool {
+        guard self.shuffleMode[0] == 2 else {
+            return false
+        }
+
+        // When shuffle and riffle are both enabled, a deck produced by riffle
+        // must keep the standard riffle/cut distribution. Slot 0 geometry only
+        // applies to a deck produced by shuffle.
+        if !self.singlefeatureArray.isEmpty && self.shuffleOrRiffle != 0 {
+            return false
+        }
+
+        if self.detectNeedToCut {
+            return true
+        }
+
+        guard !self.singlefeatureArray.isEmpty else {
+            return false
+        }
+
+        let hasHorizontalShuffleCutAction = self.cutMode[0] != 0
+            || self.specialCard[0] != 0
+            || self.recgReport
+        return self.isProcessNeedToCut && hasHorizontalShuffleCutAction
+    }
+
+    private func resolveTargetAreaScenario(boxCount _: Int) -> TargetAreaScenario {
+        guard self.shuffleMode[0] == 2 else {
+            return .standard
+        }
+
+        if self.isHorizontalShuffleCutROIPhase() {
+            return .horizontalShuffleCut
+        }
+
+        // A pending cut from a riffle-produced deck belongs to slot 1 and must
+        // retain standard riffle/cut geometry even when horizontal shuffle is
+        // also enabled.
+        if !self.singlefeatureArray.isEmpty
+            && self.shuffleOrRiffle != 0
+            && (self.detectNeedToCut || self.isProcessNeedToCut || self.recgReport) {
+            return .standard
+        }
+
+        // A single box is a horizontal-shuffle search anchor even when riffle
+        // is also enabled. It uses the wide single-box ROI to preserve the
+        // possible second pile; the state machine may consume it as riffle.
+        return .horizontalShuffle
+    }
+
+    func computeTargetArea(stateResult: [[Float]]) -> [Float] {
+        let scenario = resolveTargetAreaScenario(boxCount: stateResult.count)
+        return computeTargetArea(
+            stateResult: stateResult,
+            scenario: scenario,
+            isCameraHorizon: self.isCameraHorizon
+        )
+    }
+
+    private func computeTargetArea(
+        stateResult: [[Float]],
+        scenario: TargetAreaScenario,
+        isCameraHorizon: Bool
+    ) -> [Float] {
+        switch scenario {
+        case .standard:
+            return computeStandardTargetArea(
+                stateResult: stateResult,
+                isCameraHorizon: isCameraHorizon
+            )
+        case .horizontalShuffle, .horizontalShuffleCut:
+            return computeHorizontalShuffleTargetArea(
+                stateResult: stateResult,
+                isCameraHorizon: isCameraHorizon
+            )
+        }
+    }
+
+    private func computeHorizontalShuffleTargetArea(
+        stateResult: [[Float]],
+        isCameraHorizon: Bool
+    ) -> [Float] {
+        let sourceBoxes = Array(stateResult.prefix(2))
+        guard !sourceBoxes.isEmpty else {
+            return [0, 0, 0, 0]
+        }
+
+        let pixelBoxes = sourceBoxes.map { box -> HorizontalShufflePixelBox in
+            if isCameraHorizon {
+                return HorizontalShufflePixelBox(
+                    centerAlong: box[0] * self.originSize[0],
+                    centerCross: box[1] * self.originSize[1],
+                    sizeAlong: box[2] * self.originSize[0],
+                    sizeCross: box[3] * self.originSize[1]
+                )
+            }
+            return HorizontalShufflePixelBox(
+                centerAlong: box[1] * self.originSize[1],
+                centerCross: box[0] * self.originSize[0],
+                sizeAlong: box[3] * self.originSize[1],
+                sizeCross: box[2] * self.originSize[0]
+            )
+        }
+
+        let centerAlong: Float
+        let centerCross: Float
+        if pixelBoxes.count == 1 {
+            centerAlong = pixelBoxes[0].centerAlong
+            centerCross = pixelBoxes[0].centerCross
+        }
+        else {
+            centerAlong = (pixelBoxes[0].centerAlong + pixelBoxes[1].centerAlong) / 2
+            centerCross = (pixelBoxes[0].centerCross + pixelBoxes[1].centerCross) / 2
+        }
+
+        let alongLength: Float
+        if pixelBoxes.count == 1 {
+            let box = pixelBoxes[0]
+            alongLength = sqrt(horizontalShuffleROIAreaFactor
+                * box.sizeAlong * box.sizeCross * horizontalShuffleROIAspect)
+        } else {
+            // Full outer-edge span, centered on the two box centers' midpoint.
+            // Do not reuse the old area-based pair baseline or 90% expansion.
+            let minAlong = pixelBoxes.map { $0.centerAlong - $0.sizeAlong / 2 }.min()!
+            let maxAlong = pixelBoxes.map { $0.centerAlong + $0.sizeAlong / 2 }.max()!
+            alongLength = (maxAlong - minAlong) * horizontalShuffleROIPairSpanFactor
+        }
+        let crossLength = alongLength / horizontalShuffleROIAspect
+
+        guard alongLength > 0, crossLength > 0 else {
+            return [0, 0, 0, 0]
+        }
+
+        let result = makeHorizontalShuffleTargetArea(
+            centerAlong: centerAlong,
+            centerCross: centerCross,
+            alongLength: alongLength,
+            crossLength: crossLength,
+            isCameraHorizon: isCameraHorizon
+        )
+
+        // The statistical size is never changed by the screen. The origin is
+        // shifted toward real pixels and any unavoidable overflow is filled
+        // gray by createCVPixelBuffer, matching the training generator.
+        if !horizontalShuffleTargetArea(result, contains: sourceBoxes) {
+            return [0, 0, 0, 0]
+        }
+        return result
+    }
+
+    private func makeHorizontalShuffleTargetArea(
+        centerAlong: Float,
+        centerCross: Float,
+        alongLength: Float,
+        crossLength: Float,
+        isCameraHorizon: Bool
+    ) -> [Float] {
+        let targetWidth = isCameraHorizon ? alongLength : crossLength
+        let targetHeight = isCameraHorizon ? crossLength : alongLength
+        let requestedCenterX = isCameraHorizon ? centerAlong : centerCross
+        let requestedCenterY = isCameraHorizon ? centerCross : centerAlong
+
+        // Clamp the ROI origin, not the center with an extra inset. This also
+        // handles an along length equal to the full screen without inverted
+        // center bounds or a two-pixel overflow.
+        let originX = fittedHorizontalShuffleOrigin(
+            desired: requestedCenterX - targetWidth / 2,
+            roiSize: targetWidth,
+            frameSize: self.originSize[0]
+        )
+        let originY = fittedHorizontalShuffleOrigin(
+            desired: requestedCenterY - targetHeight / 2,
+            roiSize: targetHeight,
+            frameSize: self.originSize[1]
+        )
+        return [
+            (originX + targetWidth / 2) / self.originSize[0],
+            (originY + targetHeight / 2) / self.originSize[1],
+            targetWidth / self.originSize[0],
+            targetHeight / self.originSize[1]
+        ]
+    }
+
+    private func fittedHorizontalShuffleOrigin(
+        desired: Float,
+        roiSize: Float,
+        frameSize: Float
+    ) -> Float {
+        if roiSize <= frameSize {
+            return max(0, min(desired, frameSize - roiSize))
+        }
+        return max(frameSize - roiSize, min(desired, 0))
+    }
+
+    private func horizontalShuffleTargetArea(
+        _ targetArea: [Float],
+        contains boxes: [[Float]]
+    ) -> Bool {
+        let epsilon: Float = 0.000_01
+        let targetMinX = targetArea[0] - targetArea[2] / 2
+        let targetMaxX = targetArea[0] + targetArea[2] / 2
+        let targetMinY = targetArea[1] - targetArea[3] / 2
+        let targetMaxY = targetArea[1] + targetArea[3] / 2
+        return boxes.allSatisfy { box in
+            targetMinX <= box[0] - box[2] / 2 + epsilon
+                && targetMaxX + epsilon >= box[0] + box[2] / 2
+                && targetMinY <= box[1] - box[3] / 2 + epsilon
+                && targetMaxY + epsilon >= box[1] + box[3] / 2
+        }
+    }
+
+    private func computeStandardTargetArea(
+        stateResult: [[Float]],
+        isCameraHorizon: Bool
+    ) -> [Float]{
         
-        var originBoxes = stateResult
+        let originBoxes = stateResult
         var targetArea:[Float] = [0,0,0,0]
         
-        var w = self.imageSize[0]
-        var h = self.imageSize[1]
+        let w = self.imageSize[0]
+        let h = self.imageSize[1]
         
         var boxfactor:Float = 1.5
         
@@ -2385,7 +2907,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             var minW = (maxX - minX)
             var minH = (maxY - minY)
             
-            if self.isCameraHorizon{
+            if isCameraHorizon{
                 
                 //如果不洗牌 只拨牌
                 if self.shuffleMode[0] == 0 && self.shuffleMode[1] != 0{
@@ -2487,17 +3009,15 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         
         else if originBoxes.count == 2{
+            // 两框的包围区域不依赖左右/上下顺序；ROI 比例始终跟随手机方向。
+            let minX = self.originSize[0] * min(originBoxes[0][0] - originBoxes[0][2] / 2, originBoxes[1][0] - originBoxes[1][2] / 2)
+            let maxX = self.originSize[0] * max(originBoxes[0][0] + originBoxes[0][2] / 2, originBoxes[1][0] + originBoxes[1][2] / 2)
+            let minY = self.originSize[1] * min(originBoxes[0][1] - originBoxes[0][3] / 2, originBoxes[1][1] - originBoxes[1][3] / 2)
+            let maxY = self.originSize[1] * max(originBoxes[0][1] + originBoxes[0][3] / 2, originBoxes[1][1] + originBoxes[1][3] / 2)
+            let centerX = (minX + maxX)/2
+            let centerY = (minY + maxY)/2
             
-            if self.isCameraHorizon
-            {
-                if originBoxes[0][0] > originBoxes[1][0]{
-                    originBoxes.swapAt(0, 1)
-                }
-                
-                let minX = self.originSize[0] * (originBoxes[0][0] - originBoxes[0][2] / 2)
-                let maxX = self.originSize[0] * (originBoxes[1][0] + originBoxes[1][2] / 2)
-                let minY = self.originSize[1] * min(originBoxes[0][1] - originBoxes[0][3] / 2, originBoxes[1][1] - originBoxes[1][3] / 2)
-                let maxY = self.originSize[1] * max(originBoxes[0][1] + originBoxes[0][3] / 2, originBoxes[1][1] + originBoxes[1][3] / 2)
+            if isCameraHorizon{
                 
                 var minW = (maxX - minX)*boxfactor
                 minW = min(minW, self.originSize[0] - 10)
@@ -2507,42 +3027,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 
                 targetArea[2] = max(minW, minH / h * w)
                 targetArea[3] = max(minH, minW / w * h)
-                
-                
-                let centerX = (minX + maxX)/2
-                let centerY = (minY + maxY)/2
-                
-                if centerX + targetArea[2]/2 >= self.originSize[0]{
-                    targetArea[0] = self.originSize[0] - targetArea[2] / 2 - 2
-                }
-                else if centerX - targetArea[2]/2 <= 0{
-                    targetArea[0] = targetArea[2]/2 + 2
-                }
-                else{
-                    targetArea[0] = centerX
-                }
-                
-                if centerY + targetArea[3]/2 >= self.originSize[1]{
-                    targetArea[1] = self.originSize[1] - targetArea[3] / 2 - 2
-                }
-                else if centerY - targetArea[3]/2 <= 0{
-                    targetArea[1] = targetArea[3]/2 + 2
-                }
-                else{
-                    targetArea[1] = centerY
-                }
             }
             else{
-                
-                if originBoxes[0][1] > originBoxes[1][1]{
-                    originBoxes.swapAt(0, 1)
-                }
-                
-                let minY = self.originSize[1] * (originBoxes[0][1] - originBoxes[0][3] / 2)
-                let maxY = self.originSize[1] * (originBoxes[1][1] + originBoxes[1][3] / 2)
-                let minX = self.originSize[0] * min(originBoxes[0][0] - originBoxes[0][2] / 2, originBoxes[1][0] - originBoxes[1][2] / 2)
-                let maxX = self.originSize[0] * max(originBoxes[0][0] + originBoxes[0][2] / 2, originBoxes[1][0] + originBoxes[1][2] / 2)
-                
                 var minW = (maxX - minX)*boxfactor
                 var minH = (maxY - minY)*boxfactor
                 
@@ -2553,30 +3039,26 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 
                 targetArea[2] = minW
                 targetArea[3] = minH
-                
-                
-                let centerX = (minX + maxX)/2
-                let centerY = (minY + maxY)/2
-                
-                if centerX + targetArea[2]/2 >= self.originSize[0]{
-                    targetArea[0] = self.originSize[0] - targetArea[2] / 2 - 2
-                }
-                else if centerX - targetArea[2]/2 <= 0{
-                    targetArea[0] = targetArea[2]/2 + 2
-                }
-                else{
-                    targetArea[0] = centerX
-                }
-                
-                if centerY + targetArea[3]/2 >= self.originSize[1]{
-                    targetArea[1] = self.originSize[1] - targetArea[3] / 2 - 2
-                }
-                else if centerY - targetArea[3]/2 <= 0{
-                    targetArea[1] = targetArea[3]/2 + 2
-                }
-                else{
-                    targetArea[1] = centerY
-                }
+            }
+
+            if centerX + targetArea[2]/2 >= self.originSize[0]{
+                targetArea[0] = self.originSize[0] - targetArea[2] / 2 - 2
+            }
+            else if centerX - targetArea[2]/2 <= 0{
+                targetArea[0] = targetArea[2]/2 + 2
+            }
+            else{
+                targetArea[0] = centerX
+            }
+
+            if centerY + targetArea[3]/2 >= self.originSize[1]{
+                targetArea[1] = self.originSize[1] - targetArea[3] / 2 - 2
+            }
+            else if centerY - targetArea[3]/2 <= 0{
+                targetArea[1] = targetArea[3]/2 + 2
+            }
+            else{
+                targetArea[1] = centerY
             }
         }
         
@@ -2589,7 +3071,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         return targetArea
     }
     
-    func updateTargetArea(coordinates:[[Float]], targetArea:[Float]) -> [Float]{
+    private func updateTargetArea(
+        coordinates: [[Float]],
+        targetArea: [Float],
+        scenario: TargetAreaScenario,
+        isCameraHorizon: Bool
+    ) -> [Float]{
         let targetX = targetArea[0] * self.originSize[0]
         let targetY = targetArea[1] * self.originSize[1]
         let targetW = targetArea[2] * self.originSize[0]
@@ -2615,12 +3102,42 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 stateResult.append([x,y,w,h])
             }
         }
-        
-        return computeTargetArea(stateResult: stateResult)
+
+        // Single-box search/cut ROI is established by the full-frame entry
+        // paths. A missing pile must never shrink a shuffle crop. Use the most
+        // recent crop, not this possibly older concurrent frame's snapshot.
+        // Explicit riffle keeps its existing single-target tracking behavior.
+        switch scenario {
+        case .horizontalShuffle, .horizontalShuffleCut:
+            if stateResult.isEmpty || (stateResult.count == 1 && self.state != "riffle") {
+                return self.targetArea
+            }
+        case .standard:
+            break
+        }
+
+        let nextTargetArea = computeTargetArea(
+            stateResult: stateResult,
+            scenario: scenario,
+            isCameraHorizon: isCameraHorizon
+        )
+        if nextTargetArea[2] == 0 || nextTargetArea[3] == 0 {
+            switch scenario {
+            case .horizontalShuffle, .horizontalShuffleCut:
+                return nextTargetArea
+            case .standard:
+                return targetArea
+            }
+        }
+        return nextTargetArea
     }
     
-    func targetAreaMove(initTargetArea: [Float], targetArea: [Float]) -> Bool{
-        if self.isCameraHorizon{
+    func targetAreaMove(
+        initTargetArea: [Float],
+        targetArea: [Float],
+        isCameraHorizon: Bool
+    ) -> Bool{
+        if isCameraHorizon{
             if abs(initTargetArea[0] - targetArea[0]) > (initTargetArea[2] + targetArea[2]) / 5
                 || abs(initTargetArea[1] - targetArea[1]) > (initTargetArea[3] + targetArea[3]) / 2.5
                 || targetArea[2] / initTargetArea[2] > 1.5
@@ -2634,8 +3151,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         else{
             if abs(initTargetArea[0] - targetArea[0]) > (initTargetArea[2] + targetArea[2]) / 2.5
                 || abs(initTargetArea[1] - targetArea[1]) > (initTargetArea[3] + targetArea[3]) / 5
-                || targetArea[2] / initTargetArea[2] > 1.5
-                || initTargetArea[2] / targetArea[2] > 1.5{
+                || targetArea[3] / initTargetArea[3] > 1.5
+                || initTargetArea[3] / targetArea[3] > 1.5{
                 return true
             }
             else{
@@ -2644,44 +3161,72 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
     }
     
-    func shufflePostureJudge(coordinates:[[Float]]) -> Bool{
-        var isShuffle = false
-        
+    private func shufflePostureJudge(
+        coordinates:[[Float]],
+        coordinateTargetArea: [Float],
+        scenario: TargetAreaScenario,
+        isCameraHorizon: Bool
+    ) -> Bool{
         let w = self.imageSize[0]
         let h = self.imageSize[1]
-        
-        if self.isCameraHorizon{
-            
-            //x间距不能太小 大于最大宽度
-            let xGap = abs(coordinates[0][0] - coordinates[1][0]) * w
-            let maxW = max((coordinates[0][2] + coordinates[1][2]) * w * 1.1 / 2, coordinates[0][3] * h, coordinates[1][3] * h)
-            
-            //y间距不能太大 小于平均高度 / 2
-            let yGap = abs(coordinates[0][1] - coordinates[1][1]) * h
-            let minH = (coordinates[0][3] + coordinates[1][3]) / 4 * h
-            
-            if xGap > maxW && yGap < minH{
-                isShuffle = true
-            }
+        let usesHorizontalShuffleROI: Bool
+        switch scenario {
+        case .horizontalShuffle, .horizontalShuffleCut:
+            usesHorizontalShuffleROI = true
+        case .standard:
+            usesHorizontalShuffleROI = false
         }
-        else{
-            //x间距不能太小 大于最大宽度
-            let xGap = abs(coordinates[0][1] - coordinates[1][1]) * w
-            let maxW = max((coordinates[0][3] + coordinates[1][3]) * w * 1.1 / 2, coordinates[0][2] * h, coordinates[1][2] * h)
-            
-            //y间距不能太大 小于平均高度 / 2
-            let yGap = abs(coordinates[0][0] - coordinates[1][0]) * h
-            let minH = (coordinates[0][2] + coordinates[1][2]) / 4 * h
-            
-            if xGap > maxW && yGap < minH{
-                isShuffle = true
-            }
+        // Classification coordinates are normalized inside the active crop.
+        // Horizontal-shuffle axes are independently data-derived instead of
+        // using the legacy 569:320 canvas. Restore posture distances with the
+        // crop that produced this frame, not the next frame's recomputed crop.
+        let xScale = usesHorizontalShuffleROI
+            ? coordinateTargetArea[2] * self.originSize[0]
+            : (isCameraHorizon ? w : h)
+        let yScale = usesHorizontalShuffleROI
+            ? coordinateTargetArea[3] * self.originSize[1]
+            : (isCameraHorizon ? h : w)
+
+        // The legacy standard-shuffle gate allows a cross-axis centre offset
+        // below half the mean cross-axis box size. That threshold rejects 732
+        // of the 1,631 reviewed horizontal-shuffle pairs, so only the dedicated
+        // horizontal-shuffle scenarios use the calibrated 1.5 multiplier.
+        let crossOffsetLimit = usesHorizontalShuffleROI
+            ? horizontalShufflePostureCrossOffsetLimit
+            : 0.5
+
+        if isCameraHorizon{
+            let alongGap = abs(coordinates[0][0] - coordinates[1][0]) * xScale
+            let minimumAlongGap = max(
+                (coordinates[0][2] + coordinates[1][2]) * xScale * 1.1 / 2,
+                coordinates[0][3] * yScale,
+                coordinates[1][3] * yScale
+            )
+            let crossGap = abs(coordinates[0][1] - coordinates[1][1]) * yScale
+            let meanCrossSize = (coordinates[0][3] + coordinates[1][3]) * yScale / 2
+            return alongGap > minimumAlongGap
+                && crossGap < meanCrossSize * crossOffsetLimit
         }
-        
-        return isShuffle
+
+        let alongGap = abs(coordinates[0][1] - coordinates[1][1]) * yScale
+        let minimumAlongGap = max(
+            (coordinates[0][3] + coordinates[1][3]) * yScale * 1.1 / 2,
+            coordinates[0][2] * xScale,
+            coordinates[1][2] * xScale
+        )
+        let crossGap = abs(coordinates[0][0] - coordinates[1][0]) * xScale
+        let meanCrossSize = (coordinates[0][2] + coordinates[1][2]) * xScale / 2
+        return alongGap > minimumAlongGap
+            && crossGap < meanCrossSize * crossOffsetLimit
     }
 
-    func getSingleFeature(from singlefeatureArray: MLMultiArray, from boxArray : MLMultiArray, from pixelBuffer : CVPixelBuffer, from iscls : Bool) -> ([DetectionResult], Int) {
+    func getSingleFeature(
+        from singlefeatureArray: MLMultiArray,
+        from boxArray: MLMultiArray,
+        from pixelBuffer: CVPixelBuffer,
+        from iscls: Bool,
+        isCameraHorizon: Bool
+    ) -> ([DetectionResult], Int) {
         let cnt : Int = Int(singlefeatureArray.shape[0])
         let n : Int = Int(singlefeatureArray.shape[1])
         var result : [DetectionResult] = []
@@ -2757,10 +3302,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             
             
             if result.count == 2{
-                if self.isCameraHorizon && result[0].coordinate[0] > result[1].coordinate[0]{
+                if isCameraHorizon && result[0].coordinate[0] > result[1].coordinate[0]{
                         result.swapAt(0, 1)
                     }
-            else if !self.isCameraHorizon && result[0].coordinate[1] > result[1].coordinate[1]{
+            else if !isCameraHorizon && result[0].coordinate[1] > result[1].coordinate[1]{
                         result.swapAt(0, 1)
                     }
             }
@@ -2894,17 +3439,17 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             
             if result.count == 2{
                 //横向排列
-                if self.isCameraHorizon && result[0].coordinate[0] > result[1].coordinate[0]{
+                if isCameraHorizon && result[0].coordinate[0] > result[1].coordinate[0]{
                         result.swapAt(0, 1)
                     }
                 //纵向排列
-                else if !self.isCameraHorizon && result[0].coordinate[1] > result[1].coordinate[1]{
+                else if !isCameraHorizon && result[0].coordinate[1] > result[1].coordinate[1]{
                         result.swapAt(0, 1)
                     }
             }
             else if result.count == 1{
                 if self.state == "shuffle"{
-                    if self.isCameraHorizon{
+                    if isCameraHorizon{
                         if result[0].coordinate[0] > self.centerPos[0]{
                             result.insert(DetectionResult(singlefeatureIndex: [-1], confidence: [0.001], confidencePercent: 0, coordinate: lastBoxes[0], laplacianVariance: 0), at: 0)
                         }
@@ -2983,6 +3528,14 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
         else if self.cutMode[self.shuffleOrRiffle] == 4{
             self.cutStructArray.append(cutStruct(cutcardIndex: cutSingleFeature, cutMode: 4))
+            self.cutShowArray.append(cutSingleFeature)
+        }
+        else if self.cutMode[self.shuffleOrRiffle] == 5{
+            cutIndex -= 1
+            if cutIndex < 0 {
+                cutIndex = self.singlefeatureArray.count - 1
+            }
+            self.cutStructArray.append(cutStruct(cutcardIndex: self.singlefeatureArray[cutIndex], cutMode: 1))
             self.cutShowArray.append(cutSingleFeature)
         }
         
@@ -3366,6 +3919,33 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         let connectedBluetoothHeadphones = currentRoute.outputs.contains { $0.portType == .bluetoothA2DP }
         return connectedBluetoothHeadphones
     }
+
+    private func combinedShuffleRiffleModeIndex() -> Int {
+        if self.shuffleMode[0] == 2 { return 3 }
+        if self.shuffleMode[1] == 1 { return 1 }
+        if self.shuffleMode[1] == 2 { return 2 }
+        return 0
+    }
+
+    private func setCombinedShuffleRiffleMode(index: Int) {
+        switch index {
+        case 1:
+            self.shuffleMode = [0, 1]
+        case 2:
+            self.shuffleMode = [0, 2]
+        case 3:
+            self.shuffleMode = [2, 0]
+        default:
+            self.shuffleMode = [1, 0]
+        }
+    }
+
+    private func cycleCombinedShuffleRiffleMode(step: Int) {
+        let count = generalRuleSetting.allShuffleRiffleMode.count
+        let nextIndex = (combinedShuffleRiffleModeIndex() + step + count) % count
+        setCombinedShuffleRiffleMode(index: nextIndex)
+        speakText(input: generalRuleSetting.allShuffleRiffleMode[nextIndex]!)
+    }
     
     public func handleTap(isUp: Bool, isSingle: Bool) {
         if isSingle{
@@ -3438,21 +4018,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode[0]]!)
             }
             else{
-                if self.shuffleMode[0] == 1{
-                    self.shuffleMode[0] = 0
-                    self.shuffleMode[1] = 1
-                    speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
-                }
-                else if self.shuffleMode[1] == 1{
-                    self.shuffleMode[0] = 0
-                    self.shuffleMode[1] = 2
-                    speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
-                }
-                else if self.shuffleMode[1] == 2{
-                    self.shuffleMode[0] = 1
-                    self.shuffleMode[1] = 0
-                    speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode[0]]!)
-                }
+                cycleCombinedShuffleRiffleMode(step: 1)
             }
             saveData()
         }
@@ -3465,21 +4031,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
             }
             else{
-                if self.shuffleMode[0] == 1{
-                    self.shuffleMode[0] = 0
-                    self.shuffleMode[1] = 1
-                    speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
-                }
-                else if self.shuffleMode[1] == 1{
-                    self.shuffleMode[0] = 0
-                    self.shuffleMode[1] = 2
-                    speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
-                }
-                else if self.shuffleMode[1] == 2{
-                    self.shuffleMode[0] = 1
-                    self.shuffleMode[1] = 0
-                    speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode[0]]!)
-                }
+                cycleCombinedShuffleRiffleMode(step: 1)
             }
             saveData()
         }
@@ -3581,21 +4133,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode[0]]!)
             }
             else{
-                if self.shuffleMode[0] == 1{
-                    self.shuffleMode[0] = 0
-                    self.shuffleMode[1] = 2
-                    speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
-                }
-                else if self.shuffleMode[1] == 1{
-                    self.shuffleMode[0] = 1
-                    self.shuffleMode[1] = 0
-                    speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
-                }
-                else if self.shuffleMode[1] == 2{
-                    self.shuffleMode[0] = 0
-                    self.shuffleMode[1] = 1
-                    speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode[0]]!)
-                }
+                cycleCombinedShuffleRiffleMode(step: -1)
             }
             saveData()
         }
@@ -3608,21 +4146,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
             }
             else{
-                if self.shuffleMode[0] == 1{
-                    self.shuffleMode[0] = 0
-                    self.shuffleMode[1] = 2
-                    speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
-                }
-                else if self.shuffleMode[1] == 1{
-                    self.shuffleMode[0] = 1
-                    self.shuffleMode[1] = 0
-                    speakText(input: generalRuleSetting.allRiffleMode[self.shuffleMode[1]]!)
-                }
-                else if self.shuffleMode[1] == 2{
-                    self.shuffleMode[0] = 0
-                    self.shuffleMode[1] = 1
-                    speakText(input: generalRuleSetting.allShuffleMode[self.shuffleMode[0]]!)
-                }
+                cycleCombinedShuffleRiffleMode(step: -1)
             }
             saveData()
         }
@@ -3819,7 +4343,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 "volumeDown": self.volumeDown,
                 "blackMode": self.blackMode,
                 "voiceDevice": self.voiceDevice,
-                "timeMode": self.timeMode,
+                "timeMode": RemoteRecognitionPolicy.localResultDisplayEnabled ? self.timeMode : ((readConfigJSON()?["Int"] as? [String: Int])?["timeMode"] ?? 0),
                 "addCardMode": self.addCardMode
             ]
             
@@ -4077,4 +4601,3 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
         // Perform any action you want after speech synthesis finishes
     }
 }
-

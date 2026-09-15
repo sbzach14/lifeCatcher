@@ -242,6 +242,10 @@ struct CurrentVisionObjectRecognitionView: View {
                     }
                     
                     HStack{
+                        if RemoteRecognitionPolicy.localResultDisplayEnabled {
+                            Button("查看结果") { viewModel.isShowSingleFeature = true }
+                                .bubbleBackground()
+                        }
                         Spacer()
                         
                         Button {
@@ -262,7 +266,7 @@ struct CurrentVisionObjectRecognitionView: View {
             Spacer()
         }
         .overlay(alignment: .top) {
-            if !viewModel.isBlack {
+            if RemotePreferences.sourceEnabled && !viewModel.isBlack {
                 RemotePresenceStatusBar(items: [
                     RemotePresenceItem(label: "服务器", state: viewModel.remoteServerPresence),
                     RemotePresenceItem(label: "手机2", state: viewModel.remoteReceiverPresence),

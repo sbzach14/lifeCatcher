@@ -6,7 +6,6 @@ import Localize_Swift
 @main
 struct MyApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
-    @StateObject private var remoteToastCenter = RemoteToastCenter.shared
     
     init(){
         // 创建导航栏外观样式
@@ -25,7 +24,7 @@ struct MyApp: App {
     var body: some Scene {
         WindowGroup {
             MainMenuView()
-                .overlay { RemoteToastHost(center: remoteToastCenter) }
+                .overlay { RemoteToastHost() }
                 .onAppear {
                     Localize.setCurrentLanguage("en")
                     refreshNetworkTime()

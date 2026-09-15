@@ -24,7 +24,8 @@ class generalRuleSetting{
     ]
     static let allShuffleMode: [Int:String] = [
         0:"不洗牌",
-        1:"洗牌"
+        1:"洗牌",
+        2:"横洗"
     ]
     
     static let allRiffleMode: [Int: String] = [
@@ -42,8 +43,9 @@ class generalRuleSetting{
         0:"洗牌",
         1:"拨到顶",
         2:"拨中间",
-//        3:"洗牌+拨到顶",
-//        4:"洗牌+拨中间",
+        3:"横洗",
+//        4:"洗牌+拨到顶",
+//        5:"洗牌+拨中间",
     ]
     
     static let allCutMode: [Int:String] = [
@@ -51,7 +53,8 @@ class generalRuleSetting{
         1:"看底",
         2:"看顶",
         3:"连续看底",
-        4:"看手牌"
+        4:"看手牌",
+        5:"连续看顶"
     ]
     
     static let allSpecialCard: [Int:String] = [
@@ -323,10 +326,10 @@ struct SettingRecordConfigView: View{
                                             .padding(.trailing, 10)
                                             .foregroundColor(.white)
                                     }
-                                    //看色牌不能选连续看底
+                                    // 看色牌只允许无、看底、看顶。
                                     else if ReportManager.allColorSpecialCardReport.contains(self.reportSetting[0]){
                                         Picker("cutMode", selection: $cutMode[0]) {
-                                            ForEach(0...generalRuleSetting.allCutMode.count - 3, id: \.self){
+                                            ForEach([0, 1, 2], id: \.self){
                                                 index in Text(generalRuleSetting.allCutMode[index]!).tag(index)
                                             }
                                         }
@@ -399,7 +402,7 @@ struct SettingRecordConfigView: View{
                                     }
                                     else if ReportManager.allColorSpecialCardReport.contains(self.reportSetting[1]){
                                         Picker("cutMode", selection: $cutMode[1]) {
-                                            ForEach(0...generalRuleSetting.allCutMode.count - 3, id: \.self){
+                                            ForEach([0, 1, 2], id: \.self){
                                                 index in Text(generalRuleSetting.allCutMode[index]!).tag(index)
                                             }
                                         }
@@ -673,8 +676,8 @@ struct SettingRecordConfigView: View{
         //看色牌
         else if ReportManager.allColorSpecialCardReport.contains(self.reportSetting[0]){
             self.specialCard[0] = 2
-            if self.cutMode[0] == 3{
-                self.cutMode[0] = 1 //看色牌情况下把连续看底变成看底
+            if self.cutMode[0] == 3 || self.cutMode[0] == 5{
+                self.cutMode[0] = 1 //看色牌情况下把连续看底/看顶变成看底
             }
             if self.cutMode[0] == 4{
                 self.cutMode[0] = 0 //看色牌情况下把看手变成不切牌
@@ -692,7 +695,7 @@ struct SettingRecordConfigView: View{
         //看色牌
         else if ReportManager.allColorSpecialCardReport.contains(self.reportSetting[1]){
             self.specialCard[1] = 2
-            if self.cutMode[1] == 3{
+            if self.cutMode[1] == 3 || self.cutMode[1] == 5{
                 self.cutMode[1] = 1
             }
             if self.cutMode[1] == 4{
@@ -920,4 +923,3 @@ struct SettingRecordConfigView: View{
         }
     }
 }
-

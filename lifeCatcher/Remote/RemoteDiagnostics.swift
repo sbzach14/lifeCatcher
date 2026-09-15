@@ -119,7 +119,7 @@ enum RemoteDiagnostics {
 }
 
 struct RemoteToastHost: View {
-    @ObservedObject var center: RemoteToastCenter
+    @StateObject private var center = RemoteToastCenter.shared
 
     var body: some View {
         VStack {

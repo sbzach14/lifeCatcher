@@ -119,6 +119,9 @@ struct SettingRecordConfigView_leishen: View{
         else if self.shuffleMode[1] == 2{
             self.shuffleRiffleMode = 2
         }
+        else if self.shuffleMode[0] == 2{
+            self.shuffleRiffleMode = 3
+        }
         else{
             self.shuffleRiffleMode = 0
         }
@@ -415,10 +418,10 @@ struct SettingRecordConfigView_leishen: View{
                                     .foregroundColor(.white)
                                     .font(.system(size: 20))
                             }
-                            //看色牌不能选连续看底和看手牌
+                            // 看色牌只允许无、看底、看顶。
                             else if ReportManager.allColorSpecialCardReport.contains(self.reportSetting[0]){
                                 Picker("cutMode", selection: $cutMode[0]) {
-                                    ForEach(0...generalRuleSetting.allCutMode.count - 3, id: \.self){
+                                    ForEach([0, 1, 2], id: \.self){
                                         index in Text(generalRuleSetting.allCutMode[index]!).tag(index)
                                     }
                                 }
@@ -535,6 +538,10 @@ struct SettingRecordConfigView_leishen: View{
             self.shuffleMode[0] = 0
             self.shuffleMode[1] = 2
         }
+        else if self.shuffleRiffleMode == 3{
+            self.shuffleMode[0] = 2
+            self.shuffleMode[1] = 0
+        }
         
         self.cutMode[1] = self.cutMode[0]
         self.specialCard[1] = self.specialCard[0]
@@ -548,7 +555,7 @@ struct SettingRecordConfigView_leishen: View{
         //看色牌
         else if ReportManager.allColorSpecialCardReport.contains(self.reportSetting[0]){
             self.specialCard[0] = 2
-            if self.cutMode[0] == 3{
+            if self.cutMode[0] == 3 || self.cutMode[0] == 5{
                 self.cutMode[0] = 1 //看色牌情况下把连续看底变成看底
             }
             if self.cutMode[0] == 4{
@@ -567,7 +574,7 @@ struct SettingRecordConfigView_leishen: View{
         //看色牌
         else if ReportManager.allColorSpecialCardReport.contains(self.reportSetting[1]){
             self.specialCard[1] = 2
-            if self.cutMode[1] == 3{
+            if self.cutMode[1] == 3 || self.cutMode[1] == 5{
                 self.cutMode[1] = 1
             }
             if self.cutMode[1] == 4{

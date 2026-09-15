@@ -33,6 +33,11 @@ enum RemotePromptKind: String, Codable {
     case failure
 }
 
+enum RemoteSourceCommand: Equatable {
+    case awaitShuffle
+    case recomputeCut(Int)
+}
+
 struct RemoteUtterance: Codable, Equatable {
     let text: String
     let voiceIntent: RemoteVoiceIntent
@@ -261,11 +266,12 @@ enum RemoteServerMessage: Decodable {
     case receiverDelivery(RemoteReceiverDelivery)
     case forwardingState(Bool)
     case sourceControl(videoWanted: Bool)
+    case sourceCommand(RemoteSourceCommand)
     case pong(clientTimeMs: Int64, serverTimeMs: Int64, resumeToken: String?)
 
     private enum CodingKeys: String, CodingKey {
         case type, requestId, status, sourceEventSeq, deliverySeq, code, message
-        case online, state, sourceSessionId, event, replayed, historySeq, enabled, videoWanted
+        case online, state, sourceSessionId, event, replayed, historySeq, enabled, videoWanted, command, cutCard
         case clientTimeMs, serverTimeMs, resumeToken
     }
 
@@ -314,6 +320,13 @@ enum RemoteServerMessage: Decodable {
         case "receiver.delivery": self = .receiverDelivery(try RemoteReceiverDelivery(from: decoder))
         case "forwarding.state": self = .forwardingState(try container.decode(Bool.self, forKey: .enabled))
         case "source.control": self = .sourceControl(videoWanted: try container.decode(Bool.self, forKey: .videoWanted))
+        case "source.command":
+            switch try container.decode(String.self, forKey: .command) {
+            case "awaitShuffle": self = .sourceCommand(.awaitShuffle)
+            case "recomputeCut": self = .sourceCommand(.recomputeCut(try container.decode(Int.self, forKey: .cutCard)))
+            default:
+                throw DecodingError.dataCorruptedError(forKey: .command, in: container, debugDescription: "Unknown source command")
+            }
         case "pong": self = .pong(
             clientTimeMs: try container.decode(Int64.self, forKey: .clientTimeMs),
             serverTimeMs: try container.decode(Int64.self, forKey: .serverTimeMs),

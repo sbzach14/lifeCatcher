@@ -91,9 +91,14 @@ final class RemoteBusinessClient: ObservableObject {
         do {
             (data, response) = try await URLSession.shared.data(for: request)
         } catch {
+            if intentionalDisconnect || Task.isCancelled || (error as? URLError)?.code == .cancelled {
+                throw CancellationError()
+            }
             RemoteDiagnostics.record(.error, category: "admission", message: RemoteDiagnostics.userMessage(for: error))
             throw error
         }
+        try Task.checkCancellation()
+        guard !intentionalDisconnect else { throw CancellationError() }
         guard let http = response as? HTTPURLResponse else { throw RemoteClientError.invalidResponse }
         guard (200..<300).contains(http.statusCode) else {
             let body = try? decoder.decode(RemoteErrorResponse.self, from: data)
@@ -194,6 +199,11 @@ final class RemoteBusinessClient: ObservableObject {
             task.cancel(with: .goingAway, reason: nil)
             if webSocketTask === task { webSocketTask = nil }
             throw error
+        }
+        try Task.checkCancellation()
+        guard !intentionalDisconnect else {
+            task.cancel(with: .normalClosure, reason: nil)
+            throw CancellationError()
         }
         let welcome = try decode(first)
         guard case .welcome(let details) = welcome else { throw RemoteClientError.unexpectedWelcome }

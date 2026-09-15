@@ -8,6 +8,9 @@
 # Xcode - User files
 xcuserdata/
 
+# Swift Package Manager build products
+.build/
+
 **/*.xcodeproj/project.xcworkspace/*
 !**/*.xcodeproj/project.xcworkspace/xcshareddata
 

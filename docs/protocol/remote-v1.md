@@ -5,7 +5,7 @@
 - admission：`POST /v1/connect`，当前固定 IP 测试环境为 HTTP JSON；
 - 业务流：`/v1/ws?token=...`，当前固定 IP 测试环境为 WS JSON；
 - 媒体凭据：`POST /v1/media-token`，Bearer resume token；
-- 视频：LiveKit WebRTC room，1280×720、30fps，source 只能发布 camera，receiver/desktop 只能订阅。
+- 视频：LiveKit WebRTC room，由识别端选择 1280×720 或 1920×1080，以及 30 或 60fps；source 只能发布 camera，receiver/desktop 只能订阅。
 
 两个区域运行完全独立的同版本部署。`region` 只能为 `cn` 或 `sg`，服务器拒绝与自身区域不符的 admission。
 
@@ -102,6 +102,7 @@ command 可为 `speakText`、`prompt` 或 `presentation`。桌面手动 prompt �
 - `forwarding.set`：desktop 改变手机2自动转发；
 - `presence.update`：receiver/desktop 上报展示模式及 videoWanted；
 - `source.control`：服务器将观看端 videoWanted 做 OR 后通知 source；
+- `source.command`：desktop 发送带 `requestId` 的 `awaitShuffle` 或带稳定牌编码 `cutCard` 的 `recomputeCut`。服务器验证手机1在线后转发给 source 并返回 ACK。前者清空当前会话并只等待稳定双框进入识别；后者以最近一次原始识别牌序替换切牌、按当前方案重新计算，并通过正常 presentation 链路发送新结果；
 - `delivery.ack`：手机2确认收到；
 - `ping/pong`：业务心跳；
 - `client.goodbye`：主动释放角色槽。

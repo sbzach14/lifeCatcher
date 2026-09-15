@@ -10,6 +10,8 @@ final class RemoteSourceBridge: ObservableObject {
     @Published private(set) var desktopPresence: RemotePresenceState = .offline
 
     var onStatusChange: ((RemoteBusinessClient.State, RemotePresenceState, RemotePresenceState) -> Void)?
+    var onAwaitShuffleCommand: (() -> Void)?
+    var onRecomputeCutCommand: ((Int) -> Void)?
 
     private struct AssignedEvent {
         let requestId: UUID
@@ -59,6 +61,7 @@ final class RemoteSourceBridge: ObservableObject {
             do {
                 try await client.connect(role: .source, region: region, serial: serial)
             } catch {
+                guard !Task.isCancelled, !(error is CancellationError) else { return }
                 RemoteDiagnostics.record(.error, category: "source", message: RemoteDiagnostics.userMessage(for: error), toast: true)
                 state = .reconnecting
                 client.maintainConnectionAfterFailure()
@@ -80,9 +83,9 @@ final class RemoteSourceBridge: ObservableObject {
         RemoteDiagnostics.record(.info, category: "source", message: "手机1远程发送已停止")
     }
 
-    func offerVideoFrame(_ sampleBuffer: CMSampleBuffer) {
+    func offerVideoFrame(_ frame: RemoteVideoFrame) {
         guard videoWanted else { return }
-        videoPublisher.offer(sampleBuffer: sampleBuffer)
+        videoPublisher.offer(frame: frame)
     }
 
     func emitPrompt(_ prompt: RemotePromptKind) {
@@ -165,7 +168,7 @@ final class RemoteSourceBridge: ObservableObject {
             desktopPresence = welcome.desktopPresence
             videoWanted = welcome.videoWanted
             if welcome.videoWanted {
-                RemoteDiagnostics.record(.info, category: "video", message: "接收端请求实时画面，开始建立 720p30 视频")
+                RemoteDiagnostics.record(.info, category: "video", message: "接收端请求实时画面，开始建立 \(videoPublisher.targetResolution)p\(videoPublisher.targetFPS) 视频")
             }
             if mediaSessionChanged { videoPublisher.resetSession(wanted: welcome.videoWanted) }
             else { videoPublisher.setWanted(welcome.videoWanted) }
@@ -195,6 +198,15 @@ final class RemoteSourceBridge: ObservableObject {
             }
             videoWanted = wanted
             videoPublisher.setWanted(wanted)
+        case .sourceCommand(let command):
+            switch command {
+            case .awaitShuffle:
+                RemoteDiagnostics.record(.info, category: "source", message: "收到桌面端待洗牌指令", toast: true)
+                onAwaitShuffleCommand?()
+            case .recomputeCut(let cutCard):
+                RemoteDiagnostics.record(.info, category: "source", message: "收到桌面端更正切牌指令", toast: true)
+                onRecomputeCutCommand?(cutCard)
+            }
         case .error(let requestId, let code, let message):
             let readableMessage = RemoteDiagnostics.serverMessage(code: code, fallback: message)
             RemoteDiagnostics.record(.error, category: "server", message: readableMessage, toast: true)

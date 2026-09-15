@@ -60,6 +60,7 @@
 		A8A9F1632CE4218500084DBE /* RFast.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8A9F1622CE4218500084DBE /* RFast.swift */; };
 		A8FBC7C22A3F0A5C00EDDFD7 /* VisionUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8FBC7C12A3F0A5C00EDDFD7 /* VisionUtils.swift */; };
 		B058BE5F2B09FFC20078E792 /* CurrentBlurDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B058BE5E2B09FFC20078E792 /* CurrentBlurDetector.swift */; };
+		C09150022D0E35540063AE34 /* cls_20260915_texas.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = C09150012D0E35540063AE34 /* cls_20260915_texas.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/detect_0903.mlmodelkey"; }; };
 		D01021C12D0E35540063AE34 /* cls_1215_h.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D01021BF2D0E35540063AE34 /* cls_1215_h.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/detect_0903.mlmodelkey"; }; };
 		D01021C22D0E35540063AE34 /* cls_1215_v.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = D01021C02D0E35540063AE34 /* cls_1215_v.mlmodel */; settings = {COMPILER_FLAGS = "--encrypt \"$SRCROOT/lifeCatcher/Resources/detect_0903.mlmodelkey"; }; };
 		D013E36D2C712F8D000F2B57 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D013E36C2C712F8D000F2B57 /* Assets.xcassets */; };
@@ -85,9 +86,9 @@
 		D0DAEF952C7766D900D5938A /* UsedFeatureSelectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF942C7766D900D5938A /* UsedFeatureSelectView.swift */; };
 		D0DAEF992C7768DD00D5938A /* SettingRecordConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEF982C7768DD00D5938A /* SettingRecordConfigView.swift */; };
 		D0DAEFA12C7EC46200D5938A /* AppViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DAEFA02C7EC46200D5938A /* AppViewModel.swift */; };
+		F09150012F00000200000001 /* FrameRateTestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F09150022F00000200000002 /* FrameRateTestView.swift */; };
 		F0A100012F00000100000001 /* LiveKit in Frameworks */ = {isa = PBXBuildFile; productRef = F0A100032F00000100000003 /* LiveKit */; };
 		F0B200012F00000200000001 /* RemoteBusinessClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B100012F00000200000001 /* RemoteBusinessClient.swift */; };
-		F0B2000D2F0000020000000D /* RemoteDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B1000D2F0000020000000D /* RemoteDiagnostics.swift */; };
 		F0B200022F00000200000002 /* RemoteOutboxStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B100022F00000200000002 /* RemoteOutboxStore.swift */; };
 		F0B200032F00000200000003 /* RemotePresentationBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B100032F00000200000003 /* RemotePresentationBuilder.swift */; };
 		F0B200042F00000200000004 /* RemoteProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B100042F00000200000004 /* RemoteProtocol.swift */; };
@@ -99,6 +100,7 @@
 		F0B2000A2F0000020000000A /* RemoteSourceBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B1000A2F0000020000000A /* RemoteSourceBridge.swift */; };
 		F0B2000B2F0000020000000B /* RemoteVideoPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B1000B2F0000020000000B /* RemoteVideoPublisher.swift */; };
 		F0B2000C2F0000020000000C /* RemoteVideoSubscriber.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B1000C2F0000020000000C /* RemoteVideoSubscriber.swift */; };
+		F0B2000D2F0000020000000D /* RemoteDiagnostics.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B1000D2F0000020000000D /* RemoteDiagnostics.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -158,6 +160,7 @@
 		A8A9F1622CE4218500084DBE /* RFast.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RFast.swift; sourceTree = "<group>"; };
 		A8FBC7C12A3F0A5C00EDDFD7 /* VisionUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionUtils.swift; sourceTree = "<group>"; };
 		B058BE5E2B09FFC20078E792 /* CurrentBlurDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentBlurDetector.swift; sourceTree = "<group>"; };
+		C09150012D0E35540063AE34 /* cls_20260915_texas.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_20260915_texas.mlmodel; sourceTree = "<group>"; };
 		D01021BF2D0E35540063AE34 /* cls_1215_h.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_1215_h.mlmodel; sourceTree = "<group>"; };
 		D01021C02D0E35540063AE34 /* cls_1215_v.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = cls_1215_v.mlmodel; sourceTree = "<group>"; };
 		D013E3612C7129EE000F2B57 /* lifeCatcher.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = lifeCatcher.entitlements; sourceTree = "<group>"; };
@@ -177,9 +180,8 @@
 		D0DAEF942C7766D900D5938A /* UsedFeatureSelectView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsedFeatureSelectView.swift; sourceTree = "<group>"; };
 		D0DAEF982C7768DD00D5938A /* SettingRecordConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingRecordConfigView.swift; sourceTree = "<group>"; };
 		D0DAEFA02C7EC46200D5938A /* AppViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppViewModel.swift; sourceTree = "<group>"; };
-		F11ED84932036610B96BC234 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
+		F09150022F00000200000002 /* FrameRateTestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrameRateTestView.swift; sourceTree = "<group>"; };
 		F0B100012F00000200000001 /* RemoteBusinessClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteBusinessClient.swift; sourceTree = "<group>"; };
-		F0B1000D2F0000020000000D /* RemoteDiagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteDiagnostics.swift; sourceTree = "<group>"; };
 		F0B100022F00000200000002 /* RemoteOutboxStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteOutboxStore.swift; sourceTree = "<group>"; };
 		F0B100032F00000200000003 /* RemotePresentationBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemotePresentationBuilder.swift; sourceTree = "<group>"; };
 		F0B100042F00000200000004 /* RemoteProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteProtocol.swift; sourceTree = "<group>"; };
@@ -191,6 +193,8 @@
 		F0B1000A2F0000020000000A /* RemoteSourceBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteSourceBridge.swift; sourceTree = "<group>"; };
 		F0B1000B2F0000020000000B /* RemoteVideoPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteVideoPublisher.swift; sourceTree = "<group>"; };
 		F0B1000C2F0000020000000C /* RemoteVideoSubscriber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteVideoSubscriber.swift; sourceTree = "<group>"; };
+		F0B1000D2F0000020000000D /* RemoteDiagnostics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteDiagnostics.swift; sourceTree = "<group>"; };
+		F11ED84932036610B96BC234 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -278,26 +282,6 @@
 				18CA14C4284AC42C00F90372 /* Views */,
 			);
 			path = lifeCatcher;
-			sourceTree = "<group>";
-		};
-		F0B000012F00000200000000 /* Remote */ = {
-			isa = PBXGroup;
-			children = (
-				F0B100012F00000200000001 /* RemoteBusinessClient.swift */,
-				F0B1000D2F0000020000000D /* RemoteDiagnostics.swift */,
-				F0B100022F00000200000002 /* RemoteOutboxStore.swift */,
-				F0B100032F00000200000003 /* RemotePresentationBuilder.swift */,
-				F0B100042F00000200000004 /* RemoteProtocol.swift */,
-				F0B100052F00000200000005 /* RemoteReceiverAudioCoordinator.swift */,
-				F0B100062F00000200000006 /* RemoteReceiverViewModel.swift */,
-				F0B100072F00000200000007 /* RemoteReceiverViews.swift */,
-				F0B100082F00000200000008 /* RemoteResultContentView.swift */,
-				F0B100092F00000200000009 /* RemoteServerProfile.swift */,
-				F0B1000A2F0000020000000A /* RemoteSourceBridge.swift */,
-				F0B1000B2F0000020000000B /* RemoteVideoPublisher.swift */,
-				F0B1000C2F0000020000000C /* RemoteVideoSubscriber.swift */,
-			);
-			path = Remote;
 			sourceTree = "<group>";
 		};
 		18CA14C2284AC42C00F90372 /* ViewModels */ = {
@@ -394,6 +378,7 @@
 			children = (
 				D03811A12C75401200726B99 /* cls_main.mlmodel */,
 				D01021BF2D0E35540063AE34 /* cls_1215_h.mlmodel */,
+				C09150012D0E35540063AE34 /* cls_20260915_texas.mlmodel */,
 				D01021C02D0E35540063AE34 /* cls_1215_v.mlmodel */,
 				D03811A52C7542C300726B99 /* cls_0715_h_trans.mlmodel */,
 				D03811A42C7542C200726B99 /* cls_0727_v_trans.mlmodel */,
@@ -408,6 +393,27 @@
 				18A7A51C2C14E5A50020138E /* IC.xcassets */,
 			);
 			path = Resources;
+			sourceTree = "<group>";
+		};
+		F0B000012F00000200000000 /* Remote */ = {
+			isa = PBXGroup;
+			children = (
+				F0B100012F00000200000001 /* RemoteBusinessClient.swift */,
+				F0B1000D2F0000020000000D /* RemoteDiagnostics.swift */,
+				F0B100022F00000200000002 /* RemoteOutboxStore.swift */,
+				F0B100032F00000200000003 /* RemotePresentationBuilder.swift */,
+				F0B100042F00000200000004 /* RemoteProtocol.swift */,
+				F0B100052F00000200000005 /* RemoteReceiverAudioCoordinator.swift */,
+				F0B100062F00000200000006 /* RemoteReceiverViewModel.swift */,
+				F0B100072F00000200000007 /* RemoteReceiverViews.swift */,
+				F0B100082F00000200000008 /* RemoteResultContentView.swift */,
+				F0B100092F00000200000009 /* RemoteServerProfile.swift */,
+				F0B1000A2F0000020000000A /* RemoteSourceBridge.swift */,
+				F0B1000B2F0000020000000B /* RemoteVideoPublisher.swift */,
+				F09150022F00000200000002 /* FrameRateTestView.swift */,
+				F0B1000C2F0000020000000C /* RemoteVideoSubscriber.swift */,
+			);
+			path = Remote;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -519,6 +525,7 @@
 				F0B200092F00000200000009 /* RemoteServerProfile.swift in Sources */,
 				F0B2000A2F0000020000000A /* RemoteSourceBridge.swift in Sources */,
 				F0B2000B2F0000020000000B /* RemoteVideoPublisher.swift in Sources */,
+				F09150012F00000200000001 /* FrameRateTestView.swift in Sources */,
 				F0B2000C2F0000020000000C /* RemoteVideoSubscriber.swift in Sources */,
 				187A45832C39440800BB055C /* AppDelegate.swift in Sources */,
 				D0DAEFA12C7EC46200D5938A /* AppViewModel.swift in Sources */,
@@ -557,6 +564,7 @@
 				D03811A22C75401200726B99 /* cls_main.mlmodel in Sources */,
 				A8A9F1632CE4218500084DBE /* RFast.swift in Sources */,
 				D01021C12D0E35540063AE34 /* cls_1215_h.mlmodel in Sources */,
+				C09150022D0E35540063AE34 /* cls_20260915_texas.mlmodel in Sources */,
 				D01021C22D0E35540063AE34 /* cls_1215_v.mlmodel in Sources */,
 				18C98D112C158F7B00A8CD49 /* NPFive.swift in Sources */,
 				A892C6002A765A0A003FA2B3 /* MainView.swift in Sources */,
@@ -732,7 +740,7 @@
 				CODE_SIGN_ENTITLEMENTS = lifeCatcher/lifeCatcher.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
 				DEVELOPMENT_TEAM = 6WK4Q32GMN;
 				ENABLE_PREVIEWS = YES;
@@ -756,7 +764,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.6;
+				MARKETING_VERSION = 3.0.1;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -780,7 +788,7 @@
 				CODE_SIGN_ENTITLEMENTS = lifeCatcher/lifeCatcher.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = lifeCatcher/App/Assets.xcassets;
 				DEVELOPMENT_TEAM = 6WK4Q32GMN;
 				ENABLE_PREVIEWS = YES;
@@ -804,7 +812,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.0.6;
+				MARKETING_VERSION = 3.0.1;
 				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.carter.LifeCatcherEng;
 				PRODUCT_NAME = "$(TARGET_NAME)";
