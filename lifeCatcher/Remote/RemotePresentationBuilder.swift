@@ -42,7 +42,20 @@ enum RemotePresentationBuilder {
                 repeatCount: max(1, repeatCount),
                 playbackMode: separateUtterances ? .separate : .joined
             ),
-            timeDisplayCue: timeDisplayCue
+            timeDisplayCue: timeDisplayCue,
+            isPreview: nil
+        )
+    }
+
+    static func preview(deck: [Int]) -> RemotePresentationSnapshot {
+        RemotePresentationSnapshot(
+            schemaVersion: RemoteProtocolVersion.current,
+            visibleDeck: deck,
+            cutCard: nil,
+            rounds: [],
+            playbackPlan: RemotePlaybackPlan(utterances: [], voiceRate: 0.5, repeatCount: 1, playbackMode: .joined),
+            timeDisplayCue: nil,
+            isPreview: true
         )
     }
 }

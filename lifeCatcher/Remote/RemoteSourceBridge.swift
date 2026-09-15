@@ -117,6 +117,10 @@ final class RemoteSourceBridge: ObservableObject {
         ))
     }
 
+    func emitDeckPreview(_ deck: [Int]) {
+        emitPresentation(RemotePresentationBuilder.preview(deck: deck))
+    }
+
     private func enqueue(_ pendingEvent: RemotePendingSourceEvent) {
         pending.append(pendingEvent)
         let now = Int64(Date().timeIntervalSince1970 * 1_000)

@@ -122,6 +122,14 @@ struct RemoteReceiverConnectView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .disabled(!region.isConfigured || !(8...128).contains(serial.trimmingCharacters(in: .whitespacesAndNewlines).count) || viewModel.connectionState == .connecting)
+
+                NavigationLink {
+                    RemoteReceiverSettingsView()
+                } label: {
+                    Label("功能设置", systemImage: "gearshape.fill")
+                        .frame(maxWidth: .infinity).padding(10)
+                }
+                .buttonStyle(.bordered)
             }
             .padding()
             .background(.black.opacity(0.38))
@@ -170,6 +178,11 @@ struct RemoteReceiverSessionView: View {
             }
         }
         .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                NavigationLink { RemoteReceiverSettingsView() } label: {
+                    Image(systemName: "gearshape.fill")
+                }
+            }
             ToolbarItem(placement: .topBarTrailing) {
                 Button("断开") { viewModel.disconnect() }
             }
@@ -234,6 +247,65 @@ struct RemoteReceiverSessionView: View {
             Label(title, systemImage: icon).labelStyle(.iconOnly)
                 .frame(width: 32, height: 28)
                 .foregroundColor(viewModel.displayMode == mode ? .blue : .white)
+        }
+    }
+}
+
+struct RemoteReceiverSettingsView: View {
+    @AppStorage(RemotePreferenceKeys.receiverSoundEnabled) private var soundEnabled = true
+    @AppStorage(RemotePreferenceKeys.receiverVolume) private var volume: Double = 0.5
+    @AppStorage(RemotePreferenceKeys.receiverVoiceRate) private var voiceRate: Double = 0.5
+    @AppStorage(RemotePreferenceKeys.receiverVoiceDevice) private var voiceDevice = 0
+    @AppStorage(RemotePreferenceKeys.receiverBlackMode) private var blackMode = 0
+    @AppStorage(RemotePreferenceKeys.receiverTimeMode) private var timeMode = 0
+    @AppStorage(RemotePreferenceKeys.receiverBrightness) private var brightness: Double = 0.1
+
+    var body: some View {
+        Form {
+            Section("声音控制") {
+                Toggle("播放提示音和结果播报", isOn: $soundEnabled)
+                Picker("播放设备", selection: $voiceDevice) {
+                    Text("扬声器").tag(0)
+                    Text("耳机").tag(1)
+                }
+                SliderRow(title: "音量", value: $volume)
+                SliderRow(title: "语速", value: $voiceRate)
+            }
+
+            Section("画面控制") {
+                Picker("屏幕显示", selection: $blackMode) {
+                    Text("相机图像").tag(0)
+                    Text("正常黑屏（双击进入）").tag(1)
+                    Text("黑屏点击（双击进入，单击暂停）").tag(2)
+                }
+                Picker("时间模式", selection: $timeMode) {
+                    Text("无").tag(0)
+                    Text("HH:MM").tag(1)
+                    Text("HH:MM:SS").tag(2)
+                }
+                SliderRow(title: "黑屏亮度", value: $brightness)
+            }
+        }
+        .navigationTitle("接收端功能设置")
+        .navigationBarTitleDisplayMode(.inline)
+        .onChange(of: soundEnabled) { _, value in RemotePreferences.receiverSoundEnabled = value }
+        .onChange(of: volume) { _, value in RemotePreferences.receiverVolume = Float(value) }
+        .onChange(of: voiceRate) { _, value in RemotePreferences.receiverVoiceRate = Float(value) }
+        .onChange(of: voiceDevice) { _, value in RemotePreferences.receiverVoiceDevice = value }
+        .onChange(of: blackMode) { _, value in RemotePreferences.receiverBlackMode = value }
+        .onChange(of: timeMode) { _, value in RemotePreferences.receiverTimeMode = value }
+        .onChange(of: brightness) { _, value in RemotePreferences.receiverBrightness = Float(value) }
+    }
+}
+
+private struct SliderRow: View {
+    let title: String
+    @Binding var value: Double
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("\(title) \(String(format: "%.2f", value))")
+            Slider(value: $value, in: 0...1, step: 0.01)
         }
     }
 }

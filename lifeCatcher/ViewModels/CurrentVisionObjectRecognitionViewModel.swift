@@ -1539,6 +1539,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             self.computeWinnerRC(isReset: true)
                         }
                         else{
+                            self.emitRemoteDeckPreview()
                             showShuffleTimeText()
                         }
                     }
@@ -1586,6 +1587,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                             self.computeWinnerRC(isReset: true)
                         }
                         else{
+                            self.emitRemoteDeckPreview()
                             showShuffleTimeText()
                         }
                     }
@@ -3725,6 +3727,12 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 print("Error initializing audio player: \(error)")
             }
         }
+    }
+
+    private func emitRemoteDeckPreview() {
+        guard RemotePreferences.sourceEnabled else { return }
+        let deck = self.singlefeatureArray
+        Task { @MainActor [weak self] in self?.remoteSourceBridge?.emitDeckPreview(deck) }
     }
 
     private func stopCurrentAudio() {

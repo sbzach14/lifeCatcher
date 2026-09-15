@@ -93,6 +93,7 @@ struct RemotePresentationSnapshot: Codable, Equatable {
     let rounds: [Round]
     let playbackPlan: RemotePlaybackPlan
     let timeDisplayCue: RemoteTimeDisplayCue?
+    let isPreview: Bool?
 
     static let empty = RemotePresentationSnapshot(
         schemaVersion: RemoteProtocolVersion.current,
@@ -100,7 +101,8 @@ struct RemotePresentationSnapshot: Codable, Equatable {
         cutCard: nil,
         rounds: [],
         playbackPlan: RemotePlaybackPlan(utterances: [], voiceRate: 0.5, repeatCount: 1, playbackMode: .joined),
-        timeDisplayCue: nil
+        timeDisplayCue: nil,
+        isPreview: nil
     )
 }
 

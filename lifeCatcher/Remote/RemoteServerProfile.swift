@@ -59,6 +59,13 @@ enum RemotePreferenceKeys {
     static let videoLowPower = "remote.video.lowPower"
     static let receiverRegion = "remote.receiver.region"
     static let receiverLastSerial = "remote.receiver.lastSerial"
+    static let receiverSoundEnabled = "remote.receiver.soundEnabled"
+    static let receiverVolume = "remote.receiver.volume"
+    static let receiverVoiceRate = "remote.receiver.voiceRate"
+    static let receiverVoiceDevice = "remote.receiver.voiceDevice"
+    static let receiverBlackMode = "remote.receiver.blackMode"
+    static let receiverTimeMode = "remote.receiver.timeMode"
+    static let receiverBrightness = "remote.receiver.brightness"
     static let clientInstanceId = "remote.client.instanceId"
 }
 
@@ -87,6 +94,41 @@ enum RemotePreferences {
     static var videoLowPower: Bool {
         get { UserDefaults.standard.bool(forKey: RemotePreferenceKeys.videoLowPower) }
         set { UserDefaults.standard.set(newValue, forKey: RemotePreferenceKeys.videoLowPower) }
+    }
+
+    static var receiverSoundEnabled: Bool {
+        get { UserDefaults.standard.object(forKey: RemotePreferenceKeys.receiverSoundEnabled) == nil || UserDefaults.standard.bool(forKey: RemotePreferenceKeys.receiverSoundEnabled) }
+        set { UserDefaults.standard.set(newValue, forKey: RemotePreferenceKeys.receiverSoundEnabled) }
+    }
+
+    static var receiverVolume: Float {
+        get { UserDefaults.standard.object(forKey: RemotePreferenceKeys.receiverVolume) == nil ? 0.5 : min(max(UserDefaults.standard.float(forKey: RemotePreferenceKeys.receiverVolume), 0), 1) }
+        set { UserDefaults.standard.set(min(max(newValue, 0), 1), forKey: RemotePreferenceKeys.receiverVolume) }
+    }
+
+    static var receiverVoiceRate: Float {
+        get { UserDefaults.standard.object(forKey: RemotePreferenceKeys.receiverVoiceRate) == nil ? 0.5 : min(max(UserDefaults.standard.float(forKey: RemotePreferenceKeys.receiverVoiceRate), 0), 1) }
+        set { UserDefaults.standard.set(min(max(newValue, 0), 1), forKey: RemotePreferenceKeys.receiverVoiceRate) }
+    }
+
+    static var receiverVoiceDevice: Int {
+        get { UserDefaults.standard.integer(forKey: RemotePreferenceKeys.receiverVoiceDevice) == 1 ? 1 : 0 }
+        set { UserDefaults.standard.set(newValue == 1 ? 1 : 0, forKey: RemotePreferenceKeys.receiverVoiceDevice) }
+    }
+
+    static var receiverBlackMode: Int {
+        get { min(max(UserDefaults.standard.integer(forKey: RemotePreferenceKeys.receiverBlackMode), 0), 2) }
+        set { UserDefaults.standard.set(min(max(newValue, 0), 2), forKey: RemotePreferenceKeys.receiverBlackMode) }
+    }
+
+    static var receiverTimeMode: Int {
+        get { min(max(UserDefaults.standard.integer(forKey: RemotePreferenceKeys.receiverTimeMode), 0), 2) }
+        set { UserDefaults.standard.set(min(max(newValue, 0), 2), forKey: RemotePreferenceKeys.receiverTimeMode) }
+    }
+
+    static var receiverBrightness: Float {
+        get { UserDefaults.standard.object(forKey: RemotePreferenceKeys.receiverBrightness) == nil ? 0.1 : min(max(UserDefaults.standard.float(forKey: RemotePreferenceKeys.receiverBrightness), 0), 1) }
+        set { UserDefaults.standard.set(min(max(newValue, 0), 1), forKey: RemotePreferenceKeys.receiverBrightness) }
     }
 
     static var sourceRegion: RemoteRegion {

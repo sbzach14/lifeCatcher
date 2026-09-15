@@ -19,9 +19,9 @@ final class RemoteReceiverViewModel: ObservableObject {
     @Published var errorMessage = ""
 
     let videoSubscriber = RemoteVideoSubscriber()
-    let blackMode: Int
-    let timeMode: Int
-    let blackFactor: Float
+    var blackMode: Int { RemotePreferences.receiverBlackMode }
+    var timeMode: Int { RemotePreferences.receiverTimeMode }
+    var blackFactor: Float { RemotePreferences.receiverBrightness }
 
     private let client = RemoteBusinessClient()
     private let audio = RemoteReceiverAudioCoordinator()
@@ -41,12 +41,6 @@ final class RemoteReceiverViewModel: ObservableObject {
     }
 
     init() {
-        let config = readConfigJSON()
-        let ints = config?["Int"] as? [String: Int]
-        let floats = config?["Float"] as? [String: Float]
-        blackMode = ints?["blackMode"] ?? 0
-        timeMode = ints?["timeMode"] ?? 0
-        blackFactor = floats?["blackFactor"] ?? 0.1
         client.onStateChange = { [weak self] state in
             guard let self else { return }
             self.connectionState = state

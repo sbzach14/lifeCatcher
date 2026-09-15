@@ -25,6 +25,7 @@ final class RemoteReceiverAudioCoordinator: NSObject, AVAudioPlayerDelegate, AVS
     }
 
     func accept(_ delivery: RemoteReceiverDelivery) {
+        guard RemotePreferences.receiverSoundEnabled else { return }
         if delivery.origin == .manual || currentOperationId != delivery.operationId {
             cancelAll()
             currentOperationId = delivery.origin == .automatic ? delivery.operationId : nil
@@ -78,7 +79,7 @@ final class RemoteReceiverAudioCoordinator: NSObject, AVAudioPlayerDelegate, AVS
         }
         audioPlayer = player
         player.delegate = self
-        player.volume = 0.5
+        player.volume = RemotePreferences.receiverVolume
         player.prepareToPlay()
         if !player.play() { finishCurrentWork() }
     }
@@ -103,7 +104,8 @@ final class RemoteReceiverAudioCoordinator: NSObject, AVAudioPlayerDelegate, AVS
             let text = item.text.isEmpty ? "0" : convertArabicNumbersToChinese(item.text)
             let utterance = AVSpeechUtterance(string: text)
             utterance.pitchMultiplier = 1
-            utterance.rate = 0.25 + min(max(plan.voiceRate, 0), 1) * 0.5
+            utterance.rate = 0.25 + RemotePreferences.receiverVoiceRate * 0.5
+            utterance.volume = RemotePreferences.receiverVolume
             utterance.voice = preferredVoice(for: item.voiceIntent)
             synthesizer.speak(utterance)
         }
@@ -119,7 +121,7 @@ final class RemoteReceiverAudioCoordinator: NSObject, AVAudioPlayerDelegate, AVS
     }
 
     private func shouldUseConfiguredOutput() -> Bool {
-        let configuredDevice = ((readConfigJSON()?["Int"] as? [String: Int])?["voiceDevice"]) ?? 0
+        let configuredDevice = RemotePreferences.receiverVoiceDevice
         let hasBluetoothHeadphones = AVAudioSession.sharedInstance().currentRoute.outputs.contains { $0.portType == .bluetoothA2DP }
         return (!hasBluetoothHeadphones && configuredDevice == 0) || (hasBluetoothHeadphones && configuredDevice == 1)
     }
