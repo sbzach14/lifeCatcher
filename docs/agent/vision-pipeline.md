@@ -7,11 +7,11 @@
 | 用途 | 普通洗牌 | 横洗 | 拨牌 |
 |---|---|---|---|
 | 全帧定位/检测 | `detect_0903` | `detect_20260915_texas` | `riffle_detect_1111` |
-| 横屏 ROI 分类 | `cls_1215_h` | `cls_20260915_texas` | `riffle_cls_h_1107` |
-| 竖屏 ROI 分类 | `cls_1215_v` | `cls_20260915_texas` | `riffle_cls_v_1107` |
+| 横屏 ROI 分类 | `cls_1215_h` | `cls_20260917_texas` | `riffle_cls_h_1107` |
+| 竖屏 ROI 分类 | `cls_1215_v` | `cls_20260917_texas` | `riffle_cls_v_1107` |
 
 Texas 分类模型为 52 类、RGB 320×320、内置 NMS 的 pipeline，横竖屏共用同一模型。
-模型 SHA-256：`cf324b25b857385a5bea45488506cb4e923ab11f86fd7cc976c8de03e2cbe078`。
+模型 SHA-256：`703de3251653cb1dde0ea4b2f1ea956647bd3d6b2b049303cffb6f9e32c2b7b0`。
 Xcode 与现有模型一样使用 `detect_0903.mlmodelkey` 编译加密。
 
 横洗检测模型 `detect_20260915_texas` 为单类 `card_corner`、RGB 640×640、内置 NMS 的 pipeline，输出 N×1 confidence 与 N×4 归一化中心坐标。来源、SHA-256 与下载步骤见 [`model-server.md`](model-server.md)。
@@ -54,7 +54,7 @@ Xcode 与现有模型一样使用 `detect_0903.mlmodelkey` 编译加密。
 
 - `isTargetArea == false`：用检测模型，confidence threshold 约 0.7。
 - ROI 内普通模式且横屏：用横向分类模型；竖屏用纵向分类模型。
-- `shuffleMode[0] == 2` 为横洗：全帧使用 `detect_20260915_texas`，ROI 分类横竖屏均使用 `cls_20260915_texas`。方向仍决定 ROI 及节点排列，横屏按 X、竖屏按 Y。
+- `shuffleMode[0] == 2` 为横洗：全帧使用 `detect_20260915_texas`，ROI 分类横竖屏均使用 `cls_20260917_texas`。方向仍决定 ROI 及节点排列，横屏按 X、竖屏按 Y。
 - `shuffleMode[0] == 1` 保留普通洗牌组；`== 0` 保留拨牌组。横洗与拨牌同时开启时保留原来的洗牌槽优先模型路由，使用 Texas 分类。
 - 模型 IOU 固定约 0.2；分类调用传 0.05 的 confidence threshold，代码再做二次阈值判断。
 

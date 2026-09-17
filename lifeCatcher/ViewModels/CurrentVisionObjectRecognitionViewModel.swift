@@ -65,7 +65,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     
     let detectModel = try! detect_0903()
     let horizontalShuffleDetectModel = try! detect_20260915_texas()
-    let horizontalShuffleModel = try! cls_20260915_texas()
+    let horizontalShuffleModel = try! cls_20260917_texas()
     let clsModel_h = try! cls_1215_h()
     let clsModel_v = try! cls_1215_v()
 //    let clsModel_h = try! cls_0715_h_trans()

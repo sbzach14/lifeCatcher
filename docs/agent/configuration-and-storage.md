@@ -96,7 +96,7 @@ specialCard[0...1]
 
 `cutMode` 的 UI 稳定编码为：0 无、1 看底、2 看顶、3 连续看底、4 看手牌、5 连续看顶、6 照顶去牌、7 连续照顶去牌。模式 6/7 将照到的顶牌从当前牌堆移除后再进入发牌与报法计算，结果页和远程 presentation 的牌堆也使用移除后的数组。看色报法仍只允许 0/1/2。
 
-横洗不改变方向协议，也没有新增方向字段。全局 `isCameraHorizon` 同时决定分类模型、ROI 形变和两堆牌排列：普通流程横屏使用横向模型/ROI并按 X 轴处理，纵屏使用纵向模型/ROI并按 Y 轴处理；横洗横竖屏共用 `cls_20260915_texas`，ROI 比例分别为 16:9 与 9:16。`shuffleMode[0] == 2` 只区分横洗业务模式。
+横洗不改变方向协议，也没有新增方向字段。全局 `isCameraHorizon` 同时决定分类模型、ROI 形变和两堆牌排列：普通流程横屏使用横向模型/ROI并按 X 轴处理，纵屏使用纵向模型/ROI并按 Y 轴处理；横洗横竖屏共用 `cls_20260917_texas`，ROI 比例分别为 16:9 与 9:16。`shuffleMode[0] == 2` 只区分横洗业务模式。
 
 ## 6. 牌资源编码
 
@@ -118,7 +118,7 @@ Core ML 输出在当前视觉代码中把类别 52 映射为 54。模型训练�
 
 - `detect_0903.mlmodel`
 - `detect_20260915_texas.mlmodel`（横洗检测）
-- `cls_20260915_texas.mlmodel`（横洗分类）
+- `cls_20260917_texas.mlmodel`（横洗分类）
 - `cls_1215_h.mlmodel`
 - `cls_1215_v.mlmodel`
 - `riffle_detect_1111.mlmodel`
@@ -127,7 +127,7 @@ Core ML 输出在当前视觉代码中把类别 52 映射为 54。模型训练�
 
 普通采集使用 `cls_main.mlmodel`。
 
-`cls_0715_h_trans`、`cls_0727_v_trans` 及 `.mlmodelkey` 是历史/备用资源，当前实例化代码已注释。`AppDelegate` 仍保留整段历史模型解密方案，但不执行。
+`cls_0715_h_trans`、`cls_0727_v_trans` 及 `.mlmodelkey` 是历史/备用资源，当前实例化代码已注释。除 `cls_main` 外，所有 target 内 `.mlmodel` 都以各自条目的 `--encrypt` 编译标志保护；横洗模型和其余活跃模型沿用 `detect_0903.mlmodelkey`，两个历史 trans 模型沿用各自密钥。此保护作用于编译进 App 的模型，仓库中的源 `.mlmodel` 文件仍为原始文件。`AppDelegate` 仍保留整段历史模型解密方案，但不执行。
 
 下载地址与访问方式见 [`model-server.md`](model-server.md)。
 

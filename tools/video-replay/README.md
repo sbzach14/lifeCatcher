@@ -52,7 +52,7 @@ swift run --package-path tools/video-replay lifecatcher-video-replay --help
 
 ### 横洗 ROI 校准状态
 
-iOS 与本工具均为横洗选择 `detect_20260915_texas` + `cls_20260915_texas`，后者横竖共用。
+iOS 与本工具均为横洗选择 `detect_20260915_texas` + `cls_20260917_texas`，后者横竖共用。
 单框入口按框面积×70 建 ROI；双框以两个框中心连线中点为中心，以最外侧沿轴边缘总跨度×1.5
 确定长轴。横屏 X 为长轴、比例 16:9，竖屏 Y 为长轴、比例 9:16。边界只平移或填 RGB 114，
 不改变训练尺寸，不使用旧的 4.5:1、最大面积参考框或 90% 包含扩展。
@@ -77,7 +77,7 @@ Core ML 和状态机进行离线回放验证的 Swift Package。
 
 | 选项 | 含义 |
 |---|---|
-| `--mode horizontal-shuffle` | 横洗，默认值；使用 `detect_20260915_texas` + `cls_20260915_texas`；ROI 与排列取 `--orientation` |
+| `--mode horizontal-shuffle` | 横洗，默认值；使用 `detect_20260915_texas` + `cls_20260917_texas`；ROI 与排列取 `--orientation` |
 | `--mode shuffle` | 只允许洗牌结果，使用 `detect_0903` 与 `cls_1215_*` |
 | `--mode riffle` | 只允许拨牌结果，使用 `riffle_detect_1111` 与 `riffle_cls_*` |
 | `--mode both` | 对应正式代码 `[1,1]`，仍按正式选择顺序使用洗牌模型组 |

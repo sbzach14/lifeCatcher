@@ -270,12 +270,30 @@ struct CurrentVisionObjectRecognitionView: View {
         }
         .overlay(alignment: .top) {
             if RemotePreferences.sourceEnabled && !viewModel.isBlack {
-                RemotePresenceStatusBar(items: [
-                    RemotePresenceItem(label: receivesRemoteAudio ? "识别端" : "服务器", state: viewModel.remoteServerPresence),
-                    RemotePresenceItem(label: "接收端", state: viewModel.remoteReceiverPresence),
-                    RemotePresenceItem(label: "桌面端", state: viewModel.remoteDesktopPresence)
-                ])
-                .padding(.top, 8)
+                if receivesRemoteAudio {
+                    if let receiverViewModel {
+                        HybridRemotePresenceStatusBar(
+                            sourceState: viewModel.remoteServerPresence,
+                            receiver: receiverViewModel,
+                            desktopState: viewModel.remoteDesktopPresence
+                        )
+                        .padding(.top, 8)
+                    } else {
+                        RemotePresenceStatusBar(items: [
+                            RemotePresenceItem(label: "识别端", state: viewModel.remoteServerPresence),
+                            RemotePresenceItem(label: "接收端", state: .offline),
+                            RemotePresenceItem(label: "桌面端", state: viewModel.remoteDesktopPresence)
+                        ])
+                        .padding(.top, 8)
+                    }
+                } else {
+                    RemotePresenceStatusBar(items: [
+                        RemotePresenceItem(label: "服务器", state: viewModel.remoteServerPresence),
+                        RemotePresenceItem(label: "接收端", state: viewModel.remoteReceiverPresence),
+                        RemotePresenceItem(label: "桌面端", state: viewModel.remoteDesktopPresence)
+                    ])
+                    .padding(.top, 8)
+                }
             }
         }
         .onAppear {

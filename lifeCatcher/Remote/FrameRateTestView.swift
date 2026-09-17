@@ -16,7 +16,7 @@ private final class FrameRateTestCapture: NSObject, AVCaptureVideoDataOutputSamp
     private var cancelled = false
     private var stopped: Bool { stopLock.lock(); defer { stopLock.unlock() }; return cancelled }
     // Counters belong to queue. Inference submission mirrors the production concurrent detectionQueue.
-    private var model: cls_20260915_texas?
+    private var model: cls_20260917_texas?
     private var inFlight = 0
     private var captured = 0
     private var completed = 0
@@ -29,7 +29,7 @@ private final class FrameRateTestCapture: NSObject, AVCaptureVideoDataOutputSamp
         queue.async { [self] in
             do {
                 self.remoteVideoFPS = remoteVideoFPS == 60 ? 60 : 30
-                model = try cls_20260915_texas(configuration: MLModelConfiguration())
+                model = try cls_20260917_texas(configuration: MLModelConfiguration())
                 guard !stopped else { return }
                 let fps: Double = back ? 240 : 120
                 guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: back ? .back : .front) else {
@@ -334,7 +334,7 @@ struct FrameRateTestView: View {
                     }.monospacedDigit()
                     Text(model.networkStatus).font(.subheadline)
                 }
-                Text("CLS：cls-20260915-texas · 320×320\n每个相机回调都按正式识别链路提交到并发 CLS 队列；“完成”是每秒成功返回的推理数，“待完成”是当前积压。\(remoteEnabled ? "LiveKit 送帧不代表接收端帧率。" : "本地模式不创建网络连接。")返回或切到后台即停止测试。")
+                Text("CLS：cls-20260917-texas · 320×320\n每个相机回调都按正式识别链路提交到并发 CLS 队列；“完成”是每秒成功返回的推理数，“待完成”是当前积压。\(remoteEnabled ? "LiveKit 送帧不代表接收端帧率。" : "本地模式不创建网络连接。")返回或切到后台即停止测试。")
                     .font(.footnote).foregroundStyle(.secondary)
             }.padding()
         }

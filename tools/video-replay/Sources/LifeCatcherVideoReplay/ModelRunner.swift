@@ -50,7 +50,7 @@ final class ModelRunner {
 
     static func classifierName(mode: ReplayMode, orientation: CameraOrientation) -> String {
         if mode == .horizontalShuffle {
-            return "cls_20260915_texas"
+            return "cls_20260917_texas"
         }
         if mode.usesShuffleModels {
             return orientation.isHorizontal ? "cls_1215_h" : "cls_1215_v"

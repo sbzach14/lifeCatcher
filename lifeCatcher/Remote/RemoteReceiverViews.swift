@@ -29,6 +29,20 @@ struct RemotePresenceStatusBar: View {
     }
 }
 
+struct HybridRemotePresenceStatusBar: View {
+    let sourceState: RemotePresenceState
+    @ObservedObject var receiver: RemoteReceiverViewModel
+    let desktopState: RemotePresenceState
+
+    var body: some View {
+        RemotePresenceStatusBar(items: [
+            RemotePresenceItem(label: "识别端", state: sourceState),
+            RemotePresenceItem(label: "接收端", state: receiver.serverPresence),
+            RemotePresenceItem(label: "桌面端", state: desktopState)
+        ])
+    }
+}
+
 private extension RemotePresenceState {
     var statusTitle: String {
         switch self {

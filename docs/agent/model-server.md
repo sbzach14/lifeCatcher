@@ -35,10 +35,10 @@ aws ec2 describe-instances --profile lifecatcher-sg --region us-east-1 \
 - App 资源：`lifeCatcher/Resources/detect_20260915_texas.mlmodel`；本地文件名用下划线以生成 Swift 类型 `detect_20260915_texas`，模型内容不变。
 - SHA-256：`0e111dd26f8ddd65f2e18a4ee769ebcd7f351107bab05fe76d849b05c49fa1fe`（远端与本地一致）。
 - 协议：RGB 640×640，单类 `card_corner`，pipeline 内置 NMS；输入 `image`、`iouThreshold`、`confidenceThreshold`，输出 `confidence`（N×1）、`coordinates`（N×4，归一化中心 XYWH）。
-- 路由：仅 `shuffleMode[0] == 2` 的全帧检测使用新模型；横洗 ROI 分类仍为 `cls_20260915_texas`。
+- 路由：仅 `shuffleMode[0] == 2` 的全帧检测使用；横洗 ROI 分类使用 `cls_20260917_texas`。
 - 编译沿用现有 `detect_0903.mlmodelkey` 加密设置；模型默认阈值由运行时现有 IOU 0.2 / confidence 0.7 覆盖。
 
-在仓库根目录下载：
+在仓库根目录下载检测模型：
 
 ```bash
 aws s3 cp \
@@ -46,4 +46,24 @@ aws s3 cp \
   lifeCatcher/Resources/detect_20260915_texas.mlmodel \
   --profile lifecatcher-sg --region us-east-1 --only-show-errors
 shasum -a 256 lifeCatcher/Resources/detect_20260915_texas.mlmodel
+```
+
+## 2026-09-17 横洗分类模型
+
+- 远端源：`/home/ubuntu/card-data/coreml-export-20260917/normalized/cls_20260917_texas.mlmodel`。
+- S3 交接：`s3://lifecatcher-card-training-429583250861-us-east-1/horizontal-shuffle/v1/handoffs/coreml-20260917/cls-20260917-texas.mlmodel`。
+- App 资源：`lifeCatcher/Resources/cls_20260917_texas.mlmodel`；下划线文件名生成 Swift 类型 `cls_20260917_texas`。
+- SHA-256：`703de3251653cb1dde0ea4b2f1ea956647bd3d6b2b049303cffb6f9e32c2b7b0`（远端与本地一致）。
+- 协议：RGB 320×320、52 类（0...51 与稳定牌编码一致）、内置 NMS；输入 `image`、`iouThreshold`、`confidenceThreshold`，输出 `confidence`（N×52）及 `coordinates`（N×4）。
+- 路由：仅横洗 ROI 分类使用；帧率测试及独立视频回放也使用这一版分类器。横洗检测模型仍为 `detect_20260915_texas`。
+- Xcode 编译沿用现有 `detect_0903.mlmodelkey` 的 `--encrypt` 配置；`cls_main` 保持不加密。
+
+在仓库根目录下载分类模型：
+
+```bash
+aws s3 cp \
+  s3://lifecatcher-card-training-429583250861-us-east-1/horizontal-shuffle/v1/handoffs/coreml-20260917/cls-20260917-texas.mlmodel \
+  lifeCatcher/Resources/cls_20260917_texas.mlmodel \
+  --profile lifecatcher-sg --region us-east-1 --only-show-errors
+shasum -a 256 lifeCatcher/Resources/cls_20260917_texas.mlmodel
 ```
