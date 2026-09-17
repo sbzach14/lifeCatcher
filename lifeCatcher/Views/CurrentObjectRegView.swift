@@ -6,7 +6,10 @@ import AVFoundation
 struct CurrentVisionObjectRecognitionView: View {
     var saveRuleIndex : Int
     var configType : Int
+    var receivesRemoteAudio = false
     @StateObject var viewModel : CurrentVisionObjectRecognitionViewModel = CurrentVisionObjectRecognitionViewModel()
+    @State private var receiverViewModel: RemoteReceiverViewModel?
+    @State private var startupTask: Task<Void, Never>?
     @State var isAVCaptureActive = false
     
     var body: some View {
@@ -276,14 +279,14 @@ struct CurrentVisionObjectRecognitionView: View {
             }
         }
         .onAppear {
-            Task { @MainActor in
+            startupTask = Task { @MainActor in
                 let cameraGranted: Bool
                 switch AVCaptureDevice.authorizationStatus(for: .video) {
                 case .authorized: cameraGranted = true
                 case .notDetermined: cameraGranted = await AVCaptureDevice.requestAccess(for: .video)
                 default: cameraGranted = false
                 }
-                guard cameraGranted else { return }
+                guard cameraGranted, !Task.isCancelled else { return }
                 if !self.isAVCaptureActive && self.saveRuleIndex != -1 {
                     viewModel.initialize(saveRuleIndex: saveRuleIndex, configType: configType)
                 }
@@ -293,12 +296,25 @@ struct CurrentVisionObjectRecognitionView: View {
                 viewModel.isCamereSetting = false
                 viewModel.prestartCamera()
                 viewModel.startRemoteSourceIfEnabled()
+                if receivesRemoteAudio {
+                    let serial = AuthManager.retrieveUUID()
+                    let region = RemotePreferences.sourceRegion
+                    if !serial.isEmpty && region.isConfigured {
+                        let receiver = RemoteReceiverViewModel()
+                        receiverViewModel = receiver
+                        await receiver.connect(region: region, serial: serial, receiveVideo: false)
+                    }
+                }
             }
         }
         .onDisappear {
+            startupTask?.cancel()
+            startupTask = nil
             viewModel.stopCamera()
             viewModel.speechPerformer.stopSpeechSynthesis()
             viewModel.stopRemoteSource()
+            receiverViewModel?.disconnect()
+            receiverViewModel = nil
         }
         .onTapGesture{
             if viewModel.blackMode == 2 && viewModel.isBlack{

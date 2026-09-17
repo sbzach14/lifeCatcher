@@ -298,6 +298,20 @@ struct DeprecatedMainView: View {
                     .background(.green.opacity(0.82)).foregroundColor(.white)
                     .clipShape(RoundedRectangle(cornerRadius: 14))
             }
+            NavigationLink(destination: RecognitionEndpointHomeView(receivesRemoteAudio: true)) {
+                Label("识别-接收端", systemImage: "waveform.badge.mic")
+                    .font(.title2).frame(maxWidth: .infinity).padding()
+                    .background(.purple.opacity(0.82)).foregroundColor(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+            }
+            #if SHOW_RECOGNITION_MODE_SWITCH
+            NavigationLink(destination: RecognitionEndpointHomeView(isLocalEndpoint: true)) {
+                Label("本地端", systemImage: "iphone")
+                    .font(.title2).frame(maxWidth: .infinity).padding()
+                    .background(.orange.opacity(0.82)).foregroundColor(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 14))
+            }
+            #endif
             Spacer()
         }
         .padding(.horizontal, 30)
@@ -307,12 +321,15 @@ struct DeprecatedMainView: View {
 }
 
 struct RecognitionEndpointHomeView: View {
+    var isLocalEndpoint = false
+    var receivesRemoteAudio = false
+
     var body: some View {
         ZStack{
             //Image("Logo")
             VStack {
                 NavigationLink(
-                    destination: SettingRecordView(configType: 0)
+                    destination: SettingRecordView(configType: 0, receivesRemoteAudio: receivesRemoteAudio)
                 ) {
                     VStack(alignment: .leading) {
                         Text("历史记录(幻影界面)")
@@ -322,7 +339,7 @@ struct RecognitionEndpointHomeView: View {
                     .padding()
                 }
                 NavigationLink(
-                    destination: SettingRecordView(configType: 1)
+                    destination: SettingRecordView(configType: 1, receivesRemoteAudio: receivesRemoteAudio)
                 ) {
                     VStack(alignment: .leading) {
                         Text("历史记录(经典界面)")
@@ -332,7 +349,7 @@ struct RecognitionEndpointHomeView: View {
                     .padding()
                 }
                 NavigationLink(
-                    destination: DeprecatedInfoView()
+                    destination: DeprecatedInfoView(isLocalEndpoint: isLocalEndpoint, includesReceiverSettings: receivesRemoteAudio)
                 ) {
                     VStack(alignment: .leading) {
                         Text("功能设置")
@@ -352,6 +369,7 @@ struct RecognitionEndpointHomeView: View {
                 .scaledToFill()
                 .ignoresSafeArea()
         )
-        .navigationBarTitle("识别端")
+        .onAppear { RemotePreferences.recognitionMode = isLocalEndpoint ? .local : .remote }
+        .navigationBarTitle(isLocalEndpoint ? "本地端" : receivesRemoteAudio ? "识别-接收端" : "识别端")
     }
 }

@@ -80,9 +80,10 @@ struct InfoView: View {
 
 
 struct DeprecatedInfoView: View {
+    var isLocalEndpoint = false
+    var includesReceiverSettings = false
     @StateObject var viewModel = SettingViewModel()
     @State private var remoteRegion = RemotePreferences.sourceRegion
-    @AppStorage(RemotePreferenceKeys.recognitionMode) private var recognitionMode = RecognitionMode.remote.rawValue
     @AppStorage(RemotePreferenceKeys.videoFPS) private var remoteVideoFPS = 30
     @AppStorage(RemotePreferenceKeys.videoResolution) private var remoteVideoResolution = 720
     @AppStorage(RemotePreferenceKeys.videoLowPower) private var remoteVideoLowPower = false
@@ -90,14 +91,6 @@ struct DeprecatedInfoView: View {
     var body: some View {
         ScrollView {
         VStack{
-            #if SHOW_RECOGNITION_MODE_SWITCH
-            Picker("识别模式", selection: $recognitionMode) {
-                ForEach(RecognitionMode.allCases) { mode in Text(mode.title).tag(mode.rawValue) }
-            }
-            .pickerStyle(.segmented)
-            .padding(.horizontal)
-            #endif
-
             NavigationLink(frameRateTestTitle) {
                 FrameRateTestView(
                     isBackCamera: viewModel.isBackCamera,
@@ -107,6 +100,13 @@ struct DeprecatedInfoView: View {
                 )
             }
             .padding()
+
+            if includesReceiverSettings {
+                Divider().colorInvert()
+                NavigationLink("接收声音设置") { RemoteReceiverAudioSettingsView() }
+                    .foregroundColor(.white)
+                    .padding()
+            }
 
             Divider().colorInvert()
             if isLocalMode {
@@ -226,12 +226,7 @@ struct DeprecatedInfoView: View {
             
             Spacer()
         }
-        .onAppear {
-            #if !SHOW_RECOGNITION_MODE_SWITCH
-            recognitionMode = RecognitionMode.remote.rawValue
-            RemotePreferences.recognitionMode = .remote
-            #endif
-        }
+        .onAppear { RemotePreferences.recognitionMode = isLocalEndpoint ? .local : .remote }
         }
         .onDisappear{
             viewModel.updateConfigJSON()
@@ -246,11 +241,7 @@ struct DeprecatedInfoView: View {
     }
 
     private var isLocalMode: Bool {
-        #if SHOW_RECOGNITION_MODE_SWITCH
-        recognitionMode == RecognitionMode.local.rawValue
-        #else
-        false
-        #endif
+        isLocalEndpoint
     }
 
     private var frameRateTestTitle: String {

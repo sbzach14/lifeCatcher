@@ -8,9 +8,10 @@ MainMenuView
   ├─ History 按钮
   │   ├─ 未连登录服务 → LoginView
   │   ├─ AuthManager.isActive → DeprecatedMainView
-  │   │   ├─ SettingRecordView(configType: 0)
-  │   │   ├─ SettingRecordView(configType: 1)
-  │   │   └─ DeprecatedInfoView
+  │   │   ├─ 识别端 / 识别-接收端 / 本地端（后者仅 ModeSwitch/Auth Scheme）
+  │   │   │   ├─ SettingRecordView(configType: 0 / 1)
+  │   │   │   └─ DeprecatedInfoView
+  │   │   └─ 接收端 → RemoteReceiverConnectView
   │   └─ 已登录但未 active → HistoryView
   ├─ Information → InfoView
   └─ Account → LoginView
@@ -27,7 +28,7 @@ SettingRecordView
 ## 2. 页面职责
 
 - `MainMenuView`：根导航、语言、自动登录和基于授权状态的路由。
-- `InfoView`：设备/版本与入口信息；`DeprecatedInfoView` 隐藏本地/远程模式切换并在进入时固定为远程模式，显示服务器、LiveKit 720p/1080p、30/60 FPS 与远程帧率测试入口。详见 `remote-system.md` 第 8 节。
+- `InfoView`：设备/版本与入口信息；`DeprecatedInfoView` 根据当前角色显示远程服务器/LiveKit 或本地播报设置。识别-接收端额外提供接收声音设置入口，屏幕显示仍沿用识别相机的“相机图像/黑屏”选项。详见 `remote-system.md` 第 8 节。
 - `LoginView`：账号登录、注册 UI、激活/状态展示；包含与 MainView 重复的登录实现。
 - `RegisterView`：独立注册页实现，当前主登录页也自带注册逻辑。
 - `SettingRecordView`：用户方案列表、删除、新增/编辑。
@@ -35,7 +36,7 @@ SettingRecordView
 - `SettingRecordConfigView_leishen`：简化方案编辑。
 - `CurrentVisionObjectRecognitionView`：相机/黑屏/结果三种表面状态与相机设置 overlay。
 - `ShowResultView`：结构化规则结果展示和随机测试入口。
-- `AuthTestView`：管理接口测试页面，主菜单入口已注释，但源码仍编译。
+- `AuthTestView`：管理接口测试页面，仅 Auth Scheme 的主菜单显示入口；源码在其他方案中仍编译。
 
 ## 3. 普通采集历史细节
 

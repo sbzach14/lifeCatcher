@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingRecordConfigView_leishen: View{
     
     var selectedSaveIndex: Int
+    var receivesRemoteAudio = false
     @State private var initdone : Bool = false
     @State private var _selectedSaveIndex: Int = -1
     @State private var editType: Int = 0
@@ -489,7 +490,7 @@ struct SettingRecordConfigView_leishen: View{
                         dismissButton: .default(Text("OK"))
                     )
                 }.background(NavigationLink(destination:
-                                                CurrentVisionObjectRecognitionView(saveRuleIndex: self._selectedSaveIndex, configType: 1)
+                                                CurrentVisionObjectRecognitionView(saveRuleIndex: self._selectedSaveIndex, configType: 1, receivesRemoteAudio: receivesRemoteAudio)
                                                 ,
                                             isActive: $isNavigateToMainContentView,
                                             label: EmptyView.init).hidden()

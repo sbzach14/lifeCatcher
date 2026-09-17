@@ -152,6 +152,6 @@ SwiftUI 中大量资源按字符串查找，Xcode 不会在编译期验证拼写
 
 ## 本地/远程识别模式
 
-`RemotePreferences.recognitionMode` 使用 UserDefaults 的 `recognition.mode`，值为 `remote` / `local`；缺失或无效值默认为远程，兼容现有安装。仅决定识别端连接、本地音频与结果显示，不改变方案、接收端或 ROI/规则参数。功能设置提供切换；本地模式读取原 `config.json` 的音频与时间配置，远程运行时强制 timeMode=0，但两份设置写入流程不会把原保存的时间模式覆盖为 0。
+`RemotePreferences.recognitionMode` 使用 UserDefaults 的 `recognition.mode`，值为 `remote` / `local`；缺失或无效值默认为远程，兼容现有安装。仅决定识别端连接、本地音频与结果显示，不改变方案、接收端或 ROI/规则参数。进入识别端或识别-接收端时设为远程；进入本地端时设为本地。本地端读取原 `config.json` 的音频与时间配置，远程运行时强制 timeMode=0，但两份设置写入流程不会把原保存的时间模式覆盖为 0。
 
-归档提供三个共享 Scheme：`lifeCatcher` 保持当前发布界面并固定远程模式；`lifeCatcher-ModeSwitch` 通过 `SHOW_RECOGNITION_MODE_SWITCH` 显示识别端的本地/远程模式选择，并按模式切换帧率测试与对应设置；`lifeCatcher-Auth` 同时启用 `SHOW_RECOGNITION_MODE_SWITCH` 和 `SHOW_AUTH_TEST_ENTRY`，额外显示主页面到 `AuthTestView` 的入口。三者使用同一 Bundle ID，安装时会相互覆盖。
+归档提供三个共享 Scheme：`lifeCatcher` 提供识别端、接收端与识别-接收端；`lifeCatcher-ModeSwitch` 通过 `SHOW_RECOGNITION_MODE_SWITCH` 在同级额外显示本地端，而不在功能设置中切换；`lifeCatcher-Auth` 同时启用 `SHOW_RECOGNITION_MODE_SWITCH` 和 `SHOW_AUTH_TEST_ENTRY`，额外显示主页面到 `AuthTestView` 的入口。三者使用同一 Bundle ID，安装时会相互覆盖。

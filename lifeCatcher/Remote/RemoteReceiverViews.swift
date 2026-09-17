@@ -169,11 +169,6 @@ struct RemoteReceiverSessionView: View {
         .toolbar(isDisguiseVisible ? .hidden : .visible, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                NavigationLink { RemoteReceiverSettingsView() } label: {
-                    Image(systemName: "gearshape.fill")
-                }
-            }
-            ToolbarItem(placement: .topBarTrailing) {
                 Button("断开") { viewModel.disconnect() }
             }
         }
@@ -239,6 +234,7 @@ struct RemoteReceiverSessionView: View {
 }
 
 struct RemoteReceiverSettingsView: View {
+    var audioOnly = false
     @AppStorage(RemotePreferenceKeys.receiverSoundEnabled) private var soundEnabled = true
     @AppStorage(RemotePreferenceKeys.receiverVolume) private var volume: Double = 0.5
     @AppStorage(RemotePreferenceKeys.receiverVoiceRate) private var voiceRate: Double = 0.5
@@ -268,26 +264,28 @@ struct RemoteReceiverSettingsView: View {
                 settingSliderRow("语速", value: $voiceRate)
                 Divider().colorInvert()
 
-                settingPickerRow("屏幕显示", selection: $blackMode) {
-                    Text("无").tag(0)
-                    Text("正常黑屏（双击进入）").tag(1)
-                    Text("黑屏点击（双击进入，单击暂停）").tag(2)
-                }
-                Divider().colorInvert()
+                if !audioOnly {
+                    settingPickerRow("屏幕显示", selection: $blackMode) {
+                        Text("无").tag(0)
+                        Text("正常黑屏（双击进入）").tag(1)
+                        Text("黑屏点击（双击进入，单击暂停）").tag(2)
+                    }
+                    Divider().colorInvert()
 
-                settingPickerRow("时间模式", selection: $timeMode) {
-                    Text("无").tag(0)
-                    Text("HH:MM").tag(1)
-                    Text("HH:MM:SS").tag(2)
-                }
-                Divider().colorInvert()
+                    settingPickerRow("时间模式", selection: $timeMode) {
+                        Text("无").tag(0)
+                        Text("HH:MM").tag(1)
+                        Text("HH:MM:SS").tag(2)
+                    }
+                    Divider().colorInvert()
 
-                settingSliderRow("黑屏亮度", value: $brightness)
-                Divider().colorInvert()
+                    settingSliderRow("黑屏亮度", value: $brightness)
+                    Divider().colorInvert()
+                }
             }
         }
         .background(Image("Newbg2").resizable().scaledToFill().ignoresSafeArea())
-        .navigationTitle("接收端功能设置")
+        .navigationTitle(audioOnly ? "接收声音设置" : "接收端功能设置")
         .navigationBarTitleDisplayMode(.automatic)
         .onChange(of: soundEnabled) { _, value in RemotePreferences.receiverSoundEnabled = value }
         .onChange(of: volume) { _, value in RemotePreferences.receiverVolume = Float(value) }
@@ -324,4 +322,8 @@ struct RemoteReceiverSettingsView: View {
         .padding(.horizontal, 20)
         .frame(minHeight: 50)
     }
+}
+
+struct RemoteReceiverAudioSettingsView: View {
+    var body: some View { RemoteReceiverSettingsView(audioOnly: true) }
 }

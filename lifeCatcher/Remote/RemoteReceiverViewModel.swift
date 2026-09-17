@@ -52,7 +52,7 @@ final class RemoteReceiverViewModel: ObservableObject {
         updateClock()
     }
 
-    func connect(region: RemoteRegion, serial: String) async {
+    func connect(region: RemoteRegion, serial: String, receiveVideo: Bool = true) async {
         startTimer()
         audio.cancelAll()
         presentation = .empty
@@ -60,7 +60,7 @@ final class RemoteReceiverViewModel: ObservableObject {
         lastDeliverySeq = 0
         sourcePresence = .offline
         desktopPresence = .offline
-        displayMode = .video
+        displayMode = receiveVideo ? .video : .black
         targetSerial = serial.trimmingCharacters(in: .whitespacesAndNewlines)
         errorMessage = ""
         do {
@@ -69,6 +69,7 @@ final class RemoteReceiverViewModel: ObservableObject {
             guard !Task.isCancelled, !(error is CancellationError) else { return }
             errorMessage = RemoteDiagnostics.userMessage(for: error)
             client.markFailed(error)
+            if !receiveVideo { client.maintainConnectionAfterFailure() }
         }
     }
 

@@ -77,7 +77,7 @@ Resources            Core ML 模型、音频、图片、本地化资源
 - `ClassifierSettingArgs.selectDataset` → `ReportManager.DatasetReporter` → 对应数据集 `FindWinner`。
 - 输出包括每轮各玩家结果、剩余牌、语音片段与下一轮状态。
 
-核心入口先选择识别端或接收端。相机权限延迟到识别页面申请；接收端不申请相机权限，也不实例化核心识别 ViewModel。远程子系统通过输出桥接层旁路业务事件和按设置发送的 720p/1080p、30/60 FPS 视频，详情见 [`remote-system.md`](remote-system.md)。
+核心入口提供识别端、接收端、识别-接收端；ModeSwitch/Auth 归档方案还提供本地端。相机权限延迟到识别页面申请；纯接收端不申请相机权限，也不实例化核心识别 ViewModel。识别-接收端在本机相机识别和发送的同时，以同一序列号接收桌面转发的语音，不订阅本机视频。远程子系统通过输出桥接层旁路业务事件和按设置发送的 720p/1080p、30/60 FPS 视频，详情见 [`remote-system.md`](remote-system.md)。
 
 ## 5. 核心模块职责
 

@@ -4,6 +4,7 @@ import SwiftUI
 struct SettingRecordView: View {
     
     var configType : Int
+    var receivesRemoteAudio = false
     
     @State private var selectedRuleIndex: Int? = nil
     @State private var rules:[DatasetRule] = DetectSettingArgs.allUsersDatasetRule
@@ -19,7 +20,7 @@ struct SettingRecordView: View {
                             
                             if configType == 0{
                                 NavigationLink(
-                                    destination: SettingRecordConfigView(selectedSaveIndex: index)
+                                    destination: SettingRecordConfigView(selectedSaveIndex: index, receivesRemoteAudio: receivesRemoteAudio)
                                 ) {
                                     
                                     let name: String = rules[index].RuleName
@@ -51,7 +52,7 @@ struct SettingRecordView: View {
                             }
                             else{
                                 NavigationLink(
-                                    destination: SettingRecordConfigView_leishen(selectedSaveIndex: index)
+                                    destination: SettingRecordConfigView_leishen(selectedSaveIndex: index, receivesRemoteAudio: receivesRemoteAudio)
                                 ) {
                                     
                                     let name: String = rules[index].RuleName
@@ -100,7 +101,7 @@ struct SettingRecordView: View {
                             self.isNavigateToSelectDatasetView = true
                         }){
                             Image("icon_add").resizable().frame(width: 150, height: 60)
-                        }.background(NavigationLink(destination:SettingRecordConfigView(selectedSaveIndex: -1),
+                        }.background(NavigationLink(destination:SettingRecordConfigView(selectedSaveIndex: -1, receivesRemoteAudio: receivesRemoteAudio),
                                                     isActive: $isNavigateToSelectDatasetView,
                                                     label: EmptyView.init).hidden()
                         )
@@ -110,7 +111,7 @@ struct SettingRecordView: View {
                             self.isNavigateToSelectDatasetView = true
                         }){
                             Image("icon_add").resizable().frame(width: 150, height: 60)
-                        }.background(NavigationLink(destination:SettingRecordConfigView_leishen(selectedSaveIndex: -1),
+                        }.background(NavigationLink(destination:SettingRecordConfigView_leishen(selectedSaveIndex: -1, receivesRemoteAudio: receivesRemoteAudio),
                                                     isActive: $isNavigateToSelectDatasetView,
                                                     label: EmptyView.init).hidden()
                         )
