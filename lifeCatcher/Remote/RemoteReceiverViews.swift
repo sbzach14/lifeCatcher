@@ -106,7 +106,7 @@ struct RemoteReceiverConnectView: View {
                 .font(.caption)
                 .foregroundColor(region.isConfigured ? .green : .orange)
 
-                TextField("输入手机1序列号", text: $serial)
+                TextField("输入识别端序列号", text: $serial)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
                     .padding(12)
@@ -160,7 +160,7 @@ struct RemoteReceiverSessionView: View {
             if !isDisguiseVisible {
                 RemotePresenceStatusBar(items: [
                     RemotePresenceItem(label: "服务器", state: viewModel.serverPresence),
-                    RemotePresenceItem(label: "手机1", state: viewModel.sourcePresence),
+                    RemotePresenceItem(label: "识别端", state: viewModel.sourcePresence),
                     RemotePresenceItem(label: "桌面端", state: viewModel.desktopPresence)
                 ])
                 .padding(.top, 8)
@@ -193,7 +193,7 @@ struct RemoteReceiverSessionView: View {
                 Color.black
                 RemoteVideoSurface(subscriber: viewModel.videoSubscriber)
                 if viewModel.videoSubscriber.track == nil {
-                    Text(viewModel.sourceOnline ? "正在建立实时画面…" : "等待手机1上线")
+                    Text(viewModel.sourceOnline ? "正在建立实时画面…" : "等待识别端上线")
                         .foregroundColor(.white)
                 }
             }
@@ -234,11 +234,6 @@ struct RemoteReceiverSessionView: View {
 }
 
 struct RemoteReceiverSettingsView: View {
-    var audioOnly = false
-    @AppStorage(RemotePreferenceKeys.receiverSoundEnabled) private var soundEnabled = true
-    @AppStorage(RemotePreferenceKeys.receiverVolume) private var volume: Double = 0.5
-    @AppStorage(RemotePreferenceKeys.receiverVoiceRate) private var voiceRate: Double = 0.5
-    @AppStorage(RemotePreferenceKeys.receiverVoiceDevice) private var voiceDevice = 0
     @AppStorage(RemotePreferenceKeys.receiverBlackMode) private var blackMode = 0
     @AppStorage(RemotePreferenceKeys.receiverTimeMode) private var timeMode = 0
     @AppStorage(RemotePreferenceKeys.receiverBrightness) private var brightness: Double = 0.1
@@ -246,51 +241,28 @@ struct RemoteReceiverSettingsView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 0) {
-                Toggle("播放提示音和结果播报", isOn: $soundEnabled)
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 20)
-                    .frame(minHeight: 50)
-                Divider().colorInvert()
-
-                settingPickerRow("播放设备", selection: $voiceDevice) {
-                    Text("扬声器").tag(0)
-                    Text("耳机").tag(1)
+                RemoteReceiverAudioSettingsRows()
+                settingPickerRow("屏幕显示", selection: $blackMode) {
+                    Text("无").tag(0)
+                    Text("正常黑屏（双击进入）").tag(1)
+                    Text("黑屏点击（双击进入，单击暂停）").tag(2)
                 }
                 Divider().colorInvert()
 
-                settingSliderRow("音量", value: $volume)
-                Divider().colorInvert()
-
-                settingSliderRow("语速", value: $voiceRate)
-                Divider().colorInvert()
-
-                if !audioOnly {
-                    settingPickerRow("屏幕显示", selection: $blackMode) {
-                        Text("无").tag(0)
-                        Text("正常黑屏（双击进入）").tag(1)
-                        Text("黑屏点击（双击进入，单击暂停）").tag(2)
-                    }
-                    Divider().colorInvert()
-
-                    settingPickerRow("时间模式", selection: $timeMode) {
-                        Text("无").tag(0)
-                        Text("HH:MM").tag(1)
-                        Text("HH:MM:SS").tag(2)
-                    }
-                    Divider().colorInvert()
-
-                    settingSliderRow("黑屏亮度", value: $brightness)
-                    Divider().colorInvert()
+                settingPickerRow("时间模式", selection: $timeMode) {
+                    Text("无").tag(0)
+                    Text("HH:MM").tag(1)
+                    Text("HH:MM:SS").tag(2)
                 }
+                Divider().colorInvert()
+
+                settingSliderRow("黑屏亮度", value: $brightness)
+                Divider().colorInvert()
             }
         }
         .background(Image("Newbg2").resizable().scaledToFill().ignoresSafeArea())
-        .navigationTitle(audioOnly ? "接收声音设置" : "接收端功能设置")
+        .navigationTitle("接收端功能设置")
         .navigationBarTitleDisplayMode(.automatic)
-        .onChange(of: soundEnabled) { _, value in RemotePreferences.receiverSoundEnabled = value }
-        .onChange(of: volume) { _, value in RemotePreferences.receiverVolume = Float(value) }
-        .onChange(of: voiceRate) { _, value in RemotePreferences.receiverVoiceRate = Float(value) }
-        .onChange(of: voiceDevice) { _, value in RemotePreferences.receiverVoiceDevice = value }
         .onChange(of: blackMode) { _, value in RemotePreferences.receiverBlackMode = value }
         .onChange(of: timeMode) { _, value in RemotePreferences.receiverTimeMode = value }
         .onChange(of: brightness) { _, value in RemotePreferences.receiverBrightness = Float(value) }
@@ -324,6 +296,53 @@ struct RemoteReceiverSettingsView: View {
     }
 }
 
-struct RemoteReceiverAudioSettingsView: View {
-    var body: some View { RemoteReceiverSettingsView(audioOnly: true) }
+struct RemoteReceiverAudioSettingsRows: View {
+    @AppStorage(RemotePreferenceKeys.receiverSoundEnabled) private var soundEnabled = true
+    @AppStorage(RemotePreferenceKeys.receiverVolume) private var volume: Double = 0.5
+    @AppStorage(RemotePreferenceKeys.receiverVoiceRate) private var voiceRate: Double = 0.5
+    @AppStorage(RemotePreferenceKeys.receiverVoiceDevice) private var voiceDevice = 0
+
+    var body: some View {
+        Group {
+            Toggle("播放提示音和结果播报", isOn: $soundEnabled)
+                .foregroundColor(.white)
+                .padding(.horizontal, 20)
+                .frame(minHeight: 50)
+            Divider().colorInvert()
+
+            HStack {
+                Text("播放设备").foregroundColor(.white)
+                Spacer()
+                Picker("播放设备", selection: $voiceDevice) {
+                    Text("扬声器").tag(0)
+                    Text("耳机").tag(1)
+                }
+                .pickerStyle(.menu)
+            }
+            .padding(.horizontal, 20)
+            .frame(minHeight: 50)
+            Divider().colorInvert()
+
+            sliderRow("音量", value: $volume)
+            Divider().colorInvert()
+            sliderRow("语速", value: $voiceRate)
+            Divider().colorInvert()
+        }
+        .onChange(of: soundEnabled) { _, value in RemotePreferences.receiverSoundEnabled = value }
+        .onChange(of: volume) { _, value in RemotePreferences.receiverVolume = Float(value) }
+        .onChange(of: voiceRate) { _, value in RemotePreferences.receiverVoiceRate = Float(value) }
+        .onChange(of: voiceDevice) { _, value in RemotePreferences.receiverVoiceDevice = value }
+    }
+
+    private func sliderRow(_ title: String, value: Binding<Double>) -> some View {
+        HStack {
+            Text("\(title) \(String(format: "%.2f", value.wrappedValue))")
+                .foregroundColor(.white)
+                .frame(width: 115, alignment: .leading)
+            Slider(value: value, in: 0...1, step: 0.01)
+                .accentColor(.white)
+        }
+        .padding(.horizontal, 20)
+        .frame(minHeight: 50)
+    }
 }

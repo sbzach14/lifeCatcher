@@ -176,7 +176,7 @@ final class RemoteVideoPublisher: RoomDelegate {
         defer { connecting = false }
         do {
             if room.connectionState == .disconnected {
-                RemoteDiagnostics.record(.info, category: "video", message: "手机1正在连接媒体服务器")
+                RemoteDiagnostics.record(.info, category: "video", message: "识别端正在连接媒体服务器")
                 let credentials = try await client.requestMediaToken()
                 guard wanted, generation == currentGeneration else { return }
                 try await room.connect(url: credentials.serverUrl.absoluteString, token: credentials.participantToken)
@@ -208,7 +208,7 @@ final class RemoteVideoPublisher: RoomDelegate {
             retryAttempt = 0
             nextConnectAttemptAt = .distantPast
             lastReportedError = ""
-            RemoteDiagnostics.record(.success, category: "video", message: "手机1实时画面已开始发送（\(targetResolution)p\(targetFPS)）", toast: true)
+            RemoteDiagnostics.record(.success, category: "video", message: "识别端实时画面已开始发送（\(targetResolution)p\(targetFPS)）", toast: true)
         } catch {
             guard wanted, generation == currentGeneration else { return }
             stopPublishing()
@@ -250,7 +250,7 @@ final class RemoteVideoPublisher: RoomDelegate {
             if self.publication?.track == nil {
                 self.recoverPublishing(reason: "媒体网络已恢复但发布轨道不可用")
             } else {
-                RemoteDiagnostics.record(.success, category: "video", message: "手机1视频发送连接已自动恢复")
+                RemoteDiagnostics.record(.success, category: "video", message: "识别端视频发送连接已自动恢复")
             }
         }
     }

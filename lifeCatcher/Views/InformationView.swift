@@ -102,10 +102,7 @@ struct DeprecatedInfoView: View {
             .padding()
 
             if includesReceiverSettings {
-                Divider().colorInvert()
-                NavigationLink("接收声音设置") { RemoteReceiverAudioSettingsView() }
-                    .foregroundColor(.white)
-                    .padding()
+                RemoteReceiverAudioSettingsRows()
             }
 
             Divider().colorInvert()

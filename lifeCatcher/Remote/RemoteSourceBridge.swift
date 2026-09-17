@@ -80,7 +80,7 @@ final class RemoteSourceBridge: ObservableObject {
         activeSerial = nil
         currentOperationId = nil
         publishStatus()
-        RemoteDiagnostics.record(.info, category: "source", message: "手机1远程发送已停止")
+        RemoteDiagnostics.record(.info, category: "source", message: "识别端远程发送已停止")
     }
 
     func offerVideoFrame(_ frame: RemoteVideoFrame) {
@@ -181,7 +181,7 @@ final class RemoteSourceBridge: ObservableObject {
         case .receiverPresence(let presence):
             let previous = receiverPresence
             receiverPresence = presence
-            announcePresenceChange(label: "手机2", from: previous, to: presence)
+            announcePresenceChange(label: "接收端", from: previous, to: presence)
             publishStatus()
         case .desktopPresence(let presence):
             let previous = desktopPresence
@@ -232,7 +232,7 @@ final class RemoteSourceBridge: ObservableObject {
         onStatusChange?(state, receiverPresence, desktopPresence)
     }
 
-    /// 手机1只产生可视日志/toast；这里绝不触发音频 API。
+    /// 识别端只产生可视日志/toast；这里绝不触发音频 API。
     private func announcePresenceChange(label: String, from previous: RemotePresenceState, to current: RemotePresenceState) {
         guard previous != current else { return }
         let level: RemoteDiagnosticLevel

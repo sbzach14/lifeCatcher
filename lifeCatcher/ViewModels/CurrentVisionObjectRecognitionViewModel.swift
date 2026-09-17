@@ -4517,7 +4517,7 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
     }
 
     func performSpeechSynthesis(utterance: AVSpeechUtterance) {
-        // 远程版手机1的最终防线：即使上层以后漏掉 guard，也不允许本机或耳机 TTS。
+        // 远程版识别端的最终防线：即使上层以后漏掉 guard，也不允许本机或耳机 TTS。
         guard RemoteRecognitionPolicy.localAudioEnabled else { return }
         lock.lock()
         guard !isPlaying else {
@@ -4540,7 +4540,7 @@ class SpeechPerformer: NSObject, AVSpeechSynthesizerDelegate{
     }
     
     func performSpeechSynthesis(speakResultStruct: [[SpeakResultStruct]], repeatCnt: Int, isSeparate: Bool) {
-        // 手机2使用独立 RemoteReceiverAudioCoordinator，不经过这里。
+        // 接收端使用独立 RemoteReceiverAudioCoordinator，不经过这里。
         guard RemoteRecognitionPolicy.localAudioEnabled else { return }
         var emptyFlag = true
         for (turnIndex, turnResult) in speakResultStruct.enumerated() {

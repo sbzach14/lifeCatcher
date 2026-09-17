@@ -77,13 +77,13 @@ enum RemoteDiagnostics {
     nonisolated static func serverMessage(code: String?, fallback: String?) -> String {
         switch code {
         case "wrong_region": return "服务器区域不匹配，请检查所选服务器"
-        case "source_offline": return "目标手机1尚未连接当前服务器"
+        case "source_offline": return "目标识别端尚未连接当前服务器"
         case "slot_occupied": return "该序列号的当前角色已被另一台设备占用"
-        case "receiver_offline": return "手机2尚未连接，命令未发送"
+        case "receiver_offline": return "接收端尚未连接，命令未发送"
         case "invalid_resume": return "连接凭证已过期，正在重新建立连接"
         case "inactive_session": return "当前会话已经失效，正在重新连接"
         case "invalid_sequence": return "远程事件顺序不一致，正在重新同步"
-        case "invalid_source_session": return "手机1会话已变化，正在重新同步"
+        case "invalid_source_session": return "识别端会话已变化，正在重新同步"
         case "invalid_message": return "服务器拒绝了不符合协议的消息"
         case "rate_limited": return "连接请求过于频繁，请稍后重试"
         case "missing_token", "invalid_token": return "服务器认证失败，请重新连接"

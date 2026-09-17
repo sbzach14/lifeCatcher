@@ -110,11 +110,11 @@ final class RemoteReceiverViewModel: ObservableObject {
             sourcePresence = welcome.sourcePresence
             desktopPresence = welcome.desktopPresence
             if welcome.sourcePresence == .online {
-                RemoteDiagnostics.record(.success, category: "presence", message: "手机1已在线", toast: true)
+                RemoteDiagnostics.record(.success, category: "presence", message: "识别端已在线", toast: true)
             } else if welcome.sourcePresence == .reconnecting {
-                RemoteDiagnostics.record(.warning, category: "presence", message: "手机1正在重连，继续等待", toast: true)
+                RemoteDiagnostics.record(.warning, category: "presence", message: "识别端正在重连，继续等待", toast: true)
             } else {
-                RemoteDiagnostics.record(.warning, category: "presence", message: "已连接服务器，正在等待手机1上线", toast: true)
+                RemoteDiagnostics.record(.warning, category: "presence", message: "已连接服务器，正在等待识别端上线", toast: true)
             }
             if displayMode == .video && sourceOnline {
                 if mediaSessionChanged { Task { await videoSubscriber.resetSession(using: client) } }
@@ -127,7 +127,7 @@ final class RemoteReceiverViewModel: ObservableObject {
             if sourceSessionId != sessionId { lastDeliverySeq = 0 }
             sourceSessionId = sessionId
             sourcePresence = presence
-            announcePresenceChange(label: "手机1", from: previous, to: presence)
+            announcePresenceChange(label: "识别端", from: previous, to: presence)
             if presence == .online && displayMode == .video {
                 if mediaSessionChanged { Task { await videoSubscriber.resetSession(using: client) } }
                 else { Task { await videoSubscriber.connect(using: client) } }

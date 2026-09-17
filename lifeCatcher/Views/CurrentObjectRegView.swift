@@ -271,8 +271,8 @@ struct CurrentVisionObjectRecognitionView: View {
         .overlay(alignment: .top) {
             if RemotePreferences.sourceEnabled && !viewModel.isBlack {
                 RemotePresenceStatusBar(items: [
-                    RemotePresenceItem(label: "服务器", state: viewModel.remoteServerPresence),
-                    RemotePresenceItem(label: "手机2", state: viewModel.remoteReceiverPresence),
+                    RemotePresenceItem(label: receivesRemoteAudio ? "识别端" : "服务器", state: viewModel.remoteServerPresence),
+                    RemotePresenceItem(label: "接收端", state: viewModel.remoteReceiverPresence),
                     RemotePresenceItem(label: "桌面端", state: viewModel.remoteDesktopPresence)
                 ])
                 .padding(.top, 8)
