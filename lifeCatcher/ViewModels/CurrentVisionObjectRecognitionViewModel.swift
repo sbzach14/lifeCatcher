@@ -302,32 +302,30 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         }
     }
 
+    @MainActor
     func startRemoteSourceIfEnabled() {
         guard RemotePreferences.sourceEnabled else { return }
-        Task { @MainActor [weak self] in
-            guard let self else { return }
-            if self.remoteSourceBridge == nil {
-                let bridge = RemoteSourceBridge()
-                bridge.onStatusChange = { [weak self] state, receiver, desktop in
-                    guard let self else { return }
-                    switch state {
-                    case .connected: self.remoteServerPresence = .online
-                    case .connecting, .reconnecting: self.remoteServerPresence = .reconnecting
-                    case .idle, .failed: self.remoteServerPresence = .offline
-                    }
-                    self.remoteReceiverPresence = receiver
-                    self.remoteDesktopPresence = desktop
+        if remoteSourceBridge == nil {
+            let bridge = RemoteSourceBridge()
+            bridge.onStatusChange = { [weak self] state, receiver, desktop in
+                guard let self else { return }
+                switch state {
+                case .connected: self.remoteServerPresence = .online
+                case .connecting, .reconnecting: self.remoteServerPresence = .reconnecting
+                case .idle, .failed: self.remoteServerPresence = .offline
                 }
-                bridge.onAwaitShuffleCommand = { [weak self] in
-                    self?.resetToAwaitingShuffle()
-                }
-                bridge.onRecomputeCutCommand = { [weak self] cutCard in
-                    self?.recomputeRemoteResult(cutCard: cutCard)
-                }
-                self.remoteSourceBridge = bridge
+                self.remoteReceiverPresence = receiver
+                self.remoteDesktopPresence = desktop
             }
-            self.remoteSourceBridge?.startIfEnabled()
+            bridge.onAwaitShuffleCommand = { [weak self] in
+                self?.resetToAwaitingShuffle()
+            }
+            bridge.onRecomputeCutCommand = { [weak self] cutCard in
+                self?.recomputeRemoteResult(cutCard: cutCard)
+            }
+            remoteSourceBridge = bridge
         }
+        remoteSourceBridge?.startIfEnabled()
     }
 
     /// Resets only the current recognition session and keeps the selected rule/camera configuration.
@@ -390,14 +388,13 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         RemoteDiagnostics.record(.success, category: "source", message: "已按更正切牌重新计算并发送结果", toast: true)
     }
 
+    @MainActor
     func stopRemoteSource() {
-        Task { @MainActor [weak self] in
-            self?.remoteSourceBridge?.stop()
-            self?.remoteSourceBridge = nil
-            self?.remoteServerPresence = .offline
-            self?.remoteReceiverPresence = .offline
-            self?.remoteDesktopPresence = .offline
-        }
+        remoteSourceBridge?.stop()
+        remoteSourceBridge = nil
+        remoteServerPresence = .offline
+        remoteReceiverPresence = .offline
+        remoteDesktopPresence = .offline
     }
     
     // 在初始化时预计算变换矩阵

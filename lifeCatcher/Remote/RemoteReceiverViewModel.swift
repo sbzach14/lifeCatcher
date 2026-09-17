@@ -42,6 +42,7 @@ final class RemoteReceiverViewModel: ObservableObject {
         client.onStateChange = { [weak self] state in
             guard let self else { return }
             self.connectionState = state
+            if state != .connected { self.audio.cancelAll() }
             if state == .reconnecting {
                 self.videoSubscriber.disconnect()
             }
@@ -136,6 +137,7 @@ final class RemoteReceiverViewModel: ObservableObject {
         case .desktopPresence(let presence):
             let previous = desktopPresence
             desktopPresence = presence
+            if presence != .online { audio.cancelAll() }
             announcePresenceChange(label: "桌面端", from: previous, to: presence)
         case .receiverDelivery(let delivery):
             consume(delivery)
@@ -168,6 +170,12 @@ final class RemoteReceiverViewModel: ObservableObject {
     private func consume(_ delivery: RemoteReceiverDelivery) {
         guard delivery.deliverySeq > lastDeliverySeq else {
             RemoteDiagnostics.record(.info, category: "delivery", message: "忽略重复投递 #\(delivery.deliverySeq)")
+            acknowledge(delivery.deliverySeq)
+            return
+        }
+        if desktopPresence != .online {
+            lastDeliverySeq = delivery.deliverySeq
+            RemoteDiagnostics.record(.info, category: "delivery", message: "桌面端离线，忽略投递 #\(delivery.deliverySeq)")
             acknowledge(delivery.deliverySeq)
             return
         }

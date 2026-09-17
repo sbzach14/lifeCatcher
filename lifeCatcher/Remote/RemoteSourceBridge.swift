@@ -28,6 +28,8 @@ final class RemoteSourceBridge: ObservableObject {
     private var currentOperationId: UUID?
     private var activeRegion: RemoteRegion?
     private var activeSerial: String?
+    private var connectionTask: Task<Void, Never>?
+    private var connectionGeneration = 0
 
     init() {
         pending = outboxStore.load()
@@ -45,6 +47,7 @@ final class RemoteSourceBridge: ObservableObject {
 
     func startIfEnabled() {
         guard RemotePreferences.sourceEnabled else { return }
+        guard activeRegion == nil else { return }
         let serial = AuthManager.retrieveUUID()
         guard !serial.isEmpty else {
             RemoteDiagnostics.record(.error, category: "source", message: "无法读取本机序列号，远程连接未启动", toast: true)
@@ -57,7 +60,11 @@ final class RemoteSourceBridge: ObservableObject {
         }
         activeRegion = region
         activeSerial = serial
-        Task {
+        connectionGeneration += 1
+        let generation = connectionGeneration
+        connectionTask = Task {
+            defer { if connectionGeneration == generation { connectionTask = nil } }
+            guard !Task.isCancelled else { return }
             do {
                 try await client.connect(role: .source, region: region, serial: serial)
             } catch {
@@ -70,6 +77,9 @@ final class RemoteSourceBridge: ObservableObject {
     }
 
     func stop() {
+        connectionGeneration += 1
+        connectionTask?.cancel()
+        connectionTask = nil
         videoPublisher.stop()
         client.disconnect()
         state = .idle

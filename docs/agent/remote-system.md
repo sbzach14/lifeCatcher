@@ -70,6 +70,7 @@
 - 永久协议错误只隔离并删除对应远程 outbox 项，避免坏快照阻塞后续远程事件；会话或序号错误不丢事件，而是重连后按新 welcome 重派。两种路径都不回调或中断本地识别链。
 - start/success/failure 有 5 秒有效期；过期提示从 outbox 清理。presentation 不过期。
 - `RemoteBusinessClient` 使用 0.5 秒起、最高 30 秒的指数退避；同 `clientInstanceId` 在服务器租约内恢复同一角色槽。
+- 识别页重复出现不会重复启动 source/receiver 连接；退出页会取消尚未完成的连接，并在关闭 WebSocket 前尝试发送 `client.goodbye`，及时释放服务器角色槽。接收端业务连接断开或桌面端转为非 online 时停止本机待播内容，投递若在状态变化后抵达则确认并丢弃，不在桌面离线时补播。
 - LiveKit SDK 负责短时媒体网络重连；重连后若本地发布轨道没有恢复，或房间仍在线但 publication 已失去 track，手机1会清理旧发布并重新创建 buffer track。该恢复只重建视频发送，不重启识别状态机。
 - 手机1、手机2、桌面端可按任意顺序加入同一 `(region, serial)` 等待房间。welcome 给出三角色完整三态，后续 presence 用 online/reconnecting/offline 增量更新；reconnecting 不能当作在线投递或可用视频。
 - HTTP admission、媒体令牌和首条 WebSocket welcome 均有10秒超时；已连会话用15秒 ping、45秒无 pong 主动重连。

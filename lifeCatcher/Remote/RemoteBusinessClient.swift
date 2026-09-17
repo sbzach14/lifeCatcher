@@ -128,9 +128,24 @@ final class RemoteBusinessClient: ObservableObject {
         receiveTask = nil
         heartbeatTask?.cancel()
         heartbeatTask = nil
-        Task { try? await send(RemoteGoodbyeMessage()) }
-        webSocketTask?.cancel(with: .normalClosure, reason: nil)
+        let closingSocket = webSocketTask
         webSocketTask = nil
+        if let closingSocket {
+            Task {
+                let closeTimeout = Task {
+                    try? await Task.sleep(for: .seconds(1))
+                    closingSocket.cancel(with: .normalClosure, reason: nil)
+                }
+                if closingSocket.state == .running {
+                    let data = try? encoder.encode(RemoteGoodbyeMessage())
+                    if let data {
+                        try? await closingSocket.send(.string(String(decoding: data, as: UTF8.self)))
+                    }
+                }
+                closeTimeout.cancel()
+                closingSocket.cancel(with: .normalClosure, reason: nil)
+            }
+        }
         sessionToken = nil
         resumeToken = nil
         sourceOnline = false

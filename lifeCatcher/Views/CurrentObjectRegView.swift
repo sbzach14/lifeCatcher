@@ -297,6 +297,7 @@ struct CurrentVisionObjectRecognitionView: View {
             }
         }
         .onAppear {
+            guard startupTask == nil else { return }
             startupTask = Task { @MainActor in
                 let cameraGranted: Bool
                 switch AVCaptureDevice.authorizationStatus(for: .video) {
