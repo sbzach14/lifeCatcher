@@ -310,9 +310,7 @@ struct CurrentVisionObjectRecognitionView: View {
                     viewModel.initialize(saveRuleIndex: saveRuleIndex, configType: configType)
                 }
                 self.isAVCaptureActive = true
-                viewModel.isWorking = true
-                viewModel.isShowSingleFeature = false
-                viewModel.isCamereSetting = false
+                viewModel.prepareForRecognitionScreenEntry()
                 viewModel.prestartCamera()
                 viewModel.startRemoteSourceIfEnabled()
                 if receivesRemoteAudio {

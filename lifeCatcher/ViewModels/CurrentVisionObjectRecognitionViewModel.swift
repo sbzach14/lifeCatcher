@@ -333,6 +333,19 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         remoteSourceBridge?.startIfEnabled()
     }
 
+    /// Starts every recognition-screen visit as a fresh, actively running session.
+    /// This also clears a previous desktop-requested awaiting-shuffle marker when
+    /// SwiftUI reuses the same view model after navigating back to this screen.
+    @MainActor
+    func prepareForRecognitionScreenEntry() {
+        isWorking = true
+        remoteAwaitingShuffle = false
+        isShowSingleFeature = false
+        isCamereSetting = false
+        recognitionGeneration += 1
+        remoteSourceBridge?.updateControlState(recognitionPaused: false, awaitingShuffle: false)
+    }
+
     /// Resets only the current recognition session and keeps the selected rule/camera configuration.
     @MainActor
     func resetToAwaitingShuffle() {
@@ -4244,7 +4257,14 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     public func toggleWorking(){
         isWorking.toggle()
         if !isWorking { recognitionGeneration += 1 }
-        remoteSourceBridge?.updateControlState(recognitionPaused: !isWorking, awaitingShuffle: remoteAwaitingShuffle)
+        let recognitionPaused = !isWorking
+        let awaitingShuffle = remoteAwaitingShuffle
+        Task { @MainActor [weak self] in
+            self?.remoteSourceBridge?.updateControlState(
+                recognitionPaused: recognitionPaused,
+                awaitingShuffle: awaitingShuffle
+            )
+        }
         if isWorking{
             speakText(input: "开始")
         }
