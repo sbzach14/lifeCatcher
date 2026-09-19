@@ -323,6 +323,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             bridge.onRecomputeCutCommand = { [weak self] cutCard in
                 self?.recomputeRemoteResult(cutCard: cutCard)
             }
+            bridge.onRecognitionPausedCommand = { [weak self] paused in
+                self?.setRecognitionPaused(paused)
+            }
             remoteSourceBridge = bridge
         }
         remoteSourceBridge?.startIfEnabled()
@@ -386,6 +389,18 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 
         computeWinnerRC(isReset: true)
         RemoteDiagnostics.record(.success, category: "source", message: "已按更正切牌重新计算并发送结果", toast: true)
+    }
+
+    @MainActor
+    func setRecognitionPaused(_ paused: Bool) {
+        guard isWorking == paused else { return }
+        isWorking = !paused
+        if paused {
+            // Discard any inference that began before the pause command. Video
+            // publishing continues because it occurs before the isWorking gate.
+            recognitionGeneration += 1
+        }
+        RemoteDiagnostics.record(.success, category: "source", message: paused ? "识别已暂停" : "识别已开始", toast: true)
     }
 
     @MainActor
@@ -4216,6 +4231,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     
     public func toggleWorking(){
         isWorking.toggle()
+        if !isWorking { recognitionGeneration += 1 }
         if isWorking{
             speakText(input: "开始")
         }

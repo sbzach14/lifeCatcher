@@ -36,6 +36,7 @@ enum RemotePromptKind: String, Codable {
 enum RemoteSourceCommand: Equatable {
     case awaitShuffle
     case recomputeCut(Int)
+    case setRecognitionPaused(Bool)
 }
 
 struct RemoteUtterance: Codable, Equatable {
@@ -273,7 +274,7 @@ enum RemoteServerMessage: Decodable {
 
     private enum CodingKeys: String, CodingKey {
         case type, requestId, status, sourceEventSeq, deliverySeq, code, message
-        case online, state, sourceSessionId, event, replayed, historySeq, enabled, videoWanted, command, cutCard
+        case online, state, sourceSessionId, event, replayed, historySeq, enabled, videoWanted, command, cutCard, paused
         case clientTimeMs, serverTimeMs, resumeToken
     }
 
@@ -326,6 +327,7 @@ enum RemoteServerMessage: Decodable {
             switch try container.decode(String.self, forKey: .command) {
             case "awaitShuffle": self = .sourceCommand(.awaitShuffle)
             case "recomputeCut": self = .sourceCommand(.recomputeCut(try container.decode(Int.self, forKey: .cutCard)))
+            case "setRecognitionPaused": self = .sourceCommand(.setRecognitionPaused(try container.decode(Bool.self, forKey: .paused)))
             default:
                 throw DecodingError.dataCorruptedError(forKey: .command, in: container, debugDescription: "Unknown source command")
             }

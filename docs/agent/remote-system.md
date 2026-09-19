@@ -60,6 +60,8 @@
 
 桌面端还可针对当前 presentation 发送 `source.command { command: "recomputeCut", cutCard }`。识别端保留最近一次完成识别时的原始牌序，按当前切牌模式替换最后一条切牌记录并重新调用既有规则计算；计算结果仍由标准 presentation outbox 发送，因此桌面端会更新当前结果，开启自动转发时手机2也会收到重算结果。历史结果不能触发该命令。
 
+桌面端的识别开关发送 `source.command { command: "setRecognitionPaused", paused }`。暂停只关闭检测/分类处理并递增识别代次，使已排队的旧推理结果不能回写；相机采集和 LiveKit 画面继续运行。恢复后沿用暂停前的识别状态和已有结果继续处理。
+
 ## 4. 顺序、去重和重连
 
 - `operationId`：一次识别尝试。start 开启新操作；后续 success/failure/presentation 归入当前操作。

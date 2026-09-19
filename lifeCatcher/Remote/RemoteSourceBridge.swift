@@ -12,6 +12,7 @@ final class RemoteSourceBridge: ObservableObject {
     var onStatusChange: ((RemoteBusinessClient.State, RemotePresenceState, RemotePresenceState) -> Void)?
     var onAwaitShuffleCommand: (() -> Void)?
     var onRecomputeCutCommand: ((Int) -> Void)?
+    var onRecognitionPausedCommand: ((Bool) -> Void)?
 
     private struct AssignedEvent {
         let requestId: UUID
@@ -220,6 +221,9 @@ final class RemoteSourceBridge: ObservableObject {
             case .recomputeCut(let cutCard):
                 RemoteDiagnostics.record(.info, category: "source", message: "收到桌面端更正切牌指令", toast: true)
                 onRecomputeCutCommand?(cutCard)
+            case .setRecognitionPaused(let paused):
+                RemoteDiagnostics.record(.info, category: "source", message: paused ? "收到桌面端暂停识别指令" : "收到桌面端开始识别指令", toast: true)
+                onRecognitionPausedCommand?(paused)
             }
         case .error(let requestId, let code, let message):
             let readableMessage = RemoteDiagnostics.serverMessage(code: code, fallback: message)
