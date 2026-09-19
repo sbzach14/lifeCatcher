@@ -297,6 +297,7 @@ public class DetectSettingArgs{
     //初始化预设好的报法
     static func LoadAllReportRules(){
         allPreSetReportRules[0] = ReportClass.init(reportName: "[1]报最大", reportID: 0, rankReport: 0, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: -1, reportTarget: 0, singlefeaturesTransformation: -1, consecutiveReport: -1, positionToReport: -1, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, dealFormation: -1, cutSingleFeatureProcession: -1)
+        allPreSetReportRules[275] = ReportClass.init(reportName: "[9]报出所有并列最大", reportID: 275, rankReport: 8, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: -1, reportTarget: 0, singlefeaturesTransformation: -1, consecutiveReport: -1, positionToReport: -1, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, dealFormation: -1, cutSingleFeatureProcession: -1)
         allPreSetReportRules[1] = ReportClass.init(reportName: "[2]报最小", reportID: 1, rankReport: 3, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: -1, reportTarget: 0, singlefeaturesTransformation: -1, consecutiveReport: -1, positionToReport: -1, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, dealFormation: -1, cutSingleFeatureProcession: -1)
         allPreSetReportRules[2] = ReportClass.init(reportName: "[3]报最大次大", reportID: 2, rankReport: 1, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: -1, reportTarget: 0, singlefeaturesTransformation: -1, consecutiveReport: -1, positionToReport: -1, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, dealFormation: -1, cutSingleFeatureProcession: -1)
         allPreSetReportRules[3] = ReportClass.init(reportName: "[4]报最小次小", reportID: 3, rankReport: 4, aliveDeathReport: -1, pairReport: -1, drawPointReport: -1, ninePointReport: -1,  reportCutRange: -1, reportTarget: 0, singlefeaturesTransformation: -1, consecutiveReport: -1, positionToReport: -1, colorSingleFeaturePos: -1, hasSpecialSingleFeature: -1, specifiedRCHand: -1, differentDeal: -1, dealFormation: -1, cutSingleFeatureProcession: -1)
@@ -4084,5 +4085,4 @@ struct RankRulesSate {
     var isChecked: Bool
     
 }
-
 

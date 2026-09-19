@@ -114,7 +114,7 @@ PB 的方法名是大写 `GetMinSingleFeatureNum`，其余多数为小写；映�
 
 一个报法由多个整数开关组合，而不是独立类。关键维度：
 
-- `rankReport`：最大、最大次大、前三、最小、排名等。
+- `rankReport`：最大、最大次大、前三、最小、排名等；值 8 表示只报第一名分组中的所有并列最大玩家。
 - `aliveDeathReport`：活门/半活门/死门的输出。
 - `pairReport`、`DrawPointReport`、`NPReport`：对子、平点、九点统计。
 - `reportCutRange`：遍历上/下多少张、固定位置、范围切牌等。

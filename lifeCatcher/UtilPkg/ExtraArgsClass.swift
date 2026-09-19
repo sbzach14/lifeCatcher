@@ -12,6 +12,7 @@ struct ReportClass{
     //5，报排名（6名）
     //6，报大1大2，小1小2
     //7, 报原始排名4432
+    //8，报出所有并列最大
     var rankReport: Int = -1
     //0, 报活门
     //1，报活门半活门
@@ -480,6 +481,7 @@ class ReportManager{
         272:"[76-2]上10张去牌保有下活门报最大",
         273:"[8_3]:报排名活门对子",
         274:"[8_4]:看手牌报排名活门对子",
+        275:"[9]:报出所有并列最大",
     ]
     static let allReportInfo: [Int: String] = [
         0:"""
@@ -1536,6 +1538,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
         274:"""
         说明：在8-1报法的基础上加入看手牌，报 1张 23 活门4 对子 表示照牌是发牌的第一张
 最大次大家为第二家和第三家，有活门4 有对子。以此类推
+""",
+        275:"""
+报出所有并列第一的玩家；没有并列时只报唯一最大玩家。
 """,
         
     ]
@@ -3465,6 +3470,11 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
                                 for maxWinner in rankedWinnersInfo[0]{
                                     resultTargetPos.append(maxWinner.rcID)
                                 }
+                            //所有并列最大
+                            case 8:
+                                for maxWinner in rankedWinnersInfo[0]{
+                                    resultTargetPos.append(maxWinner.rcID)
+                                }
                             //最大次大
                             case 1:
                                 for i in 0..<min(rankedWinnersInfo.count, 2){
@@ -4870,6 +4880,9 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
             case 5:
                 validNum = 6
                 break
+            case 8:
+                validNum = rcNum
+                break
             default:
                 validNum = 6
             }
@@ -4932,7 +4945,7 @@ Y=21:发牌的第一家开始报，1最大，4最小。比如报 33214表示 第
 //            235: "[803]:固定第10张牌作色去色全部报最小次小",
 //            236: "[804]:固定第10张牌作色去色全部报排名",
         //报法格式 "1轮最大/最小 2轮最大/最小“
-        case 0...4, 168...172,174,177...186,193...201,203...206,214,216...229,232...236,261...264:
+        case 0...4, 168...172,174,177...186,193...201,203...206,214,216...229,232...236,261...264,275:
             
             for resultInfo in multipleReportResultInfo.singleResultList{
                 var reportString = ""
