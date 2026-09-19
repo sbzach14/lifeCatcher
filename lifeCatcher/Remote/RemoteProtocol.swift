@@ -371,6 +371,16 @@ struct RemoteSourceEventMessage: Encodable {
     let event: RemoteSourceEvent
 }
 
+struct RemoteSourceControlState: Encodable, Equatable {
+    let recognitionPaused: Bool
+    let awaitingShuffle: Bool
+}
+
+struct RemoteSourceStateMessage: Encodable {
+    let type = "source.state"
+    let state: RemoteSourceControlState
+}
+
 struct RemotePresenceMessage: Encodable {
     let type = "presence.update"
     let displayMode: String

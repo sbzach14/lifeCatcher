@@ -62,6 +62,8 @@
 
 桌面端的识别开关发送 `source.command { command: "setRecognitionPaused", paused }`。暂停只关闭检测/分类处理并递增识别代次，使已排队的旧推理结果不能回写；相机采集和 LiveKit 画面继续运行。恢复后沿用暂停前的识别状态和已有结果继续处理。
 
+暂停/继续与待洗牌控制均由识别端在实际执行后发送 `source.state`，包含 `recognitionPaused` 和 `awaitingShuffle`。服务器按 source 会话保存最后确认状态、实时推送桌面端，并在桌面重连的 welcome 中恢复；桌面不以命令已转交的 ACK 代替执行成功。进入稳定双框识别时，识别端自动把 `awaitingShuffle` 改回 false。旧识别端不发送该消息时，桌面显示“状态待确认”并禁用控制，避免凭本地默认值误报状态。
+
 ## 4. 顺序、去重和重连
 
 - `operationId`：一次识别尝试。start 开启新操作；后续 success/failure/presentation 归入当前操作。

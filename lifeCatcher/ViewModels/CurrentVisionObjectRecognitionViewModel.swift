@@ -91,6 +91,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     let saveImageQueue = DispatchQueue(label: "saveImageQueue", qos: .userInteractive, attributes: .concurrent)
     let detectionQueue = DispatchQueue(label: "detectionQueue", attributes: .concurrent)
     private var recognitionGeneration = 0
+    private var remoteAwaitingShuffle = false
     private var requiresPairForNextRecognition = false
     private var remoteRecomputableDeck: [Int] = []
     
@@ -327,6 +328,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 self?.setRecognitionPaused(paused)
             }
             remoteSourceBridge = bridge
+            bridge.updateControlState(recognitionPaused: !isWorking, awaitingShuffle: remoteAwaitingShuffle)
         }
         remoteSourceBridge?.startIfEnabled()
     }
@@ -342,12 +344,14 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         reloadingTime = 0
         detectNeedToCut = false
         requiresPairForNextRecognition = true
+        remoteAwaitingShuffle = true
         remoteRecomputableDeck = []
         initShuffle()
         initDetectResult()
         initBoxes()
         recognitionGeneration += 1
         state = "idle"
+        remoteSourceBridge?.updateControlState(recognitionPaused: false, awaitingShuffle: true)
         changeCameraFrameRate(to: idleRate)
         RemoteDiagnostics.record(.success, category: "source", message: "识别端已切换为待洗牌", toast: true)
     }
@@ -393,13 +397,17 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
 
     @MainActor
     func setRecognitionPaused(_ paused: Bool) {
-        guard isWorking == paused else { return }
+        guard isWorking == paused else {
+            remoteSourceBridge?.updateControlState(recognitionPaused: !isWorking, awaitingShuffle: remoteAwaitingShuffle)
+            return
+        }
         isWorking = !paused
         if paused {
             // Discard any inference that began before the pause command. Video
             // publishing continues because it occurs before the isWorking gate.
             recognitionGeneration += 1
         }
+        remoteSourceBridge?.updateControlState(recognitionPaused: paused, awaitingShuffle: remoteAwaitingShuffle)
         RemoteDiagnostics.record(.success, category: "source", message: paused ? "识别已暂停" : "识别已开始", toast: true)
     }
 
@@ -1115,6 +1123,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     
                     self.requiresPairForNextRecognition = false
                     self.state = "detecting"
+                    self.remoteAwaitingShuffle = false
+                    self.remoteSourceBridge?.updateControlState(recognitionPaused: false, awaitingShuffle: false)
                     
                     self.changeCameraFrameRate(to: Int(self.setFrameRate))
                 }
@@ -1660,6 +1670,8 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     self.initDetectResult()
                     
                     self.state = "detecting"
+                    self.remoteAwaitingShuffle = false
+                    self.remoteSourceBridge?.updateControlState(recognitionPaused: false, awaitingShuffle: false)
                     print("状态：重新进入识别")
                 }
                 else{
@@ -4232,6 +4244,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     public func toggleWorking(){
         isWorking.toggle()
         if !isWorking { recognitionGeneration += 1 }
+        remoteSourceBridge?.updateControlState(recognitionPaused: !isWorking, awaitingShuffle: remoteAwaitingShuffle)
         if isWorking{
             speakText(input: "开始")
         }

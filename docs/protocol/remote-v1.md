@@ -34,6 +34,14 @@ desktop.presence  { online, state }
 
 `state` 为 `online | reconnecting | offline`。reconnecting 表示角色槽处于断线租约宽限期，`online` 兼容字段此时为 false；客户端 UI 使用三态，但只有 online 可看实时画面或接收新命令。
 
+识别端在连接及控制状态变化后发送：
+
+```json
+{"type":"source.state","state":{"recognitionPaused":false,"awaitingShuffle":true}}
+```
+
+服务器把该状态推送桌面端，并在后续 desktop welcome 的可选 `sourceControlState` 字段中恢复。`source.command` 的 ACK 只表示服务器已转交；桌面必须以 `source.state` 作为手机实际执行暂停、继续或进入待洗牌的权威确认。识别端进入稳定双框识别后将 `awaitingShuffle` 置回 false。
+
 ## SourceEvent
 
 ```json
