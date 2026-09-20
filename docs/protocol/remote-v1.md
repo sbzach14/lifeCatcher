@@ -37,10 +37,10 @@ desktop.presence  { online, state }
 识别端在连接及控制状态变化后发送：
 
 ```json
-{"type":"source.state","state":{"recognitionPaused":false,"awaitingShuffle":true}}
+{"type":"source.state","state":{"recognitionPaused":false,"awaitingShuffle":false}}
 ```
 
-服务器把该状态推送桌面端，并在后续 desktop welcome 的可选 `sourceControlState` 字段中恢复。`source.command` 的 ACK 只表示服务器已转交；桌面必须以 `source.state` 作为手机实际执行暂停、继续或进入待洗牌的权威确认。识别端进入稳定双框识别后将 `awaitingShuffle` 置回 false。
+服务器把该状态推送桌面端，并在后续 desktop welcome 的可选 `sourceControlState` 字段中恢复。`recognitionPaused` 在当前客户端表示 `!isWorking`；`awaitingShuffle` 仅为 v1 旧端兼容且固定为 false。ACK 只表示服务器已转交，桌面必须以 `source.state` 作为识别端实际执行确认。
 
 ## SourceEvent
 
@@ -114,7 +114,7 @@ command 可为 `speakText`、`prompt` 或 `presentation`。桌面手动 prompt �
 - `forwarding.set`：desktop 改变手机2自动转发；
 - `presence.update`：receiver/desktop 上报展示模式及 videoWanted；
 - `source.control`：服务器将观看端 videoWanted 做 OR 后通知 source；
-- `source.command`：desktop 发送带 `requestId` 的 `awaitShuffle` 或带稳定牌编码 `cutCard` 的 `recomputeCut`。服务器验证手机1在线后转发给 source 并返回 ACK。前者清空当前会话并只等待稳定双框进入识别；后者以最近一次原始识别牌序替换切牌、按当前方案重新计算，并通过正常 presentation 链路发送新结果；
+- `source.command`：desktop 发送带 `requestId` 的 `setRecognitionPaused` 控制 `isWorking` 入口许可，或发送带稳定牌编码 `cutCard` 的 `recomputeCut`。服务器验证识别端在线后转发并返回 ACK；切牌重算通过正常 presentation 链路发送新结果；
 - `delivery.ack`：手机2确认收到；
 - `ping/pong`：业务心跳；
 - `client.goodbye`：主动释放角色槽。

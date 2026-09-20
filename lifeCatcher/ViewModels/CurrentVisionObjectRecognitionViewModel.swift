@@ -91,8 +91,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     let saveImageQueue = DispatchQueue(label: "saveImageQueue", qos: .userInteractive, attributes: .concurrent)
     let detectionQueue = DispatchQueue(label: "detectionQueue", attributes: .concurrent)
     private var recognitionGeneration = 0
-    private var remoteAwaitingShuffle = false
-    private var requiresPairForNextRecognition = false
     private var remoteRecomputableDeck: [Int] = []
     
     let lock = NSLock()
@@ -318,62 +316,34 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 self.remoteReceiverPresence = receiver
                 self.remoteDesktopPresence = desktop
             }
-            bridge.onAwaitShuffleCommand = { [weak self] in
-                self?.resetToAwaitingShuffle()
-            }
             bridge.onRecomputeCutCommand = { [weak self] cutCard in
                 self?.recomputeRemoteResult(cutCard: cutCard)
             }
-            bridge.onRecognitionPausedCommand = { [weak self] paused in
-                self?.setRecognitionPaused(paused)
+            bridge.onRecognitionWorkingCommand = { [weak self] working in
+                self?.setRecognitionWorking(working)
             }
             remoteSourceBridge = bridge
-            bridge.updateControlState(recognitionPaused: !isWorking, awaitingShuffle: remoteAwaitingShuffle)
+            bridge.updateWorkingState(isWorking)
         }
         remoteSourceBridge?.startIfEnabled()
     }
 
-    /// Starts every recognition-screen visit as a fresh, actively running session
-    /// that waits for a stable pair before beginning the next shuffle recognition.
+    /// Starts every recognition-screen visit as a fresh session that is allowed
+    /// to enter recognition when the existing ROI/state-machine conditions match.
     @MainActor
     func prepareForRecognitionScreenEntry() {
         isWorking = true
-        remoteAwaitingShuffle = true
         isShowSingleFeature = false
         isCamereSetting = false
         reloadingTime = 0
         detectNeedToCut = false
-        requiresPairForNextRecognition = true
         remoteRecomputableDeck = []
         initShuffle()
         initDetectResult()
         initBoxes()
         recognitionGeneration += 1
         state = "idle"
-        remoteSourceBridge?.updateControlState(recognitionPaused: false, awaitingShuffle: true)
-    }
-
-    /// Resets only the current recognition session and keeps the selected rule/camera configuration.
-    @MainActor
-    func resetToAwaitingShuffle() {
-        stopCurrentAudio()
-        speechPerformer.stopSpeechSynthesis()
-        isWorking = true
-        isShowSingleFeature = false
-        isCamereSetting = false
-        reloadingTime = 0
-        detectNeedToCut = false
-        requiresPairForNextRecognition = true
-        remoteAwaitingShuffle = true
-        remoteRecomputableDeck = []
-        initShuffle()
-        initDetectResult()
-        initBoxes()
-        recognitionGeneration += 1
-        state = "idle"
-        remoteSourceBridge?.updateControlState(recognitionPaused: false, awaitingShuffle: true)
-        changeCameraFrameRate(to: idleRate)
-        RemoteDiagnostics.record(.success, category: "source", message: "识别端已切换为待洗牌", toast: true)
+        remoteSourceBridge?.updateWorkingState(true)
     }
 
     /// Replaces the most recent visually recognized cut card and reruns the
@@ -416,19 +386,14 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     }
 
     @MainActor
-    func setRecognitionPaused(_ paused: Bool) {
-        guard isWorking == paused else {
-            remoteSourceBridge?.updateControlState(recognitionPaused: !isWorking, awaitingShuffle: remoteAwaitingShuffle)
+    func setRecognitionWorking(_ working: Bool) {
+        guard isWorking != working else {
+            remoteSourceBridge?.updateWorkingState(isWorking)
             return
         }
-        isWorking = !paused
-        if paused {
-            // Discard any inference that began before the pause command. Video
-            // publishing continues because it occurs before the isWorking gate.
-            recognitionGeneration += 1
-        }
-        remoteSourceBridge?.updateControlState(recognitionPaused: paused, awaitingShuffle: remoteAwaitingShuffle)
-        RemoteDiagnostics.record(.success, category: "source", message: paused ? "识别已暂停" : "识别已开始", toast: true)
+        isWorking = working
+        remoteSourceBridge?.updateWorkingState(working)
+        RemoteDiagnostics.record(.success, category: "source", message: working ? "已允许进入识别" : "已停止进入识别", toast: true)
     }
 
     @MainActor
@@ -792,7 +757,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
             return
         }
 
-        if !self.isBlack && !self.isShowSingleFeature && self.isWorking {
+        if !self.isBlack && !self.isShowSingleFeature {
             backgroundQueue.async {
                 do {
 //                    var rectList : [[Float]] = []
@@ -878,9 +843,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
         let recognitionGeneration = self.recognitionGeneration
     
         
-        if self.isWorking{
-            
-            self.detectionQueue.async {
+        self.detectionQueue.async {
                 
                 if targetArea.count == 4{
                     if isTargetArea{
@@ -910,7 +873,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         )
                     }
                 }
-            }
         }
         
         
@@ -1088,13 +1050,11 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                 else{
                     self.detectNeedToCut = false
                 }
-                let entryMatchesRequestedTarget = self.requiresPairForNextRecognition
-                    ? (detectNum == 2 && self.shuffleMode[0] != 0)
-                    : ((detectNum == 1 && (self.shuffleMode[1] != 0
-                                        || self.detectNeedToCut
-                                        || self.shuffleMode[0] == 2))
-                       || (detectNum == 2 && (self.shuffleMode[0] != 0 || self.detectNeedToCut)))
-                if entryMatchesRequestedTarget && stateCounter >= 1{
+                let entryMatchesRequestedTarget = (detectNum == 1 && (self.shuffleMode[1] != 0
+                                                                      || self.detectNeedToCut
+                                                                      || self.shuffleMode[0] == 2))
+                    || (detectNum == 2 && (self.shuffleMode[0] != 0 || self.detectNeedToCut))
+                if self.isWorking && entryMatchesRequestedTarget && stateCounter >= 1{
                     
                     self.reloadingTime = 0.2
                     
@@ -1141,10 +1101,7 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                         }
                     }
                     
-                    self.requiresPairForNextRecognition = false
                     self.state = "detecting"
-                    self.remoteAwaitingShuffle = false
-                    self.remoteSourceBridge?.updateControlState(recognitionPaused: false, awaitingShuffle: false)
                     
                     self.changeCameraFrameRate(to: Int(self.setFrameRate))
                 }
@@ -1690,10 +1647,6 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     self.initDetectResult()
                     
                     self.state = "detecting"
-                    if self.remoteAwaitingShuffle {
-                        self.remoteAwaitingShuffle = false
-                        self.remoteSourceBridge?.updateControlState(recognitionPaused: false, awaitingShuffle: false)
-                    }
                     print("状态：重新进入识别")
                 }
                 else{
@@ -4265,14 +4218,9 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
     
     public func toggleWorking(){
         isWorking.toggle()
-        if !isWorking { recognitionGeneration += 1 }
-        let recognitionPaused = !isWorking
-        let awaitingShuffle = remoteAwaitingShuffle
+        let working = isWorking
         Task { @MainActor [weak self] in
-            self?.remoteSourceBridge?.updateControlState(
-                recognitionPaused: recognitionPaused,
-                awaitingShuffle: awaitingShuffle
-            )
+            self?.remoteSourceBridge?.updateWorkingState(working)
         }
         if isWorking{
             speakText(input: "开始")

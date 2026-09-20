@@ -10,9 +10,8 @@ final class RemoteSourceBridge: ObservableObject {
     @Published private(set) var desktopPresence: RemotePresenceState = .offline
 
     var onStatusChange: ((RemoteBusinessClient.State, RemotePresenceState, RemotePresenceState) -> Void)?
-    var onAwaitShuffleCommand: (() -> Void)?
     var onRecomputeCutCommand: ((Int) -> Void)?
-    var onRecognitionPausedCommand: ((Bool) -> Void)?
+    var onRecognitionWorkingCommand: ((Bool) -> Void)?
 
     private struct AssignedEvent {
         let requestId: UUID
@@ -79,8 +78,10 @@ final class RemoteSourceBridge: ObservableObject {
         }
     }
 
-    func updateControlState(recognitionPaused: Bool, awaitingShuffle: Bool) {
-        controlState = RemoteSourceControlState(recognitionPaused: recognitionPaused, awaitingShuffle: awaitingShuffle)
+    func updateWorkingState(_ isWorking: Bool) {
+        // awaitingShuffle remains in the v1 envelope only so already-installed
+        // peers can decode source.state. It has no current product behavior.
+        controlState = RemoteSourceControlState(recognitionPaused: !isWorking, awaitingShuffle: false)
         sendControlStateIfConnected()
     }
 
@@ -238,14 +239,13 @@ final class RemoteSourceBridge: ObservableObject {
         case .sourceCommand(let command):
             switch command {
             case .awaitShuffle:
-                RemoteDiagnostics.record(.info, category: "source", message: "收到桌面端待洗牌指令", toast: true)
-                onAwaitShuffleCommand?()
+                RemoteDiagnostics.record(.warning, category: "source", message: "已忽略旧版桌面端待洗牌指令")
             case .recomputeCut(let cutCard):
                 RemoteDiagnostics.record(.info, category: "source", message: "收到桌面端更正切牌指令", toast: true)
                 onRecomputeCutCommand?(cutCard)
             case .setRecognitionPaused(let paused):
-                RemoteDiagnostics.record(.info, category: "source", message: paused ? "收到桌面端暂停识别指令" : "收到桌面端开始识别指令", toast: true)
-                onRecognitionPausedCommand?(paused)
+                RemoteDiagnostics.record(.info, category: "source", message: paused ? "收到桌面端停止进入识别指令" : "收到桌面端允许进入识别指令", toast: true)
+                onRecognitionWorkingCommand?(!paused)
             }
         case .error(let requestId, let code, let message):
             let readableMessage = RemoteDiagnostics.serverMessage(code: code, fallback: message)

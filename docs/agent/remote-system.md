@@ -12,7 +12,7 @@
 必须保持以下不变量：
 
 1. 识别、牌序恢复、`ClassifierSettingArgs.selectDataset` 和 `ReportManager` 的既有调用顺序不因网络成功或失败改变；远程模式下识别端的所有本地提示音与 TTS 禁用，本地模式按原播报设备设置输出。
-2. 网络输出只监听三个既有边界：`speakText(input: Int)` 的开始/成功/失败、最终 `speakText(input:[[SpeakResultStruct]],...)`、`captureOutput` 的原始帧旁路；输入侧接收桌面端 `awaitShuffle` 会话复位与 `recomputeCut` 切牌重算命令。
+2. 网络输出只监听三个既有边界：`speakText(input: Int)` 的开始/成功/失败、最终 `speakText(input:[[SpeakResultStruct]],...)`、`captureOutput` 的原始帧旁路；输入侧接收桌面端进入识别许可与 `recomputeCut` 切牌重算命令。
 3. 业务事件写入持久 outbox 后异步发送；网络异常不能阻塞识别线程。
 4. 大陆与新加坡是完全隔离的域和会话空间。outbox 项记录 region + serial，禁止切换区域后跨区补发。
 5. 权限模型仅为“知道当前序列号即可连接”，不要在本子系统自行增加账号、配对码或设备证明。
@@ -54,17 +54,15 @@
 
 `captureOutput` 从同一个 `CMSampleBuffer` 旁路给桥接层，随后原检测仍读取 pixel buffer。不要重新引入 `CMSampleBufferInvalidate`；异步消费者依赖 Core Foundation 对 pixel buffer 的引用生命周期。媒体层在主线程先限流/单飞，再在独立 utility 队列缩放，识别队列不等待它。
 
-### 桌面端待洗牌指令
-
-桌面端发送 `source.command { command: "awaitShuffle" }`，服务器只允许当前 desktop 角色调用，并要求同序列号手机1在线；服务器转发为同名 `source.command` 后向桌面请求返回 ACK。识别端收到后执行会话级复位，并等待稳定双框才重新进入识别。该指令不转发给手机2、不进入结果 outbox、不改变方案或相机设置。
+### 桌面端识别控制
 
 桌面端还可针对当前 presentation 发送 `source.command { command: "recomputeCut", cutCard }`。识别端保留最近一次完成识别时的原始牌序，按当前切牌模式替换最后一条切牌记录并重新调用既有规则计算；计算结果仍由标准 presentation outbox 发送，因此桌面端会更新当前结果，开启自动转发时手机2也会收到重算结果。历史结果不能触发该命令。
 
-桌面端的识别开关发送 `source.command { command: "setRecognitionPaused", paused }`。暂停只关闭检测/分类处理并递增识别代次，使已排队的旧推理结果不能回写；相机采集和 LiveKit 画面继续运行。恢复后沿用暂停前的识别状态和已有结果继续处理。
+桌面端的识别开关沿用 v1 `source.command { command: "setRecognitionPaused", paused }` 信封控制 `isWorking`。`isWorking=false` 只禁止状态机从 `idle` 进入 `detecting`；相机、LiveKit、全帧检测和已进入的120/240 FPS识别流程继续运行，也不改变帧率。`isWorking=true` 后恢复使用原入口条件，普通洗牌双框、横洗单框/双框 ROI、拨牌和切牌逻辑均不变。
 
-暂停/继续与待洗牌控制均由识别端在实际执行后发送 `source.state`，包含 `recognitionPaused` 和 `awaitingShuffle`。服务器按 source 会话保存最后确认状态、实时推送桌面端，并在桌面重连的 welcome 中恢复；桌面不以命令已转交的 ACK 代替执行成功。首次或重新进入识别界面时，识别端处于运行且待洗牌状态，必须等稳定双框才能开始本轮识别，并向桌面同步 `recognitionPaused: false`、`awaitingShuffle: true`；进入稳定双框识别后再自动把 `awaitingShuffle` 改回 false。旧识别端不发送该消息时，桌面显示“状态待确认”并禁用控制，避免凭本地默认值误报状态。
+识别端执行后发送 `source.state`，服务器保存并同步桌面。v1 信封中的 `recognitionPaused` 表示 `!isWorking`；`awaitingShuffle` 仅为旧端解码兼容而固定为 false，当前产品没有待洗牌状态或控制。桌面必须以 `source.state` 作为实际执行确认，不能以服务器转交 ACK 代替。
 
-`source.state` 只在控制状态实际变化时发送；连接或重连完成后强制补发一次当前状态。识别帧内重复进入同一检测状态不得逐帧发送该消息，避免控制消息占满 WebSocket 发送队列并阻塞牌序事件。
+`source.state` 只在 `isWorking` 实际变化时发送；连接或重连完成后强制补发一次当前状态。
 
 ## 4. 顺序、去重和重连
 
