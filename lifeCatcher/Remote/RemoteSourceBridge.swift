@@ -32,6 +32,7 @@ final class RemoteSourceBridge: ObservableObject {
     private var connectionTask: Task<Void, Never>?
     private var connectionGeneration = 0
     private var controlState = RemoteSourceControlState(recognitionPaused: false, awaitingShuffle: false)
+    private var lastSentControlState: RemoteSourceControlState?
 
     init() {
         pending = outboxStore.load()
@@ -83,12 +84,17 @@ final class RemoteSourceBridge: ObservableObject {
         sendControlStateIfConnected()
     }
 
-    private func sendControlStateIfConnected() {
+    private func sendControlStateIfConnected(force: Bool = false) {
         guard case .connected = client.state else { return }
+        guard force || lastSentControlState != controlState else { return }
         let message = RemoteSourceStateMessage(state: controlState)
+        lastSentControlState = controlState
         Task {
             do { try await client.send(message) }
-            catch { RemoteDiagnostics.record(.warning, category: "source", message: "识别控制状态同步失败，将在重连后重试") }
+            catch {
+                lastSentControlState = nil
+                RemoteDiagnostics.record(.warning, category: "source", message: "识别控制状态同步失败，将在重连后重试")
+            }
         }
     }
 
@@ -203,7 +209,7 @@ final class RemoteSourceBridge: ObservableObject {
             if mediaSessionChanged { videoPublisher.resetSession(wanted: welcome.videoWanted) }
             else { videoPublisher.setWanted(welcome.videoWanted) }
             publishStatus()
-            sendControlStateIfConnected()
+            sendControlStateIfConnected(force: true)
             flush()
         case .receiverPresence(let presence):
             let previous = receiverPresence

@@ -64,6 +64,8 @@
 
 暂停/继续与待洗牌控制均由识别端在实际执行后发送 `source.state`，包含 `recognitionPaused` 和 `awaitingShuffle`。服务器按 source 会话保存最后确认状态、实时推送桌面端，并在桌面重连的 welcome 中恢复；桌面不以命令已转交的 ACK 代替执行成功。首次或重新进入识别界面时，识别端处于运行且待洗牌状态，必须等稳定双框才能开始本轮识别，并向桌面同步 `recognitionPaused: false`、`awaitingShuffle: true`；进入稳定双框识别后再自动把 `awaitingShuffle` 改回 false。旧识别端不发送该消息时，桌面显示“状态待确认”并禁用控制，避免凭本地默认值误报状态。
 
+`source.state` 只在控制状态实际变化时发送；连接或重连完成后强制补发一次当前状态。识别帧内重复进入同一检测状态不得逐帧发送该消息，避免控制消息占满 WebSocket 发送队列并阻塞牌序事件。
+
 ## 4. 顺序、去重和重连
 
 - `operationId`：一次识别尝试。start 开启新操作；后续 success/failure/presentation 归入当前操作。

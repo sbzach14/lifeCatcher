@@ -1690,8 +1690,10 @@ class CurrentVisionObjectRecognitionViewModel: NSObject, ObservableObject, AVCap
                     self.initDetectResult()
                     
                     self.state = "detecting"
-                    self.remoteAwaitingShuffle = false
-                    self.remoteSourceBridge?.updateControlState(recognitionPaused: false, awaitingShuffle: false)
+                    if self.remoteAwaitingShuffle {
+                        self.remoteAwaitingShuffle = false
+                        self.remoteSourceBridge?.updateControlState(recognitionPaused: false, awaitingShuffle: false)
+                    }
                     print("状态：重新进入识别")
                 }
                 else{
